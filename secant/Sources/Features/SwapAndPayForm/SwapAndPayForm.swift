@@ -317,7 +317,7 @@ extension View {
 
                 RoundedRectangle(cornerRadius: Design.Radius._sm)
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                    .shimmer(true).clipShape(RoundedRectangle(cornerRadius: 6))
+                    .shimmer(true).clipShape(RoundedRectangle(cornerRadius: 0))
                     .frame(width: 50, height: 18)
                     .padding(.trailing, 4)
             }

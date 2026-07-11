@@ -79,8 +79,10 @@ struct ZashiFontModifier: ViewModifier {
             case .medium: return FontFamily.Inter.medium.name
             case .mediumItalic: return FontFamily.Inter.mediumItalic.name
             case .regular: return FontFamily.Inter.regular.name
-            case .semiBold: return FontFamily.Inter.semiBold.name
-            case .semiBoldItalic: return FontFamily.Inter.semiBoldItalic.name
+            // Zapp Swiss design: headings, titles, and CTAs are Black-weight, so the
+            // semantic semiBold weight resolves to Inter Black across all call sites.
+            case .semiBold: return FontFamily.Inter.black.name
+            case .semiBoldItalic: return FontFamily.Inter.blackItalic.name
             case .thin: return FontFamily.Inter.thin.name
             case .thinItalic: return FontFamily.Inter.thinItalic.name
             }

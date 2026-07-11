@@ -28,7 +28,7 @@ extension TransactionDetailsView {
                     .padding(.top, 2)
                     .padding(.bottom, 10)
                     .colorBackground(Design.Inputs.Default.bg.color(colorScheme))
-                    .cornerRadius(10)
+                    .cornerRadius(0)
                     .overlay {
                         if store.annotationToInput.isEmpty {
                             HStack {

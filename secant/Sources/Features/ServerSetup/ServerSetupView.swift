@@ -324,7 +324,7 @@ struct ServerSetupView: View {
             ZStack {
                 Asset.Colors.background.color
                     .frame(height: 72)
-                    .cornerRadius(32)
+                    .cornerRadius(0)
                     .shadow(color: .black.opacity(0.02), radius: 4, x: 0, y: -8)
 
                 let customLabel = String(localizable: .serverSetupCustom)
@@ -359,7 +359,7 @@ struct ServerSetupView: View {
                         ? Design.Btns.Primary.bgDisabled.color(colorScheme)
                         : Design.Btns.Primary.bg.color(colorScheme)
                     )
-                    .cornerRadius(10)
+                    .cornerRadius(0)
                     .screenHorizontalPadding()
                 }
                 .disabled(store.isUpdatingServer || !canSave)
@@ -399,7 +399,7 @@ struct ServerSetupView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 2)
             .zBackground(Design.Utility.SuccessGreen._50)
-            .cornerRadius(16)
+            .cornerRadius(0)
             .overlay {
                 RoundedRectangle(cornerRadius: Design.Radius._2xl)
                     .inset(by: 0.5)
@@ -419,7 +419,7 @@ struct ServerSetupView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 2)
         .zBackground(Design.Utility.WarningYellow._50)
-        .cornerRadius(16)
+        .cornerRadius(0)
         .overlay {
             RoundedRectangle(cornerRadius: Design.Radius._2xl)
                 .inset(by: 0.5)

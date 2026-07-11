@@ -227,7 +227,7 @@ extension ScanView {
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
                 .reverseMask(alignment: .topLeading) {
-                    RoundedRectangle(cornerRadius: 28)
+                    RoundedRectangle(cornerRadius: 0)
                         .frame(
                             width: frameSize.width,
                             height: frameSize.height,

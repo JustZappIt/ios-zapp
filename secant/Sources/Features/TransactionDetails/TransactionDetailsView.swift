@@ -680,7 +680,7 @@ extension TransactionDetailsView {
             .padding(.vertical, 12)
             .screenHorizontalPadding()
             .background {
-                CustomRoundedRectangle(corners: RowAppereance.bottom.corners, radius: 12)
+                CustomRoundedRectangle(corners: RowAppereance.bottom.corners, radius: 0)
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
             }
         }
@@ -713,7 +713,7 @@ extension TransactionDetailsView {
         .padding(.vertical, 12)
         .padding(.horizontal, 20)
         .background {
-            CustomRoundedRectangle(corners: rowAppereance.corners, radius: 12)
+            CustomRoundedRectangle(corners: rowAppereance.corners, radius: 0)
                 .fill(Design.Surfaces.bgSecondary.color(colorScheme))
         }
         .padding(.bottom, rowAppereance == .full || rowAppereance == .bottom ? 0 : 1)
@@ -735,7 +735,7 @@ extension TransactionDetailsView {
         .padding(.vertical, 12)
         .padding(.horizontal, 20)
         .background {
-            CustomRoundedRectangle(corners: rowAppereance.corners, radius: 12)
+            CustomRoundedRectangle(corners: rowAppereance.corners, radius: 0)
                 .fill(Design.Surfaces.bgSecondary.color(colorScheme))
         }
         .padding(.bottom, rowAppereance == .full || rowAppereance == .bottom ? 0 : 1)

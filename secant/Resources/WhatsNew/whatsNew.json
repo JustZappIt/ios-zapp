@@ -48,7 +48,7 @@
                 {
                     "title": "Added:",
                     "bulletpoints": [
-                        "Until now, balances and amounts in Zodl only displayed in US dollars. We added multi-currency support — pick your preferred fiat currency in Currency Conversion settings and on the Wallet Status Widget opt-in."
+                        "Until now, balances and amounts in Zapp only displayed in US dollars. We added multi-currency support — pick your preferred fiat currency in Currency Conversion settings and on the Wallet Status Widget opt-in."
                     ]
                 },
                 {
@@ -114,7 +114,7 @@
                 {
                     "title": "Added:",
                     "bulletpoints": [
-                        "Coinholder Polling lets you vote on Zcash governance privately, right from your Zodl and Keystone wallets."
+                        "Coinholder Polling lets you vote on Zcash governance privately, right from your Zapp and Keystone wallets."
                     ]
                 }
             ]
@@ -272,7 +272,7 @@
                 {
                     "title": "Changed:",
                     "bulletpoints": [
-                        "Zashi -> Zodl branding update - we rebranded Zashi to Zodl, without impacting the user experience. It’s a new brand for a new chapter, but everything else stays the same: the wallet, the team behind it, and our commitment to Zcash.",
+                        "Zashi -> Zapp branding update - we rebranded Zashi to Zapp, without impacting the user experience. It’s a new brand for a new chapter, but everything else stays the same: the wallet, the team behind it, and our commitment to Zcash.",
                         "This update comes with iOS 26 upgrade and liquid glass support.",
                         "We improved Swap/Pay UI details."
                     ]

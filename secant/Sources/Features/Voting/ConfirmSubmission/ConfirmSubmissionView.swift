@@ -340,9 +340,9 @@ struct ConfirmSubmissionView: View {
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 4)
+                            RoundedRectangle(cornerRadius: 0)
                                 .fill(Design.Surfaces.bgTertiary.color(colorScheme))
-                            RoundedRectangle(cornerRadius: 4)
+                            RoundedRectangle(cornerRadius: 0)
                                 .fill(Design.Text.primary.color(colorScheme))
                                 .frame(width: geo.size.width * progressInfo.progress)
                                 .animation(.easeInOut(duration: 0.3), value: progressInfo.progress)

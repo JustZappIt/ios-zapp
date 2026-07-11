@@ -374,19 +374,20 @@ public enum Design: Colorable {
 
     // MARK: - Corner Radius Constants
     
+    // Zapp Swiss design: sharp corners everywhere, so every radius token resolves to 0.
     public enum Radius {
         public static let _none: CGFloat = 0
-        public static let _xxs: CGFloat = 2
-        public static let _xs: CGFloat = 4
-        public static let _sm: CGFloat = 6
-        public static let _md: CGFloat = 8
-        public static let _lg: CGFloat = 10
-        public static let _xl: CGFloat = 12
-        public static let _2xl: CGFloat = 16
-        public static let _3xl: CGFloat = 20
-        public static let _4xl: CGFloat = 24
-        public static let _5xl: CGFloat = 32
-        public static let _full: CGFloat = 9999
+        public static let _xxs: CGFloat = 0
+        public static let _xs: CGFloat = 0
+        public static let _sm: CGFloat = 0
+        public static let _md: CGFloat = 0
+        public static let _lg: CGFloat = 0
+        public static let _xl: CGFloat = 0
+        public static let _2xl: CGFloat = 0
+        public static let _3xl: CGFloat = 0
+        public static let _4xl: CGFloat = 0
+        public static let _5xl: CGFloat = 0
+        public static let _full: CGFloat = 0
     }
     
     // MARK: - Spacing Constants
@@ -485,11 +486,13 @@ public extension Design.Text {
     }
 }
 
+// Zapp Swiss design: the accent is the single call-to-action color, so the primary
+// button resolves to the brand accent with on-accent foregrounds in both schemes.
 public extension Design.Btns.Primary {
     func color(_ colorScheme: ColorScheme) -> Color {
         switch self {
-        case .bg: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.Base.bone.color, colorScheme)
-        case .bgHover: return Design.col(Asset.Colors.ZDesign.gray900.color, Asset.Colors.ZDesign.gray100.color, colorScheme)
+        case .bg: return Design.col(Asset.Colors.ZDesign.Base.brand.color, Asset.Colors.ZDesign.Base.brand.color, colorScheme)
+        case .bgHover: return Design.col(Asset.Colors.ZDesign.brand600.color, Asset.Colors.ZDesign.brand600.color, colorScheme)
         case .fg: return Design.col(Asset.Colors.ZDesign.Base.bone.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
         case .bgDisabled: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
         case .fgDisabled: return Design.col(Asset.Colors.ZDesign.gray500.color, Asset.Colors.ZDesign.shark500.color, colorScheme)
@@ -497,18 +500,20 @@ public extension Design.Btns.Primary {
     }
 }
 
+// Zapp Swiss design: the secondary button is a flat surface-alt block, so its border
+// resolves to the background color (visually borderless) per the ZappButton spec.
 public extension Design.Btns.Secondary {
     func color(_ colorScheme: ColorScheme) -> Color {
         switch self {
-        case .bg: return Design.col(Asset.Colors.ZDesign.Base.bone.color, Asset.Colors.ZDesign.Base.midnight.color, colorScheme)
-        case .bgHover: return Design.col(Asset.Colors.ZDesign.gray50.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
+        case .bg: return Design.col(Asset.Colors.ZDesign.Base.concrete.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
+        case .bgHover: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark800.color, colorScheme)
         case .fg: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.shark50.color, colorScheme)
         case .fgHover: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.shark50.color, colorScheme)
-        case .border: return Design.col(Asset.Colors.ZDesign.gray200.color, Asset.Colors.ZDesign.shark700.color, colorScheme)
-        case .borderHover: return Design.col(Asset.Colors.ZDesign.gray200.color, Asset.Colors.ZDesign.shark600.color, colorScheme)
+        case .border: return Design.col(Asset.Colors.ZDesign.Base.concrete.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
+        case .borderHover: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark800.color, colorScheme)
         case .bgDisabled: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
         case .fgDisabled: return Design.col(Asset.Colors.ZDesign.gray500.color, Asset.Colors.ZDesign.shark500.color, colorScheme)
-        case .disabledStroke: return Design.col(Asset.Colors.ZDesign.gray200.color, Asset.Colors.ZDesign.shark800.color, colorScheme)
+        case .disabledStroke: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
         }
     }
 }
@@ -569,10 +574,10 @@ public extension Design.Btns.Destructive2 {
 public extension Design.Btns.Brand {
     func color(_ colorScheme: ColorScheme) -> Color {
         switch self {
-        case .bg: return Design.col(Asset.Colors.ZDesign.brand400.color, Asset.Colors.ZDesign.brand400.color, colorScheme)
-        case .bgHover: return Design.col(Asset.Colors.ZDesign.brand300.color, Asset.Colors.ZDesign.brand300.color, colorScheme)
-        case .fg: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
-        case .fgHover: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
+        case .bg: return Design.col(Asset.Colors.ZDesign.Base.brand.color, Asset.Colors.ZDesign.Base.brand.color, colorScheme)
+        case .bgHover: return Design.col(Asset.Colors.ZDesign.brand600.color, Asset.Colors.ZDesign.brand600.color, colorScheme)
+        case .fg: return Design.col(Asset.Colors.ZDesign.Base.bone.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
+        case .fgHover: return Design.col(Asset.Colors.ZDesign.Base.bone.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
         case .bgDisabled: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
         case .fgDisabled: return Design.col(Asset.Colors.ZDesign.gray500.color, Asset.Colors.ZDesign.shark500.color, colorScheme)
         }

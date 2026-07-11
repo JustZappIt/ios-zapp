@@ -158,7 +158,7 @@ struct WalletBalancesView: View {
                                     .stroke(Design.Surfaces.strokePrimary.color(colorScheme))
                                     .background {
                                         Design.Surfaces.bgSecondary.color(colorScheme)
-                                            .cornerRadius(10)
+                                            .cornerRadius(0)
                                     }
                             }
                         } else {

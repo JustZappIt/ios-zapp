@@ -68,7 +68,7 @@ struct ZashiButton<PrefixContent, AccessoryContent>: View where PrefixContent: V
                 }
 
                 Text(title)
-                    .font(.custom(FontFamily.Inter.semiBold.name, size: fontSize))
+                    .font(.custom(FontFamily.Inter.black.name, size: fontSize))
                     .fixedSize()
                     .minimumScaleFactor(0.5)
                 

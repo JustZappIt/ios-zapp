@@ -837,7 +837,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.electriccoin.zodlTests;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.justzappit.zapp.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG UNREDACTED";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -859,7 +859,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.electriccoin.zodlTests;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.justzappit.zapp.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/zodl-internal.app/zodl-internal";
@@ -888,7 +888,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.ecc.zashi-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.testnet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG UNREDACTED SECANT_TESTNET";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -917,7 +917,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.ecc.zashi-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.testnet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SECANT_TESTNET;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -946,7 +946,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.ecc.zashi-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.testnet";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SECANT_TESTNET;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -976,7 +976,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-mainnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG UNREDACTED SECANT_MAINNET";
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = NO;
@@ -1015,7 +1015,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-mainnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SECANT_MAINNET;
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = NO;
@@ -1106,7 +1106,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.electriccoin.zodlTests;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.justzappit.zapp.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/zodl-internal.app/zodl-internal";
@@ -1134,7 +1134,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-mainnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SECANT_MAINNET SECANT_DISTRIB";
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = NO;
@@ -1174,7 +1174,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.internal";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG UNREDACTED SECANT_MAINNET";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1203,7 +1203,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.internal";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SECANT_MAINNET;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1232,7 +1232,7 @@
 				);
 				MARKETING_VERSION = 3.7.2;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "co.electriccoin.secant-testnet";
+				PRODUCT_BUNDLE_IDENTIFIER = "xyz.justzappit.zapp.internal";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = SECANT_MAINNET;
 				TARGETED_DEVICE_FAMILY = 1;

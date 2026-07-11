@@ -303,10 +303,10 @@ struct DelegationSigningView: View {
                     .padding(.vertical, 2)
                     .padding(.horizontal, 8)
                     .background {
-                        Capsule()
+                        Rectangle()
                             .fill(Design.Utility.HyperBlue._50.color(colorScheme))
                             .overlay {
-                                Capsule()
+                                Rectangle()
                                     .stroke(Design.Utility.HyperBlue._200.color(colorScheme), lineWidth: 1)
                             }
                     }
@@ -314,9 +314,9 @@ struct DelegationSigningView: View {
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    Capsule()
+                    Rectangle()
                         .fill(Design.Surfaces.bgQuaternary.color(colorScheme))
-                    Capsule()
+                    Rectangle()
                         .fill(Design.Text.primary.color(colorScheme))
                         .frame(width: geometry.size.width * Self.signingProgress(signed: signed, total: total))
                 }
