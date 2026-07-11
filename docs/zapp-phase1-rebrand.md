@@ -212,7 +212,9 @@ xcstrings values, WhatsNew json, `DesignSystem.swift`, and this note + CHANGELOG
 
 ## D. Verification
 
-- BUILD_RESULT_PLACEHOLDER
+- `xcodebuild -project secant.xcodeproj -scheme zodl-internal build` (iOS Simulator
+  destination): **BUILD SUCCEEDED** (verified on the Phase 2 branch, which includes all
+  Phase 1 changes; the original Phase 1 verification build was interrupted by a full disk).
 - SwiftGen/SwiftLint are not installed on this machine. Both build phases degrade to
   warnings when the binaries are absent, and upstream ships the `swiftlint lint`
   invocations commented out in the build phase, so the phase passes vacuously.

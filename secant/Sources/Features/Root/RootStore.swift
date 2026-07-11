@@ -63,6 +63,9 @@ struct Root {
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var homeState: Home.State = .initial
         var isLockedInKeychainUnavailableState = false
+        /// Zapp fork: true while the create-wallet onboarding path shows the
+        /// seed-phrase reveal before landing at home (Android WALLET_SEED analog).
+        var isOnboardingSeedRevealShown = false
         var isRestoringWallet = false
         @Shared(.appStorage(.lastAuthenticationTimestamp)) var lastAuthenticationTimestamp: Int = 0
         var maxResetZashiAppAttempts = ResetZashiConstants.maxResetZashiAppAttempts
@@ -127,6 +130,12 @@ struct Root {
         /// before the project compiles.
         var isSensitiveFlowActive: Bool {
             if signWithKeystoneCoordFlowBinding { return true }
+            // Zapp fork: Settings is mounted as the You tab, so the voting flow
+            // (presented from inside Settings) can run while `path == nil`. Its
+            // broadcasts must not be interrupted by an automatic server switch,
+            // so gate on the presentation state directly - the `.settings` path
+            // classification below still covers the legacy entry.
+            if settingsState.votingCoordFlow != nil { return true }
             guard let path else { return false }
             switch path {
             // The voting flow has no `Path` case of its own — it is presented from inside Settings
@@ -262,7 +271,11 @@ struct Root {
 
         // Swap API Acccess
         case loadSwapAPIAccess
-        
+        // Zapp fork: Android parity - the balance hero sources its USD figure
+        // from the 1-Click swap asset catalog (EnsureSwapAssetsLoaded analog).
+        case ensureSwapAssetsLoaded
+        case swapAssetsLoaded(IdentifiedArrayOf<SwapAsset>)
+
         // Auto-update Swaps
         case attemptToCheckSwapStatus(Bool)
         case autoUpdateCandidatesSwapDetails(SwapDetails)
@@ -473,6 +486,24 @@ struct Root {
 
             case .onboarding(.newWalletSuccessfulyCreated):
                 return .send(.initialization(.initializeSDK(.newWallet)))
+
+            case .home(.onAppear):
+                // Zapp fork: keep the swap asset catalog warm so the wallet
+                // tab's fiat hero has a USD price without the exchange-rate
+                // opt-in, mirroring Android's EnsureSwapAssetsLoadedUseCase.
+                return .send(.ensureSwapAssetsLoaded)
+
+            case .ensureSwapAssetsLoaded:
+                guard state.swapAssets.isEmpty else { return .none }
+                return .run { send in
+                    if let assets = try? await swapAndPay.swapAssets(), !assets.isEmpty {
+                        await send(.swapAssetsLoaded(assets))
+                    }
+                }
+
+            case .swapAssetsLoaded(let assets):
+                state.$swapAssets.withLock { $0 = assets }
+                return .none
 
             case .refreshAutomaticServer:
                 // Skip during a background task, and while the user is on the Server Setup

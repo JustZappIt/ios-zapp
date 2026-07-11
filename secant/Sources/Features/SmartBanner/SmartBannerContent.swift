@@ -9,12 +9,14 @@ import SwiftUI
 import ComposableArchitecture
 
 extension SmartBannerView {
+    // Zapp fork: banner text on the flat obsidian panel - bone primary,
+    // warm muted secondary (dark-mode text ramp).
     func titleStyle() -> Color {
-        Design.Utility.Purple._50.color(.light)
+        Asset.Colors.ZDesign.Base.bone.color
     }
 
     func infoStyle() -> Color {
-        Design.Utility.Purple._200.color(.light)
+        Asset.Colors.ZDesign.shark400.color
     }
 
     @ViewBuilder func priorityContent() -> some View {

@@ -7,6 +7,8 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Changed
+- [ZAPP-2] New app shell: a persistent bottom navigation pill with Pay and You tabs replaces the old home screen navigation. The Pay tab shows your balance with a history chart (24h, 1w, 1m, All), live sync status, recent activity, and a quick-action button for Send, Receive, Scan, and Swap. The You tab gathers your settings in tidy groups.
+- [ZAPP-2] Creating a new wallet now shows your recovery phrase right away so you can back it up before you start using the app.
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
 - [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and Black-weight headings, titles, and buttons in both light and dark mode.
 

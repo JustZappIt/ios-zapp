@@ -98,16 +98,12 @@ private extension RootView {
 
                 case .home:
                     ZStack {
-                        // Home view
-                        NavigationStack {
-                            HomeView(
-                                store: store.scope(
-                                    state: \.homeState,
-                                    action: \.home
-                                ),
-                                tokenName: tokenName
-                            )
-                        }
+                        // Zapp fork: persistent tabs shell replaces the
+                        // Home-rooted NavigationStack (see docs/zapp-phase2-shell.md).
+                        ZappTabsView(
+                            store: store,
+                            tokenName: tokenName
+                        )
                         .offset(x: store.path == nil ? 0 : -200)
                         .onChange(of: store.path) { value in
                             if value == nil {
@@ -267,14 +263,28 @@ private extension RootView {
                     }
 
                 case .onboarding:
-                    RestoreWalletCoordFlowView(
-                        store: store.scope(
-                            state: \.onboardingState,
-                            action: \.onboarding
+                    // Zapp fork: after "create new wallet" the seed phrase is
+                    // revealed before landing at home, mirroring Android's
+                    // WALLET_SEED onboarding step.
+                    if store.isOnboardingSeedRevealShown {
+                        NavigationStack {
+                            RecoveryPhraseDisplayView(
+                                store: store.scope(
+                                    state: \.phraseDisplayState,
+                                    action: \.phraseDisplay
+                                )
+                            )
+                        }
+                    } else {
+                        RestoreWalletCoordFlowView(
+                            store: store.scope(
+                                state: \.onboardingState,
+                                action: \.onboarding
+                            )
                         )
-                    )
-                    .overlayedWithSplash(store.splashAppeared) {
-                        store.send(.splashRemovalRequested)
+                        .overlayedWithSplash(store.splashAppeared) {
+                            store.send(.splashRemovalRequested)
+                        }
                     }
 
                 case .welcome:

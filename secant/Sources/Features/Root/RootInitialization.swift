@@ -467,11 +467,15 @@ extension Root {
 
                 state.appInitializationState = .initialized
                 let isAtDeeplinkWarningScreen = state.destinationState.destination == .deeplinkWarning
+                // Zapp fork: while the create-path seed reveal is on screen the
+                // wallet already reads as initialized, so this must not route to
+                // home - the reveal's own buttons do that (RootView .onboarding).
+                let isAtSeedReveal = state.isOnboardingSeedRevealShown
 
                 return .run { send in
                     // Delay the splash overlay dismissal
                     try await mainQueue.sleep(for: .seconds(0.5))
-                    if !isAtDeeplinkWarningScreen {
+                    if !isAtDeeplinkWarningScreen && !isAtSeedReveal {
                         await send(.destination(.updateDestination(Root.DestinationState.Destination.home)))
                     }
                 }
@@ -692,8 +696,22 @@ extension Root {
                 state.alert = AlertState.wipeFailed(Int32.max)
                 return .cancel(id: state.SynchronizerCancelId)
 
-            case .phraseDisplay(.finishedTapped), .onboarding(.newWalletSuccessfulyCreated):
+            case .phraseDisplay(.finishedTapped),
+                 .phraseDisplay(.seedSavedTapped),
+                 .phraseDisplay(.remindMeLaterTapped):
+                state.isOnboardingSeedRevealShown = false
                 state.destinationState.destination = .home
+                return .none
+
+            case .onboarding(.newWalletSuccessfulyCreated):
+                // Zapp fork: reveal the seed phrase before landing at home
+                // (Android WALLET_SEED analog); SDK initialization proceeds in
+                // parallel via the combinedCore handler for this action. The
+                // backup reminder stays active until the user completes the
+                // real backup flow, mirroring upstream semantics.
+                state.phraseDisplayState = RecoveryPhraseDisplay.State.initial
+                state.phraseDisplayState.isWalletBackup = true
+                state.isOnboardingSeedRevealShown = true
                 return .none
 
             case .onboarding(.createNewWalletTapped):
