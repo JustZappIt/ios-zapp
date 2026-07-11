@@ -6,7 +6,11 @@ directly impact users rather than highlighting other crucial architectural updat
 
 ## [Unreleased]
 
-## 3.7.3 build 1 (20026-07-12)
+### Changed
+- [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
+- [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and bold Swiss typography (bold headings and titles, a heavy-weight balance display) in both light and dark mode.
+
+## 3.7.3 build 1 (2026-07-12)
 
 ### Changed
 - [MOB-1472] The assets you can swap are now a curated set of major coins and stablecoins across the supported chains (plus swapping to ZEC), instead of the full list from the swap provider, and the address-book chain picker is limited to those chains. Existing swaps in your history (including assets no longer offered) still display normally, and existing contacts on other chains are preserved.

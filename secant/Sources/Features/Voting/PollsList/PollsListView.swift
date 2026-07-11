@@ -410,9 +410,9 @@ struct PollsListView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 2)
         .background(style.backgroundColor)
-        .clipShape(Capsule())
+        .clipShape(Rectangle())
         .overlay(
-            Capsule()
+            Rectangle()
                 .stroke(style.borderColor, lineWidth: 1)
         )
     }

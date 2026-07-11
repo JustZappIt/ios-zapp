@@ -135,6 +135,6 @@ struct PollsListSkeletonCard: View {
         Color.gray.opacity(0.25)
             .frame(width: width, height: height)
             .shimmer(true)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 }

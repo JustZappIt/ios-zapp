@@ -53,7 +53,7 @@ struct SendFeedbackView: View {
                                             .padding(3)
                                             .overlay {
                                                 if let selectedRating = store.selectedRating, selectedRating == rating {
-                                                    RoundedRectangle(cornerRadius: 14)
+                                                    RoundedRectangle(cornerRadius: 0)
                                                         .stroke(Design.Text.primary.color(colorScheme))
                                                 }
                                             }

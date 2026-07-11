@@ -326,9 +326,9 @@ struct ResultsView: View {
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: 0)
                         .fill(Design.Surfaces.bgTertiary.color(colorScheme))
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: 0)
                         .fill(fillColor)
                         .frame(width: max(0, geo.size.width * ratio))
                 }
@@ -346,9 +346,9 @@ struct ResultsView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(Design.Utility.Gray._100.color(colorScheme))
-            .clipShape(Capsule())
+            .clipShape(Rectangle())
             .overlay(
-                Capsule()
+                Rectangle()
                     .stroke(Design.Utility.Gray._200.color(colorScheme), lineWidth: 1)
             )
     }
