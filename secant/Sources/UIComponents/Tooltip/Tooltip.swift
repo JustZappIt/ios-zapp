@@ -54,7 +54,7 @@ struct Tooltip: View {
             }
             .padding(12)
             .zBackground(Design.HintTooltips.surfacePrimary)
-            .cornerRadius(8)
+            .cornerRadius(0)
             // TODO: Colors from Design once available
             .shadow(color: Color(red: 0.137, green: 0.122, blue: 0.125).opacity(0.03), radius: 4, x: 0, y: 4)
             .shadow(color: Color(red: 0.137, green: 0.122, blue: 0.125).opacity(0.08), radius: 8, x: 0, y: 12)

@@ -136,7 +136,7 @@ struct WhatsNewView: View {
                 .padding(.top, 2)
                 .padding(.bottom, 10)
                 .colorBackground(Design.Inputs.Default.bg.color(colorScheme))
-                .cornerRadius(10)
+                .cornerRadius(0)
                 .padding(.bottom, 8)
             
             TextEditor(text: $store.output)
@@ -145,7 +145,7 @@ struct WhatsNewView: View {
                 .padding(.top, 2)
                 .padding(.bottom, 10)
                 .colorBackground(Design.Inputs.Default.bg.color(colorScheme))
-                .cornerRadius(10)
+                .cornerRadius(0)
         }
         .padding()
         .zashiBack()

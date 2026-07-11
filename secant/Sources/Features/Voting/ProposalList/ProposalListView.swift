@@ -297,9 +297,9 @@ struct ProposalListView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(Design.Utility.Gray._100.color(colorScheme))
-            .clipShape(Capsule())
+            .clipShape(Rectangle())
             .overlay(
-                Capsule()
+                Rectangle()
                     .stroke(Design.Utility.Gray._200.color(colorScheme), lineWidth: 1)
             )
     }

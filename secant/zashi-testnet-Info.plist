@@ -15,7 +15,7 @@
 		<string>es</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>Zodl Testnet</string>
+	<string>Zapp [TN]</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

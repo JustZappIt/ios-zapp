@@ -47,12 +47,12 @@ struct NoTransactionPlaceholder: View {
             VStack(alignment: .leading, spacing: 4) {
                 RoundedRectangle(cornerRadius: Design.Radius._md)
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                    .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 7))
+                    .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 0))
                     .frame(width: 86, height: 14)
                 
                 RoundedRectangle(cornerRadius: Design.Radius._md)
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                    .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 7))
+                    .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 0))
                     .frame(width: 64, height: 14)
             }
             
@@ -60,7 +60,7 @@ struct NoTransactionPlaceholder: View {
             
             RoundedRectangle(cornerRadius: Design.Radius._md)
                 .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 7))
+                .shimmer(isShimmerOn).clipShape(RoundedRectangle(cornerRadius: 0))
                 .frame(width: 32, height: 14)
         }
         .screenHorizontalPadding()

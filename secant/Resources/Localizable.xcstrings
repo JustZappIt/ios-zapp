@@ -74,13 +74,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is a Zcash-powered mobile wallet, built for unstoppable private payments. It’s optimized for storage and real-world use of shielded $ZEC—the truly private cryptocurrency."
+            "value": "Zapp is a Zcash-powered mobile wallet, built for unstoppable private payments. It’s optimized for storage and real-world use of shielded $ZEC—the truly private cryptocurrency."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl es una wallet móvil impulsada por Zcash, creada para pagos privados imparables. Está optimizada para almacenar y usar en el mundo real $ZEC protegido: la criptomoneda verdaderamente privada."
+            "value": "Zapp es una wallet móvil impulsada por Zcash, creada para pagos privados imparables. Está optimizada para almacenar y usar en el mundo real $ZEC protegido: la criptomoneda verdaderamente privada."
           }
         }
       }
@@ -125,13 +125,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Introducing Zodl"
+            "value": "Introducing Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presentando Zodl"
+            "value": "Presentando Zapp"
           }
         }
       }
@@ -244,13 +244,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         }
       }
@@ -637,13 +637,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "My Zodl ZEC Address"
+            "value": "My Zapp ZEC Address"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mi Dirección ZEC de Zodl"
+            "value": "Mi Dirección ZEC de Zapp"
           }
         }
       }
@@ -876,13 +876,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain to make sure your balances are displayed correctly."
+            "value": "Zapp is scanning the blockchain to make sure your balances are displayed correctly."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la blockchain para asegurarse de que tus balances se muestren correctamente."
+            "value": "Zapp está escaneando la blockchain para asegurarse de que tus balances se muestren correctamente."
           }
         }
       }
@@ -3291,13 +3291,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Please enter a valid URL (e.g. https://zodl.com/polls)"
+            "value": "Please enter a valid URL (e.g. https://justzappit.xyz/polls)"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Please enter a valid URL (e.g. https://zodl.com/polls)"
+            "value": "Please enter a valid URL (e.g. https://justzappit.xyz/polls)"
           }
         }
       }
@@ -5008,13 +5008,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How to vote with Zodl"
+            "value": "How to vote with Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "How to vote with Zodl"
+            "value": "How to vote with Zapp"
           }
         }
       }
@@ -5281,13 +5281,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Approved by Zodl"
+            "value": "Approved by Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Approved by Zodl"
+            "value": "Approved by Zapp"
           }
         }
       }
@@ -5981,13 +5981,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Approved by Zodl"
+            "value": "Approved by Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Approved by Zodl"
+            "value": "Approved by Zapp"
           }
         }
       }
@@ -7260,13 +7260,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If you disconnect now, your Keystone will no longer be paired with your Zodl wallet."
+            "value": "If you disconnect now, your Keystone will no longer be paired with your Zapp wallet."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Si desconectas ahora, tu Keystone dejará de estar vinculado con tu billetera Zodl."
+            "value": "Si desconectas ahora, tu Keystone dejará de estar vinculado con tu billetera Zapp."
           }
         }
       }
@@ -7481,13 +7481,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl's currency conversion feature doesn't compromise your IP address."
+            "value": "Zapp's currency conversion feature doesn't compromise your IP address."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La función de conversión de moneda de Zodl no compromete tu dirección IP."
+            "value": "La función de conversión de moneda de Zapp no compromete tu dirección IP."
           }
         }
       }
@@ -7771,13 +7771,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rescan in Zodl"
+            "value": "Rescan in Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reescanear en Zodl"
+            "value": "Reescanear en Zapp"
           }
         }
       }
@@ -7788,13 +7788,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "For better safety and security, rescan the QR code with Zodl."
+            "value": "For better safety and security, rescan the QR code with Zapp."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para mayor seguridad y protección, vuelve a escanear el código QR con Zodl."
+            "value": "Para mayor seguridad y protección, vuelve a escanear el código QR con Zapp."
           }
         }
       }
@@ -7874,13 +7874,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reset Zodl"
+            "value": "Reset Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restablecer Zodl"
+            "value": "Restablecer Zapp"
           }
         }
       }
@@ -7908,13 +7908,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Resetting the Zodl app will delete the app database and cached app data, and disconnect all connected hardware wallets."
+            "value": "Resetting the Zapp app will delete the app database and cached app data, and disconnect all connected hardware wallets."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restablecer la aplicación Zodl eliminará la base de datos y los datos en caché de la aplicación, además de desconectar todas las billeteras de hardware conectadas."
+            "value": "Restablecer la aplicación Zapp eliminará la base de datos y los datos en caché de la aplicación, además de desconectar todas las billeteras de hardware conectadas."
           }
         }
       }
@@ -7925,13 +7925,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Once you Reset Zodl, the only way to access your funds is through a wallet restore process that requires your Zodl Recovery Phrase and Wallet Birthday Height."
+            "value": "Once you Reset Zapp, the only way to access your funds is through a wallet restore process that requires your Zapp Recovery Phrase and Wallet Birthday Height."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una vez que restablezcas Zodl, la única forma de acceder a tus fondos será mediante un proceso de restauración de billetera que requiere tu Frase de Recuperación de Zodl y la Altura de Cumpleaños de la Billetera."
+            "value": "Una vez que restablezcas Zapp, la única forma de acceder a tus fondos será mediante un proceso de restauración de billetera que requiere tu Frase de Recuperación de Zapp y la Altura de Cumpleaños de la Billetera."
           }
         }
       }
@@ -8028,13 +8028,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reset Zodl"
+            "value": "Reset Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restablecer Zodl"
+            "value": "Restablecer Zapp"
           }
         }
       }
@@ -8420,13 +8420,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If you confirm, Zodl will fetch transaction data for a transaction ID you provide."
+            "value": "If you confirm, Zapp will fetch transaction data for a transaction ID you provide."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Si confirmas, Zodl obtendrá datos de una transacción usando el ID que proporciones."
+            "value": "Si confirmas, Zapp obtendrá datos de una transacción usando el ID que proporciones."
           }
         }
       }
@@ -8848,13 +8848,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Decide how far Zodl should scan. Enter a date before your first received transaction. If you’re not sure, choose an earlier date."
+            "value": "Decide how far Zapp should scan. Enter a date before your first received transaction. If you’re not sure, choose an earlier date."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Decide hasta dónde debe escanear Zodl. Ingresa una fecha anterior a tu primera transacción recibida. Si no estás seguro/a, elige una fecha anterior."
+            "value": "Decide hasta dónde debe escanear Zapp. Ingresa una fecha anterior a tu primera transacción recibida. Si no estás seguro/a, elige una fecha anterior."
           }
         }
       }
@@ -8865,13 +8865,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Decide how far Zodl should resync. Enter a date before your first received transaction. If you’re not sure, choose an earlier date."
+            "value": "Decide how far Zapp should resync. Enter a date before your first received transaction. If you’re not sure, choose an earlier date."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Decide hasta dónde debe resincronizarse Zodl. Ingresa una fecha anterior a tu primera transacción recibida. Si no estás seguro/a, elige una fecha anterior."
+            "value": "Decide hasta dónde debe resincronizarse Zapp. Ingresa una fecha anterior a tu primera transacción recibida. Si no estás seguro/a, elige una fecha anterior."
           }
         }
       }
@@ -9870,13 +9870,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Information you share with Zodl integration partners is subject to their privacy policies."
+            "value": "Information you share with Zapp integration partners is subject to their privacy policies."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La información que compartas con los socios de integración de Zodl está sujeta a sus políticas de privacidad."
+            "value": "La información que compartas con los socios de integración de Zapp está sujeta a sus políticas de privacidad."
           }
         }
       }
@@ -9972,13 +9972,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain to retrieve your transactions. Older wallets can take hours to complete syncing. Follow these steps to prevent interruption:"
+            "value": "Zapp is scanning the blockchain to retrieve your transactions. Older wallets can take hours to complete syncing. Follow these steps to prevent interruption:"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en sincronizarse. Sigue estos pasos para evitar interrupciones:"
+            "value": "Zapp está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en sincronizarse. Sigue estos pasos para evitar interrupciones:"
           }
         }
       }
@@ -9989,13 +9989,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain to retrieve your transactions. Older wallets can take hours to restore. Follow these steps to prevent interruption:"
+            "value": "Zapp is scanning the blockchain to retrieve your transactions. Older wallets can take hours to restore. Follow these steps to prevent interruption:"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en restaurarse. Sigue estos pasos para evitar interrupciones:"
+            "value": "Zapp está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en restaurarse. Sigue estos pasos para evitar interrupciones:"
           }
         }
       }
@@ -10006,13 +10006,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain to retrieve your transactions. Older wallets can take hours to resync. Follow these steps to prevent interruption:"
+            "value": "Zapp is scanning the blockchain to retrieve your transactions. Older wallets can take hours to resync. Follow these steps to prevent interruption:"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en resincronizarse. Sigue estos pasos para evitar interrupciones:"
+            "value": "Zapp está escaneando la cadena de bloques para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en resincronizarse. Sigue estos pasos para evitar interrupciones:"
           }
         }
       }
@@ -10074,13 +10074,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[Warning:](style: 'boldPrimary') Your Zodl funds cannot be spent until your Keystone wallet is synced."
+            "value": "^[Warning:](style: 'boldPrimary') Your Zapp funds cannot be spent until your Keystone wallet is synced."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[Advertencia:](style: 'boldPrimary') No podrás usar tus fondos de Zodl hasta que tu billetera Keystone esté sincronizada."
+            "value": "^[Advertencia:](style: 'boldPrimary') No podrás usar tus fondos de Zapp hasta que tu billetera Keystone esté sincronizada."
           }
         }
       }
@@ -10244,13 +10244,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connecting to a hardware wallet that was previously connected to Zashi will require synchronization to discover your transaction history. We'll guide you through it."
+            "value": "Connecting to a hardware wallet that was previously connected to Zapp will require synchronization to discover your transaction history. We'll guide you through it."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Conectarse a una billetera de hardware que ya estaba conectada a Zashi requerirá sincronización para descubrir tu historial de transacciones. Te guiaremos en el proceso."
+            "value": "Conectarse a una billetera de hardware que ya estaba conectada a Zapp requerirá sincronización para descubrir tu historial de transacciones. Te guiaremos en el proceso."
           }
         }
       }
@@ -10397,13 +10397,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select Zodl app and scan QR code"
+            "value": "Select Zapp app and scan QR code"
           }
         },
         "es": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Selecciona la app Zodl y escanea el código QR"
+            "value": "Selecciona la app Zapp y escanea el código QR"
           }
         }
       }
@@ -10516,13 +10516,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Get 5%% off airgapped hardware wallet. Promo code \"Zodl\"."
+            "value": "Get 5%% off airgapped hardware wallet. Promo code \"Zapp\"."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Obtén un 5%% de descuento en una billetera de hardware aislada. Código promocional: 'Zodl'."
+            "value": "Obtén un 5%% de descuento en una billetera de hardware aislada. Código promocional: 'Zapp'."
           }
         }
       }
@@ -11183,13 +11183,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl requires %@ GB of space to synchronize the Zcash blockchain but there is only "
+            "value": "Zapp requires %@ GB of space to synchronize the Zcash blockchain but there is only "
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl requiere %@ GB de espacio para sincronizar la blockchain de Zcash, pero solo hay "
+            "value": "Zapp requiere %@ GB de espacio para sincronizar la blockchain de Zcash, pero solo hay "
           }
         }
       }
@@ -11252,13 +11252,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your funds are safe but something happened while we were trying to retrieve the Keychain data. Close the Zodl app, and give it a fresh launch, we will try again."
+            "value": "Your funds are safe but something happened while we were trying to retrieve the Keychain data. Close the Zapp app, and give it a fresh launch, we will try again."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tus fondos están seguros, pero algo ocurrió mientras intentábamos recuperar los datos del llavero. Cierra la aplicación de Zodl y ábrela de nuevo; lo intentaremos otra vez."
+            "value": "Tus fondos están seguros, pero algo ocurrió mientras intentábamos recuperar los datos del llavero. Cierra la aplicación de Zapp y ábrela de nuevo; lo intentaremos otra vez."
           }
         }
       }
@@ -11901,13 +11901,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Flexa payments require a ZODL account. Switch to a ZODL account to pay with Flexa."
+            "value": "Flexa payments require a Zapp account. Switch to a Zapp account to pay with Flexa."
           }
         },
         "es": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Los pagos con Flexa requieren una cuenta ZODL. Cambia a una cuenta ZODL para pagar con Flexa."
+            "value": "Los pagos con Flexa requieren una cuenta Zapp. Cambia a una cuenta Zapp para pagar con Flexa."
           }
         }
       }
@@ -12004,13 +12004,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "I agree to Zodl's Export Private Data Policies and Privacy Policy"
+            "value": "I agree to Zapp's Export Private Data Policies and Privacy Policy"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acepto las Políticas de Exportación de Datos Privados y la Política de Privacidad de Zodl"
+            "value": "Acepto las Políticas de Exportación de Datos Privados y la Política de Privacidad de Zapp"
           }
         }
       }
@@ -12038,13 +12038,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The private data also gives the ability to see certain future actions you take with Zodl."
+            "value": "The private data also gives the ability to see certain future actions you take with Zapp."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los datos privados también permiten ver ciertas acciones futuras que realices con Zodl."
+            "value": "Los datos privados también permiten ver ciertas acciones futuras que realices con Zapp."
           }
         }
       }
@@ -12346,13 +12346,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "To protect your privacy, Zodl will guide you to shield any transparent ZEC you receive with just one click."
+            "value": "To protect your privacy, Zapp will guide you to shield any transparent ZEC you receive with just one click."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para proteger tu privacidad, Zodl te guiará para proteger cualquier ZEC transparente que recibas con un solo clic."
+            "value": "Para proteger tu privacidad, Zapp te guiará para proteger cualquier ZEC transparente que recibas con un solo clic."
           }
         }
       }
@@ -12499,13 +12499,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If you confirm, Zodl will scan the transparent address you provide and discover its funds. This may take a few minutes."
+            "value": "If you confirm, Zapp will scan the transparent address you provide and discover its funds. This may take a few minutes."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Si confirmas, Zodl escaneará la dirección transparente que proporciones y descubrirá sus fondos. Esto puede tardar unos minutos."
+            "value": "Si confirmas, Zapp escaneará la dirección transparente que proporciones y descubrirá sus fondos. Esto puede tardar unos minutos."
           }
         }
       }
@@ -12976,13 +12976,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tapping the button below will send details about this swap (like the deposit address and target asset) to the Zodl support team so they can help resolve your issue. The transaction info is included automatically."
+            "value": "Tapping the button below will send details about this swap (like the deposit address and target asset) to the Zapp support team so they can help resolve your issue. The transaction info is included automatically."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Al tocar el botón de abajo, se enviarán detalles de este swap (como la dirección de depósito y el activo destino) al equipo de soporte de Zodl para que puedan ayudarte a resolver tu problema. La información de la transacción se incluye automáticamente."
+            "value": "Al tocar el botón de abajo, se enviarán detalles de este swap (como la dirección de depósito y el activo destino) al equipo de soporte de Zapp para que puedan ayudarte a resolver tu problema. La información de la transacción se incluye automáticamente."
           }
         }
       }
@@ -13095,13 +13095,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hi, I have generated a ZEC payment request for you using the Zodl app!"
+            "value": "Hi, I have generated a ZEC payment request for you using the Zapp app!"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hola, he generado una solicitud de pago en ZEC para ti utilizando la aplicación Zodl."
+            "value": "Hola, he generado una solicitud de pago en ZEC para ti utilizando la aplicación Zapp."
           }
         }
       }
@@ -13215,13 +13215,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep the Zodl app open on an active phone screen."
+            "value": "Keep the Zapp app open on an active phone screen."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mantén la app de Zodl abierta con la pantalla del teléfono activa."
+            "value": "Mantén la app de Zapp abierta con la pantalla del teléfono activa."
           }
         }
       }
@@ -13250,13 +13250,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep Zodl open!"
+            "value": "Keep Zapp open!"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "¡Mantén Zodl abierto!"
+            "value": "¡Mantén Zapp abierto!"
           }
         }
       }
@@ -13301,13 +13301,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl will scan and recover all transactions made after the following block number."
+            "value": "Zapp will scan and recover all transactions made after the following block number."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl escaneará y recuperará todas las transacciones realizadas después del siguiente número de bloque."
+            "value": "Zapp escaneará y recuperará todas las transacciones realizadas después del siguiente número de bloque."
           }
         }
       }
@@ -13403,13 +13403,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[The Secret Recovery Phrase](style: 'boldPrimary') is a unique set of 24 words, appearing in a precise order. It can be used to gain full control of your funds from any device via any Zcash wallet app. Think of it as the master key to your wallet. It is stored in Zodl’s Advanced Settings."
+            "value": "^[The Secret Recovery Phrase](style: 'boldPrimary') is a unique set of 24 words, appearing in a precise order. It can be used to gain full control of your funds from any device via any Zcash wallet app. Think of it as the master key to your wallet. It is stored in Zapp’s Advanced Settings."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[La Frase de Recuperación Secreta](style: 'boldPrimary') es un conjunto único de 24 palabras, que aparecen en un orden preciso. Se puede usar para obtener control total de tus fondos desde cualquier dispositivo a través de cualquier aplicación de billetera Zcash. Piensa en ella como la llave maestra de tu billetera. Se guarda en la Configuración Avanzada de Zodl."
+            "value": "^[La Frase de Recuperación Secreta](style: 'boldPrimary') es un conjunto único de 24 palabras, que aparecen en un orden preciso. Se puede usar para obtener control total de tus fondos desde cualquier dispositivo a través de cualquier aplicación de billetera Zcash. Piensa en ella como la llave maestra de tu billetera. Se guarda en la Configuración Avanzada de Zapp."
           }
         }
       }
@@ -13472,13 +13472,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your wallet will be resynced from ^[%@](style: 'boldPrimary') (%@ blocks). Zodl will scan and recover all transactions made after the following block number."
+            "value": "Your wallet will be resynced from ^[%@](style: 'boldPrimary') (%@ blocks). Zapp will scan and recover all transactions made after the following block number."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu billetera se resincronizará desde ^[%@](style: 'boldPrimary') (%@ bloques).. Zodl escaneará y recuperará todas las transacciones realizadas después del siguiente número de bloque."
+            "value": "Tu billetera se resincronizará desde ^[%@](style: 'boldPrimary') (%@ bloques).. Zapp escaneará y recuperará todas las transacciones realizadas después del siguiente número de bloque."
           }
         }
       }
@@ -13523,13 +13523,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unless you specify otherwise below, Zodl will resync from the date displayed."
+            "value": "Unless you specify otherwise below, Zapp will resync from the date displayed."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "A menos que especifiques lo contrario a continuación, Zodl se resincronizará desde la fecha mostrada."
+            "value": "A menos que especifiques lo contrario a continuación, Zapp se resincronizará desde la fecha mostrada."
           }
         }
       }
@@ -13676,13 +13676,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "We identified a Zodl database backup on this device. If you create a new wallet, you will lose access to this database backup and if you try to restore later, some information may be lost."
+            "value": "We identified a Zapp database backup on this device. If you create a new wallet, you will lose access to this database backup and if you try to restore later, some information may be lost."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Identificamos una copia de seguridad de la base de datos de Zodl en este dispositivo. Si creas una nueva billetera, perderás acceso a esta copia de seguridad de la base de datos y si intentas restaurarla más tarde, se podría perder información."
+            "value": "Identificamos una copia de seguridad de la base de datos de Zapp en este dispositivo. Si creas una nueva billetera, perderás acceso a esta copia de seguridad de la base de datos y si intentas restaurarla más tarde, se podría perder información."
           }
         }
       }
@@ -13898,13 +13898,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This recovery phrase doesn't match the Zodl database backup saved on this device. If you proceed, you will lose access to this database backup and if you try to restore later, some information may be lost."
+            "value": "This recovery phrase doesn't match the Zapp database backup saved on this device. If you proceed, you will lose access to this database backup and if you try to restore later, some information may be lost."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esta frase de recuperación no coincide con la copia de seguridad de la base de datos de Zodl guardada en este dispositivo. Si continúas, perderás acceso a esta copia de seguridad de la base de datos y si intentas restaurarla más tarde, se podría perder información."
+            "value": "Esta frase de recuperación no coincide con la copia de seguridad de la base de datos de Zapp guardada en este dispositivo. Si continúas, perderás acceso a esta copia de seguridad de la base de datos y si intentas restaurarla más tarde, se podría perder información."
           }
         }
       }
@@ -13966,13 +13966,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The camera is not authorized. Please go to the system settings of Zodl and turn it on."
+            "value": "The camera is not authorized. Please go to the system settings of Zapp and turn it on."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La cámara no está autorizada. Por favor, ve a la configuración del sistema de Zodl y actívala."
+            "value": "La cámara no está autorizada. Por favor, ve a la configuración del sistema de Zapp y actívala."
           }
         }
       }
@@ -14903,13 +14903,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How is your Zodl experience?"
+            "value": "How is your Zapp experience?"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "¿Cómo ha sido tu experiencia con Zodl?"
+            "value": "¿Cómo ha sido tu experiencia con Zapp?"
           }
         }
       }
@@ -14937,13 +14937,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         }
       }
@@ -15518,13 +15518,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reset Zodl"
+            "value": "Reset Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restablecer Zodl"
+            "value": "Restablecer Zapp"
           }
         }
       }
@@ -15688,13 +15688,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl Recovery Phrase"
+            "value": "Zapp Recovery Phrase"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frase de Recuperación de Zodl"
+            "value": "Frase de Recuperación de Zapp"
           }
         }
       }
@@ -16420,13 +16420,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Check your connection and reload Zodl"
+            "value": "Check your connection and reload Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verifica tu conexión y recarga Zodl"
+            "value": "Verifica tu conexión y recarga Zapp"
           }
         }
       }
@@ -16454,13 +16454,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep Zodl open on active phone screen"
+            "value": "Keep Zapp open on active phone screen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mantén Zodl abierta en una pantalla activa del teléfono"
+            "value": "Mantén Zapp abierta en una pantalla activa del teléfono"
           }
         }
       }
@@ -16828,13 +16828,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You appear to be offline. Please restore your internet connection to use Zodl wallet."
+            "value": "You appear to be offline. Please restore your internet connection to use Zapp wallet."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Parece que estás offline. Por favor, restaura tu conexión a internet para usar la billetera Zodl."
+            "value": "Parece que estás offline. Por favor, restaura tu conexión a internet para usar la billetera Zapp."
           }
         }
       }
@@ -16914,13 +16914,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain to retrieve your transactions. Older wallets can take hours to restore. Follow these steps to prevent interruption:"
+            "value": "Zapp is scanning the blockchain to retrieve your transactions. Older wallets can take hours to restore. Follow these steps to prevent interruption:"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la blockchain para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en restaurarse. Sigue estos pasos para evitar interrupciones:"
+            "value": "Zapp está escaneando la blockchain para recuperar tus transacciones. Las billeteras más antiguas pueden tardar horas en restaurarse. Sigue estos pasos para evitar interrupciones:"
           }
         }
       }
@@ -16931,13 +16931,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep the Zodl app open on an active phone screen."
+            "value": "Keep the Zapp app open on an active phone screen."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mantén la aplicación Zodl abierta en una pantalla activa del teléfono."
+            "value": "Mantén la aplicación Zapp abierta en una pantalla activa del teléfono."
           }
         }
       }
@@ -17027,13 +17027,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "To protect user privacy, Zodl doesn't support spending transparent ZEC. Tap the \"Shield\" button below to make your transparent funds spendable and your total Zodl balance private. "
+            "value": "To protect user privacy, Zapp doesn't support spending transparent ZEC. Tap the \"Shield\" button below to make your transparent funds spendable and your total Zapp balance private. "
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para proteger la privacidad del usuario, Zodl no admite el gasto de ZEC transparente. Toca el botón \"Proteger\" abajo para hacer que tus fondos transparentes sean gastables y tu saldo total en Zodl sea privado."
+            "value": "Para proteger la privacidad del usuario, Zapp no admite el gasto de ZEC transparente. Toca el botón \"Proteger\" abajo para hacer que tus fondos transparentes sean gastables y tu saldo total en Zapp sea privado."
           }
         }
       }
@@ -17112,13 +17112,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl is scanning the blockchain for your latest transactions to make sure your balances are displayed correctly. Keep the Zodl app open on an active phone screen to avoid interruptions."
+            "value": "Zapp is scanning the blockchain for your latest transactions to make sure your balances are displayed correctly. Keep the Zapp app open on an active phone screen to avoid interruptions."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl está escaneando la blockchain para tus últimas transacciones para asegurarse de que tus balances se muestren correctamente. Mantén la aplicación Zodl abierta en una pantalla activa del teléfono para evitar interrupciones."
+            "value": "Zapp está escaneando la blockchain para tus últimas transacciones para asegurarse de que tus balances se muestren correctamente. Mantén la aplicación Zapp abierta en una pantalla activa del teléfono para evitar interrupciones."
           }
         }
       }
@@ -17243,13 +17243,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your Zodl account is secured."
+            "value": "Your Zapp account is secured."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu cuenta Zodl está protegida."
+            "value": "Tu cuenta Zapp está protegida."
           }
         }
       }
@@ -18060,13 +18060,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "I understand that Zodl makes API requests to the NEAR API every time I interact with a Swap/Pay transaction."
+            "value": "I understand that Zapp makes API requests to the NEAR API every time I interact with a Swap/Pay transaction."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Entiendo que Zodl realiza solicitudes a la API de NEAR cada vez que interactúo con una transacción de Intercambio/Pago."
+            "value": "Entiendo que Zapp realiza solicitudes a la API de NEAR cada vez que interactúo con una transacción de Intercambio/Pago."
           }
         }
       }
@@ -18315,13 +18315,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This feature is powered by a third-party NEAR API. Zodl needs to make networking calls to fetch rates, quotes, execute transactions and check their status in the transaction history which can leak your IP address. We recommend you to allow Tor connection to protect your IP address at all times."
+            "value": "This feature is powered by a third-party NEAR API. Zapp needs to make networking calls to fetch rates, quotes, execute transactions and check their status in the transaction history which can leak your IP address. We recommend you to allow Tor connection to protect your IP address at all times."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esta función es provista por una API de terceros de NEAR. Zodl necesita hacer llamadas de red para obtener tasas, cotizaciones, ejecutar transacciones y revisar su estado en el historial de transacciones, lo cual puede exponer tu dirección IP. Te recomendamos permitir la conexión por Tor para proteger tu dirección IP en todo momento."
+            "value": "Esta función es provista por una API de terceros de NEAR. Zapp necesita hacer llamadas de red para obtener tasas, cotizaciones, ejecutar transacciones y revisar su estado en el historial de transacciones, lo cual puede exponer tu dirección IP. Te recomendamos permitir la conexión por Tor para proteger tu dirección IP en todo momento."
           }
         }
       }
@@ -18604,13 +18604,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl"
+            "value": "Zapp"
           }
         }
       }
@@ -18672,13 +18672,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your deposit was detected but the swap could not be completed. Your funds have been returned, minus transaction fees. If you haven't received them, contact the Zodl support team."
+            "value": "Your deposit was detected but the swap could not be completed. Your funds have been returned, minus transaction fees. If you haven't received them, contact the Zapp support team."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu depósito fue detectado pero el intercambio no pudo completarse. Tus fondos han sido devueltos, descontando las tarifas de transacción. Si aún no los recibiste, contacta al equipo de soporte de Zodl."
+            "value": "Tu depósito fue detectado pero el intercambio no pudo completarse. Tus fondos han sido devueltos, descontando las tarifas de transacción. Si aún no los recibiste, contacta al equipo de soporte de Zapp."
           }
         }
       }
@@ -18791,13 +18791,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This setting determines the maximum allowable difference between the expected price of a swap and the actual price you pay, which is outside of Zodl's control."
+            "value": "This setting determines the maximum allowable difference between the expected price of a swap and the actual price you pay, which is outside of Zapp's control."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esta configuración determina la diferencia máxima permitida entre el precio esperado de un intercambio y el precio real que pagas, lo cual está fuera del control de Zodl."
+            "value": "Esta configuración determina la diferencia máxima permitida entre el precio esperado de un intercambio y el precio real que pagas, lo cual está fuera del control de Zapp."
           }
         }
       }
@@ -19659,13 +19659,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deposit address for %@ %@ on Near swap to ZEC in Zodl."
+            "value": "Deposit address for %@ %@ on Near swap to ZEC in Zapp."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dirección de depósito para %@ %@ en Near swap a ZEC en Zodl."
+            "value": "Dirección de depósito para %@ %@ en Near swap a ZEC en Zapp."
           }
         }
       }
@@ -20155,13 +20155,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Transfer ZEC to your Zodl shielded address"
+            "value": "Transfer ZEC to your Zapp shielded address"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Transfiere ZEC a tu dirección protegida de Zodl"
+            "value": "Transfiere ZEC a tu dirección protegida de Zapp"
           }
         }
       }
@@ -20172,13 +20172,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Send to Zodl first"
+            "value": "Send to Zapp first"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Envía primero a Zodl"
+            "value": "Envía primero a Zapp"
           }
         }
       }
@@ -20189,13 +20189,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Once received in Zodl, send the tokens to your final TEX destination address"
+            "value": "Once received in Zapp, send the tokens to your final TEX destination address"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una vez recibido en Zodl, envía los tokens a tu dirección TEX de destino final"
+            "value": "Una vez recibido en Zapp, envía los tokens a tu dirección TEX de destino final"
           }
         }
       }
@@ -20206,13 +20206,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Send from Zodl to TEX address"
+            "value": "Send from Zapp to TEX address"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Envía desde Zodl a la dirección TEX"
+            "value": "Envía desde Zapp a la dirección TEX"
           }
         }
       }
@@ -21228,13 +21228,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[The Wallet Birthday Height](style: 'boldPrimary') is the block height (block # in the blockchain) at which your wallet was created. If you ever lose access to your Zodl app and need to recover your funds, providing the block height along with your recovery phrase can significantly speed up the process."
+            "value": "^[The Wallet Birthday Height](style: 'boldPrimary') is the block height (block # in the blockchain) at which your wallet was created. If you ever lose access to your Zapp app and need to recover your funds, providing the block height along with your recovery phrase can significantly speed up the process."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "^[La Altura de Cumpleaños de la Billetera](style: 'boldPrimary') es la altura del bloque (número de bloque en la blockchain) en el que tu billetera fue creada. Si alguna vez pierdes acceso a tu aplicación Zodl y necesitas recuperar tus fondos, proporcionar la altura del bloque junto con tu frase de recuperación puede acelerar significativamente el proceso."
+            "value": "^[La Altura de Cumpleaños de la Billetera](style: 'boldPrimary') es la altura del bloque (número de bloque en la blockchain) en el que tu billetera fue creada. Si alguna vez pierdes acceso a tu aplicación Zapp y necesitas recuperar tus fondos, proporcionar la altura del bloque junto con tu frase de recuperación puede acelerar significativamente el proceso."
           }
         }
       }
@@ -21281,13 +21281,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zodl Version %@"
+            "value": "Zapp Version %@"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Versión de Zodl %@"
+            "value": "Versión de Zapp %@"
           }
         }
       }

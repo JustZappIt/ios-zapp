@@ -61,7 +61,7 @@
                 {
                     "title": "Añadido:",
                     "bulletpoints": [
-                        "Hasta ahora, los saldos y montos en Zodl solo se mostraban en dólares estadounidenses. Añadimos soporte multimoneda: elige tu moneda preferida en los ajustes de Conversión de Moneda y en la activación del widget de Estado de la Billetera."
+                        "Hasta ahora, los saldos y montos en Zapp solo se mostraban en dólares estadounidenses. Añadimos soporte multimoneda: elige tu moneda preferida en los ajustes de Conversión de Moneda y en la activación del widget de Estado de la Billetera."
                     ]
                 },
                 {
@@ -127,7 +127,7 @@
                 {
                     "title": "Añadido:",
                     "bulletpoints": [
-                        "Coinholder Polling te permite votar en la gobernanza de Zcash de forma privada, directamente desde tus billeteras Zodl y Keystone."
+                        "Coinholder Polling te permite votar en la gobernanza de Zcash de forma privada, directamente desde tus billeteras Zapp y Keystone."
                     ]
                 }
             ]
@@ -285,7 +285,7 @@
                 {
                     "title": "Cambiado:",
                     "bulletpoints": [
-                        "Zashi -> Actualización de la marca Zodl: cambiamos la marca de Zashi a Zodl, sin afectar la experiencia del usuario. Es una nueva marca para un nuevo capítulo, pero todo lo demás se mantiene igual: la billetera, el equipo que la respalda y nuestro compromiso con Zcash.",
+                        "Zashi -> Actualización de la marca Zapp: cambiamos la marca de Zashi a Zapp, sin afectar la experiencia del usuario. Es una nueva marca para un nuevo capítulo, pero todo lo demás se mantiene igual: la billetera, el equipo que la respalda y nuestro compromiso con Zcash.",
                         "Esta actualización incluye la actualización a iOS 26 y compatibilidad con Liquid Glass.",
                         "Mejoramos los detalles de la interfaz de usuario de Swap/Pago."
                     ]
