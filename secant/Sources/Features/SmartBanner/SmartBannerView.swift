@@ -32,7 +32,7 @@ struct SmartBannerView: View {
     var body: some View {
         WithPerceptionTracking {
             ZStack(alignment: .top) {
-                BottomRoundedRectangle(radius: SBConstants.fixedHeight)
+                BottomRoundedRectangle(radius: Design.Radius._5xl)
                     .frame(height: SBConstants.fixedHeight)
                     .foregroundColor(Design.screenBackground.color(colorScheme))
                     .shadow(color: Design.Text.primary.color(colorScheme).opacity(store.isOpen ? 0.25 : 0), radius: 1)
@@ -46,7 +46,7 @@ struct SmartBannerView: View {
                             .screenHorizontalPadding()
                     }
                     
-                    TopRoundedRectangle(radius: store.isOpen ? SBConstants.fixedHeight : 0)
+                    TopRoundedRectangle(radius: store.isOpen ? Design.Radius._5xl : 0)
                         .frame(height: SBConstants.fixedHeightWithShadow)
                         .foregroundColor(Design.screenBackground.color(colorScheme))
                         .shadow(color: Design.Text.primary.color(colorScheme).opacity(0.1), radius: store.isOpen ? 1 : 0, y: -1)
