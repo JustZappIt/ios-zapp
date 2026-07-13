@@ -374,19 +374,28 @@ public enum Design: Colorable {
 
     // MARK: - Corner Radius Constants
     
+    /// Zapp is a Swiss design system: **sharp corners everywhere**.
+    /// Android's equivalent is `RectangleShape` on every surface.
+    ///
+    /// Every constant is deliberately 0. The scale is kept (rather than
+    /// deleted) so the ~207 `Design.Radius.*` call sites keep compiling and we
+    /// retain a single lever to dial roundness back in if the look is rejected.
+    ///
+    /// This does NOT square the ~137 bare `Circle()` / `Capsule()` / `clipShape(.circle)`
+    /// uses — those are not behind any token and must be found per-view (Phase 6).
     public enum Radius {
         public static let _none: CGFloat = 0
-        public static let _xxs: CGFloat = 2
-        public static let _xs: CGFloat = 4
-        public static let _sm: CGFloat = 6
-        public static let _md: CGFloat = 8
-        public static let _lg: CGFloat = 10
-        public static let _xl: CGFloat = 12
-        public static let _2xl: CGFloat = 16
-        public static let _3xl: CGFloat = 20
-        public static let _4xl: CGFloat = 24
-        public static let _5xl: CGFloat = 32
-        public static let _full: CGFloat = 9999
+        public static let _xxs: CGFloat = 0
+        public static let _xs: CGFloat = 0
+        public static let _sm: CGFloat = 0
+        public static let _md: CGFloat = 0
+        public static let _lg: CGFloat = 0
+        public static let _xl: CGFloat = 0
+        public static let _2xl: CGFloat = 0
+        public static let _3xl: CGFloat = 0
+        public static let _4xl: CGFloat = 0
+        public static let _5xl: CGFloat = 0
+        public static let _full: CGFloat = 0
     }
     
     // MARK: - Spacing Constants
@@ -488,8 +497,8 @@ public extension Design.Text {
 public extension Design.Btns.Primary {
     func color(_ colorScheme: ColorScheme) -> Color {
         switch self {
-        case .bg: return Design.col(Asset.Colors.ZDesign.Base.obsidian.color, Asset.Colors.ZDesign.Base.bone.color, colorScheme)
-        case .bgHover: return Design.col(Asset.Colors.ZDesign.gray900.color, Asset.Colors.ZDesign.gray100.color, colorScheme)
+        case .bg: return Design.col(Asset.Colors.ZDesign.Base.brand.color, Asset.Colors.ZDesign.Base.brand.color, colorScheme)
+        case .bgHover: return Design.col(Asset.Colors.ZDesign.brand600.color, Asset.Colors.ZDesign.brand600.color, colorScheme)
         case .fg: return Design.col(Asset.Colors.ZDesign.Base.bone.color, Asset.Colors.ZDesign.Base.obsidian.color, colorScheme)
         case .bgDisabled: return Design.col(Asset.Colors.ZDesign.gray100.color, Asset.Colors.ZDesign.shark900.color, colorScheme)
         case .fgDisabled: return Design.col(Asset.Colors.ZDesign.gray500.color, Asset.Colors.ZDesign.shark500.color, colorScheme)
