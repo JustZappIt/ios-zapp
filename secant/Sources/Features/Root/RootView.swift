@@ -100,8 +100,12 @@ private extension RootView {
                     ZStack {
                         // Home view
                         NavigationStack {
-                            HomeView(
+                            ZappTabsView(
                                 store: store.scope(
+                                    state: \.zappTabsState,
+                                    action: \.zappTabs
+                                ),
+                                homeStore: store.scope(
                                     state: \.homeState,
                                     action: \.home
                                 ),

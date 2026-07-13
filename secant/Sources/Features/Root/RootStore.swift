@@ -62,6 +62,7 @@ struct Root {
         var exportLogsState: ExportLogs.State
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var homeState: Home.State = .initial
+        var zappTabsState: ZappTabs.State = .initial
         var isLockedInKeychainUnavailableState = false
         var isRestoringWallet = false
         @Shared(.appStorage(.lastAuthenticationTimestamp)) var lastAuthenticationTimestamp: Int = 0
@@ -195,6 +196,7 @@ struct Root {
         case flexaOpenRequest
         case flexaTransactionFailed(String)
         case home(Home.Action)
+        case zappTabs(ZappTabs.Action)
         case initialization(InitializationAction)
         case notEnoughFreeSpace(NotEnoughFreeSpace.Action)
         case resetZashiFinishProcessing
@@ -325,6 +327,10 @@ struct Root {
 
         Scope(state: \.homeState, action: \.home) {
             Home()
+        }
+
+        Scope(state: \.zappTabsState, action: \.zappTabs) {
+            ZappTabs()
         }
 
         Scope(state: \.exportLogsState, action: \.exportLogs) {
