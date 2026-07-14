@@ -50,7 +50,7 @@ struct ZappTabsView: View {
                 ChatIdentitySetupView(store: chatIdentitySetupStore)
             }
         case .you:
-            SettingsTabContent(store: store)
+            SettingsTabContent(store: store, displayName: store.displayName)
         }
     }
 

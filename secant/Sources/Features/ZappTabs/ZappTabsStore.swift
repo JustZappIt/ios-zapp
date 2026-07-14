@@ -33,6 +33,9 @@ struct ZappTabs {
         /// setup screen until this is true.
         var hasChatIdentity = false
 
+        /// The chat identity's display name, for the You tab's profile card.
+        var displayName: String?
+
         // Set by tab content when it pushes a fullscreen sub-screen that owns its
         // own bottom CTA, so the two don't overlap.
         var hideNavPill = false

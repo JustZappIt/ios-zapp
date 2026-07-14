@@ -14,15 +14,17 @@ import SwiftUI
 /// makes any screen we later merge from upstream conform automatically. A parallel modifier would
 /// leave newly-merged screens silently reintroducing a top-bar back button.
 ///
-/// Screens that own a bottom CTA render it above this dock for now. Folding those into the dock's
-/// `primaryAction` slot — one row, back left, CTA right, as on Android — is per-screen work.
-struct ZashiBackModifier: ViewModifier {
+/// A screen with a primary CTA passes it through `primaryAction:` so the dock renders one row — back
+/// left, CTA right, as on Android. With no CTA the dock stays chrome-free (`ZappBottomActionBar`
+/// switches on `PrimaryAction.self == EmptyView.self`).
+struct ZashiBackModifier<PrimaryAction: View>: ViewModifier {
     @Environment(\.dismiss) private var dismiss
 
     let disabled: Bool
     let hidden: Bool
     let invertedColors: Bool
     let customDismiss: (() -> Void)?
+    let primaryAction: PrimaryAction
 
     func body(content: Content) -> some View {
         if hidden {
@@ -41,7 +43,9 @@ struct ZashiBackModifier: ViewModifier {
                             }
                         },
                         backTint: invertedColors ? .bg : .text
-                    )
+                    ) {
+                        primaryAction
+                    }
                     .disabled(disabled)
                 }
         }
@@ -56,11 +60,37 @@ extension View {
         customDismiss: (() -> Void)? = nil
     ) -> some View {
         modifier(
+            ZashiBackModifier<EmptyView>(
+                disabled: disabled,
+                hidden: hidden,
+                invertedColors: invertedColors,
+                customDismiss: customDismiss,
+                primaryAction: EmptyView()
+            )
+        )
+    }
+
+    /// The dock with a CTA in it: back left, action right.
+    ///
+    /// `primaryAction` is deliberately NOT the last parameter. Swift binds a bare trailing closure to
+    /// the LAST closure-typed argument, so putting the `@ViewBuilder` last would make every one of the
+    /// 57 existing `zashiBack { ... }` call sites silently rebind their `customDismiss` into this slot
+    /// — yielding a dock whose back button does nothing and whose CTA is the old dismiss closure.
+    /// Keeping it here means the plain overload still wins for those call sites, untouched.
+    func zashiBack<PrimaryAction: View>(
+        _ disabled: Bool = false,
+        hidden: Bool = false,
+        invertedColors: Bool = false,
+        @ViewBuilder primaryAction: () -> PrimaryAction,
+        customDismiss: (() -> Void)? = nil
+    ) -> some View {
+        modifier(
             ZashiBackModifier(
                 disabled: disabled,
                 hidden: hidden,
                 invertedColors: invertedColors,
-                customDismiss: customDismiss
+                customDismiss: customDismiss,
+                primaryAction: primaryAction()
             )
         )
     }
