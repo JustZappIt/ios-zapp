@@ -44,7 +44,7 @@ struct ZappTabsView: View {
         case .chats:
             placeholder(.chats)
         case .you:
-            placeholder(.you)
+            SettingsTabContent(store: store)
         }
     }
 
