@@ -16,7 +16,9 @@ struct Root {
         enum Path {
             case addKeystoneHWWalletCoordFlow
             case chatContacts
+            case chatProfile
             case chatRoom
+            case groupInfo
             case newChat
             case currencyConversionSetup
             case receive
@@ -113,7 +115,9 @@ struct Root {
         var chatsListState = ChatsList.State.initial
         var chatIdentitySetupState = ChatIdentitySetup.State.initial
         var chatContactsListState = ChatContactsList.State.initial
+        var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
+        var groupInfoState = GroupInfo.State.initial
         var newChatState = NewChat.State.initial
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
@@ -153,7 +157,8 @@ struct Root {
                 return true
             case .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatRoom, .newChat, .currencyConversionSetup, .receive,
+            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatProfile, .chatRoom, .groupInfo,
+                 .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
                 return false
             }
@@ -238,7 +243,9 @@ struct Root {
         case chatsList(ChatsList.Action)
         case chatIdentitySetup(ChatIdentitySetup.Action)
         case chatContactsList(ChatContactsList.Action)
+        case chatProfile(ChatProfile.Action)
         case chatRoom(ChatRoom.Action)
+        case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
@@ -391,8 +398,16 @@ struct Root {
             ChatContactsList()
         }
 
+        Scope(state: \.chatProfileState, action: \.chatProfile) {
+            ChatProfile()
+        }
+
         Scope(state: \.chatRoomState, action: \.chatRoom) {
             ChatRoom()
+        }
+
+        Scope(state: \.groupInfoState, action: \.groupInfo) {
+            GroupInfo()
         }
 
         Scope(state: \.newChatState, action: \.newChat) {

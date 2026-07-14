@@ -4,6 +4,7 @@
 //
 
 import ComposableArchitecture
+import PhotosUI
 import SwiftUI
 import ZappMessaging
 
@@ -17,7 +18,11 @@ struct ChatRoomView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                ZappScreenHeader(title: store.title, subtitle: store.subtitle) {
+                ZappScreenHeader(
+                    title: store.title,
+                    subtitle: store.subtitle,
+                    onTitleTap: store.isGroup ? { store.send(.titleTapped) } : nil
+                ) {
                     ZappBackButton {
                         store.send(.backToHomeTapped)
                     }
@@ -31,15 +36,33 @@ struct ChatRoomView: View {
                     .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
 
+                if store.sendDidFail {
+                    Text(String(localizable: .chatRoomSendFailed))
+                        .zappFont(.caption, style: ZappColors.danger)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, Design.Spacing._xl)
+                        .padding(.top, Design.Spacing._md)
+                        .background(ZappColors.surface.color(colorScheme))
+                }
+
+                if let replyingTo = store.replyingTo {
+                    ChatReplyBar(
+                        senderName: store.state.replySenderName(for: replyingTo),
+                        content: replyingTo.content,
+                        onCancel: { store.send(.cancelReplyTapped) }
+                    )
+                }
+
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
-                    isSendEnabled: !store.trimmedDraft.isEmpty
-                ) {
-                    store.send(.sendTapped)
-                }
+                    pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
+                    isSendEnabled: !store.trimmedDraft.isEmpty,
+                    onSend: { store.send(.sendTapped) }
+                )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .animation(ZappMotion.content, value: store.replyingTo)
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
         }
@@ -63,7 +86,7 @@ struct ChatRoomView: View {
                     ForEach(items) { item in
                         switch item {
                         case .message(let message):
-                            ChatMessageBubble(message: message, senderName: store.state.senderName(for: message))
+                            bubble(for: message)
 
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)
@@ -79,6 +102,29 @@ struct ChatRoomView: View {
                 withAnimation(ZappMotion.content) {
                     proxy.scrollTo(last.id, anchor: .bottom)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func bubble(for message: ZMMessage) -> some View {
+        Group {
+            if let mediaId = message.mediaId {
+                ChatMediaBubble(
+                    message: message,
+                    senderName: store.state.senderName(for: message),
+                    progress: store.mediaProgress[mediaId]
+                )
+            } else {
+                ChatMessageBubble(
+                    message: message,
+                    senderName: store.state.senderName(for: message)
+                )
+            }
+        }
+        .contextMenu {
+            Button(String(localizable: .chatRoomReply)) {
+                store.send(.replyTapped(message))
             }
         }
     }
@@ -134,11 +180,21 @@ private struct ChatRoomInputRow: View {
     }
 
     @Binding var draft: String
+    @Binding var pickedItem: PhotosPickerItem?
     let isSendEnabled: Bool
     let onSend: () -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Design.Spacing._md) {
+            // PhotosPicker's label closure is @Sendable, and the Zapp font modifiers are
+            // MainActor-isolated — so the label has to be its own view rather than built
+            // inline.
+            PhotosPicker(selection: $pickedItem, matching: .images) {
+                ChatAttachGlyph()
+            }
+            .buttonStyle(.zappPress)
+            .accessibilityLabel(String(localizable: .chatRoomAttach))
+
             TextField(String(localizable: .chatRoomInputPlaceholder), text: $draft, axis: .vertical)
                 .zappFont(.body, style: ZappColors.text)
                 .lineLimit(Constants.lineLimit)
@@ -167,6 +223,23 @@ private struct ChatRoomInputRow: View {
     }
 }
 
+private extension ZappTextStyle {
+    static let attachGlyph = ZappTextStyle(weight: .medium, size: 22, lineHeight: 24)
+}
+
 #Preview {
     ChatRoomView(store: ChatRoom.initial)
+}
+
+private struct ChatAttachGlyph: View {
+    static let size: CGFloat = 44
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Text(verbatim: "+")
+            .zappFont(.attachGlyph, style: ZappColors.text)
+            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
+            .background(ZappColors.surfaceInput.color(colorScheme))
+    }
 }

@@ -2,10 +2,11 @@
 //  NewChatStore.swift
 //  Zapp
 //
-//  Start a direct conversation: search the saved contacts, or paste a peer's key.
+//  Start a conversation: search the saved contacts, or paste a peer's key. Tapping a
+//  contact opens a DM; "New group" flips the same list into multi-select.
 //
-//  Mirrors Android's NewConversation screen, minus its multi-select group path —
-//  `createGroup` has no surface on `ZappMessagingClient` yet.
+//  Mirrors Android's NewConversation screen, which infers "group" from having selected
+//  more than one participant. Here the mode is explicit, so a one-member group is possible.
 //
 
 import ComposableArchitecture
@@ -30,6 +31,14 @@ struct NewChat {
         /// to. Without an exchange in one direction or the other, neither side can
         /// start anything.
         var myPublicKey = ""
+
+        var isGroupMode = false
+        var selectedContacts: [ChatContact] = []
+        var groupName = ""
+
+        /// The group-name field is only revealed once members are picked, so the CTA
+        /// reads "Create group" both before and after it appears.
+        var isNamingGroup = false
 
         var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
         var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
@@ -58,9 +67,24 @@ struct NewChat {
         }
 
         /// Only an unknown pasted key needs a name; a saved contact already has one.
-        var showsNameField: Bool { isValidKey && detectedContact == nil }
+        /// A group takes keys alone, so the field has no job there.
+        var showsNameField: Bool { !isGroupMode && isValidKey && detectedContact == nil }
 
         var canStart: Bool { isValidKey && !isCreating }
+
+        var isDetectedKeySelected: Bool {
+            isValidKey && selectedContacts.contains { $0.publicKey == detectedKey }
+        }
+
+        var canCreateGroup: Bool { !selectedContacts.isEmpty && !isCreating }
+
+        var canConfirmGroup: Bool {
+            canCreateGroup && !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+
+        func isSelected(_ contact: ChatContact) -> Bool {
+            selectedContacts.contains { $0.publicKey == contact.publicKey }
+        }
 
         init() { }
     }
@@ -78,6 +102,14 @@ struct NewChat {
         case startTapped
         case created(ZMConversation)
         case createFailed(String)
+
+        case newGroupTapped
+        case detectedKeyAdded
+        case participantRemoved(String)
+        case groupCreateTapped
+        case groupNameChanged(String)
+        case groupConfirmTapped
+        case groupCancelTapped
     }
 
     @Dependency(\.mainQueue) var mainQueue
@@ -127,7 +159,22 @@ struct NewChat {
                 return .none
 
             case .contactTapped(let contact):
-                return start(&state, publicKey: contact.publicKey, displayName: contact.name)
+                guard state.isGroupMode else {
+                    return start(&state, publicKey: contact.publicKey, displayName: contact.name)
+                }
+                guard !state.isCreating else { return .none }
+
+                if let index = state.selectedContacts.firstIndex(where: { $0.publicKey == contact.publicKey }) {
+                    state.selectedContacts.remove(at: index)
+                } else {
+                    state.selectedContacts.append(contact)
+                }
+
+                if state.selectedContacts.isEmpty {
+                    state.isNamingGroup = false
+                }
+
+                return .none
 
             case .startTapped:
                 guard state.isValidKey else { return .none }
@@ -140,6 +187,10 @@ struct NewChat {
 
             case .created:
                 state.isCreating = false
+                state.isGroupMode = false
+                state.selectedContacts = []
+                state.groupName = ""
+                state.isNamingGroup = false
                 return .none
 
             case .createFailed(let code):
@@ -147,10 +198,93 @@ struct NewChat {
                 state.errorCode = code
                 return .none
 
+            case .newGroupTapped:
+                guard !state.isCreating, !state.isGroupMode else { return .none }
+                state.isGroupMode = true
+                state.errorCode = nil
+                return .none
+
+            // A pasted key can join a group without ever becoming a saved contact, so the chip
+            // is an unsaved stand-in. It is local to this screen and never reaches @Shared.
+            case .detectedKeyAdded:
+                guard state.isGroupMode, state.isValidKey, !state.isCreating else { return .none }
+
+                let key = state.detectedKey
+                state.searchInput = ""
+
+                guard !state.selectedContacts.contains(where: { $0.publicKey == key }) else { return .none }
+
+                state.selectedContacts.append(
+                    ChatContact(
+                        publicKey: key,
+                        name: state.chatContacts.contact(for: key)?.name ?? String(key.prefix(Constants.keyPreviewLength)),
+                        lastUpdated: .distantPast,
+                        isSaved: false
+                    )
+                )
+
+                return .none
+
+            case .participantRemoved(let publicKey):
+                guard !state.isCreating else { return .none }
+                state.selectedContacts.removeAll { $0.publicKey == publicKey }
+
+                if state.selectedContacts.isEmpty {
+                    state.isNamingGroup = false
+                }
+
+                return .none
+
+            case .groupCreateTapped:
+                guard state.canCreateGroup else { return .none }
+                state.isNamingGroup = true
+                return .none
+
+            case .groupNameChanged(let value):
+                state.groupName = value
+                state.errorCode = nil
+                return .none
+
+            case .groupConfirmTapped:
+                guard state.canConfirmGroup else { return .none }
+                state.isCreating = true
+                state.errorCode = nil
+
+                let name = state.groupName.trimmingCharacters(in: .whitespacesAndNewlines)
+                let keys = state.selectedContacts.map(\.publicKey)
+
+                return .run { send in
+                    do {
+                        let conversation = try await zappMessaging.createGroup(name, keys)
+                        await send(.created(conversation))
+                    } catch {
+                        LoggerProxy.event("NewChat: createGroup failed: \(error)")
+                        await send(.createFailed((error as NSError).domain))
+                    }
+                }
+
+            case .groupCancelTapped:
+                guard !state.isCreating else { return .none }
+
+                if state.isNamingGroup {
+                    state.isNamingGroup = false
+                    state.groupName = ""
+                    return .none
+                }
+
+                state.isGroupMode = false
+                state.selectedContacts = []
+                state.errorCode = nil
+                return .none
+
             case .backToHomeTapped:
                 return .none
             }
         }
+    }
+
+    private enum Constants {
+        static let keyPreviewLength = 8
     }
 
     private func start(

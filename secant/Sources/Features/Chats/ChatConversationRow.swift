@@ -8,9 +8,8 @@ import ZappMessaging
 
 /// One conversation in the Chats tab, mirroring `ChatListConversationItem.kt`.
 ///
-/// `isPeerOnline` and `unreadCount` are passed in rather than read off the conversation: the SDK
-/// carries per-peer status and per-conversation unread, but `ZappMessagingClient` surfaces neither
-/// yet (only a total unread), so the list passes `false` / `0` until it does.
+/// `isPeerOnline` and `unreadCount` are passed in rather than read off the conversation: neither
+/// lives on `ZMConversation`. The list reads both off `ZappMessagingState`, keyed by conversation id.
 struct ChatConversationRow: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -95,6 +94,8 @@ struct ChatConversationRow: View {
             .frame(width: Constants.avatarSize, height: Constants.avatarSize)
             .background(ZappColors.accent.color(colorScheme))
 
+            // Presence is keyed by conversation, so it only means "someone in here is online".
+            // Unambiguous for a DM; meaningless for a group, which therefore gets no dot.
             if isPeerOnline && conversation.type == .direct {
                 Rectangle()
                     .fill(ZappColors.success.color(colorScheme))

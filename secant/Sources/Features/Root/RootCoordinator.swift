@@ -18,7 +18,9 @@ extension Root {
 
             case .settings(.backToHomeTapped),
                 .chatContactsList(.backToHomeTapped),
+                .chatProfile(.backToHomeTapped),
                 .chatRoom(.backToHomeTapped),
+                .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
@@ -260,6 +262,28 @@ extension Root {
                 return .none
 
                 // MARK: - Chats tab
+
+            case .zappTabs(.chatProfileTapped):
+                state.chatProfileState = .initial
+                state.path = .chatProfile
+                return .none
+
+                // Only a group has anything behind its title.
+            case .chatRoom(.titleTapped):
+                guard let conversation = state.chatRoomState.conversation,
+                      conversation.type == .group else {
+                    return .none
+                }
+                state.groupInfoState = .initial
+                state.groupInfoState.conversation = conversation
+                state.path = .groupInfo
+                return .none
+
+                // Leaving drops you out of the group entirely, so go back to the list
+                // rather than to a room that no longer exists.
+            case .groupInfo(.didLeave):
+                state.path = nil
+                return .run { _ in try? await zappMessaging.refreshConversations() }
 
             case .zappTabs(.chatContactsTapped):
                 state.chatContactsListState = .initial

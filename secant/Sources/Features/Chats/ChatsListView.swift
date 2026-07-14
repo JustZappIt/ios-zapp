@@ -9,8 +9,8 @@ import ZappMessaging
 
 /// The Chats tab root, mirroring `ChatListView.kt`.
 ///
-/// Android also pins a "Zapp Support" row, filters blocked contacts and swipes a row away to leave
-/// the conversation. Each needs repository surface iOS does not have yet.
+/// Android also pins a "Zapp Support" row and swipes a row away to leave the conversation. Both
+/// need surface iOS does not have yet.
 struct ChatsListView: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -52,7 +52,9 @@ struct ChatsListView: View {
                 ForEach(store.sortedConversations) { conversation in
                     ChatConversationRow(
                         conversation: conversation,
-                        displayName: store.state.displayName(for: conversation)
+                        displayName: store.state.displayName(for: conversation),
+                        isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
+                        unreadCount: store.state.messagingState.unreadCount(for: conversation.id)
                     ) {
                         store.send(.conversationTapped(conversation.id))
                     }
