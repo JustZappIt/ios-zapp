@@ -12,56 +12,60 @@ import ComposableArchitecture
 import Lottie
 
 struct SendingView: View {
-    @Environment(\.colorScheme) var colorScheme
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     private enum Constants {
         static let lottieNameLight = "sending"
         static let lottieNameDark = "sending-dark"
+        static let lottieSize: CGFloat = 170
     }
-    
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
+                Spacer()
+
                 LottieView(
-                    animation:
-                            .named(
-                                colorScheme == .light ? Constants.lottieNameLight : Constants.lottieNameDark
-                            )
+                    animation: .named(
+                        colorScheme == .light ? Constants.lottieNameLight : Constants.lottieNameDark
+                    )
                 )
                 .resizable()
                 .looping()
-                .frame(width: 170, height: 170)
+                .frame(width: Constants.lottieSize, height: Constants.lottieSize)
 
                 Text(store.isShielding ? String(localizable: .sendShielding) : String(localizable: .sendSending))
-                    .zFont(.semiBold, size: 28, style: Design.Text.primary)
-                    .padding(.top, 16)
+                    .zappFont(.display, style: ZappColors.text)
+                    .padding(.top, Design.Spacing._xl)
 
                 Text(store.sendingInfo)
-                    .zFont(size: 14, style: Design.Text.primary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .lineLimit(store.type != .regular ? 3 : 1)
                     .minimumScaleFactor(store.type != .regular ? 1.0 : 0.5)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, store.type != .regular ? 30 : 0)
 
                 if !store.isShielding && store.type == .regular {
                     Text(store.address.zip316)
-                        .zFont(fontFamily: .robotoMono, size: 14, style: Design.Text.primary)
-                        .padding(.top, 4)
+                        .zappFont(.mono, style: ZappColors.textMuted)
+                        .padding(.top, Design.Spacing._xs)
                 }
+
+                Spacer()
             }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.sendingScreenOnAppear) }
         }
         .navigationBarBackButtonHidden()
-        .screenHorizontalPadding()
-        .applyScreenBackground()
     }
 }
 

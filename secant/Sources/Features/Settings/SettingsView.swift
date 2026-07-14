@@ -3,105 +3,119 @@ import ComposableArchitecture
 
 struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
-    
+
+    private enum Constants {
+        static let logoSize: CGFloat = 41
+        static let wordmarkWidth: CGFloat = 73
+        static let wordmarkHeight: CGFloat = 20
+    }
+
     @Perception.Bindable var store: StoreOf<Settings>
-    
+
     init(store: StoreOf<Settings>) {
         self.store = store
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 VStack(spacing: 0) {
-                    List {
-                        Group {
-                            ActionRow(
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ZappRow(
+                                title: String(localizable: .settingsAddressBook),
                                 icon: Asset.Assets.Icons.user.image,
-                                title: String(localizable: .settingsAddressBook)
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.addressBookAccessCheck)
                             }
                             .accessibilityIdentifier(AccessibilityID.Settings.addressBook)
 
-
                             if store.isEnoughFreeSpaceMode {
-                                ActionRow(
-                                    icon: Asset.Assets.Icons.currencyDollar.image,
+                                ZappRowDivider(inset: true)
+
+                                ZappRow(
                                     title: String(localizable: .currencyConversionTitle),
+                                    icon: Asset.Assets.Icons.currencyDollar.image,
+                                    iconTint: .accentText,
+                                    iconBackground: .accentSoft
                                 ) {
                                     store.send(.currencyConversionTapped)
                                 }
                             }
-                            
-                            ActionRow(
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsCoinholderPolling),
                                 icon: Asset.Assets.Icons.checkVerified.image,
-                                title: String(localizable: .settingsCoinholderPolling)
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.coinholderPollingTapped)
                             }
 
-                            ActionRow(
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsAdvanced),
                                 icon: Asset.Assets.Icons.settings.image,
-                                title: String(localizable: .settingsAdvanced)
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.advancedSettingsTapped)
                             }
-                            
-                            ActionRow(
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsWhatsNew),
                                 icon: Asset.Assets.Icons.magicWand.image,
-                                title: String(localizable: .settingsWhatsNew)
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.whatsNewTapped)
                             }
-                            
-                            ActionRow(
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsAbout),
                                 icon: Asset.Assets.infoOutline.image,
-                                title: String(localizable: .settingsAbout)
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.aboutTapped)
                             }
-                            
-                            ActionRow(
-                                icon: Asset.Assets.Icons.messageSmile.image,
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
                                 title: String(localizable: .settingsFeedback),
-                                divider: false
+                                icon: Asset.Assets.Icons.messageSmile.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
                             ) {
                                 store.send(.sendUsFeedbackTapped)
                             }
                         }
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Asset.Colors.background.color)
-                        .listRowSeparator(.hidden)
+                        .background(ZappColors.surface.color(colorScheme))
+                        .overlay(
+                            Rectangle()
+                                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                        )
+                        .padding(.horizontal, Design.Spacing._lg)
+                        .padding(.top, Design.Spacing._3xl)
                     }
-                    .padding(.top, 24)
-                    .padding(.horizontal, 4)
                     .onAppear { store.send(.onAppear) }
-                    
+
                     Spacer()
 
-                    Group {
-                        Asset.Assets.zashiLogo.image
-                            .zImage(width: 41, height: 41, color: Asset.Colors.primary.color)
-                            .padding(.bottom, 7)
-                        
-                        Asset.Assets.zashiTitle.image
-                            .zImage(width: 73, height: 20, color: Asset.Colors.primary.color)
-                            .padding(.bottom, 16)
-                    }
-                    .onLongPressGesture {
-                        store.send(.enableRecoverFundsMode)
-                    }
-                    .onTapGesture(count: 3) {
-                        store.send(.enableEnhanceTransactionMode)
-                    }
-                    
-                    Text(localizable: .settingsVersion(store.appVersion, store.appBuild))
-                        .zFont(size: 16, style: Design.Text.tertiary)
-                        .padding(.bottom, 24)
+                    footer
                 }
-                .listStyle(.plain)
-                .applyScreenBackground()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(ZappColors.bg.color(colorScheme))
                 .zashiBack() { store.send(.backToHomeTapped) }
                 .screenTitle(String(localizable: .settingsTitle))
             } destination: { store in
@@ -152,7 +166,7 @@ struct SettingsView: View {
                     WhatsNewView(store: store)
                 }
             }
-            .applyScreenBackground()
+            .background(ZappColors.bg.color(colorScheme))
             .zashiSheet(isPresented: $store.isInRecoverFundsMode) {
                 recoverFundsSheetContent()
             }
@@ -174,112 +188,147 @@ struct SettingsView: View {
             }
         }
     }
-    
+
+    /// The wordmark is the only affordance for the two hidden debug modes, so it stays.
+    private var footer: some View {
+        VStack(spacing: 0) {
+            Group {
+                Asset.Assets.zashiLogo.image
+                    .zImage(width: Constants.logoSize, height: Constants.logoSize, style: ZappColors.text)
+                    .padding(.bottom, Design.Spacing._sm)
+
+                Asset.Assets.zashiTitle.image
+                    .zImage(width: Constants.wordmarkWidth, height: Constants.wordmarkHeight, style: ZappColors.text)
+                    .padding(.bottom, Design.Spacing._xl)
+            }
+            .onLongPressGesture {
+                store.send(.enableRecoverFundsMode)
+            }
+            .onTapGesture(count: 3) {
+                store.send(.enableEnhanceTransactionMode)
+            }
+
+            Text(localizable: .settingsVersion(store.appVersion, store.appBuild))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+                .padding(.bottom, Design.Spacing._3xl)
+        }
+    }
+
     @ViewBuilder private func recoverFundsSheetContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(localizable: .recoverFundsTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.top, 24)
-                .padding(.bottom, 12)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._lg)
 
             Text(localizable: .recoverFundsMsg)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 24)
-            
-            ZashiTextField(
-                addressFont: true,
-                text: $store.addressToRecoverFunds,
+                .padding(.bottom, Design.Spacing._3xl)
+
+            sheetField(
+                title: String(localizable: .recoverFundsFieldTitle),
                 placeholder: String(localizable: .recoverFundsPlaceholder),
-                title: String(localizable: .recoverFundsFieldTitle)
+                text: $store.addressToRecoverFunds
             )
-            .padding(.bottom, 32)
+            .padding(.bottom, Design.Spacing._4xl)
 
             if !store.isTorOn {
-                HStack(alignment: .top, spacing: 0) {
+                HStack(alignment: .top, spacing: Design.Spacing._lg) {
                     Asset.Assets.infoOutline.image
-                        .zImage(size: 20, style: Design.Utility.WarningYellow._500)
-                        .padding(.trailing, 12)
-                    
+                        .zImage(size: 20, style: ZappColors.accentText)
+
                     Text(localizable: .recoverFundsTor)
-                        .zFont(size: 12, style: Design.Utility.WarningYellow._700)
+                        .zappFont(.caption, style: ZappColors.accentText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, Design.Spacing._lg)
             }
-            
-            ZashiButton(String(localizable: .recoverFundsBtn)) {
+
+            ZappButton(
+                title: String(localizable: .recoverFundsBtn),
+                isEnabled: !store.addressToRecoverFunds.isEmpty && store.isTorOn
+            ) {
                 store.send(.checkFundsForAddress(store.addressToRecoverFunds))
             }
-            .disabled(store.addressToRecoverFunds.isEmpty || !store.isTorOn)
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-    
+
     @ViewBuilder private func resyncHelpSheetContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(localizable: .restoreWalletHelpTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.top, 24)
-                .padding(.bottom, 12)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._lg)
 
-            HStack(alignment: .top, spacing: 8) {
+            HStack(alignment: .top, spacing: Design.Spacing._md) {
                 Asset.Assets.infoCircle.image
-                    .zImage(size: 20, style: Design.Text.primary)
+                    .zImage(size: 20, style: ZappColors.text)
 
                 if let attrText = try? AttributedString(
                     markdown: String(localizable: .walletBirthdayHelpDesc),
                     including: \.zashiApp
                 ) {
                     ZashiText(withAttributedString: attrText, colorScheme: colorScheme)
-                        .zFont(size: 14, style: Design.Text.tertiary)
+                        .zappFont(.body, style: ZappColors.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding(.bottom, 32)
-            
-            ZashiButton(String(localizable: .restoreInfoGotIt)) {
+            .padding(.bottom, Design.Spacing._4xl)
+
+            ZappButton(title: String(localizable: .restoreInfoGotIt)) {
                 store.send(.closeResyncHelpSheetTapped)
             }
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-    
+
     @ViewBuilder private func enhanceTransactionSheetContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(localizable: .enhanceTransactionTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.top, 24)
-                .padding(.bottom, 12)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._lg)
 
             Text(localizable: .enhanceTransactionMsg)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 24)
-            
-            ZashiTextField(
-                addressFont: true,
-                text: $store.txidToEnhance,
-                placeholder: String(localizable: .enhanceTransactionPlaceholder),
-                title: String(localizable: .enhanceTransactionFieldTitle)
-            )
-            .padding(.bottom, 32)
+                .padding(.bottom, Design.Spacing._3xl)
 
-            ZashiButton(String(localizable: .enhanceTransactionBtn)) {
+            sheetField(
+                title: String(localizable: .enhanceTransactionFieldTitle),
+                placeholder: String(localizable: .enhanceTransactionPlaceholder),
+                text: $store.txidToEnhance
+            )
+            .padding(.bottom, Design.Spacing._4xl)
+
+            ZappButton(
+                title: String(localizable: .enhanceTransactionBtn),
+                isEnabled: !store.txidToEnhance.isEmpty
+            ) {
                 store.send(.fetchDataForTxid(store.txidToEnhance))
             }
-            .disabled(store.txidToEnhance.isEmpty)
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-}
 
-extension Image {
-    func seekOutline(_ colorScheme: ColorScheme) -> some View {
-        self
-            .resizable()
-            .frame(width: 20, height: 20)
-            .background { Circle().fill(Design.Surfaces.bgPrimary.color(colorScheme)).frame(width: 26, height: 26) }
+    @ViewBuilder private func sheetField(
+        title: String,
+        placeholder: String,
+        text: Binding<String>
+    ) -> some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: title)
+
+            TextField(placeholder, text: text, axis: .vertical)
+                .zappFont(.mono, style: ZappColors.text)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .lineLimit(2, reservesSpace: true)
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceInput.color(colorScheme))
+        }
     }
 }
 

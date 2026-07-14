@@ -16,12 +16,20 @@ struct SignWithKeystoneView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.presentationMode) var presentationMode
 
+    private enum Constants {
+        static let vendorIconSize: CGFloat = 24
+        static let vendorIconBox: CGFloat = 40
+        static let qrSize: CGFloat = 216
+        static let qrRenderSize: CGFloat = 250
+        static let qrPadding: CGFloat = 24
+    }
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
 
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
 
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
@@ -30,151 +38,125 @@ struct SignWithKeystoneView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
+                ZappScreenHeader(
+                    title: String(localizable: .keystoneSignWithSignTransaction),
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: { EmptyView() }
+                )
+
                 ScrollView {
                     VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            Asset.Assets.Partners.keystoneLogo.image
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .padding(8)
-                                .background {
-                                    Circle()
-                                        .fill(Design.Surfaces.bgAlt.color(colorScheme))
-                                }
-                                .padding(.trailing, 12)
-                            
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(localizable: .accountsKeystone)
-                                    .zFont(.semiBold, size: 16, style: Design.Text.primary)
-                                
-                                Text(store.selectedWalletAccount?.unifiedAddress?.zip316 ?? "")
-                                    .zFont(fontFamily: .robotoMono, size: 12, style: Design.Text.tertiary)
-                            }
-                            
-                            Spacer()
-                            
-                            Text(localizable: .keystoneSignWithHardware)
-                                .zFont(.medium, size: 12, style: Design.Utility.HyperBlue._700)
-                                .padding(.vertical, 2)
-                                .padding(.horizontal, 8)
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._2xl)
-                                        .fill(Design.Utility.HyperBlue._50.color(colorScheme))
-                                        .background {
-                                            RoundedRectangle(cornerRadius: Design.Radius._2xl)
-                                                .stroke(Design.Utility.HyperBlue._200.color(colorScheme))
-                                        }
-                                }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._2xl)
-                                .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                        }
-                        .padding(.top, 40)
+                        accountCard
 
-                        if let pczt = store.pcztForUI, let encoder = sdkSynchronizer.urEncoderForPCZT(pczt), !store.isQRCodeEnlarged {
-                            AnimatedQRCode(urEncoder: encoder, size: 250)
-                                .frame(width: 216, height: 216)
-                                .padding(24)
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                        .fill(Asset.Colors.ZDesign.Base.bone.color)
-                                        .background {
-                                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                                .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                                        }
-                                }
-                                .padding(.top, 32)
-                                .onTapGesture {
-                                    store.send(.enlargeQRCodeTapped, animation: .easeInOut)
-                                }
-                        } else {
-                            VStack {
-                                ProgressView()
-                            }
-                            .frame(width: 216, height: 216)
-                            .padding(24)
-                            .background {
-                                RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                    .fill(Asset.Colors.ZDesign.Base.bone.color)
-                                    .background {
-                                        RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                            .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                                    }
-                            }
-                            .padding(.top, 32)
-                        }
+                        qrPanel
+                            .padding(.top, Design.Spacing._4xl)
 
                         Text(localizable: .keystoneSignWithTitle)
-                            .zFont(.medium, size: 16, style: Design.Text.primary)
-                            .padding(.top, 32)
-                        
+                            .zappFont(.sectionTitle, style: ZappColors.text)
+                            .padding(.top, Design.Spacing._4xl)
+
                         Text(localizable: .keystoneSignWithDesc)
-                            .zFont(size: 14, style: Design.Text.tertiary)
-                            .screenHorizontalPadding()
-                            .lineLimit(2)
+                            .zappFont(.body, style: ZappColors.textMuted)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
-                            .padding(.top, 4)
+                            .padding(.top, Design.Spacing._xs)
                     }
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .padding(.top, Design.Spacing._2xl)
                 }
 
                 #if DEBUG
-                ZashiButton(
-                    "Share PCZT",
-                    type: .ghost
-                ) {
+                ZappButton(title: "Share PCZT", variant: .ghost) {
                     store.send(.sharePCZT)
                 }
-                .padding(.top, 16)
+                .padding(.horizontal, Design.Spacing._2xl)
                 #endif
 
-                Spacer()
+                VStack(spacing: Design.Spacing._md) {
+                    ZappButton(
+                        title: String(localizable: .keystoneSignWithReject),
+                        variant: .danger
+                    ) {
+                        store.send(.rejectRequested)
+                    }
 
-                ZashiButton(
-                    String(localizable: .keystoneSignWithReject),
-                    type: .destructive1
-                ) {
-                    store.send(.rejectRequested)
+                    ZappButton(title: String(localizable: .keystoneSignWithGetSignature)) {
+                        store.send(.getSignatureTapped)
+                    }
                 }
-                .padding(.bottom, 8)
-
-                ZashiButton(
-                    String(localizable: .keystoneSignWithGetSignature)
-                ) {
-                    store.send(.getSignatureTapped)
-                }
-                .padding(.bottom, 24)
+                .padding(.horizontal, Design.Spacing._2xl)
+                .padding(.top, Design.Spacing._xl)
+                .padding(.bottom, Design.Spacing._3xl)
 
                 shareView()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .zashiSheet(isPresented: $store.rejectSendRequest) {
                 rejectSendContent(colorScheme: colorScheme)
             }
-            .onAppear {
-                store.send(.onAppear)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.top, 20)
+            .onAppear { store.send(.onAppear) }
         }
-        .screenHorizontalPadding()
-        .applyScreenBackground()
         .navigationBarBackButtonHidden(true)
-        .navigationBarTitleDisplayMode(.inline)
-        .screenTitle(String(localizable: .keystoneSignWithSignTransaction))
         .enlargeQR(isPresented: $store.isQRCodeEnlarged) {
             Group {
                 if let pczt = store.pcztForUI, let encoder = sdkSynchronizer.urEncoderForPCZT(pczt) {
                     AnimatedQRCode(urEncoder: encoder, size: UIScreen.main.bounds.width - 64)
                         .padding()
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._4xl)
-                                .fill(Color.white)
-                        }
+                        .background(Color.white)
                 }
             }
+        }
+    }
+
+    private var accountCard: some View {
+        HStack(spacing: Design.Spacing._lg) {
+            Asset.Assets.Partners.keystoneLogo.image
+                .resizable()
+                .frame(width: Constants.vendorIconSize, height: Constants.vendorIconSize)
+                .frame(width: Constants.vendorIconBox, height: Constants.vendorIconBox)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
+
+            VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                Text(localizable: .accountsKeystone)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+
+                Text(store.selectedWalletAccount?.unifiedAddress?.zip316 ?? "")
+                    .zappFont(.mono, style: ZappColors.textMuted)
+            }
+
+            Spacer(minLength: 0)
+
+            ZappStatusChip(text: String(localizable: .keystoneSignWithHardware), variant: .muted)
+        }
+        .padding(Design.Spacing._lg)
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+    }
+
+    // The QR panel keeps a white fill in both themes: a Keystone camera has to read it.
+    @ViewBuilder private var qrPanel: some View {
+        Group {
+            if let pczt = store.pcztForUI, let encoder = sdkSynchronizer.urEncoderForPCZT(pczt), !store.isQRCodeEnlarged {
+                AnimatedQRCode(urEncoder: encoder, size: Constants.qrRenderSize)
+                    .frame(width: Constants.qrSize, height: Constants.qrSize)
+            } else {
+                ProgressView()
+                    .frame(width: Constants.qrSize, height: Constants.qrSize)
+            }
+        }
+        .padding(Constants.qrPadding)
+        .background(Color.white)
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+        .onTapGesture {
+            store.send(.enlargeQRCodeTapped, animation: .easeInOut)
         }
     }
 }

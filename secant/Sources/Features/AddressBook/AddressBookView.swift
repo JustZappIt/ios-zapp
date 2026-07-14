@@ -8,21 +8,17 @@
 import SwiftUI
 import ComposableArchitecture
 
-extension String {
-    var initials: String {
-        var res = ""
-        self.split(separator: " ").forEach {
-            if let firstChar = $0.first, res.count < 2 {
-                res.append(String(firstChar))
-            }
-        }
-
-        return res
-    }
-}
-
+/// The ZEC address book. Chat contacts are a separate screen (`ChatContactsListView`) with a separate
+/// store; the two are never merged.
 struct AddressBookView: View {
     @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let emptyIconSize: CGFloat = 32
+        static let emptyIconBoxSize: CGFloat = 72
+        static let menuIconSize: CGFloat = 20
+    }
+
     @Perception.Bindable var store: StoreOf<AddressBook>
 
     init(store: StoreOf<AddressBook>) {
@@ -34,31 +30,21 @@ struct AddressBookView: View {
             VStack(alignment: .leading, spacing: 0) {
                 if store.isInSelectMode && store.walletAccounts.count > 1 && store.context != .swap {
                     contactsList()
+                } else if store.addressBookContactsToShow.contacts.isEmpty {
+                    Spacer()
+
+                    emptyState()
+
+                    Spacer()
                 } else {
-                    if store.addressBookContactsToShow.contacts.isEmpty {
-                        Spacer()
-                        
-                        VStack(spacing: 40) {
-                            emptyComposition()
-                            
-                            Text(localizable: .addressBookEmpty)
-                                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .screenHorizontalPadding()
-                    } else {
-                        contactsList()
-                    }
+                    contactsList()
                 }
-
-                Spacer()
-
-                addContactButton(store)
             }
-            .padding(.top, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.top, Design.Spacing._3xl)
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
-            .zashiBack()
+            .zashiBack(primaryAction: { addContactButton })
             .screenTitle(
                 store.isInSelectMode
                 && (!store.addressBookContactsToShow.contacts.isEmpty || store.walletAccounts.count > 1 || store.context == .swap)
@@ -66,11 +52,10 @@ struct AddressBookView: View {
                 : String(localizable: .addressBookTitle)
             )
             .navigationBarTitleDisplayMode(.inline)
-            .applyScreenBackground()
         }
     }
 
-    func addContactButton(_ store: StoreOf<AddressBook>) -> some View {
+    private var addContactButton: some View {
         WithPerceptionTracking {
             Menu {
                 Button {
@@ -78,7 +63,7 @@ struct AddressBookView: View {
                 } label: {
                     HStack {
                         Asset.Assets.Icons.qr.image
-                            .zImage(size: 20, style: Design.Text.primary)
+                            .zImage(size: Constants.menuIconSize, style: ZappColors.text)
 
                         Text(localizable: .addressBookScanAddress)
                     }
@@ -90,177 +75,205 @@ struct AddressBookView: View {
                 } label: {
                     HStack {
                         Asset.Assets.Icons.pencil.image
-                            .zImage(size: 20, style: Design.Text.primary)
+                            .zImage(size: Constants.menuIconSize, style: ZappColors.text)
 
                         Text(localizable: .addressBookManualEntry)
                     }
                 }
                 .accessibilityIdentifier(AccessibilityID.AddressBook.manualEntry)
             } label: {
-                ZashiButton(
-                    String(localizable: .addressBookAddNewContact),
-                    prefixView:
-                        Asset.Assets.Icons.plus.image
-                            .renderingMode(.template)
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                ) {
-
-                }
-                .screenHorizontalPadding()
-                .padding(.bottom, 24)
-                .padding(.top, 8)
+                // The Menu owns the tap; the button is a label, so its own action stays empty, as upstream.
+                ZappButton(
+                    title: String(localizable: .addressBookAddNewContact),
+                    leadingIcon: Asset.Assets.Icons.plus.image
+                ) { }
             }
             .accessibilityIdentifier(AccessibilityID.AddressBook.addContact)
         }
     }
-    
-    func emptyComposition() -> some View {
-        Asset.Assets.send.image
-            .zImage(size: 32, style: Design.Btns.Tertiary.fg)
-            .zForegroundColor(Design.Btns.Tertiary.fg)
-            .background {
-                Circle()
-                    .fill(Design.Btns.Tertiary.bg.color(colorScheme))
-                    .frame(width: 72, height: 72)
-            }
-    }
-    
-    @ViewBuilder func contactsList() -> some View {
-        List {
-            if store.walletAccounts.count > 1 && store.isInSelectMode && store.context != .swap {
-                Text(localizable: .accountsAddressBookYour)
-                    .zFont(.medium, size: 14, style: Design.Text.tertiary)
-                    .padding(.top, 24)
-                    .padding(.bottom, 16)
-                    .screenHorizontalPadding()
-                    .listBackground()
 
-                ForEach(store.walletAccounts, id: \.self) { walletAccount in
-                    if walletAccount != store.selectedWalletAccount {
-                        VStack {
-                            walletAccountView(
-                                icon: walletAccount.vendor.icon(),
-                                title: walletAccount.vendor.name(),
-                                address: walletAccount.unifiedAddress ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
-                            ) {
-                                store.send(.walletAccountTapped(walletAccount))
-                            }
-                            
-                            if let last = store.walletAccounts.last, last != walletAccount {
-                                Design.Surfaces.divider.color(colorScheme)
-                                    .frame(height: 1)
-                                    .padding(.top, 12)
-                                    .padding(.horizontal, 4)
-                            }
-                        }
-                        .listBackground()
-                    }
-                }
-                
-                if store.addressBookContactsToShow.contacts.isEmpty {
-                    VStack(spacing: 40) {
-                        emptyComposition()
-                        
-                        Text(localizable: .addressBookEmpty)
-                            .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .listBackground()
-                    .screenHorizontalPadding()
-                    .padding(.bottom, 40)
-                    .padding(.top, 70)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._2xl)
-                            .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), style: StrokeStyle(lineWidth: 2.0, dash: [8, 6]))
-                    }
-                    .padding(.top, 24)
-                    .screenHorizontalPadding()
-                } else {
-                    Text(localizable: .accountsAddressBookContacts)
-                        .zFont(.medium, size: 14, style: Design.Text.tertiary)
-                        .padding(.top, 32)
-                        .padding(.bottom, 16)
-                        .screenHorizontalPadding()
-                        .listBackground()
-                }
-            }
+    private func emptyState() -> some View {
+        VStack(spacing: Design.Spacing._5xl) {
+            Asset.Assets.send.image
+                .zImage(size: Constants.emptyIconSize, style: ZappColors.textSubtle)
+                .frame(width: Constants.emptyIconBoxSize, height: Constants.emptyIconBoxSize)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
 
-            ForEach(store.addressBookContactsToShow.contacts, id: \.self) { record in
-                VStack {
-                    ContactView(
-                        iconText: record.name.initials,
-                        tickerIcon: AddressBook.contactTicker(chainId: record.chainId),
-                        title: record.name,
-                        desc: record.address.trailingZip316,
-                        descIsAddress: true
-                    ) {
-                        store.send(.editId(record.address, record.id))
-                    }
-
-                    if let last = store.addressBookContactsToShow.contacts.last, last != record {
-                        Design.Surfaces.divider.color(colorScheme)
-                            .frame(height: 1)
-                            .padding(.top, 12)
-                            .padding(.horizontal, 4)
-                    }
-                }
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Asset.Colors.background.color)
-                .listRowSeparator(.hidden)
-            }
+            Text(localizable: .addressBookEmpty)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .multilineTextAlignment(.center)
         }
-        .padding(.vertical, 1)
-        .background(Asset.Colors.background.color)
-        .listStyle(.plain)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, Design.Spacing._lg)
     }
 
-    @ViewBuilder func walletAccountView(
-        icon: Image,
-        title: String,
-        address: String,
-        selected: Bool = false,
-        action: (() -> Void)? = nil
-    ) -> some View {
-        WithPerceptionTracking {
-            Button {
-                action?()
-            } label: {
-                HStack(spacing: 0) {
-                    icon
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .padding(8)
-                        .background {
-                            Circle()
-                                .fill(Design.Surfaces.bgAlt.color(colorScheme))
+    @ViewBuilder private func contactsList() -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                if store.walletAccounts.count > 1 && store.isInSelectMode && store.context != .swap {
+                    ZappGroupHeader(text: String(localizable: .accountsAddressBookYour))
+
+                    VStack(spacing: 0) {
+                        ForEach(store.walletAccounts, id: \.self) { walletAccount in
+                            WithPerceptionTracking {
+                                if walletAccount != store.selectedWalletAccount {
+                                    AddressBookRow(
+                                        title: walletAccount.vendor.name(),
+                                        subtitle: (
+                                            walletAccount.unifiedAddress
+                                            ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
+                                        ).zip316,
+                                        leading: .vendor(walletAccount.vendor.icon())
+                                    ) {
+                                        store.send(.walletAccountTapped(walletAccount))
+                                    }
+
+                                    if store.walletAccounts.last != walletAccount {
+                                        ZappRowDivider(inset: true)
+                                    }
+                                }
+                            }
                         }
-                        .padding(.trailing, 12)
-                    
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(title)
-                            .zFont(.semiBold, size: 14, style: Design.Text.primary)
-                        
-                        Text(address.zip316)
-                            .zFont(fontFamily: .robotoMono, size: 12, style: Design.Text.tertiary)
                     }
-                    
-                    Spacer()
-                    
-                    Asset.Assets.chevronRight.image
-                        .zImage(size: 20, style: Design.Text.tertiary)
+                    .zappCard()
+
+                    if store.addressBookContactsToShow.contacts.isEmpty {
+                        emptyState()
+                            .padding(.top, Design.Spacing._7xl)
+                            .padding(.bottom, Design.Spacing._5xl)
+                    } else {
+                        ZappGroupHeader(text: String(localizable: .accountsAddressBookContacts))
+                    }
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background {
-                    if selected {
-                        RoundedRectangle(cornerRadius: Design.Radius._2xl)
-                            .fill(Design.Surfaces.bgSecondary.color(colorScheme))
+
+                if !store.addressBookContactsToShow.contacts.isEmpty {
+                    VStack(spacing: 0) {
+                        ForEach(store.addressBookContactsToShow.contacts, id: \.self) { record in
+                            WithPerceptionTracking {
+                                AddressBookRow(
+                                    title: record.name,
+                                    subtitle: record.address.trailingZip316,
+                                    leading: .initials(
+                                        record.name.zappInitials,
+                                        ticker: AddressBook.contactTicker(chainId: record.chainId)
+                                    )
+                                ) {
+                                    store.send(.editId(record.address, record.id))
+                                }
+
+                                if store.addressBookContactsToShow.contacts.last != record {
+                                    ZappRowDivider(inset: true)
+                                }
+                            }
+                        }
                     }
+                    .zappCard()
                 }
             }
+            .padding(.bottom, ZappNavBar.pushedFloatingMargin)
         }
+    }
+}
+
+/// A `ZappRow`-shaped row whose leading slot is either an initials tile or a vendor mark. `ZappRow`
+/// only takes a template `Image`, which would flatten a vendor logo to a single tint.
+private struct AddressBookRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    enum Leading {
+        case initials(String, ticker: Image?)
+        case vendor(Image)
+    }
+
+    private enum Constants {
+        static let minHeight: CGFloat = 56
+        static let horizontalPadding: CGFloat = 18
+        static let verticalPadding: CGFloat = 12
+        static let spacing: CGFloat = 14
+        static let tileSize: CGFloat = 36
+        static let vendorIconSize: CGFloat = 20
+        static let tickerSize: CGFloat = 14
+        static let chevronSize: CGFloat = 18
+    }
+
+    let title: String
+    let subtitle: String
+    let leading: Leading
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: Constants.spacing) {
+                leadingTile
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .zappFont(.rowTitle, style: ZappColors.text)
+                        .lineLimit(1)
+
+                    Text(subtitle)
+                        .zappFont(.mono, style: ZappColors.textMuted)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Asset.Assets.chevronRight.image
+                    .zImage(size: Constants.chevronSize, style: ZappColors.textSubtle)
+            }
+            .padding(.horizontal, Constants.horizontalPadding)
+            .padding(.vertical, Constants.verticalPadding)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: Constants.minHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+    }
+
+    @ViewBuilder private var leadingTile: some View {
+        switch leading {
+        case let .initials(initials, ticker):
+            Text(initials)
+                .zappFont(.caption, style: ZappColors.accentText)
+                .minimumScaleFactor(0.5)
+                .frame(width: Constants.tileSize, height: Constants.tileSize)
+                .background(ZappColors.accentSoft.color(colorScheme))
+                .overlay(alignment: .bottomTrailing) {
+                    if let ticker {
+                        ticker
+                            .resizable()
+                            .frame(width: Constants.tickerSize, height: Constants.tickerSize)
+                            .padding(1)
+                            .background(ZappColors.surface.color(colorScheme))
+                    }
+                }
+        case let .vendor(icon):
+            icon
+                .resizable()
+                .frame(width: Constants.vendorIconSize, height: Constants.vendorIconSize)
+                .frame(width: Constants.tileSize, height: Constants.tileSize)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
+        }
+    }
+}
+
+private struct ZappCard: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
+            .padding(.horizontal, Design.Spacing._lg)
+    }
+}
+
+private extension View {
+    func zappCard() -> some View {
+        modifier(ZappCard())
     }
 }
 

@@ -42,7 +42,7 @@ struct ZappTabsView: View {
     private func content() -> some View {
         switch store.selectedTab {
         case .pay:
-            HomeView(store: homeStore, tokenName: tokenName)
+            ZappPayView(store: homeStore, tokenName: tokenName)
         case .chats:
             if store.hasChatIdentity {
                 ChatsListView(store: chatsListStore)

@@ -14,13 +14,11 @@ struct SendCoordFlowView: View {
     @Perception.Bindable var store: StoreOf<SendCoordFlow>
     let tokenName: String
 
-    @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
-
     init(store: StoreOf<SendCoordFlow>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
@@ -31,13 +29,6 @@ struct SendCoordFlowView: View {
                             action: \.sendForm
                         ),
                     tokenName: tokenName
-                )
-                .screenTitle(String(localizable: .generalSend))
-                .navigationBarItems(
-                    trailing:
-                        HStack(spacing: 0) {
-                            hideBalancesButton()
-                        }
                 )
             } destination: { store in
                 switch store.case {
@@ -67,19 +58,9 @@ struct SendCoordFlowView: View {
                     TransactionDetailsView(store: store, tokenName: tokenName)
                 }
             }
+            .navigationBarHidden(true)
         }
-        .applyScreenBackground()
-    }
-    
-    private func hideBalancesButton() -> some View {
-        Button {
-            $isSensitiveContentHidden.withLock { $0.toggle() }
-        } label: {
-            let image = isSensitiveContentHidden ? Asset.Assets.eyeOff.image : Asset.Assets.eyeOn.image
-            image
-                .zImage(size: 24, color: Asset.Colors.primary.color)
-                .padding(Design.Spacing.navBarButtonPadding)
-        }
+        .background(ZappColors.bg.color(colorScheme))
     }
 }
 

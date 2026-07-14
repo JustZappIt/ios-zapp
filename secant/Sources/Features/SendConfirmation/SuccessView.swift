@@ -10,14 +10,20 @@ import ComposableArchitecture
 @preconcurrency import ZcashLightClientKit
 
 struct SuccessView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let illustrationSize: CGFloat = 148
+    }
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
@@ -25,58 +31,55 @@ struct SuccessView: View {
 
                 store.successIlustration
                     .resizable()
-                    .frame(width: 148, height: 148)
+                    .frame(width: Constants.illustrationSize, height: Constants.illustrationSize)
 
                 Text(store.isShielding ? String(localizable: .sendSuccessShielding) : String(localizable: .sendSuccess))
-                    .zFont(.semiBold, size: 28, style: Design.Text.primary)
-                    .padding(.top, 16)
+                    .zappFont(.display, style: ZappColors.text)
+                    .padding(.top, Design.Spacing._xl)
 
                 Text(store.successInfo)
-                    .zFont(size: 14, style: Design.Text.primary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(1.5)
-                    .padding(.top, 8)
-                    .screenHorizontalPadding()
+                    .padding(.top, Design.Spacing._md)
 
                 if !store.isShielding && store.type == .regular {
                     Text(store.address.zip316)
-                        .zFont(fontFamily: .robotoMono, size: 14, style: Design.Text.primary)
-                        .padding(.top, 4)
+                        .zappFont(.mono, style: ZappColors.textMuted)
+                        .padding(.top, Design.Spacing._xs)
                 }
 
                 if store.txIdToExpand != nil || store.type == .regular {
-                    ZashiButton(
-                        String(localizable: .sendViewTransaction),
-                        type: .tertiary,
-                        infinityWidth: false
+                    ZappButton(
+                        title: String(localizable: .sendViewTransaction),
+                        variant: .accentGhost
                     ) {
                         store.send(.viewTransactionTapped)
                     }
-                    .padding(.top, 16)
+                    .padding(.top, Design.Spacing._xl)
                 }
 
                 Spacer()
-                
-                ZashiButton(
-                    String(localizable: .generalClose),
-                    type: store.type != .regular ? .ghost : .primary
+
+                ZappButton(
+                    title: String(localizable: .generalClose),
+                    variant: store.type != .regular ? .ghost : .primary
                 ) {
                     store.send(.closeTapped)
                 }
-                .padding(.bottom, store.type != .regular ? 12 : 24)
+                .padding(.bottom, store.type != .regular ? Design.Spacing._lg : Design.Spacing._3xl)
 
                 if store.type != .regular {
-                    ZashiButton(String(localizable: .swapAndPayCheckStatus)) {
+                    ZappButton(title: String(localizable: .swapAndPayCheckStatus)) {
                         store.send(.checkStatusTapped)
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Design.Spacing._3xl)
                 }
             }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
         }
         .navigationBarBackButtonHidden()
-        .padding(.vertical, 1)
-        .screenHorizontalPadding()
-        .applySuccessScreenBackground()
     }
 }
 

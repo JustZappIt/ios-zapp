@@ -11,197 +11,178 @@ import ComposableArchitecture
 
 struct SendConfirmationView: View {
     @Environment(\.colorScheme) private var colorScheme
-    
+
+    private enum Constants {
+        static let vendorIconSize: CGFloat = 24
+        static let vendorIconBox: CGFloat = 32
+    }
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
-            VStack {
+            VStack(spacing: 0) {
+                ZappScreenHeader(
+                    title: title,
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: { EmptyView() }
+                )
+
                 ScrollView {
-                    // Total Amount
-                    VStack(spacing: 0) {
-                        Text(localizable: .sendAmountSummary)
-                            .zFont(size: 14, style: Design.Text.primary)
-                            .padding(.bottom, 2)
-                        
-                        BalanceWithIconView(balance: store.amount + store.feeRequired)
-                        
-                        Text(store.currencyAmount.data)
-                            .zFont(.semiBold, size: 16, style: Design.Text.primary)
-                            .padding(.top, 10)
-                    }
-                    .screenHorizontalPadding()
-                    .padding(.top, 40)
-                    .padding(.bottom, 20)
+                    VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
+                        total
+                        sendingTo
 
-                    // Sending to
-                    HStack {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(localizable: .sendToSummary)
-                                .zFont(.medium, size: 14, style: Design.Text.tertiary)
-
-                            if let alias = store.alias {
-                                Text(alias)
-                                    .zFont(.medium, size: 14, style: Design.Inputs.Filled.label)
-                            }
-                            
-                            Text(store.address)
-                                .zFont(fontFamily: .robotoMono, size: 12, style: Design.Text.primary)
+                        if store.walletAccounts.count > 1 {
+                            sendingFrom
                         }
-                        
-                        Spacer()
-                    }
-                    .screenHorizontalPadding()
-                    .padding(.bottom, 20)
 
-                    // Sending from
-                    if store.walletAccounts.count > 1 {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(localizable: .accountsSendingFrom)
-                                    .zFont(.medium, size: 14, style: Design.Text.tertiary)
-                                
-                                if let selectedWalletAccount = store.selectedWalletAccount {
-                                    HStack(spacing: 0) {
-                                        selectedWalletAccount.vendor.icon()
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                            .background {
-                                                Circle()
-                                                    .fill(Design.Surfaces.bgAlt.color(colorScheme))
-                                                    .frame(width: 32, height: 32)
-                                            }
-                                        
-                                        Text(selectedWalletAccount.vendor.name())
-                                            .zFont(.semiBold, size: 16, style: Design.Text.primary)
-                                            .padding(.leading, 16)
-                                    }
-                                }
-                            }
-                            
-                            Spacer()
+                        amountRow
+                        feeRow
+
+                        if !store.message.isEmpty {
+                            memo
                         }
-                        .screenHorizontalPadding()
-                        .padding(.bottom, 20)
                     }
-
-                    // Amount
-                    HStack {
-                        Text(localizable: .sendAmount)
-                            .zFont(.medium, size: 14, style: Design.Text.tertiary)
-                        
-                        Spacer()
-
-                        ZatoshiRepresentationView(
-                            balance: store.amount,
-                            fontName: FontFamily.Inter.semiBold.name,
-                            mostSignificantFontSize: 14,
-                            leastSignificantFontSize: 7,
-                            format: .expanded
-                        )
-                        .padding(.trailing, 4)
-                    }
-                    .screenHorizontalPadding()
-                    .padding(.bottom, 20)
-                    
-                    // Fee
-                    HStack {
-                        Text(localizable: .sendFeeSummary)
-                            .zFont(.medium, size: 14, style: Design.Text.tertiary)
-                        
-                        Spacer()
-
-                        ZatoshiRepresentationView(
-                            balance: store.feeRequired,
-                            fontName: FontFamily.Inter.semiBold.name,
-                            mostSignificantFontSize: 14,
-                            leastSignificantFontSize: 7,
-                            format: .expanded
-                        )
-                        .padding(.trailing, 4)
-                    }
-                    .screenHorizontalPadding()
-                    .padding(.bottom, 20)
-
-                    // Memo
-                    if !store.message.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text(localizable: .sendMessage)
-                                .zFont(.medium, size: 14, style: Design.Text.tertiary)
-
-                            HStack {
-                                Text(store.message)
-                                    .zFont(.medium, size: 14, style: Design.Inputs.Filled.text)
-                                
-                                Spacer(minLength: 0)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background {
-                                RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                    .fill(Design.Inputs.Filled.bg.color(colorScheme))
-                            }
-                        }
-                        .screenHorizontalPadding()
-                        .padding(.bottom, 40)
-                    }
-                }
-                .padding(.vertical, 1)
-                .alert($store.scope(state: \.alert, action: \.alert))
-                
-                Spacer()
-
-                if store.selectedWalletAccount?.vendor == .keystone {
-                    ZashiButton(String(localizable: .keystoneConfirm)) {
-                        store.send(.confirmWithKeystoneTapped)
-                    }
-                    .screenHorizontalPadding()
-                    .padding(.bottom, 24)
-                } else {
-                    if store.isSending {
-                        ZashiButton(
-                            String(localizable: .sendSending),
-                            accessoryView:
-                                ProgressView()
-                                .progressViewStyle(
-                                    CircularProgressViewStyle(
-                                        tint: Asset.Colors.secondary.color
-                                    )
-                                )
-                        ) { }
-                        .screenHorizontalPadding()
-                        .padding(.bottom, 24)
-                        .disabled(store.isSending)
-                    } else {
-                        ZashiButton(String(localizable: .generalSend)) {
-                            store.send(.sendTapped)
-                        }
-                        .accessibilityIdentifier(AccessibilityID.SendConfirmation.sendButton)
-                        .screenHorizontalPadding()
-                        .padding(.bottom, 24)
-                    }
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .padding(.top, Design.Spacing._2xl)
+                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
-            .screenTitle(
-                store.selectedWalletAccount?.vendor == .keystone
-                ? String(localizable: .sendReview)
-                : String(localizable: .sendConfirmationTitle)
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .zashiBack(
+                store.isSending,
+                primaryAction: { confirmButton },
+                customDismiss: { store.send(.cancelTapped) }
             )
-            .zashiBack(store.isSending) {
-                store.send(.cancelTapped)
+        }
+        .navigationBarBackButtonHidden()
+    }
+
+    private var title: String {
+        store.selectedWalletAccount?.vendor == .keystone
+            ? String(localizable: .sendReview)
+            : String(localizable: .sendConfirmationTitle)
+    }
+
+    @ViewBuilder private var confirmButton: some View {
+        if store.selectedWalletAccount?.vendor == .keystone {
+            ZappButton(title: String(localizable: .keystoneConfirm)) {
+                store.send(.confirmWithKeystoneTapped)
+            }
+        } else if store.isSending {
+            ZappButton(title: String(localizable: .sendSending), isEnabled: false) { }
+        } else {
+            ZappButton(title: String(localizable: .generalSend)) {
+                store.send(.sendTapped)
+            }
+            .accessibilityIdentifier(AccessibilityID.SendConfirmation.sendButton)
+        }
+    }
+
+    private var total: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .sendAmountSummary))
+
+            BalanceWithIconView(balance: store.amount + store.feeRequired)
+
+            Text(store.currencyAmount.data)
+                .zappFont(.rowTitle, style: ZappColors.textMuted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var sendingTo: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .sendToSummary))
+
+            if let alias = store.alias {
+                Text(alias)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+            }
+
+            Text(store.address)
+                .zappFont(.mono, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var sendingFrom: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .accountsSendingFrom))
+
+            if let selectedWalletAccount = store.selectedWalletAccount {
+                HStack(spacing: Design.Spacing._lg) {
+                    selectedWalletAccount.vendor.icon()
+                        .resizable()
+                        .frame(width: Constants.vendorIconSize, height: Constants.vendorIconSize)
+                        .frame(width: Constants.vendorIconBox, height: Constants.vendorIconBox)
+                        .background(ZappColors.surfaceAlt.color(colorScheme))
+
+                    Text(selectedWalletAccount.vendor.name())
+                        .zappFont(.rowTitle, style: ZappColors.text)
+                }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
-        .padding(.vertical, 1)
-        .applyScreenBackground()
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var amountRow: some View {
+        HStack {
+            Text(localizable: .sendAmount)
+                .zappFont(.body, style: ZappColors.textMuted)
+
+            Spacer()
+
+            ZatoshiRepresentationView(
+                balance: store.amount,
+                fontName: FontFamily.Inter.semiBold.name,
+                mostSignificantFontSize: 14,
+                leastSignificantFontSize: 7,
+                format: .expanded
+            )
+        }
+    }
+
+    private var feeRow: some View {
+        HStack {
+            Text(localizable: .sendFeeSummary)
+                .zappFont(.body, style: ZappColors.textMuted)
+
+            Spacer()
+
+            ZatoshiRepresentationView(
+                balance: store.feeRequired,
+                fontName: FontFamily.Inter.semiBold.name,
+                mostSignificantFontSize: 14,
+                leastSignificantFontSize: 7,
+                format: .expanded
+            )
+        }
+    }
+
+    private var memo: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .sendMessage))
+
+            Text(store.message)
+                .zappFont(.body, style: ZappColors.text)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceInput.color(colorScheme))
+        }
     }
 }
 

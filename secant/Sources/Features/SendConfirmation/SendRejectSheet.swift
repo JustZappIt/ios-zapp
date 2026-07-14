@@ -12,33 +12,30 @@ extension SignWithKeystoneView {
     @ViewBuilder func rejectSendContent(colorScheme: ColorScheme) -> some View {
         VStack(spacing: 0) {
             Asset.Assets.Icons.arrowUp.image
-                .zImage(size: 20, style: Design.Utility.ErrorRed._500)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.ErrorRed._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
-                .padding(.bottom, 20)
+                .zImage(width: 20, height: 20, style: ZappColors.danger)
+                .frame(width: 44, height: 44)
+                .background(ZappColors.dangerSoft.color(colorScheme))
+                .padding(.top, Design.Spacing._6xl)
+                .padding(.bottom, Design.Spacing._2xl)
 
             Text(localizable: .keystoneTransactionRejectTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.bottom, 8)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.bottom, Design.Spacing._md)
 
             Text(localizable: .keystoneTransactionRejectMsg)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 32)
+                .padding(.bottom, Design.Spacing._4xl)
 
-            ZashiButton(String(localizable: .keystoneTransactionRejectGoBack)) {
+            ZappButton(title: String(localizable: .keystoneTransactionRejectGoBack)) {
                 store.send(.rejectRequestCanceled)
             }
-            .padding(.bottom, 8)
-            
-            ZashiButton(
-                String(localizable: .keystoneTransactionRejectRejectSig),
-                type: .destructive2
+            .padding(.bottom, Design.Spacing._md)
+
+            ZappButton(
+                title: String(localizable: .keystoneTransactionRejectRejectSig),
+                variant: .danger
             ) {
                 store.send(.rejectTapped)
             }

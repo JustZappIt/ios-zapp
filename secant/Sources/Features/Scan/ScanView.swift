@@ -11,18 +11,31 @@ import ComposableArchitecture
 struct ScanView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
-    
+
+    // The scanner chrome sits on a live camera feed, so it is fixed light-on-dark in both themes
+    // rather than reading ZappColors, which would flip it to dark-on-dark in light mode.
+    private enum Constants {
+        static let chromeForeground = Color.white
+        static let chromeBackground = Color.black.opacity(0.55)
+        static let scrimOpacity: CGFloat = 0.65
+        static let controlIconSize: CGFloat = 24
+        static let controlBox: CGFloat = 48
+        static let controlOffset: CGFloat = 35
+        static let controlDrop: CGFloat = 45
+        static let progressDrop: CGFloat = 56
+    }
+
     @State private var image: UIImage?
     @State private var showSheet = false
-    
+
     let store: StoreOf<Scan>
     let popoverRatio: CGFloat
-    
+
     init(store: StoreOf<Scan>, popoverRatio: CGFloat = 1.0) {
         self.store = store
         self.popoverRatio = popoverRatio
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             ZStack {
@@ -57,56 +70,52 @@ struct ScanView: View {
                         }
                     }
                     
-                    VStack {
+                    VStack(spacing: 0) {
                         WithPerceptionTracking {
                             if let instructions = store.instructions {
                                 Text(instructions)
-                                    .font(.custom(FontFamily.Inter.semiBold.name, size: 20))
-                                    .foregroundColor(Asset.Colors.ZDesign.shark200.color)
-                                    .padding(.top, 64)
+                                    .zappFont(.sectionTitle, color: Constants.chromeForeground)
+                                    .padding(.top, Design.Spacing._7xl)
                                     .lineLimit(nil)
                                     .multilineTextAlignment(.center)
-                                    .lineSpacing(3)
-                                    .screenHorizontalPadding()
                             }
-                            
+
                             Spacer()
-                            
-                            HStack(alignment: .top, spacing: 0) {
-                                if !store.info.isEmpty {
+
+                            if !store.info.isEmpty {
+                                HStack(alignment: .top, spacing: Design.Spacing._lg) {
                                     Asset.Assets.infoOutline.image
-                                        .zImage(size: 20, color: Asset.Colors.ZDesign.shark200.color)
-                                        .padding(.trailing, 12)
-                                    
+                                        .zImage(width: 20, height: 20, color: Constants.chromeForeground)
+
                                     Text(store.info)
-                                        .font(.custom(FontFamily.Inter.medium.name, size: 12))
-                                        .foregroundColor(Asset.Colors.ZDesign.shark200.color)
-                                        .padding(.top, 2)
-                                    
+                                        .zappFont(.caption, color: Constants.chromeForeground)
+
                                     Spacer(minLength: 0)
                                 }
+                                .padding(.bottom, Design.Spacing._xl)
                             }
-                            .padding(.bottom, 15)
-                            
+
                             if !store.isCameraEnabled {
-                                primaryButton(String(localizable: .scanOpenSettings)) {
+                                ZappButton(title: String(localizable: .scanOpenSettings)) {
                                     if let url = URL(string: UIApplication.openSettingsURLString) {
                                         openURL(url)
                                     }
                                 }
+                                .padding(.bottom, Design.Spacing._5xl)
                             } else {
-                                primaryButton(String(localizable: .generalCancel)) {
+                                ZappButton(title: String(localizable: .generalCancel)) {
                                     store.send(.cancelTapped)
                                 }
+                                .padding(.bottom, Design.Spacing._5xl)
                             }
                         }
                     }
-                    .screenHorizontalPadding()
+                    .padding(.horizontal, Design.Spacing._2xl)
                 }
             }
             .edgesIgnoringSafeArea(.all)
             .ignoresSafeArea()
-            .applyScreenBackground()
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .zashiBackV2(hidden: store.isCameraEnabled, invertedColors: colorScheme == .light) {
@@ -120,96 +129,71 @@ struct ScanView: View {
         }
     }
     
-    private func primaryButton(_ text: String, action: @escaping () -> Void) -> some View {
-        Button {
-            action()
-        } label: {
-            Text(text)
-                .font(.custom(FontFamily.Inter.semiBold.name, size: 16))
-                .foregroundColor(Asset.Colors.ZDesign.Base.obsidian.color)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
-                .frame(maxWidth: .infinity)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                        .fill(Asset.Colors.ZDesign.Base.bone.color)
-                }
+    private func controlButton(icon: Image, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            icon
+                .zImage(
+                    width: Constants.controlIconSize,
+                    height: Constants.controlIconSize,
+                    color: Constants.chromeForeground
+                )
+                .frame(width: Constants.controlBox, height: Constants.controlBox)
+                .background(Constants.chromeBackground)
         }
-        .padding(.bottom, 40)
+        .buttonStyle(.zappPress)
     }
-    
+
     private func torchButton(size: CGSize) -> some View {
         let topLeft = ScanView.rectOfInterest(size, popoverRatio).origin
         let frameSize = ScanView.frameSize(size, popoverRatio)
 
         return WithPerceptionTracking {
-            Button {
+            controlButton(
+                icon: store.isTorchOn
+                    ? Asset.Assets.Icons.flashOff.image
+                    : Asset.Assets.Icons.flashOn.image
+            ) {
                 store.send(.torchTapped)
-            } label: {
-                if store.isTorchOn {
-                    Asset.Assets.Icons.flashOff.image
-                        .zImage(size: 24, color: Asset.Colors.ZDesign.shark50.color)
-                        .padding(12)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                .fill(Asset.Colors.ZDesign.shark900.color)
-                        }
-                } else {
-                    Asset.Assets.Icons.flashOn.image
-                        .zImage(size: 24, color: Asset.Colors.ZDesign.shark50.color)
-                        .padding(12)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                .fill(Asset.Colors.ZDesign.shark900.color)
-                        }
-                }
             }
             .position(
-                x: topLeft.x + frameSize.width * 0.5 + (store.forceLibraryToHide ? 0 : 35),
-                y: topLeft.y + frameSize.height + 45
+                x: topLeft.x + frameSize.width * 0.5
+                    + (store.forceLibraryToHide ? 0 : Constants.controlOffset),
+                y: topLeft.y + frameSize.height + Constants.controlDrop
             )
         }
     }
-    
+
     private func libraryButton(size: CGSize) -> some View {
         let topLeft = ScanView.rectOfInterest(size, popoverRatio).origin
         let frameSize = ScanView.frameSize(size, popoverRatio)
 
         return WithPerceptionTracking {
-            Button {
+            controlButton(icon: Asset.Assets.Icons.imageLibrary.image) {
                 showSheet = true
-            } label: {
-                Asset.Assets.Icons.imageLibrary.image
-                    .zImage(size: 24, color: Asset.Colors.ZDesign.shark50.color)
-                    .padding(12)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._xl)
-                            .fill(Asset.Colors.ZDesign.shark900.color)
-                    }
             }
             .position(
-                x: topLeft.x + frameSize.width * 0.5 - (store.isTorchAvailable ? 35 : 0),
-                y: topLeft.y + frameSize.height + 45
+                x: topLeft.x + frameSize.width * 0.5
+                    - (store.isTorchAvailable ? Constants.controlOffset : 0),
+                y: topLeft.y + frameSize.height + Constants.controlDrop
             )
         }
     }
-    
+
     private func progress(size: CGSize, progress: Int) -> some View {
         let topLeft = ScanView.rectOfInterest(size, popoverRatio).origin
         let frameSize = ScanView.frameSize(size, popoverRatio)
 
-        return VStack {
+        return VStack(spacing: Design.Spacing._xs) {
             Text(String(format: "%d%%", progress))
-                .font(.custom(FontFamily.Inter.semiBold.name, size: 16))
-                .foregroundColor(Asset.Colors.ZDesign.shark50.color)
-                .padding(.bottom, 4)
+                .zappFont(.rowTitle, color: Constants.chromeForeground)
+
             ProgressView(value: Float(progress), total: Float(100))
         }
         .frame(width: frameSize.width * 0.8)
-        .tint(Asset.Colors.ZDesign.Base.brand.color)
+        .tint(ZappColors.accent.color(colorScheme))
         .position(
             x: topLeft.x + frameSize.width * 0.5,
-            y: topLeft.y - 56
+            y: topLeft.y - Constants.progressDrop
         )
     }
 }
@@ -223,11 +207,11 @@ extension ScanView {
 
         return ZStack {
             Color.black
-                .opacity(0.65)
+                .opacity(Constants.scrimOpacity)
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
                 .reverseMask(alignment: .topLeading) {
-                    RoundedRectangle(cornerRadius: 28)
+                    Rectangle()
                         .frame(
                             width: frameSize.width,
                             height: frameSize.height,
