@@ -45,6 +45,7 @@ struct ZappTabs {
         // Routed by RootCoordinator into Root's path overlays, the same way Home's
         // *Tapped actions are. The You tab stays navigation-agnostic.
         case allSettingsTapped
+        case chatContactsTapped
         case chooseServerTapped
         case localCurrencyTapped
         case torTapped
@@ -63,7 +64,7 @@ struct ZappTabs {
                 state.hideNavPill = isFullscreen
                 return .none
 
-            case .allSettingsTapped, .chooseServerTapped, .localCurrencyTapped, .torTapped:
+            case .allSettingsTapped, .chatContactsTapped, .chooseServerTapped, .localCurrencyTapped, .torTapped:
                 return .none
             }
         }

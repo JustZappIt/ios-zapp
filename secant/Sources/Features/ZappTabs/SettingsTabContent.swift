@@ -60,6 +60,18 @@ struct SettingsTabContent: View {
                             ZappRowDivider(inset: true)
 
                             ZappRow(
+                                title: String(localizable: .settingsYouContactsTitle),
+                                subtitle: String(localizable: .settingsYouContactsSubtitle),
+                                icon: Asset.Assets.Icons.user.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.chatContactsTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
                                 title: String(localizable: .settingsYouServerTitle),
                                 subtitle: String(localizable: .settingsYouServerSubtitle),
                                 icon: Asset.Assets.Icons.server.image,

@@ -2,12 +2,10 @@
 //  NewChatStore.swift
 //  Zapp
 //
-//  Start a direct conversation from a peer's public key.
+//  Start a direct conversation: search the saved contacts, or paste a peer's key.
 //
-//  Android's NewConversation screen is a contact search that also detects a
-//  pasted key, and supports multi-select for groups. iOS has no chat contacts
-//  layer yet, so this is the key-entry half only. Groups and contact search land
-//  with that layer.
+//  Mirrors Android's NewConversation screen, minus its multi-select group path —
+//  `createGroup` has no surface on `ZappMessagingClient` yet.
 //
 
 import ComposableArchitecture
@@ -18,7 +16,11 @@ import ZappMessaging
 struct NewChat {
     @ObservableState
     struct State: Equatable {
-        var peerKey = ""
+        @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+
+        /// Held raw, not sanitized: the one field both searches contacts and takes a
+        /// pasted key, so it has to keep the non-hex characters a name search needs.
+        var searchInput = ""
         var displayName = ""
         var isCreating = false
         var errorCode: String?
@@ -29,8 +31,36 @@ struct NewChat {
         /// start anything.
         var myPublicKey = ""
 
-        var isValidKey: Bool { PublicKeyRules.isValid(peerKey) }
-        var showsInvalidKeyHint: Bool { !peerKey.isEmpty && !isValidKey }
+        var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
+        var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
+
+        /// A pasted key we already have a name for.
+        var detectedContact: ChatContact? {
+            guard isValidKey else { return nil }
+
+            return chatContacts.contact(for: detectedKey)
+        }
+
+        /// Blocked contacts are excluded: starting a chat with one silently drops their replies.
+        var visibleContacts: [ChatContact] {
+            chatContacts.saved.filter { !$0.isBlocked }
+        }
+
+        var filteredContacts: [ChatContact] {
+            let query = searchInput.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !query.isEmpty else { return visibleContacts }
+
+            return visibleContacts.filter {
+                $0.name.localizedCaseInsensitiveContains(query)
+                    || $0.publicKey.localizedCaseInsensitiveContains(query)
+            }
+        }
+
+        /// Only an unknown pasted key needs a name; a saved contact already has one.
+        var showsNameField: Bool { isValidKey && detectedContact == nil }
+
+        var canStart: Bool { isValidKey && !isCreating }
 
         init() { }
     }
@@ -44,6 +74,7 @@ struct NewChat {
         case pasteTapped
         case copyMyKeyTapped
         case copyIndicatorExpired
+        case contactTapped(ChatContact)
         case startTapped
         case created(ZMConversation)
         case createFailed(String)
@@ -68,7 +99,7 @@ struct NewChat {
                 return .cancel(id: CancelID.copyIndicator)
 
             case .peerKeyChanged(let value):
-                state.peerKey = PublicKeyRules.sanitize(value)
+                state.searchInput = value
                 state.errorCode = nil
                 return .none
 
@@ -78,9 +109,8 @@ struct NewChat {
 
             case .pasteTapped:
                 guard let pasted = pasteboard.getString() else { return .none }
-                state.peerKey = PublicKeyRules.sanitize(pasted.data)
-                state.errorCode = nil
-                return .none
+
+                return .send(.peerKeyChanged(pasted.data))
 
             case .copyMyKeyTapped:
                 guard !state.myPublicKey.isEmpty else { return .none }
@@ -96,26 +126,17 @@ struct NewChat {
                 state.didCopy = false
                 return .none
 
+            case .contactTapped(let contact):
+                return start(&state, publicKey: contact.publicKey, displayName: contact.name)
+
             case .startTapped:
-                guard state.isValidKey, !state.isCreating else { return .none }
-                state.isCreating = true
-                state.errorCode = nil
+                guard state.isValidKey else { return .none }
 
-                let peerKey = state.peerKey
-                let name = state.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+                let typed = state.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+                let name = state.detectedContact?.name ?? (typed.isEmpty ? nil : typed)
+                let key = state.detectedKey
 
-                return .run { send in
-                    do {
-                        let conversation = try await zappMessaging.createDirectConversation(
-                            peerKey,
-                            name.isEmpty ? nil : name
-                        )
-                        await send(.created(conversation))
-                    } catch {
-                        LoggerProxy.event("NewChat: createDirectConversation failed: \(error)")
-                        await send(.createFailed((error as NSError).domain))
-                    }
-                }
+                return start(&state, publicKey: key, displayName: name)
 
             case .created:
                 state.isCreating = false
@@ -128,6 +149,26 @@ struct NewChat {
 
             case .backToHomeTapped:
                 return .none
+            }
+        }
+    }
+
+    private func start(
+        _ state: inout State,
+        publicKey: String,
+        displayName: String?
+    ) -> Effect<Action> {
+        guard !state.isCreating else { return .none }
+        state.isCreating = true
+        state.errorCode = nil
+
+        return .run { send in
+            do {
+                let conversation = try await zappMessaging.createDirectConversation(publicKey, displayName)
+                await send(.created(conversation))
+            } catch {
+                LoggerProxy.event("NewChat: createDirectConversation failed: \(error)")
+                await send(.createFailed((error as NSError).domain))
             }
         }
     }

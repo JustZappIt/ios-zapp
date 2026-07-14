@@ -22,9 +22,18 @@ struct NewChatView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-                        peerKeyField
-                        nameField
+                        searchField
+
+                        if store.isValidKey {
+                            keyDetectedBanner
+                        }
+
+                        if store.showsNameField {
+                            nameField
+                        }
+
                         startButton
+                        contacts
                         myKeyCard
                     }
                     .padding(.horizontal, Design.Spacing._lg)
@@ -39,39 +48,56 @@ struct NewChatView: View {
         }
     }
 
-    private var peerKeyField: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .newChatPeerLabel))
-
-            HStack(spacing: Design.Spacing._sm) {
-                TextField(
-                    String(localizable: .newChatPeerPlaceholder),
-                    text: Binding(
-                        get: { store.peerKey },
-                        set: { store.send(.peerKeyChanged($0)) }
-                    ),
-                    axis: .vertical
+    /// One field, two jobs: it filters the contacts below and detects a pasted key.
+    private var searchField: some View {
+        HStack(spacing: Design.Spacing._sm) {
+            TextField(
+                String(localizable: .newChatSearchPlaceholder),
+                text: Binding(
+                    get: { store.searchInput },
+                    set: { store.send(.peerKeyChanged($0)) }
                 )
-                .zappFont(.mono, style: ZappColors.text)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .lineLimit(2, reservesSpace: true)
+            )
+            .zappFont(.body, style: ZappColors.text)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
 
-                Button {
-                    store.send(.pasteTapped)
-                } label: {
-                    Text(String(localizable: .newChatPaste))
-                        .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
-                }
-            }
-            .padding(Design.Spacing._md)
-            .background(ZappColors.surfaceInput.color(colorScheme))
-
-            if store.showsInvalidKeyHint {
-                Text(String(localizable: .newChatInvalidKey))
-                    .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
+            Button {
+                store.send(.pasteTapped)
+            } label: {
+                Text(String(localizable: .newChatPaste))
+                    .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
             }
         }
+        .padding(Design.Spacing._md)
+        .background(ZappColors.surfaceInput.color(colorScheme))
+    }
+
+    private var keyDetectedBanner: some View {
+        Button {
+            store.send(.startTapped)
+        } label: {
+            HStack(spacing: Design.Spacing._sm) {
+                VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                    Text(String(localizable: .newChatKeyDetected))
+                        .zappFont(.rowTitle, style: ZappColors.text)
+
+                    Text(store.detectedContact?.name ?? store.detectedKey)
+                        .zappFont(.mono, style: ZappColors.textMuted)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "arrow.right")
+                    .zImage(width: Constants.bannerIconSize, height: Constants.bannerIconSize, style: ZappColors.accent)
+            }
+            .padding(Design.Spacing._md)
+            .frame(maxWidth: .infinity)
+            .background(ZappColors.surfaceAlt.color(colorScheme))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
     }
 
     private var nameField: some View {
@@ -97,7 +123,7 @@ struct NewChatView: View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             ZappButton(
                 title: String(localizable: .newChatStart),
-                isEnabled: store.isValidKey && !store.isCreating
+                isEnabled: store.canStart
             ) {
                 store.send(.startTapped)
             }
@@ -108,6 +134,36 @@ struct NewChatView: View {
                     .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
             }
         }
+    }
+
+    @ViewBuilder private var contacts: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .newChatContactsLabel))
+
+            if store.visibleContacts.isEmpty {
+                Text(String(localizable: .newChatNoContacts))
+                    .zappFont(.body, style: ZappColors.textMuted)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(store.filteredContacts) { contact in
+                        NewChatContactRow(contact: contact) {
+                            store.send(.contactTapped(contact))
+                        }
+
+                        if contact.id != store.filteredContacts.last?.id {
+                            rowDivider
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var rowDivider: some View {
+        Rectangle()
+            .fill(ZappColors.border.color(colorScheme))
+            .frame(height: 1)
+            .padding(.leading, NewChatContactRow.dividerInset)
     }
 
     /// Chat is symmetric: the peer needs our key just as much as we need theirs.
@@ -142,5 +198,71 @@ struct NewChatView: View {
             }
         }
         .padding(.top, Design.Spacing._lg)
+    }
+
+    private enum Constants {
+        static let bannerIconSize: CGFloat = 16
+    }
+}
+
+private struct NewChatContactRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let avatarSize: CGFloat = 40
+        static let avatarIconSize: CGFloat = 18
+        static let spacing: CGFloat = 12
+        static let verticalPadding: CGFloat = 10
+    }
+
+    static let dividerInset: CGFloat = Constants.avatarSize + Constants.spacing
+
+    let contact: ChatContact
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: Constants.spacing) {
+                avatar
+
+                VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                    Text(contact.name)
+                        .zappFont(.rowTitle, style: ZappColors.text)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+
+                    Text(contact.publicKey)
+                        .zappFont(.mono, style: ZappColors.textMuted)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.vertical, Constants.verticalPadding)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+    }
+
+    private var avatar: some View {
+        ZStack {
+            if initials.isEmpty {
+                Image(systemName: "person.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: Constants.avatarIconSize, height: Constants.avatarIconSize)
+                    .zForegroundColor(ZappColors.onAccent)
+            } else {
+                Text(initials)
+                    .zappFont(.rowTitle, style: ZappColors.onAccent)
+            }
+        }
+        .frame(width: Constants.avatarSize, height: Constants.avatarSize)
+        .background(ZappColors.accent.color(colorScheme))
+    }
+
+    private var initials: String {
+        contact.name.zappInitials.trimmingCharacters(in: .whitespaces)
     }
 }
