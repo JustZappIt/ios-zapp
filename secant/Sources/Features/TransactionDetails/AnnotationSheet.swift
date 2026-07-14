@@ -15,66 +15,62 @@ extension TransactionDetailsView {
                  ? String(localizable: .annotationEdit)
                  : String(localizable: .annotationAddArticle)
             )
-            .zFont(.semiBold, size: 20, style: Design.Text.primary)
+            .zappFont(.sectionTitle, style: ZappColors.text)
             .padding(.top, 32)
             .padding(.bottom, 16)
-            
+
             VStack(alignment: .leading, spacing: 6) {
                 TextEditor(text: $store.annotationToInput)
                     .focused($isAnnotationFocused)
-                    .font(.custom(FontFamily.Inter.medium.name, size: 16))
+                    .zappFont(.body, style: ZappColors.text)
+                    .scrollContentBackground(.hidden)
                     .frame(height: 122)
                     .padding(.horizontal, 10)
-                    .padding(.top, 2)
-                    .padding(.bottom, 10)
-                    .colorBackground(Design.Inputs.Default.bg.color(colorScheme))
-                    .cornerRadius(10)
+                    .padding(.vertical, 8)
+                    .background(ZappColors.surfaceInput.color(colorScheme))
                     .overlay {
+                        Rectangle()
+                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                    }
+                    .overlay(alignment: .topLeading) {
                         if store.annotationToInput.isEmpty {
-                            HStack {
-                                VStack {
-                                    Text(localizable: .annotationPlaceholder)
-                                        .font(.custom(FontFamily.Inter.regular.name, size: 16))
-                                        .zForegroundColor(Design.Inputs.Default.text)
-                                        .allowsHitTesting(false)
-
-                                    Spacer()
-                                }
-                                .padding(.top, 10)
-                                
-                                Spacer()
-                            }
-                            .padding(.leading, 14)
-                        } else {
-                            EmptyView()
+                            Text(localizable: .annotationPlaceholder)
+                                .zappFont(.body, style: ZappColors.textSubtle)
+                                .allowsHitTesting(false)
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 16)
                         }
                     }
 
                 Text(localizable: .annotationChars(String(store.annotationToInput.count), String(TransactionDetails.State.Constants.annotationMaxLength)))
-                    .zFont(size: 14, style: Design.Inputs.Default.hint)
+                    .zappFont(.caption, style: ZappColors.textMuted)
             }
             .padding(.bottom, 32)
-            
+
             if isEditMode {
-                HStack(spacing: 8) {
-                    ZashiButton(
-                        String(localizable: .annotationDelete),
-                        type: .destructive1
+                HStack(spacing: 12) {
+                    ZappButton(
+                        title: String(localizable: .annotationDelete),
+                        variant: .danger
                     ) {
                         store.send(.deleteNoteTapped)
                     }
 
-                    ZashiButton(String(localizable: .annotationSave)) {
+                    ZappButton(
+                        title: String(localizable: .annotationSave),
+                        isEnabled: store.isAnnotationModified
+                    ) {
                         store.send(.saveNoteTapped)
                     }
-                    .disabled(!store.isAnnotationModified)
                 }
                 .padding(.bottom, Design.Spacing.sheetBottomSpace)
             } else {
-                ZashiButton(String(localizable: .annotationAdd)) {
+                ZappButton(
+                    title: String(localizable: .annotationAdd),
+                    isEnabled: !store.annotationToInput.isEmpty
+                ) {
                     store.send(.addNoteTapped)
                 }
-                .disabled(store.annotationToInput.isEmpty)
                 .padding(.bottom, Design.Spacing.sheetBottomSpace)
             }
         }

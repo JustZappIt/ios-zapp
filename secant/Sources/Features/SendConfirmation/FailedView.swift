@@ -10,14 +10,20 @@ import ComposableArchitecture
 @preconcurrency import ZcashLightClientKit
 
 struct FailureView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let illustrationSize: CGFloat = 148
+    }
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
@@ -25,51 +31,45 @@ struct FailureView: View {
 
                 store.failureIlustration
                     .resizable()
-                    .frame(width: 148, height: 148)
+                    .frame(width: Constants.illustrationSize, height: Constants.illustrationSize)
 
                 Text(store.isShielding ? String(localizable: .sendFailureShielding) : String(localizable: .sendFailure))
-                    .zFont(.semiBold, size: 28, style: Design.Text.primary)
-                    .padding(.top, 16)
+                    .zappFont(.display, style: ZappColors.text)
+                    .padding(.top, Design.Spacing._xl)
 
                 Text(store.failureInfo)
-                    .zFont(size: 14, style: Design.Text.primary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(1.5)
-                    .screenHorizontalPadding()
+                    .padding(.top, Design.Spacing._md)
 
                 if store.txIdToExpand != nil || store.type != .regular {
-                    ZashiButton(
-                        String(localizable: .sendViewTransaction),
-                        type: .tertiary,
-                        infinityWidth: false
+                    ZappButton(
+                        title: String(localizable: .sendViewTransaction),
+                        variant: .accentGhost
                     ) {
                         store.send(.viewTransactionTapped)
                     }
-                    .padding(.top, 16)
+                    .padding(.top, Design.Spacing._xl)
                 }
 
                 Spacer()
-                
-                ZashiButton(
-                    String(localizable: .generalClose),
-                    type: store.type != .regular
-                    ? .ghost
-                    : .primary
+
+                ZappButton(
+                    title: String(localizable: .generalClose),
+                    variant: store.type != .regular ? .ghost : .primary
                 ) {
                     store.send(.closeTapped)
                 }
-                .padding(.bottom, 8)
+                .padding(.bottom, Design.Spacing._md)
 
-                ZashiButton(
-                    String(localizable: .sendReport),
-                    type: store.type != .regular
-                    ? .primary
-                    : .ghost
+                ZappButton(
+                    title: String(localizable: .sendReport),
+                    variant: store.type != .regular ? .primary : .ghost
                 ) {
                     store.send(.reportTapped)
                 }
-                .padding(.bottom, 24)
-                
+                .padding(.bottom, Design.Spacing._3xl)
+
                 if let supportData = store.supportData {
                     UIMailDialogView(
                         supportData: supportData,
@@ -81,14 +81,14 @@ struct FailureView: View {
                     // so frame is set to 0 to not break SwiftUI's layout
                     .frame(width: 0, height: 0)
                 }
-                
+
                 shareMessageView()
             }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
         }
         .navigationBarBackButtonHidden()
-        .padding(.vertical, 1)
-        .screenHorizontalPadding()
-        .applyFailureScreenBackground()
     }
 }
 

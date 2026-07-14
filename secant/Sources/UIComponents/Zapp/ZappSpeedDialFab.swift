@@ -32,6 +32,7 @@ struct ZappSpeedDialFab: View {
         static let labelHorizontalPadding: CGFloat = 12
         static let labelVerticalPadding: CGFloat = 8
         static let expandedRotation: Double = 45
+        static let trailingMargin: CGFloat = 18
     }
 
     let expandLabel: String
@@ -58,7 +59,9 @@ struct ZappSpeedDialFab: View {
 
                 toggle
             }
+            .padding(.trailing, Constants.trailingMargin)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         .animation(ZappMotion.content, value: isExpanded)
     }
 

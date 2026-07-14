@@ -7,20 +7,34 @@
 
 import SwiftUI
 import ComposableArchitecture
-//import Scan
 
 struct SendFormView: View {
     @Environment(\.colorScheme) private var colorScheme
-    
+
     private enum InputID: Hashable {
         case message
         case addressBookHint
     }
-    
-    @State private var keyboardVisible: Bool = false
+
+    private enum Constants {
+        static let fieldButtonSize: CGFloat = 40
+        static let fieldIconSize: CGFloat = 18
+        static let memoMinHeight: CGFloat = 155
+        static let memoMaxHeight: CGFloat = 300
+        static let hintHeight: CGFloat = 40
+        static let hintInset: CGFloat = 24
+        static let keyboardAccessoryHeight: CGFloat = 38
+        static let sheetIconBox: CGFloat = 44
+        static let sheetIconSize: CGFloat = 20
+        static let stepRailWidth: CGFloat = 3
+    }
+
+    @State private var keyboardVisible = false
 
     @Perception.Bindable var store: StoreOf<SendForm>
     let tokenName: String
+
+    @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
 
     @FocusState private var isAddressFocused
     @FocusState private var isAmountFocused
@@ -31,190 +45,77 @@ struct SendFormView: View {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
-            ZStack {
-                WithPerceptionTracking {
-                    ScrollView {
-                        ScrollViewReader { value in
-                            WithPerceptionTracking {
-                                VStack(alignment: .center) {
-                                    WithPerceptionTracking {
-                                        WalletBalancesView(
-                                            store: store.scope(
-                                                state: \.walletBalancesState,
-                                                action: \.walletBalances
-                                            ),
-                                            tokenName: tokenName,
-                                            couldBeHidden: true
-                                        )
-                                        
-                                        VStack(alignment: .leading) {
-                                            ZashiTextField(
-                                                addressFont: true,
-                                                text: store.bindingForAddress,
-                                                placeholder: String(localizable: .sendAddressPlaceholder),
-                                                title: String(localizable: .sendTo),
-                                                error: store.invalidAddressErrorText,
-                                                inputAccessibilityIdentifier: AccessibilityID.SendForm.zcashAddressField,
-                                                accessoryView:
-                                                    HStack(spacing: 4) {
-                                                        WithPerceptionTracking {
-                                                            fieldButton(
-                                                                icon: store.isNotAddressInAddressBook
-                                                                ? Asset.Assets.Icons.userPlus.image
-                                                                : Asset.Assets.Icons.user.image,
-                                                                identifier: AccessibilityID.SendForm.addToContactsButton
-                                                            ) {
-                                                                if store.isNotAddressInAddressBook {
-                                                                    store.send(.addNewContactTapped(store.address))
-                                                                } else {
-                                                                    store.send(.addressBookTapped)
-                                                                }
-                                                            }
+            VStack(spacing: 0) {
+                ZappScreenHeader(
+                    title: String(localizable: .generalSend),
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: { hideBalancesButton }
+                )
 
-                                                            fieldButton(
-                                                                icon: Asset.Assets.Icons.qr.image,
-                                                                identifier: AccessibilityID.SendForm.scanButton
-                                                            ) {
-                                                                store.send(.scanTapped)
-                                                            }
-                                                        }
-                                                    }
-                                                    .frame(height: 20)
-                                                    .offset(x: 8)
-                                            )
-                                            .id(InputID.addressBookHint)
-                                            .keyboardType(.alphabet)
-                                            .focused($isAddressFocused)
-                                            .submitLabel(.next)
-                                            .onSubmit {
-                                                isAmountFocused = true
-                                            }
-                                            .padding(.bottom, 20)
-                                            .anchorPreference(
-                                                key: UnknownAddressPreferenceKey.self,
-                                                value: .bounds
-                                            ) { $0 }
-                                            
-                                            VStack(alignment: .leading) {
-                                                HStack(alignment: .top, spacing: 4) {
-                                                    ZashiTextField(
-                                                        text: store.bindingForZecAmount,
-                                                        placeholder: tokenName.uppercased(),
-                                                        title: String(localizable: .sendAmount),
-                                                        error: store.invalidZecAmountErrorText,
-                                                        prefixView:
-                                                            Asset.Assets.Icons.currencyZec.image
-                                                                .zImage(size: 20, style: Design.Inputs.Default.text)
-                                                    )
-                                                    .keyboardType(.decimalPad)
-                                                    .focused($isAmountFocused)
-                                                    
-                                                    if store.isCurrencyConversionEnabled {
-                                                        Asset.Assets.Icons.switchHorizontal.image
-                                                            .zImage(size: 24, style: Design.Btns.Ghost.fg)
-                                                            .padding(8)
-                                                            .padding(.top, 24)
-                                                        
-                                                        ZashiTextField(
-                                                            text: store.bindingForCurrency,
-                                                            placeholder: store.currencyCode,
-                                                            error: store.invalidCurrencyAmountErrorText,
-                                                            prefixView:
-                                                                Group {
-                                                                    if store.hasCurrencySymbol {
-                                                                        Text(store.currencySymbol)
-                                                                            .zFont(.semiBold, size: 18, style: Design.Inputs.Default.text)
-                                                                    }
-                                                                }
-                                                        )
-                                                        .keyboardType(.decimalPad)
-                                                        .focused($isCurrencyFocused)
-                                                        .padding(.top, 23)
-                                                        .disabled(store.currencyConversion == nil)
-                                                        .opacity(store.currencyConversion == nil ? 0.5 : 1.0)
-                                                    }
-                                                }
-                                            }
-                                            .padding(.bottom, 20)
-                                        }
-                                        
-                                        if store.isMemoInputEnabled {
-                                            MessageEditorView(store: store.memoStore(), isAddUAtoMemoActive: true)
-                                                .frame(minHeight: 155)
-                                                .frame(maxHeight: 300)
-                                                .id(InputID.message)
-                                                .focused($isMemoFocused)
-                                        } else {
-                                            VStack(alignment: .leading, spacing: 0) {
-                                                Text(localizable: .sendMessage)
-                                                    .zFont(.medium, size: 14, style: Design.Inputs.Filled.label)
-                                                    .padding(.bottom, 6)
-                                                
-                                                HStack(spacing: 0) {
-                                                    VStack {
-                                                        Asset.Assets.infoOutline.image
-                                                            .zImage(size: 20, style: Design.Utility.Gray._500)
-                                                            .padding(.trailing, 12)
-                                                        
-                                                        Spacer(minLength: 0)
-                                                    }
-                                                    
-                                                    Text(localizable: .sendInfoMemo)
-                                                        .zFont(size: 12, style: Design.Utility.Gray._700)
-                                                    
-                                                    Spacer()
-                                                }
-                                                .padding(10)
-                                                .background {
-                                                    RoundedRectangle(cornerRadius: Design.Radius._md)
-                                                        .fill(Design.Utility.Gray._100.color(colorScheme))
-                                                }
-                                            }
-                                        }
-                                        
-                                        ZashiButton(String(localizable: .sendReview)) {
-                                            store.send(.reviewTapped)
-                                        }
-                                        .disabled(!store.isValidForm)
-                                        .padding(.top, 40)
-                                        .accessibilityIdentifier(AccessibilityID.SendForm.reviewButton)
+                ScrollView {
+                    ScrollViewReader { value in
+                        WithPerceptionTracking {
+                            VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
+                                WalletBalancesView(
+                                    store: store.scope(
+                                        state: \.walletBalancesState,
+                                        action: \.walletBalances
+                                    ),
+                                    tokenName: tokenName,
+                                    couldBeHidden: true
+                                )
+
+                                addressField
+                                amountFields
+                                memoField
+                            }
+                            .padding(.horizontal, Design.Spacing._2xl)
+                            .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+                            .onChange(of: store.isNotAddressInAddressBook) { update in
+                                withAnimation(ZappMotion.content) {
+                                    if update {
+                                        value.scrollTo(InputID.addressBookHint, anchor: .top)
                                     }
                                 }
-                                .screenHorizontalPadding()
-                                .onChange(of: store.isNotAddressInAddressBook) { update in
-                                    withAnimation {
-                                        if update {
-                                            value.scrollTo(InputID.addressBookHint, anchor: .top)
-                                        }
-                                    }
-                                }
-                                .onChange(of: isAddressFocused) { update in
-                                    withAnimation {
-                                        if update && store.isNotAddressInAddressBook {
-                                            value.scrollTo(InputID.addressBookHint, anchor: .top)
-                                        }
+                            }
+                            .onChange(of: isAddressFocused) { update in
+                                withAnimation(ZappMotion.content) {
+                                    if update && store.isNotAddressInAddressBook {
+                                        value.scrollTo(InputID.addressBookHint, anchor: .top)
                                     }
                                 }
                             }
                         }
-                        .trackKeyboardVisibility($keyboardVisible)
-                        .onAppear {
-                            store.send(.onAppear)
-                            if store.requestsAddressFocus {
-                                isAddressFocused = true
-                                store.send(.requestsAddressFocusResolved)
-                            }
+                    }
+                    .trackKeyboardVisibility($keyboardVisible)
+                    .onAppear {
+                        store.send(.onAppear)
+                        if store.requestsAddressFocus {
+                            isAddressFocused = true
+                            store.send(.requestsAddressFocusResolved)
                         }
-                        .applyScreenBackground()
                     }
                 }
             }
-            .padding(.vertical, 1)
-            .applyScreenBackground()
-            .zashiBack() { store.send(.dismissRequired) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
+            .zashiBack(
+                primaryAction: {
+                    ZappButton(
+                        title: String(localizable: .sendReview),
+                        isEnabled: store.isValidForm
+                    ) {
+                        store.send(.reviewTapped)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.SendForm.reviewButton)
+                },
+                customDismiss: { store.send(.dismissRequired) }
+            )
             .zashiSheet(isPresented: $store.isSheetTexAddressVisible) {
                 helpSheetContent()
             }
@@ -233,118 +134,259 @@ struct SendFormView: View {
                 if isAddressFocused && store.isAddressBookHintVisible {
                     GeometryReader { geometry in
                         preferences.map {
-                            HStack(alignment: .top, spacing: 0) {
-                                Asset.Assets.Icons.userPlus.image
-                                    .zImage(size: 20, style: Design.HintTooltips.titleText)
-                                    .padding(.trailing, 12)
-                                
-                                Text(localizable: .sendAddressNotInBook)
-                                    .zFont(.medium, size: 14, style: Design.HintTooltips.titleText)
-                                    .padding(.top, 2)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                
-                                Spacer(minLength: 0)
-                            }
-                            .padding(.horizontal, 10)
-                            .frame(height: 40)
-                            .background {
-                                RoundedRectangle(cornerRadius: Design.Radius._md)
-                                    .fill(Design.HintTooltips.surfacePrimary.color(colorScheme))
-                            }
-                            .frame(width: geometry.size.width - 48)
-                            .offset(x: 24, y: geometry[$0].minY + geometry[$0].height - 16)
+                            addressBookHint
+                                .frame(width: geometry.size.width - Constants.hintInset * 2)
+                                .offset(
+                                    x: Constants.hintInset,
+                                    y: geometry[$0].minY + geometry[$0].height
+                                )
                         }
                     }
                 }
             }
             .overlay {
                 if keyboardVisible {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        
-                        Asset.Colors.primary.color
-                            .frame(height: 1)
-                            .opacity(0.1)
-                        
-                        HStack(alignment: .center) {
-                            Spacer()
-                            
-                            Button {
-                                isAmountFocused = false
-                                isAddressFocused = false
-                                isCurrencyFocused = false
-                                isMemoFocused = false
-                            } label: {
-                                Text(String(localizable: .generalDone).uppercased())
-                                    .zFont(.regular, size: 14, style: Design.Text.primary)
-                            }
-                            .padding(.bottom, 4)
-                        }
-                        .applyScreenBackground()
-                        .padding(.horizontal, 20)
-                        .frame(height: keyboardVisible ? 38 : 0)
-                        .frame(maxWidth: .infinity)
-                        .opacity(keyboardVisible ? 1 : 0)
-                    }
+                    keyboardDismissAccessory
                 }
             }
         }
     }
-    
-    private func fieldButton(icon: Image, identifier: String = "", _ action: @escaping () -> Void) -> some View {
+
+    private var hideBalancesButton: some View {
         Button {
-            action()
+            $isSensitiveContentHidden.withLock { $0.toggle() }
         } label: {
-            icon
-                .zImage(size: 20, style: Design.Inputs.Default.label)
+            (isSensitiveContentHidden ? Asset.Assets.eyeOff.image : Asset.Assets.eyeOn.image)
+                .zImage(width: 24, height: 24, style: ZappColors.text)
+                .frame(width: 48, height: 48)
         }
-        .accessibilityIdentifier(identifier)
-        .padding(8)
-        .background {
-            RoundedRectangle(cornerRadius: Design.Radius._md)
-                .fill(Design.Btns.Secondary.bg.color(colorScheme))
-                .overlay {
-                    RoundedRectangle(cornerRadius: Design.Radius._md)
-                        .stroke(Design.Btns.Secondary.border.color(colorScheme))
+        .buttonStyle(.zappPress)
+    }
+
+    private var addressField: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .sendTo))
+
+            HStack(spacing: Design.Spacing._md) {
+                TextField(
+                    String(localizable: .sendAddressPlaceholder),
+                    text: store.bindingForAddress
+                )
+                .zappFont(.mono, style: ZappColors.text)
+                .keyboardType(.alphabet)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .focused($isAddressFocused)
+                .submitLabel(.next)
+                .onSubmit { isAmountFocused = true }
+                .accessibilityIdentifier(AccessibilityID.SendForm.zcashAddressField)
+
+                fieldButton(
+                    icon: store.isNotAddressInAddressBook
+                        ? Asset.Assets.Icons.userPlus.image
+                        : Asset.Assets.Icons.user.image,
+                    identifier: AccessibilityID.SendForm.addToContactsButton
+                ) {
+                    if store.isNotAddressInAddressBook {
+                        store.send(.addNewContactTapped(store.address))
+                    } else {
+                        store.send(.addressBookTapped)
+                    }
                 }
+
+                fieldButton(
+                    icon: Asset.Assets.Icons.qr.image,
+                    identifier: AccessibilityID.SendForm.scanButton
+                ) {
+                    store.send(.scanTapped)
+                }
+            }
+            .padding(Design.Spacing._md)
+            .background(ZappColors.surfaceInput.color(colorScheme))
+            .id(InputID.addressBookHint)
+            .anchorPreference(key: UnknownAddressPreferenceKey.self, value: .bounds) { $0 }
+
+            if let error = store.invalidAddressErrorText {
+                Text(error)
+                    .zappFont(.caption, style: ZappColors.danger)
+            }
         }
+    }
+
+    private var amountFields: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .sendAmount))
+
+            HStack(alignment: .center, spacing: Design.Spacing._md) {
+                amountInput(
+                    text: store.bindingForZecAmount,
+                    placeholder: tokenName.uppercased(),
+                    prefix: nil,
+                    focus: $isAmountFocused
+                )
+
+                if store.isCurrencyConversionEnabled {
+                    Asset.Assets.Icons.switchHorizontal.image
+                        .zImage(width: 20, height: 20, style: ZappColors.textMuted)
+
+                    amountInput(
+                        text: store.bindingForCurrency,
+                        placeholder: store.currencyCode,
+                        prefix: store.hasCurrencySymbol ? store.currencySymbol : nil,
+                        focus: $isCurrencyFocused
+                    )
+                    .disabled(store.currencyConversion == nil)
+                    .opacity(store.currencyConversion == nil ? 0.5 : 1)
+                }
+            }
+
+            if let error = store.invalidZecAmountErrorText {
+                Text(error)
+                    .zappFont(.caption, style: ZappColors.danger)
+            }
+
+            if let error = store.invalidCurrencyAmountErrorText {
+                Text(error)
+                    .zappFont(.caption, style: ZappColors.danger)
+            }
+        }
+    }
+
+    private func amountInput(
+        text: Binding<String>,
+        placeholder: String,
+        prefix: String?,
+        focus: FocusState<Bool>.Binding
+    ) -> some View {
+        HStack(spacing: Design.Spacing._xs) {
+            if let prefix {
+                Text(prefix)
+                    .zappFont(.rowTitle, style: ZappColors.textMuted)
+            }
+
+            TextField(placeholder, text: text)
+                .zappFont(.rowTitle, style: ZappColors.text)
+                .keyboardType(.decimalPad)
+                .focused(focus)
+        }
+        .padding(Design.Spacing._md)
+        .frame(maxWidth: .infinity)
+        .background(ZappColors.surfaceInput.color(colorScheme))
+    }
+
+    @ViewBuilder private var memoField: some View {
+        if store.isMemoInputEnabled {
+            MessageEditorView(store: store.memoStore(), isAddUAtoMemoActive: true)
+                .frame(minHeight: Constants.memoMinHeight)
+                .frame(maxHeight: Constants.memoMaxHeight)
+                .id(InputID.message)
+                .focused($isMemoFocused)
+        } else {
+            VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+                ZappSectionLabel(text: String(localizable: .sendMessage))
+
+                HStack(alignment: .top, spacing: Design.Spacing._lg) {
+                    Asset.Assets.infoOutline.image
+                        .zImage(width: 20, height: 20, style: ZappColors.textMuted)
+
+                    Text(localizable: .sendInfoMemo)
+                        .zappFont(.caption, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 0)
+                }
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
+            }
+        }
+    }
+
+    private var addressBookHint: some View {
+        HStack(alignment: .center, spacing: Design.Spacing._lg) {
+            Asset.Assets.Icons.userPlus.image
+                .zImage(width: 20, height: 20, style: ZappColors.accentText)
+
+            Text(localizable: .sendAddressNotInBook)
+                .zappFont(.caption, style: ZappColors.accentText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, Design.Spacing._lg)
+        .frame(height: Constants.hintHeight)
+        .background(ZappColors.accentSoft.color(colorScheme))
+    }
+
+    private var keyboardDismissAccessory: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            Rectangle()
+                .fill(ZappColors.border.color(colorScheme))
+                .frame(height: 1)
+
+            HStack {
+                Spacer()
+
+                Button {
+                    isAmountFocused = false
+                    isAddressFocused = false
+                    isCurrencyFocused = false
+                    isMemoFocused = false
+                } label: {
+                    Text(String(localizable: .generalDone).uppercased())
+                        .zappFont(.chip, style: ZappColors.accentText)
+                }
+                .buttonStyle(.zappPress)
+            }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(height: Constants.keyboardAccessoryHeight)
+            .frame(maxWidth: .infinity)
+            .background(ZappColors.surface.color(colorScheme))
+        }
+    }
+
+    private func fieldButton(icon: Image, identifier: String = "", _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            icon
+                .zImage(width: Constants.fieldIconSize, height: Constants.fieldIconSize, style: ZappColors.text)
+                .frame(width: Constants.fieldButtonSize, height: Constants.fieldButtonSize)
+                .background(ZappColors.surface.color(colorScheme))
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityIdentifier(identifier)
     }
 
     @ViewBuilder private func currencyUnavailableSheetContent() -> some View {
         VStack(alignment: .center, spacing: 0) {
-            Asset.Assets.Icons.alertOutline.image
-                .zImage(size: 20, style: Design.Utility.ErrorRed._500)
-                .padding(12)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.ErrorRed._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
+            sheetIcon(Asset.Assets.Icons.alertOutline.image, tint: .danger, background: .dangerSoft)
+                .padding(.top, Design.Spacing._6xl)
 
             Text(String(localizable: .sendCurrencyUnavailableTitle(store.selectedCurrency.code)))
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
+                .zappFont(.displaySecondary, style: ZappColors.text)
                 .multilineTextAlignment(.center)
-                .padding(.top, 24)
-                .padding(.bottom, 8)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._md)
 
             Text(String(localizable: .sendCurrencyUnavailableDesc(store.selectedCurrency.displayName)))
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .lineSpacing(2)
-                .padding(.horizontal, 4)
-                .padding(.bottom, 24)
+                .padding(.bottom, Design.Spacing._3xl)
 
-            ZashiButton(String(localizable: .sendCurrencyUnavailableSwitchToUSD)) {
+            ZappButton(title: String(localizable: .sendCurrencyUnavailableSwitchToUSD)) {
                 store.send(.currencyUnavailableSwitchToUSDTapped)
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, Design.Spacing._md)
 
-            ZashiButton(
-                String(localizable: .sendCurrencyUnavailableContinueInZEC),
-                type: .ghost
+            ZappButton(
+                title: String(localizable: .sendCurrencyUnavailableContinueInZEC),
+                variant: .ghost
             ) {
                 store.send(.currencyUnavailableContinueInZECTapped)
             }
@@ -354,100 +396,79 @@ struct SendFormView: View {
 
     @ViewBuilder private func helpSheetContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Asset.Assets.Icons.alertOutline.image
-                .zImage(size: 20, style: Design.Utility.ErrorRed._500)
-                .padding(12)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.ErrorRed._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
+            sheetIcon(Asset.Assets.Icons.alertOutline.image, tint: .danger, background: .dangerSoft)
+                .padding(.top, Design.Spacing._6xl)
 
             Text(localizable: .texKeystoneTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.top, 24)
-                .padding(.bottom, 8)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._md)
 
             Group {
                 Text(localizable: .texKeystoneWarn1).bold()
                 + Text(localizable: .texKeystoneWarn2)
             }
-            .zFont(size: 14, style: Design.Text.tertiary)
+            .zappFont(.body, style: ZappColors.textMuted)
             .fixedSize(horizontal: false, vertical: true)
-            .lineSpacing(2)
-            .padding(.bottom, 24)
+            .padding(.bottom, Design.Spacing._3xl)
 
             Text(localizable: .texKeystoneWorkaround)
-                .zFont(.semiBold, size: 16, style: Design.Text.primary)
-                .padding(.bottom, 16)
+                .zappFont(.sectionTitle, style: ZappColors.text)
+                .padding(.bottom, Design.Spacing._xl)
 
             texSupportPoint(0)
             texSupportPoint(1)
-                .padding(.bottom, 8)
+                .padding(.bottom, Design.Spacing._md)
 
-            ZashiButton(String(localizable: .texKeystoneGotIt)) {
+            ZappButton(title: String(localizable: .texKeystoneGotIt)) {
                 store.send(.gotTexSupportTapped)
             }
-            .padding(.top, 32)
+            .padding(.top, Design.Spacing._4xl)
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-    
+
+    private func sheetIcon(_ icon: Image, tint: ZappColors, background: ZappColors) -> some View {
+        icon
+            .zImage(width: Constants.sheetIconSize, height: Constants.sheetIconSize, style: tint)
+            .frame(width: Constants.sheetIconBox, height: Constants.sheetIconBox)
+            .background(background.color(colorScheme))
+    }
+
     @ViewBuilder private func texSupportPoint(_ index: Int) -> some View {
         HStack(alignment: .top, spacing: 0) {
             VStack(spacing: 0) {
                 Asset.Assets.Icons.trIn.image
-                    .zImage(size: 20, style: index == 0 ? Design.Text.opposite : Design.Text.primary)
-                    .padding(12)
+                    .zImage(width: Constants.sheetIconSize, height: Constants.sheetIconSize, style: index == 0 ? ZappColors.onAccent : ZappColors.text)
                     .rotationEffect(.degrees(225 * Double(index)))
-                    .background {
-                        Circle()
-                            .fill(index == 0 ? Design.Surfaces.bgAlt.color(colorScheme) : Design.Surfaces.bgQuaternary.color(colorScheme))
-                            .frame(width: 44, height: 44)
-                    }
+                    .frame(width: Constants.sheetIconBox, height: Constants.sheetIconBox)
+                    .background(
+                        (index == 0 ? ZappColors.accent : ZappColors.surfaceAlt).color(colorScheme)
+                    )
 
                 if index == 0 {
-                    Color.white
-                        .frame(width: 3)
-                        .overlay {
-                            LinearGradient(
-                                stops: [
-                                    Gradient.Stop(color: Design.Utility.Gray._950.color(colorScheme), location: 0.00),
-                                    Gradient.Stop(color: Design.Surfaces.bgQuaternary.color(colorScheme), location: 1.00),
-                                ],
-                                startPoint: UnitPoint(x: 0.5, y: 0),
-                                endPoint: UnitPoint(x: 0.5, y: 1)
-                            )
-                        }
-                        .padding(.vertical, 4)
+                    Rectangle()
+                        .fill(ZappColors.border.color(colorScheme))
+                        .frame(width: Constants.stepRailWidth)
+                        .padding(.vertical, Design.Spacing._xs)
                 }
             }
             .padding(.trailing, Design.Spacing._xl)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(localizable: .texKeystoneStep("\(index + 1)"))
-                    .zFont(.medium, size: 12, style: Design.Utility.Gray._700)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: Design.Radius._sm)
-                            .fill(Design.Utility.Gray._100.color(colorScheme))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: Design.Radius._sm)
-                                    .stroke(Design.Utility.Gray._200.color(colorScheme))
-                            }
-                    )
-                    .padding(.vertical, 4)
-                
+            VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+                ZappSectionLabel(text: String(localizable: .texKeystoneStep("\(index + 1)")))
+                    .padding(.vertical, Design.Spacing._xs)
+                    .padding(.horizontal, Design.Spacing._sm)
+                    .background(ZappColors.chipBg.color(colorScheme))
+
                 Text(index == 0 ? String(localizable: .texKeystoneStep1Title) : String(localizable: .texKeystoneStep2Title))
-                    .zFont(.medium, size: 14, style: Design.Text.primary)
+                    .zappFont(.rowTitle, style: ZappColors.text)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(index == 0 ? String(localizable: .texKeystoneStep1Desc) : String(localizable: .texKeystoneStep2Desc))
-                    .zFont(.medium, size: 14, style: Design.Text.tertiary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Design.Spacing._3xl)
             }
         }
     }
@@ -500,7 +521,7 @@ extension StoreOf<SendForm> {
             set: { self.send(.currencyUpdated($0.redacted)) }
         )
     }
-    
+
     var bindingForZecAmount: Binding<String> {
         Binding(
             get: { self.zecAmountText.data },

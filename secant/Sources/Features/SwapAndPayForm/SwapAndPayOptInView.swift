@@ -10,147 +10,150 @@ import ComposableArchitecture
 
 struct SwapAndPayOptInView: View {
     @Environment(\.colorScheme) private var colorScheme
-    
+
+    private enum Constants {
+        static let brandmarkSize: CGFloat = 64
+        static let nearLogoWidth: CGFloat = 98
+        static let nearLogoHeight: CGFloat = 24
+        static let optionMinHeight: CGFloat = 40
+    }
+
     @Perception.Bindable var store: StoreOf<SwapAndPay>
 
     init(store: StoreOf<SwapAndPay>) {
         self.store = store
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ScrollView {
                     layout()
                 }
-                .padding(.vertical, 1)
-                
+
                 Spacer()
-                
-                HStack(alignment: .top, spacing: 0) {
+
+                HStack(alignment: .top, spacing: Design.Spacing._lg) {
                     Asset.Assets.infoCircle.image
-                        .zImage(size: 20, style: Design.Text.primary)
-                        .padding(.trailing, 12)
+                        .zImage(width: 20, height: 20, style: ZappColors.textMuted)
 
                     Text(localizable: .swapAndPayOptInWarn)
-                        .zFont(size: 12, style: Design.Text.tertiary)
+                        .zappFont(.caption, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.bottom, 20)
-                
-                ZashiButton(
-                    String(localizable: .currencyConversionSkipBtn),
-                    type: .ghost
+                .padding(.bottom, Design.Spacing._2xl)
+
+                ZappButton(
+                    title: String(localizable: .currencyConversionSkipBtn),
+                    variant: .ghost
                 ) {
                     store.send(.skipOptInTapped)
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, Design.Spacing._lg)
 
-                ZashiButton(String(localizable: .generalConfirm)) {
+                ZappButton(
+                    title: String(localizable: .generalConfirm),
+                    isEnabled: store.optionOneChecked && store.optionTwoChecked
+                ) {
                     store.send(.confirmOptInTapped)
                 }
-                .padding(.bottom, 24)
-                .disabled(!store.optionOneChecked || !store.optionTwoChecked)
+                .padding(.bottom, Design.Spacing._3xl)
             }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
         }
-        .screenHorizontalPadding()
-        .applyScreenBackground()
     }
-    
+
     private func header() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 0) {
                 Asset.Assets.Brandmarks.brandmarkMax.image
-                    .zImage(size: 64, style: Design.Surfaces.brandPrimary)
+                    .zImage(
+                        width: Constants.brandmarkSize,
+                        height: Constants.brandmarkSize,
+                        style: ZappColors.text
+                    )
 
-                ZStack {
-                    Asset.Assets.Tickers.nearChain.image
-                        .zImage(size: 70, color: Design.screenBackground.color(colorScheme))
-                        .offset(x: -10)
-
-                    Asset.Assets.Tickers.nearChain.image
-                        .resizable()
-                        .frame(width: 64, height: 64)
-                        .offset(x: -10)
-                }
+                Asset.Assets.Tickers.nearChain.image
+                    .resizable()
+                    .frame(width: Constants.brandmarkSize, height: Constants.brandmarkSize)
+                    .padding(.leading, Design.Spacing._lg)
 
                 Spacer()
             }
-            .padding(.vertical, 24)
+            .padding(.vertical, Design.Spacing._3xl)
 
-            HStack(spacing: 6) {
+            HStack(spacing: Design.Spacing._sm) {
                 Text(localizable: .swapAndPayOptInTitle)
-                    .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                    .padding(.bottom, 8)
-                
+                    .zappFont(.displaySecondary, style: ZappColors.text)
+
                 Asset.Assets.Partners.nearLogo.image
-                    .zImage(width: 98, height: 24, style: Design.Text.primary)
-                    .offset(y: -4)
+                    .zImage(
+                        width: Constants.nearLogoWidth,
+                        height: Constants.nearLogoHeight,
+                        style: ZappColors.text
+                    )
             }
-            
+            .padding(.bottom, Design.Spacing._md)
+
             Text(localizable: .swapAndPayOptInDesc)
-                .zFont(size: 14, style: Design.Text.tertiary)
-                .padding(.bottom, 4)
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
-    
+
     private func layout() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: Design.Spacing._lg) {
             header()
-                .padding(.bottom, 24)
+                .padding(.bottom, Design.Spacing._lg)
 
-            Button {
+            optionRow(
+                isOn: store.optionOneChecked,
+                title: String(localizable: .swapAndPayOptInOptionOneTitle),
+                subtitle: String(localizable: .swapAndPayOptInOptionOneSubtitle)
+            ) {
                 store.send(.optionOneTapped)
-            } label: {
-                HStack(alignment: .top, spacing: 0) {
-                    ZashiToggle(isOn: $store.optionOneChecked)
-                        .padding(.trailing, 8)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(localizable: .swapAndPayOptInOptionOneTitle)
-                            .zFont(.semiBold, size: 14, style: Design.Text.primary)
-                        
-                        Text(localizable: .swapAndPayOptInOptionOneSubtitle)
-                            .zFont(size: 14, style: Design.Text.tertiary)
-                    }
-                    
-                    Spacer()
-                }
-                .frame(minHeight: 40)
-                .frame(maxWidth: .infinity)
-                .padding(16)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                        .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                }
             }
-            .padding(.bottom, 12)
 
-            Button {
+            optionRow(
+                isOn: store.optionTwoChecked,
+                title: String(localizable: .swapAndPayOptInOptionTwoTitle),
+                subtitle: String(localizable: .swapAndPayOptInOptionTwoSubtitle)
+            ) {
                 store.send(.optionTwoTapped)
-            } label: {
-                HStack(alignment: .top, spacing: 0) {
-                    ZashiToggle(isOn: $store.optionTwoChecked)
-                        .padding(.trailing, 8)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(localizable: .swapAndPayOptInOptionTwoTitle)
-                            .zFont(.semiBold, size: 14, style: Design.Text.primary)
-                        
-                        Text(localizable: .swapAndPayOptInOptionTwoSubtitle)
-                            .zFont(size: 14, style: Design.Text.tertiary)
-                    }
-                    
-                    Spacer()
-                }
-                .frame(minHeight: 40)
-                .frame(maxWidth: .infinity)
-                .padding(16)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                        .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                }
             }
-            .padding(.bottom, 12)
         }
+    }
+
+    private func optionRow(
+        isOn: Bool,
+        title: String,
+        subtitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack(alignment: .top, spacing: Design.Spacing._lg) {
+            ZappToggle(isOn: isOn, action: action)
+
+            VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                Text(title)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+
+                Text(subtitle)
+                    .zappFont(.rowSubtitle, style: ZappColors.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(minHeight: Constants.optionMinHeight)
+        .frame(maxWidth: .infinity)
+        .padding(Design.Spacing._xl)
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 }

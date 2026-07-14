@@ -6,21 +6,21 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The You tab, mirroring `SettingsTabContent.kt`.
+/// The You tab, mirroring the grouping of `SettingsTabContent.kt`.
 ///
-/// Only the rows whose subsystem exists on iOS today are rendered. Android also lists chat profile,
-/// contacts, app lock, read receipts, online status, background delivery and the p2p payment method;
-/// those arrive with chat (Phase 3), PIN (Phase 4) and offramp (Phase 5), each a one-row insert into
-/// the group it belongs to.
+/// Android's App lock, Background delivery, Read receipts, Online status and P2P payment method rows
+/// are deliberately absent: each fronts a subsystem iOS does not have yet, and the receipts/presence
+/// toggles already live inside Chat profile. A row that opens nothing is worse than no row.
 ///
-/// `allSettings` is a transitional bridge to the existing settings screen so the address book,
-/// advanced settings, about and feedback stay reachable. It retires as those rows are promoted here.
+/// `allSettings` has no Android counterpart — Android's own MoreScreen is unreachable from the Zapp
+/// shell, which is a bug there, not a target. It is the only route to the address book, advanced
+/// settings, about, feedback and voting, all of which have working iOS screens.
 struct SettingsTabContent: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @Perception.Bindable var store: StoreOf<ZappTabs>
 
-    /// nil until chat identity is wired into the app; Android hides the card the same way.
+    /// nil until the chat identity resolves; Android hides the card the same way.
     var displayName: String?
 
     var body: some View {
@@ -32,6 +32,30 @@ struct SettingsTabContent: View {
                     VStack(spacing: 0) {
                         if let displayName {
                             ProfileCard(displayName: displayName)
+                        }
+
+                        SettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
+                            ZappRow(
+                                title: String(localizable: .settingsYouContactsTitle),
+                                subtitle: String(localizable: .settingsYouContactsSubtitleNew),
+                                icon: Asset.Assets.Icons.userPlus.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.chatContactsTapped)
+                            }
+                        }
+
+                        SettingsGroup(title: String(localizable: .settingsYouGroupSecurity)) {
+                            ZappRow(
+                                title: String(localizable: .settingsYouProfileIdentityTitle),
+                                subtitle: String(localizable: .settingsYouProfileIdentitySubtitle),
+                                icon: Asset.Assets.Icons.user.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.chatProfileTapped)
+                            }
                         }
 
                         SettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
@@ -55,30 +79,6 @@ struct SettingsTabContent: View {
                                 iconBackground: .accentSoft
                             ) {
                                 store.send(.localCurrencyTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsYouChatProfileTitle),
-                                subtitle: String(localizable: .settingsYouChatProfileSubtitle),
-                                icon: Asset.Assets.Icons.user.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.chatProfileTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsYouContactsTitle),
-                                subtitle: String(localizable: .settingsYouContactsSubtitle),
-                                icon: Asset.Assets.Icons.user.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.chatContactsTapped)
                             }
 
                             ZappRowDivider(inset: true)

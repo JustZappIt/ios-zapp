@@ -51,9 +51,7 @@ struct TransactionsCoordFlowView: View {
             }
             .navigationBarHidden(true)
         }
-        .applyScreenBackground()
-        .zashiBack()
-        .screenTitle(String(localizable: .generalRequest))
+        .background(ZappColors.bg.color(colorScheme))
     }
 }
 

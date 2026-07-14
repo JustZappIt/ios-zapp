@@ -12,9 +12,17 @@ import ComposableArchitecture
 struct TransactionsManagerView: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    enum Constants {
+        static let horizontalPadding: CGFloat = 18
+        static let controlSize: CGFloat = 44
+        static let iconSize: CGFloat = 20
+        static let badgeSize: CGFloat = 16
+        static let placeholderRows = 15
+    }
+
     @Perception.Bindable var store: StoreOf<TransactionsManager>
     let tokenName: String
-    
+
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
 
     init(store: StoreOf<TransactionsManager>, tokenName: String) {
@@ -25,188 +33,237 @@ struct TransactionsManagerView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    ZashiTextField(
-                        text: $store.searchTerm,
-                        placeholder: String(localizable: .filterSearch),
-                        eraseAction: { store.send(.eraseSearchTermTapped) },
-                        accessoryView: !store.searchTerm.isEmpty ? Asset.Assets.Icons.xClose.image
-                            .zImage(size: 16, style: Design.Btns.Tertiary.fg) : nil,
-                        prefixView: Asset.Assets.Icons.search.image
-                            .zImage(size: 20, style: Design.Dropdowns.Default.text)
-                    )
-                    .padding(.trailing, 8)
-                    
-                    Button {
-                        store.send(.filterTapped)
-                    } label: {
-                        ZStack {
-                            Asset.Assets.Icons.filter.image
-                                .zImage(size: 24, style: Design.Text.primary)
-                                .padding(10)
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                        .fill(Design.Btns.Secondary.bg.color(colorScheme))
-                                        .overlay {
-                                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                                .stroke(store.activeFilters.count > 0
-                                                        ? Design.Utility.Gray._900.color(colorScheme)
-                                                        : Design.Utility.Gray._100.color(colorScheme),
-                                                        style: StrokeStyle(lineWidth: store.activeFilters.count > 0 ? 2.0 : 1.0)
-                                                )
-                                        }
-                                }
-                            
-                            if store.activeFilters.count > 0 {
-                                Text("\(store.activeFilters.count)")
-                                    .zFont(.medium, size: 12, style: Design.Text.opposite)
-                                    .background {
-                                        Circle()
-                                            .fill(Design.Utility.Gray._900.color(colorScheme))
-                                            .frame(width: 20, height: 20)
-                                            .background {
-                                                Circle()
-                                                    .fill(Asset.Colors.background.color)
-                                                    .frame(width: 24, height: 24)
-                                            }
-                                    }
-                                    .offset(x: 22, y: -22)
-                            }
-                        }
-                    }
+                ZappScreenHeader(title: String(localizable: .generalActivity)) {
+                    hideBalancesButton()
                 }
-                .screenHorizontalPadding()
-                .padding(.vertical, 12)
-                
+
+                searchRow()
+
                 if store.transactionSections.isEmpty && !store.isInvalidated {
                     noTransactionsView()
-                    
+
                     Spacer()
                 } else {
-                    ScrollViewReader { scrollViewProxy in
-                        List {
-                            if store.isInvalidated {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    ForEach(0..<15) { _ in
-                                        NoTransactionPlaceholder(true)
-                                    }
-                                    
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .listRowInsets(EdgeInsets())
-                                .listRowBackground(Asset.Colors.background.color)
-                                .listRowSeparator(.hidden)
-                            } else {
-                                ForEach(store.transactionSections) { section in
-                                    WithPerceptionTracking {
-                                        Section {
-                                            ForEach(section.transactions) { transaction in
-                                                WithPerceptionTracking {
-                                                    Button {
-                                                        store.send(.transactionTapped(transaction.id))
-                                                    } label: {
-                                                        TransactionRowView(
-                                                            transaction: transaction,
-                                                            isUnread: TransactionsManager.isUnread(transaction),
-                                                            isSwap: TransactionsManager.isSwap(transaction),
-                                                            divider: section.latestTransactionId != transaction.id
-                                                        )
-                                                        .onAppear {
-                                                            if transaction.requiresAutoUpdate {
-                                                                store.send(.transactionOnAppear(transaction.id))
-                                                            }
-                                                        }
-                                                    }
-                                                    .listRowInsets(EdgeInsets())
-                                                }
-                                            }
-                                            .listRowBackground(Asset.Colors.background.color)
-                                            .listRowSeparator(.hidden)
-                                        } header: {
-                                            Text(section.id)
-                                                .zFont(.medium, size: 16, style: Design.Text.tertiary)
-                                                .screenHorizontalPadding()
-                                                .listRowInsets(EdgeInsets())
-                                                .listRowBackground(Asset.Colors.background.color)
-                                                .listRowSeparator(.hidden)
-                                                .id(section.id)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .onChange(of: store.transactionSections) { _ in
-                            scrollViewProxy.scrollTo(store.transactionSections.first?.id, anchor: .top)
-                        }
-                    }
+                    transactionsList()
                 }
             }
             .disabled(store.transactions.isEmpty)
-            .applyScreenBackground()
-            .listStyle(.plain)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
-            .navigationBarItems(trailing: hideBalancesButton())
             .zashiSheet(isPresented: $store.filtersRequest) {
-                filtersContent()
+                // A sheet's content closure escapes: reads inside it only register with TCA's
+                // observation system under their own WithPerceptionTracking.
+                WithPerceptionTracking {
+                    filtersContent()
+                }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
         .zashiBack() {
             store.send(.dismissRequired)
         }
-        .screenTitle(String(localizable: .generalActivity).uppercased())
     }
-    
+
+    @ViewBuilder func transactionsList() -> some View {
+        ScrollViewReader { scrollViewProxy in
+            List {
+                if store.isInvalidated {
+                    VStack(spacing: 0) {
+                        ForEach(0..<Constants.placeholderRows, id: \.self) { _ in
+                            TransactionPlaceholderRow()
+                        }
+
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(ZappColors.bg.color(colorScheme))
+                    .listRowSeparator(.hidden)
+                } else {
+                    ForEach(store.transactionSections) { section in
+                        WithPerceptionTracking {
+                            Section {
+                                ForEach(section.transactions) { transaction in
+                                    WithPerceptionTracking {
+                                        ZappTransactionRow(
+                                            transaction: transaction,
+                                            tokenName: tokenName,
+                                            isUnread: TransactionsManager.isUnread(transaction),
+                                            isSwap: TransactionsManager.isSwap(transaction),
+                                            divider: section.latestTransactionId != transaction.id
+                                        ) {
+                                            store.send(.transactionTapped(transaction.id))
+                                        }
+                                        // Feeds the swap-status poll in RootSwaps; drop it and swap
+                                        // rows keep rendering a stale status.
+                                        .onAppear {
+                                            if transaction.requiresAutoUpdate {
+                                                store.send(.transactionOnAppear(transaction.id))
+                                            }
+                                        }
+                                        .listRowInsets(EdgeInsets())
+                                    }
+                                }
+                                .listRowBackground(ZappColors.bg.color(colorScheme))
+                                .listRowSeparator(.hidden)
+                            } header: {
+                                ZappSectionLabel(text: section.id)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, Constants.horizontalPadding)
+                                    .padding(.vertical, 8)
+                                    .background(ZappColors.bg.color(colorScheme))
+                                    .listRowInsets(EdgeInsets())
+                                    .listRowBackground(ZappColors.bg.color(colorScheme))
+                                    .listRowSeparator(.hidden)
+                                    .id(section.id)
+                            }
+                        }
+                    }
+                }
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .onChange(of: store.transactionSections) { _ in
+                scrollViewProxy.scrollTo(store.transactionSections.first?.id, anchor: .top)
+            }
+        }
+    }
+
+    @ViewBuilder func searchRow() -> some View {
+        HStack(spacing: 8) {
+            searchField()
+
+            filterButton()
+        }
+        .padding(.horizontal, Constants.horizontalPadding)
+        .padding(.vertical, 12)
+    }
+
+    @ViewBuilder func searchField() -> some View {
+        HStack(spacing: 8) {
+            Asset.Assets.Icons.search.image
+                .zImage(size: Constants.iconSize, style: ZappColors.textSubtle)
+
+            ZStack(alignment: .leading) {
+                if store.searchTerm.isEmpty {
+                    Text(localizable: .filterSearch)
+                        .zappFont(.body, style: ZappColors.textSubtle)
+                        .allowsHitTesting(false)
+                }
+
+                TextField("", text: $store.searchTerm)
+                    .zappFont(.body, style: ZappColors.text)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+            }
+
+            if !store.searchTerm.isEmpty {
+                Button {
+                    store.send(.eraseSearchTermTapped)
+                } label: {
+                    Asset.Assets.Icons.xClose.image
+                        .zImage(size: 16, style: ZappColors.textMuted)
+                }
+                .buttonStyle(.zappPress)
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(height: Constants.controlSize)
+        .background(ZappColors.surfaceInput.color(colorScheme))
+        .overlay {
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        }
+    }
+
+    @ViewBuilder func filterButton() -> some View {
+        Button {
+            store.send(.filterTapped)
+        } label: {
+            ZStack(alignment: .topTrailing) {
+                Asset.Assets.Icons.filter.image
+                    .zImage(size: Constants.iconSize, style: ZappColors.text)
+                    .frame(width: Constants.controlSize, height: Constants.controlSize)
+                    .background(ZappColors.surfaceAlt.color(colorScheme))
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(
+                                store.activeFilters.isEmpty
+                                ? ZappColors.border.color(colorScheme)
+                                : ZappColors.accent.color(colorScheme),
+                                lineWidth: store.activeFilters.isEmpty ? 1 : 2
+                            )
+                    }
+
+                if !store.activeFilters.isEmpty {
+                    Text("\(store.activeFilters.count)")
+                        .zappFont(.chip, style: ZappColors.onAccent)
+                        .frame(width: Constants.badgeSize, height: Constants.badgeSize)
+                        .background(ZappColors.accent.color(colorScheme))
+                        .offset(x: 5, y: -5)
+                }
+            }
+        }
+        .buttonStyle(.zappPress)
+    }
+
     @ViewBuilder func hideBalancesButton() -> some View {
         Button {
             $isSensitiveContentHidden.withLock { $0.toggle() }
         } label: {
             let image = isSensitiveContentHidden ? Asset.Assets.eyeOff.image : Asset.Assets.eyeOn.image
             image
-                .zImage(size: 24, color: Asset.Colors.primary.color)
-                .padding(Design.Spacing.navBarButtonPadding)
+                .zImage(size: 24, style: ZappColors.text)
         }
+        .buttonStyle(.zappPress)
     }
-    
+
     @ViewBuilder func noTransactionsView() -> some View {
         WithPerceptionTracking {
-            ZStack {
-                VStack(spacing: 0) {
-                    ForEach(0..<5) { _ in
-                        NoTransactionPlaceholder()
-                    }
-                    
-                    Spacer()
-                }
-                .overlay {
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: .clear, location: 0.0),
-                            Gradient.Stop(color: Asset.Colors.background.color, location: 0.3)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                }
-                
-                VStack(spacing: 0) {
-                    Asset.Assets.Illustrations.emptyState.image
-                        .resizable()
-                        .frame(width: 164, height: 164)
-                        .padding(.bottom, 20)
+            VStack(spacing: 8) {
+                Text(localizable: .filterNoResults)
+                    .zappFont(.sectionTitle, style: ZappColors.text)
 
-                    Text(localizable: .filterNoResults)
-                        .zFont(.semiBold, size: 20, style: Design.Text.primary)
-                        .padding(.bottom, 8)
-
-                    Text(localizable: .filterWeTried)
-                        .zFont(size: 14, style: Design.Text.tertiary)
-                        .padding(.bottom, 20)
-                }
-                .padding(.top, 40)
+                Text(localizable: .filterWeTried)
+                    .zappFont(.body, style: ZappColors.textMuted)
+                    .multilineTextAlignment(.center)
             }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, Design.Spacing._4xl)
+            .padding(.top, 64)
         }
+    }
+}
+
+private struct TransactionPlaceholderRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(ZappColors.surfaceAlt.color(colorScheme))
+                .shimmer(true)
+                .frame(width: 40, height: 40)
+
+            VStack(alignment: .leading, spacing: 6) {
+                bar(width: 86)
+                bar(width: 64)
+            }
+
+            Spacer()
+
+            bar(width: 40)
+        }
+        .padding(.horizontal, TransactionsManagerView.Constants.horizontalPadding)
+        .padding(.vertical, 14)
+    }
+
+    private func bar(width: CGFloat) -> some View {
+        Rectangle()
+            .fill(ZappColors.surfaceAlt.color(colorScheme))
+            .shimmer(true)
+            .frame(width: width, height: 12)
     }
 }
 

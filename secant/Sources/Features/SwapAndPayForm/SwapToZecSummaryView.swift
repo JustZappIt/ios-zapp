@@ -11,112 +11,99 @@ import ComposableArchitecture
 struct SwapToZecSummaryView: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    private enum Constants {
+        static let qrSize: CGFloat = 216
+        static let qrPadding: CGFloat = 24
+        static let tickerSize: CGFloat = 40
+        static let tickerBadgeSize: CGFloat = 18
+        static let actionMinHeight: CGFloat = 64
+        static let actionIconSize: CGFloat = 20
+        static let toolbarIconSize: CGFloat = 22
+        static let toolbarTouchTarget: CGFloat = 44
+    }
+
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
 
     @Perception.Bindable var store: StoreOf<SwapAndPay>
     let tokenName: String
-    
+
     init(store: StoreOf<SwapAndPay>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                Button {
-                    store.send(.copySwapToZecAmountTapped)
-                } label: {
-                    VStack(spacing: 8) {
-                        HStack(spacing: 12) {
-                            Text(localizable: .swapToZecDeposit)
-                                .zFont(.medium, size: 16, style: Design.Text.primary)
-                            
-                            Asset.Assets.copy.image
-                                .zImage(size: 20, style: Design.Btns.Ghost.fg)
+                ZappScreenHeader(
+                    title: String(localizable: .swapAndPaySwap),
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: {
+                        Button {
+                            store.send(.openDepositHelpSheetTapped)
+                        } label: {
+                            Asset.Assets.infoCircle.image
+                                .zImage(
+                                    width: Constants.toolbarIconSize,
+                                    height: Constants.toolbarIconSize,
+                                    style: ZappColors.text
+                                )
+                                .frame(width: Constants.toolbarTouchTarget, height: Constants.toolbarTouchTarget)
                         }
-                        .padding(.top, 24)
-                        
-                        HStack(spacing: 8) {
-                            tokenTicker(asset: store.selectedAsset, colorScheme)
-                            
-                            Text(store.swapToZecAmountInQuotePreciseCopy)
-                                .zFont(.semiBold, size: 48, style: Design.Text.primary)
-                                .minimumScaleFactor(0.1)
-                                .lineLimit(1)
-                        }
-                        
-                        Text(store.zecUsdToBeSpendInQuote)
-                            .zFont(.medium, size: 18, style: Design.Text.tertiary)
-                            .padding(.bottom, 8)
+                        .buttonStyle(.zappPress)
                     }
-                    .frame(maxWidth: .infinity)
+                )
+
+                ScrollView {
+                    VStack(spacing: Design.Spacing._2xl) {
+                        depositAmount
+
+                        qrPanel
+
+                        if let depositAddress = store.quote?.depositAddress {
+                            Text(depositAddress.truncateMiddle10)
+                                .zappFont(.mono, style: ZappColors.text)
+                                .padding(.horizontal, Design.Spacing._lg)
+                                .padding(.vertical, Design.Spacing._md)
+                                .background(ZappColors.surfaceAlt.color(colorScheme))
+                        }
+
+                        HStack(spacing: Design.Spacing._md) {
+                            actionButton(
+                                title: String(localizable: .receiveCopy),
+                                icon: Asset.Assets.copy.image
+                            ) {
+                                store.send(.copyDepositAddressToPastboard)
+                            }
+
+                            actionButton(
+                                title: String(localizable: .swapToZecShareQR),
+                                icon: Asset.Assets.Icons.qr.image
+                            ) {
+                                store.send(.shareQR)
+                            }
+                        }
+
+                        Group {
+                            Text(localizable: .swapToZecInfo1)
+                            + Text(localizable: .swapToZecInfo2(store.selectedAsset?.token ?? "", store.selectedAsset?.chainName ?? "")).bold()
+                            + Text(localizable: .swapToZecInfo3)
+                        }
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .padding(.top, Design.Spacing._xl)
+                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
                 }
 
-                qrCode(store.quote?.depositAddress ?? "")
-                    .frame(width: 216, height: 216)
-                    .onAppear {
-                        store.send(.generateQRCode(colorScheme == .dark ? true : false))
-                    }
-                    .padding(24)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._xl)
-                            .fill(Design.screenBackground.color(colorScheme))
-                    }
-                    .onTapGesture {
-                        store.send(.qrCodeTapped, animation: .easeInOut)
-                    }
-                
-                if let depositAddress = store.quote?.depositAddress {
-                    Text(depositAddress.truncateMiddle10)
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._full)
-                                .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                        }
-                        .padding(.bottom, 12)
-                }
-                
-                HStack(spacing: 8) {
-                    button(
-                        String(localizable: .receiveCopy),
-                        icon: Asset.Assets.copy.image
-                    ) {
-                        store.send(.copyDepositAddressToPastboard)
-                    }
-                    
-                    button(
-                        String(localizable: .swapToZecShareQR),
-                        icon: Asset.Assets.Icons.qr.image
-                    ) {
-                        store.send(.shareQR)
-                    }
-                }
-                .zFont(.medium, size: 12, style: Design.Text.primary)
-                .padding(.bottom, 32)
-                
-                Group {
-                    Text(localizable: .swapToZecInfo1)
-                    + Text(localizable: .swapToZecInfo2(store.selectedAsset?.token ?? "", store.selectedAsset?.chainName ?? "")).bold()
-                    + Text(localizable: .swapToZecInfo3)
-                }
-                .zFont(size: 14, style: Design.Text.primary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(2)
-                .padding(.bottom, 12)
-                
-                Spacer()
-                
-                ZashiButton(String(localizable: .swapToZecSentTheFunds)) {
-                    store.send(.sentTheFundsButtonTapped)
-                }
-                .padding(.bottom, 32)
-                
                 shareView()
             }
-            .screenHorizontalPadding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .zashiSheet(isPresented: $store.isDepositHelpSheetVisible) {
                 helpSheetContent(colorScheme)
             }
@@ -126,98 +113,157 @@ struct SwapToZecSummaryView: View {
                     action: \.alert
                 )
             )
-            .navigationBarItems(
-                trailing:
-                    Button {
-                        store.send(.openDepositHelpSheetTapped)
-                    } label: {
-                        Asset.Assets.infoCircle.image
-                            .zImage(size: 24, style: Design.Text.primary)
-                            .padding(Design.Spacing.navBarButtonPadding)
+            .zashiBack(
+                primaryAction: {
+                    ZappButton(title: String(localizable: .swapToZecSentTheFunds)) {
+                        store.send(.sentTheFundsButtonTapped)
                     }
+                },
+                customDismiss: { store.send(.depositFundsBackTapped) }
             )
-            .zashiBack() { store.send(.depositFundsBackTapped) }
-            .screenTitle(String(localizable: .swapAndPaySwap).uppercased())
-            .applyScreenBackground()
             .enlargeQR(isPresented: $store.isQRCodeEnlarged) {
                 qrEnlargedCode(store.quote?.depositAddress ?? "")
                     .aspectRatio(1, contentMode: .fit)
                     .padding(48)
                     .background {
                         if store.storedEnlargedQR != nil {
-                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                .fill(Asset.Colors.ZDesign.Base.bone.color)
+                            Rectangle()
+                                .fill(Color.white)
                                 .padding(24)
                         }
                     }
             }
         }
     }
-    
+
+    private var depositAmount: some View {
+        Button {
+            store.send(.copySwapToZecAmountTapped)
+        } label: {
+            VStack(spacing: Design.Spacing._md) {
+                HStack(spacing: Design.Spacing._md) {
+                    ZappSectionLabel(text: String(localizable: .swapToZecDeposit))
+
+                    Asset.Assets.copy.image
+                        .zImage(width: 16, height: 16, style: ZappColors.textMuted)
+                }
+
+                HStack(spacing: Design.Spacing._md) {
+                    tokenTicker(asset: store.selectedAsset, colorScheme)
+
+                    Text(store.swapToZecAmountInQuotePreciseCopy)
+                        .zappFont(.display, style: ZappColors.text)
+                        .minimumScaleFactor(0.1)
+                        .lineLimit(1)
+                }
+
+                Text(store.zecUsdToBeSpendInQuote)
+                    .zappFont(.rowTitle, style: ZappColors.textMuted)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+    }
+
+    // The QR keeps a white fill in both themes: a sending wallet has to scan it.
+    private var qrPanel: some View {
+        qrCode(store.quote?.depositAddress ?? "")
+            .frame(width: Constants.qrSize, height: Constants.qrSize)
+            .onAppear {
+                store.send(.generateQRCode(colorScheme == .dark ? true : false))
+            }
+            .padding(Constants.qrPadding)
+            .background(ZappColors.bg.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
+            .onTapGesture {
+                store.send(.qrCodeTapped, animation: .easeInOut)
+            }
+    }
+
+    private func actionButton(
+        title: String,
+        icon: Image,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: Design.Spacing._sm) {
+                icon
+                    .zImage(
+                        width: Constants.actionIconSize,
+                        height: Constants.actionIconSize,
+                        style: ZappColors.text
+                    )
+
+                Text(title)
+                    .zappFont(.buttonSmall, style: ZappColors.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .padding(Design.Spacing._md)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: Constants.actionMinHeight)
+            .background(ZappColors.surfaceAlt.color(colorScheme))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(title)
+    }
+
     @ViewBuilder private func bulletpoint(_ text: String) -> some View {
-        HStack(alignment: .top) {
-            Circle()
-                .fill(Design.Text.tertiary.color(colorScheme))
+        HStack(alignment: .top, spacing: Design.Spacing._md) {
+            Rectangle()
+                .fill(ZappColors.textSubtle.color(colorScheme))
                 .frame(width: 4, height: 4)
-                .padding(.top, 7)
-                .padding(.leading, 8)
+                .padding(.top, Design.Spacing._md)
 
             Text(text)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.bottom, 5)
     }
-    
+
     @ViewBuilder func helpSheetContent(_ colorScheme: ColorScheme) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: Design.Spacing._xl) {
             Text(localizable: .depositFundsTitle)
-                .zFont(.semiBold, size: 20, style: Design.Text.primary)
-                .padding(.top, 32)
-                .padding(.bottom, 12)
+                .zappFont(.sectionTitle, style: ZappColors.text)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, Design.Spacing._4xl)
 
             Text(localizable: .depositFundsDesc)
-                .zFont(size: 16, style: Design.Text.tertiary)
-                .padding(.bottom, 18)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-            
-            bulletpoint(String(localizable: .depositFundsBulletPoint1))
-                .padding(.bottom, 24)
-            bulletpoint(String(localizable: .depositFundsBulletPoint2))
-                .padding(.bottom, 24)
-            bulletpoint(String(localizable: .depositFundsBulletPoint3))
-                .padding(.bottom, 32)
 
-            ZashiButton(String(localizable: .generalOk).uppercased()) {
+            bulletpoint(String(localizable: .depositFundsBulletPoint1))
+            bulletpoint(String(localizable: .depositFundsBulletPoint2))
+            bulletpoint(String(localizable: .depositFundsBulletPoint3))
+
+            ZappButton(title: String(localizable: .generalOk)) {
                 store.send(.closeDepositHelpSheetTapped)
             }
+            .padding(.top, Design.Spacing._xl)
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-    
+
     @ViewBuilder func tokenTicker(asset: SwapAsset?, _ colorScheme: ColorScheme) -> some View {
         if let asset {
             asset.tokenIcon
                 .resizable()
-                .frame(width: 40, height: 40)
-                .padding(.trailing, 8)
-                .overlay {
-                    ZStack {
-                        Circle()
-                            .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                            .frame(width: 20, height: 20)
-                            .offset(x: 12, y: 12)
-                        
-                        asset.chainIcon
-                            .resizable()
-                            .frame(width: 18, height: 18)
-                            .offset(x: 12, y: 12)
-                    }
+                .frame(width: Constants.tickerSize, height: Constants.tickerSize)
+                .overlay(alignment: .bottomTrailing) {
+                    asset.chainIcon
+                        .resizable()
+                        .frame(width: Constants.tickerBadgeSize, height: Constants.tickerBadgeSize)
+                        .background(ZappColors.bg.color(colorScheme))
+                        .offset(x: 5, y: 5)
                 }
         }
     }
-    
+
     @ViewBuilder func qrCode(_ qrText: String = "") -> some View {
         Group {
             if let storedImg = store.storedQR {
@@ -228,7 +274,7 @@ struct SwapToZecSummaryView: View {
             }
         }
     }
-    
+
     @ViewBuilder func qrEnlargedCode(_ qrText: String = "") -> some View {
         Group {
             if let storedImg = store.storedEnlargedQR {
@@ -239,7 +285,7 @@ struct SwapToZecSummaryView: View {
             }
         }
     }
-    
+
     @ViewBuilder func shareView() -> some View {
         if let addressToShare = store.addressToShare,
            let cgImg = QRCodeGenerator.generateCode(
@@ -262,84 +308,6 @@ struct SwapToZecSummaryView: View {
             .frame(width: 0, height: 0)
         } else {
             EmptyView()
-        }
-    }
-    
-    @ViewBuilder private func button(
-        _ title: String,
-        icon: Image,
-        action: @escaping () -> Void
-    ) -> some View {
-        if colorScheme == .light {
-            Button {
-                action()
-            } label: {
-                VStack(spacing: 4) {
-                    icon
-                        .resizable()
-                        .renderingMode(.template)
-                        .frame(width: 24, height: 24)
-                    
-                    Text(title)
-                }
-                .frame(height: 80)
-                .frame(maxWidth: .infinity)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                        .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                                .stroke(Design.Utility.Gray._100.color(colorScheme))
-                        }
-                }
-                .shadow(color: .black.opacity(0.02), radius: 0.66667, x: 0, y: 1.33333)
-                .shadow(color: .black.opacity(0.08), radius: 1.33333, x: 0, y: 1.33333)
-                .padding(.bottom, 4)
-            }
-        } else {
-            Button {
-                action()
-            } label: {
-                VStack(spacing: 4) {
-                    icon
-                        .resizable()
-                        .renderingMode(.template)
-                        .frame(width: 24, height: 24)
-                    
-                    Text(title)
-                }
-                .frame(height: 80)
-                .frame(maxWidth: .infinity)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                        .fill(
-                            LinearGradient(
-                                stops: [
-                                    Gradient.Stop(color: Asset.Colors.ZDesign.sharkShades12dp.color, location: 0.00),
-                                    Gradient.Stop(color: Asset.Colors.ZDesign.sharkShades01dp.color, location: 1.00)
-                                ],
-                                startPoint: UnitPoint(x: 0.5, y: 0.0),
-                                endPoint: UnitPoint(x: 0.5, y: 1.0)
-                            )
-                        )
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                                .stroke(
-                                    LinearGradient(
-                                        stops: [
-                                            Gradient.Stop(color: Design.Utility.Gray._200.color(colorScheme), location: 0.00),
-                                            Gradient.Stop(color: Design.Utility.Gray._200.color(colorScheme).opacity(0.15), location: 1.00)
-                                        ],
-                                        startPoint: UnitPoint(x: 0.5, y: 0.0),
-                                        endPoint: UnitPoint(x: 0.5, y: 1.0)
-                                    )
-                                )
-                        }
-                }
-                .shadow(color: .black.opacity(0.02), radius: 0.66667, x: 0, y: 1.33333)
-                .shadow(color: .black.opacity(0.08), radius: 1.33333, x: 0, y: 1.33333)
-                .padding(.bottom, 4)
-            }
         }
     }
 }

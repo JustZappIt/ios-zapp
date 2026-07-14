@@ -13,42 +13,48 @@ extension SwapAndPayForm {
     @ViewBuilder func assetContent(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                ZStack {
-                    VStack {
-                        Text(String(localizable: .swapAndPaySelectToken).uppercased())
-                            .zFont(.semiBold, size: 16, style: Design.Text.primary)
-                            .fixedSize()
-                    }
-                    
-                    HStack {
+                ZappScreenHeader(
+                    title: String(localizable: .swapAndPaySelectToken),
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: {
                         Button {
                             store.send(.closeAssetsSheetTapped)
                         } label: {
                             Asset.Assets.buttonCloseX.image
-                                .zImage(size: 24, style: Design.Text.primary)
-                                .padding(8)
+                                .zImage(width: 20, height: 20, style: ZappColors.text)
+                                .frame(width: 48, height: 48)
                         }
-                        
-                        Spacer()
+                        .buttonStyle(.zappPress)
+                    }
+                )
+
+                HStack(spacing: Design.Spacing._md) {
+                    Asset.Assets.Icons.search.image
+                        .zImage(width: 18, height: 18, style: ZappColors.textMuted)
+
+                    TextField(String(localizable: .swapAndPaySearch), text: $store.searchTerm)
+                        .zappFont(.body, style: ZappColors.text)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+
+                    if !store.searchTerm.isEmpty {
+                        Button {
+                            store.send(.eraseSearchTermTapped)
+                        } label: {
+                            Asset.Assets.Icons.xClose.image
+                                .zImage(width: 16, height: 16, style: ZappColors.textMuted)
+                        }
+                        .buttonStyle(.zappPress)
                     }
                 }
-                .padding(.top, 16)
-                .padding(.bottom, 24)
-                .padding(.horizontal, 20)
-                
-                ZashiTextField(
-                    text: $store.searchTerm,
-                    placeholder: String(localizable: .swapAndPaySearch),
-                    eraseAction: { store.send(.eraseSearchTermTapped) },
-                    accessoryView: !store.searchTerm.isEmpty ? Asset.Assets.Icons.xClose.image
-                        .zImage(size: 16, style: Design.Btns.Tertiary.fg) : nil,
-                    prefixView: Asset.Assets.Icons.search.image
-                        .zImage(size: 20, style: Design.Dropdowns.Default.text)
-                )
-                .padding(.bottom, 32)
-                .padding(.horizontal, 20)
-                
-                if let _ = store.swapAssetFailedWithRetry {
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceInput.color(colorScheme))
+                .padding(.horizontal, Design.Spacing._2xl)
+                .padding(.bottom, Design.Spacing._2xl)
+
+                if store.swapAssetFailedWithRetry != nil {
                     assetsFailureComposition(colorScheme)
                 } else if store.swapAssetsToPresent.isEmpty && !store.searchTerm.isEmpty {
                     assetsEmptyComposition(colorScheme)
@@ -60,20 +66,19 @@ extension SwapAndPayForm {
                             ForEach(store.swapAssetsToPresent, id: \.self) { asset in
                                 assetView(asset, colorScheme)
                                     .listRowInsets(EdgeInsets())
-                                    .listRowBackground(Asset.Colors.background.color)
+                                    .listRowBackground(ZappColors.bg.color(colorScheme))
                                     .listRowSeparator(.hidden)
                             }
                         }
                     }
-                    .padding(.vertical, 1)
-                    .background(Asset.Colors.background.color)
+                    .background(ZappColors.bg.color(colorScheme))
                     .listStyle(.plain)
                 }
             }
         }
     }
 }
-    
+
 extension SwapAndPayForm {
     @ViewBuilder private func assetView(_ asset: SwapAsset, _ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
@@ -81,56 +86,54 @@ extension SwapAndPayForm {
                 store.send(.assetTapped(asset))
             } label: {
                 VStack(spacing: 0) {
-                    HStack(spacing: 0) {
+                    HStack(spacing: Design.Spacing._lg) {
                         asset.tokenIcon
                             .resizable()
-                            .frame(width: 40, height: 40)
-                            .padding(.trailing, 12)
-                            .overlay {
-                                ZStack {
-                                    Circle()
-                                        .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                                        .frame(width: 22, height: 22)
-                                        .offset(x: 9, y: 16)
-                                    
-                                    asset.chainIcon
-                                        .resizable()
-                                        .frame(width: 18, height: 18)
-                                        .offset(x: 9, y: 16)
-                                }
+                            .frame(
+                                width: Constants.assetIconSize,
+                                height: Constants.assetIconSize
+                            )
+                            .overlay(alignment: .bottomTrailing) {
+                                asset.chainIcon
+                                    .resizable()
+                                    .frame(
+                                        width: Constants.assetBadgeSize,
+                                        height: Constants.assetBadgeSize
+                                    )
+                                    .background(ZappColors.bg.color(colorScheme))
+                                    .offset(x: 5, y: 5)
                             }
-                        
-                        VStack(alignment: .leading, spacing: 0) {
+
+                        VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
                             Text(asset.token)
-                                .font(.custom(FontFamily.Inter.semiBold.name, size: 14))
-                                .zForegroundColor(Design.Text.primary)
-                            
+                                .zappFont(.rowTitle, style: ZappColors.text)
+
                             Text(asset.chainName)
-                                .font(.custom(FontFamily.Inter.regular.name, size: 14))
-                                .zForegroundColor(Design.Text.tertiary)
+                                .zappFont(.rowSubtitle, style: ZappColors.textMuted)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
-                                .padding(.top, 2)
                         }
-                        .padding(.trailing, 16)
-                        
+
                         Spacer(minLength: 2)
-                        
+
                         Asset.Assets.chevronRight.image
-                            .zImage(size: 20, style: Design.Text.tertiary)
+                            .zImage(width: 18, height: 18, style: ZappColors.textSubtle)
                     }
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 20)
-                    
+                    .padding(.vertical, Design.Spacing._lg)
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .contentShape(Rectangle())
+
                     if store.swapAssetsToPresent.last != asset {
-                        Design.Surfaces.divider.color(colorScheme)
+                        Rectangle()
+                            .fill(ZappColors.border.color(colorScheme))
                             .frame(height: 1)
                     }
                 }
             }
+            .buttonStyle(.zappPress)
         }
     }
-    
+
     @ViewBuilder func slippageContent(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
@@ -138,98 +141,32 @@ extension SwapAndPayForm {
                     store.send(.closeSlippageSheetTapped)
                 } label: {
                     Asset.Assets.buttonCloseX.image
-                        .zImage(size: 24, style: Design.Text.primary)
-                        .padding(8)
+                        .zImage(width: 20, height: 20, style: ZappColors.text)
+                        .frame(width: 48, height: 48)
                 }
-                .padding(.vertical, 24)
-                
+                .buttonStyle(.zappPress)
+                .padding(.vertical, Design.Spacing._lg)
+
                 Text(localizable: .swapAndPaySlippage)
-                    .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                    .padding(.bottom, 8)
-                
+                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .padding(.bottom, Design.Spacing._md)
+
                 Text(localizable: .swapAndPaySlippageDesc)
-                    .zFont(size: 14, style: Design.Text.tertiary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                
-                HStack(spacing: 0) {
-                    slippageChip(index: 0, text: store.slippage05String, colorScheme)
-                    slippageChip(index: 1, text: store.slippage1String, colorScheme)
-                    slippageChip(index: 2, text: store.slippage2String, colorScheme)
-                    
-                    if store.selectedSlippageChip == 3 {
-                        HStack(spacing: 0) {
-                            Spacer()
-                            
-                            FocusableTextField(
-                                text: $store.customSlippage,
-                                isFirstResponder: $isSlippageFocused,
-                                placeholder: "%",
-                                colorScheme: colorScheme
-                            )
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth:
-                                    store.customSlippage.isEmpty
-                                   ? .infinity
-                                   : (store.customSlippage.contains(".") || store.customSlippage.contains(","))
-                                   ? CGFloat(store.customSlippage.count - 1) * 13.0 + 2.0
-                                   : CGFloat(store.customSlippage.count) * 13.0
-                            )
-                            .keyboardType(.decimalPad)
-                            .onAppear {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    isSlippageFocused = true
-                                }
-                            }
-                            
-                            if !store.customSlippage.isEmpty {
-                                Text("%")
-                                    .zFont(.medium, size: 16, style: Design.Switcher.selectedText)
-                            }
-                            
-                            Spacer()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 36)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                .fill(Design.Switcher.selectedBg.color(colorScheme))
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                        .stroke(Design.Switcher.selectedStroke.color(colorScheme))
-                                }
-                        }
-                    } else {
-                        Text(localizable: .swapAndPayCustom)
-                            .zFont(.medium, size: 16, style: Design.Switcher.defaultText)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .onTapGesture {
-                                store.send(.slippageChipTapped(3))
-                            }
-                    }
-                }
-                .padding(.horizontal, 2)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 2)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._lg)
-                        .fill(Design.Switcher.surfacePrimary.color(colorScheme))
-                }
-                .padding(.top, 24)
-                
+
+                slippageSwitcher(colorScheme)
+                    .padding(.top, Design.Spacing._3xl)
+
                 slippageInfoText()
-                .zFont(size: 12, style: slippageWarnTextStyle())
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._lg)
-                        .fill(slippageWarnBcgColor(colorScheme))
-                }
-                .padding(.vertical, 20)
-                
+                    .zappFont(.caption, style: slippageWarnTextStyle())
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(Design.Spacing._xl)
+                    .background(slippageWarnBcgColor(colorScheme))
+                    .padding(.vertical, Design.Spacing._2xl)
+
                 Spacer()
 
                 if store.slippageInSheet < 2.0 {
@@ -240,31 +177,90 @@ extension SwapAndPayForm {
                         ZashiText(
                             withAttributedString: attrText,
                             colorScheme: colorScheme,
-                            textColor: Design.Utility.WarningYellow._900.color(colorScheme),
+                            textColor: ZappColors.accentText.color(colorScheme),
                             textSize: 12
                         )
-                        .zFont(size: 12, style: Design.Utility.WarningYellow._900)
+                        .zappFont(.caption, style: ZappColors.accentText)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                .fill(Design.Utility.WarningYellow._100.color(colorScheme))
-                        }
-                        .padding(.bottom, 24)
+                        .padding(Design.Spacing._xl)
+                        .background(ZappColors.accentSoft.color(colorScheme))
+                        .padding(.bottom, Design.Spacing._3xl)
                     }
                 }
 
-                ZashiButton(String(localizable: .generalConfirm)) {
+                ZappButton(
+                    title: String(localizable: .generalConfirm),
+                    isEnabled: store.slippageInSheet <= 30.0
+                ) {
                     store.send(.slippageSetConfirmTapped)
                 }
                 .padding(.bottom, keyboardVisible ? 74 : Design.Spacing.sheetBottomSpace)
-                .disabled(store.slippageInSheet > 30.0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
-    
+
+    @ViewBuilder private func slippageSwitcher(_ colorScheme: ColorScheme) -> some View {
+        HStack(spacing: Design.Spacing._xxs) {
+            slippageChip(index: 0, text: store.slippage05String, colorScheme)
+            slippageChip(index: 1, text: store.slippage1String, colorScheme)
+            slippageChip(index: 2, text: store.slippage2String, colorScheme)
+
+            if store.selectedSlippageChip == 3 {
+                HStack(spacing: 0) {
+                    Spacer()
+
+                    FocusableTextField(
+                        text: $store.customSlippage,
+                        isFirstResponder: $isSlippageFocused,
+                        placeholder: "%",
+                        colorScheme: colorScheme
+                    )
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth:
+                            store.customSlippage.isEmpty
+                           ? .infinity
+                           : (store.customSlippage.contains(".") || store.customSlippage.contains(","))
+                           ? CGFloat(store.customSlippage.count - 1) * 13.0 + 2.0
+                           : CGFloat(store.customSlippage.count) * 13.0
+                    )
+                    .keyboardType(.decimalPad)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isSlippageFocused = true
+                        }
+                    }
+
+                    if !store.customSlippage.isEmpty {
+                        Text("%")
+                            .zappFont(.rowTitle, style: ZappColors.text)
+                    }
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: Constants.slippageChipHeight)
+                .background(ZappColors.bg.color(colorScheme))
+            } else {
+                Text(localizable: .swapAndPayCustom)
+                    .zappFont(.caption, style: ZappColors.textMuted)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: Constants.slippageChipHeight)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        store.send(.slippageChipTapped(3))
+                    }
+            }
+        }
+        .padding(Design.Spacing._xs)
+        .frame(maxWidth: .infinity)
+        .background(ZappColors.surface.color(colorScheme))
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+    }
+
     @ViewBuilder private func slippageInfoText() -> some View {
         if store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled {
             if store.slippageInSheet > 30.0 {
@@ -292,71 +288,54 @@ extension SwapAndPayForm {
     }
 
     @ViewBuilder private func slippageChip(index: Int, text: String, _ colorScheme: ColorScheme) -> some View {
-        if store.selectedSlippageChip == index {
-            Text(text)
-                .zFont(.medium, size: 16, style: Design.Switcher.selectedText)
-                .frame(maxWidth: .infinity)
-                .frame(height: 36)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._lg)
-                        .fill(Design.Switcher.selectedBg.color(colorScheme))
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                .stroke(Design.Switcher.selectedStroke.color(colorScheme))
-                        }
-                }
-                .onTapGesture {
-                    store.send(.slippageChipTapped(index))
-                }
-        } else {
-            Text(text)
-                .zFont(.medium, size: 16, style: Design.Switcher.defaultText)
-                .frame(maxWidth: .infinity)
-                .frame(height: 36)
-                .onTapGesture {
-                    store.send(.slippageChipTapped(index))
-                }
-        }
+        let isSelected = store.selectedSlippageChip == index
+
+        Text(text)
+            .zappFont(.caption, style: isSelected ? ZappColors.text : ZappColors.textMuted)
+            .frame(maxWidth: .infinity)
+            .frame(height: Constants.slippageChipHeight)
+            .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                store.send(.slippageChipTapped(index))
+            }
     }
 
     @ViewBuilder func quoteUnavailableContent(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 Asset.Assets.Icons.alertOutline.image
-                    .zImage(size: 24, style: Design.Utility.ErrorRed._500)
-                    .padding(12)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._full)
-                            .fill(Design.Utility.ErrorRed._50.color(colorScheme))
-                    }
-                    .padding(.top, 24)
-                    .padding(.bottom, 12)
+                    .zImage(width: 20, height: 20, style: ZappColors.danger)
+                    .frame(width: 44, height: 44)
+                    .background(ZappColors.dangerSoft.color(colorScheme))
+                    .padding(.top, Design.Spacing._3xl)
+                    .padding(.bottom, Design.Spacing._lg)
 
                 Text(localizable: .swapAndPayQuoteUnavailable)
-                    .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                    .padding(.bottom, 8)
+                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .padding(.bottom, Design.Spacing._md)
 
                 Text(store.quoteUnavailableErrorMsg)
-                    .zFont(size: 14, style: Design.Text.tertiary)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 32)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, Design.Spacing._xl)
+                    .padding(.bottom, Design.Spacing._4xl)
 
-                ZashiButton(
-                    (store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled)
-                    ? String(localizable: .swapAndPayCancelSwap)
-                    : String(localizable: .swapAndPayCancelPayment),
-                    type: .destructive1
+                ZappButton(
+                    title: (store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled)
+                        ? String(localizable: .swapAndPayCancelSwap)
+                        : String(localizable: .swapAndPayCancelPayment),
+                    variant: .danger
                 ) {
                     store.send(.cancelPaymentTapped)
                 }
-                .padding(.bottom, 8)
+                .padding(.bottom, Design.Spacing._md)
 
-                ZashiButton(
-                    (store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled)
-                    ? String(localizable: .swapAndPayEditSwap)
-                    : String(localizable: .swapAndPayEditPayment)
+                ZappButton(
+                    title: (store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled)
+                        ? String(localizable: .swapAndPayEditSwap)
+                        : String(localizable: .swapAndPayEditPayment)
                 ) {
                     store.send(.editPaymentTapped)
                 }
@@ -364,7 +343,7 @@ extension SwapAndPayForm {
             }
         }
     }
-    
+
     @ViewBuilder func quoteContent(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
@@ -373,8 +352,8 @@ extension SwapAndPayForm {
                     ? String(localizable: .swapAndPaySwapNow)
                     : String(localizable: .swapAndPayPayNow)
                 )
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.vertical, 24)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.vertical, Design.Spacing._3xl)
 
                 SwapFromToView(
                     tokenName: tokenName,
@@ -386,7 +365,7 @@ extension SwapAndPayForm {
                     tokenToBeReceivedInQuote: store.tokenToBeReceivedInQuote,
                     tokenUsdToBeReceivedInQuote: store.tokenUsdToBeReceivedInQuote
                 )
-                .padding(.bottom, 32)
+                .padding(.bottom, Design.Spacing._4xl)
 
                 quoteLineContent(
                     store.isSwapExperienceEnabled
@@ -394,8 +373,8 @@ extension SwapAndPayForm {
                     : String(localizable: .swapAndPayPayFrom),
                     store.selectedWalletAccount?.vendor.name() ?? String(localizable: .swapAndPayQuoteZashi)
                 )
-                .padding(.bottom, 12)
-                
+                .padding(.bottom, Design.Spacing._lg)
+
                 quoteLineContent(
                     store.isSwapExperienceEnabled
                     ? String(localizable: .swapAndPaySwapTo)
@@ -403,78 +382,59 @@ extension SwapAndPayForm {
                     store.address.zip316,
                     addressFont: true
                 )
-                .padding(.bottom, 12)
+                .padding(.bottom, Design.Spacing._lg)
 
                 quoteLineContent(String(localizable: .swapAndPayTotalFees), "\(store.totalFeesStr) \(tokenName)")
-                if !store.isSwapExperienceEnabled {
-                    HStack(spacing: 0) {
-                        Spacer()
-                        
-                        Text(store.totalFeesUsdStr)
-                            .zFont(.medium, size: 12, style: Design.Text.tertiary)
-                    }
-                }
 
                 if !store.isSwapExperienceEnabled {
+                    quoteSubvalue(store.totalFeesUsdStr)
+
                     quoteLineContent(
                         String(localizable: .swapAndPayMaxSlippage(store.currentSlippageString)),
                         "\(store.swapSlippageStr) \(tokenName)"
                     )
-                    .padding(.top, 12)
-                    
-                    if !store.isSwapExperienceEnabled {
-                        HStack(spacing: 0) {
-                            Spacer()
-                            
-                            Text(store.swapSlippageUsdStr)
-                                .zFont(.medium, size: 12, style: Design.Text.tertiary)
-                        }
-                    }
+                    .padding(.top, Design.Spacing._lg)
+
+                    quoteSubvalue(store.swapSlippageUsdStr)
                 }
-                
-                Divider()
+
+                Rectangle()
+                    .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
-                    .background(Design.Surfaces.strokeSecondary.color(colorScheme))
-                    .padding(.vertical, 12)
-                
+                    .padding(.vertical, Design.Spacing._lg)
+
                 HStack(spacing: 0) {
                     Text(localizable: .swapAndPayTotalAmount)
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
+                        .zappFont(.rowTitle, style: ZappColors.text)
 
                     Spacer()
 
                     Text("\(store.totalZecToBeSpendInQuote) \(tokenName)")
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
+                        .zappFont(.rowTitle, style: ZappColors.text)
                 }
-                HStack(spacing: 0) {
-                    Spacer()
 
-                    Text(store.totalZecUsdToBeSpendInQuote)
-                        .zFont(.medium, size: 12, style: Design.Text.tertiary)
-                }
-                .padding(.bottom, 32)
-                
+                quoteSubvalue(store.totalZecUsdToBeSpendInQuote)
+                    .padding(.bottom, Design.Spacing._4xl)
+
                 if store.isSwapExperienceEnabled {
-                    HStack(alignment: .top, spacing: 0) {
+                    HStack(alignment: .top, spacing: Design.Spacing._lg) {
                         Asset.Assets.infoOutline.image
-                            .zImage(size: 16, style: Design.Text.tertiary)
-                            .padding(.trailing, 12)
-                        
+                            .zImage(width: 16, height: 16, style: ZappColors.textSubtle)
+
                         Text(localizable: .swapAndPaySwapQuoteSlippageWarn(store.swapQuoteSlippageUsdStr, store.currentSlippageString))
+                            .zappFont(.caption, style: ZappColors.textSubtle)
                     }
-                    .zFont(size: 12, style: Design.Text.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Design.Spacing._3xl)
                 }
 
                 if store.selectedWalletAccount?.vendor == .keystone {
-                    ZashiButton(String(localizable: .keystoneConfirmSwap)) {
+                    ZappButton(title: String(localizable: .keystoneConfirmSwap)) {
                         store.send(.confirmWithKeystoneTapped)
                     }
                     .padding(.bottom, Design.Spacing.sheetBottomSpace)
                 } else {
-                    ZashiButton(String(localizable: .generalConfirm)) {
+                    ZappButton(title: String(localizable: .generalConfirm)) {
                         store.send(.confirmButtonTapped)
                     }
                     .padding(.bottom, Design.Spacing.sheetBottomSpace)
@@ -482,13 +442,13 @@ extension SwapAndPayForm {
             }
         }
     }
-    
+
     @ViewBuilder func quoteToZecContent(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 Text(localizable: .swapToZecReview)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.vertical, 24)
+                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .padding(.vertical, Design.Spacing._3xl)
 
                 SwapFromToView(
                     reversed: true,
@@ -501,52 +461,58 @@ extension SwapAndPayForm {
                     tokenToBeReceivedInQuote: store.swapToZecAmountInQuote,
                     tokenUsdToBeReceivedInQuote: store.zecUsdToBeSpendInQuote
                 )
-                .padding(.bottom, 32)
+                .padding(.bottom, Design.Spacing._4xl)
 
-                quoteLineContent(String(localizable: .swapAndPayTotalFees), "\(store.swapToZecTotalFees) \(store.selectedAsset?.tokenName ?? "")")
+                quoteLineContent(
+                    String(localizable: .swapAndPayTotalFees),
+                    "\(store.swapToZecTotalFees) \(store.selectedAsset?.tokenName ?? "")"
+                )
 
-                Divider()
+                Rectangle()
+                    .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
-                    .background(Design.Surfaces.strokeSecondary.color(colorScheme))
-                    .padding(.vertical, 12)
-                
+                    .padding(.vertical, Design.Spacing._lg)
+
                 HStack(spacing: 0) {
                     Text(localizable: .swapAndPayTotalAmount)
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
+                        .zappFont(.rowTitle, style: ZappColors.text)
 
                     Spacer()
 
                     Text("\(store.swapToZecAmountInQuote) \(store.selectedAsset?.tokenName ?? "")")
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
+                        .zappFont(.rowTitle, style: ZappColors.text)
                 }
-                HStack(spacing: 0) {
-                    Spacer()
 
-                    Text(store.zecUsdToBeSpendInQuote)
-                        .zFont(.medium, size: 12, style: Design.Text.tertiary)
-                }
-                .padding(.bottom, 32)
-                
-                HStack(alignment: .top, spacing: 0) {
+                quoteSubvalue(store.zecUsdToBeSpendInQuote)
+                    .padding(.bottom, Design.Spacing._4xl)
+
+                HStack(alignment: .top, spacing: Design.Spacing._lg) {
                     Asset.Assets.infoOutline.image
-                        .zImage(size: 16, style: Design.Text.tertiary)
-                        .padding(.trailing, 12)
-                    
-                    Text(localizable: .swapAndPaySwapQuoteSlippageWarn(store.swapToZecQuoteSlippageUsdStr, store.currentSlippageString))
-                }
-                .zFont(size: 12, style: Design.Text.tertiary)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 12)
-                .padding(.bottom, 24)
+                        .zImage(width: 16, height: 16, style: ZappColors.textSubtle)
 
-                ZashiButton(String(localizable: .generalConfirm)) {
+                    Text(localizable: .swapAndPaySwapQuoteSlippageWarn(store.swapToZecQuoteSlippageUsdStr, store.currentSlippageString))
+                        .zappFont(.caption, style: ZappColors.textSubtle)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.bottom, Design.Spacing._3xl)
+
+                ZappButton(title: String(localizable: .generalConfirm)) {
                     store.send(.confirmToZecButtonTapped)
                 }
                 .padding(.bottom, Design.Spacing.sheetBottomSpace)
             }
         }
     }
-    
+
+    @ViewBuilder private func quoteSubvalue(_ value: String) -> some View {
+        HStack(spacing: 0) {
+            Spacer()
+
+            Text(value)
+                .zappFont(.caption, style: ZappColors.textMuted)
+        }
+    }
+
     @ViewBuilder private func quoteLineContent(
         _ info: String,
         _ value: String,
@@ -554,71 +520,68 @@ extension SwapAndPayForm {
     ) -> some View {
         HStack(spacing: 0) {
             Text(info)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
 
             Spacer()
 
             Text(value)
-                .zFont(.medium, fontFamily: addressFont ? .robotoMono : .inter, size: 14, style: Design.Text.primary)
+                .zappFont(addressFont ? .mono : .rowTitle, style: ZappColors.text)
         }
     }
-    
+
     @ViewBuilder func cancelSheetContent(_ colorScheme: ColorScheme) -> some View {
         VStack(spacing: 0) {
             Asset.Assets.Icons.logOut.image
-                .zImage(size: 20, style: Design.Utility.ErrorRed._500)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.ErrorRed._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
-                .padding(.bottom, 20)
+                .zImage(width: 20, height: 20, style: ZappColors.danger)
+                .frame(width: 44, height: 44)
+                .background(ZappColors.dangerSoft.color(colorScheme))
+                .padding(.top, Design.Spacing._6xl)
+                .padding(.bottom, Design.Spacing._2xl)
 
             Text(localizable: .swapAndPayCanceltitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.bottom, 8)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.bottom, Design.Spacing._md)
 
             Text(localizable: .swapAndPayCancelMsg)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 32)
+                .padding(.bottom, Design.Spacing._4xl)
 
-            ZashiButton(
-                String(localizable: .swapAndPayCancelSwap),
-                type: .destructive1
+            ZappButton(
+                title: String(localizable: .swapAndPayCancelSwap),
+                variant: .danger
             ) {
                 store.send(.cancelSwapTapped)
             }
-            .padding(.bottom, 8)
-            
-            ZashiButton(String(localizable: .swapAndPayCancelDont)) {
+            .padding(.bottom, Design.Spacing._md)
+
+            ZappButton(title: String(localizable: .swapAndPayCancelDont)) {
                 store.send(.dontCancelTapped)
             }
             .padding(.bottom, Design.Spacing.sheetBottomSpace)
         }
     }
-    
+
     @ViewBuilder func refundAddressSheetContent(_ colorScheme: ColorScheme) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(localizable: .swapToZecRefundAddressTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.bottom, 8)
-                .padding(.top, 32)
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, Design.Spacing._4xl)
+                .padding(.bottom, Design.Spacing._md)
 
             Text(localizable: .swapToZecRefundAddressMsg1)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
+                .padding(.top, Design.Spacing._xl)
 
             Text(localizable: .swapToZecRefundAddressMsg2)
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
-                .padding(.bottom, 32)
+                .padding(.top, Design.Spacing._xl)
+                .padding(.bottom, Design.Spacing._4xl)
 
-            ZashiButton(String(localizable: .generalOk)) {
+            ZappButton(title: String(localizable: .generalOk)) {
                 store.send(.refundAddressCloseTapped)
             }
             .padding(.bottom, Design.Spacing.sheetBottomSpace)

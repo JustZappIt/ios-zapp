@@ -10,10 +10,18 @@ import ComposableArchitecture
 
 struct FilterView: View {
     @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let horizontalPadding: CGFloat = 14
+        static let verticalPadding: CGFloat = 10
+        static let iconSize: CGFloat = 16
+        static let spacing: CGFloat = 6
+    }
+
     let title: String
     let active: Bool
     let action: () -> Void
-    
+
     init(
         title: String,
         active: Bool,
@@ -23,41 +31,34 @@ struct FilterView: View {
         self.active = active
         self.action = action
     }
-    
+
     var body: some View {
-        Button {
-            action()
-        } label: {
-            if active {
-                HStack(spacing: 4) {
-                    Text(title)
-                        .zFont(.semiBold, size: 14, style: Design.Btns.Secondary.fg)
-                        .lineLimit(1)
-                    
-                    Asset.Assets.buttonCloseX.image
-                        .zImage(size: 20, style: Design.Btns.Secondary.fg)
-                }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 14)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                        .fill(Design.Btns.Secondary.bg.color(colorScheme))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                                .stroke(Design.Btns.Secondary.border.color(colorScheme))
-                        }
-                }
-            } else {
+        Button(action: action) {
+            HStack(spacing: Constants.spacing) {
                 Text(title)
-                    .zFont(.semiBold, size: 14, style: Design.Btns.Tertiary.fg)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 14)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._3xl)
-                            .fill(Design.Btns.Tertiary.bg.color(colorScheme))
-                    }
+                    .zappFont(.button, style: active ? ZappColors.accentText : ZappColors.textMuted)
+                    .lineLimit(1)
+
+                if active {
+                    Asset.Assets.Icons.xClose.image
+                        .zImage(size: Constants.iconSize, style: ZappColors.accentText)
+                }
+            }
+            .padding(.horizontal, Constants.horizontalPadding)
+            .padding(.vertical, Constants.verticalPadding)
+            .background(active
+                ? ZappColors.accentSoft.color(colorScheme)
+                : ZappColors.chipBg.color(colorScheme)
+            )
+            .overlay {
+                if active {
+                    Rectangle()
+                        .strokeBorder(ZappColors.accent.color(colorScheme), lineWidth: 1)
+                }
             }
         }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(title)
     }
 }
 
@@ -65,17 +66,17 @@ extension TransactionsManagerView {
     @ViewBuilder func filtersContent() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(localizable: .filterTitle)
-                .zFont(.semiBold, size: 20, style: Design.Text.primary)
+                .zappFont(.sectionTitle, style: ZappColors.text)
                 .padding(.top, 32)
                 .padding(.bottom, 24)
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     FilterView(title: String(localizable: .filterSent), active: store.isSentFilterActive) { store.send(.toggleFilter(.sent)) }
                     FilterView(title: String(localizable: .filterReceived), active: store.isReceivedFilterActive) { store.send(.toggleFilter(.received)) }
                     FilterView(title: String(localizable: .filterMemos), active: store.isMemosFilterActive) { store.send(.toggleFilter(.memos)) }
                 }
-                
+
                 HStack(spacing: 8) {
                     FilterView(title: String(localizable: .filterNotes), active: store.isNotesFilterActive) { store.send(.toggleFilter(.notes)) }
                     FilterView(title: String(localizable: .filterBookmarked), active: store.isBookmarkedFilterActive) { store.send(.toggleFilter(.bookmarked)) }
@@ -83,16 +84,16 @@ extension TransactionsManagerView {
                 }
             }
             .padding(.bottom, 32)
-            
+
             HStack(spacing: 12) {
-                ZashiButton(
-                    String(localizable: .filterReset),
-                    type: .secondary
+                ZappButton(
+                    title: String(localizable: .filterReset),
+                    variant: .secondary
                 ) {
                     store.send(.resetFiltersTapped)
                 }
-                
-                ZashiButton(String(localizable: .filterApply)) {
+
+                ZappButton(title: String(localizable: .filterApply)) {
                     store.send(.applyFiltersTapped)
                 }
             }

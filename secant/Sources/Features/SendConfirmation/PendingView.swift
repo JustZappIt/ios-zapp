@@ -11,86 +11,87 @@ import ComposableArchitecture
 import Lottie
 
 struct PendingView: View {
-    @Environment(\.colorScheme) var colorScheme
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     private enum Constants {
         static let lottieNameLight = "sending"
         static let lottieNameDark = "sending-dark"
+        static let lottieSize: CGFloat = 170
     }
-    
+
     @Perception.Bindable var store: StoreOf<SendConfirmation>
     let tokenName: String
-    
+
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 Spacer()
-                
+
                 LottieView(
-                    animation:
-                            .named(
-                                colorScheme == .light ? Constants.lottieNameLight : Constants.lottieNameDark
-                            )
+                    animation: .named(
+                        colorScheme == .light ? Constants.lottieNameLight : Constants.lottieNameDark
+                    )
                 )
                 .resizable()
                 .looping()
-                .frame(width: 170, height: 170)
+                .frame(width: Constants.lottieSize, height: Constants.lottieSize)
 
                 Text(store.pendingTitle)
-                    .zFont(.semiBold, size: 28, style: Design.Text.primary)
-                    .padding(.top, 16)
+                    .zappFont(.display, style: ZappColors.text)
+                    .padding(.top, Design.Spacing._xl)
 
                 Text(store.pendingInfo)
-                    .zFont(size: 14, style: Design.Text.primary)
+                    .zappFont(.body, style: ZappColors.textMuted)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(1.5)
-                    .padding(.top, 8)
-                    .screenHorizontalPadding()
+                    .padding(.top, Design.Spacing._md)
 
                 if store.txIdToExpand != nil {
-                    ZashiButton(
-                        String(localizable: .sendViewTransaction),
-                        type: .tertiary,
-                        infinityWidth: false
+                    ZappButton(
+                        title: String(localizable: .sendViewTransaction),
+                        variant: .accentGhost
                     ) {
                         store.send(.viewTransactionTapped)
                     }
-                    .padding(.top, 16)
+                    .padding(.top, Design.Spacing._xl)
                 }
 
                 Spacer()
-                
-                ZashiButton(
-                    String(localizable: .generalClose),
-                    type: store.type != .regular && store.txIdToExpand != nil ? .ghost : .primary
+
+                ZappButton(
+                    title: String(localizable: .generalClose),
+                    variant: showsCheckStatus ? .ghost : .primary
                 ) {
                     store.send(.closeTapped)
                 }
-                .padding(.bottom, store.type != .regular && store.txIdToExpand != nil ? 12 : 24)
+                .padding(.bottom, showsCheckStatus ? Design.Spacing._lg : Design.Spacing._3xl)
 
-                if store.type != .regular && store.txIdToExpand != nil {
-                    ZashiButton(String(localizable: .swapAndPayCheckStatus)) {
+                if showsCheckStatus {
+                    ZappButton(title: String(localizable: .swapAndPayCheckStatus)) {
                         store.send(.checkStatusTapped)
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, Design.Spacing._3xl)
                 }
             }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
         }
         .navigationBarBackButtonHidden()
-        .padding(.vertical, 1)
-        .screenHorizontalPadding()
-        .applyIndigoScreenBackground()
+    }
+
+    private var showsCheckStatus: Bool {
+        store.type != .regular && store.txIdToExpand != nil
     }
 }
 
 #Preview {
     NavigationView {
-        SuccessView(
+        PendingView(
             store: SendConfirmation.initial,
             tokenName: "ZEC"
         )

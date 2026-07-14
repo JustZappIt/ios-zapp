@@ -11,200 +11,236 @@ import ComposableArchitecture
 
 struct ZecKeyboardView: View {
     @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let keyCount = 12
+        static let keySize: CGFloat = 40
+        static let keyPadding: CGFloat = 10
+        static let keypadHeight: CGFloat = 240
+        static let amountHeight: CGFloat = 68
+        static let switchIconSize: CGFloat = 20
+        static let switchBox: CGFloat = 40
+        static let sheetIconBox: CGFloat = 44
+        static let sheetIconSize: CGFloat = 20
+    }
+
     @Perception.Bindable var store: StoreOf<ZecKeyboard>
-    
+
     let tokenName: String
-    
+
     init(store: StoreOf<ZecKeyboard>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
-            keyboardBody
-        }
-        .applyScreenBackground()
-        .zashiBack()
-        .screenTitle(String(localizable: .generalRequest))
-        .zashiSheet(isPresented: $store.isCurrencyUnavailableSheetPresented) {
-            currencyUnavailableSheetContent()
+            VStack(spacing: 0) {
+                ZappScreenHeader(
+                    title: String(localizable: .generalRequest),
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: { EmptyView() }
+                )
+
+                keyboardBody
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
+            .zashiBack(primaryAction: {
+                ZappButton(
+                    title: String(localizable: .generalNext),
+                    isEnabled: !store.isNextButtonDisabled
+                ) {
+                    store.send(.nextTapped)
+                }
+            })
+            .zashiSheet(isPresented: $store.isCurrencyUnavailableSheetPresented) {
+                currencyUnavailableSheetContent()
+            }
         }
     }
 
     @ViewBuilder private var keyboardBody: some View {
         VStack(spacing: 0) {
-                VStack(spacing: 0) {
-                    if !store.isValidInput {
-                        HStack(spacing: 0) {
-                            Asset.Assets.infoOutline.image
-                                .zImage(size: 20, style: Design.Utility.WarningYellow._500)
-                                .padding(.trailing, 12)
-                            
-                            Text(localizable: .zecKeyboardInvalid)
-                                .zFont(.medium, size: 14, style: Design.Utility.WarningYellow._700)
-                                .padding(.top, 3)
-                        }
-                        .padding(.horizontal, 10)
-                        .screenHorizontalPadding()
-                        .padding(.bottom, 4)
-                    }
-                    
-                    HStack(spacing: 0) {
-                        if store.isInputInZec {
-                            Text(store.humanReadableMainInput)
-                            + Text(" \(tokenName)")
-                                .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                        } else {
-                            if store.isCurrencySymbolPrefix {
-                                Text(store.localeCurrencySymbol)
-                                    .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                                + Text(store.humanReadableMainInput)
-                            } else {
-                                Text(store.humanReadableMainInput)
-                                + Text(" \(store.localeCurrencySymbol)")
-                                    .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                            }
-                        }
-                    }
-                    .zFont(.semiBold, size: 56, style: Design.Text.primary)
-                    .frame(height: 68)
-                    .minimumScaleFactor(0.1)
-                    .lineLimit(1)
-                    .screenHorizontalPadding()
-                }
-                .padding(.top, 88)
-                .onChange(of: store.currencyConversion) { _ in
-                    store.send(.validateInputs)
-                }
+            if !store.isValidInput {
+                HStack(spacing: Design.Spacing._lg) {
+                    Asset.Assets.infoOutline.image
+                        .zImage(width: 20, height: 20, style: ZappColors.accentText)
 
-                if store.currencyConversion != nil {
-                    HStack(spacing: 0) {
-                        Group {
-                            if store.isInputInZec {
-                                if store.isCurrencySymbolPrefix {
-                                    Text(store.localeCurrencySymbol)
-                                        .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                                    + Text(store.humanReadableConvertedInput)
-                                } else {
-                                    Text(store.humanReadableConvertedInput)
-                                    + Text(" \(store.localeCurrencySymbol)")
-                                        .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                                }
-                            } else {
-                                Text(store.humanReadableConvertedInput)
-                                + Text(" \(tokenName)")
-                                    .foregroundColor(Design.Text.quaternary.color(colorScheme))
-                            }
-                        }
-                        .zFont(.medium, size: 18, style: Design.Text.primary)
-                        .padding(.trailing, 9)
+                    Text(localizable: .zecKeyboardInvalid)
+                        .zappFont(.caption, style: ZappColors.accentText)
 
-                        Button {
-                            store.send(.swapCurrenciesTapped)
-                        } label: {
-                            Asset.Assets.Icons.switchHorizontal.image
-                                .zImage(size: 24, style: Design.Btns.Tertiary.fg)
-                                .padding(8)
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                        .fill(Design.Btns.Tertiary.bg.color(colorScheme))
-                                }
-                                .rotationEffect(Angle(degrees: 90))
-                        }
-                    }
-                    .minimumScaleFactor(0.6)
-                    .screenHorizontalPadding()
+                    Spacer(minLength: 0)
                 }
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.accentSoft.color(colorScheme))
+                .padding(.horizontal, Design.Spacing._2xl)
+                .padding(.bottom, Design.Spacing._lg)
+            }
 
-                Spacer()
+            mainInput
 
-                if store.keys.count == 12 {
-                    VStack(spacing: 0) {
-                        ForEach(0..<4) { column in
-                            HStack {
-                                Spacer()
-                                
-                                ForEach(0..<3) { row in
-                                    VStack {
-                                        WithPerceptionTracking {
-                                            Button {
-                                                store.send(.keyTapped(column * 3 + row))
-                                            } label: {
-                                                if store.keys[column * 3 + row] == "x" {
-                                                    Asset.Assets.Icons.delete.image
-                                                        .zImage(size: 40, style: Design.Text.primary)
-                                                } else {
-                                                    Text(store.keys[column * 3 + row])
-                                                        .zFont(.semiBold, size: 32, style: Design.Text.primary)
-                                                        .frame(width: 40, height: 40)
-                                                }
-                                            }
-                                            .padding(10)
-                                            .simultaneousGesture(
-                                                LongPressGesture().onEnded { _ in
-                                                    if store.keys[column * 3 + row] == "x" {
-                                                        store.send(.longKeyTapped(column * 3 + row))
-                                                    }
-                                                }
-                                            )
-                                        }
-                                        
-                                        Spacer()
-                                    }
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .frame(height: 240)
-                    .padding(.bottom, 24)
-                }
+            if store.currencyConversion != nil {
+                convertedInput
+                    .padding(.top, Design.Spacing._lg)
+            }
 
-                ZashiButton(String(localizable: .generalNext)) {
-                    store.send(.nextTapped)
-                }
-                .disabled(store.isNextButtonDisabled)
-                .padding(.bottom, 24)
-                .screenHorizontalPadding()
+            Spacer()
+
+            if store.keys.count == Constants.keyCount {
+                keypad
+            }
         }
+        .padding(.top, Design.Spacing._5xl)
         .onAppear { store.send(.onAppear) }
+        .onChange(of: store.currencyConversion) { _ in
+            store.send(.validateInputs)
+        }
+    }
+
+    private var mainInput: some View {
+        HStack(spacing: 0) {
+            if store.isInputInZec {
+                Text(store.humanReadableMainInput)
+                + Text(" \(tokenName)")
+                    .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+            } else {
+                if store.isCurrencySymbolPrefix {
+                    Text(store.localeCurrencySymbol)
+                        .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+                    + Text(store.humanReadableMainInput)
+                } else {
+                    Text(store.humanReadableMainInput)
+                    + Text(" \(store.localeCurrencySymbol)")
+                        .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+                }
+            }
+        }
+        .zappFont(.display, style: ZappColors.text)
+        .frame(height: Constants.amountHeight)
+        .minimumScaleFactor(0.1)
+        .lineLimit(1)
+        .padding(.horizontal, Design.Spacing._2xl)
+    }
+
+    private var convertedInput: some View {
+        HStack(spacing: Design.Spacing._md) {
+            Group {
+                if store.isInputInZec {
+                    if store.isCurrencySymbolPrefix {
+                        Text(store.localeCurrencySymbol)
+                            .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+                        + Text(store.humanReadableConvertedInput)
+                    } else {
+                        Text(store.humanReadableConvertedInput)
+                        + Text(" \(store.localeCurrencySymbol)")
+                            .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+                    }
+                } else {
+                    Text(store.humanReadableConvertedInput)
+                    + Text(" \(tokenName)")
+                        .foregroundColor(ZappColors.textSubtle.color(colorScheme))
+                }
+            }
+            .zappFont(.sectionTitle, style: ZappColors.textMuted)
+
+            Button {
+                store.send(.swapCurrenciesTapped)
+            } label: {
+                Asset.Assets.Icons.switchHorizontal.image
+                    .zImage(
+                        width: Constants.switchIconSize,
+                        height: Constants.switchIconSize,
+                        style: ZappColors.text
+                    )
+                    .rotationEffect(.degrees(90))
+                    .frame(width: Constants.switchBox, height: Constants.switchBox)
+                    .background(ZappColors.surfaceAlt.color(colorScheme))
+            }
+            .buttonStyle(.zappPress)
+        }
+        .minimumScaleFactor(0.6)
+        .padding(.horizontal, Design.Spacing._2xl)
+    }
+
+    private var keypad: some View {
+        VStack(spacing: 0) {
+            ForEach(0..<4) { column in
+                HStack(spacing: 0) {
+                    ForEach(0..<3) { row in
+                        WithPerceptionTracking {
+                            key(at: column * 3 + row)
+                        }
+                    }
+                }
+            }
+        }
+        .frame(height: Constants.keypadHeight)
+        .padding(.bottom, Design.Spacing._3xl)
+    }
+
+    private func key(at index: Int) -> some View {
+        Button {
+            store.send(.keyTapped(index))
+        } label: {
+            Group {
+                if store.keys[index] == "x" {
+                    Asset.Assets.Icons.delete.image
+                        .zImage(width: Constants.keySize, height: Constants.keySize, style: ZappColors.text)
+                } else {
+                    Text(store.keys[index])
+                        .zappFont(.display, style: ZappColors.text)
+                        .frame(width: Constants.keySize, height: Constants.keySize)
+                }
+            }
+            .padding(Constants.keyPadding)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+        .simultaneousGesture(
+            LongPressGesture().onEnded { _ in
+                if store.keys[index] == "x" {
+                    store.send(.longKeyTapped(index))
+                }
+            }
+        )
     }
 
     @ViewBuilder private func currencyUnavailableSheetContent() -> some View {
         VStack(alignment: .center, spacing: 0) {
             Asset.Assets.Icons.alertOutline.image
-                .zImage(size: 20, style: Design.Utility.ErrorRed._500)
-                .padding(12)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.ErrorRed._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
+                .zImage(
+                    width: Constants.sheetIconSize,
+                    height: Constants.sheetIconSize,
+                    style: ZappColors.danger
+                )
+                .frame(width: Constants.sheetIconBox, height: Constants.sheetIconBox)
+                .background(ZappColors.dangerSoft.color(colorScheme))
+                .padding(.top, Design.Spacing._6xl)
 
             Text(String(localizable: .sendCurrencyUnavailableTitle(store.selectedCurrency.code)))
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
+                .zappFont(.displaySecondary, style: ZappColors.text)
                 .multilineTextAlignment(.center)
-                .padding(.top, 24)
-                .padding(.bottom, 8)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._md)
 
             Text(String(localizable: .sendCurrencyUnavailableDesc(store.selectedCurrency.displayName)))
-                .zFont(size: 14, style: Design.Text.tertiary)
+                .zappFont(.body, style: ZappColors.textMuted)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .lineSpacing(2)
-                .padding(.horizontal, 4)
-                .padding(.bottom, 24)
+                .padding(.bottom, Design.Spacing._3xl)
 
-            ZashiButton(String(localizable: .sendCurrencyUnavailableSwitchToUSD)) {
+            ZappButton(title: String(localizable: .sendCurrencyUnavailableSwitchToUSD)) {
                 store.send(.currencyUnavailableSwitchToUSDTapped)
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, Design.Spacing._md)
 
-            ZashiButton(
-                String(localizable: .sendCurrencyUnavailableContinueInZEC),
-                type: .ghost
+            ZappButton(
+                title: String(localizable: .sendCurrencyUnavailableContinueInZEC),
+                variant: .ghost
             ) {
                 store.send(.currencyUnavailableContinueInZECTapped)
             }

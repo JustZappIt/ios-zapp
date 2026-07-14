@@ -16,105 +16,95 @@ extension SwapAndPayForm {
                 ForEach(0..<15) { _ in
                     NoTransactionPlaceholder(true)
                         .listRowInsets(EdgeInsets())
-                        .listRowBackground(Asset.Colors.background.color)
+                        .listRowBackground(ZappColors.bg.color(colorScheme))
                         .listRowSeparator(.hidden)
                 }
             }
         }
         .disabled(true)
-        .padding(.vertical, 1)
-        .background(Asset.Colors.background.color)
+        .background(ZappColors.bg.color(colorScheme))
         .listStyle(.plain)
     }
-    
+
     @ViewBuilder func assetsEmptyComposition(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
-            ZStack {
-                VStack(spacing: 0) {
-                    ForEach(0..<5) { _ in
-                        NoTransactionPlaceholder()
-                    }
-                    
-                    Spacer()
-                }
-                .overlay {
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: .clear, location: 0.0),
-                            Gradient.Stop(color: Asset.Colors.background.color, location: 0.3)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                }
-                
+            placeholderBackdrop(colorScheme) {
                 VStack(spacing: 0) {
                     Asset.Assets.Illustrations.emptyState.image
                         .resizable()
                         .frame(width: 164, height: 164)
-                        .padding(.bottom, 20)
-                    
+                        .padding(.bottom, Design.Spacing._2xl)
+
                     Text(localizable: .swapAndPayEmptyAssetsTitle)
-                        .zFont(.semiBold, size: 20, style: Design.Text.primary)
-                        .padding(.bottom, 8)
-                    
+                        .zappFont(.sectionTitle, style: ZappColors.text)
+                        .padding(.bottom, Design.Spacing._md)
+
                     Text(localizable: .swapAndPayEmptyAssetsSubtitle)
-                        .zFont(size: 14, style: Design.Text.tertiary)
-                        .padding(.bottom, 20)
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.top, 40)
+                .padding(.top, Design.Spacing._5xl)
             }
         }
     }
-    
+
     @ViewBuilder func assetsFailureComposition(_ colorScheme: ColorScheme) -> some View {
         WithPerceptionTracking {
-            ZStack {
-                VStack(spacing: 0) {
-                    ForEach(0..<5) { _ in
-                        NoTransactionPlaceholder()
-                    }
-                    
-                    Spacer()
-                }
-                .overlay {
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: .clear, location: 0.0),
-                            Gradient.Stop(color: Asset.Colors.background.color, location: 0.3)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                }
-                
+            placeholderBackdrop(colorScheme) {
                 VStack(alignment: .center, spacing: 0) {
                     Asset.Assets.Illustrations.cone.image
-                        .zImage(size: 164, style: Design.Text.primary)
-                        .padding(.bottom, 20)
-                    
+                        .zImage(width: 164, height: 164, style: ZappColors.text)
+                        .padding(.bottom, Design.Spacing._2xl)
+
                     Text(localizable: .swapAndPayFailureWrong)
-                        .zFont(.semiBold, size: 20, style: Design.Text.primary)
-                        .padding(.bottom, 8)
-                    
+                        .zappFont(.sectionTitle, style: ZappColors.text)
+                        .padding(.bottom, Design.Spacing._md)
+
                     Text(localizable: .swapAndPayFailureWrongDesc)
-                        .zFont(size: 14, style: Design.Text.tertiary)
-                        .padding(.bottom, 20)
+                        .zappFont(.body, style: ZappColors.textMuted)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                        .screenHorizontalPadding()
-                    
+                        .padding(.horizontal, Design.Spacing._2xl)
+                        .padding(.bottom, Design.Spacing._2xl)
+
                     if let retryFailure = store.swapAssetFailedWithRetry, retryFailure {
-                        ZashiButton(
-                            String(localizable: .swapAndPayFailureTryAgain),
-                            type: .tertiary,
-                            infinityWidth: false
+                        ZappButton(
+                            title: String(localizable: .swapAndPayFailureTryAgain),
+                            variant: .secondary
                         ) {
                             store.send(.trySwapsAssetsAgainTapped)
                         }
+                        .padding(.horizontal, Design.Spacing._6xl)
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder private func placeholderBackdrop<Content: View>(
+        _ colorScheme: ColorScheme,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        ZStack {
+            VStack(spacing: 0) {
+                ForEach(0..<5) { _ in
+                    NoTransactionPlaceholder()
+                }
+
+                Spacer()
+            }
+            .overlay {
+                LinearGradient(
+                    stops: [
+                        Gradient.Stop(color: .clear, location: 0.0),
+                        Gradient.Stop(color: ZappColors.bg.color(colorScheme), location: 0.3)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+
+            content()
         }
     }
 }
@@ -131,7 +121,7 @@ struct FocusableTextField: UIViewRepresentable {
         textField.attributedPlaceholder = NSAttributedString(
             string: placeholder,
             attributes: [
-                .foregroundColor: UIColor(Design.Switcher.selectedText.color(colorScheme)),
+                .foregroundColor: UIColor(ZappColors.textMuted.color(colorScheme)),
                 .font: FontFamily.Inter.medium.font(size: 16)
             ]
         )
@@ -141,7 +131,7 @@ struct FocusableTextField: UIViewRepresentable {
         textField.keyboardType = .decimalPad
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textDidChange(_:)), for: .editingChanged)
         textField.font = FontFamily.Inter.medium.font(size: 16)
-        textField.textColor = UIColor(Design.Switcher.selectedText.color(colorScheme))
+        textField.textColor = UIColor(ZappColors.text.color(colorScheme))
 
         return textField
     }

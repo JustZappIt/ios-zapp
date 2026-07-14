@@ -11,31 +11,42 @@ import ComposableArchitecture
 struct SwapAndPayForm: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    private enum InputID: Hashable {
+    enum InputID: Hashable {
         case addressBookHint
     }
-    
+
     enum Constants {
         static let maxAllowedSlippage = "30%"
+
+        static let fieldButtonSize: CGFloat = 40
+        static let fieldIconSize: CGFloat = 18
+        static let addressMinHeight: CGFloat = 44
+        static let slippageChipHeight: CGFloat = 36
+        static let tickerIconSize: CGFloat = 24
+        static let tickerBadgeSize: CGFloat = 14
+        static let tickerBadgeBackdrop: CGFloat = 16
+        static let assetIconSize: CGFloat = 40
+        static let assetBadgeSize: CGFloat = 18
+        static let assetBadgeBackdrop: CGFloat = 22
     }
 
     @State var keyboardVisible: Bool = false
-    
+
     @FocusState var isAddressFocused
     @FocusState var isAmountFocused
     @FocusState var isUsdFocused
     @State var isSlippageFocused: Bool = false
-    
+
     @State var safeAreaHeight: CGFloat = 0
 
     @Perception.Bindable var store: StoreOf<SwapAndPay>
     let tokenName: String
-    
+
     init(store: StoreOf<SwapAndPay>, tokenName: String) {
         self.store = store
         self.tokenName = tokenName
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
             if store.isSwapExperienceEnabled || store.isSwapToZecExperienceEnabled {
@@ -49,345 +60,376 @@ struct SwapAndPayForm: View {
     }
 
     @ViewBuilder func addressView() -> some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             Button {
                 store.send(.refundAddressTapped)
             } label: {
-                HStack(spacing: 0) {
-                    Text(store.isSwapToZecExperienceEnabled
-                         ? String(localizable: .swapToZecRefundAddress)
-                         : store.isSwapExperienceEnabled ? String(localizable: .swapAndPayAddress) : ""
+                HStack(spacing: Design.Spacing._xs) {
+                    ZappSectionLabel(
+                        text: store.isSwapToZecExperienceEnabled
+                            ? String(localizable: .swapToZecRefundAddress)
+                            : store.isSwapExperienceEnabled ? String(localizable: .swapAndPayAddress) : ""
                     )
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .font(.custom(FontFamily.Inter.medium.name, size: 14))
-                    .zForegroundColor(Design.Inputs.Filled.label)
 
                     if store.isSwapToZecExperienceEnabled {
                         Asset.Assets.infoCircle.image
-                            .zImage(size: 13, style: Design.Text.primary)
-                            .padding(8)
+                            .zImage(width: 14, height: 14, style: ZappColors.textMuted)
                     }
-                    
+
                     Spacer()
                 }
             }
             .disabled(!store.isSwapToZecExperienceEnabled)
 
-            ZashiTextField(
-                addressFont: true,
-                text: $store.address,
-                placeholder: String(localizable: .swapToZecAddress(store.selectedAsset?.chainName ?? "")),
-                accessoryView:
-                    HStack(spacing: 4) {
-                        WithPerceptionTracking {
-                            fieldButton(
-                                icon: store.isNotAddressInAddressBook
-                                ? Asset.Assets.Icons.userPlus.image
-                                : Asset.Assets.Icons.user.image,
-                                identifier: AccessibilityID.SwapAndPayForm.addToContactsButton
-                            ) {
-                                if store.isNotAddressInAddressBook {
-                                    store.send(.notInAddressBookButtonTapped(store.address))
-                                } else {
-                                    store.send(.addressBookRequested)
-                                }
-                            }
+            HStack(spacing: Design.Spacing._md) {
+                if let contact = store.selectedContact {
+                    selectedContactTag(contact.name)
 
-                            fieldButton(
-                                icon: Asset.Assets.Icons.qr.image,
-                                identifier: AccessibilityID.SwapAndPayForm.scanButton
-                            ) {
-                                store.send(.scanTapped)
-                            }
-                        }
-                    }
-                    .frame(height: 20)
-                    .offset(x: 8),
-                inputReplacementView:
-                    store.selectedContact != nil
-                ? HStack(spacing: 0) {
-                    Text(store.selectedContact?.name ?? "")
-                        .zFont(.medium, size: 14, style: Design.Text.primary)
-                        .padding(.trailing, 3)
-                    
-                    Button {
-                        store.send(.selectedContactClearTapped)
-                    } label: {
-                        Asset.Assets.buttonCloseX.image
-                            .zImage(size: 14, style: Design.Tags.tcHoverFg)
-                            .padding(3)
-                            .background {
-                                Circle()
-                                    .fill(Design.Tags.tcHoverBg.color(colorScheme))
-                            }
+                    Spacer(minLength: 0)
+                } else {
+                    TextField(
+                        String(localizable: .swapToZecAddress(store.selectedAsset?.chainName ?? "")),
+                        text: $store.address
+                    )
+                    .zappFont(.mono, style: ZappColors.text)
+                    .keyboardType(.alphabet)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .focused($isAddressFocused)
+                    .disabled(store.isQuoteRequestInFlight)
+                }
+
+                fieldButton(
+                    icon: store.isNotAddressInAddressBook
+                        ? Asset.Assets.Icons.userPlus.image
+                        : Asset.Assets.Icons.user.image,
+                    identifier: AccessibilityID.SwapAndPayForm.addToContactsButton
+                ) {
+                    if store.isNotAddressInAddressBook {
+                        store.send(.notInAddressBookButtonTapped(store.address))
+                    } else {
+                        store.send(.addressBookRequested)
                     }
                 }
-                    .padding(4)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._sm)
-                            .fill(Design.Tags.surfacePrimary.color(colorScheme))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: Design.Radius._sm)
-                                    .stroke(Design.Tags.surfaceStroke.color(colorScheme))
-                                
-                            }
-                    }
-                : nil
-            )
-            .frame(minHeight: 44)
-            .disabled(store.isQuoteRequestInFlight)
+
+                fieldButton(
+                    icon: Asset.Assets.Icons.qr.image,
+                    identifier: AccessibilityID.SwapAndPayForm.scanButton
+                ) {
+                    store.send(.scanTapped)
+                }
+            }
+            .padding(Design.Spacing._md)
+            .frame(minHeight: Constants.addressMinHeight)
+            .background(ZappColors.surfaceInput.color(colorScheme))
             .id(InputID.addressBookHint)
-            .keyboardType(.alphabet)
-            .focused($isAddressFocused)
-            .padding(.top, 8)
             .anchorPreference(
                 key: UnknownAddressPreferenceKey.self,
                 value: .bounds
             ) { $0 }
         }
     }
-    
+
+    private func selectedContactTag(_ name: String) -> some View {
+        HStack(spacing: Design.Spacing._sm) {
+            Text(name)
+                .zappFont(.caption, style: ZappColors.text)
+
+            Button {
+                store.send(.selectedContactClearTapped)
+            } label: {
+                Asset.Assets.buttonCloseX.image
+                    .zImage(width: 12, height: 12, style: ZappColors.textMuted)
+            }
+            .buttonStyle(.zappPress)
+        }
+        .padding(.horizontal, Design.Spacing._md)
+        .padding(.vertical, Design.Spacing._xs)
+        .background(ZappColors.chipBg.color(colorScheme))
+    }
+
     @ViewBuilder func slippageView() -> some View {
         HStack(spacing: 0) {
             Text(localizable: .swapAndPaySlippageTolerance)
-                .zFont(.medium, size: 14, style: Design.Text.secondary)
-            
+                .zappFont(.body, style: ZappColors.textMuted)
+
             Spacer()
 
             Button {
                 isAmountFocused = false
                 store.send(.slippageTapped)
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: Design.Spacing._sm) {
                     Text(store.currentSlippageString)
-                        .zFont(.semiBold, size: 14, style: Design.Btns.Tertiary.fg)
+                        .zappFont(.buttonSmall, style: ZappColors.text)
 
                     Asset.Assets.Icons.settings2.image
-                        .zImage(size: 16, style: Design.Btns.Tertiary.fg)
+                        .zImage(width: 16, height: 16, style: ZappColors.text)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, Design.Spacing._lg)
+                .padding(.vertical, Design.Spacing._md)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
             }
+            .buttonStyle(.zappPress)
             .disabled(store.isQuoteRequestInFlight)
-            .frame(height: 32)
-            .background {
-                RoundedRectangle(cornerRadius: Design.Radius._md)
-                    .fill(Design.Btns.Tertiary.bg.color(colorScheme))
-            }
         }
     }
 
     func fieldButton(icon: Image, identifier: String = "", _ action: @escaping () -> Void) -> some View {
-        Button {
-            action()
-        } label: {
+        Button(action: action) {
             icon
-                .zImage(size: 20, style: Design.Inputs.Default.label)
+                .zImage(
+                    width: Constants.fieldIconSize,
+                    height: Constants.fieldIconSize,
+                    style: ZappColors.text
+                )
+                .frame(width: Constants.fieldButtonSize, height: Constants.fieldButtonSize)
+                .background(ZappColors.surface.color(colorScheme))
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                )
         }
+        .buttonStyle(.zappPress)
         .accessibilityIdentifier(identifier)
-        .padding(8)
-        .background {
-            RoundedRectangle(cornerRadius: Design.Radius._md)
-                .fill(Design.Btns.Secondary.bg.color(colorScheme))
-                .overlay {
-                    RoundedRectangle(cornerRadius: Design.Radius._md)
-                        .stroke(Design.Btns.Secondary.border.color(colorScheme))
-                }
-        }
     }
-    
+
     @ViewBuilder func zecTicker(_ colorScheme: ColorScheme, shield: Bool = true) -> some View {
-        HStack(spacing: 0) {
+        HStack(spacing: Design.Spacing._md) {
             zecTickerLogo(colorScheme, shield: shield)
-            
+
             Text(tokenName)
-                .zFont(.semiBold, size: 14, style: Design.Text.primary)
-            
+                .zappFont(.rowTitle, style: ZappColors.text)
+
             Spacer()
         }
     }
-    
+
     @ViewBuilder func zecTickerLogo(_ colorScheme: ColorScheme, shield: Bool = true) -> some View {
         Asset.Assets.Brandmarks.brandmarkMax.image
-            .zImage(size: 24, style: Design.Text.primary)
-            .padding(.trailing, 12)
-            .overlay {
-                if shield {
-                    Asset.Assets.Icons.shieldBcg.image
-                        .zImage(size: 15, color: Design.screenBackground.color(colorScheme))
-                        .offset(x: 4, y: 8)
-                        .overlay {
-                            Asset.Assets.Icons.shieldTickFilled.image
-                                .zImage(size: 13, color: Design.Text.primary.color(colorScheme))
-                                .offset(x: 4, y: 8)
-                        }
-                } else {
-                    Asset.Assets.Icons.shieldOffSolid.image
-                        .resizable()
-                        .frame(width: 15, height: 15)
-                        .offset(x: 4, y: 8)
-                }
+            .zImage(
+                width: Constants.tickerIconSize,
+                height: Constants.tickerIconSize,
+                style: ZappColors.text
+            )
+            .overlay(alignment: .bottomTrailing) {
+                shieldBadge(shield, colorScheme)
+                    .offset(x: 4, y: 4)
             }
     }
-    
+
     @ViewBuilder func zecTickerBadge(_ colorScheme: ColorScheme, shield: Bool = true) -> some View {
-        HStack(spacing: 0) {
-            Asset.Assets.Brandmarks.brandmarkMax.image
-                .zImage(size: 24, style: Design.Text.primary)
-                .padding(.trailing, 6)
-                .overlay {
-                    if shield {
-                        Asset.Assets.Icons.shieldBcg.image
-                            .zImage(size: 15, color: Design.screenBackground.color(colorScheme))
-                            .offset(x: 4, y: 8)
-                            .overlay {
-                                Asset.Assets.Icons.shieldTickFilled.image
-                                    .zImage(size: 13, color: Design.Text.primary.color(colorScheme))
-                                    .offset(x: 4, y: 8)
-                            }
-                    } else {
-                        Asset.Assets.Icons.shieldOffSolid.image
-                            .resizable()
-                            .frame(width: 15, height: 15)
-                            .offset(x: 4, y: 8)
-                    }
-                }
-                .scaleEffect(0.8)
+        zecTickerLogo(colorScheme, shield: shield)
+            .scaleEffect(0.8)
+    }
+
+    @ViewBuilder private func shieldBadge(_ shield: Bool, _ colorScheme: ColorScheme) -> some View {
+        if shield {
+            Asset.Assets.Icons.shieldTickFilled.image
+                .zImage(width: 11, height: 11, style: ZappColors.text)
+                .frame(width: Constants.tickerBadgeSize, height: Constants.tickerBadgeSize)
+                .background(ZappColors.bg.color(colorScheme))
+        } else {
+            Asset.Assets.Icons.shieldOffSolid.image
+                .resizable()
+                .frame(width: 11, height: 11)
+                .frame(width: Constants.tickerBadgeSize, height: Constants.tickerBadgeSize)
+                .background(ZappColors.bg.color(colorScheme))
         }
     }
-    
+
+    var addressBookHint: some View {
+        HStack(alignment: .center, spacing: Design.Spacing._lg) {
+            Asset.Assets.Icons.userPlus.image
+                .zImage(width: 20, height: 20, style: ZappColors.accentText)
+
+            Text(localizable: .sendAddressNotInBook)
+                .zappFont(.caption, style: ZappColors.accentText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, Design.Spacing._lg)
+        .frame(height: 40)
+        .background(ZappColors.accentSoft.color(colorScheme))
+    }
+
+    func keyboardDoneAccessory(_ dismiss: @escaping () -> Void) -> some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            Rectangle()
+                .fill(ZappColors.border.color(colorScheme))
+                .frame(height: 1)
+
+            HStack {
+                Spacer()
+
+                Button(action: dismiss) {
+                    Text(String(localizable: .generalDone).uppercased())
+                        .zappFont(.chip, style: ZappColors.accentText)
+                }
+                .buttonStyle(.zappPress)
+            }
+            .padding(.horizontal, Design.Spacing._2xl)
+            .frame(height: 38)
+            .frame(maxWidth: .infinity)
+            .background(ZappColors.surface.color(colorScheme))
+        }
+    }
+
+    /// The swap CTA. `swapAssetFailedWithRetry` swaps it for a retry/unavailable block.
+    @ViewBuilder func quoteCta(title: String, accessibilityID: String) -> some View {
+        if let retryFailure = store.swapAssetFailedWithRetry {
+            VStack(spacing: Design.Spacing._md) {
+                Asset.Assets.infoOutline.image
+                    .zImage(width: 16, height: 16, style: ZappColors.danger)
+
+                Text(retryFailure
+                     ? String(localizable: .swapAndPayFailureRetryTitle)
+                     : String(localizable: .swapAndPayFailureLaterTitle)
+                )
+                .zappFont(.rowTitle, style: ZappColors.danger)
+
+                Text(retryFailure
+                     ? String(localizable: .swapAndPayFailureRetryDesc)
+                     : String(localizable: .swapAndPayFailureLaterDesc)
+                )
+                .zappFont(.body, style: ZappColors.danger)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+                if retryFailure {
+                    ZappButton(
+                        title: String(localizable: .swapAndPayFailureTryAgain),
+                        variant: .danger
+                    ) {
+                        store.send(.trySwapsAssetsAgainTapped)
+                    }
+                    .padding(.top, Design.Spacing._lg)
+                }
+            }
+            .padding(.top, Design.Spacing._4xl)
+        } else {
+            ZappButton(
+                title: title,
+                isEnabled: store.isValidForm && !store.isQuoteRequestInFlight
+            ) {
+                store.send(.getQuoteTapped)
+            }
+            .accessibilityIdentifier(accessibilityID)
+            .padding(.top, keyboardVisible ? Design.Spacing._5xl : 0)
+        }
+    }
+
     func slippageWarnBcgColor(_ colorScheme: ColorScheme) -> Color {
         if store.slippageInSheet <= 2.0 {
-            return Design.Utility.Gray._100.color(colorScheme)
+            return ZappColors.surfaceAlt.color(colorScheme)
         } else if store.slippageInSheet > 2.0 && store.slippageInSheet <= 3.0 {
-            return Design.Utility.WarningYellow._50.color(colorScheme)
+            return ZappColors.accentSoft.color(colorScheme)
         } else {
-            return Design.Utility.ErrorRed._100.color(colorScheme)
+            return ZappColors.dangerSoft.color(colorScheme)
         }
     }
 
     func slippageWarnTextStyle() -> Colorable {
         if store.slippageInSheet <= 2.0 {
-            return Design.Utility.Gray._900
+            return ZappColors.textMuted
         } else if store.slippageInSheet > 2.0 && store.slippageInSheet <= 3.0 {
-            return Design.Utility.WarningYellow._900
+            return ZappColors.accentText
         } else {
-            return Design.Utility.ErrorRed._900
+            return ZappColors.danger
         }
     }
 }
 
 extension View {
     @ViewBuilder func noBcgTicker(asset: SwapAsset?, crosspay: Bool, _ colorScheme: ColorScheme) -> some View {
-        HStack(spacing: 0) {
+        HStack(spacing: Design.Spacing._xs) {
             if let asset {
                 tokenTicker(asset: asset, colorScheme)
-                
+
                 if crosspay {
-                    HStack(spacing: 4) {
+                    HStack(spacing: Design.Spacing._xs) {
                         Text(asset.token)
-                            .zFont(.semiBold, size: 14, style: Design.Text.primary)
-                        
+                            .zappFont(.rowTitle, style: ZappColors.text)
+
                         Text(localizable: .tokenOnChain)
-                            .zFont(.medium, size: 14, style: Design.Text.tertiary)
+                            .zappFont(.body, style: ZappColors.textMuted)
 
                         Text(asset.chainName)
-                            .zFont(.medium, size: 14, style: Design.Text.tertiary)
+                            .zappFont(.body, style: ZappColors.textMuted)
                     }
-                    .padding(.horizontal, 4)
                 } else {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(asset.token)
-                            .zFont(.semiBold, size: 12, style: Design.Text.primary)
-                        
+                            .zappFont(.caption, style: ZappColors.text)
+
                         Text(asset.chainName)
-                            .zFont(.medium, size: 12, style: Design.Text.tertiary)
+                            .zappFont(.caption, style: ZappColors.textMuted)
                     }
-                    .padding(.horizontal, 4)
                     .fixedSize()
                     .minimumScaleFactor(0.7)
                 }
             } else {
-                Circle()
-                    .shimmer(true).clipShape(Circle())
-                    .frame(width: 24, height: 24)
-                    .zForegroundColor(Design.Surfaces.bgSecondary)
-                    .padding(.trailing, 4)
+                Rectangle()
+                    .fill(ZappColors.surfaceAlt.color(colorScheme))
+                    .shimmer(true)
+                    .clipShape(Rectangle())
+                    .frame(width: SwapAndPayForm.Constants.tickerIconSize, height: SwapAndPayForm.Constants.tickerIconSize)
 
-                RoundedRectangle(cornerRadius: Design.Radius._sm)
-                    .fill(Design.Surfaces.bgSecondary.color(colorScheme))
-                    .shimmer(true).clipShape(RoundedRectangle(cornerRadius: 6))
+                Rectangle()
+                    .fill(ZappColors.surfaceAlt.color(colorScheme))
+                    .shimmer(true)
+                    .clipShape(Rectangle())
                     .frame(width: 50, height: 18)
-                    .padding(.trailing, 4)
             }
-            
+
             Asset.Assets.chevronDown.image
-                .zImage(size: 16, style: Design.Text.primary)
-                .padding(.trailing, 4)
+                .zImage(width: 16, height: 16, style: ZappColors.text)
         }
-        .padding(4)
+        .padding(.horizontal, Design.Spacing._md)
+        .padding(.vertical, Design.Spacing._sm)
     }
-    
+
     @ViewBuilder func tokenTicker(asset: SwapAsset?, _ colorScheme: ColorScheme) -> some View {
         if let asset {
             asset.tokenIcon
                 .resizable()
-                .frame(width: 24, height: 24)
-                .padding(.trailing, 8)
-                .overlay {
-                    ZStack {
-                        Circle()
-                            .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                            .frame(width: 16, height: 16)
-                            .offset(x: 6, y: 6)
-                        
-                        asset.chainIcon
-                            .resizable()
-                            .frame(width: 14, height: 14)
-                            .offset(x: 6, y: 6)
-                    }
+                .frame(
+                    width: SwapAndPayForm.Constants.tickerIconSize,
+                    height: SwapAndPayForm.Constants.tickerIconSize
+                )
+                .overlay(alignment: .bottomTrailing) {
+                    asset.chainIcon
+                        .resizable()
+                        .frame(
+                            width: SwapAndPayForm.Constants.tickerBadgeSize,
+                            height: SwapAndPayForm.Constants.tickerBadgeSize
+                        )
+                        .background(ZappColors.bg.color(colorScheme))
+                        .offset(x: 4, y: 4)
                 }
         }
     }
-    
+
     @ViewBuilder func tokenTickerSelector(asset: SwapAsset?, _ colorScheme: ColorScheme) -> some View {
         if let asset {
-            HStack(spacing: 0) {
-                asset.tokenIcon
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .padding(.trailing, 8)
-                    .overlay {
-                        ZStack {
-                            Circle()
-                                .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                                .frame(width: 16, height: 16)
-                                .offset(x: 6, y: 6)
-                            
-                            asset.chainIcon
-                                .resizable()
-                                .frame(width: 14, height: 14)
-                                .offset(x: 6, y: 6)
-                        }
-                    }
-                    .scaleEffect(0.8)
-            }
+            tokenTicker(asset: asset, colorScheme)
+                .scaleEffect(0.8)
         }
     }
-    
+
     @ViewBuilder func ticker(asset: SwapAsset?, crosspay: Bool, _ colorScheme: ColorScheme) -> some View {
         noBcgTicker(asset: asset, crosspay: crosspay, colorScheme)
-            .background {
-                RoundedRectangle(cornerRadius: Design.Radius._full)
-                    .fill(Design.Surfaces.bgPrimary.color(colorScheme))
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._full)
-                            .stroke(Design.Surfaces.strokeTertiary.color(colorScheme))
-                    }
-            }
-            .shadow(color: .black.opacity(0.02), radius: 0.66667, x: 0, y: 1.33333)
-            .shadow(color: .black.opacity(0.08), radius: 1.33333, x: 0, y: 1.33333)
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
     }
 }
 

@@ -10,7 +10,12 @@ import ComposableArchitecture
 
 struct AddressBookContactView: View {
     @Environment(\.colorScheme) var colorScheme
-    
+
+    private enum Constants {
+        static let chainIconSize: CGFloat = 24
+        static let chevronSize: CGFloat = 18
+    }
+
     @Perception.Bindable var store: StoreOf<AddressBook>
 
     @FocusState var isAddressFocused: Bool
@@ -23,122 +28,50 @@ struct AddressBookContactView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            VStack {
-                ZashiTextField(
-                    addressFont: true,
-                    text: $store.address,
-                    placeholder: String(localizable: .addressBookNewContactAddressPlaceholder),
-                    title: String(localizable: .addressBookNewContactAddress),
-                    error: store.invalidAddressErrorText
-                )
-                .padding(.top, 20)
-                .focused($isAddressFocused)
-                .accessibilityIdentifier(AccessibilityID.AddressBookContact.walletAddressField)
+            ScrollView {
+                VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
+                    field(
+                        title: String(localizable: .addressBookNewContactAddress),
+                        placeholder: String(localizable: .addressBookNewContactAddressPlaceholder),
+                        text: $store.address,
+                        error: store.invalidAddressErrorText,
+                        isMono: true
+                    )
+                    .focused($isAddressFocused)
+                    .accessibilityIdentifier(AccessibilityID.AddressBookContact.walletAddressField)
 
-                ZashiTextField(
-                    text: $store.name,
-                    placeholder: String(localizable: .addressBookNewContactNamePlaceholder),
-                    title: String(localizable: .addressBookNewContactName),
-                    error: store.invalidNameErrorText
-                )
-                .padding(.top, 20)
-                .padding(.bottom, (store.context != .send || store.isEditingContactWithChain) ? 0 : 20)
-                .focused($isNameFocused)
-                .accessibilityIdentifier(AccessibilityID.AddressBookContact.contactNameField)
+                    field(
+                        title: String(localizable: .addressBookNewContactName),
+                        placeholder: String(localizable: .addressBookNewContactNamePlaceholder),
+                        text: $store.name,
+                        error: store.invalidNameErrorText,
+                        isMono: false
+                    )
+                    .focused($isNameFocused)
+                    .accessibilityIdentifier(AccessibilityID.AddressBookContact.contactNameField)
 
-                if store.context != .send || store.isEditingContactWithChain {
-                    if store.isValidZcashAddress && store.context != .swap {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(localizable: .swapAndPayAddressBookSelectChain)
-                                .zFont(.medium, size: 14, style: Design.Dropdowns.Default.label)
-                                .padding(.bottom, 6)
-                            
-                            HStack(spacing: 0) {
-                                store.zecAsset.chainIcon
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
-                                    .padding(.trailing, 8)
-                                
-                                Text(store.zecAsset.chainName)
-                                    .zFont(size: 16, style: Design.Dropdowns.Disabled.dropdown)
-                                
-                                Spacer()
-                                
-                                Asset.Assets.chevronDown.image
-                                    .zImage(size: 18, style: Design.Dropdowns.Disabled.dropdown)
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 14)
-                            .background(
-                                RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                    .fill(Design.Dropdowns.Disabled.bg.color(colorScheme))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                            .stroke(Design.Dropdowns.Disabled.stroke.color(colorScheme))
-                                    }
-                            )
+                    if store.context != .send || store.isEditingContactWithChain {
+                        if store.isValidZcashAddress && store.context != .swap {
+                            lockedChain
+                        } else {
+                            chainSelector
+                                .focused($isChainIdFocused)
                         }
-                        .padding(.top, 20)
-                    } else {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(localizable: .swapAndPayAddressBookSelectChain)
-                                .zFont(.medium, size: 14, style: Design.Dropdowns.Default.label)
-                                .padding(.bottom, 6)
-                            
-                            Button {
-                                store.send(.selectChainTapped)
-                            } label: {
-                                HStack(spacing: 0) {
-                                    if let selectedChain = store.selectedChain {
-                                        selectedChain.chainIcon
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                            .padding(.trailing, 8)
-                                        
-                                        Text(selectedChain.chainName)
-                                            .zFont(size: 16, style: Design.Dropdowns.Default.text)
-                                    } else {
-                                        Text(localizable: .swapAndPayAddressBookSelect)
-                                            .zFont(size: 16, style: Design.Dropdowns.Default.text)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Asset.Assets.chevronDown.image
-                                        .zImage(size: 18, style: Design.Text.primary)
-                                }
-                                .padding(.vertical, store.selectedChain == nil ? 10 : 8)
-                                .padding(.horizontal, 14)
-                                .background(
-                                    RoundedRectangle(cornerRadius: Design.Radius._lg)
-                                        .fill(Design.Inputs.Default.bg.color(colorScheme))
-                                )
-                            }
-                            .accessibilityIdentifier(AccessibilityID.AddressBookContact.chainSelector)
+                    }
+
+                    if store.editId != nil {
+                        ZappButton(title: String(localizable: .generalDelete), variant: .danger) {
+                            store.send(.deleteId(store.uniqueId))
                         }
-                        .padding(.top, 20)
-                        .focused($isChainIdFocused)
+                        .accessibilityIdentifier(AccessibilityID.AddressBookContact.deleteButton)
                     }
                 }
-
-                Spacer()
-                
-                ZashiButton(String(localizable: .generalSave)) {
-                    store.send(.saveButtonTapped)
-                }
-                .disabled(store.isSaveButtonDisabled)
-                .accessibilityIdentifier(AccessibilityID.AddressBookContact.saveButton)
-                .padding(.bottom, store.editId != nil ? 0 : 24)
-
-                if store.editId != nil {
-                    ZashiButton(String(localizable: .generalDelete), type: .destructive1) {
-                        store.send(.deleteId(store.uniqueId))
-                    }
-                    .accessibilityIdentifier(AccessibilityID.AddressBookContact.deleteButton)
-                    .padding(.bottom, 24)
-                }
+                .padding(.horizontal, Design.Spacing._lg)
+                .padding(.top, Design.Spacing._2xl)
+                .padding(.bottom, ZappNavBar.pushedFloatingMargin)
             }
-            .screenHorizontalPadding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
             .onAppear {
                 isAddressFocused = store.isAddressFocused
                 if !isAddressFocused {
@@ -154,17 +87,115 @@ struct AddressBookContactView: View {
             )
             .popover(isPresented: $store.chainSelectBinding) {
                 assetContent(colorScheme)
-                    .padding(.horizontal, 4)
-                    .applyScreenBackground()
+                    .padding(.horizontal, Design.Spacing._xs)
+                    .background(ZappColors.bg.color(colorScheme))
+            }
+            .zashiBack(primaryAction: { saveButton })
+            .screenTitle(
+                store.editId != nil
+                ? String(localizable: .addressBookSavedAddress)
+                : String(localizable: .swapAndPayAddressBookNewContact)
+            )
+        }
+    }
+
+    private var saveButton: some View {
+        WithPerceptionTracking {
+            ZappButton(
+                title: String(localizable: .generalSave),
+                isEnabled: !store.isSaveButtonDisabled
+            ) {
+                store.send(.saveButtonTapped)
+            }
+            .accessibilityIdentifier(AccessibilityID.AddressBookContact.saveButton)
+        }
+    }
+
+    @ViewBuilder private func field(
+        title: String,
+        placeholder: String,
+        text: Binding<String>,
+        error: String?,
+        isMono: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: title)
+
+            TextField(placeholder, text: text, axis: .vertical)
+                .zappFont(isMono ? .mono : .body, style: ZappColors.text)
+                .textInputAutocapitalization(isMono ? .never : .words)
+                .autocorrectionDisabled()
+                .lineLimit(isMono ? 2 : 1, reservesSpace: true)
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceInput.color(colorScheme))
+
+            if let error {
+                Text(error)
+                    .zappFont(.caption, style: ZappColors.danger)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .applyScreenBackground()
-        .zashiBack()
-        .screenTitle(
-            store.editId != nil
-            ? String(localizable: .addressBookSavedAddress)
-            : String(localizable: .swapAndPayAddressBookNewContact)
-        )
+    }
+
+    private var lockedChain: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .swapAndPayAddressBookSelectChain))
+
+            HStack(spacing: Design.Spacing._md) {
+                store.zecAsset.chainIcon
+                    .resizable()
+                    .frame(width: Constants.chainIconSize, height: Constants.chainIconSize)
+
+                Text(store.zecAsset.chainName)
+                    .zappFont(.body, style: ZappColors.textMuted)
+
+                Spacer()
+
+                Asset.Assets.chevronDown.image
+                    .zImage(size: Constants.chevronSize, style: ZappColors.textSubtle)
+            }
+            .padding(Design.Spacing._lg)
+            .background(ZappColors.surfaceAlt.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
+        }
+    }
+
+    private var chainSelector: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            ZappSectionLabel(text: String(localizable: .swapAndPayAddressBookSelectChain))
+
+            Button {
+                store.send(.selectChainTapped)
+            } label: {
+                HStack(spacing: Design.Spacing._md) {
+                    if let selectedChain = store.selectedChain {
+                        selectedChain.chainIcon
+                            .resizable()
+                            .frame(width: Constants.chainIconSize, height: Constants.chainIconSize)
+
+                        Text(selectedChain.chainName)
+                            .zappFont(.body, style: ZappColors.text)
+                    } else {
+                        Text(localizable: .swapAndPayAddressBookSelect)
+                            .zappFont(.body, style: ZappColors.textSubtle)
+                    }
+
+                    Spacer()
+
+                    Asset.Assets.chevronDown.image
+                        .zImage(size: Constants.chevronSize, style: ZappColors.text)
+                }
+                .padding(Design.Spacing._lg)
+                .frame(maxWidth: .infinity)
+                .background(ZappColors.surfaceInput.color(colorScheme))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.zappPress)
+            .accessibilityIdentifier(AccessibilityID.AddressBookContact.chainSelector)
+        }
     }
 }
 

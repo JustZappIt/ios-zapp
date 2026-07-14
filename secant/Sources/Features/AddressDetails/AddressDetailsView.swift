@@ -12,103 +12,130 @@ import ComposableArchitecture
 struct AddressDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
 
+    private enum Constants {
+        static let qrSize: CGFloat = 216
+        static let qrPadding: CGFloat = 24
+        static let copyConfirmDuration: TimeInterval = 1.5
+        static let iconSize: CGFloat = 20
+    }
+
     @Perception.Bindable var store: StoreOf<AddressDetails>
-    
+
+    @State private var copyConfirmed = false
+
     init(store: StoreOf<AddressDetails>) {
         self.store = store
     }
-    
+
     var body: some View {
         WithPerceptionTracking {
-            WithPerceptionTracking {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            qrCode(store.address.data)
-                                .frame(width: 216, height: 216)
-                                .onAppear {
-                                    store.send(.generateQRCode(colorScheme == .dark ? true : false))
-                                }
-                                .padding(24)
-                                .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                        .fill(Design.screenBackground.color(colorScheme))
-                                        .background {
-                                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                                .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                                        }
-                                }
-                                .padding(.top, 40)
-                                .onTapGesture {
-                                    store.send(.qrCodeTapped, animation: .easeInOut)
-                                }
-                            
-                            PrivacyBadge(store.maxPrivacy ? .max : .low)
-                                .padding(.top, 32)
-                            
-                            Text(store.addressTitle)
-                                .zFont(.semiBold, size: 20, style: Design.Text.primary)
-                                .padding(.top, 12)
-                            
-                            Text(store.address.data)
-                                .zFont(fontFamily: .robotoMono, size: 14, style: Design.Text.tertiary)
-                                .lineLimit(store.isAddressExpanded ? nil : 2)
-                                .truncationMode(.middle)
-                                .padding(.top, 8)
-                                .onTapGesture {
-                                    store.send(.addressTapped)
-                                }
-                                .onLongPressGesture {
-                                    store.send(.copyToPastboard)
-                                }
-                        }
+            VStack(spacing: 0) {
+                ZappScreenHeader(
+                    title: store.addressTitle,
+                    containerColor: .bg,
+                    titleStyle: .displaySecondary,
+                    left: { EmptyView() },
+                    right: { EmptyView() }
+                )
+
+                ScrollView {
+                    VStack(spacing: 0) {
+                        qrPanel
+
+                        PrivacyBadge(store.maxPrivacy ? .max : .low)
+                            .padding(.top, Design.Spacing._4xl)
+
+                        Text(store.address.data)
+                            .zappFont(.mono, style: ZappColors.textMuted)
+                            .lineLimit(store.isAddressExpanded ? nil : 2)
+                            .truncationMode(.middle)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, Design.Spacing._lg)
+                            .onTapGesture {
+                                store.send(.addressTapped)
+                            }
+                            .onLongPressGesture {
+                                store.send(.copyToPastboard)
+                            }
+
+                        copyButton
+                            .padding(.top, Design.Spacing._xl)
                     }
-                    
-                    Spacer()
-                    
-                    ZashiButton(
-                        String(localizable: .addressDetailsShareQR),
-                        prefixView:
-                            Asset.Assets.Icons.share.image
-                            .zImage(size: 20, style: Design.Btns.Primary.fg)
-                    ) {
-                        store.send(.shareQR)
-                    }
-                    .padding(.bottom, 8)
-                    .disabled(store.addressToShare != nil)
-                    
-                    ZashiButton(
-                        String(localizable: .addressDetailsCopyAddress),
-                        type: .ghost,
-                        prefixView:
-                            Asset.Assets.copy.image
-                            .zImage(size: 20, style: Design.Btns.Ghost.fg)
-                    ) {
-                        store.send(.copyToPastboard)
-                    }
-                    .padding(.bottom, 20)
-                    
-                    shareView()
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .padding(.top, Design.Spacing._2xl)
+                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 20)
-                .onAppear { store.send(.onAppear) }
-                .onDisappear { store.send(.onDisappear) }
+
+                shareView()
             }
-            .screenHorizontalPadding()
-            .applyScreenBackground()
-            .zashiBack()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ZappColors.bg.color(colorScheme))
+            .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
+            .zashiBack(primaryAction: {
+                ZappButton(
+                    title: String(localizable: .addressDetailsShareQR),
+                    isEnabled: store.addressToShare == nil,
+                    leadingIcon: Asset.Assets.Icons.share.image
+                ) {
+                    store.send(.shareQR)
+                }
+            })
             .enlargeQR(isPresented: $store.isQRCodeEnlarged) {
                 qrEnlargedCode(store.address.data)
                     .aspectRatio(1, contentMode: .fit)
                     .padding(48)
                     .background {
                         if store.storedEnlargedQR != nil {
-                            RoundedRectangle(cornerRadius: Design.Radius._xl)
-                                .fill(Asset.Colors.ZDesign.Base.bone.color)
+                            Rectangle()
+                                .fill(Color.white)
                                 .padding(24)
                         }
                     }
+            }
+        }
+    }
+
+    // The QR keeps a white fill in both themes: a scanner has to read it.
+    private var qrPanel: some View {
+        qrCode(store.address.data)
+            .frame(width: Constants.qrSize, height: Constants.qrSize)
+            .onAppear {
+                store.send(.generateQRCode(colorScheme == .dark ? true : false))
+            }
+            .padding(Constants.qrPadding)
+            .background(ZappColors.bg.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
+            .onTapGesture {
+                store.send(.qrCodeTapped, animation: .easeInOut)
+            }
+    }
+
+    private var copyButton: some View {
+        ZappButton(
+            title: copyConfirmed
+                ? String(localizable: .newChatCopied)
+                : String(localizable: .addressDetailsCopyAddress),
+            variant: copyConfirmed ? .secondary : .ghost,
+            leadingIcon: copyConfirmed
+                ? Asset.Assets.Icons.checkSolid.image
+                : Asset.Assets.copy.image
+        ) {
+            store.send(.copyToPastboard)
+
+            withAnimation(ZappMotion.content) {
+                copyConfirmed = true
+            }
+
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(Constants.copyConfirmDuration * 1_000_000_000))
+
+                withAnimation(ZappMotion.content) {
+                    copyConfirmed = false
+                }
             }
         }
     }
@@ -125,7 +152,7 @@ extension AddressDetailsView {
             }
         }
     }
-    
+
     @ViewBuilder func qrEnlargedCode(_ qrText: String) -> some View {
         Group {
             if let storedImg = store.storedEnlargedQR {
@@ -136,7 +163,7 @@ extension AddressDetailsView {
             }
         }
     }
-    
+
     @ViewBuilder func shareView() -> some View {
         if let addressToShare = store.addressToShare,
            let cgImg = QRCodeGenerator.generateCode(
