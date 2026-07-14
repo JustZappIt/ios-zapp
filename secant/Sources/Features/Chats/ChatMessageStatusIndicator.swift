@@ -50,6 +50,10 @@ struct ChatMessageStatusIndicator: View {
                 .id(status)
                 .transition(.opacity)
         }
+        // One width for every state. The read mark is a double tick and is wider
+        // than the others, so without this the time shifts sideways the moment a
+        // message is read — the mark must turn in place, not nudge the row.
+        .frame(width: Constants.readWidth, alignment: .leading)
         .animation(ZappMotion.content, value: status)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
@@ -62,7 +66,6 @@ struct ChatMessageStatusIndicator: View {
                 glyph
                 glyph.offset(x: Constants.readOffset)
             }
-            .frame(width: Constants.readWidth, alignment: .leading)
         } else {
             glyph
         }
