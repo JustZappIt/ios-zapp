@@ -15,6 +15,7 @@ import ComposableArchitecture
 struct RestoreWalletCoordFlow {
     @Reducer
     enum Path {
+        case chatUsername(ChatUsernameEntry)
         case estimateBirthdaysDate(WalletBirthday)
         case estimatedBirthday(WalletBirthday)
         case recoverySeedPhraseEntry(RestoreWalletCoordFlow)

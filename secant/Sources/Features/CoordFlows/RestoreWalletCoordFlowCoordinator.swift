@@ -31,7 +31,11 @@ extension RestoreWalletCoordFlow {
                     // store the wallet to the keychain
                     try walletStorage.importWallet(newRandomPhrase, birthday, .english, false)
 
-                    return .send(.newWalletSuccessfulyCreated)
+                    // Wallet first, then the name: the chat identity derives from
+                    // the seed we just stored. The name is queued and derives once
+                    // the worklet boots, so this step does not block on it.
+                    state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                    return .none
                 } catch {
                     state.alert = AlertState.cantCreateNewWallet(error.toZcashError())
                 }
@@ -61,10 +65,8 @@ extension RestoreWalletCoordFlow {
                     // update the backup phrase validation flag
                     try walletStorage.markUserPassedPhraseBackupTest(true)
 
-                    state.path.append(.restoreInfo(RestoreInfo.State.initial))
-
-                    // notify user
-                    return .send(.successfullyRecovered)
+                    state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                    return .none
                 } catch {
                     return .send(.failedToRecover(error.toZcashError()))
                 }
@@ -80,6 +82,14 @@ extension RestoreWalletCoordFlow {
 
                 // MARK: Recovery Seed Phrase Entry
                 
+            case .path(.element(id: _, action: .chatUsername(.continueTapped))):
+                if state.isImportingWallet {
+                    state.path.append(.restoreInfo(RestoreInfo.State.initial))
+                    return .send(.successfullyRecovered)
+                } else {
+                    return .send(.newWalletSuccessfulyCreated)
+                }
+
             case .path(.element(id: _, action: .recoverySeedPhraseEntry(.nextTapped))):
                 for element in state.path {
                     if case .recoverySeedPhraseEntry(let recoverySeedPhraseEntryState) = element {
