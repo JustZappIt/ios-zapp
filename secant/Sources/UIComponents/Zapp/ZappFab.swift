@@ -1,0 +1,40 @@
+//
+//  ZappFab.swift
+//  Zapp
+//
+
+import SwiftUI
+
+/// Flat orange square FAB, anchored above the floating nav pill.
+struct ZappFab: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let size: CGFloat = 56
+        static let iconSize: CGFloat = 24
+    }
+
+    let icon: Image
+    let contentDescription: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            icon
+                .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.onAccent)
+                .frame(width: Constants.size, height: Constants.size)
+                .background(ZappColors.accent.color(colorScheme))
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                )
+                .shadow(color: ZappColors.shadow.color(colorScheme), radius: 4, y: 2)
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(contentDescription)
+    }
+}
+
+#Preview {
+    ZappFab(icon: Asset.Assets.Icons.plus.image, contentDescription: "New") { }
+}
