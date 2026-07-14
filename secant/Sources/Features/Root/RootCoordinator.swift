@@ -405,7 +405,6 @@ extension Root {
                 userDefaults.setValue(true, Constants.udIsRestoringWallet)
                 state.$walletStatus.withLock { $0 = .restoring }
                 return .concatenate(
-                    .send(.initialization(.initializeSDK(.restoreWallet))),
                     .send(.initialization(.checkBackupPhraseValidation)),
                     .send(.batteryStateChanged)
                 )
