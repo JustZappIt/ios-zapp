@@ -36,6 +36,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      # secant.xcodeproj references ../zappMessaging/ios as a local Swift package,
+      # so the sibling must exist (and be built) before packages resolve.
+      - name: Bootstrap zappMessaging
+        uses: ./.github/actions/bootstrap-zappmessaging
+
       - name: Select latest Xcode
         # macos-26 runners ship multiple Xcodes; default-selected is 16.x
         # (Swift 6.0). The project is SWIFT_VERSION=6.0, and Swift 6.0 treats

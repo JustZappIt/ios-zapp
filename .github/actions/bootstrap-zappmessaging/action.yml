@@ -1,0 +1,66 @@
+name: Bootstrap zappMessaging
+description: >
+  Check out the zappMessaging sibling and build its generated artifacts, so
+  secant.xcodeproj's local Swift package (../zappMessaging/ios) resolves.
+
+runs:
+  using: composite
+  steps:
+    # actions/checkout refuses a path outside the workspace, and the package is
+    # referenced as ../zappMessaging/ios — a SIBLING of the checked-out app. So
+    # land it inside the workspace and move it up one level. The workspace's
+    # parent is writable on the runner.
+    - name: Read the pinned zappMessaging ref
+      id: pin
+      shell: bash
+      run: |
+        REF=$(grep '^zappMessaging=' .zapp-deps | cut -d= -f2)
+        echo "ref=$REF" >> "$GITHUB_OUTPUT"
+        echo "zappMessaging pinned at: $REF"
+
+    - name: Checkout zappMessaging
+      uses: actions/checkout@v4
+      with:
+        repository: JustZappIt/zappMessaging
+        ref: ${{ steps.pin.outputs.ref }}
+        path: .zappMessaging-src
+
+    - name: Move it beside the app
+      shell: bash
+      run: |
+        rm -rf "$GITHUB_WORKSPACE/../zappMessaging"
+        mv "$GITHUB_WORKSPACE/.zappMessaging-src" "$GITHUB_WORKSPACE/../zappMessaging"
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: ../zappMessaging/package-lock.json
+
+    # `npm run setup` = install + bare-link + bare-pack. bare-link only assembles
+    # xcframeworks from npm-shipped prebuilds, so there is no native compilation.
+    # It must be `setup`, never `link` alone: worklet.bundle names each addon by
+    # exact version, and a mismatch surfaces at RUNTIME as "No addon registered",
+    # not as a build error.
+    - name: Generate the addon xcframeworks and the worklet bundle
+      shell: bash
+      working-directory: ../zappMessaging
+      run: |
+        npm ci
+        npm run setup
+
+    - name: Verify the artifacts the local package needs
+      shell: bash
+      working-directory: ../zappMessaging/ios
+      run: |
+        COUNT=$(ls -d Addons/*.xcframework 2>/dev/null | wc -l | tr -d ' ')
+        test "$COUNT" = "15" || { echo "::error::expected 15 addon xcframeworks, found $COUNT"; exit 1; }
+        test -f Resources/worklet.bundle || { echo "::error::worklet.bundle was not generated"; exit 1; }
+
+        # Package.swift hardcodes the addon list; a dependency bump renames the
+        # xcframeworks and silently staleness it. Fail loudly instead.
+        diff <(ls -d Addons/*.xcframework | sed 's|Addons/||; s|\.xcframework||' | sort) \
+             <(grep -oE '"[a-z-]+\.[0-9.]+"' Package.swift | tr -d '"' | sort) \
+          || { echo "::error::Package.swift's addon list has drifted from Addons/ — re-run npm run setup and update Package.swift"; exit 1; }
+
+        echo "zappMessaging ready: $COUNT addons + worklet.bundle"

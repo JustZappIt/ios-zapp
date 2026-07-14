@@ -1,0 +1,17 @@
+# Zapp sibling repository dependency lockfile.
+# Mirrors the convention in zodl-android/.zapp-deps.
+#
+# secant.xcodeproj references ../zappMessaging/ios as a LOCAL Swift package
+# (XCLocalSwiftPackageReference), so the sibling checkout is a build prerequisite,
+# not an optional convenience. CI checks out this exact SHA; a fresh clone must run
+# Scripts/bootstrap-zappmessaging.sh before the project will resolve.
+#
+# The package's binary artifacts (Addons/*.xcframework) and Resources/worklet.bundle
+# are GENERATED and gitignored — `npm run setup` produces them from committed npm
+# prebuilds (no native compilation). They are also VERSION-LOCKED to each other:
+# worklet.bundle names each addon by exact version, so running `npm run link` without
+# `npm run build` yields a runtime "No addon registered", not a build error. Always
+# run `npm run setup`.
+#
+# GitHub: https://github.com/JustZappIt/zappMessaging
+zappMessaging=main

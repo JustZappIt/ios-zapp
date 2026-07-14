@@ -55,6 +55,11 @@ jobs:
       - name: Checkout app
         uses: actions/checkout@v4
 
+      # secant.xcodeproj references ../zappMessaging/ios as a local Swift package,
+      # so the sibling must exist (and be built) before packages resolve.
+      - name: Bootstrap zappMessaging
+        uses: ./.github/actions/bootstrap-zappmessaging
+
       # Synchronized Xcode groups resolve .app bundle membership from the
       # on-disk file tree *before* build phases run. PartnerKeys.plist is
       # gitignored, so on a clean checkout it isn't present at planning time
