@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+/// Zapp puts back at the BOTTOM-LEFT, in a dock, never in a top app bar.
+///
+/// Rewritten in place rather than replaced with a `zappBack()` of our own: upstream funnels all 57
+/// screens through this one modifier, so overriding it here relocates every back button at once AND
+/// makes any screen we later merge from upstream conform automatically. A parallel modifier would
+/// leave newly-merged screens silently reintroducing a top-bar back button.
+///
+/// Screens that own a bottom CTA render it above this dock for now. Folding those into the dock's
+/// `primaryAction` slot — one row, back left, CTA right, as on Android — is per-screen work.
 struct ZashiBackModifier: ViewModifier {
     @Environment(\.dismiss) private var dismiss
 
@@ -14,7 +23,7 @@ struct ZashiBackModifier: ViewModifier {
     let hidden: Bool
     let invertedColors: Bool
     let customDismiss: (() -> Void)?
-    
+
     func body(content: Content) -> some View {
         if hidden {
             content
@@ -22,36 +31,19 @@ struct ZashiBackModifier: ViewModifier {
         } else {
             content
                 .navigationBarBackButtonHidden(true)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    ZappBottomActionBar(
+                        onBack: {
                             if let customDismiss {
                                 customDismiss()
                             } else {
                                 dismiss()
                             }
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                backIcon()
-                            } else {
-                                backIcon()
-                                    .padding(.trailing, 24)
-                                    .padding(8)
-                            }
-                        }
-                        .disabled(disabled)
-                        .accessibilityIdentifier(AccessibilityID.Navigation.back)
-                    }
+                        },
+                        backTint: invertedColors ? .bg : .text
+                    )
+                    .disabled(disabled)
                 }
-        }
-    }
-    
-    @ViewBuilder private func backIcon() -> some View {
-        HStack {
-            Asset.Assets.Icons.arrowNarrowLeft.image
-                .zImage(size: 24,
-                        color: invertedColors ? Asset.Colors.secondary.color : Asset.Colors.primary.color
-                )
         }
     }
 }
