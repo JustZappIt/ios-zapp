@@ -291,6 +291,32 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .chatReadReceipts {
+                                ChatPrivacySettingView(
+                                    store: store.scope(
+                                        state: \.chatProfileState,
+                                        action: \.chatProfile
+                                    ),
+                                    setting: .readReceipts,
+                                    initialValue: store.chatProfileState.readReceiptsEnabled
+                                ) {
+                                    store.send(.backToHomeFromChatPrivacyTapped)
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .chatOnlineStatus {
+                                ChatPrivacySettingView(
+                                    store: store.scope(
+                                        state: \.chatProfileState,
+                                        action: \.chatProfile
+                                    ),
+                                    setting: .onlineStatus,
+                                    initialValue: store.chatProfileState.presenceVisible
+                                ) {
+                                    store.send(.backToHomeFromChatPrivacyTapped)
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .chatProfile {
                                 ChatProfileView(
                                     store: store.scope(

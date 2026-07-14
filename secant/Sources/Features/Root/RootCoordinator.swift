@@ -26,6 +26,7 @@ extension Root {
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
                 .currencyConversionSetup(.backToHomeTapped),
+                .backToHomeFromChatPrivacyTapped,
                 .backToHomeFromServerSwitchTapped,
                 .sendCoordFlow(.sendForm(.dismissRequired)):
                 state.path = nil
@@ -335,6 +336,14 @@ extension Root {
                 state.currencyConversionSetupState = .initial
                 state.currencyConversionSetupState.isSettingsView = true
                 state.path = .currencyConversionSetup
+                return .none
+
+            case .zappTabs(.readReceiptsTapped):
+                state.path = .chatReadReceipts
+                return .none
+
+            case .zappTabs(.onlineStatusTapped):
+                state.path = .chatOnlineStatus
                 return .none
 
             case .zappTabs(.torTapped):

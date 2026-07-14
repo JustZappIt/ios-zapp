@@ -1,5 +1,5 @@
 //
-//  CurrencyConversionSetupView.swift
+//  TorSetupView.swift
 //  Zashi
 //
 //  Created by Lukáš Korba on 2025-07-10.
@@ -47,18 +47,14 @@ struct TorSetupView: View {
                     ZappSectionLabel(text: String(localizable: .settingsPrivate))
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    ZappRow(
+                    ZappToggleRow(
                         title: String(localizable: .smartBannerContentTorTitle),
                         subtitle: String(localizable: .torSetupEnableDesc),
                         icon: Asset.Assets.Icons.shieldZap.image,
                         iconTint: .accentText,
                         iconBackground: .accentSoft,
-                        trailing: {
-                            ZappToggle(isOn: store.currentSettingsOption == .optIn) {
-                                toggleTorSelection()
-                            }
-                        },
-                        action: { toggleTorSelection() }
+                        isOn: store.currentSettingsOption == .optIn,
+                        action: toggleTorSelection
                     )
                     .background(ZappColors.surface.color(colorScheme))
                     .overlay(
@@ -73,7 +69,6 @@ struct TorSetupView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
         .zashiBack(
-            store.isSaveButtonDisabled,
             primaryAction: {
                 ZappButton(
                     title: String(localizable: .currencyConversionSaveBtn),

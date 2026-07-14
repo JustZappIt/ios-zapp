@@ -30,7 +30,7 @@ struct ChatContactsListView: View {
 
                 ZappFab(
                     icon: Asset.Assets.Icons.userPlus.image,
-                    contentDescription: String(localizable: .chatContactsAdd)
+                    accessibilityLabel: String(localizable: .chatContactsAdd)
                 ) {
                     store.send(.addTapped)
                 }

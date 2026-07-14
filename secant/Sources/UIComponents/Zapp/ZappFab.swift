@@ -15,7 +15,7 @@ struct ZappFab: View {
     }
 
     let icon: Image
-    let contentDescription: String
+    let accessibilityLabel: String
     let action: () -> Void
 
     var body: some View {
@@ -27,10 +27,10 @@ struct ZappFab: View {
                 .shadow(color: ZappColors.shadow.color(colorScheme), radius: 4, y: 2)
         }
         .buttonStyle(.zappPress)
-        .accessibilityLabel(contentDescription)
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 
 #Preview {
-    ZappFab(icon: Asset.Assets.Icons.plus.image, contentDescription: "New") { }
+    ZappFab(icon: Asset.Assets.Icons.plus.image, accessibilityLabel: "New") { }
 }

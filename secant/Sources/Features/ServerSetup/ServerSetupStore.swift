@@ -62,6 +62,23 @@ struct ServerSetup {
             return modeChanged || serverChanged || customChanged
         }
 
+        /// The single validity rule shared by the UI and reducer. Manual mode requires a selected,
+        /// parseable endpoint; automatic mode only requires an actual change.
+        var canSave: Bool {
+            guard hasChanges else { return false }
+            guard connectionMode == .manual else { return true }
+            guard let selectedServer else { return false }
+
+            let customLabel = String(localizable: .serverSetupCustom)
+            guard selectedServer == customLabel else { return true }
+
+            return UserPreferencesStorage.ServerConfig.endpoint(
+                for: customServer.trimmingCharacters(in: .whitespaces),
+                streamingCallTimeoutInMillis:
+                    ZcashSDKEnvironment.ZcashSDKConstants.streamingCallTimeoutInMillis
+            ) != nil
+        }
+
         /// The fastest server from the most recent benchmark (the top of `topKServers`), or nil
         /// before any evaluation has completed.
         var recommendedSyncServer: String? {
@@ -244,7 +261,7 @@ struct ServerSetup {
                 return .none
 
             case .setServerTapped:
-                guard state.hasChanges else { return .none }
+                guard state.canSave else { return .none }
 
                 state.isUpdatingServer = true
                 let network = state.network

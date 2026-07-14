@@ -39,4 +39,37 @@ import Testing
         #expect(state.recommendedSyncServer == nil)
         #expect(state.automaticDisplayServer == "active.server:443")
     }
+
+    @Test func canSaveRequiresAChange() {
+        let state = ServerSetup.State(connectionMode: .automatic)
+        #expect(!state.canSave)
+    }
+
+    @Test func canSaveAcceptsAutomaticModeChange() {
+        var state = ServerSetup.State(connectionMode: .manual)
+        state.connectionMode = .automatic
+        #expect(state.canSave)
+    }
+
+    @Test func canSaveRequiresManualSelection() {
+        var state = ServerSetup.State(connectionMode: .automatic)
+        state.connectionMode = .manual
+        #expect(!state.canSave)
+    }
+
+    @Test func canSaveRejectsInvalidCustomEndpoint() {
+        let customLabel = String(localizable: .serverSetupCustom)
+        var state = ServerSetup.State(connectionMode: .manual, selectedServer: customLabel)
+        state.initialSelectedServer = customLabel
+        state.customServer = "not an endpoint"
+        #expect(!state.canSave)
+    }
+
+    @Test func canSaveAcceptsValidCustomEndpoint() {
+        let customLabel = String(localizable: .serverSetupCustom)
+        var state = ServerSetup.State(connectionMode: .manual, selectedServer: customLabel)
+        state.initialSelectedServer = customLabel
+        state.customServer = "custom.server:443"
+        #expect(state.canSave)
+    }
 }

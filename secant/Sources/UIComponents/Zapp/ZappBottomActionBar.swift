@@ -25,6 +25,7 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
 
     private let onBack: () -> Void
     private let backTint: ZappColors
+    private let isBackEnabled: Bool
     private let primaryAction: PrimaryAction
 
     /// Chrome-free when there is no primary action, matching `ZappBottomActionBar.kt`.
@@ -33,10 +34,12 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
     init(
         onBack: @escaping () -> Void,
         backTint: ZappColors = .text,
+        isBackEnabled: Bool = true,
         @ViewBuilder primaryAction: () -> PrimaryAction
     ) {
         self.onBack = onBack
         self.backTint = backTint
+        self.isBackEnabled = isBackEnabled
         self.primaryAction = primaryAction()
     }
 
@@ -44,7 +47,7 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
     var body: some View {
         if hasChrome {
             HStack(spacing: 0) {
-                ZappBackButton(tint: backTint, action: onBack)
+                ZappBackButton(tint: backTint, isEnabled: isBackEnabled, action: onBack)
 
                 primaryAction
                     .frame(maxWidth: .infinity)
@@ -62,12 +65,13 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
             .padding(.horizontal, Constants.gutter)
         } else {
             HStack(spacing: 0) {
-                ZappBackButton(tint: backTint, action: onBack)
+                ZappBackButton(tint: backTint, isEnabled: isBackEnabled, action: onBack)
 
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity)
             .frame(minHeight: Constants.minHeight)
+            .padding(Constants.innerPadding)
             .padding(.bottom, Constants.bottomMargin)
             .padding(.horizontal, Constants.gutter)
         }
@@ -75,8 +79,8 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
 }
 
 extension ZappBottomActionBar where PrimaryAction == EmptyView {
-    init(onBack: @escaping () -> Void, backTint: ZappColors = .text) {
-        self.init(onBack: onBack, backTint: backTint) { EmptyView() }
+    init(onBack: @escaping () -> Void, backTint: ZappColors = .text, isBackEnabled: Bool = true) {
+        self.init(onBack: onBack, backTint: backTint, isBackEnabled: isBackEnabled) { EmptyView() }
     }
 }
 

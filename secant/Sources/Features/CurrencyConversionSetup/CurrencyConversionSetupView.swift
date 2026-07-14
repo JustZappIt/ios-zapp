@@ -59,7 +59,6 @@ struct CurrencyConversionSetupView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
         .zashiBack(
-            store.isSaveButtonDisabled,
             primaryAction: {
                 ZappButton(
                     title: String(localizable: .currencyConversionSaveBtn),
@@ -136,59 +135,6 @@ struct CurrencyConversionSetupView: View {
         }
     }
     
-    private func settingsLayout() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header(String(localizable: .currencyConversionSettingsDesc))
-                .padding(.horizontal, 16)
-                .padding(.bottom, 20)
-
-            ForEach(CurrencyConversionSetup.State.SettingsOptions.allCases, id: \.self) { option in
-                Button {
-                    store.send(.settingsOptionTapped(option))
-                } label: {
-                    HStack(alignment: .top, spacing: 0) {
-                        optionIcon(option.icon().image)
-                        optionVStack(option.title(), subtitle: option.subtitle())
-                        
-                        Spacer()
-                        
-                        if option == store.currentSettingsOption {
-                            Circle()
-                                .fill(Design.Checkboxes.onBg.color(colorScheme))
-                                .frame(width: 20, height: 20)
-                                .overlay {
-                                    Circle()
-                                        .fill(Design.Checkboxes.onFg.color(colorScheme))
-                                        .frame(width: 10, height: 10)
-                                }
-                        } else {
-                            Circle()
-                                .fill(Design.Checkboxes.offBg.color(colorScheme))
-                                .frame(width: 20, height: 20)
-                                .overlay {
-                                    Circle()
-                                        .stroke(Design.Checkboxes.offStroke.color(colorScheme))
-                                        .frame(width: 20, height: 20)
-                                }
-                        }
-                    }
-                    .frame(minHeight: 40)
-                    .padding(20)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._xl)
-                            .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                    }
-                }
-            }
-            .padding(.bottom, Design.Spacing._3xl)
-
-            if store.currentSettingsOption == .optIn {
-                currencyPickerSection()
-            }
-        }
-        .padding(.horizontal, 8)
-    }
-
     private func currencyPickerSection() -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(String(localizable: .currencyConversionSelectCurrencyTitle))
@@ -315,29 +261,6 @@ struct CurrencyConversionSetupView: View {
         .screenHorizontalPadding()
     }
  
-    private func settingsFooter() -> some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 0) {
-                Asset.Assets.infoOutline.image
-                    .zImage(size: 16, style: Design.Text.tertiary)
-                    .padding(.trailing, 12)
-                
-                Text(store.isTorOn
-                     ? String(localizable: .currencyConversionTorOnInfo)
-                     : String(localizable: .currencyConversionTorOffInfo)
-                )
-                .zFont(size: 12, style: Design.Text.tertiary)
-            }
-            .padding(.bottom, 20)
-            .screenHorizontalPadding()
-            
-            primaryButton(String(localizable: .currencyConversionSaveBtn), disabled: store.isSaveButtonDisabled) {
-                store.send(.saveChangesTapped)
-            }
-            .padding(.bottom, 24)
-        }
-    }
-    
     private func learnMoreFooter() -> some View {
         VStack {
             secondaryButton(String(localizable: .currencyConversionSkipBtn)) {

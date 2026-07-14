@@ -33,7 +33,7 @@ struct ChatsListView: View {
                     }
                 }
 
-                ZappFab(icon: Asset.Assets.Icons.messageChat.image, contentDescription: String(localizable: .chatListNewChat)) {
+                ZappFab(icon: Asset.Assets.Icons.messageChat.image, accessibilityLabel: String(localizable: .chatListNewChat)) {
                     store.send(.newConversationTapped)
                 }
                 .padding(.trailing, Design.Spacing._2xl)
