@@ -48,6 +48,7 @@ struct Root {
         var DidFinishLaunchingId = UUID()
         var CancelFlexaId = UUID()
         var shieldingProcessorCancelId = UUID()
+        var zappMessagingCancelId = UUID()
         var automaticServerRefreshCancelId = UUID()
 
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
@@ -63,6 +64,7 @@ struct Root {
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var homeState: Home.State = .initial
         var zappTabsState: ZappTabs.State = .initial
+        var zappMessagingState = ZappMessagingState()
         var isLockedInKeychainUnavailableState = false
         var isRestoringWallet = false
         @Shared(.appStorage(.lastAuthenticationTimestamp)) var lastAuthenticationTimestamp: Int = 0
@@ -189,6 +191,8 @@ struct Root {
         case batteryStateChanged
         case binding(BindingAction<Root.State>)
         case cancelAllRunningEffects
+        case observeZappMessaging
+        case zappMessagingStateChanged(ZappMessagingState)
         case deeplinkWarning(DeeplinkWarning.Action)
         case destination(DestinationAction)
         case exportLogs(ExportLogs.Action)
@@ -309,6 +313,7 @@ struct Root {
     @Dependency(\.walletConfigProvider) var walletConfigProvider
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.readTransactionsStorage) var readTransactionsStorage
+    @Dependency(\.zappMessaging) var zappMessaging
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
     init() { }
@@ -418,6 +423,8 @@ struct Root {
         coordinatorReduce()
         
         shieldingProcessorReduce()
+
+        zappMessagingReduce()
         
         torInitCheckReduce()
         
