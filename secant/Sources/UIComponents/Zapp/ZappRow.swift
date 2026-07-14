@@ -155,6 +155,7 @@ struct ZappSelectionRow: View {
             },
             action: isEnabled ? action : nil
         )
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var titleColor: ZappColors {
@@ -163,6 +164,33 @@ struct ZappSelectionRow: View {
         }
 
         return isSelected ? .accentText : .text
+    }
+}
+
+/// A single accessible row action with a passive toggle indicator. This avoids nesting a Button
+/// inside `ZappRow`'s Button while making the full row the tap target.
+struct ZappToggleRow: View {
+    let title: String
+    var subtitle: String?
+    var icon: Image?
+    var iconTint: ZappColors = .text
+    var iconBackground: ZappColors = .surfaceAlt
+    let isOn: Bool
+    var isEnabled = true
+    let action: () -> Void
+
+    var body: some View {
+        ZappRow(
+            title: title,
+            subtitle: subtitle,
+            icon: icon,
+            iconTint: iconTint,
+            iconBackground: iconBackground,
+            trailing: { ZappToggleIndicator(isOn: isOn) },
+            action: isEnabled ? action : nil
+        )
+        .accessibilityValue(toggleAccessibilityValue(isOn))
+        .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }
 

@@ -9,8 +9,8 @@ import SwiftUI
 /// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
 /// Android's App lock, Background delivery and P2P payment method rows are deliberately absent:
-/// each fronts a subsystem iOS does not have yet. Read receipts and online status live here and
-/// use the existing ChatProfile reducer, matching Android without duplicating them in Profile.
+/// each fronts a subsystem iOS does not have yet. Read receipts and online status open staged
+/// detail screens, matching Android without duplicating them in Profile.
 ///
 /// `allSettings` is iOS's route to the address book, advanced settings, about,
 /// feedback and voting. Keeping it here preserves those working surfaces without
@@ -35,7 +35,7 @@ struct SettingsTabContent: View {
                             ProfileCard(displayName: displayName)
                         }
 
-                        SettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
                             ZappRow(
                                 title: String(localizable: .settingsYouContactsTitle),
                                 subtitle: String(localizable: .settingsYouContactsSubtitleNew),
@@ -47,7 +47,7 @@ struct SettingsTabContent: View {
                             }
                         }
 
-                        SettingsGroup(title: String(localizable: .settingsYouGroupSecurity)) {
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupSecurity)) {
                             ZappRow(
                                 title: String(localizable: .settingsYouProfileIdentityTitle),
                                 subtitle: String(localizable: .settingsYouProfileIdentitySubtitle),
@@ -59,7 +59,7 @@ struct SettingsTabContent: View {
                             }
                         }
 
-                        SettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
                             ZappRow(
                                 title: String(localizable: .settingsYouTorTitle),
                                 subtitle: String(localizable: .settingsYouTorSubtitle),
@@ -77,14 +77,8 @@ struct SettingsTabContent: View {
                                 subtitle: String(localizable: .chatProfileReadReceiptsHint),
                                 icon: Asset.Assets.Icons.checkSolid.image,
                                 iconTint: .accentText,
-                                iconBackground: .accentSoft,
-                                trailing: {
-                                    ZappToggle(isOn: chatProfileStore.readReceiptsEnabled) {
-                                        chatProfileStore.send(.readReceiptsToggled)
-                                    }
-                                    .disabled(chatProfileStore.isReadReceiptsBusy)
-                                }
-                            )
+                                iconBackground: .accentSoft
+                            ) { store.send(.readReceiptsTapped) }
 
                             ZappRowDivider(inset: true)
 
@@ -93,17 +87,11 @@ struct SettingsTabContent: View {
                                 subtitle: String(localizable: .chatProfilePresenceHint),
                                 icon: Asset.Assets.Icons.user.image,
                                 iconTint: .accentText,
-                                iconBackground: .accentSoft,
-                                trailing: {
-                                    ZappToggle(isOn: chatProfileStore.presenceVisible) {
-                                        chatProfileStore.send(.presenceToggled)
-                                    }
-                                    .disabled(chatProfileStore.isPresenceBusy)
-                                }
-                            )
+                                iconBackground: .accentSoft
+                            ) { store.send(.onlineStatusTapped) }
                         }
 
-                        SettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
                             ZappRow(
                                 title: String(localizable: .settingsYouLocalCurrencyTitle),
                                 subtitle: String(localizable: .settingsYouLocalCurrencySubtitle),
@@ -127,7 +115,7 @@ struct SettingsTabContent: View {
                             }
                         }
 
-                        SettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
                             ZappRow(
                                 title: String(localizable: .settingsYouAllSettingsTitle),
                                 subtitle: String(localizable: .settingsYouAllSettingsSubtitle),
@@ -173,32 +161,6 @@ private struct ProfileCard: View {
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 18)
         .padding(.vertical, 16)
-    }
-}
-
-private struct SettingsGroup<Content: View>: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let title: String
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ZappGroupHeader(text: title)
-
-            VStack(spacing: 0) {
-                content
-            }
-            .background(ZappColors.surface.color(colorScheme))
-            .overlay(
-                Rectangle()
-                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-            )
-            .padding(.horizontal, 14)
-
-            Spacer()
-                .frame(height: Design.Spacing._md)
-        }
     }
 }
 

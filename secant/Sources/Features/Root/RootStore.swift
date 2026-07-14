@@ -16,7 +16,9 @@ struct Root {
         enum Path {
             case addKeystoneHWWalletCoordFlow
             case chatContacts
+            case chatOnlineStatus
             case chatProfile
+            case chatReadReceipts
             case chatRoom
             case groupInfo
             case newChat
@@ -157,7 +159,8 @@ struct Root {
                 return true
             case .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatProfile, .chatRoom, .groupInfo,
+            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
+                 .chatReadReceipts, .chatRoom, .groupInfo,
                  .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
                 return false
@@ -259,6 +262,7 @@ struct Root {
         case transactionsCoordFlow(TransactionsCoordFlow.Action)
         case walletBackupCoordFlow(WalletBackupCoordFlow.Action)
         case torSetup(TorSetup.Action)
+        case backToHomeFromChatPrivacyTapped
         case backToHomeFromServerSwitchTapped
         case refreshAutomaticServer
         case autoServerCandidateReady(LightWalletEndpoint)

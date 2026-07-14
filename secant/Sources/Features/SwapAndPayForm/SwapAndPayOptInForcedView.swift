@@ -132,24 +132,30 @@ struct SwapAndPayOptInForcedView: View {
         title: String,
         action: @escaping () -> Void
     ) -> some View {
-        HStack(alignment: .top, spacing: Design.Spacing._lg) {
-            ZappToggle(isOn: isOn, action: action)
+        Button(action: action) {
+            HStack(alignment: .top, spacing: Design.Spacing._lg) {
+                ZappToggleIndicator(isOn: isOn)
+                    .frame(minWidth: 44, minHeight: 44)
 
-            Text(title)
-                .zappFont(.rowTitle, style: ZappColors.text)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
+                Text(title)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Spacer(minLength: 0)
+                Spacer(minLength: 0)
+            }
+            .frame(minHeight: Constants.optionMinHeight)
+            .frame(maxWidth: .infinity)
+            .padding(Design.Spacing._xl)
+            .contentShape(Rectangle())
         }
-        .frame(minHeight: Constants.optionMinHeight)
-        .frame(maxWidth: .infinity)
-        .padding(Design.Spacing._xl)
+        .buttonStyle(.zappPress)
         .overlay(
             Rectangle()
                 .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         )
-        .contentShape(Rectangle())
-        .onTapGesture(perform: action)
+        .accessibilityLabel(title)
+        .accessibilityValue(toggleAccessibilityValue(isOn))
+        .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }

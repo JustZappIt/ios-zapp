@@ -16,32 +16,22 @@ struct ReceiveView: View {
     private enum Constants {
         static let copyConfirmDuration: TimeInterval = 1.5
         static let actionIconSize: CGFloat = 20
-        static let actionMinHeight: CGFloat = 64
-        static let infoIconSize: CGFloat = 16
-        static let infoBox: CGFloat = 32
-        static let warningIconSize: CGFloat = 24
-        static let qrSize: CGFloat = 260
+        static let qrMaxSize: CGFloat = 300
         static let copyButtonSize: CGFloat = 40
     }
 
-    /// One switcher segment. `actionAddress` is kept apart from the displayed `address` because
-    /// upstream renders the Keystone account's own transparent address but copies/shares
-    /// `store.transparentAddress`; that asymmetry is preserved rather than silently reconciled.
+    /// One switcher segment. A single address is the source for display, QR, copy, share, and request.
     private struct AddressSegment {
         let focus: Receive.State.AddressType
         let label: String
-        let title: String
         let address: String
-        let actionAddress: String
         let isShielded: Bool
-        let canCopy: Bool
     }
 
     @Perception.Bindable var store: StoreOf<Receive>
     let networkType: NetworkType
     let tokenName: String
 
-    @State var explainer = false
     @State private var copyConfirmed = false
 
     init(store: StoreOf<Receive>, networkType: NetworkType, tokenName: String) {
@@ -69,9 +59,6 @@ struct ReceiveView: View {
                 }
             }
             .navigationBarHidden(true)
-            .zashiSheet(isPresented: $explainer) {
-                explainerContent()
-            }
         }
     }
 
@@ -82,14 +69,24 @@ struct ReceiveView: View {
             if let segment = selectedSegment {
                 ScrollView {
                     VStack(spacing: Design.Spacing._xl) {
-                        ReceiveAddressQRCode(address: segment.actionAddress)
-                            .frame(width: Constants.qrSize, height: Constants.qrSize)
-                            .padding(Design.Spacing._md)
-                            .background(Color.white)
-                            .overlay(
-                                Rectangle()
-                                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                        GeometryReader { proxy in
+                            let size = min(
+                                max(0, proxy.size.width - (Design.Spacing._md * 2)),
+                                Constants.qrMaxSize
                             )
+
+                            ReceiveAddressQRCode(address: segment.address)
+                                .frame(width: size, height: size)
+                                .padding(Design.Spacing._md)
+                                .background(Color.white)
+                                .overlay(
+                                    Rectangle()
+                                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                                )
+                                .frame(maxWidth: .infinity)
+                        }
+                        .aspectRatio(1, contentMode: .fit)
+                        .frame(maxWidth: Constants.qrMaxSize + (Design.Spacing._md * 2))
 
                         HStack(alignment: .top, spacing: Design.Spacing._md) {
                             Text(segment.address)
@@ -128,7 +125,7 @@ struct ReceiveView: View {
                     .padding(.vertical, Design.Spacing._sm)
                 }
 
-                ShareLink(item: segment.actionAddress) {
+                ShareLink(item: segment.address) {
                     Text(String(localizable: .generalShare).uppercased())
                         .zappFont(.button, style: ZappColors.textMuted)
                         .frame(maxWidth: .infinity)
@@ -150,7 +147,7 @@ struct ReceiveView: View {
             primaryAction: {
                 if let segment = selectedSegment {
                     ZappButton(title: String(localizable: .receiveRequest)) {
-                        store.send(.requestTapped(segment.actionAddress.redacted, segment.isShielded))
+                        store.send(.requestTapped(segment.address.redacted, segment.isShielded))
                     }
                 }
             },
@@ -165,13 +162,8 @@ struct ReceiveView: View {
             AddressSegment(
                 focus: .uaAddress,
                 label: String(localizable: .zappPayShielded),
-                title: isKeystone
-                    ? String(localizable: .accountsKeystoneShieldedAddress)
-                    : String(localizable: .accountsZashiShieldedAddress),
                 address: store.unifiedAddress,
-                actionAddress: store.unifiedAddress,
-                isShielded: true,
-                canCopy: true
+                isShielded: true
             )
         ]
 
@@ -181,11 +173,8 @@ struct ReceiveView: View {
                     AddressSegment(
                         focus: .tAddress,
                         label: String(localizable: .zappPayTransparent),
-                        title: String(localizable: .accountsKeystoneTransparentAddress),
                         address: transparentAddress,
-                        actionAddress: store.transparentAddress,
-                        isShielded: false,
-                        canCopy: false
+                        isShielded: false
                     )
                 )
             }
@@ -194,11 +183,8 @@ struct ReceiveView: View {
                 AddressSegment(
                     focus: .tAddress,
                     label: String(localizable: .zappPayTransparent),
-                    title: String(localizable: .accountsZashiTransparentAddress),
                     address: store.transparentAddress,
-                    actionAddress: store.transparentAddress,
-                    isShielded: false,
-                    canCopy: false
+                    isShielded: false
                 )
             )
 
@@ -208,11 +194,8 @@ struct ReceiveView: View {
                     AddressSegment(
                         focus: .saplingAddress,
                         label: String(localizable: .receiveSaplingAddress),
-                        title: String(localizable: .receiveSaplingAddress),
                         address: store.saplingAddress,
-                        actionAddress: store.saplingAddress,
-                        isShielded: true,
-                        canCopy: true
+                        isShielded: true
                     )
                 )
             }
@@ -234,7 +217,7 @@ struct ReceiveView: View {
 
     private func copyIconButton(_ segment: AddressSegment) -> some View {
         Button {
-            store.send(.copyToPastboard(segment.actionAddress.redacted))
+            store.send(.copyToPastboard(segment.address.redacted))
             withAnimation(ZappMotion.content) { copyConfirmed = true }
             Task {
                 try? await Task.sleep(nanoseconds: UInt64(Constants.copyConfirmDuration * 1_000_000_000))
@@ -258,216 +241,6 @@ struct ReceiveView: View {
         }
         .buttonStyle(.zappPress)
         .accessibilityLabel(String(localizable: .receiveCopy))
-    }
-
-    private func addressPanel(_ segment: AddressSegment) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._md) {
-            HStack(spacing: Design.Spacing._md) {
-                ZappSectionLabel(text: segment.title)
-
-                Spacer(minLength: 0)
-
-                Button {
-                    store.send(.infoTapped(segment.isShielded))
-                    explainer = true
-                } label: {
-                    Asset.Assets.infoCircle.image
-                        .zImage(
-                            width: Constants.infoIconSize,
-                            height: Constants.infoIconSize,
-                            style: ZappColors.textMuted
-                        )
-                        .frame(width: Constants.infoBox, height: Constants.infoBox)
-                        .background(ZappColors.surfaceAlt.color(colorScheme))
-                }
-                .buttonStyle(.zappPress)
-            }
-
-            Text(segment.address)
-                .zappFont(.mono, style: ZappColors.text)
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(Design.Spacing._lg)
-                .background(ZappColors.surfaceInput.color(colorScheme))
-        }
-    }
-
-    private func actionRow(_ segment: AddressSegment) -> some View {
-        HStack(spacing: Design.Spacing._md) {
-            if segment.canCopy {
-                copyAction(segment)
-            }
-
-            actionButton(
-                title: String(localizable: .receiveQrCode),
-                icon: Asset.Assets.Icons.qr.image
-            ) {
-                store.send(.addressDetailsRequest(segment.actionAddress.redacted, segment.isShielded))
-            }
-
-            actionButton(
-                title: String(localizable: .receiveRequest),
-                icon: Asset.Assets.Icons.coinsHand.image
-            ) {
-                store.send(.requestTapped(segment.actionAddress.redacted, segment.isShielded))
-            }
-        }
-    }
-
-    private func copyAction(_ segment: AddressSegment) -> some View {
-        actionButton(
-            title: copyConfirmed
-                ? String(localizable: .newChatCopied)
-                : String(localizable: .receiveCopy),
-            icon: copyConfirmed
-                ? Asset.Assets.Icons.checkSolid.image
-                : Asset.Assets.copy.image,
-            tint: copyConfirmed ? .success : .text
-        ) {
-            store.send(.copyToPastboard(segment.actionAddress.redacted))
-
-            withAnimation(ZappMotion.content) {
-                copyConfirmed = true
-            }
-
-            Task {
-                try? await Task.sleep(nanoseconds: UInt64(Constants.copyConfirmDuration * 1_000_000_000))
-
-                withAnimation(ZappMotion.content) {
-                    copyConfirmed = false
-                }
-            }
-        }
-    }
-
-    private func actionButton(
-        title: String,
-        icon: Image,
-        tint: ZappColors = .text,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            VStack(spacing: Design.Spacing._sm) {
-                icon
-                    .zImage(
-                        width: Constants.actionIconSize,
-                        height: Constants.actionIconSize,
-                        style: tint
-                    )
-
-                Text(title)
-                    .zappFont(.buttonSmall, style: tint)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
-            .padding(Design.Spacing._md)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: Constants.actionMinHeight)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.zappPress)
-        .accessibilityLabel(title)
-    }
-
-    private var privacyWarning: some View {
-        VStack(spacing: Design.Spacing._md) {
-            Asset.Assets.shieldTick.image
-                .zImage(
-                    width: Constants.warningIconSize,
-                    height: Constants.warningIconSize,
-                    style: ZappColors.textSubtle
-                )
-
-            Text(localizable: .receiveWarning)
-                .zappFont(.caption, style: ZappColors.textSubtle)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.horizontal, Design.Spacing._6xl)
-        .padding(.bottom, Design.Spacing._2xl)
-    }
-
-    @ViewBuilder private func explainerContent() -> some View {
-        VStack(spacing: 0) {
-            if store.isExplainerForShielded {
-                explainerBody(
-                    icon: Asset.Assets.Icons.shieldTickFilled.image,
-                    title: String(localizable: .receiveHelpShieldedTitle),
-                    points: [
-                        String(localizable: .receiveHelpShieldedDesc1),
-                        String(localizable: .receiveHelpShieldedDesc2),
-                        String(localizable: .receiveHelpShieldedDesc3),
-                        String(localizable: .receiveHelpShieldedDesc4)
-                    ],
-                    isShielded: true
-                )
-            } else {
-                explainerBody(
-                    icon: Asset.Assets.Icons.shieldOff.image,
-                    title: String(localizable: .receiveHelpTransparentTitle),
-                    points: [
-                        String(localizable: .receiveHelpTransparentDesc1),
-                        String(localizable: .receiveHelpTransparentDesc2),
-                        String(localizable: .receiveHelpTransparentDesc3),
-                        String(localizable: .receiveHelpTransparentDesc4)
-                    ],
-                    isShielded: false
-                )
-            }
-        }
-    }
-
-    private func explainerBody(
-        icon: Image,
-        title: String,
-        points: [String],
-        isShielded: Bool
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            icon
-                .zImage(width: 20, height: 20, style: ZappColors.text)
-                .frame(width: 44, height: 44)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
-                .padding(.top, Design.Spacing._3xl)
-                .padding(.bottom, Design.Spacing._lg)
-
-            Text(title)
-                .zappFont(.sectionTitle, style: ZappColors.text)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, Design.Spacing._lg)
-
-            ForEach(points, id: \.self) { point in
-                infoContent(text: point)
-                    .padding(.bottom, Design.Spacing._lg)
-            }
-
-            ZappButton(title: String(localizable: .generalOk)) {
-                store.send(.infoTapped(isShielded))
-                explainer = false
-            }
-            .padding(.top, Design.Spacing._2xl)
-            .padding(.bottom, Design.Spacing.sheetBottomSpace)
-        }
-    }
-
-    @ViewBuilder private func infoContent(text: String) -> some View {
-        HStack(alignment: .top, spacing: Design.Spacing._md) {
-            Rectangle()
-                .fill(ZappColors.textSubtle.color(colorScheme))
-                .frame(width: 4, height: 4)
-                .padding(.top, Design.Spacing._md)
-
-            if let attrText = try? AttributedString(
-                markdown: text,
-                including: \.zashiApp
-            ) {
-                ZashiText(withAttributedString: attrText, colorScheme: colorScheme)
-                    .zappFont(.body, style: ZappColors.textMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
     }
 }
 

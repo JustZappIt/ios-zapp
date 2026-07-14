@@ -21,7 +21,7 @@ struct ZappComponentGallery: View {
 
                 section("FAB + CHIPS") {
                     HStack(spacing: Design.Spacing._lg) {
-                        ZappFab(icon: Asset.Assets.Icons.plus.image, contentDescription: "New") { }
+                        ZappFab(icon: Asset.Assets.Icons.plus.image, accessibilityLabel: "New") { }
 
                         VStack(alignment: .leading, spacing: Design.Spacing._sm) {
                             ZappStatusChip(text: "Muted")
@@ -33,8 +33,12 @@ struct ZappComponentGallery: View {
 
                 section("TOGGLE") {
                     HStack(spacing: Design.Spacing._lg) {
-                        ZappToggle(isOn: isToggleOn) { isToggleOn.toggle() }
-                        ZappToggle(isOn: !isToggleOn) { isToggleOn.toggle() }
+                        ZappToggle(isOn: isToggleOn, accessibilityLabel: "Example toggle") {
+                            isToggleOn.toggle()
+                        }
+                        ZappToggle(isOn: !isToggleOn, accessibilityLabel: "Inverse example toggle") {
+                            isToggleOn.toggle()
+                        }
 
                         Text(isToggleOn ? "On / Off" : "Off / On")
                             .zappFont(.body, style: ZappColors.textMuted)

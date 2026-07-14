@@ -9,12 +9,13 @@
 import SwiftUI
 
 struct ZappSpeedDialAction: Identifiable {
-    let id = UUID()
+    let id: String
     let icon: Image
     let label: String
     let action: () -> Void
 
-    init(icon: Image, label: String, action: @escaping () -> Void) {
+    init(id: String? = nil, icon: Image, label: String, action: @escaping () -> Void) {
+        self.id = id ?? label
         self.icon = icon
         self.label = label
         self.action = action
@@ -75,7 +76,7 @@ struct ZappSpeedDialFab: View {
                 .padding(.vertical, Constants.labelVerticalPadding)
                 .background(ZappColors.surface.color(colorScheme))
 
-            ZappFab(icon: action.icon, contentDescription: action.label) {
+            ZappFab(icon: action.icon, accessibilityLabel: action.label) {
                 // Collapse BEFORE firing: the action pushes a screen, and a speed dial
                 // left open behind it reappears expanded when the user comes back.
                 collapse()

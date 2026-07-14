@@ -6,6 +6,23 @@
 import SwiftUI
 
 struct ZappToggle: View {
+    let isOn: Bool
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ZappToggleIndicator(isOn: isOn)
+                .frame(minWidth: 44, minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(toggleAccessibilityValue(isOn))
+        .accessibilityAddTraits(isOn ? [.isSelected] : [])
+    }
+}
+
+struct ZappToggleIndicator: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private enum Constants {
@@ -16,30 +33,30 @@ struct ZappToggle: View {
     }
 
     let isOn: Bool
-    let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            Rectangle()
-                .fill((isOn ? ZappColors.accent : ZappColors.borderStrong).color(colorScheme))
-                .frame(width: Constants.width, height: Constants.height)
-                .overlay(alignment: isOn ? .trailing : .leading) {
-                    Rectangle()
-                        .fill(.white)
-                        .frame(width: Constants.knobSize, height: Constants.knobSize)
-                        .padding(.horizontal, Constants.knobInset)
-                }
-                .animation(ZappMotion.state, value: isOn)
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isOn ? [.isSelected] : [])
+        Rectangle()
+            .fill((isOn ? ZappColors.accent : ZappColors.borderStrong).color(colorScheme))
+            .frame(width: Constants.width, height: Constants.height)
+            .overlay(alignment: isOn ? .trailing : .leading) {
+                Rectangle()
+                    .fill(.white)
+                    .frame(width: Constants.knobSize, height: Constants.knobSize)
+                    .padding(.horizontal, Constants.knobInset)
+            }
+            .animation(ZappMotion.state, value: isOn)
+            .accessibilityHidden(true)
     }
+}
+
+func toggleAccessibilityValue(_ isOn: Bool) -> String {
+    String(localizable: isOn ? .zappToggleOn : .zappToggleOff)
 }
 
 #Preview {
     VStack(spacing: 12) {
-        ZappToggle(isOn: true) { }
-        ZappToggle(isOn: false) { }
+        ZappToggle(isOn: true, accessibilityLabel: "Read receipts") { }
+        ZappToggle(isOn: false, accessibilityLabel: "Online status") { }
     }
     .applyScreenBackground()
 }

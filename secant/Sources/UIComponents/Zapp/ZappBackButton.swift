@@ -13,6 +13,7 @@ struct ZappBackButton: View {
     }
 
     var tint: ZappColors = .text
+    var isEnabled = true
     let action: () -> Void
 
     var body: some View {
@@ -22,6 +23,7 @@ struct ZappBackButton: View {
                 .frame(width: Constants.touchTarget, height: Constants.touchTarget)
         }
         .buttonStyle(.zappPress)
+        .disabled(!isEnabled)
         .accessibilityLabel(String(localizable: .generalBack))
         .accessibilityIdentifier(AccessibilityID.Navigation.back)
     }

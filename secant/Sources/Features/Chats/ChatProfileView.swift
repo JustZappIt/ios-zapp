@@ -12,41 +12,14 @@ struct ChatProfileView: View {
 
     @Perception.Bindable var store: StoreOf<ChatProfile>
 
-    private let isYouRoot: Bool
-    private let onBack: () -> Void
-    private let onSettings: (() -> Void)?
-
-    /// Pushed presentation retained for any existing deep link or settings route.
     init(store: StoreOf<ChatProfile>) {
         self.store = store
-        self.isYouRoot = false
-        self.onBack = { store.send(.backToHomeTapped) }
-        self.onSettings = nil
-    }
-
-    /// Android's profile-first You tab: no duplicate title, no floating nav pill,
-    /// and a bottom dock that returns to the previous tab or opens Settings.
-    init(
-        store: StoreOf<ChatProfile>,
-        onBack: @escaping () -> Void,
-        onSettings: @escaping () -> Void
-    ) {
-        self.store = store
-        self.isYouRoot = true
-        self.onBack = onBack
-        self.onSettings = onSettings
     }
 
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                if !isYouRoot {
-                    ZappScreenHeader(title: String(localizable: .chatProfileTitle)) {
-                        ZappBackButton(action: onBack)
-                    } right: {
-                        EmptyView()
-                    }
-                }
+                ZappScreenHeader(title: String(localizable: .chatProfileTitle))
 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -69,18 +42,7 @@ struct ChatProfileView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                if isYouRoot, let onSettings {
-                    ZappBottomActionBar(onBack: onBack) {
-                        ZappButton(
-                            title: String(localizable: .settingsTitle),
-                            variant: .secondary,
-                            leadingIcon: Asset.Assets.Icons.settings.image,
-                            action: onSettings
-                        )
-                    }
-                }
-            }
+            .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
         }
@@ -161,7 +123,7 @@ struct ChatProfileView: View {
     }
 
     private var displayNameGroup: some View {
-        ChatProfileGroup(title: String(localizable: .chatProfileDisplayName)) {
+        ZappSettingsGroup(title: String(localizable: .chatProfileDisplayName)) {
             VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 TextField(
                     String(localizable: .chatProfileDisplayName),
@@ -193,7 +155,7 @@ struct ChatProfileView: View {
                     store.send(.saveTapped)
                 }
             }
-            .padding(ChatProfileGroupConstants.contentPadding)
+            .padding(Constants.contentPadding)
         }
     }
 
@@ -207,6 +169,7 @@ private extension ChatProfileView {
         static let publicKeyLineLimit = 3
         static let screenInset: CGFloat = 18
         static let touchTarget: CGFloat = 48
+        static let contentPadding: CGFloat = 18
     }
 }
 
@@ -248,41 +211,6 @@ private struct ChatIdentityQRCode: View {
     }
 }
 
-private struct ChatProfileGroup<Content: View>: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let title: String
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ZappGroupHeader(text: title)
-
-            VStack(spacing: 0) {
-                content
-            }
-            .background(ZappColors.surface.color(colorScheme))
-            .overlay(
-                Rectangle()
-                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-            )
-            .padding(.horizontal, ChatProfileGroupConstants.horizontalInset)
-
-            Spacer()
-                .frame(height: Design.Spacing._md)
-        }
-    }
-}
-
-private enum ChatProfileGroupConstants {
-    static let contentPadding: CGFloat = 18
-    static let horizontalInset: CGFloat = 14
-}
-
 #Preview {
-    ChatProfileView(
-        store: ChatProfile.initial,
-        onBack: { },
-        onSettings: { }
-    )
+    ChatProfileView(store: ChatProfile.initial)
 }
