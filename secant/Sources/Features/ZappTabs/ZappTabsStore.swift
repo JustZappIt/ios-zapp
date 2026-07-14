@@ -46,6 +46,7 @@ struct ZappTabs {
         // *Tapped actions are. The You tab stays navigation-agnostic.
         case allSettingsTapped
         case chatContactsTapped
+        case chatProfileTapped
         case chooseServerTapped
         case localCurrencyTapped
         case torTapped
@@ -64,7 +65,8 @@ struct ZappTabs {
                 state.hideNavPill = isFullscreen
                 return .none
 
-            case .allSettingsTapped, .chatContactsTapped, .chooseServerTapped, .localCurrencyTapped, .torTapped:
+            case .allSettingsTapped, .chatContactsTapped, .chatProfileTapped, .chooseServerTapped,
+            .localCurrencyTapped, .torTapped:
                 return .none
             }
         }
