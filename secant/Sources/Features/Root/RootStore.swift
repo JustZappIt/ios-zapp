@@ -544,8 +544,10 @@ struct Root {
                     .cancel(id: state.DidFinishLaunchingId)
                 )
 
-            case .onboarding(.newWalletSuccessfulyCreated):
-                return .send(.initialization(.initializeSDK(.newWallet)))
+            case let .onboarding(.walletProvisioned(mode)):
+                return .send(
+                    .initialization(.initializeSDK(mode == .restored ? .restoreWallet : .newWallet))
+                )
 
             case .refreshAutomaticServer:
                 // Skip during a background task, and while the user is on the Server Setup

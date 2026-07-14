@@ -13,13 +13,27 @@ import ComposableArchitecture
 
 @Reducer
 struct RestoreWalletCoordFlow {
+    enum LandingStep: Equatable {
+        case welcome
+        case walletIntro
+        case walletChoice
+        case creatingWallet
+    }
+
+    enum WalletProvisioningMode: Equatable {
+        case created
+        case restored
+    }
+
     @Reducer
     enum Path {
         case chatUsername(ChatUsernameEntry)
         case estimateBirthdaysDate(WalletBirthday)
         case estimatedBirthday(WalletBirthday)
+        case identityDerivation(OnboardingIdentityDerivation)
         case recoverySeedPhraseEntry(RestoreWalletCoordFlow)
         case restoreInfo(RestoreInfo)
+        case seedBackup(OnboardingSeedBackup)
         case walletBirthday(WalletBirthday)
     }
     
@@ -32,6 +46,8 @@ struct RestoreWalletCoordFlow {
         var isValidSeed = false
         var isTorOn = false
         var isTorSheetPresented = false
+        var landingStep = LandingStep.welcome
+        var walletCreationError: String?
         var nextIndex: Int?
         var path = StackState<Path.State>()
         var prevWords: [String] = Array(repeating: "", count: 24)
@@ -59,6 +75,9 @@ struct RestoreWalletCoordFlow {
         case evaluateSeedValidity
         case failedToRecover(ZcashError)
         case helpSheetRequested
+        case landingBackTapped
+        case landingContinueTapped
+        case landingGetStartedTapped
         case nextTapped
         case path(StackActionOf<Path>)
         case resolveRestore
@@ -70,6 +89,7 @@ struct RestoreWalletCoordFlow {
         case suggestedWordTapped(String)
         case suggestionsRequested(Int, Bool)
         case updateKeyboardFlag(Bool)
+        case walletProvisioned(WalletProvisioningMode)
         #if DEBUG
         case debugPasteSeed
         #endif
@@ -77,12 +97,16 @@ struct RestoreWalletCoordFlow {
         // Onboarding
         case createNewWalletTapped
         case createNewWalletRequested
+        case createNewWalletRetryTapped
+        case createNewWalletFailed(ZcashError)
         case dismissDestination
         case importExistingWallet
-        case newWalletSuccessfulyCreated
+        case newWalletPersisted
+        case newWalletSuccessfullyCreated
     }
 
     @Dependency(\.mnemonic) var mnemonic
+    @Dependency(\.continuousClock) var continuousClock
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.walletStorage) var walletStorage
@@ -210,6 +234,153 @@ struct RestoreWalletCoordFlow {
     }
 }
 
+@Reducer
+struct OnboardingIdentityDerivation {
+    @ObservableState
+    struct State: Equatable {
+        var hasReportedReady = false
+        var messagingCancelId = UUID()
+        var messagingState = ZappMessagingState(phase: .initializing)
+
+        var errorCode: String? {
+            if case let .failed(code) = messagingState.phase {
+                return code
+            }
+            return messagingState.identityErrorCode
+        }
+
+        static let initial = State()
+    }
+
+    enum Action: Equatable {
+        case identityReady
+        case messagingStateChanged(ZappMessagingState)
+        case onAppear
+        case onDisappear
+        case retryTapped
+    }
+
+    @Dependency(\.mainQueue) var mainQueue
+    @Dependency(\.zappMessaging) var zappMessaging
+
+    var body: some Reducer<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .onAppear:
+                return .merge(
+                    .send(.messagingStateChanged(zappMessaging.latestState())),
+                    .publisher {
+                        zappMessaging.stateStream()
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
+                            .map(Action.messagingStateChanged)
+                    }
+                    .cancellable(id: state.messagingCancelId, cancelInFlight: true)
+                )
+
+            case .onDisappear:
+                return .cancel(id: state.messagingCancelId)
+
+            case let .messagingStateChanged(messagingState):
+                state.messagingState = messagingState
+                guard
+                    !state.hasReportedReady,
+                    messagingState.phase == .ready,
+                    messagingState.identity != nil
+                else {
+                    return .none
+                }
+                state.hasReportedReady = true
+                return .send(.identityReady)
+
+            case .identityReady:
+                return .none
+
+            case .retryTapped:
+                zappMessaging.retryIdentityDerivation()
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct OnboardingSeedBackup {
+    @ObservableState
+    struct State: Equatable {
+        var errorMessage: String?
+        var isConfirmed = false
+        var isLoading = false
+        var isRevealed = false
+        var words: [RedactableString] = []
+
+        static let initial = State()
+    }
+
+    enum Action: Equatable {
+        case confirmationTapped
+        case continueTapped
+        case hideSensitiveContent
+        case revealTapped
+        case seedLoadFailed(ZcashError)
+        case seedLoaded([RedactableString])
+    }
+
+    @Dependency(\.walletStorage) var walletStorage
+
+    var body: some Reducer<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .confirmationTapped:
+                guard state.isRevealed else { return .none }
+                state.isConfirmed.toggle()
+                return .none
+
+            case .continueTapped:
+                guard state.isRevealed, state.isConfirmed else { return .none }
+                state.words.removeAll(keepingCapacity: false)
+                state.isRevealed = false
+                state.isConfirmed = false
+                return .none
+
+            case .hideSensitiveContent:
+                state.words.removeAll(keepingCapacity: false)
+                state.isRevealed = false
+                state.isConfirmed = false
+                state.isLoading = false
+                return .none
+
+            case .revealTapped:
+                state.errorMessage = nil
+                state.isLoading = true
+                return .run { send in
+                    do {
+                        let storedWallet = try walletStorage.exportWallet()
+                        let words = storedWallet.seedPhrase.value()
+                            .split(separator: " ")
+                            .map { RedactableString(String($0)) }
+                        await send(.seedLoaded(words))
+                    } catch {
+                        await send(.seedLoadFailed(error.toZcashError()))
+                    }
+                }
+
+            case let .seedLoadFailed(error):
+                state.errorMessage = error.detailedMessage
+                state.isLoading = false
+                state.isRevealed = false
+                state.words.removeAll(keepingCapacity: false)
+                return .none
+
+            case let .seedLoaded(words):
+                state.words = words
+                state.isLoading = false
+                state.isRevealed = true
+                return .none
+            }
+        }
+    }
+}
+
 // MARK: Alerts
 
 extension AlertState where Action == RestoreWalletCoordFlow.Action {
@@ -218,6 +389,14 @@ extension AlertState where Action == RestoreWalletCoordFlow.Action {
             TextState(String(localizable: .rootInitializationAlertFailedTitle))
         } message: {
             TextState(String(localizable: .rootInitializationAlertCantCreateNewWalletMessage(error.detailedMessage)))
+        }
+    }
+
+    static func cantMarkPhraseBackedUp(_ error: ZcashError) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .rootInitializationAlertFailedTitle))
+        } message: {
+            TextState(String(localizable: .onboardingSeedConfirmationFailed(error.detailedMessage)))
         }
     }
 }

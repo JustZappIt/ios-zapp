@@ -11281,6 +11281,620 @@
         }
       }
     },
+    "onboarding.creatingWallet.failed": {
+      "comment": "MARK: - Zapp Onboarding",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn’t create your wallet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No pudimos crear tu billetera."
+          }
+        }
+      }
+    },
+    "onboarding.creatingWallet.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hold on a moment —\nwe’re encrypting your new wallet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un momento —\nestamos cifrando tu nueva billetera."
+          }
+        }
+      }
+    },
+    "onboarding.continue": {
+      "comment": "MARK: - Zapp Onboarding",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuar"
+          }
+        }
+      }
+    },
+    "onboarding.identityDeriving.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn’t create your messaging identity."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No pudimos crear tu identidad de mensajería."
+          }
+        }
+      }
+    },
+    "onboarding.identityDeriving.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating your encrypted\nmessaging identity…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creando tu identidad de\nmensajería cifrada…"
+          }
+        }
+      }
+    },
+    "onboarding.loading.greeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hey."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hola."
+          }
+        }
+      }
+    },
+    "onboarding.loading.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar"
+          }
+        }
+      }
+    },
+    "onboarding.progressAccessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onboarding progress: part 1 of 3"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progreso de configuración: parte 1 de 3"
+          }
+        }
+      }
+    },
+    "onboarding.seed.confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I’ve written all 24 words in order. I understand this phrase cannot be recovered if lost."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "He escrito las 24 palabras en orden. Entiendo que esta frase no se puede recuperar si se pierde."
+          }
+        }
+      }
+    },
+    "onboarding.seed.confirmationFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn’t record your backup confirmation. Please reveal and confirm the phrase again. %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No pudimos registrar la confirmación de tu respaldo. Revela y confirma la frase de nuevo. %@"
+          }
+        }
+      }
+    },
+    "onboarding.seed.hiddenWordAccessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden recovery word"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palabra de recuperación oculta"
+          }
+        }
+      }
+    },
+    "onboarding.seed.revealRetry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t load phrase · Tap to retry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo cargar · Toca para reintentar"
+          }
+        }
+      }
+    },
+    "onboarding.seed.savedButton": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I’ve saved it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya la guardé"
+          }
+        }
+      }
+    },
+    "onboarding.seed.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These 24 words restore both your wallet funds and your messaging identity. Back them up offline — they cover everything."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estas 24 palabras restauran los fondos de tu billetera y tu identidad de mensajería. Respáldalas fuera de línea — lo cubren todo."
+          }
+        }
+      }
+    },
+    "onboarding.seed.tapToReveal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to reveal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca para revelar"
+          }
+        }
+      }
+    },
+    "onboarding.seed.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wallet &\nmessaging phrase"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase de billetera\ny mensajería"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Part 1 · Wallet & Messaging"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parte 1 · Billetera y mensajería"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.create": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create new wallet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crear nueva billetera"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.createSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New wallet + fresh messaging identity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Billetera nueva + identidad de mensajería nueva"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore from phrase"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar desde frase"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.restoreSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restores wallet and derives your messaging ID from it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaura la billetera y deriva tu ID de mensajería de ella"
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your wallet seed also creates your messaging identity. One backup for everything."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La semilla de tu billetera también crea tu identidad de mensajería. Un solo respaldo para todo."
+          }
+        }
+      }
+    },
+    "onboarding.walletChoice.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up\nyour wallet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura\ntu billetera"
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Part 1 of 3 · Wallet & Messaging"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parte 1 de 3 · Billetera y mensajería"
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.createSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your choice here also sets your messaging identity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu elección aquí también define tu identidad de mensajería"
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.createTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create or restore a wallet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crea o restaura una billetera"
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.phraseSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "24 BIP-39 words restore your funds and messaging identity — back them up offline."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "24 palabras BIP-39 restauran tus fondos y tu identidad de mensajería — respáldalas fuera de línea."
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.phraseTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One phrase for everything"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una frase para todo"
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your wallet’s 24-word recovery phrase also seeds your messaging identity — one phrase covers both."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La frase de recuperación de 24 palabras de tu billetera también genera tu identidad de mensajería — una sola frase cubre ambas."
+          }
+        }
+      }
+    },
+    "onboarding.walletIntro.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wallet &\nmessaging\nsetup"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura tu\nbilletera y\nmensajería"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End-to-end encrypted messaging with a shielded Zcash wallet built in."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensajería cifrada de extremo a extremo con una billetera Zcash blindada integrada."
+          }
+        }
+      }
+    },
+    "onboarding.welcome.getStarted": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get started"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comenzar"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.heroLine1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your messages\nand money."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus mensajes\ny tu dinero."
+          }
+        }
+      }
+    },
+    "onboarding.welcome.heroLine2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encrypted."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cifrados."
+          }
+        }
+      }
+    },
+    "onboarding.welcome.restore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I already use Zapp"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya uso Zapp"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.terms": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By continuing you accept our terms & privacy policy."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al continuar aceptas nuestros términos y política de privacidad."
+          }
+        }
+      }
+    },
     "partners.flexa.keystoneNotSupportedMessage": {
       "extractionState": "manual",
       "localizations": {

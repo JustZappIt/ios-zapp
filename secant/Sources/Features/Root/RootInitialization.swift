@@ -720,7 +720,7 @@ extension Root {
                 state.alert = AlertState.wipeFailed(Int32.max)
                 return .cancel(id: state.SynchronizerCancelId)
 
-            case .phraseDisplay(.finishedTapped), .onboarding(.newWalletSuccessfulyCreated):
+            case .phraseDisplay(.finishedTapped), .onboarding(.newWalletSuccessfullyCreated):
                 state.destinationState.destination = .home
                 return .none
 

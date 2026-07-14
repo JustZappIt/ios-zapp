@@ -16,6 +16,28 @@ extension RestoreWalletCoordFlow {
 
             case .dismissDestination:
                 state.path.removeAll()
+                state.landingStep = .welcome
+                return .none
+
+            case .landingGetStartedTapped:
+                state.landingStep = .walletIntro
+                return .none
+
+            case .landingContinueTapped:
+                state.landingStep = .walletChoice
+                return .none
+
+            case .landingBackTapped:
+                switch state.landingStep {
+                case .welcome:
+                    return .none
+                case .walletIntro:
+                    state.landingStep = .welcome
+                case .walletChoice:
+                    state.landingStep = .walletIntro
+                case .creatingWallet:
+                    return .none
+                }
                 return .none
                 
             case .restoreCancelTapped:
@@ -23,22 +45,20 @@ extension RestoreWalletCoordFlow {
                 return .none
 
             case .createNewWalletRequested:
-                do {
-                    // get the random english mnemonic
-                    let newRandomPhrase = try mnemonic.randomMnemonic()
-                    let birthday = zcashSDKEnvironment.latestCheckpoint()
-                    
-                    // store the wallet to the keychain
-                    try walletStorage.importWallet(newRandomPhrase, birthday, .english, false)
+                state.landingStep = .creatingWallet
+                state.walletCreationError = nil
+                return createWalletEffect()
 
-                    // Wallet first, then the name: the chat identity derives from
-                    // the seed we just stored. The name is queued and derives once
-                    // the worklet boots, so this step does not block on it.
-                    state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
-                    return .none
-                } catch {
-                    state.alert = AlertState.cantCreateNewWallet(error.toZcashError())
-                }
+            case .createNewWalletRetryTapped:
+                state.walletCreationError = nil
+                return createWalletEffect()
+
+            case let .createNewWalletFailed(error):
+                state.walletCreationError = error.detailedMessage
+                return .none
+
+            case .newWalletPersisted:
+                state.path.append(.seedBackup(.initial))
                 return .none
 
             case .importExistingWallet:
@@ -66,7 +86,7 @@ extension RestoreWalletCoordFlow {
                     try walletStorage.markUserPassedPhraseBackupTest(true)
 
                     state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
-                    return .none
+                    return .send(.walletProvisioned(.restored))
                 } catch {
                     return .send(.failedToRecover(error.toZcashError()))
                 }
@@ -83,12 +103,25 @@ extension RestoreWalletCoordFlow {
                 // MARK: Recovery Seed Phrase Entry
                 
             case .path(.element(id: _, action: .chatUsername(.continueTapped))):
+                state.path.append(.identityDerivation(.initial))
+                return .none
+
+            case .path(.element(id: _, action: .seedBackup(.continueTapped))):
+                do {
+                    try walletStorage.markUserPassedPhraseBackupTest(true)
+                } catch {
+                    state.alert = .cantMarkPhraseBackedUp(error.toZcashError())
+                    return .none
+                }
+                state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                return .send(.walletProvisioned(.created))
+
+            case .path(.element(id: _, action: .identityDerivation(.identityReady))):
                 if state.isImportingWallet {
                     state.path.append(.restoreInfo(RestoreInfo.State.initial))
                     return .send(.successfullyRecovered)
-                } else {
-                    return .send(.newWalletSuccessfulyCreated)
                 }
+                return .send(.newWalletSuccessfullyCreated)
 
             case .path(.element(id: _, action: .recoverySeedPhraseEntry(.nextTapped))):
                 for element in state.path {
@@ -145,6 +178,25 @@ extension RestoreWalletCoordFlow {
                 return .none
 
             default: return .none
+            }
+        }
+    }
+
+    private func createWalletEffect() -> Effect<Action> {
+        .run { send in
+            // Give SwiftUI a render pass so the loading state is visible before
+            // seed generation and encrypted persistence begin.
+            await Task.yield()
+            do {
+                let newRandomPhrase = try mnemonic.randomMnemonic()
+                let birthday = zcashSDKEnvironment.latestCheckpoint()
+                try walletStorage.importWallet(newRandomPhrase, birthday, .english, false)
+                // The operation can be faster than one frame on modern devices. Keep
+                // the explicit progress state legible instead of flashing through it.
+                try? await continuousClock.sleep(for: .milliseconds(900))
+                await send(.newWalletPersisted)
+            } catch {
+                await send(.createNewWalletFailed(error.toZcashError()))
             }
         }
     }
