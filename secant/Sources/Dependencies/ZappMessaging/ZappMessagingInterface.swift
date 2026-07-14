@@ -51,7 +51,30 @@ struct ZappMessagingState: Equatable, Sendable {
 
     var totalUnreadCount = 0
 
+    /// Per-conversation unread. Counted app-side: the core never sends an
+    /// `unreadCount` and `ZMConversation` carries no such field.
+    var unreadCounts: [String: Int] = [:]
+
+    /// Conversations with a peer currently online. Keyed by CONVERSATION id, not by
+    /// peer key — the core truncates `peerId` to 12 chars, so it is not comparable
+    /// to a public key and cannot identify who is online, only that someone is.
+    var onlineConversationIds: Set<String> = []
+
+    /// The worklet defaults read receipts ON at identity create/restore, before the
+    /// app's preferences have loaded. The app re-asserts the user's real setting the
+    /// moment identity lands, or a receipts-off user leaks receipts on every cold start.
+    var readReceiptsEnabled = true
+    var presenceVisible = true
+
     var isReady: Bool { phase == .ready }
+
+    func unreadCount(for conversationId: String) -> Int {
+        unreadCounts[conversationId] ?? 0
+    }
+
+    func isPeerOnline(in conversationId: String) -> Bool {
+        onlineConversationIds.contains(conversationId)
+    }
 }
 
 @DependencyClient
@@ -103,11 +126,57 @@ struct ZappMessagingClient {
         _ displayName: String?
     ) async throws -> ZMConversation
 
+    // MARK: Groups
+
+    var createGroup: @Sendable (
+        _ name: String,
+        _ participantKeys: [String]
+    ) async throws -> ZMConversation
+
+    var renameGroup: @Sendable (_ conversationId: String, _ name: String) async throws -> Void
+    var addMember: @Sendable (_ conversationId: String, _ publicKey: String, _ displayName: String?) async throws -> Void
+    var leaveConversation: @Sendable (_ conversationId: String) async throws -> Void
+    var removeConversation: @Sendable (_ conversationId: String) async throws -> Void
+
     // MARK: Messages
 
     var messages: @Sendable (_ conversationId: String, _ limit: Int) async throws -> [ZMMessage] = { _, _ in [] }
-    var sendMessage: @Sendable (_ conversationId: String, _ content: String) async throws -> ZMMessage
+
+    var sendMessage: @Sendable (
+        _ conversationId: String,
+        _ content: String,
+        _ replyTo: ZMReplyContext?
+    ) async throws -> ZMMessage
+
+    var sendMedia: @Sendable (
+        _ conversationId: String,
+        _ mediaPath: String,
+        _ contentType: String,
+        _ caption: String,
+        _ thumbnailData: String?
+    ) async throws -> ZMMessage
+
     var markRead: @Sendable (_ conversationId: String) async throws -> Void
+
+    /// Delivery-state changes for messages already on screen (queued -> sent -> read).
+    var messageStatusStream: @Sendable () -> AnyPublisher<(messageId: String, conversationId: String, status: String), Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
+    /// (mediaId, 0...1). Fires for both directions.
+    var mediaProgressStream: @Sendable () -> AnyPublisher<(mediaId: String, progress: Double), Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
+    /// (mediaId, localPath) — an inbound transfer landed on disk.
+    var mediaCompleteStream: @Sendable () -> AnyPublisher<(mediaId: String, filePath: String), Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
+    // MARK: Privacy toggles
+
+    var setReadReceiptsEnabled: @Sendable (Bool) async throws -> Void
+    var setPresenceVisible: @Sendable (Bool) async throws -> Void
 
     /// Fires for every inbound message, on every tab. Root subscribes so unread
     /// counts accrue while the user is elsewhere in the app.

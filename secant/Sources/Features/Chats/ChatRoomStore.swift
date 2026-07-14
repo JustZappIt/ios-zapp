@@ -136,7 +136,7 @@ struct ChatRoom {
                 let conversationId = state.conversationId
 
                 return .run { send in
-                    let message = try await zappMessaging.sendMessage(conversationId, content)
+                    let message = try await zappMessaging.sendMessage(conversationId, content, nil)
                     await send(.messageReceived(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send message: \(error)")

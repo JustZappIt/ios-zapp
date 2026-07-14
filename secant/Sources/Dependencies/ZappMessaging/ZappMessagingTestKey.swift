@@ -31,8 +31,15 @@ extension ZappMessagingClient: TestDependencyKey {
                 displayName: displayName ?? String(publicKey.prefix(8))
             )
         },
+        createGroup: { name, participantKeys in
+            ZMConversation(id: name, type: .group, participantIds: participantKeys, displayName: name)
+        },
+        renameGroup: { _, _ in },
+        addMember: { _, _, _ in },
+        leaveConversation: { _ in },
+        removeConversation: { _ in },
         messages: { _, _ in [] },
-        sendMessage: { conversationId, content in
+        sendMessage: { conversationId, content, _ in
             ZMMessage(
                 id: UUID().uuidString,
                 conversationId: conversationId,
@@ -41,7 +48,22 @@ extension ZappMessagingClient: TestDependencyKey {
                 isFromMe: true
             )
         },
+        sendMedia: { conversationId, _, contentType, caption, _ in
+            ZMMessage(
+                id: UUID().uuidString,
+                conversationId: conversationId,
+                senderId: "test",
+                content: caption,
+                contentType: contentType,
+                isFromMe: true
+            )
+        },
         markRead: { _ in },
+        messageStatusStream: { Empty().eraseToAnyPublisher() },
+        mediaProgressStream: { Empty().eraseToAnyPublisher() },
+        mediaCompleteStream: { Empty().eraseToAnyPublisher() },
+        setReadReceiptsEnabled: { _ in },
+        setPresenceVisible: { _ in },
         messageReceivedStream: { Empty().eraseToAnyPublisher() },
         setActiveConversation: { _ in },
         setBlockedKeys: { _ in }

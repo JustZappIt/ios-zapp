@@ -37,9 +37,20 @@ extension ZappMessagingClient: DependencyKey {
             conversationsStream: { impl.conversationsSubject.eraseToAnyPublisher() },
             refreshConversations: { try await impl.refreshConversations() },
             createDirectConversation: { try await impl.createDirectConversation(publicKey: $0, displayName: $1) },
+            createGroup: { try await impl.createGroup(name: $0, participantKeys: $1) },
+            renameGroup: { try await impl.renameGroup(conversationId: $0, name: $1) },
+            addMember: { try await impl.addMember(conversationId: $0, publicKey: $1, displayName: $2) },
+            leaveConversation: { try await impl.leaveConversation($0) },
+            removeConversation: { try await impl.removeConversation($0) },
             messages: { try await impl.messages(conversationId: $0, limit: $1) },
-            sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1) },
+            sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1, replyTo: $2) },
+            sendMedia: { try await impl.sendMedia(conversationId: $0, mediaPath: $1, contentType: $2, caption: $3, thumbnailData: $4) },
             markRead: { try await impl.markRead(conversationId: $0) },
+            messageStatusStream: { impl.messageStatusSubject.eraseToAnyPublisher() },
+            mediaProgressStream: { impl.mediaProgressSubject.eraseToAnyPublisher() },
+            mediaCompleteStream: { impl.mediaCompleteSubject.eraseToAnyPublisher() },
+            setReadReceiptsEnabled: { try await impl.setReadReceiptsEnabled($0) },
+            setPresenceVisible: { try await impl.setPresenceVisible($0) },
             messageReceivedStream: { impl.messageReceivedSubject.eraseToAnyPublisher() },
             setActiveConversation: { impl.setActiveConversation($0) },
             setBlockedKeys: { impl.setBlockedKeys($0) }
@@ -55,11 +66,20 @@ extension ZappMessagingClient: DependencyKey {
 /// hop into it goes through `Task { @MainActor in ... }`.
 private final class ZappMessagingImpl: @unchecked Sendable {
     @Dependency(\.mainQueue) var mainQueue
+    @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.walletStorage) var walletStorage
+
+    private enum PrefKey {
+        static let readReceipts = "zappChat.readReceiptsEnabled"
+        static let presence = "zappChat.presenceVisible"
+    }
 
     let stateSubject = CurrentValueSubject<ZappMessagingState, Never>(ZappMessagingState())
     let conversationsSubject = CurrentValueSubject<[ZMConversation], Never>([])
     let messageReceivedSubject = PassthroughSubject<ZMMessage, Never>()
+    let messageStatusSubject = PassthroughSubject<(messageId: String, conversationId: String, status: String), Never>()
+    let mediaProgressSubject = PassthroughSubject<(mediaId: String, progress: Double), Never>()
+    let mediaCompleteSubject = PassthroughSubject<(mediaId: String, filePath: String), Never>()
 
     /// Created lazily: constructing it resolves the data dir, which touches the
     /// filesystem, and `liveValue` is built eagerly at first dependency access.
@@ -99,6 +119,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                         $0.identity = identity
                         $0.phase = .ready
                     }
+                    await self.reassertPrivacySettings(sdk)
                     try? await sdk.refreshConversations()
                     self.conversationsSubject.send(sdk.conversations)
                 } else {
@@ -205,6 +226,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                     $0.phase = .ready
                 }
 
+                await self.reassertPrivacySettings(sdk)
                 try? await sdk.refreshConversations()
                 self.conversationsSubject.send(sdk.conversations)
             } catch {
@@ -253,9 +275,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         return try await sdk.getMessages(conversationId: conversationId, limit: limit)
     }
 
-    func sendMessage(conversationId: String, content: String) async throws -> ZMMessage {
+    func sendMessage(conversationId: String, content: String, replyTo: ZMReplyContext?) async throws -> ZMMessage {
         guard let sdk else { throw ZMError.notInitialized }
-        return try await sdk.sendMessage(conversationId: conversationId, content: content)
+        return try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
     }
 
     func markRead(conversationId: String) async throws {
@@ -272,6 +294,106 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         lock.withLock { activeConversationId = conversationId }
         if let conversationId {
             clearUnread(for: conversationId)
+        }
+    }
+
+    // MARK: - Groups
+
+    @MainActor
+    func createGroup(name: String, participantKeys: [String]) async throws -> ZMConversation {
+        guard let sdk else { throw ZMError.notInitialized }
+
+        let conversation = try await sdk.createConversation(
+            type: .group,
+            participants: participantKeys.map(PublicKeyRules.sanitize),
+            displayName: name
+        )
+        conversationsSubject.send(sdk.conversations)
+
+        return conversation
+    }
+
+    func renameGroup(conversationId: String, name: String) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.renameGroup(conversationId: conversationId, name: name)
+        conversationsSubject.send(await sdk.conversations)
+    }
+
+    func addMember(conversationId: String, publicKey: String, displayName: String?) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.addMember(
+            conversationId: conversationId,
+            publicKey: PublicKeyRules.sanitize(publicKey),
+            displayName: displayName
+        )
+        conversationsSubject.send(await sdk.conversations)
+    }
+
+    func leaveConversation(_ conversationId: String) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.leaveConversation(conversationId)
+        conversationsSubject.send(await sdk.conversations)
+        clearUnread(for: conversationId)
+    }
+
+    func removeConversation(_ conversationId: String) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.removeConversation(conversationId)
+        conversationsSubject.send(await sdk.conversations)
+        clearUnread(for: conversationId)
+    }
+
+    // MARK: - Media
+
+    func sendMedia(
+        conversationId: String,
+        mediaPath: String,
+        contentType: String,
+        caption: String,
+        thumbnailData: String?
+    ) async throws -> ZMMessage {
+        guard let sdk else { throw ZMError.notInitialized }
+
+        return try await sdk.sendMediaMessage(
+            conversationId: conversationId,
+            mediaPath: mediaPath,
+            contentType: contentType,
+            caption: caption,
+            thumbnailData: thumbnailData
+        )
+    }
+
+    // MARK: - Privacy toggles
+
+    func setReadReceiptsEnabled(_ enabled: Bool) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.setReadReceiptsEnabled(enabled)
+        userDefaults.setValue(enabled, PrefKey.readReceipts)
+        mutate { $0.readReceiptsEnabled = enabled }
+    }
+
+    func setPresenceVisible(_ visible: Bool) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.setPresenceVisible(visible)
+        userDefaults.setValue(visible, PrefKey.presence)
+        mutate { $0.presenceVisible = visible }
+    }
+
+    /// The worklet optimistically turns read receipts ON at identity create/restore,
+    /// before it has any idea what the user actually wants. Until this runs, a user
+    /// who turned receipts OFF is silently emitting them. Re-assert both the moment
+    /// identity lands — this is a privacy fix, not a tidiness one.
+    @MainActor
+    private func reassertPrivacySettings(_ sdk: ZappMessagingSDK) async {
+        let receipts = (userDefaults.objectForKey(PrefKey.readReceipts) as? Bool) ?? true
+        let presence = (userDefaults.objectForKey(PrefKey.presence) as? Bool) ?? true
+
+        try? await sdk.setReadReceiptsEnabled(receipts)
+        try? await sdk.setPresenceVisible(presence)
+
+        mutate {
+            $0.readReceiptsEnabled = receipts
+            $0.presenceVisible = presence
         }
     }
 
@@ -303,6 +425,36 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             .receive(on: mainQueue)
             .sink { [weak self] health in self?.mutate { $0.dhtHealth = health } }
             .store(in: &cancellables)
+
+        sdk.messageStatus
+            .receive(on: mainQueue)
+            .sink { [weak self] status in self?.messageStatusSubject.send(status) }
+            .store(in: &cancellables)
+
+        // Keyed by CONVERSATION, not peer: the core truncates peerId to 12 chars, so
+        // it tells us that someone in this conversation is online, not who.
+        sdk.peerStatus
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId, _, status in
+                self?.mutate {
+                    if status == "online" {
+                        $0.onlineConversationIds.insert(conversationId)
+                    } else {
+                        $0.onlineConversationIds.remove(conversationId)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
+        sdk.mediaTransferProgress
+            .receive(on: mainQueue)
+            .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
+            .store(in: &cancellables)
+
+        sdk.mediaDownloadComplete
+            .receive(on: mainQueue)
+            .sink { [weak self] complete in self?.mediaCompleteSubject.send(complete) }
+            .store(in: &cancellables)
     }
 
     /// Unread is counted app-side, not read off the wire — the core never sends
@@ -312,19 +464,26 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard !lock.withLock({ blockedKeys }).contains(PublicKeyRules.sanitize(message.senderId)) else { return }
         guard lock.withLock({ activeConversationId }) != message.conversationId else { return }
 
-        let total: Int = lock.withLock {
+        let counts: [String: Int] = lock.withLock {
             unreadCounts[message.conversationId, default: 0] += 1
-            return unreadCounts.values.reduce(0, +)
+            return unreadCounts
         }
-        mutate { $0.totalUnreadCount = total }
+        publishUnread(counts)
     }
 
     private func clearUnread(for conversationId: String) {
-        let total: Int = lock.withLock {
+        let counts: [String: Int] = lock.withLock {
             unreadCounts[conversationId] = nil
-            return unreadCounts.values.reduce(0, +)
+            return unreadCounts
         }
-        mutate { $0.totalUnreadCount = total }
+        publishUnread(counts)
+    }
+
+    private func publishUnread(_ counts: [String: Int]) {
+        mutate {
+            $0.unreadCounts = counts
+            $0.totalUnreadCount = counts.values.reduce(0, +)
+        }
     }
 
     // MARK: - Helpers
