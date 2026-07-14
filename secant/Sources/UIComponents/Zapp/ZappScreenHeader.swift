@@ -13,6 +13,8 @@ struct ZappScreenHeader<Left: View, Right: View>: View {
     private let title: String
     private let subtitle: String?
     private let onTitleTap: (() -> Void)?
+    private let containerColor: ZappColors
+    private let titleStyle: ZappTextStyle
     private let left: Left
     private let right: Right
 
@@ -20,12 +22,16 @@ struct ZappScreenHeader<Left: View, Right: View>: View {
         title: String,
         subtitle: String? = nil,
         onTitleTap: (() -> Void)? = nil,
+        containerColor: ZappColors = .surface,
+        titleStyle: ZappTextStyle = .screenTitle,
         @ViewBuilder left: () -> Left,
         @ViewBuilder right: () -> Right
     ) {
         self.title = title
         self.subtitle = subtitle
         self.onTitleTap = onTitleTap
+        self.containerColor = containerColor
+        self.titleStyle = titleStyle
         self.left = left()
         self.right = right()
     }
@@ -46,13 +52,13 @@ struct ZappScreenHeader<Left: View, Right: View>: View {
         .padding(.horizontal, Constants.horizontalPadding)
         .padding(.vertical, Constants.verticalPadding)
         .frame(maxWidth: .infinity)
-        .background(ZappColors.surface.color(colorScheme))
+        .background(containerColor.color(colorScheme))
     }
 
     private var titles: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
-                .zappFont(.screenTitle, style: ZappColors.text)
+                .zappFont(titleStyle, style: ZappColors.text)
                 .lineLimit(1)
 
             if let subtitle {
