@@ -67,10 +67,13 @@ struct ZappPayView: View {
             .background(ZappColors.bg.color(colorScheme))
             .overlay {
                 speedDial()
-                    .padding(.trailing, Constants.fabTrailingPadding)
-                    .padding(.bottom, ZappNavBar.fabBottomPadding)
             }
-            .onAppear { store.send(.onAppear) }
+            .onAppear {
+                store.send(.onAppear)
+                // The banner starts its streams on appear but does not kick the priority chain.
+                // Trigger it here so the Android-parity Tor protection prompt is evaluated.
+                store.send(.smartBanner(.evaluatePriority1))
+            }
             .onChange(of: store.canRequestReview) { canRequestReview in
                 if canRequestReview {
                     if let currentScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
@@ -215,7 +218,9 @@ struct ZappPayView: View {
                 ) {
                     store.send(.receiveScreenRequested)
                 }
-            ]
+            ],
+            trailingPadding: Constants.fabTrailingPadding,
+            bottomPadding: ZappNavBar.fabBottomPadding
         )
     }
 }

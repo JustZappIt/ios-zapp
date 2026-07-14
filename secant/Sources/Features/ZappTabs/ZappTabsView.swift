@@ -13,6 +13,7 @@ struct ZappTabsView: View {
     let homeStore: StoreOf<Home>
     let chatsListStore: StoreOf<ChatsList>
     let chatIdentitySetupStore: StoreOf<ChatIdentitySetup>
+    let chatProfileStore: StoreOf<ChatProfile>
     let tokenName: String
 
     var body: some View {
@@ -50,7 +51,11 @@ struct ZappTabsView: View {
                 ChatIdentitySetupView(store: chatIdentitySetupStore)
             }
         case .you:
-            SettingsTabContent(store: store, displayName: store.displayName)
+            SettingsTabContent(
+                store: store,
+                chatProfileStore: chatProfileStore,
+                displayName: store.displayName
+            )
         }
     }
 

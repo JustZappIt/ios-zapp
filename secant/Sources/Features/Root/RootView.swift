@@ -117,6 +117,10 @@ private extension RootView {
                                     state: \.chatIdentitySetupState,
                                     action: \.chatIdentitySetup
                                 ),
+                                chatProfileStore: store.scope(
+                                    state: \.chatProfileState,
+                                    action: \.chatProfile
+                                ),
                                 tokenName: tokenName
                             )
                         }

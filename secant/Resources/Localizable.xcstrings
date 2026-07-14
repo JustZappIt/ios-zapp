@@ -1703,6 +1703,23 @@
         }
       }
     },
+    "chatProfile.qrCaption": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan to start a conversation"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanea para iniciar una conversación"
+          }
+        }
+      }
+    },
     "chatProfile.readReceipts": {
       "extractionState": "manual",
       "localizations": {

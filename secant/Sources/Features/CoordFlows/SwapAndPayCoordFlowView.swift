@@ -44,9 +44,10 @@ struct SwapAndPayCoordFlowView: View {
                         header
                     }
                 }
-                .zashiBack {
-                    store.send(.backButtonTapped)
-                }
+                .zashiBack(
+                    primaryAction: { formPrimaryAction },
+                    customDismiss: { store.send(.backButtonTapped) }
+                )
             } destination: { store in
                 switch store.case {
                 case let .addressBook(store):
@@ -85,6 +86,39 @@ struct SwapAndPayCoordFlowView: View {
             }
             .onAppear { store.send(.onAppear) }
             .background(ZappColors.bg.color(colorScheme))
+        }
+    }
+
+    @ViewBuilder private var formPrimaryAction: some View {
+        WithPerceptionTracking {
+            if let retryFailure = store.swapAndPayState.swapAssetFailedWithRetry {
+                ZappButton(
+                    title: retryFailure
+                        ? String(localizable: .swapAndPayFailureTryAgain)
+                        : String(localizable: .swapAndPayFailureLaterTitle),
+                    variant: .danger,
+                    isEnabled: retryFailure
+                ) {
+                    store.send(.swapAndPay(.trySwapsAssetsAgainTapped))
+                }
+            } else {
+                ZappButton(
+                    title: store.swapAndPayState.isSwapExperienceEnabled
+                        || store.swapAndPayState.isSwapToZecExperienceEnabled
+                        ? String(localizable: .swapAndPayGetQuote)
+                        : String(localizable: .sendReview),
+                    isEnabled: store.swapAndPayState.isValidForm
+                        && !store.swapAndPayState.isQuoteRequestInFlight
+                ) {
+                    store.send(.swapAndPay(.getQuoteTapped))
+                }
+                .accessibilityIdentifier(
+                    store.swapAndPayState.isSwapExperienceEnabled
+                        || store.swapAndPayState.isSwapToZecExperienceEnabled
+                        ? AccessibilityID.SwapForm.reviewButton
+                        : AccessibilityID.CrossPayForm.reviewButton
+                )
+            }
         }
     }
 

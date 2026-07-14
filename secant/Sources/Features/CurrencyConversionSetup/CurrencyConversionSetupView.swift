@@ -18,38 +18,80 @@ struct CurrencyConversionSetupView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            VStack {
-                ScrollView {
-                    if store.isSettingsView {
-                        settingsLayout()
-                    } else {
-                        learnMoreLayout()
+            if store.isSettingsView {
+                currencyPickerScreen
+            } else {
+                learnMoreScreen
+            }
+        }
+        .onAppear { store.send(.onAppear) }
+    }
+
+    private var currencyPickerScreen: some View {
+        VStack(spacing: 0) {
+            ZappScreenHeader(title: String(localizable: .currencyConversionSelectCurrencyTitle))
+
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(Array(CurrencyISO4217.allCases.enumerated()), id: \.element) { index, currency in
+                        ZappSelectionRow(
+                            title: currency.code,
+                            subtitle: currency.displayName,
+                            isSelected: store.selectedCurrency == currency
+                        ) {
+                            store.send(.currencyChanged(currency))
+                        }
+
+                        if index != CurrencyISO4217.allCases.count - 1 {
+                            ZappRowDivider(inset: true)
+                        }
                     }
                 }
-                .padding(.vertical, 1)
-                
-                Spacer()
-                
-                if store.isSettingsView {
-                    settingsFooter()
-                } else {
-                    learnMoreFooter()
+                .background(ZappColors.surface.color(colorScheme))
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                )
+                .padding(.horizontal, 14)
+                .padding(.vertical, Design.Spacing._lg)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ZappColors.bg.color(colorScheme))
+        .zashiBack(
+            store.isSaveButtonDisabled,
+            primaryAction: {
+                ZappButton(
+                    title: String(localizable: .currencyConversionSaveBtn),
+                    isEnabled: !store.isSaveButtonDisabled
+                ) {
+                    store.send(.saveChangesTapped)
                 }
-            }
-            .onAppear { store.send(.onAppear) }
-            .zashiBack() { store.send(.backToHomeTapped) }
-            .zashiSheet(isPresented: $store.isTorSheetPresented) {
-                torSheetContent()
-            }
-            .sheet(isPresented: $store.isCurrencyPickerSheetPresented) {
-                currencyPickerSheetContent()
-                    .applySheetBackground()
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
-            }
+            },
+            customDismiss: { store.send(.backToHomeTapped) }
+        )
+    }
+
+    private var learnMoreScreen: some View {
+        VStack {
+            ScrollView { learnMoreLayout() }
+                .padding(.vertical, 1)
+
+            Spacer()
+            learnMoreFooter()
         }
         .navigationBarTitleDisplayMode(.inline)
         .applyScreenBackground()
+        .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
+        .zashiSheet(isPresented: $store.isTorSheetPresented) {
+            torSheetContent()
+        }
+        .sheet(isPresented: $store.isCurrencyPickerSheetPresented) {
+            currencyPickerSheetContent()
+                .applySheetBackground()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
     }
     
     @ViewBuilder private func torSheetContent() -> some View {
