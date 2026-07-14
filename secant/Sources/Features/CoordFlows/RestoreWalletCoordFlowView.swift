@@ -65,6 +65,8 @@ struct RestoreWalletCoordFlowView: View {
                 .alert($store.scope(state: \.alert, action: \.alert))
             } destination: { store in
                 switch store.case {
+                case let .chatUsername(store):
+                    ChatUsernameEntryView(store: store)
                 case let .estimateBirthdaysDate(store):
                     WalletBirthdayEstimateDateView(store: store)
                 case let .estimatedBirthday(store):

@@ -273,6 +273,10 @@ extension Root {
             case .chatsList(.conversationTapped(let conversationId)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversationId
+                // Carry the conversation across, or the room has no name to show
+                // and falls back to "Chat".
+                state.chatRoomState.conversation = state.chatsListState.conversations
+                    .first { $0.id == conversationId }
                 state.path = .chatRoom
                 return .none
 
