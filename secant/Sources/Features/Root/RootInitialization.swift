@@ -74,6 +74,11 @@ extension Root {
                 
             case .initialization(.appDelegate(.didEnterBackground)):
                 sdkSynchronizer.stop()
+                // iOS freezes the process shortly after backgrounding whether we
+                // ask or not. Parking the worklet is strictly better than being
+                // frozen mid-socket. Live P2P stops until foreground; that gap is
+                // what the (still unbuilt) push doorbell is for.
+                zappMessaging.suspend()
                 state.bgTask?.setTaskCompleted(success: false)
                 state.bgTask = nil
                 state.appStartState = .didEnterBackground
@@ -185,6 +190,8 @@ extension Root {
                     state.destinationState.internalDestination = preNotEnoughFreeSpaceDestination
                     state.destinationState.preNotEnoughFreeSpaceDestination = nil
                 }
+                zappMessaging.resume()
+
                 // Try the start only if the synchronizer has been already prepared
                 guard sdkSynchronizer.latestState().syncStatus.isPrepared else {
                     return .none
@@ -402,7 +409,11 @@ extension Root {
                     .send(.observeTransactions),
                     .send(.observeShieldingProcessor),
                     .send(.observeTorInit),
-                    .send(.refreshAutomaticServer)
+                    .send(.refreshAutomaticServer),
+                    // The chat identity derives from the wallet seed, so the
+                    // worklet cannot boot before the wallet exists. This action
+                    // fires on both the new-wallet and existing-wallet paths.
+                    .send(.observeZappMessaging)
                 )
                 
             case .initialization(.loadedWalletAccounts(let walletAccounts)):
@@ -565,8 +576,16 @@ extension Root {
                     state = .initial
                 }
 
-                return .send(.resetZashiKeychainRequest)
-                
+                // Stop the worklet, then delete its store — in that order. A
+                // running worklet still holds rocksdb's files open. Chat history
+                // is never exempted by `areMetadataPreserved`: the identity is
+                // derived from the wallet seed, so it belongs to the wallet being
+                // deleted, not to the user's portable metadata.
+                return .run { send in
+                    await zappMessaging.wipe()
+                    await send(.resetZashiKeychainRequest)
+                }
+
             case .resetZashiKeychainRequest:
                 return .run { send in
                     do {

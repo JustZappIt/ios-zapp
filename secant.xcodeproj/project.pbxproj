@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A99EE0000000000000000C0 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B0 /* ZappMessaging */; };
+		5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B1 /* ZappMessaging */; };
+		5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B2 /* ZappMessaging */; };
+		5A99EE0000000000000000C3 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B3 /* ZappMessaging */; };
 		348ECAA02FD5D95200BF9FE4 /* ZcashLightClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 348ECA9F2FD5D95200BF9FE4 /* ZcashLightClientKit */; };
 		34AA77182F857DB300D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77172F857DB300D244E2 /* ComposableArchitecture */; };
 		34AA771A2F857DB800D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77192F857DB800D244E2 /* ComposableArchitecture */; };
@@ -131,6 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A99EE0000000000000000C0 /* ZappMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */,
 				34AA77832F8582F100D244E2 /* ZcashPaymentURI in Frameworks */,
 				34AA774B2F85815200D244E2 /* URLRouting in Frameworks */,
 				34B967692F8CC49100823B20 /* Atomics in Frameworks */,
@@ -159,6 +165,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */,
 				34AA777F2F8582E600D244E2 /* ZcashPaymentURI in Frameworks */,
 				34AA77472F85814600D244E2 /* URLRouting in Frameworks */,
 				34B967652F8CC48700823B20 /* Atomics in Frameworks */,
@@ -180,6 +187,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A99EE0000000000000000C3 /* ZappMessaging in Frameworks */,
 				9E4841532F869F5F00D0649B /* ZcashLightClientKit in Frameworks */,
 				34AA77812F8582EB00D244E2 /* ZcashPaymentURI in Frameworks */,
 				34AA77492F85814C00D244E2 /* URLRouting in Frameworks */,
@@ -285,6 +293,8 @@
 			);
 			name = "zodl-testnet";
 			packageProductDependencies = (
+				5A99EE0000000000000000B1 /* ZappMessaging */,
+				5A99EE0000000000000000B0 /* ZappMessaging */,
 				34AA771B2F857DBB00D244E2 /* ComposableArchitecture */,
 				34AA772A2F857E3800D244E2 /* XCTestDynamicOverlay */,
 				34AA773D2F8580D700D244E2 /* CasePaths */,
@@ -325,6 +335,7 @@
 			);
 			name = "zodl-production";
 			packageProductDependencies = (
+				5A99EE0000000000000000B2 /* ZappMessaging */,
 				34AA77172F857DB300D244E2 /* ComposableArchitecture */,
 				34AA77262F857E2F00D244E2 /* XCTestDynamicOverlay */,
 				34AA77352F8580CB00D244E2 /* CasePaths */,
@@ -365,6 +376,7 @@
 			);
 			name = "zodl-internal";
 			packageProductDependencies = (
+				5A99EE0000000000000000B3 /* ZappMessaging */,
 				34AA77192F857DB800D244E2 /* ComposableArchitecture */,
 				34AA77282F857E3400D244E2 /* XCTestDynamicOverlay */,
 				34AA77392F8580D000D244E2 /* CasePaths */,
@@ -411,6 +423,7 @@
 			);
 			mainGroup = 0D4E79FC26B364170058B01E;
 			packageReferences = (
+				5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */,
 				34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */,
 				34AA772C2F8580B800D244E2 /* XCRemoteSwiftPackageReference "swift-case-paths" */,
@@ -1295,6 +1308,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../zappMessaging/ios;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1413,6 +1433,26 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5A99EE0000000000000000B0 /* ZappMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */;
+			productName = ZappMessaging;
+		};
+		5A99EE0000000000000000B1 /* ZappMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */;
+			productName = ZappMessaging;
+		};
+		5A99EE0000000000000000B2 /* ZappMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */;
+			productName = ZappMessaging;
+		};
+		5A99EE0000000000000000B3 /* ZappMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */;
+			productName = ZappMessaging;
+		};
 		348ECA9F2FD5D95200BF9FE4 /* ZcashLightClientKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9E4841512F869F5E00D0649B /* XCRemoteSwiftPackageReference "zcash-swift-wallet-sdk" */;
