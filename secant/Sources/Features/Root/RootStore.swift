@@ -15,6 +15,8 @@ struct Root {
     struct State {
         enum Path {
             case addKeystoneHWWalletCoordFlow
+            case chatRoom
+            case newChat
             case currencyConversionSetup
             case receive
             case requestZecCoordFlow
@@ -106,6 +108,10 @@ struct Root {
 
         var addKeystoneHWWalletCoordFlowState = AddKeystoneHWWalletCoordFlow.State.initial
         var currencyConversionSetupState = CurrencyConversionSetup.State.initial
+        var chatsListState = ChatsList.State.initial
+        var chatIdentitySetupState = ChatIdentitySetup.State.initial
+        var chatRoomState = ChatRoom.State.initial
+        var newChatState = NewChat.State.initial
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
@@ -144,7 +150,7 @@ struct Root {
                 return true
             case .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .currencyConversionSetup, .receive,
+            case .addKeystoneHWWalletCoordFlow, .chatRoom, .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
                 return false
             }
@@ -224,6 +230,10 @@ struct Root {
 
         case addKeystoneHWWalletCoordFlow(AddKeystoneHWWalletCoordFlow.Action)
         case currencyConversionSetup(CurrencyConversionSetup.Action)
+        case chatsList(ChatsList.Action)
+        case chatIdentitySetup(ChatIdentitySetup.Action)
+        case chatRoom(ChatRoom.Action)
+        case newChat(NewChat.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -360,6 +370,22 @@ struct Root {
 
         Scope(state: \.osStatusErrorState, action: \.osStatusError) {
             OSStatusError()
+        }
+
+        Scope(state: \.chatsListState, action: \.chatsList) {
+            ChatsList()
+        }
+
+        Scope(state: \.chatIdentitySetupState, action: \.chatIdentitySetup) {
+            ChatIdentitySetup()
+        }
+
+        Scope(state: \.chatRoomState, action: \.chatRoom) {
+            ChatRoom()
+        }
+
+        Scope(state: \.newChatState, action: \.newChat) {
+            NewChat()
         }
 
         Scope(state: \.settingsState, action: \.settings) {

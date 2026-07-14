@@ -109,6 +109,14 @@ private extension RootView {
                                     state: \.homeState,
                                     action: \.home
                                 ),
+                                chatsListStore: store.scope(
+                                    state: \.chatsListState,
+                                    action: \.chatsList
+                                ),
+                                chatIdentitySetupStore: store.scope(
+                                    state: \.chatIdentitySetupState,
+                                    action: \.chatIdentitySetup
+                                ),
                                 tokenName: tokenName
                             )
                         }
@@ -249,6 +257,24 @@ private extension RootView {
                                             state: \.swapAndPayCoordFlowState,
                                             action: \.swapAndPayCoordFlow),
                                     tokenName: tokenName
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .chatRoom {
+                                ChatRoomView(
+                                    store: store.scope(
+                                        state: \.chatRoomState,
+                                        action: \.chatRoom
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .newChat {
+                                NewChatView(
+                                    store: store.scope(
+                                        state: \.newChatState,
+                                        action: \.newChat
+                                    )
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)

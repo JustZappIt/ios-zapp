@@ -11,6 +11,8 @@ struct ZappTabsView: View {
     @Perception.Bindable var store: StoreOf<ZappTabs>
 
     let homeStore: StoreOf<Home>
+    let chatsListStore: StoreOf<ChatsList>
+    let chatIdentitySetupStore: StoreOf<ChatIdentitySetup>
     let tokenName: String
 
     var body: some View {
@@ -42,7 +44,11 @@ struct ZappTabsView: View {
         case .pay:
             HomeView(store: homeStore, tokenName: tokenName)
         case .chats:
-            placeholder(.chats)
+            if store.hasChatIdentity {
+                ChatsListView(store: chatsListStore)
+            } else {
+                ChatIdentitySetupView(store: chatIdentitySetupStore)
+            }
         case .you:
             SettingsTabContent(store: store)
         }

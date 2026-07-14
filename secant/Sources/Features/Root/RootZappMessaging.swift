@@ -31,6 +31,7 @@ extension Root {
             case .zappMessagingStateChanged(let messagingState):
                 state.zappMessagingState = messagingState
                 state.zappTabsState.chatUnreadCount = messagingState.totalUnreadCount
+                state.zappTabsState.hasChatIdentity = messagingState.identity != nil
                 return .none
 
             default: return .none
