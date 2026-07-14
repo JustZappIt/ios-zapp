@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import UIKit
 @preconcurrency import ZcashLightClientKit
 
 struct ReceiveView: View {
@@ -19,6 +20,8 @@ struct ReceiveView: View {
         static let infoIconSize: CGFloat = 16
         static let infoBox: CGFloat = 32
         static let warningIconSize: CGFloat = 24
+        static let qrSize: CGFloat = 260
+        static let copyButtonSize: CGFloat = 40
     }
 
     /// One switcher segment. `actionAddress` is kept apart from the displayed `address` because
@@ -74,40 +77,85 @@ struct ReceiveView: View {
 
     private var content: some View {
         VStack(spacing: 0) {
-            ZappScreenHeader(
-                title: String(localizable: .tabsReceiveZec),
-                containerColor: .bg,
-                titleStyle: .displaySecondary,
-                left: { EmptyView() },
-                right: { EmptyView() }
-            )
+            ZappScreenHeader(title: String(localizable: .tabsReceiveZec))
 
-            ScrollView {
-                VStack(spacing: Design.Spacing._2xl) {
+            if let segment = selectedSegment {
+                ScrollView {
+                    VStack(spacing: Design.Spacing._xl) {
+                        ReceiveAddressQRCode(address: segment.actionAddress)
+                            .frame(width: Constants.qrSize, height: Constants.qrSize)
+                            .padding(Design.Spacing._md)
+                            .background(Color.white)
+                            .overlay(
+                                Rectangle()
+                                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                            )
+
+                        HStack(alignment: .top, spacing: Design.Spacing._md) {
+                            Text(segment.address)
+                                .zappFont(.mono, style: ZappColors.textMuted)
+                                .textSelection(.enabled)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            copyIconButton(segment)
+                        }
+
+                        HStack(alignment: .top, spacing: Design.Spacing._md) {
+                            Rectangle()
+                                .fill(ZappColors.accent.color(colorScheme))
+                                .frame(width: 3, height: 36)
+
+                            Text(localizable: .receiveWarning)
+                                .zappFont(.caption, style: ZappColors.textMuted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .padding(.horizontal, Design.Spacing._3xl)
+                    .padding(.top, Design.Spacing._xl)
+                }
+                .frame(maxHeight: .infinity)
+
+                if segments.count > 1 {
                     ZappSegmentedSelector(
                         options: segments.map(\.label),
                         selectedIndex: selectedIndex
                     ) { index in
                         store.send(.updateCurrentFocus(segments[index].focus), animation: .default)
                     }
-
-                    if let segment = selectedSegment {
-                        addressPanel(segment)
-                        actionRow(segment)
-                    }
+                    .padding(.horizontal, Design.Spacing._2xl)
+                    .padding(.vertical, Design.Spacing._sm)
                 }
+
+                ShareLink(item: segment.actionAddress) {
+                    Text(String(localizable: .generalShare).uppercased())
+                        .zappFont(.button, style: ZappColors.textMuted)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .overlay(
+                            Rectangle()
+                                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.zappPress)
                 .padding(.horizontal, Design.Spacing._2xl)
-                .padding(.top, Design.Spacing._2xl)
+                .padding(.bottom, Design.Spacing._sm)
             }
-
-            Spacer()
-
-            privacyWarning
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
         .onAppear { store.send(.updateCurrentFocus(.uaAddress)) }
-        .zashiBack() { store.send(.backToHomeTapped) }
+        .zashiBack(
+            primaryAction: {
+                if let segment = selectedSegment {
+                    ZappButton(title: String(localizable: .receiveRequest)) {
+                        store.send(.requestTapped(segment.actionAddress.redacted, segment.isShielded))
+                    }
+                }
+            },
+            customDismiss: { store.send(.backToHomeTapped) }
+        )
     }
 
     private var segments: [AddressSegment] {
@@ -182,6 +230,34 @@ struct ReceiveView: View {
         let all = segments
 
         return all.indices.contains(selectedIndex) ? all[selectedIndex] : all.first
+    }
+
+    private func copyIconButton(_ segment: AddressSegment) -> some View {
+        Button {
+            store.send(.copyToPastboard(segment.actionAddress.redacted))
+            withAnimation(ZappMotion.content) { copyConfirmed = true }
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(Constants.copyConfirmDuration * 1_000_000_000))
+                withAnimation(ZappMotion.content) { copyConfirmed = false }
+            }
+        } label: {
+            (copyConfirmed ? Asset.Assets.Icons.checkSolid.image : Asset.Assets.copy.image)
+                .zImage(
+                    width: Constants.actionIconSize,
+                    height: Constants.actionIconSize,
+                    style: copyConfirmed ? ZappColors.success : ZappColors.accentText
+                )
+                .frame(width: Constants.copyButtonSize, height: Constants.copyButtonSize)
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(
+                            (copyConfirmed ? ZappColors.success : ZappColors.border).color(colorScheme),
+                            lineWidth: 1
+                        )
+                )
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(String(localizable: .receiveCopy))
     }
 
     private func addressPanel(_ segment: AddressSegment) -> some View {
@@ -391,6 +467,38 @@ struct ReceiveView: View {
                     .zappFont(.body, style: ZappColors.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
+        }
+    }
+}
+
+private struct ReceiveAddressQRCode: View {
+    let address: String
+
+    @State private var image: CGImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(uiImage: UIImage(cgImage: image))
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+            } else {
+                Color.white
+            }
+        }
+        .task(id: address) {
+            guard !address.isEmpty else {
+                image = nil
+                return
+            }
+
+            image = await QRCodeGenerator.generate(
+                from: address,
+                maxPrivacy: false,
+                color: .black,
+                overlayedWithZcashLogo: true
+            )
         }
     }
 }

@@ -45,8 +45,12 @@ struct ZashiBackModifier<PrimaryAction: View>: ViewModifier {
                         backTint: invertedColors ? .bg : .text
                     ) {
                         primaryAction
+                            .disabled(disabled)
                     }
-                    .disabled(disabled)
+                    // Historically `disabled` controlled a lone back button. Once a primary action
+                    // shares the dock, it applies only to that action so Back never gets stranded by
+                    // an unchanged/invalid Save state.
+                    .disabled(PrimaryAction.self == EmptyView.self && disabled)
                 }
         }
     }

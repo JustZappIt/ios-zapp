@@ -32,12 +32,13 @@ struct ZappSpeedDialFab: View {
         static let labelHorizontalPadding: CGFloat = 12
         static let labelVerticalPadding: CGFloat = 8
         static let expandedRotation: Double = 45
-        static let trailingMargin: CGFloat = 18
     }
 
     let expandLabel: String
     let collapseLabel: String
     let actions: [ZappSpeedDialAction]
+    var trailingPadding: CGFloat = 18
+    var bottomPadding: CGFloat = 0
 
     @State private var isExpanded = false
 
@@ -59,7 +60,8 @@ struct ZappSpeedDialFab: View {
 
                 toggle
             }
-            .padding(.trailing, Constants.trailingMargin)
+            .padding(.trailing, trailingPadding)
+            .padding(.bottom, bottomPadding)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         .animation(ZappMotion.content, value: isExpanded)
@@ -72,10 +74,6 @@ struct ZappSpeedDialFab: View {
                 .padding(.horizontal, Constants.labelHorizontalPadding)
                 .padding(.vertical, Constants.labelVerticalPadding)
                 .background(ZappColors.surface.color(colorScheme))
-                .overlay(
-                    Rectangle()
-                        .stroke(ZappColors.border.color(colorScheme), lineWidth: 1)
-                )
 
             ZappFab(icon: action.icon, contentDescription: action.label) {
                 // Collapse BEFORE firing: the action pushes a screen, and a speed dial

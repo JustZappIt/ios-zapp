@@ -39,13 +39,7 @@ extension SwapAndPayForm {
 
                     rateView(colorScheme)
 
-                    Spacer()
-
-                    quoteCta(
-                        title: String(localizable: .swapAndPayGetQuote),
-                        accessibilityID: AccessibilityID.SwapForm.reviewButton
-                    )
-                    .padding(.bottom, Design.Spacing._6xl)
+                    Spacer(minLength: Design.Spacing._2xl)
                 }
                 .ignoresSafeArea()
                 .frame(minHeight: keyboardVisible ? 0 : safeAreaHeight)

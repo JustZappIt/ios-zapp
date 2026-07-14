@@ -18,78 +18,89 @@ struct TorSetupView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            VStack {
-                ScrollView {
-                    if store.isSettingsView {
-                        settingsLayout()
-                    } else {
-                        learnMoreLayout()
-                    }
-                }
-                .padding(.vertical, 1)
-                
-                Spacer()
-                
-                if store.isSettingsView {
-                    settingsFooter()
-                } else {
-                    learnMoreFooter()
-                }
+            if store.isSettingsView {
+                settingsScreen
+            } else {
+                learnMoreScreen
             }
-            .onAppear { store.send(.onAppear) }
-            .zashiBack() { store.send(.backToHomeTapped) }
+        }
+        .onAppear { store.send(.onAppear) }
+    }
+
+    private var settingsScreen: some View {
+        VStack(spacing: 0) {
+            ZappScreenHeader(title: String(localizable: .settingsPrivate))
+
+            ScrollView {
+                VStack(spacing: 0) {
+                    Asset.Assets.Partners.torLogo.image
+                        .zImage(width: 36, height: 24, color: .white)
+                        .frame(width: 64, height: 64)
+                        .background(ZappColors.text.color(colorScheme))
+                        .padding(.bottom, Design.Spacing._lg)
+
+                    Text(localizable: .torSetupSettingsDesc1)
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.bottom, Design.Spacing._3xl)
+
+                    ZappSectionLabel(text: String(localizable: .settingsPrivate))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    ZappRow(
+                        title: String(localizable: .smartBannerContentTorTitle),
+                        subtitle: String(localizable: .torSetupEnableDesc),
+                        icon: Asset.Assets.Icons.shieldZap.image,
+                        iconTint: .accentText,
+                        iconBackground: .accentSoft,
+                        trailing: {
+                            ZappToggle(isOn: store.currentSettingsOption == .optIn) {
+                                toggleTorSelection()
+                            }
+                        },
+                        action: { toggleTorSelection() }
+                    )
+                    .background(ZappColors.surface.color(colorScheme))
+                    .overlay(
+                        Rectangle()
+                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal, Design.Spacing._2xl)
+                .padding(.top, Design.Spacing._2xl)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ZappColors.bg.color(colorScheme))
+        .zashiBack(
+            store.isSaveButtonDisabled,
+            primaryAction: {
+                ZappButton(
+                    title: String(localizable: .currencyConversionSaveBtn),
+                    isEnabled: !store.isSaveButtonDisabled
+                ) {
+                    store.send(.saveChangesTapped)
+                }
+            },
+            customDismiss: { store.send(.backToHomeTapped) }
+        )
+    }
+
+    private var learnMoreScreen: some View {
+        VStack {
+            ScrollView { learnMoreLayout() }
+                .padding(.vertical, 1)
+
+            Spacer()
+            learnMoreFooter()
         }
         .navigationBarTitleDisplayMode(.inline)
         .applyScreenBackground()
+        .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
     }
-    
-    private func settingsLayout() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header(desc1: String(localizable: .torSetupSettingsDesc1), desc2: String(localizable: .torSetupSettingsDesc2))
-                .padding(.horizontal, 16)
-                .padding(.bottom, 20)
 
-            ForEach(TorSetup.State.SettingsOptions.allCases, id: \.self) { option in
-                Button {
-                    store.send(.settingsOptionTapped(option))
-                } label: {
-                    HStack(alignment: .top, spacing: 0) {
-                        optionIcon(option.icon().image)
-                        optionVStack(option.title(), subtitle: option.subtitle())
-                        
-                        Spacer()
-                        
-                        if option == store.currentSettingsOption {
-                            Circle()
-                                .fill(Design.Checkboxes.onBg.color(colorScheme))
-                                .frame(width: 20, height: 20)
-                                .overlay {
-                                    Circle()
-                                        .fill(Design.Checkboxes.onFg.color(colorScheme))
-                                        .frame(width: 10, height: 10)
-                                }
-                        } else {
-                            Circle()
-                                .fill(Design.Checkboxes.offBg.color(colorScheme))
-                                .frame(width: 20, height: 20)
-                                .overlay {
-                                    Circle()
-                                        .stroke(Design.Checkboxes.offStroke.color(colorScheme))
-                                        .frame(width: 20, height: 20)
-                                }
-                        }
-                    }
-                    .frame(minHeight: 40)
-                    .padding(20)
-                    .background {
-                        RoundedRectangle(cornerRadius: Design.Radius._xl)
-                            .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
-                    }
-                }
-            }
-            .padding(.bottom, 12)
-        }
-        .padding(.horizontal, 8)
+    private func toggleTorSelection() {
+        store.send(.settingsOptionTapped(store.currentSettingsOption == .optIn ? .optOut : .optIn))
     }
     
     private func learnMoreLayout() -> some View {
@@ -108,15 +119,6 @@ struct TorSetupView: View {
         .screenHorizontalPadding()
     }
  
-    private func settingsFooter() -> some View {
-        ZashiButton(String(localizable: .currencyConversionSaveBtn)) {
-            store.send(.saveChangesTapped)
-        }
-        .disabled(store.isSaveButtonDisabled)
-        .screenHorizontalPadding()
-        .padding(.bottom, 24)
-    }
-    
     private func learnMoreFooter() -> some View {
         VStack {
             ZashiButton(

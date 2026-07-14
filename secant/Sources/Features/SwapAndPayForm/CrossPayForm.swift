@@ -32,14 +32,7 @@ extension SwapAndPayForm {
                             slippageView()
                         }
 
-                        Spacer()
-
-                        quoteCta(
-                            title: String(localizable: .sendReview),
-                            accessibilityID: AccessibilityID.CrossPayForm.reviewButton
-                        )
-                        .padding(.top, Design.Spacing._3xl)
-                        .padding(.bottom, Design.Spacing._6xl)
+                        Spacer(minLength: Design.Spacing._2xl)
                     }
                 }
                 .ignoresSafeArea()

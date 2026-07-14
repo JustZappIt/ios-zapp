@@ -333,6 +333,7 @@ extension Root {
 
             case .zappTabs(.localCurrencyTapped):
                 state.currencyConversionSetupState = .initial
+                state.currencyConversionSetupState.isSettingsView = true
                 state.path = .currencyConversionSetup
                 return .none
 

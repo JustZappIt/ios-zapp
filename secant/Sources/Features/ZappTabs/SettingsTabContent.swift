@@ -6,19 +6,20 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The You tab, mirroring the grouping of `SettingsTabContent.kt`.
+/// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
-/// Android's App lock, Background delivery, Read receipts, Online status and P2P payment method rows
-/// are deliberately absent: each fronts a subsystem iOS does not have yet, and the receipts/presence
-/// toggles already live inside Chat profile. A row that opens nothing is worse than no row.
+/// Android's App lock, Background delivery and P2P payment method rows are deliberately absent:
+/// each fronts a subsystem iOS does not have yet. Read receipts and online status live here and
+/// use the existing ChatProfile reducer, matching Android without duplicating them in Profile.
 ///
-/// `allSettings` has no Android counterpart — Android's own MoreScreen is unreachable from the Zapp
-/// shell, which is a bug there, not a target. It is the only route to the address book, advanced
-/// settings, about, feedback and voting, all of which have working iOS screens.
+/// `allSettings` is iOS's route to the address book, advanced settings, about,
+/// feedback and voting. Keeping it here preserves those working surfaces without
+/// editing upstream's Settings reducer.
 struct SettingsTabContent: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @Perception.Bindable var store: StoreOf<ZappTabs>
+    @Perception.Bindable var chatProfileStore: StoreOf<ChatProfile>
 
     /// nil until the chat identity resolves; Android hides the card the same way.
     var displayName: String?
@@ -68,6 +69,38 @@ struct SettingsTabContent: View {
                             ) {
                                 store.send(.torTapped)
                             }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .chatProfileReadReceipts),
+                                subtitle: String(localizable: .chatProfileReadReceiptsHint),
+                                icon: Asset.Assets.Icons.checkSolid.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft,
+                                trailing: {
+                                    ZappToggle(isOn: chatProfileStore.readReceiptsEnabled) {
+                                        chatProfileStore.send(.readReceiptsToggled)
+                                    }
+                                    .disabled(chatProfileStore.isReadReceiptsBusy)
+                                }
+                            )
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .chatProfilePresence),
+                                subtitle: String(localizable: .chatProfilePresenceHint),
+                                icon: Asset.Assets.Icons.user.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft,
+                                trailing: {
+                                    ZappToggle(isOn: chatProfileStore.presenceVisible) {
+                                        chatProfileStore.send(.presenceToggled)
+                                    }
+                                    .disabled(chatProfileStore.isPresenceBusy)
+                                }
+                            )
                         }
 
                         SettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
@@ -111,6 +144,8 @@ struct SettingsTabContent: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .onAppear { chatProfileStore.send(.onAppear) }
+            .onDisappear { chatProfileStore.send(.onDisappear) }
         }
     }
 }
@@ -168,5 +203,9 @@ private struct SettingsGroup<Content: View>: View {
 }
 
 #Preview {
-    SettingsTabContent(store: ZappTabs.initial, displayName: "chinmay")
+    SettingsTabContent(
+        store: ZappTabs.initial,
+        chatProfileStore: ChatProfile.initial,
+        displayName: "chinmay"
+    )
 }

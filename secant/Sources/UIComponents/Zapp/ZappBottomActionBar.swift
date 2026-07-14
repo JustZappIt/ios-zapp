@@ -8,14 +8,13 @@ import SwiftUI
 /// Bottom action bar for detail/sub-screens.
 ///
 /// The back button is always on the LEFT (thumb-reachable). An optional primary action — typically a
-/// `ZappButton` — sits on the RIGHT, aligned with it. The content row holds a 52pt min height (the
-/// `ZappButton` height) so the bar measures the same with or without a primary action. The
-/// surface/border panel chrome only appears when there is a primary action; a lone back button
-/// renders chrome-free.
+/// `ZappButton` — sits on the RIGHT inside the same bordered panel. A lone back button renders
+/// chrome-free.
 private enum ZappBottomActionBarConstants {
     static let minHeight: CGFloat = 52
     static let gutter: CGFloat = 18
     static let innerPadding: CGFloat = 12
+    static let actionGap: CGFloat = 12
     static let bottomMargin: CGFloat = 8
 }
 
@@ -41,32 +40,37 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
         self.primaryAction = primaryAction()
     }
 
+    @ViewBuilder
     var body: some View {
-        HStack(spacing: 0) {
-            ZappBackButton(tint: backTint, action: onBack)
+        if hasChrome {
+            HStack(spacing: 0) {
+                ZappBackButton(tint: backTint, action: onBack)
 
-            Spacer(minLength: 0)
-
-            primaryAction
-        }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: Constants.minHeight)
-        // The inset + margin land OUTSIDE the background/border, so the full border stays visible
-        // above the home indicator. SwiftUI applies modifiers inside-out, so this reads in reverse
-        // of the Compose chain.
-        .padding(Constants.innerPadding)
-        .background {
-            if hasChrome {
-                Rectangle()
-                    .fill(ZappColors.surface.color(colorScheme))
-                    .overlay(
-                        Rectangle()
-                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-                    )
+                primaryAction
+                    .frame(maxWidth: .infinity)
+                    .padding(.leading, Constants.actionGap)
             }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: Constants.minHeight)
+            .padding(Constants.innerPadding)
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay(
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            )
+            .padding(.bottom, Constants.bottomMargin)
+            .padding(.horizontal, Constants.gutter)
+        } else {
+            HStack(spacing: 0) {
+                ZappBackButton(tint: backTint, action: onBack)
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: Constants.minHeight)
+            .padding(.bottom, Constants.bottomMargin)
+            .padding(.horizontal, Constants.gutter)
         }
-        .padding(.bottom, Constants.bottomMargin)
-        .padding(.horizontal, Constants.gutter)
     }
 }
 

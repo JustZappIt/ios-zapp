@@ -24,10 +24,6 @@ struct ZappFab: View {
                 .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.onAccent)
                 .frame(width: Constants.size, height: Constants.size)
                 .background(ZappColors.accent.color(colorScheme))
-                .overlay(
-                    Rectangle()
-                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-                )
                 .shadow(color: ZappColors.shadow.color(colorScheme), radius: 4, y: 2)
         }
         .buttonStyle(.zappPress)
