@@ -39,11 +39,11 @@ extension SwapAndPayForm {
                         fromView(colorScheme)
                     }
 
+                    rateView(colorScheme)
+
                     slippageView()
                         .padding(.top, Design.Spacing._3xl)
                         .padding(.bottom, Design.Spacing._xl)
-
-                    rateView(colorScheme)
 
                     Spacer(minLength: Design.Spacing._2xl)
                 }
