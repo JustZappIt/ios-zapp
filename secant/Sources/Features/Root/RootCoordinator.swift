@@ -17,6 +17,8 @@ extension Root {
                 // MARK: - Returns to Home
 
             case .settings(.backToHomeTapped),
+                .chatRoom(.backToHomeTapped),
+                .newChat(.backToHomeTapped),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
@@ -250,6 +252,28 @@ extension Root {
             case .home(.smartBanner(.serverSwitchRequested)):
                 state.serverSetupState = .initial
                 state.path = .serverSwitch
+                return .none
+
+                // MARK: - Chats tab
+
+            case .chatsList(.newConversationTapped):
+                state.newChatState = .initial
+                state.path = .newChat
+                return .none
+
+                // Creating a conversation lands the user straight in it, rather than
+                // back on a list they then have to find it in.
+            case .newChat(.created(let conversation)):
+                state.chatRoomState = .initial
+                state.chatRoomState.conversationId = conversation.id
+                state.chatRoomState.conversation = conversation
+                state.path = .chatRoom
+                return .none
+
+            case .chatsList(.conversationTapped(let conversationId)):
+                state.chatRoomState = .initial
+                state.chatRoomState.conversationId = conversationId
+                state.path = .chatRoom
                 return .none
 
                 // MARK: - You tab

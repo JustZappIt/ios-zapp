@@ -36,6 +36,7 @@ extension ZappMessagingClient: DependencyKey {
             latestState: { impl.stateSubject.value },
             conversationsStream: { impl.conversationsSubject.eraseToAnyPublisher() },
             refreshConversations: { try await impl.refreshConversations() },
+            createDirectConversation: { try await impl.createDirectConversation(publicKey: $0, displayName: $1) },
             messages: { try await impl.messages(conversationId: $0, limit: $1) },
             sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1) },
             markRead: { try await impl.markRead(conversationId: $0) },
@@ -220,6 +221,29 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard let sdk else { throw ZMError.notInitialized }
         try await sdk.refreshConversations()
         conversationsSubject.send(await sdk.conversations)
+    }
+
+    @MainActor
+    func createDirectConversation(publicKey: String, displayName: String?) async throws -> ZMConversation {
+        guard let sdk else { throw ZMError.notInitialized }
+
+        // Re-open rather than fork: the core keys a direct conversation on its
+        // participant, so creating a second one for the same peer would split the
+        // history in two.
+        if let existing = sdk.conversations.first(where: {
+            $0.type == .direct && $0.participantIds.contains(publicKey)
+        }) {
+            try await sdk.ensureConversationConnected(existing.id)
+            return existing
+        }
+
+        let conversation = try await sdk.createConversation(
+            type: .direct,
+            participants: [publicKey],
+            displayName: displayName
+        )
+        conversationsSubject.send(sdk.conversations)
+        return conversation
     }
 
     func messages(conversationId: String, limit: Int) async throws -> [ZMMessage] {

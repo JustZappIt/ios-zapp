@@ -29,6 +29,10 @@ struct ZappTabs {
         var selectedTab: Tab = .chats
         var chatUnreadCount = 0
 
+        /// Fed from Root's ZappMessagingState. The Chats tab shows the identity
+        /// setup screen until this is true.
+        var hasChatIdentity = false
+
         // Set by tab content when it pushes a fullscreen sub-screen that owns its
         // own bottom CTA, so the two don't overlap.
         var hideNavPill = false

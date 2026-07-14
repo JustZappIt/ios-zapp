@@ -96,6 +96,13 @@ struct ZappMessagingClient {
     }
     var refreshConversations: @Sendable () async throws -> Void
 
+    /// Start (or re-open) a direct conversation with a peer's Ed25519 public key.
+    /// Returns the existing conversation if one already exists for that peer.
+    var createDirectConversation: @Sendable (
+        _ publicKey: String,
+        _ displayName: String?
+    ) async throws -> ZMConversation
+
     // MARK: Messages
 
     var messages: @Sendable (_ conversationId: String, _ limit: Int) async throws -> [ZMMessage] = { _, _ in [] }
