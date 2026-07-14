@@ -61,14 +61,18 @@ struct SendFormView: View {
                     ScrollViewReader { value in
                         WithPerceptionTracking {
                             VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
-                                WalletBalancesView(
-                                    store: store.scope(
-                                        state: \.walletBalancesState,
-                                        action: \.walletBalances
-                                    ),
-                                    tokenName: tokenName,
-                                    couldBeHidden: true
+                                ZappAvailableBalanceHeader(
+                                    balance: store.walletBalancesState.totalBalance,
+                                    fiatText: store.walletBalancesState.currencyValue.nilIfEmpty,
+                                    tokenName: tokenName
                                 )
+
+                                VStack(spacing: Design.Spacing._sm) {
+                                    ZappSectionLabel(text: String(localizable: .zappWalletAsset))
+
+                                    ZappAssetPill(tokenName: tokenName)
+                                }
+                                .frame(maxWidth: .infinity)
 
                                 addressField
                                 amountFields
@@ -471,6 +475,12 @@ struct SendFormView: View {
                     .padding(.bottom, Design.Spacing._3xl)
             }
         }
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }
 

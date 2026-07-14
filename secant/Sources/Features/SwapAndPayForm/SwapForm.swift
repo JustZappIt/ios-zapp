@@ -13,9 +13,16 @@ extension SwapAndPayForm {
         WithPerceptionTracking {
             ScrollView {
                 VStack(spacing: 0) {
+                    ZappAvailableBalanceHeader(
+                        balance: store.walletBalancesState.totalBalance,
+                        fiatText: availableBalanceFiat,
+                        tokenName: tokenName
+                    )
+                    .padding(.top, Design.Spacing._lg)
+                    .padding(.bottom, Design.Spacing._3xl)
+
                     if store.isSwapExperienceEnabled {
                         fromView(colorScheme)
-                            .padding(.top, Design.Spacing._4xl)
 
                         dividerView(colorScheme)
 
@@ -24,7 +31,6 @@ extension SwapAndPayForm {
                         addressView()
                     } else {
                         toView(colorScheme)
-                            .padding(.top, Design.Spacing._4xl)
 
                         addressView()
 
@@ -117,6 +123,12 @@ extension SwapAndPayForm {
                 safeAreaHeight = safeFrame.height
             }
         }
+    }
+
+    private var availableBalanceFiat: String? {
+        guard let zecAsset = store.zecAsset else { return nil }
+        let balance = store.walletBalancesState.totalBalance.decimalValue.decimalValue
+        return (balance * zecAsset.usdPrice).formatted(.currency(code: CurrencyISO4217.usd.code))
     }
 
     @ViewBuilder private func rateView(_ colorScheme: ColorScheme) -> some View {

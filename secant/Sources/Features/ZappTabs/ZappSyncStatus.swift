@@ -156,7 +156,7 @@ struct ZappSyncProgressRow: View {
     }
 }
 
-/// The actionable half of the smart banner: wallet backup, shielding, Tor, currency conversion.
+/// The actionable half of the smart banner: wallet backup, shielding, currency conversion.
 ///
 /// Android drops these entirely. Not copied: wallet backup is a funds-loss surface and the Zapp
 /// shell has no other entry point to it. The non-actionable priorities (disconnected, sync error,
@@ -230,13 +230,8 @@ struct ZappSmartActionStrip: View {
                 isEnabled: !store.isShielding
             )
         case .priority75:
-            return ZappSmartAction(
-                icon: Asset.Assets.Icons.shieldZap.image,
-                title: String(localizable: .smartBannerContentTorTitle),
-                info: String(localizable: .smartBannerContentTorInfo),
-                cta: String(localizable: .smartBannerContentTorButton),
-                event: .torSetupTapped
-            )
+            // Android exposes Tor in You > Privacy, not as a Pay action.
+            return nil
         case .priority8:
             return ZappSmartAction(
                 icon: Asset.Assets.Icons.coinsSwap.image,
