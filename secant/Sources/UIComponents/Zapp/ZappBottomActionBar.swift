@@ -25,19 +25,25 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
     private typealias Constants = ZappBottomActionBarConstants
 
     private let onBack: () -> Void
+    private let backTint: ZappColors
     private let primaryAction: PrimaryAction
 
     /// Chrome-free when there is no primary action, matching `ZappBottomActionBar.kt`.
     private var hasChrome: Bool { PrimaryAction.self != EmptyView.self }
 
-    init(onBack: @escaping () -> Void, @ViewBuilder primaryAction: () -> PrimaryAction) {
+    init(
+        onBack: @escaping () -> Void,
+        backTint: ZappColors = .text,
+        @ViewBuilder primaryAction: () -> PrimaryAction
+    ) {
         self.onBack = onBack
+        self.backTint = backTint
         self.primaryAction = primaryAction()
     }
 
     var body: some View {
         HStack(spacing: 0) {
-            ZappBackButton(action: onBack)
+            ZappBackButton(tint: backTint, action: onBack)
 
             Spacer(minLength: 0)
 
@@ -65,8 +71,8 @@ struct ZappBottomActionBar<PrimaryAction: View>: View {
 }
 
 extension ZappBottomActionBar where PrimaryAction == EmptyView {
-    init(onBack: @escaping () -> Void) {
-        self.init(onBack: onBack) { EmptyView() }
+    init(onBack: @escaping () -> Void, backTint: ZappColors = .text) {
+        self.init(onBack: onBack, backTint: backTint) { EmptyView() }
     }
 }
 

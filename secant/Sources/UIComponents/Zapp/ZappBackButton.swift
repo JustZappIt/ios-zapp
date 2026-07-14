@@ -12,16 +12,18 @@ struct ZappBackButton: View {
         static let iconSize: CGFloat = 20
     }
 
+    var tint: ZappColors = .text
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Asset.Assets.Icons.arrowNarrowLeft.image
-                .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.text)
+                .zImage(width: Constants.iconSize, height: Constants.iconSize, style: tint)
                 .frame(width: Constants.touchTarget, height: Constants.touchTarget)
         }
         .buttonStyle(.zappPress)
         .accessibilityLabel(String(localizable: .generalBack))
+        .accessibilityIdentifier(AccessibilityID.Navigation.back)
     }
 }
 
