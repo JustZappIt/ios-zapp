@@ -25,6 +25,9 @@ struct ChatConversationRow: View {
     }
 
     let conversation: ZMConversation
+    /// Resolved by the store (local alias > wire name > key prefix). The row must
+    /// not read `conversation.displayName` directly, or a saved alias never shows.
+    let displayName: String
     var isPeerOnline = false
     var unreadCount = 0
     let action: () -> Void
@@ -40,7 +43,7 @@ struct ChatConversationRow: View {
 
             VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
                 HStack(spacing: Design.Spacing._md) {
-                    Text(conversation.displayName)
+                    Text(displayName)
                         .zappFont(.rowTitle, style: ZappColors.text)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -103,7 +106,7 @@ struct ChatConversationRow: View {
     }
 
     private var initials: String {
-        conversation.displayName.zappInitials
+        displayName.zappInitials
     }
 
     private var avatarIconName: String? {
@@ -153,6 +156,7 @@ private enum ChatPreviewSentinel {
                 lastMessage: "See you at 8",
                 lastMessageTimestamp: Date()
             ),
+            displayName: "chinmay",
             isPeerOnline: true,
             unreadCount: 3
         ) { }
@@ -167,13 +171,15 @@ private enum ChatPreviewSentinel {
                 displayName: "Zapp builders",
                 lastMessage: "{\"txId\":\"abc\"}",
                 lastMessageTimestamp: Date(timeIntervalSinceNow: -7200)
-            )
+            ),
+            displayName: "Zapp builders"
         ) { }
 
         ZappRowDivider(inset: true)
 
         ChatConversationRow(
-            conversation: ZMConversation(id: "3", type: .direct, participantIds: [], displayName: "ada")
+            conversation: ZMConversation(id: "3", type: .direct, participantIds: [], displayName: "ada"),
+            displayName: "ada"
         ) { }
     }
     .applyScreenBackground()

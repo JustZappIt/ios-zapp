@@ -429,6 +429,7 @@ extension Root {
                 }
                 return .merge(
                     .send(.loadContacts),
+                    .send(.loadChatContacts),
                     .send(.loadUserMetadata),
                     .send(.loadSwapAPIAccess)
                 )
@@ -558,6 +559,13 @@ extension Root {
                         try? votingMetadata.resetAccount(account.account)
                     }
                 }
+                // Outside the `areMetadataPreserved` guard on purpose: the chat
+                // identity is derived from the wallet seed, so chat contacts belong
+                // to the wallet being deleted, not to the user's portable metadata.
+                // Must run BEFORE clearEncryptionKeys — the file is keyed by them.
+                state.walletAccounts.forEach { account in
+                    try? chatContacts.resetAccount(account.account)
+                }
                 state.walletAccounts.forEach { account in
                     try? walletStorage.clearEncryptionKeys(account.account)
                 }
@@ -570,6 +578,7 @@ extension Root {
                 state.$zashiWalletAccount.withLock { $0 = nil }
                 state.$transactionMemos.withLock { $0 = [:] }
                 state.$addressBookContacts.withLock { $0 = .empty }
+                state.$chatContacts.withLock { $0 = .empty }
                 state.$transactions.withLock { $0 = [] }
                 state.path = nil
                 if state.appInitializationState != .keysMissing {

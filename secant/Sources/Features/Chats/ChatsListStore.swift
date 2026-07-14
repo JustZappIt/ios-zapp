@@ -11,6 +11,8 @@ import ZappMessaging
 struct ChatsList {
     @ObservableState
     struct State: Equatable {
+        @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+
         var conversations: [ZMConversation] = []
         var messagingState = ZappMessagingState()
 
@@ -20,10 +22,22 @@ struct ChatsList {
         var conversationsCancelId = UUID()
         var stateCancelId = UUID()
 
+        /// Blocked DMs are hidden outright. A group is not hidden because one member
+        /// is blocked — their messages are filtered inside the room instead.
         var sortedConversations: [ZMConversation] {
-            conversations.sorted {
-                ($0.lastMessageTimestamp ?? .distantPast) > ($1.lastMessageTimestamp ?? .distantPast)
-            }
+            conversations
+                .filter { conversation in
+                    guard conversation.type == .direct else { return true }
+
+                    return !conversation.participantIds.contains { chatContacts.isBlocked($0) }
+                }
+                .sorted {
+                    ($0.lastMessageTimestamp ?? .distantPast) > ($1.lastMessageTimestamp ?? .distantPast)
+                }
+        }
+
+        func displayName(for conversation: ZMConversation) -> String {
+            conversation.resolvedDisplayName(chatContacts)
         }
 
         init() { }

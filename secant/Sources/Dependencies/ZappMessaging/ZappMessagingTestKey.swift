@@ -43,6 +43,7 @@ extension ZappMessagingClient: TestDependencyKey {
         },
         markRead: { _ in },
         messageReceivedStream: { Empty().eraseToAnyPublisher() },
-        setActiveConversation: { _ in }
+        setActiveConversation: { _ in },
+        setBlockedKeys: { _ in }
     )
 }

@@ -46,14 +46,14 @@ struct ChatRoomView: View {
     }
 
     private var items: [ChatRoomItem] {
-        ChatRoomItem.build(from: store.messages)
+        ChatRoomItem.build(from: store.visibleMessages)
     }
 
     private var messages: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: Design.Spacing._md) {
-                    if store.isLoading && store.messages.isEmpty {
+                    if store.isLoading && store.visibleMessages.isEmpty {
                         ProgressView()
                             .tint(ZappColors.accent.color(colorScheme))
                             .frame(maxWidth: .infinity)
@@ -63,7 +63,7 @@ struct ChatRoomView: View {
                     ForEach(items) { item in
                         switch item {
                         case .message(let message):
-                            ChatMessageBubble(message: message)
+                            ChatMessageBubble(message: message, senderName: store.state.senderName(for: message))
 
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)

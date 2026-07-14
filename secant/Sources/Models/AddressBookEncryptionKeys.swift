@@ -122,4 +122,34 @@ struct AddressBookKey: Codable, Equatable, Redactable {
         // Prepend the prefix to the result
         return "zashi-address-book-\(fileIdentifier)"
     }
+
+    /**
+     * Derives the filename for the chat-contacts file.
+     *
+     * Chat contacts live in their own file, NOT in the address book, and this is not a
+     * stylistic split. The address-book decoder returns `.empty` for an unrecognised
+     * version (`AddressBookEncryption.swift`, `default: return (.empty, false)`), that
+     * empty is cached, and the next save writes it back — so any already-shipped build
+     * that met a newer address-book file would silently destroy the user's ZEC payees.
+     * That code is in binaries already in users' hands and cannot be fixed from our side.
+     * A chat contact also has no ZEC address, and an empty address desynchronises that
+     * file's parser mid-record, corrupting every contact after it.
+     *
+     * Same key material, different HKDF `info`, so the two files are domain-separated and
+     * a Zashi build can never be handed this one. Mirrors how UserMetadataEncryptionKeys
+     * derives its metadata and voting filenames from a single key.
+     */
+    func chatContactsFileIdentifier() -> String? {
+        guard let info = "chat_contacts_file_identifier".data(using: .utf8) else {
+            fatalError("Unable to prepare `chat_contacts_file_identifier` info")
+        }
+
+        let hkdfKey = HKDF<SHA256>.deriveKey(inputKeyMaterial: key, info: info, outputByteCount: 32)
+
+        let fileIdentifier = hkdfKey.withUnsafeBytes { rawBytes in
+            rawBytes.map { String(format: "%02x", $0) }.joined()
+        }
+
+        return "zapp-chat-contacts-\(fileIdentifier)"
+    }
 }

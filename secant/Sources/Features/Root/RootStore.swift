@@ -54,6 +54,7 @@ struct Root {
         var automaticServerRefreshCancelId = UUID()
 
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
+        @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
         @Presents var alert: AlertState<Action>?
         var appInitializationState: InitializationState = .uninitialized
         var appStartState: AppStartState = .unknown
@@ -197,6 +198,8 @@ struct Root {
         case batteryStateChanged
         case binding(BindingAction<Root.State>)
         case cancelAllRunningEffects
+        case loadChatContacts
+        case chatContactsLoaded(ChatContacts)
         case observeZappMessaging
         case zappMessagingStateChanged(ZappMessagingState)
         case deeplinkWarning(DeeplinkWarning.Action)
@@ -323,6 +326,7 @@ struct Root {
     @Dependency(\.walletConfigProvider) var walletConfigProvider
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.readTransactionsStorage) var readTransactionsStorage
+    @Dependency(\.chatContacts) var chatContacts
     @Dependency(\.zappMessaging) var zappMessaging
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
@@ -449,6 +453,8 @@ struct Root {
         coordinatorReduce()
         
         shieldingProcessorReduce()
+
+        chatContactsReduce()
 
         zappMessagingReduce()
         

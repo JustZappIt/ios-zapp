@@ -20,13 +20,16 @@ struct ChatMessageBubble: View {
     }
 
     let message: ZMMessage
+    /// Resolved by the store (local alias > wire name). Passed in so the bubble
+    /// stays dumb and the resolution stays testable.
+    var senderName: String?
 
     private var isFromMe: Bool { message.isFromMe }
     private var hasQuote: Bool { message.replyToId != nil }
 
     var body: some View {
         VStack(alignment: isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
-            if !isFromMe, let senderName = message.senderName {
+            if !isFromMe, let senderName {
                 Text(senderName)
                     .zappFont(.chip, style: ZappColors.accent)
                     .padding(.leading, Design.Spacing._xs)
