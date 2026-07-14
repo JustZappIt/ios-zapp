@@ -12,6 +12,8 @@ import ZappMessaging
 struct ChatRoom {
     @ObservableState
     struct State: Equatable {
+        @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+
         var conversationId: String
         var conversation: ZMConversation?
         var messages: [ZMMessage] = []
@@ -28,9 +30,21 @@ struct ChatRoom {
         }
 
         var title: String {
-            let name = conversation?.displayName ?? ""
+            guard let conversation else { return String(localizable: .chatRoomTitleFallback) }
+
+            let name = conversation.resolvedDisplayName(chatContacts)
 
             return name.isEmpty ? String(localizable: .chatRoomTitleFallback) : name
+        }
+
+        /// Blocked senders are filtered on the way out too, not just at ingest: a
+        /// cold load reads straight from the store, which knows nothing about blocks.
+        var visibleMessages: [ZMMessage] {
+            messages.filter { !chatContacts.isBlocked($0.senderId) }
+        }
+
+        func senderName(for message: ZMMessage) -> String? {
+            message.resolvedSenderName(chatContacts)
         }
 
         /// OUR connectivity, not the peer's — `isOnline` is this node's swarm
@@ -135,6 +149,7 @@ struct ChatRoom {
                 return .none
 
             case .messageReceived(let message):
+                guard !state.chatContacts.isBlocked(message.senderId) else { return .none }
                 guard !state.messages.contains(where: { $0.id == message.id }) else { return .none }
 
                 state.messages.append(message)

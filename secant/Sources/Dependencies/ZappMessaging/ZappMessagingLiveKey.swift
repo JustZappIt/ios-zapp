@@ -41,7 +41,8 @@ extension ZappMessagingClient: DependencyKey {
             sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1) },
             markRead: { try await impl.markRead(conversationId: $0) },
             messageReceivedStream: { impl.messageReceivedSubject.eraseToAnyPublisher() },
-            setActiveConversation: { impl.setActiveConversation($0) }
+            setActiveConversation: { impl.setActiveConversation($0) },
+            setBlockedKeys: { impl.setBlockedKeys($0) }
         )
     }
 }
@@ -70,6 +71,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     private var pendingDisplayName: String?
     private var activeConversationId: String?
     private var unreadCounts: [String: Int] = [:]
+    private var blockedKeys: Set<String> = []
 
     // MARK: - Lifecycle
 
@@ -262,6 +264,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         clearUnread(for: conversationId)
     }
 
+    func setBlockedKeys(_ keys: Set<String>) {
+        lock.withLock { blockedKeys = keys }
+    }
+
     func setActiveConversation(_ conversationId: String?) {
         lock.withLock { activeConversationId = conversationId }
         if let conversationId {
@@ -303,6 +309,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     /// an `unreadCount` and `ZMConversation` never carries one.
     private func countUnread(_ message: ZMMessage) {
         guard !message.isFromMe else { return }
+        guard !lock.withLock({ blockedKeys }).contains(PublicKeyRules.sanitize(message.senderId)) else { return }
         guard lock.withLock({ activeConversationId }) != message.conversationId else { return }
 
         let total: Int = lock.withLock {

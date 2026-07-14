@@ -50,7 +50,10 @@ struct ChatsListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(store.sortedConversations) { conversation in
-                    ChatConversationRow(conversation: conversation) {
+                    ChatConversationRow(
+                        conversation: conversation,
+                        displayName: store.state.displayName(for: conversation)
+                    ) {
                         store.send(.conversationTapped(conversation.id))
                     }
 

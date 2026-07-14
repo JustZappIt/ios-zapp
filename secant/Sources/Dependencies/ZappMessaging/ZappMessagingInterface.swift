@@ -118,4 +118,9 @@ struct ZappMessagingClient {
     /// Tell the subsystem which room is on screen, so its inbound messages are
     /// not counted as unread.
     var setActiveConversation: @Sendable (String?) -> Void
+
+    /// Blocked senders must not bump the unread badge. Unread is counted inside the
+    /// messaging subsystem, which cannot see the contact list, so Root pushes the
+    /// set down whenever it changes.
+    var setBlockedKeys: @Sendable (Set<String>) -> Void
 }
