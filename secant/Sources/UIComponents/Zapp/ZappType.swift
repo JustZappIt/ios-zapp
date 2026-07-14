@@ -38,6 +38,8 @@ extension ZappTextStyle {
     static let sectionTitle = ZappTextStyle(weight: .bold, size: 18, lineHeight: 24, tracking: -0.3)
     static let display = ZappTextStyle(weight: .bold, size: 32, lineHeight: 36, tracking: -1.0)
     static let displaySecondary = ZappTextStyle(weight: .bold, size: 24, lineHeight: 28, tracking: -0.5)
+    static let balanceDisplay = ZappTextStyle(weight: .black, size: 35.2, lineHeight: 39.6, tracking: -1.0)
+    static let balanceFraction = ZappTextStyle(weight: .bold, size: 19.8, lineHeight: 26.4, tracking: -0.3)
     static let eyebrow = ZappTextStyle(weight: .bold, size: 11, lineHeight: 14, tracking: 1.0)
     static let groupLabel = ZappTextStyle(weight: .bold, size: 10, lineHeight: 14, tracking: 1.0)
     static let rowTitle = ZappTextStyle(weight: .semiBold, size: 15, lineHeight: 20)
