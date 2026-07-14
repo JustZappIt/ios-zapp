@@ -17,6 +17,7 @@ extension Root {
                 // MARK: - Returns to Home
 
             case .settings(.backToHomeTapped),
+                .chatContactsList(.backToHomeTapped),
                 .chatRoom(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
                 .receive(.backToHomeTapped),
@@ -259,6 +260,16 @@ extension Root {
                 return .none
 
                 // MARK: - Chats tab
+
+            case .zappTabs(.chatContactsTapped):
+                state.chatContactsListState = .initial
+                state.path = .chatContacts
+                return .none
+
+                // The feature owns no shared state; Root does. A mutation comes back
+                // up here so every screen reading @Shared sees it at once.
+            case .chatContactsList(.contactsChanged(let contacts)):
+                return .send(.chatContactsLoaded(contacts))
 
             case .chatsList(.newConversationTapped):
                 state.newChatState = .initial

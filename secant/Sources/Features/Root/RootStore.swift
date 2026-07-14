@@ -15,6 +15,7 @@ struct Root {
     struct State {
         enum Path {
             case addKeystoneHWWalletCoordFlow
+            case chatContacts
             case chatRoom
             case newChat
             case currencyConversionSetup
@@ -111,6 +112,7 @@ struct Root {
         var currencyConversionSetupState = CurrencyConversionSetup.State.initial
         var chatsListState = ChatsList.State.initial
         var chatIdentitySetupState = ChatIdentitySetup.State.initial
+        var chatContactsListState = ChatContactsList.State.initial
         var chatRoomState = ChatRoom.State.initial
         var newChatState = NewChat.State.initial
         var receiveState = Receive.State.initial
@@ -151,7 +153,7 @@ struct Root {
                 return true
             case .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .chatRoom, .newChat, .currencyConversionSetup, .receive,
+            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatRoom, .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
                 return false
             }
@@ -235,6 +237,7 @@ struct Root {
         case currencyConversionSetup(CurrencyConversionSetup.Action)
         case chatsList(ChatsList.Action)
         case chatIdentitySetup(ChatIdentitySetup.Action)
+        case chatContactsList(ChatContactsList.Action)
         case chatRoom(ChatRoom.Action)
         case newChat(NewChat.Action)
         case receive(Receive.Action)
@@ -382,6 +385,10 @@ struct Root {
 
         Scope(state: \.chatIdentitySetupState, action: \.chatIdentitySetup) {
             ChatIdentitySetup()
+        }
+
+        Scope(state: \.chatContactsListState, action: \.chatContactsList) {
+            ChatContactsList()
         }
 
         Scope(state: \.chatRoomState, action: \.chatRoom) {

@@ -278,6 +278,15 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .chatContacts {
+                                ChatContactsListView(
+                                    store: store.scope(
+                                        state: \.chatContactsListState,
+                                        action: \.chatContactsList
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             }
                         }
                     }
