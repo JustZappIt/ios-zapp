@@ -37,6 +37,13 @@ struct ZappTabs {
     enum Action: Equatable {
         case tabSelected(Tab)
         case fullscreenChanged(Bool)
+
+        // Routed by RootCoordinator into Root's path overlays, the same way Home's
+        // *Tapped actions are. The You tab stays navigation-agnostic.
+        case allSettingsTapped
+        case chooseServerTapped
+        case localCurrencyTapped
+        case torTapped
     }
 
     init() { }
@@ -50,6 +57,9 @@ struct ZappTabs {
 
             case .fullscreenChanged(let isFullscreen):
                 state.hideNavPill = isFullscreen
+                return .none
+
+            case .allSettingsTapped, .chooseServerTapped, .localCurrencyTapped, .torTapped:
                 return .none
             }
         }

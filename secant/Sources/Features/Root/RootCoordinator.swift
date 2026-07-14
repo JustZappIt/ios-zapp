@@ -252,6 +252,29 @@ extension Root {
                 state.path = .serverSwitch
                 return .none
 
+                // MARK: - You tab
+
+            case .zappTabs(.allSettingsTapped):
+                state.settingsState = .initial
+                state.path = .settings
+                return .none
+
+            case .zappTabs(.chooseServerTapped):
+                state.serverSetupState = .initial
+                state.path = .serverSwitch
+                return .none
+
+            case .zappTabs(.localCurrencyTapped):
+                state.currencyConversionSetupState = .initial
+                state.path = .currencyConversionSetup
+                return .none
+
+            case .zappTabs(.torTapped):
+                state.torSetupState = .initial
+                state.torSetupState.isSettingsView = true
+                state.path = .torSetup
+                return .none
+
                 // MARK: - Keystone
 
             case .sendCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.rejectTapped)))),
