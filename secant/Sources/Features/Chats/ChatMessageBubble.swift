@@ -49,7 +49,11 @@ struct ChatMessageBubble: View {
     private var fillWidth: CGFloat? { hasQuote ? .infinity : nil }
 
     private var bubble: some View {
-        HStack(alignment: .bottom, spacing: Design.Spacing._md) {
+        // Baseline-aligned, not bottom-aligned: the meta is 10pt against 14pt body
+        // text, so matching box edges leaves the time floating above the words.
+        // Aligning on the LAST baseline sits it on the final line of the message,
+        // which is where a reader expects it.
+        HStack(alignment: .lastTextBaseline, spacing: Design.Spacing._md) {
             Text(message.content)
                 .zappFont(.body, color: textColor)
                 .frame(maxWidth: fillWidth, alignment: .leading)
@@ -61,10 +65,13 @@ struct ChatMessageBubble: View {
         .background(bubbleColor)
     }
 
+    /// Time, then the tick — always in that order, and the tick is always last so
+    /// it stays hard against the bubble's trailing edge.
     private var meta: some View {
-        HStack(spacing: Design.Spacing._xs) {
+        HStack(alignment: .firstTextBaseline, spacing: Design.Spacing._xs) {
             Text(timeLabel)
                 .zappFont(.bubbleMeta, color: metaColor)
+                .fixedSize()
 
             if isFromMe {
                 ChatMessageStatusIndicator(
@@ -74,6 +81,7 @@ struct ChatMessageBubble: View {
                 )
             }
         }
+        .fixedSize()
     }
 
     private var quote: some View {
