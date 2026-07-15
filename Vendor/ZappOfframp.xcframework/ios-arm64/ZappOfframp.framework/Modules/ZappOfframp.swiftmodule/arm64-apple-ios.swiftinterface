@@ -1,0 +1,1850 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 effective-5.10 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios14.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -O -module-name ZappOfframp
+// swift-module-flags-ignorable:  -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import Foundation
+import Swift
+@_exported import ZappOfframp
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum Skie {
+  public enum KotlinxCoroutinesCore {
+    public enum Runnable {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreRunnable
+    }
+    public enum Flow {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreFlow
+    }
+    public enum StateFlow {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreStateFlow
+    }
+    public enum SharedFlow {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreSharedFlow
+    }
+    public enum MutableSharedFlow {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreMutableSharedFlow
+    }
+    public enum MutableStateFlow {
+      public typealias __Kotlin = ZappOfframp.Kotlinx_coroutines_coreMutableStateFlow
+    }
+    public enum SelectClause0 {
+    }
+    public enum SelectClause {
+    }
+    public enum SelectInstance {
+    }
+    public enum SelectClause1 {
+    }
+    public enum SelectClause2 {
+    }
+  }
+  public typealias org_jetbrains_kotlinx__kotlinx_coroutines_core = ZappOfframp.Skie.KotlinxCoroutinesCore
+  public enum RuntimeKotlin {
+    public enum SkieColdFlowIterator {
+      public typealias __Kotlin = ZappOfframp.SkieColdFlowIterator
+    }
+    public enum SkieKotlinFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinFlow
+    }
+    public enum SkieKotlinMutableSharedFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinMutableSharedFlow
+    }
+    public enum SkieKotlinMutableStateFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinMutableStateFlow
+    }
+    public enum SkieKotlinOptionalFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinOptionalFlow
+    }
+    public enum SkieKotlinOptionalMutableSharedFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinOptionalMutableSharedFlow
+    }
+    public enum SkieKotlinOptionalMutableStateFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinOptionalMutableStateFlow
+    }
+    public enum SkieKotlinOptionalSharedFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinOptionalSharedFlow
+    }
+    public enum SkieKotlinOptionalStateFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinOptionalStateFlow
+    }
+    public enum SkieKotlinSharedFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinSharedFlow
+    }
+    public enum SkieKotlinStateFlow {
+      public typealias __Kotlin = ZappOfframp.SkieKotlinStateFlow
+    }
+    public enum Skie_CancellationHandler {
+      public typealias __Kotlin = ZappOfframp.Skie_CancellationHandler
+    }
+    public enum Skie_DispatcherDelegate {
+      public typealias __Kotlin = ZappOfframp.Skie_DispatcherDelegate
+    }
+    public enum Skie_SuspendHandler {
+      public typealias __Kotlin = ZappOfframp.Skie_SuspendHandler
+    }
+    public enum Skie_SuspendResult {
+      public typealias __Kotlin = ZappOfframp.Skie_SuspendResult
+      public enum Success {
+        public typealias __Kotlin = ZappOfframp.Skie_SuspendResult.Success
+      }
+      public enum Error {
+        public typealias __Kotlin = ZappOfframp.Skie_SuspendResult.Error
+      }
+      public enum Canceled {
+        public typealias __Kotlin = ZappOfframp.Skie_SuspendResult.Canceled
+      }
+    }
+  }
+  public typealias co_touchlab_skie__runtime_kotlin = ZappOfframp.Skie.RuntimeKotlin
+  public enum KtorUtils {
+    public enum Pipeline {
+    }
+  }
+  public typealias io_ktor__ktor_utils = ZappOfframp.Skie.KtorUtils
+  public enum EvmLib {
+    public enum AbiArg {
+    }
+    public enum RpcException {
+    }
+    public enum RlpItem {
+    }
+  }
+  public typealias zcash_android_app__evm_lib = ZappOfframp.Skie.EvmLib
+  public enum KotlinxSerializationCore {
+    public enum SerialKind {
+    }
+    public enum SerializersModule {
+    }
+    public enum PolymorphicKind {
+    }
+    public enum PrimitiveKind {
+    }
+    public enum StructureKind {
+    }
+  }
+  public typealias org_jetbrains_kotlinx__kotlinx_serialization_core = ZappOfframp.Skie.KotlinxSerializationCore
+  public enum KtorHttp {
+    public enum OutgoingContent {
+    }
+  }
+  public typealias io_ktor__ktor_http = ZappOfframp.Skie.KtorHttp
+  public enum KotlinxIoCore {
+    public enum Source {
+    }
+    public enum Sink {
+    }
+  }
+  public typealias org_jetbrains_kotlinx__kotlinx_io_core = ZappOfframp.Skie.KotlinxIoCore
+  public enum OfframpLib {
+    public enum FundingOutcome {
+    }
+    public enum BridgeToBaseStatus {
+    }
+    public enum OfframpStatus {
+    }
+    public enum PaymentQrParseResult {
+    }
+    public enum PaymentQrError {
+    }
+    public enum UpiQrParseResult {
+    }
+    public enum UpiQrError {
+    }
+  }
+  public typealias zcash_android_app__offramp_lib = ZappOfframp.Skie.OfframpLib
+  public enum KotlinxSerializationJson {
+    public enum JsonElement {
+    }
+    public enum JsonPrimitive {
+    }
+  }
+  public typealias org_jetbrains_kotlinx__kotlinx_serialization_json = ZappOfframp.Skie.KotlinxSerializationJson
+}
+@_hasMissingDesignatedInitializers public class SkieSwiftFlowIterator<T> : _Concurrency.AsyncIteratorProtocol {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func next() async -> T?
+  @objc deinit
+  public typealias Element = T
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncIteratorProtocol, Failure) public typealias __AsyncIteratorProtocol_Failure = Swift.Never
+}
+public protocol SkieSwiftFlowProtocol<Element> : _Concurrency.AsyncSequence {
+  associatedtype Element
+  associatedtype Delegate : ZappOfframp.Kotlinx_coroutines_coreFlow
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias Element = T
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftOptionalFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinOptionalFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias Element = T?
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinOptionalFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftSharedFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var replayCache: [T] {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftSharedFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftSharedFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinSharedFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinSharedFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias Element = T
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinSharedFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreSharedFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftOptionalSharedFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var replayCache: [T?] {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalSharedFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalSharedFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalSharedFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinOptionalSharedFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias Element = T?
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinOptionalSharedFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreSharedFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftMutableSharedFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var subscriptionCount: ZappOfframp.SkieSwiftStateFlow<ZappOfframp.KotlinInt> {
+    get
+  }
+  final public var replayCache: [T] {
+    get
+  }
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  final public func emit(value: T) async throws
+  final public func tryEmit(value: T) -> Swift.Bool
+  final public func resetReplayCache()
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftMutableSharedFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftMutableSharedFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableSharedFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinMutableSharedFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias Element = T
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinMutableSharedFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreMutableSharedFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftOptionalMutableSharedFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var subscriptionCount: ZappOfframp.SkieSwiftStateFlow<ZappOfframp.KotlinInt> {
+    get
+  }
+  final public var replayCache: [T?] {
+    get
+  }
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  final public func emit(value: T?) async throws
+  final public func tryEmit(value: T?) -> Swift.Bool
+  final public func resetReplayCache()
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias Element = T?
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinOptionalMutableSharedFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreMutableSharedFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftStateFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var value: T {
+    get
+  }
+  final public var replayCache: [T] {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftStateFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftStateFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinStateFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinStateFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias Element = T
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinStateFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreStateFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftOptionalStateFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var value: T? {
+    get
+  }
+  final public var replayCache: [T?] {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalStateFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalStateFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalStateFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinOptionalStateFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias Element = T?
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinOptionalStateFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreStateFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftMutableStateFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var value: T {
+    get
+    set(value)
+  }
+  final public var replayCache: [T] {
+    get
+  }
+  final public var subscriptionCount: ZappOfframp.SkieSwiftStateFlow<ZappOfframp.KotlinInt> {
+    get
+  }
+  final public func compareAndSet(expect: T, update: T) -> Swift.Bool
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  final public func emit(value: T) async throws
+  final public func tryEmit(value: T) -> Swift.Bool
+  final public func resetReplayCache()
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftMutableStateFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftMutableStateFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinMutableStateFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinMutableStateFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T>
+  public typealias Element = T
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinMutableStateFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreMutableStateFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class SkieSwiftOptionalMutableStateFlow<T> : ZappOfframp.SkieSwiftFlowProtocol, Swift._ObjectiveCBridgeable {
+  final public var value: T? {
+    get
+    set(value)
+  }
+  final public var replayCache: [T?] {
+    get
+  }
+  final public var subscriptionCount: ZappOfframp.SkieSwiftStateFlow<ZappOfframp.KotlinInt> {
+    get
+  }
+  final public func compareAndSet(expect: T?, update: T?) -> Swift.Bool
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  final public func emit(value: T?) async throws
+  final public func tryEmit(value: T?) -> Swift.Bool
+  final public func resetReplayCache()
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableStateFlow<Swift.AnyObject>, result: inout ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.SkieKotlinOptionalMutableStateFlow<Swift.AnyObject>?) -> Self
+  final public func _bridgeToObjectiveC() -> ZappOfframp.SkieKotlinOptionalMutableStateFlow<Swift.AnyObject>
+  final public func makeAsyncIterator() -> ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias AsyncIterator = ZappOfframp.SkieSwiftFlowIterator<T?>
+  public typealias Element = T?
+  public typealias _ObjectiveCType = ZappOfframp.SkieKotlinOptionalMutableStateFlow<Swift.AnyObject>
+  public typealias Delegate = any ZappOfframp.Kotlinx_coroutines_coreMutableStateFlow
+  @available(iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, macOS 15.0, *)
+  @_implements(_Concurrency.AsyncSequence, Failure) public typealias __AsyncSequence_Failure = Swift.Never
+  @objc deinit
+}
+extension ZappOfframp.RelayIdentityStoreKt {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public static func getOrCreate(_ receiver: any ZappOfframp.RelayIdentityStore, generate: @escaping () -> ZappOfframp.RelayIdentity) async throws -> ZappOfframp.RelayIdentity
+}
+extension ZappOfframp.BaseRpcClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethCall(to: ZappOfframp.Address, data: ZappOfframp.KotlinByteArray, blockTag: Swift.String) async throws -> ZappOfframp.KotlinByteArray
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethChainId() async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethEstimateGas(from: ZappOfframp.Address, to: ZappOfframp.Address, value: Any, data: ZappOfframp.KotlinByteArray) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethGasPrice() async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethGetBlockByNumber(blockTag: Swift.String) async throws -> ZappOfframp.BlockHeader
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethGetCode(address: ZappOfframp.Address, blockTag: Swift.String) async throws -> ZappOfframp.KotlinByteArray
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethGetTransactionCount(address: ZappOfframp.Address, blockTag: Swift.String) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethGetTransactionReceipt(txHash: ZappOfframp.TxHash) async throws -> ZappOfframp.TransactionReceipt?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethMaxPriorityFeePerGas() async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ethSendRawTransaction(rawTxHex: Swift.String) async throws -> ZappOfframp.TxHash
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getUsdcBalance(usdcAddress: ZappOfframp.Address, owner: ZappOfframp.Address) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getAdditionalOrderDetails(diamondAddress: ZappOfframp.Address, orderId: ZappOfframp.BigInteger) async throws -> ZappOfframp.OrderFeeDetails
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getPriceConfig(diamondAddress: ZappOfframp.Address, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.PriceConfig
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getPayFeeConfig(diamondAddress: ZappOfframp.Address, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.PayFeeConfig
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getSmallOrderFixedFeePay(diamondAddress: ZappOfframp.Address, currency: ZappOfframp.CurrencyCode) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getSmallOrderThreshold(diamondAddress: ZappOfframp.Address, currency: ZappOfframp.CurrencyCode) async throws -> Any
+}
+extension ZappOfframp.Kotlinx_coroutines_coreJob {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func join() async throws
+}
+extension ZappOfframp.Skie.KtorUtils.Pipeline {
+  public struct __Suspend<TSubject, TContext> where TSubject : AnyObject, TContext : AnyObject {
+    public let __kotlinObject: ZappOfframp.Ktor_utilsPipeline<TSubject, TContext>
+    public init(_ __kotlinObject: ZappOfframp.Ktor_utilsPipeline<TSubject, TContext>)
+  }
+}
+public func skie<TSubject, TContext>(_ kotlinObject: ZappOfframp.Ktor_utilsPipeline<TSubject, TContext>) -> ZappOfframp.Skie.KtorUtils.Pipeline.__Suspend<TSubject, TContext> where TSubject : AnyObject, TContext : AnyObject
+extension ZappOfframp.Skie.KtorUtils.Pipeline.__Suspend {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func execute(context: TContext, subject: TSubject) async throws -> TSubject
+}
+extension ZappOfframp.KotlinSuspendFunction2 {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func invoke(p1: Any?, p2: Any?) async throws -> Any?
+}
+extension ZappOfframp.Ktor_client_coreHttpClientCall {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func body(info: ZappOfframp.Ktor_utilsTypeInfo) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func bodyNullable(info: ZappOfframp.Ktor_utilsTypeInfo) async throws -> Any?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getResponseContent() async throws -> any ZappOfframp.Ktor_ioByteReadChannel
+}
+extension ZappOfframp.Ktor_ioByteReadChannel {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func awaitContent(min: Swift.Int32) async throws -> ZappOfframp.KotlinBoolean
+}
+extension ZappOfframp.Ktor_client_coreHttpClientEngine {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func execute(data: ZappOfframp.Ktor_client_coreHttpRequestData) async throws -> ZappOfframp.Ktor_client_coreHttpResponseData
+}
+extension ZappOfframp.BundlerClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func estimateUserOperationGas(op: ZappOfframp.UserOperationV06) async throws -> ZappOfframp.UserOpGasEstimate
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getPaymasterStubData(op: ZappOfframp.UserOperationV06) async throws -> ZappOfframp.PaymasterResult
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getUserOperationGasPrice() async throws -> ZappOfframp.UserOpGasPrice
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getUserOperationReceipt(userOpHash: ZappOfframp.TxHash) async throws -> ZappOfframp.TransactionReceipt?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func sendUserOperation(op: ZappOfframp.UserOperationV06) async throws -> ZappOfframp.TxHash
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func sponsorUserOperation(op: ZappOfframp.UserOperationV06) async throws -> ZappOfframp.PaymasterResult
+}
+extension ZappOfframp.TxSubmitter {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func awaitReceipt(txHash: ZappOfframp.TxHash) async throws -> ZappOfframp.TransactionReceipt
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func sendTransaction(to: ZappOfframp.Address, value: Any, data: ZappOfframp.KotlinByteArray) async throws -> ZappOfframp.TxHash
+}
+extension ZappOfframp.Skie.RuntimeKotlin.SkieColdFlowIterator {
+  public struct __Suspend<E> where E : AnyObject {
+    public let __kotlinObject: ZappOfframp.SkieColdFlowIterator<E>
+    public init(_ __kotlinObject: ZappOfframp.SkieColdFlowIterator<E>)
+  }
+}
+public func skie<E>(_ kotlinObject: ZappOfframp.SkieColdFlowIterator<E>) -> ZappOfframp.Skie.RuntimeKotlin.SkieColdFlowIterator.__Suspend<E> where E : AnyObject
+extension ZappOfframp.Skie.RuntimeKotlin.SkieColdFlowIterator.__Suspend {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func hasNext() async throws -> ZappOfframp.KotlinBoolean
+}
+extension ZappOfframp.Kotlinx_coroutines_coreFlow {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func collect(collector: any ZappOfframp.Kotlinx_coroutines_coreFlowCollector) async throws
+}
+extension ZappOfframp.Kotlinx_coroutines_coreFlowCollector {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func emit(value: Any?) async throws
+}
+extension ZappOfframp.OfframpAccountProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func nextOfframpAccount() async throws -> ZappOfframp.EvmKey
+}
+extension ZappOfframp.SeedPhraseSource {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getSeedPhrase() async throws -> ZappOfframp.KotlinCharArray
+}
+extension ZappOfframp.SmartOfframpAccountProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func resolve() async throws -> ZappOfframp.OfframpSmartAccount
+}
+extension ZappOfframp.AppleOfframpBridge {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func execute(depositAddress: Swift.String) async throws -> ZappOfframp.AppleBridgeExecution
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func prepare(accountAddress: Swift.String, usdcMicros: Swift.String) async throws -> Swift.String
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func prepareRefund(accountAddress: Swift.String, usdcMicros: Swift.String) async throws -> Swift.String
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func resume(depositAddress: Swift.String) async throws -> ZappOfframp.AppleBridgeExecution
+}
+extension ZappOfframp.AppleOfframpClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func accountAddress() async throws -> Swift.String
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func accountSummary() async throws -> ZappOfframp.AppleOfframpAccountSummary
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func checkpointCurrencyCode() async throws -> Swift.String?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func discardCheckpoint() async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func hasCheckpoint() async throws -> ZappOfframp.KotlinBoolean
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func history() async throws -> [ZappOfframp.AppleOfframpHistoryItem]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func parsePaymentQr(currencyCode: Swift.String, rawPayload: Swift.String) async throws -> ZappOfframp.ApplePaymentQrResult
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(currencyCode: Swift.String, fiatAmount: Swift.String) async throws -> ZappOfframp.AppleOfframpQuote
+}
+extension ZappOfframp.AppleOfframpClient.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleOfframpClient
+}
+extension ZappOfframp.OfframpFunding {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ensureFunded(account: ZappOfframp.Address, request: ZappOfframp.OfframpRequest, resumeHandle: Swift.String?, onBridgeStarted: any ZappOfframp.KotlinSuspendFunction1) async throws -> any ZappOfframp.FundingOutcome
+}
+extension ZappOfframp.KotlinSuspendFunction1 {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func invoke(p1: Any?) async throws -> Any?
+}
+extension ZappOfframp.OfframpRefund {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func pullbackTarget(account: ZappOfframp.Address, amount: Any) async throws -> ZappOfframp.Address?
+}
+extension ZappOfframp.OfframpTopUp {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func bridge(account: ZappOfframp.Address, usdc: Any, resumeHandle: Swift.String?, onBridgeStarted: any ZappOfframp.KotlinSuspendFunction1) async throws -> any ZappOfframp.FundingOutcome
+}
+extension ZappOfframp.OfframpPaymentDetailsProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func requestPaymentDetails(orderId: ZappOfframp.BigInteger, accepted: ZappOfframp.OrderSnapshot, request: ZappOfframp.OfframpRequest) async throws -> ZappOfframp.OfframpPaymentDetails
+}
+extension ZappOfframp.OrderRecipientUpiCache {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func get(orderId: Swift.String) async throws -> Swift.String?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func put(orderId: Swift.String, recipientUpi: Swift.String) async throws
+}
+extension ZappOfframp.RelayIdentityStore {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func get() async throws -> ZappOfframp.RelayIdentity?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func set(identity: ZappOfframp.RelayIdentity) async throws
+  public func __getOrCreate(generate: @escaping () -> ZappOfframp.RelayIdentity, completionHandler: @escaping (ZappOfframp.RelayIdentity?, (any Swift.Error)?) -> Swift.Void)
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getOrCreate(generate: @escaping () -> ZappOfframp.RelayIdentity) async throws -> ZappOfframp.RelayIdentity
+}
+extension ZappOfframp.CircleRouter {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func selectCircleForOrder(circles: [ZappOfframp.CircleForRouting], orderCurrency: Swift.String, validateCircle: any ZappOfframp.KotlinSuspendFunction1) async throws -> Any
+}
+extension ZappOfframp.OrderReadSource {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func fetchOrder(orderId: ZappOfframp.BigInteger) async throws -> ZappOfframp.OrderSnapshot?
+}
+extension ZappOfframp.SubgraphClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func circlesForRouting(currencyBytes32Hex: Swift.String) async throws -> [ZappOfframp.CircleForRouting]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func ordersForUser(userAddress: Swift.String, first: Swift.Int32, skip: Swift.Int32) async throws -> [[Swift.String : ZappOfframp.Kotlinx_serialization_jsonJsonElement]]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func rawOrderById(orderId: Swift.String) async throws -> [Swift.String : ZappOfframp.Kotlinx_serialization_jsonJsonElement]?
+}
+extension ZappOfframp.OfframpDriver {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func isMerchantAvailable(usdc: Any, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.KotlinBoolean
+}
+extension ZappOfframp.DynamicPixResolver {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func resolveAmount(locationUrl: Swift.String, orderId: Swift.String?) async throws -> Swift.String?
+}
+extension ZappOfframp.P2pOrderHistorySource {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func fetchAll(userAddress: ZappOfframp.Address, maxOrders: Swift.Int32) async throws -> [ZappOfframp.P2pOrderHistoryItem]
+}
+extension ZappOfframp.PaymentQrParser {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func parse(currency: ZappOfframp.CurrencyCode, qrData: Swift.String, dynamicPixResolver: (any ZappOfframp.DynamicPixResolver)?, orderId: Swift.String?) async throws -> ZappOfframp.PaymentQrParseResult
+}
+extension ZappOfframp.PixQrParser {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func parse(qrData: Swift.String, resolver: (any ZappOfframp.DynamicPixResolver)?, orderId: Swift.String?) async throws -> ZappOfframp.PaymentQrParseResult
+}
+extension ZappOfframp.Ktor_httpOutgoingContent.ProtocolUpgrade {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func upgrade(input: any ZappOfframp.Ktor_ioByteReadChannel, output: any ZappOfframp.Ktor_ioByteWriteChannel, engineContext: any ZappOfframp.KotlinCoroutineContext, userContext: any ZappOfframp.KotlinCoroutineContext) async throws -> any ZappOfframp.Kotlinx_coroutines_coreJob
+}
+extension ZappOfframp.Ktor_ioByteWriteChannel {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func flush() async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func flushAndClose() async throws
+}
+extension ZappOfframp.Ktor_httpOutgoingContent.WriteChannelContent {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func writeTo(channel: any ZappOfframp.Ktor_ioByteWriteChannel) async throws
+}
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftFlow<T>) -> ZappOfframp.SkieKotlinFlow<T> where T : AnyObject
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinFlow<T> where T : AnyObject
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinFlow<T> where T : AnyObject
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinFlow<T> where T : AnyObject
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinFlow<T> where T : AnyObject
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftFlow<T>) -> ZappOfframp.SkieKotlinFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T> where T : AnyObject
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftOptionalFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftOptionalFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T> where T : AnyObject
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T> where T : AnyObject
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T> where T : AnyObject
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T> where T : AnyObject
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftSharedFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftSharedFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftOptionalSharedFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftOptionalSharedFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+public func SkieKotlinMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinMutableSharedFlow<T> where T : AnyObject
+public func SkieKotlinMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftMutableSharedFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+}
+extension ZappOfframp.SkieSwiftMutableSharedFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+}
+public func SkieKotlinOptionalMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T> where T : AnyObject
+public func SkieKotlinOptionalMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalMutableSharedFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftOptionalMutableSharedFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+}
+extension ZappOfframp.SkieSwiftOptionalMutableSharedFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableSharedFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableSharedFlow<T>)
+}
+public func SkieKotlinStateFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinStateFlow<T> where T : AnyObject
+public func SkieKotlinStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinStateFlow<T> where T : AnyObject
+public func SkieKotlinStateFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftStateFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftStateFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftOptionalStateFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftOptionalStateFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+public func SkieKotlinMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinMutableStateFlow<T> where T : AnyObject
+public func SkieKotlinMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftMutableStateFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftMutableStateFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+}
+public func SkieKotlinOptionalMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableStateFlow<T> where T : AnyObject
+public func SkieKotlinOptionalMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+public func SkieKotlinOptionalMutableStateFlow<T>(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>) -> ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType> where T : Swift._ObjectiveCBridgeable
+extension ZappOfframp.SkieSwiftOptionalMutableStateFlow where T : AnyObject {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+extension ZappOfframp.SkieSwiftOptionalMutableStateFlow where T : Swift._ObjectiveCBridgeable {
+  convenience public init(_ flow: ZappOfframp.SkieKotlinMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieKotlinOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T._ObjectiveCType>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftMutableStateFlow<T>)
+  convenience public init(_ flow: ZappOfframp.SkieSwiftOptionalMutableStateFlow<T>)
+}
+@frozen public enum KotlinKVariance : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case invariant
+  case `in`
+  case out
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__KotlinKVariance, result: inout ZappOfframp.KotlinKVariance?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__KotlinKVariance, result: inout ZappOfframp.KotlinKVariance?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__KotlinKVariance?) -> ZappOfframp.KotlinKVariance
+  public func _bridgeToObjectiveC() -> ZappOfframp.__KotlinKVariance
+  public typealias _ObjectiveCType = ZappOfframp.__KotlinKVariance
+  public static func == (a: ZappOfframp.KotlinKVariance, b: ZappOfframp.KotlinKVariance) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.KotlinKVariance]
+  nonisolated public static var allCases: [ZappOfframp.KotlinKVariance] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.KotlinKVariance {
+  public func toKotlinEnum() -> ZappOfframp.__KotlinKVariance
+}
+extension ZappOfframp.__KotlinKVariance {
+  public func toSwiftEnum() -> ZappOfframp.KotlinKVariance
+}
+@frozen public enum DecimalRounding : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case halfUp
+  case down
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__DecimalRounding, result: inout ZappOfframp.DecimalRounding?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__DecimalRounding, result: inout ZappOfframp.DecimalRounding?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__DecimalRounding?) -> ZappOfframp.DecimalRounding
+  public func _bridgeToObjectiveC() -> ZappOfframp.__DecimalRounding
+  public typealias _ObjectiveCType = ZappOfframp.__DecimalRounding
+  public static func == (a: ZappOfframp.DecimalRounding, b: ZappOfframp.DecimalRounding) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.DecimalRounding]
+  nonisolated public static var allCases: [ZappOfframp.DecimalRounding] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.DecimalRounding {
+  public func toKotlinEnum() -> ZappOfframp.__DecimalRounding
+}
+extension ZappOfframp.__DecimalRounding {
+  public func toSwiftEnum() -> ZappOfframp.DecimalRounding
+}
+@frozen public enum Ktor_utilsMonth : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case january
+  case february
+  case march
+  case april
+  case may
+  case june
+  case july
+  case august
+  case september
+  case october
+  case november
+  case december
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var value: Swift.String {
+    get
+  }
+  public static var companion: ZappOfframp.__Ktor_utilsMonth.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsMonth, result: inout ZappOfframp.Ktor_utilsMonth?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsMonth, result: inout ZappOfframp.Ktor_utilsMonth?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsMonth?) -> ZappOfframp.Ktor_utilsMonth
+  public func _bridgeToObjectiveC() -> ZappOfframp.__Ktor_utilsMonth
+  public typealias _ObjectiveCType = ZappOfframp.__Ktor_utilsMonth
+  public typealias Companion = ZappOfframp.__Ktor_utilsMonth.Companion
+  public static func == (a: ZappOfframp.Ktor_utilsMonth, b: ZappOfframp.Ktor_utilsMonth) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.Ktor_utilsMonth]
+  nonisolated public static var allCases: [ZappOfframp.Ktor_utilsMonth] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.Ktor_utilsMonth {
+  public func toKotlinEnum() -> ZappOfframp.__Ktor_utilsMonth
+}
+extension ZappOfframp.__Ktor_utilsMonth {
+  public func toSwiftEnum() -> ZappOfframp.Ktor_utilsMonth
+}
+@frozen public enum Ktor_utilsWeekDay : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case monday
+  case tuesday
+  case wednesday
+  case thursday
+  case friday
+  case saturday
+  case sunday
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var value: Swift.String {
+    get
+  }
+  public static var companion: ZappOfframp.__Ktor_utilsWeekDay.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsWeekDay, result: inout ZappOfframp.Ktor_utilsWeekDay?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsWeekDay, result: inout ZappOfframp.Ktor_utilsWeekDay?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_utilsWeekDay?) -> ZappOfframp.Ktor_utilsWeekDay
+  public func _bridgeToObjectiveC() -> ZappOfframp.__Ktor_utilsWeekDay
+  public typealias _ObjectiveCType = ZappOfframp.__Ktor_utilsWeekDay
+  public typealias Companion = ZappOfframp.__Ktor_utilsWeekDay.Companion
+  public static func == (a: ZappOfframp.Ktor_utilsWeekDay, b: ZappOfframp.Ktor_utilsWeekDay) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.Ktor_utilsWeekDay]
+  nonisolated public static var allCases: [ZappOfframp.Ktor_utilsWeekDay] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.Ktor_utilsWeekDay {
+  public func toKotlinEnum() -> ZappOfframp.__Ktor_utilsWeekDay
+}
+extension ZappOfframp.__Ktor_utilsWeekDay {
+  public func toSwiftEnum() -> ZappOfframp.Ktor_utilsWeekDay
+}
+@frozen public enum Ktor_client_loggingLogLevel : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case all
+  case headers
+  case body
+  case info
+  case none
+  public var body: Swift.Bool {
+    get
+  }
+  public var headers: Swift.Bool {
+    get
+  }
+  public var info: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_client_loggingLogLevel, result: inout ZappOfframp.Ktor_client_loggingLogLevel?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_client_loggingLogLevel, result: inout ZappOfframp.Ktor_client_loggingLogLevel?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__Ktor_client_loggingLogLevel?) -> ZappOfframp.Ktor_client_loggingLogLevel
+  public func _bridgeToObjectiveC() -> ZappOfframp.__Ktor_client_loggingLogLevel
+  public typealias _ObjectiveCType = ZappOfframp.__Ktor_client_loggingLogLevel
+  public static func == (a: ZappOfframp.Ktor_client_loggingLogLevel, b: ZappOfframp.Ktor_client_loggingLogLevel) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.Ktor_client_loggingLogLevel]
+  nonisolated public static var allCases: [ZappOfframp.Ktor_client_loggingLogLevel] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.Ktor_client_loggingLogLevel {
+  public func toKotlinEnum() -> ZappOfframp.__Ktor_client_loggingLogLevel
+}
+extension ZappOfframp.__Ktor_client_loggingLogLevel {
+  public func toSwiftEnum() -> ZappOfframp.Ktor_client_loggingLogLevel
+}
+@frozen public enum CurrencyCode : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case inr
+  case brl
+  case idr
+  case ars
+  case ven
+  case ngn
+  case cop
+  public var code: Swift.String {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var paymentAddressIsOpaque: Swift.Bool {
+    get
+  }
+  public var precision: Swift.Int32 {
+    get
+  }
+  public var symbol: Swift.String {
+    get
+  }
+  public static var companion: ZappOfframp.__CurrencyCode.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__CurrencyCode, result: inout ZappOfframp.CurrencyCode?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__CurrencyCode, result: inout ZappOfframp.CurrencyCode?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__CurrencyCode?) -> ZappOfframp.CurrencyCode
+  public func _bridgeToObjectiveC() -> ZappOfframp.__CurrencyCode
+  public typealias _ObjectiveCType = ZappOfframp.__CurrencyCode
+  public typealias Companion = ZappOfframp.__CurrencyCode.Companion
+  public static func == (a: ZappOfframp.CurrencyCode, b: ZappOfframp.CurrencyCode) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.CurrencyCode]
+  nonisolated public static var allCases: [ZappOfframp.CurrencyCode] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.CurrencyCode {
+  public func toKotlinEnum() -> ZappOfframp.__CurrencyCode
+}
+extension ZappOfframp.__CurrencyCode {
+  public func toSwiftEnum() -> ZappOfframp.CurrencyCode
+}
+extension ZappOfframp.OrderSnapshot {
+  public typealias Source = ZappOfframp.__Bridge__OrderSnapshot_Source
+}
+extension ZappOfframp.__Bridge__OrderSnapshot_Source {
+  public func toKotlinEnum() -> ZappOfframp.OrderSnapshot.__Source
+}
+extension ZappOfframp.OrderSnapshot.__Source {
+  public func toSwiftEnum() -> ZappOfframp.OrderSnapshot.Source
+}
+@frozen public enum __Bridge__OrderSnapshot_Source : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case subgraph
+  case onChain
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.OrderSnapshot.__Source, result: inout ZappOfframp.OrderSnapshot.Source?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.OrderSnapshot.__Source, result: inout ZappOfframp.OrderSnapshot.Source?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.OrderSnapshot.__Source?) -> ZappOfframp.__Bridge__OrderSnapshot_Source
+  public func _bridgeToObjectiveC() -> ZappOfframp.OrderSnapshot.__Source
+  public typealias _ObjectiveCType = ZappOfframp.OrderSnapshot.__Source
+  public static func == (a: ZappOfframp.__Bridge__OrderSnapshot_Source, b: ZappOfframp.__Bridge__OrderSnapshot_Source) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.__Bridge__OrderSnapshot_Source]
+  nonisolated public static var allCases: [ZappOfframp.__Bridge__OrderSnapshot_Source] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@frozen public enum OrderType : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case buy
+  case sell
+  case pay
+  public var name: Swift.String {
+    get
+  }
+  public var onChain: Swift.Int32 {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OrderType, result: inout ZappOfframp.OrderType?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OrderType, result: inout ZappOfframp.OrderType?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OrderType?) -> ZappOfframp.OrderType
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OrderType
+  public typealias _ObjectiveCType = ZappOfframp.__OrderType
+  public static func == (a: ZappOfframp.OrderType, b: ZappOfframp.OrderType) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OrderType]
+  nonisolated public static var allCases: [ZappOfframp.OrderType] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OrderType {
+  public func toKotlinEnum() -> ZappOfframp.__OrderType
+}
+extension ZappOfframp.__OrderType {
+  public func toSwiftEnum() -> ZappOfframp.OrderType
+}
+@frozen public enum OrderStatus : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case placed
+  case accepted
+  case paid
+  case completed
+  case cancelled
+  public var name: Swift.String {
+    get
+  }
+  public var onChain: Swift.Int32 {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OrderStatus.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OrderStatus, result: inout ZappOfframp.OrderStatus?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OrderStatus, result: inout ZappOfframp.OrderStatus?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OrderStatus?) -> ZappOfframp.OrderStatus
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OrderStatus
+  public typealias _ObjectiveCType = ZappOfframp.__OrderStatus
+  public typealias Companion = ZappOfframp.__OrderStatus.Companion
+  public static func == (a: ZappOfframp.OrderStatus, b: ZappOfframp.OrderStatus) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OrderStatus]
+  nonisolated public static var allCases: [ZappOfframp.OrderStatus] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OrderStatus {
+  public func toKotlinEnum() -> ZappOfframp.__OrderStatus
+}
+extension ZappOfframp.__OrderStatus {
+  public func toSwiftEnum() -> ZappOfframp.OrderStatus
+}
+@frozen public enum OfframpStep : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case initialization
+  case selectingCircle
+  case funding
+  case approvingUsdc
+  case placingOrder
+  case waitingForAcceptance
+  case waitingForPaymentDetails
+  case encryptingUpi
+  case sendingUpi
+  case waitingForCompletion
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OfframpStep.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OfframpStep, result: inout ZappOfframp.OfframpStep?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OfframpStep, result: inout ZappOfframp.OfframpStep?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OfframpStep?) -> ZappOfframp.OfframpStep
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OfframpStep
+  public typealias _ObjectiveCType = ZappOfframp.__OfframpStep
+  public typealias Companion = ZappOfframp.__OfframpStep.Companion
+  public static func == (a: ZappOfframp.OfframpStep, b: ZappOfframp.OfframpStep) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OfframpStep]
+  nonisolated public static var allCases: [ZappOfframp.OfframpStep] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OfframpStep {
+  public func toKotlinEnum() -> ZappOfframp.__OfframpStep
+}
+extension ZappOfframp.__OfframpStep {
+  public func toSwiftEnum() -> ZappOfframp.OfframpStep
+}
+@frozen public enum CircleStatus : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case paused
+  case bootstrap
+  case active
+  case unknown
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__CircleStatus.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__CircleStatus, result: inout ZappOfframp.CircleStatus?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__CircleStatus, result: inout ZappOfframp.CircleStatus?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__CircleStatus?) -> ZappOfframp.CircleStatus
+  public func _bridgeToObjectiveC() -> ZappOfframp.__CircleStatus
+  public typealias _ObjectiveCType = ZappOfframp.__CircleStatus
+  public typealias Companion = ZappOfframp.__CircleStatus.Companion
+  public static func == (a: ZappOfframp.CircleStatus, b: ZappOfframp.CircleStatus) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.CircleStatus]
+  nonisolated public static var allCases: [ZappOfframp.CircleStatus] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.CircleStatus {
+  public func toKotlinEnum() -> ZappOfframp.__CircleStatus
+}
+extension ZappOfframp.__CircleStatus {
+  public func toSwiftEnum() -> ZappOfframp.CircleStatus
+}
+@frozen public enum KnownRevertReason : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case buyOrderAmountExceedsLimit
+  case insufficientReputation
+  case orderAmountExceedsLimit
+  case sellAmountExceedsFiatLimit
+  case currencyNotSupported
+  case userIsBlacklisted
+  case exchangeNotOperational
+  case notEnoughEligibleMerchants
+  case orderExpired
+  case upiAlreadySent
+  case invalidOrderUpi
+  case orderNotAccepted
+  case usdcTransferFailed
+  case notAuthorized
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__KnownRevertReason, result: inout ZappOfframp.KnownRevertReason?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__KnownRevertReason, result: inout ZappOfframp.KnownRevertReason?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__KnownRevertReason?) -> ZappOfframp.KnownRevertReason
+  public func _bridgeToObjectiveC() -> ZappOfframp.__KnownRevertReason
+  public typealias _ObjectiveCType = ZappOfframp.__KnownRevertReason
+  public static func == (a: ZappOfframp.KnownRevertReason, b: ZappOfframp.KnownRevertReason) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.KnownRevertReason]
+  nonisolated public static var allCases: [ZappOfframp.KnownRevertReason] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.KnownRevertReason {
+  public func toKotlinEnum() -> ZappOfframp.__KnownRevertReason
+}
+extension ZappOfframp.__KnownRevertReason {
+  public func toSwiftEnum() -> ZappOfframp.KnownRevertReason
+}
+extension ZappOfframp.Skie.EvmLib.AbiArg {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case abiAddress(ZappOfframp.AbiAddress)
+    case abiBool(ZappOfframp.AbiBool)
+    case abiBytes(ZappOfframp.AbiBytes)
+    case abiBytes32(ZappOfframp.AbiBytes32)
+    case abiInt(ZappOfframp.AbiInt)
+    case abiString(ZappOfframp.AbiString)
+    case abiUint(ZappOfframp.AbiUint)
+    case abiUint8(ZappOfframp.AbiUint8)
+    case abiUintArray(ZappOfframp.AbiUintArray)
+    public static func == (a: ZappOfframp.Skie.EvmLib.AbiArg.__Sealed, b: ZappOfframp.Skie.EvmLib.AbiArg.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.EvmLib.AbiArg.__Sealed where __Sealed : ZappOfframp.AbiArg
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.EvmLib.AbiArg.__Sealed? where __Sealed : ZappOfframp.AbiArg
+extension ZappOfframp.Skie.EvmLib.RpcException {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case executionReverted(ZappOfframp.RpcException.ExecutionReverted)
+    case invalidParams(ZappOfframp.RpcException.InvalidParams)
+    case methodNotFound(ZappOfframp.RpcException.MethodNotFound)
+    case rateLimited(ZappOfframp.RpcException.RateLimited)
+    case transportError(ZappOfframp.RpcException.TransportError)
+    case unknown(ZappOfframp.RpcException.Unknown)
+    public static func == (a: ZappOfframp.Skie.EvmLib.RpcException.__Sealed, b: ZappOfframp.Skie.EvmLib.RpcException.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.EvmLib.RpcException.__Sealed where __Sealed : ZappOfframp.RpcException
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.EvmLib.RpcException.__Sealed? where __Sealed : ZappOfframp.RpcException
+extension ZappOfframp.Skie.EvmLib.RlpItem {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.EvmLib.RlpItem.__Sealed, b: ZappOfframp.Skie.EvmLib.RlpItem.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.EvmLib.RlpItem.__Sealed where __Sealed : ZappOfframp.RlpItem
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.EvmLib.RlpItem.__Sealed? where __Sealed : ZappOfframp.RlpItem
+extension ZappOfframp.Skie.KotlinxSerializationCore.SerialKind {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case polymorphicKind(ZappOfframp.Kotlinx_serialization_corePolymorphicKind)
+    case primitiveKind(ZappOfframp.Kotlinx_serialization_corePrimitiveKind)
+    case cONTEXTUAL(ZappOfframp.Kotlinx_serialization_coreSerialKind.CONTEXTUAL)
+    case eNUM(ZappOfframp.Kotlinx_serialization_coreSerialKind.ENUM)
+    case structureKind(ZappOfframp.Kotlinx_serialization_coreStructureKind)
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationCore.SerialKind.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationCore.SerialKind.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationCore.SerialKind.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_coreSerialKind
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationCore.SerialKind.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_coreSerialKind
+extension ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_coreSerializersModule
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_coreSerializersModule
+extension ZappOfframp.Skie.KotlinxSerializationCore.PolymorphicKind {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case oPEN(ZappOfframp.Kotlinx_serialization_corePolymorphicKind.OPEN)
+    case sEALED(ZappOfframp.Kotlinx_serialization_corePolymorphicKind.SEALED)
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationCore.PolymorphicKind.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationCore.PolymorphicKind.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationCore.PolymorphicKind.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_corePolymorphicKind
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationCore.PolymorphicKind.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_corePolymorphicKind
+extension ZappOfframp.Skie.KotlinxSerializationCore.PrimitiveKind {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case bOOLEAN(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.BOOLEAN)
+    case bYTE(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.BYTE)
+    case cHAR(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.CHAR)
+    case dOUBLE(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.DOUBLE)
+    case fLOAT(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.FLOAT)
+    case iNT(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.INT)
+    case lONG(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.LONG)
+    case sHORT(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.SHORT)
+    case sTRING(ZappOfframp.Kotlinx_serialization_corePrimitiveKind.STRING)
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationCore.PrimitiveKind.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationCore.PrimitiveKind.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationCore.PrimitiveKind.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_corePrimitiveKind
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationCore.PrimitiveKind.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_corePrimitiveKind
+extension ZappOfframp.Skie.KotlinxSerializationCore.StructureKind {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case cLASS(ZappOfframp.Kotlinx_serialization_coreStructureKind.CLASS)
+    case lIST(ZappOfframp.Kotlinx_serialization_coreStructureKind.LIST)
+    case mAP(ZappOfframp.Kotlinx_serialization_coreStructureKind.MAP)
+    case oBJECT(ZappOfframp.Kotlinx_serialization_coreStructureKind.OBJECT)
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationCore.StructureKind.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationCore.StructureKind.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationCore.StructureKind.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_coreStructureKind
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationCore.StructureKind.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_coreStructureKind
+extension ZappOfframp.Skie.KtorHttp.OutgoingContent {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case byteArrayContent(ZappOfframp.Ktor_httpOutgoingContent.ByteArrayContent)
+    case contentWrapper(ZappOfframp.Ktor_httpOutgoingContent.ContentWrapper)
+    case noContent(ZappOfframp.Ktor_httpOutgoingContent.NoContent)
+    case protocolUpgrade(ZappOfframp.Ktor_httpOutgoingContent.ProtocolUpgrade)
+    case readChannelContent(ZappOfframp.Ktor_httpOutgoingContent.ReadChannelContent)
+    case writeChannelContent(ZappOfframp.Ktor_httpOutgoingContent.WriteChannelContent)
+    public static func == (a: ZappOfframp.Skie.KtorHttp.OutgoingContent.__Sealed, b: ZappOfframp.Skie.KtorHttp.OutgoingContent.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KtorHttp.OutgoingContent.__Sealed where __Sealed : ZappOfframp.Ktor_httpOutgoingContent
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KtorHttp.OutgoingContent.__Sealed? where __Sealed : ZappOfframp.Ktor_httpOutgoingContent
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0 {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed, b: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause0
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed? where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause0
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause {
+  @frozen public enum __Sealed {
+    case selectClause0(any ZappOfframp.Kotlinx_coroutines_coreSelectClause0)
+    case selectClause1(any ZappOfframp.Kotlinx_coroutines_coreSelectClause1)
+    case selectClause2(any ZappOfframp.Kotlinx_coroutines_coreSelectClause2)
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause.__Sealed where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause.__Sealed? where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed, b: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectInstance
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed? where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectInstance
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1 {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed, b: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause1
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed? where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause1
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2 {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed, b: ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause2
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed? where __Sealed : ZappOfframp.Kotlinx_coroutines_coreSelectClause2
+extension ZappOfframp.Skie.KotlinxIoCore.Source {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case buffer(ZappOfframp.Kotlinx_io_coreBuffer)
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxIoCore.Source.__Sealed, b: ZappOfframp.Skie.KotlinxIoCore.Source.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxIoCore.Source.__Sealed where __Sealed : ZappOfframp.Kotlinx_io_coreSource
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxIoCore.Source.__Sealed? where __Sealed : ZappOfframp.Kotlinx_io_coreSource
+extension ZappOfframp.Skie.KotlinxIoCore.Sink {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case buffer(ZappOfframp.Kotlinx_io_coreBuffer)
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxIoCore.Sink.__Sealed, b: ZappOfframp.Skie.KotlinxIoCore.Sink.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxIoCore.Sink.__Sealed where __Sealed : ZappOfframp.Kotlinx_io_coreSink
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxIoCore.Sink.__Sealed? where __Sealed : ZappOfframp.Kotlinx_io_coreSink
+extension ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case canceled(ZappOfframp.Skie_SuspendResult.Canceled)
+    case error(ZappOfframp.Skie_SuspendResult.Error)
+    case success(ZappOfframp.Skie_SuspendResult.Success)
+    public static func == (a: ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed, b: ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed where __Sealed : ZappOfframp.Skie_SuspendResult
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed? where __Sealed : ZappOfframp.Skie_SuspendResult
+extension ZappOfframp.Skie.OfframpLib.FundingOutcome {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case alreadyFunded(ZappOfframp.FundingOutcomeAlreadyFunded)
+    case bridged(ZappOfframp.FundingOutcomeBridged)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed, b: ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed where __Sealed : ZappOfframp.FundingOutcome
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed? where __Sealed : ZappOfframp.FundingOutcome
+extension ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case bridging(ZappOfframp.BridgeToBaseStatusBridging)
+    case complete(ZappOfframp.BridgeToBaseStatusComplete)
+    case failed(ZappOfframp.BridgeToBaseStatusFailed)
+    case idle(ZappOfframp.BridgeToBaseStatusIdle)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus.__Sealed where __Sealed : ZappOfframp.BridgeToBaseStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus.__Sealed? where __Sealed : ZappOfframp.BridgeToBaseStatus
+extension ZappOfframp.Skie.OfframpLib.OfframpStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case approvingUsdc(ZappOfframp.OfframpStatus.ApprovingUsdc)
+    case bridgingFunds(ZappOfframp.OfframpStatus.BridgingFunds)
+    case cancelled(ZappOfframp.OfframpStatus.Cancelled)
+    case completed(ZappOfframp.OfframpStatus.Completed)
+    case failed(ZappOfframp.OfframpStatus.Failed)
+    case fundedFromBase(ZappOfframp.OfframpStatus.FundedFromBase)
+    case fundsRecovered(ZappOfframp.OfframpStatus.FundsRecovered)
+    case idle(ZappOfframp.OfframpStatus.Idle)
+    case placingOrder(ZappOfframp.OfframpStatus.PlacingOrder)
+    case selectingCircle(ZappOfframp.OfframpStatus.SelectingCircle)
+    case sendingEncryptedUpi(ZappOfframp.OfframpStatus.SendingEncryptedUpi)
+    case waitingForCompletion(ZappOfframp.OfframpStatus.WaitingForCompletion)
+    case waitingForMerchantAcceptance(ZappOfframp.OfframpStatus.WaitingForMerchantAcceptance)
+    case waitingForPaymentDetails(ZappOfframp.OfframpStatus.WaitingForPaymentDetails)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.OfframpStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.OfframpStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.OfframpStatus.__Sealed where __Sealed : ZappOfframp.OfframpStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.OfframpStatus.__Sealed? where __Sealed : ZappOfframp.OfframpStatus
+extension ZappOfframp.Skie.OfframpLib.PaymentQrParseResult {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case failure(ZappOfframp.PaymentQrParseResult.Failure)
+    case success(ZappOfframp.PaymentQrParseResult.Success)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PaymentQrParseResult.__Sealed, b: ZappOfframp.Skie.OfframpLib.PaymentQrParseResult.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PaymentQrParseResult.__Sealed where __Sealed : ZappOfframp.PaymentQrParseResult
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PaymentQrParseResult.__Sealed? where __Sealed : ZappOfframp.PaymentQrParseResult
+extension ZappOfframp.Skie.OfframpLib.PaymentQrError {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case dynamicFetchFailed(ZappOfframp.PaymentQrError.DynamicFetchFailed)
+    case emptyQr(ZappOfframp.PaymentQrError.EmptyQr)
+    case invalidAmount(ZappOfframp.PaymentQrError.InvalidAmount)
+    case invalidChecksum(ZappOfframp.PaymentQrError.InvalidChecksum)
+    case invalidFormat(ZappOfframp.PaymentQrError.InvalidFormat)
+    case invalidPaymentAddress(ZappOfframp.PaymentQrError.InvalidPaymentAddress)
+    case missingPaymentAddress(ZappOfframp.PaymentQrError.MissingPaymentAddress)
+    case unsupportedCurrency(ZappOfframp.PaymentQrError.UnsupportedCurrency)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PaymentQrError.__Sealed, b: ZappOfframp.Skie.OfframpLib.PaymentQrError.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PaymentQrError.__Sealed where __Sealed : ZappOfframp.PaymentQrError
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PaymentQrError.__Sealed? where __Sealed : ZappOfframp.PaymentQrError
+extension ZappOfframp.Skie.OfframpLib.UpiQrParseResult {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case failure(ZappOfframp.UpiQrParseResult.Failure)
+    case success(ZappOfframp.UpiQrParseResult.Success)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.UpiQrParseResult.__Sealed, b: ZappOfframp.Skie.OfframpLib.UpiQrParseResult.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.UpiQrParseResult.__Sealed where __Sealed : ZappOfframp.UpiQrParseResult
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.UpiQrParseResult.__Sealed? where __Sealed : ZappOfframp.UpiQrParseResult
+extension ZappOfframp.Skie.OfframpLib.UpiQrError {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case emptyQr(ZappOfframp.UpiQrError.EmptyQr)
+    case invalidAmount(ZappOfframp.UpiQrError.InvalidAmount)
+    case invalidUpiId(ZappOfframp.UpiQrError.InvalidUpiId)
+    case missingPaymentAddress(ZappOfframp.UpiQrError.MissingPaymentAddress)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed, b: ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed where __Sealed : ZappOfframp.UpiQrError
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed? where __Sealed : ZappOfframp.UpiQrError
+extension ZappOfframp.Skie.KotlinxSerializationJson.JsonElement {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case jsonPrimitive(ZappOfframp.Kotlinx_serialization_jsonJsonPrimitive)
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationJson.JsonElement.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationJson.JsonElement.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationJson.JsonElement.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_jsonJsonElement
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationJson.JsonElement.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_jsonJsonElement
+extension ZappOfframp.Skie.KotlinxSerializationJson.JsonPrimitive {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case jsonNull(ZappOfframp.Kotlinx_serialization_jsonJsonNull)
+    case `else`
+    public static func == (a: ZappOfframp.Skie.KotlinxSerializationJson.JsonPrimitive.__Sealed, b: ZappOfframp.Skie.KotlinxSerializationJson.JsonPrimitive.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.KotlinxSerializationJson.JsonPrimitive.__Sealed where __Sealed : ZappOfframp.Kotlinx_serialization_jsonJsonPrimitive
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.KotlinxSerializationJson.JsonPrimitive.__Sealed? where __Sealed : ZappOfframp.Kotlinx_serialization_jsonJsonPrimitive
+public func keccak256(data: ZappOfframp.KotlinByteArray) -> ZappOfframp.KotlinByteArray
+public func bigDecimalFromBigInteger(value: ZappOfframp.BigInteger) -> ZappOfframp.BigDecimal
+public func decimalDivide(dividend: ZappOfframp.BigDecimal, divisor: ZappOfframp.BigDecimal, scale: Swift.Int32, rounding: ZappOfframp.DecimalRounding) -> ZappOfframp.BigDecimal
+public func decimalMovePointLeft(value: ZappOfframp.BigDecimal, distance: Swift.Int32) -> ZappOfframp.BigDecimal
+public func decimalMovePointRight(value: ZappOfframp.BigDecimal, distance: Swift.Int32) -> ZappOfframp.BigDecimal
+public func decimalMultiply(left: ZappOfframp.BigDecimal, right: ZappOfframp.BigDecimal) -> ZappOfframp.BigDecimal
+public func decimalSetScale(value: ZappOfframp.BigDecimal, scale: Swift.Int32, rounding: ZappOfframp.DecimalRounding) -> ZappOfframp.BigDecimal
+public func decimalStripTrailingZeros(value: ZappOfframp.BigDecimal) -> ZappOfframp.BigDecimal
+public func decimalToBigInteger(value: ZappOfframp.BigDecimal) -> ZappOfframp.BigInteger
+public func decimalToLong(value: ZappOfframp.BigDecimal) -> Swift.Int64
+public func decimalToPlainString(value: ZappOfframp.BigDecimal) -> Swift.String
+public var bigIntegerOne: ZappOfframp.BigInteger {
+  get
+}
+public var bigIntegerZero: ZappOfframp.BigInteger {
+  get
+}
+public func bigIntegerValueOf(value: Swift.Int64) -> ZappOfframp.BigInteger
+public func rlpBytes(b: ZappOfframp.KotlinByteArray) -> any ZappOfframp.RlpItem
+public func rlpEmpty() -> any ZappOfframp.RlpItem
+public func rlpInt(v: ZappOfframp.BigInteger) -> any ZappOfframp.RlpItem
+public func rlpInt(v: Swift.Int64) -> any ZappOfframp.RlpItem
+public func rlpList(items: ZappOfframp.KotlinArray<any ZappOfframp.RlpItem>) -> any ZappOfframp.RlpItem
+public func rlpList(items: [any ZappOfframp.RlpItem]) -> any ZappOfframp.RlpItem
+public func hexToBigInteger(hex: Swift.String) -> ZappOfframp.BigInteger
+extension Swift.String {
+  public func hexToBytes() -> ZappOfframp.KotlinByteArray
+}
+public func extractUpiVpa(plain: Swift.String) -> Swift.String
+extension ZappOfframp.KotlinKVariance : Swift.Sendable {}
+extension ZappOfframp.KotlinKVariance : Swift.BitwiseCopyable {}
+extension ZappOfframp.DecimalRounding : Swift.Sendable {}
+extension ZappOfframp.DecimalRounding : Swift.BitwiseCopyable {}
+extension ZappOfframp.Ktor_utilsMonth : Swift.Sendable {}
+extension ZappOfframp.Ktor_utilsMonth : Swift.BitwiseCopyable {}
+extension ZappOfframp.Ktor_utilsWeekDay : Swift.Sendable {}
+extension ZappOfframp.Ktor_utilsWeekDay : Swift.BitwiseCopyable {}
+extension ZappOfframp.Ktor_client_loggingLogLevel : Swift.Sendable {}
+extension ZappOfframp.Ktor_client_loggingLogLevel : Swift.BitwiseCopyable {}
+extension ZappOfframp.CurrencyCode : Swift.Sendable {}
+extension ZappOfframp.CurrencyCode : Swift.BitwiseCopyable {}
+extension ZappOfframp.__Bridge__OrderSnapshot_Source : Swift.Sendable {}
+extension ZappOfframp.__Bridge__OrderSnapshot_Source : Swift.BitwiseCopyable {}
+extension ZappOfframp.OrderType : Swift.Sendable {}
+extension ZappOfframp.OrderType : Swift.BitwiseCopyable {}
+extension ZappOfframp.OrderStatus : Swift.Sendable {}
+extension ZappOfframp.OrderStatus : Swift.BitwiseCopyable {}
+extension ZappOfframp.OfframpStep : Swift.Sendable {}
+extension ZappOfframp.OfframpStep : Swift.BitwiseCopyable {}
+extension ZappOfframp.CircleStatus : Swift.Sendable {}
+extension ZappOfframp.CircleStatus : Swift.BitwiseCopyable {}
+extension ZappOfframp.KnownRevertReason : Swift.Sendable {}
+extension ZappOfframp.KnownRevertReason : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.EvmLib.RlpItem.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.EvmLib.RlpItem.__Sealed : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause0.__Sealed : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectInstance.__Sealed : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause1.__Sealed : Swift.BitwiseCopyable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed : Swift.Sendable {}
+extension ZappOfframp.Skie.KotlinxCoroutinesCore.SelectClause2.__Sealed : Swift.BitwiseCopyable {}

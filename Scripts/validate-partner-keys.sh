@@ -5,8 +5,8 @@
 # Fails an Xcode *archive* build when secant/Resources/PartnerKeys.plist is
 # missing, malformed, or missing any required key. No-op for normal builds.
 #
-# The REQUIRED_KEYS list mirrors the `Constants` enum in
-# secant/Sources/Dependencies/PartnerKeys/PartnerKeys.swift — keep them in sync.
+# REQUIRED_KEYS contains the production integrations that cannot use a built-in
+# default. Optional overrides in PartnerKeys.swift are intentionally excluded.
 
 # Run only during Product -> Archive. Xcode sets ACTION=install for archive
 # builds; normal build / Run set ACTION=build.
@@ -21,7 +21,7 @@ PLIST="${SRCROOT}/secant/Resources/PartnerKeys.plist"
 
 # Each key must be present, of type String, and non-empty. testSeed is
 # #if DEBUG-only and intentionally excluded from archive validation.
-REQUIRED_KEYS="flexaPublishableKey flexaPublishableTestKey nearKey cmcKey nearFeeDepositAddress nearAPIKey"
+REQUIRED_KEYS="flexaPublishableKey flexaPublishableTestKey nearKey cmcKey nearFeeDepositAddress p2pPimlicoApiKey"
 
 errors=()
 

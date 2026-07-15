@@ -8,9 +8,9 @@ import SwiftUI
 
 /// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
-/// Android's App lock, Background delivery and P2P payment method rows are deliberately absent:
-/// each fronts a subsystem iOS does not have yet. Read receipts and online status open staged
-/// detail screens, matching Android without duplicating them in Profile.
+/// Android's App lock and Background delivery rows are deliberately absent because those
+/// subsystems are not available on iOS yet. Read receipts and online status open staged detail
+/// screens, matching Android without duplicating them in Profile.
 ///
 /// `allSettings` is iOS's route to the address book, advanced settings, about,
 /// feedback and voting. Keeping it here preserves those working surfaces without
@@ -68,6 +68,36 @@ struct SettingsTabContent: View {
                                 iconBackground: .accentSoft
                             ) {
                                 store.send(.torTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localized: "offramp.paymentMethod", defaultValue: "P2P payment method"),
+                                subtitle: String(
+                                    localized: "offramp.paymentMethod.subtitle",
+                                    defaultValue: "Choose your country and local payment rail"
+                                ),
+                                icon: Asset.Assets.Icons.pay.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.p2pPaymentMethodTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localized: "offramp.history.title", defaultValue: "P2P transactions"),
+                                subtitle: String(
+                                    localized: "offramp.history.subtitle",
+                                    defaultValue: "View payments and recover cancelled orders"
+                                ),
+                                icon: Asset.Assets.Icons.noTransactions.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.p2pTransactionsTapped)
                             }
 
                             ZappRowDivider(inset: true)

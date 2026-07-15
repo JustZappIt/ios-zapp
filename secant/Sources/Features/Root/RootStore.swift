@@ -22,6 +22,7 @@ struct Root {
             case chatRoom
             case groupInfo
             case newChat
+            case offramp
             case currencyConversionSetup
             case receive
             case requestZecCoordFlow
@@ -121,6 +122,7 @@ struct Root {
         var chatRoomState = ChatRoom.State.initial
         var groupInfoState = GroupInfo.State.initial
         var newChatState = NewChat.State.initial
+        var offrampState = Offramp.State.initial()
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
@@ -157,7 +159,7 @@ struct Root {
             // it; if voting ever gets its own `Path` case, move the sensitivity there.
             case .settings:
                 return true
-            case .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
+            case .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .groupInfo,
@@ -250,6 +252,7 @@ struct Root {
         case chatRoom(ChatRoom.Action)
         case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
+        case offramp(Offramp.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -416,6 +419,10 @@ struct Root {
 
         Scope(state: \.newChatState, action: \.newChat) {
             NewChat()
+        }
+
+        Scope(state: \.offrampState, action: \.offramp) {
+            Offramp()
         }
 
         Scope(state: \.settingsState, action: \.settings) {

@@ -341,7 +341,12 @@ extension Near1Click {
             }
             
             guard let quote = jsonObject[Constants.quote] as? [String: Any],
+                  let quoteRequest = jsonObject[Constants.quoteRequest] as? [String: Any],
                   let depositAddress = quote[Constants.depositAddress] as? String,
+                  let destinationAddress = quoteRequest[Constants.recipient] as? String,
+                  let refundAddress = quoteRequest[Constants.refundTo] as? String,
+                  let echoedOriginAsset = quoteRequest[Constants.originAsset] as? String,
+                  let echoedDestinationAsset = quoteRequest[Constants.destinationAsset] as? String,
                   let amountInString = quote[Constants.amountIn] as? String,
                   let amountInUsdString = quote[Constants.amountInUsd] as? String,
                   let minAmountInString = quote[Constants.minAmountIn] as? String,
@@ -358,6 +363,10 @@ extension Near1Click {
             if isSwapToZec {
                 return SwapQuote(
                     depositAddress: depositAddress,
+                    destinationAddress: destinationAddress,
+                    refundAddress: refundAddress,
+                    originAssetId: echoedOriginAsset,
+                    destinationAssetId: echoedDestinationAsset,
                     amountIn: amountIn / Decimal(pow(10.0, Double(toAsset.decimals))),
                     amountInUsd: amountInUsdString,
                     minAmountIn: minAmountIn / Decimal(pow(10.0, Double(toAsset.decimals))),
@@ -369,6 +378,10 @@ extension Near1Click {
             
             return SwapQuote(
                 depositAddress: depositAddress,
+                destinationAddress: destinationAddress,
+                refundAddress: refundAddress,
+                originAssetId: echoedOriginAsset,
+                destinationAssetId: echoedDestinationAsset,
                 amountIn: amountIn,
                 amountInUsd: amountInUsdString,
                 minAmountIn: minAmountIn,
