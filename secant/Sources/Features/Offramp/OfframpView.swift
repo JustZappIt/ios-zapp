@@ -99,28 +99,69 @@ struct OfframpView: View {
 
     private var amount: some View {
         VStack(spacing: 0) {
-            ZappScreenHeader(title: text("offramp.pay.title", "Pay with P2P"))
+            ZappScreenHeader(title: text("offramp.pay.title", "Pay a merchant"))
             ScrollView {
                 VStack(spacing: 18) {
                     if let corridor = store.selectedCorridor {
-                        Text(corridor.flag)
-                            .font(.system(size: 38))
-                        Text(corridor.currencyCode)
+                        Button { store.send(.chooseCorridorTapped) } label: {
+                            HStack(spacing: 14) {
+                                Text(corridor.flag).font(.system(size: 30))
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(corridor.countryName).zappFont(.rowTitle, style: ZappColors.text)
+                                    Text("\(corridor.paymentRail) · \(corridor.currencyCode)")
+                                        .zappFont(.caption, style: ZappColors.textMuted)
+                                }
+                                Spacer()
+                                Asset.Assets.chevronRight.image
+                                    .zImage(width: 16, height: 16, style: ZappColors.textMuted)
+                            }
+                            .padding(16)
+                            .background(ZappColors.surface.color(colorScheme))
+                            .overlay(Rectangle().stroke(ZappColors.border.color(colorScheme), lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if let account = store.account {
+                        accountBalanceCard(account)
+                    }
+
+                    if store.hasCheckpoint && !store.isResumingCheckpoint {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(text("offramp.checkpoint.title", "Payment already in progress"))
+                                .zappFont(.rowTitle, style: ZappColors.text)
+                            Text(text(
+                                "offramp.checkpoint.message",
+                                "Resume the existing P2P payment before starting another, or discard it."
+                            ))
+                            .zappFont(.body, style: ZappColors.textMuted)
+                            HStack(spacing: 10) {
+                                ZappButton(
+                                    title: text("offramp.checkpoint.discard", "Discard"),
+                                    variant: .ghost
+                                ) { store.send(.discardCheckpointTapped) }
+                                ZappButton(title: text("offramp.checkpoint.resume", "Resume")) {
+                                    store.send(.resumeCheckpointTapped)
+                                }
+                            }
+                        }
+                        .padding(16)
+                        .background(ZappColors.surface.color(colorScheme))
+                        .overlay(Rectangle().stroke(ZappColors.border.color(colorScheme), lineWidth: 1))
+                    }
+
+                    VStack(spacing: 6) {
+                        TextField("0", text: Binding(
+                            get: { store.fiatAmount },
+                            set: { store.send(.fiatAmountChanged($0)) }
+                        ))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.center)
+                        .zappFont(.display, style: ZappColors.text)
+                        Text(store.selectedCorridor?.currencyCode ?? store.selectedCurrencyCode)
                             .zappFont(.caption, style: ZappColors.textMuted)
                     }
-
-                    TextField("0", text: Binding(
-                        get: { store.fiatAmount },
-                        set: { store.send(.fiatAmountChanged($0)) }
-                    ))
-                    .keyboardType(.decimalPad)
-                    .multilineTextAlignment(.center)
-                    .zappFont(.display, style: ZappColors.text)
-                    .disabled(store.scan?.fiatAmount != nil)
-
-                    if let scan = store.scan {
-                        infoRow(text("offramp.recipient", "Recipient"), scan.paymentAddress)
-                    }
+                    .padding(.vertical, 20)
 
                     if let quote = store.quote {
                         quoteCard(quote)
@@ -129,6 +170,12 @@ struct OfframpView: View {
                     if let error = store.errorMessage {
                         errorCard(error)
                     }
+
+                    ZappButton(
+                        title: text("offramp.addFunds.base", "Add funds to Base"),
+                        variant: .ghost,
+                        isEnabled: !store.isLoading
+                    ) { store.send(.addFundsTapped) }
 
                     Button { store.send(.historyTapped) } label: {
                         HStack {
@@ -153,7 +200,7 @@ struct OfframpView: View {
                         title: quote.canPayFromBase
                             ? text("offramp.pay.button", "Pay")
                             : text("offramp.addFunds.button", "Add funds"),
-                        isEnabled: !store.isLoading
+                        isEnabled: !store.isLoading && !store.hasCheckpoint
                     ) {
                         store.send(quote.canPayFromBase ? .payTapped : .addFundsTapped)
                     }
@@ -162,7 +209,7 @@ struct OfframpView: View {
                         title: store.isLoading
                             ? text("offramp.quote.loading", "Getting quote…")
                             : text("offramp.quote.button", "Review"),
-                        isEnabled: !store.fiatAmount.isEmpty && !store.isLoading
+                        isEnabled: !store.fiatAmount.isEmpty && !store.isLoading && !store.hasCheckpoint
                     ) { store.send(.quoteTapped) }
                 }
             }
@@ -174,11 +221,26 @@ struct OfframpView: View {
             ZappScreenHeader(title: text("offramp.topup.title", "Add funds to Base"))
             ScrollView {
                 VStack(spacing: 20) {
-                    callout(
-                        title: text("offramp.topup.amount", "Amount to add"),
-                        detail: "\(store.quote?.shortfallDisplay ?? "0") USDC"
-                    )
-                    if store.quote?.canBridgeToBase == true {
+                    VStack(spacing: 6) {
+                        Text(text("offramp.topup.amount", "Amount to add"))
+                            .zappFont(.eyebrow, style: ZappColors.textMuted)
+                        TextField("0", text: Binding(
+                            get: { store.topUpAmount },
+                            set: { store.send(.topUpAmountChanged($0)) }
+                        ))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.center)
+                        .zappFont(.display, style: ZappColors.text)
+                        Text("USDC").zappFont(.caption, style: ZappColors.textMuted)
+                    }
+                    .padding(20)
+                    .background(ZappColors.surface.color(colorScheme))
+                    .overlay(Rectangle().stroke(ZappColors.border.color(colorScheme), lineWidth: 1))
+
+                    if let account = store.account {
+                        accountBalanceCard(account)
+                    }
+                    if store.account?.canBridgeToBase == true {
                         progressStep(1, text("offramp.topup.step1", "Approve the ZEC bridge"), active: true)
                         progressStep(2, text("offramp.topup.step2", "Wait for USDC on Base"), active: false)
                         progressStep(3, text("offramp.topup.step3", "Return and pay from your Base balance"), active: false)
@@ -196,8 +258,11 @@ struct OfframpView: View {
                 .padding(18)
             }
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                if store.quote?.canBridgeToBase == true {
-                    ZappButton(title: text("offramp.topup.continue", "Add funds"), isEnabled: !store.isLoading) {
+                if store.account?.canBridgeToBase == true {
+                    ZappButton(
+                        title: text("offramp.topup.continue", "Add funds"),
+                        isEnabled: Offramp.usdcMicros(store.topUpAmount) != nil && !store.isLoading
+                    ) {
                         store.send(.startTopUpTapped)
                     }
                 }
@@ -354,7 +419,7 @@ struct OfframpView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(text("offramp.history.balance", "BASE BALANCE"))
                         .zappFont(.eyebrow, style: ZappColors.textMuted)
-                    Text("\(account.balanceDisplay) USDC")
+                    Text(account.balanceDisplay.map { "\($0) USDC" } ?? "— USDC")
                         .zappFont(.display, style: ZappColors.text)
                 }
                 Spacer()

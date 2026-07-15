@@ -36,9 +36,10 @@ struct OfframpQuoteModel: Equatable, Sendable {
 
 struct OfframpAccountModel: Equatable, Sendable {
     let address: String
-    let balanceMicros: String
-    let balanceDisplay: String
+    let balanceMicros: String?
+    let balanceDisplay: String?
     let explorerURL: URL?
+    let canBridgeToBase: Bool
     let canRefundToZec: Bool
 }
 
@@ -97,9 +98,10 @@ struct OfframpClient {
     var quote: @Sendable (_ currencyCode: String, _ fiatAmount: String) async throws -> OfframpQuoteModel
     var pay: @Sendable (
         _ quote: OfframpQuoteModel,
-        _ scan: OfframpScanResult,
         _ payeeName: String?
     ) async throws -> AsyncStream<OfframpProgressModel>
+    var resumePayment: @Sendable () async throws -> AsyncStream<OfframpProgressModel>
+    var submitPaymentDetails: @Sendable (_ scan: OfframpScanResult) async throws -> Void
     var bridgeToBase: @Sendable (_ usdcMicros: String, _ resumeHandle: String?) async throws -> AsyncStream<OfframpProgressModel>
     var history: @Sendable () async throws -> [OfframpHistoryModel]
     var recoverFunds: @Sendable (_ orderId: String?) async throws -> AsyncStream<OfframpProgressModel>
@@ -115,7 +117,8 @@ extension OfframpClient: DependencyKey {
     static let liveValue = Self.live()
 
     static func live() -> Self {
-        Self(
+        let paymentDetails = OfframpPaymentDetailsHost()
+        return Self(
             corridors: {
                 try await OfframpSession.shared.client().corridors().map(OfframpCorridor.init)
             },
@@ -135,20 +138,30 @@ extension OfframpClient: DependencyKey {
                     fiatAmount: amount
                 ))
             },
-            pay: { quote, scan, payeeName in
+            pay: { quote, payeeName in
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
                 let client = try await OfframpSession.shared.client()
+                await paymentDetails.reset()
                 let nativeQuote = try await client.quote(currencyCode: quote.currencyCode, fiatAmount: quote.fiatAmount)
                 // Re-quote at commit time. This is the same drift guard as Android; never submit the
                 // stale screen quote after the contract rate or fixed fee changes.
                 let flow = client.pay(
                     quote: nativeQuote,
-                    rawPayload: scan.rawPayload,
-                    paymentAddress: scan.paymentAddress,
+                    paymentDetailsProvider: paymentDetails,
                     payeeName: payeeName
                 )
                 return flow.offrampStream()
+            },
+            resumePayment: {
+                @Dependency(\.localAuthentication) var authentication
+                guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
+                let client = try await OfframpSession.shared.client()
+                await paymentDetails.reset()
+                return client.resumePayment(paymentDetailsProvider: paymentDetails).offrampStream()
+            },
+            submitPaymentDetails: { scan in
+                try await paymentDetails.submit(scan)
             },
             bridgeToBase: { micros, resume in
                 @Dependency(\.localAuthentication) var authentication
@@ -190,11 +203,80 @@ extension OfframpClient: DependencyKey {
     }
 }
 
+private enum OfframpPaymentDetailsError: LocalizedError {
+    case cancelled
+
+    var errorDescription: String? {
+        switch self {
+        case .cancelled: return "The merchant payment-details request was cancelled."
+        }
+    }
+}
+
+/// One suspended request per payment. The shared engine calls this only after merchant acceptance;
+/// the scanner resumes it with a locally validated QR payload.
+private final class OfframpPaymentDetailsHost: NSObject, AppleOfframpPaymentDetailsProvider, @unchecked Sendable {
+    private let worker = OfframpPaymentDetailsWorker()
+
+    func __requestPaymentDetails(
+        orderId: String,
+        currencyCode: String,
+        fiatAmount: String,
+        completionHandler: @escaping @Sendable (AppleOfframpPaymentDetails?, Error?) -> Void
+    ) {
+        Task {
+            do { completionHandler(try await worker.waitForDetails(), nil) }
+            catch { completionHandler(nil, error) }
+        }
+    }
+
+    func submit(_ scan: OfframpScanResult) async throws {
+        await worker.submit(scan)
+    }
+
+    func reset() async {
+        await worker.reset()
+    }
+}
+
+private actor OfframpPaymentDetailsWorker {
+    private var continuation: CheckedContinuation<AppleOfframpPaymentDetails, Error>?
+    private var pending: AppleOfframpPaymentDetails?
+
+    func waitForDetails() async throws -> AppleOfframpPaymentDetails {
+        if let pending {
+            self.pending = nil
+            return pending
+        }
+        return try await withCheckedThrowingContinuation { continuation = $0 }
+    }
+
+    func submit(_ scan: OfframpScanResult) {
+        let details = AppleOfframpPaymentDetails(
+            rawPayload: scan.rawPayload,
+            paymentAddress: scan.paymentAddress,
+            fiatAmount: scan.fiatAmount
+        )
+        if let continuation {
+            self.continuation = nil
+            continuation.resume(returning: details)
+        } else {
+            pending = details
+        }
+    }
+
+    func reset() {
+        continuation?.resume(throwing: OfframpPaymentDetailsError.cancelled)
+        continuation = nil
+        pending = nil
+    }
+}
+
 private actor OfframpSession {
     static let shared = OfframpSession()
 
     private var cachedClient: AppleOfframpClient?
-    private var cachedAccountID: String?
+    private var cachedWalletIdentity: String?
 
     func client() async throws -> AppleOfframpClient {
         @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
@@ -210,13 +292,20 @@ private actor OfframpSession {
         }
         guard account.vendor == .zcash else { throw OfframpClientError.unsupportedAccount }
         let accountID = account.id.id.map { String(format: "%02x", $0) }.joined()
-        if cachedAccountID == accountID, let cachedClient { return cachedClient }
+        let isTestnet = environment.network().networkType == .testnet
+        // Account UUID alone is not a sufficient wallet-lifecycle boundary. Include the SDK seed
+        // fingerprint so a delete + restore in the same process can never retain the prior
+        // wallet's Base owner/client. The mnemonic itself is never used as a cache key.
+        let seedFingerprint = account.seedFingerprint?.map { String(format: "%02x", $0) }.joined() ?? ""
+        let walletIdentity = "\(accountID):\(seedFingerprint):\(isTestnet ? "testnet" : "mainnet")"
+        if cachedWalletIdentity == walletIdentity, let cachedClient { return cachedClient }
 
         guard let pimlicoKey = PartnerKeys.p2pPimlicoApiKey, !pimlicoKey.isEmpty else {
             throw OfframpClientError.configuration("P2P payments are not configured in PartnerKeys.plist.")
         }
+        // The KMP facade derives the Base owner directly from this active Zcash wallet mnemonic
+        // at m/44'/60'/0'/0/0, matching Android. No separate Base seed or private key is stored.
         let seedPhrase = try walletStorage.exportWallet().seedPhrase.value()
-        let isTestnet = environment.network().networkType == .testnet
         let storage = try OfframpEncryptedStorage(account: account.account, walletStorage: walletStorage)
         let bridge: AppleOfframpBridge? = isTestnet ? nil : OfframpNearBridge(
             account: account,
@@ -239,7 +328,7 @@ private actor OfframpSession {
         )
         cachedClient?.close()
         cachedClient = client
-        cachedAccountID = accountID
+        cachedWalletIdentity = walletIdentity
         return client
     }
 }
@@ -282,6 +371,7 @@ private extension OfframpAccountModel {
             balanceMicros: value.balanceMicros,
             balanceDisplay: value.balanceDisplay,
             explorerURL: URL(string: value.explorerUrl),
+            canBridgeToBase: value.canBridgeToBase,
             canRefundToZec: value.canRefundToZec
         )
     }

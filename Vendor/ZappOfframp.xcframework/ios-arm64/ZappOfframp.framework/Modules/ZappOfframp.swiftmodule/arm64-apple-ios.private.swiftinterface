@@ -544,6 +544,10 @@ extension ZappOfframp.AppleOfframpClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func quote(currencyCode: Swift.String, fiatAmount: Swift.String) async throws -> ZappOfframp.AppleOfframpQuote
 }
+extension ZappOfframp.AppleOfframpPaymentDetailsProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func requestPaymentDetails(orderId: Swift.String, currencyCode: Swift.String, fiatAmount: Swift.String) async throws -> ZappOfframp.AppleOfframpPaymentDetails
+}
 extension ZappOfframp.AppleOfframpClient.Companion {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleOfframpClient

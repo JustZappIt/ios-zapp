@@ -26356,6 +26356,16 @@
         ]
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
         "kind": "Function",
         "name": "SkieKotlinFlow",
         "printedName": "SkieKotlinFlow(_:)",
@@ -45186,6 +45196,91 @@
             "printedName": "Hashable",
             "usr": "s:SH",
             "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AppleOfframpPaymentDetailsProvider",
+        "printedName": "AppleOfframpPaymentDetailsProvider",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "requestPaymentDetails",
+            "printedName": "requestPaymentDetails(orderId:currencyCode:fiatAmount:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AppleOfframpPaymentDetails",
+                "printedName": "ZappOfframp.AppleOfframpPaymentDetails",
+                "usr": "c:objc(cs)ZappOfframpAppleOfframpPaymentDetails"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB22PaymentDetailsProviderP0aB0E07requestdE07orderId12currencyCode10fiatAmountSo0abcbdE0CSS_S2StYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB22PaymentDetailsProviderP0aB0E07requestdE07orderId12currencyCode10fiatAmountSo0abcbdE0CSS_S2StYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.AppleOfframpPaymentDetailsProvider>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.AppleOfframpPaymentDetailsProvider>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "c:objc(pl)ZappOfframpAppleOfframpPaymentDetailsProvider",
+        "moduleName": "ZappOfframp",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "objc_name": "ZappOfframpAppleOfframpPaymentDetailsProvider",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
           }
         ]
       },

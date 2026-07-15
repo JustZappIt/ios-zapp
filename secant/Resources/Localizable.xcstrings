@@ -21417,13 +21417,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pay"
+            "value": "Pay Merchant"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pagar"
+            "value": "Pagar a comercio"
           }
         }
       }
@@ -21806,9 +21806,11 @@
 "offramp.account.copy": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Copy Base account"}},"es":{"stringUnit":{"state":"translated","value":"Copiar cuenta de Base"}}}},
     "offramp.account.label": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your Base account"}},"es":{"stringUnit":{"state":"translated","value":"Tu cuenta de Base"}}}},
     "offramp.addFunds.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add funds"}},"es":{"stringUnit":{"state":"translated","value":"Añadir fondos"}}}},
+    "offramp.addFunds.base": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add funds to Base"}},"es":{"stringUnit":{"state":"translated","value":"Añadir fondos a Base"}}}},
     "offramp.checkpoint.discard": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard"}},"es":{"stringUnit":{"state":"translated","value":"Descartar"}}}},
     "offramp.checkpoint.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"A P2P payment is still in progress. Resume it before starting another payment, or discard it."}},"es":{"stringUnit":{"state":"translated","value":"Hay un pago P2P en curso. Reanúdalo antes de iniciar otro pago o descártalo."}}}},
     "offramp.checkpoint.resume": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resume"}},"es":{"stringUnit":{"state":"translated","value":"Reanudar"}}}},
+    "offramp.checkpoint.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment already in progress"}},"es":{"stringUnit":{"state":"translated","value":"Ya hay un pago en curso"}}}},
     "offramp.history.balance": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"BASE BALANCE"}},"es":{"stringUnit":{"state":"translated","value":"SALDO EN BASE"}}}},
     "offramp.history.empty": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"No P2P payments yet"}},"es":{"stringUnit":{"state":"translated","value":"Aún no hay pagos P2P"}}}},
     "offramp.history.emptyDetail": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your completed and cancelled orders will appear here."}},"es":{"stringUnit":{"state":"translated","value":"Tus órdenes completadas y canceladas aparecerán aquí."}}}},
@@ -21818,7 +21820,7 @@
     "offramp.history.refund": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Return to ZEC"}},"es":{"stringUnit":{"state":"translated","value":"Devolver a ZEC"}}}},
     "offramp.history.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"P2P transactions"}},"es":{"stringUnit":{"state":"translated","value":"Transacciones P2P"}}}},
     "offramp.pay.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay"}},"es":{"stringUnit":{"state":"translated","value":"Pagar"}}}},
-    "offramp.pay.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay with P2P"}},"es":{"stringUnit":{"state":"translated","value":"Pagar con P2P"}}}},
+    "offramp.pay.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay a merchant"}},"es":{"stringUnit":{"state":"translated","value":"Pagar a un comercio"}}}},
     "offramp.paymentMethod": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"P2P payment method"}},"es":{"stringUnit":{"state":"translated","value":"Método de pago P2P"}}}},
     "offramp.paymentMethod.infoButton": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"How P2P payments work"}},"es":{"stringUnit":{"state":"translated","value":"Cómo funcionan los pagos P2P"}}}},
     "offramp.paymentMethod.infoFlow": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"ZEC can be bridged to your self-custodial Base account, then exchanged through the P2P contract. Review the amount and rate before approving."}},"es":{"stringUnit":{"state":"translated","value":"Puedes transferir ZEC a tu cuenta autocustodiada de Base y cambiarlo mediante el contrato P2P. Revisa el importe y la tasa antes de aprobar."}}}},
