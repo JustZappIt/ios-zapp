@@ -34,9 +34,71 @@ struct OfframpView: View {
                 Button(text("general.cancel", "Cancel"), role: .cancel) { store.send(.refundDismissed) }
                 Button(text("offramp.refund.confirm.button", "Return funds")) { store.send(.refundConfirmed) }
             } message: {
+                Text(bridgePreviewMessage)
+            }
+            .alert(
+                text("offramp.pay.updated.title", "Review updated payment quote"),
+                isPresented: Binding(
+                    get: { store.isPayConfirmationPresented },
+                    set: { if !$0 { store.send(.payDismissed) } }
+                )
+            ) {
+                Button(text("general.cancel", "Cancel"), role: .cancel) { store.send(.payDismissed) }
+                Button(text("offramp.pay.confirm", "Confirm payment")) { store.send(.payConfirmed) }
+            } message: {
                 Text(text(
-                    "offramp.refund.confirm.message",
-                    "Your full Base USDC balance will be bridged back to this wallet as ZEC."
+                    "offramp.pay.updated.message",
+                    "The rate, fee, or required USDC changed. Review the updated quote before confirming."
+                ))
+            }
+            .alert(
+                text("offramp.topup.confirm.title", "Confirm ZEC bridge"),
+                isPresented: Binding(
+                    get: { store.isTopUpConfirmationPresented },
+                    set: { if !$0 { store.send(.topUpDismissed) } }
+                )
+            ) {
+                Button(text("general.cancel", "Cancel"), role: .cancel) { store.send(.topUpDismissed) }
+                Button(text("offramp.topup.confirm.button", "Bridge funds")) { store.send(.topUpConfirmed) }
+            } message: {
+                Text(bridgePreviewMessage)
+            }
+            .alert(
+                text("offramp.topup.discard.confirm.title", "Discard saved top-up?"),
+                isPresented: Binding(
+                    get: { store.isTopUpDiscardConfirmationPresented },
+                    set: { if !$0 { store.send(.discardTopUpCheckpointDismissed) } }
+                )
+            ) {
+                Button(text("general.cancel", "Cancel"), role: .cancel) {
+                    store.send(.discardTopUpCheckpointDismissed)
+                }
+                Button(text("offramp.topup.discard", "Discard saved top-up"), role: .destructive) {
+                    store.send(.discardTopUpCheckpointConfirmed)
+                }
+            } message: {
+                Text(text(
+                    "offramp.topup.discard.confirm.message",
+                    "Discard only after verifying the previous bridge cannot settle. Starting again may send ZEC twice."
+                ))
+            }
+            .alert(
+                text("offramp.checkpoint.discard.confirm.title", "Discard saved payment?"),
+                isPresented: Binding(
+                    get: { store.isCheckpointDiscardConfirmationPresented },
+                    set: { if !$0 { store.send(.discardCheckpointDismissed) } }
+                )
+            ) {
+                Button(text("general.cancel", "Cancel"), role: .cancel) {
+                    store.send(.discardCheckpointDismissed)
+                }
+                Button(text("offramp.checkpoint.discard", "Discard"), role: .destructive) {
+                    store.send(.discardCheckpointConfirmed)
+                }
+            } message: {
+                Text(text(
+                    "offramp.checkpoint.discard.confirm.message",
+                    "Discarding hides local recovery for this order. Verify it is terminal before continuing."
                 ))
             }
         }
@@ -88,6 +150,12 @@ struct OfframpView: View {
                 )
                 : nil,
             onCode: { store.send(.scanPayload($0)) },
+            onCameraFailure: {
+                store.send(.scanFailed(text(
+                    "offramp.scan.cameraError",
+                    "Camera access is unavailable. Allow camera access in Settings or choose a photo."
+                )))
+            },
             onPhotoFailure: {
                 store.send(.scanFailed(text("offramp.scan.photoError", "No QR code was found in that photo.")))
             },
@@ -241,6 +309,19 @@ struct OfframpView: View {
                         accountBalanceCard(account)
                     }
                     if store.account?.canBridgeToBase == true {
+                        if store.hasTopUpCheckpoint {
+                            callout(
+                                title: text("offramp.topup.resume.title", "Base top-up in progress"),
+                                detail: text(
+                                    "offramp.topup.resume.detail",
+                                    "Resume the saved bridge to avoid sending ZEC twice, or discard it only if you have verified it will not settle."
+                                )
+                            )
+                            ZappButton(
+                                title: text("offramp.topup.discard", "Discard saved top-up"),
+                                variant: .danger
+                            ) { store.send(.discardTopUpCheckpointTapped) }
+                        }
                         progressStep(1, text("offramp.topup.step1", "Approve the ZEC bridge"), active: true)
                         progressStep(2, text("offramp.topup.step2", "Wait for USDC on Base"), active: false)
                         progressStep(3, text("offramp.topup.step3", "Return and pay from your Base balance"), active: false)
@@ -260,7 +341,9 @@ struct OfframpView: View {
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
                 if store.account?.canBridgeToBase == true {
                     ZappButton(
-                        title: text("offramp.topup.continue", "Add funds"),
+                        title: store.hasTopUpCheckpoint
+                            ? text("offramp.topup.resume.button", "Resume top-up")
+                            : text("offramp.topup.continue", "Review bridge"),
                         isEnabled: Offramp.usdcMicros(store.topUpAmount) != nil && !store.isLoading
                     ) {
                         store.send(.startTopUpTapped)
@@ -268,6 +351,23 @@ struct OfframpView: View {
                 }
             }
         }
+    }
+
+    private var bridgePreviewMessage: String {
+        guard let preview = store.bridgePreview else {
+            return text("offramp.bridge.preview.unavailable", "The bridge quote is unavailable. Review it again.")
+        }
+        var lines = [
+            "\(preview.sourceAmount) \(preview.sourceAsset)",
+            "→ \(preview.destinationAmount) \(preview.destinationAsset)"
+        ]
+        if let fee = preview.networkFee {
+            lines.append("\(text("offramp.bridge.preview.fee", "Network fee")): \(fee) ZEC")
+        }
+        if preview.estimatedSeconds > 0 {
+            lines.append("\(text("offramp.bridge.preview.time", "Estimated time")): \(preview.estimatedSeconds) s")
+        }
+        return lines.joined(separator: "\n")
     }
 
     private var progress: some View {

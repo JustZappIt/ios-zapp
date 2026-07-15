@@ -16,6 +16,8 @@ struct OfframpTests {
         state.checkpointCurrencyCode = "INR"
         let store = TestStore(initialState: state) { Offramp() } withDependencies: {
             $0.offramp.resumePayment = { AsyncStream { $0.finish() } }
+            $0.offramp.checkpointCurrencyCode = { nil }
+            $0.offramp.topUpCheckpointMicros = { nil }
         }
 
         await store.send(.resumeCheckpointTapped) {
@@ -26,12 +28,18 @@ struct OfframpTests {
             $0.isLoading = true
         }
         await store.receive(\.progressFinished) { $0.isLoading = false }
+        await store.receive(\.checkpointsLoaded) {
+            $0.hasCheckpoint = false
+            $0.checkpointCurrencyCode = nil
+        }
     }
 
     @MainActor
     @Test func paymentMethodSelectionReturnsToAmount() async {
         var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
         state.corridors = [corridor("INR"), corridor("BRL")]
+        state.selectedCurrencyCode = "INR"
+        state.draftCurrencyCode = "INR"
         let store = TestStore(initialState: state) { Offramp() }
 
         await store.send(.chooseCorridorTapped) {
@@ -66,15 +74,24 @@ struct OfframpTests {
         state.quote = quote()
         let waiting = progress(kind: "waiting_for_payment_details", title: "Merchant accepted")
         let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.quote = { _, _ in self.quote() }
             $0.offramp.pay = { _, _ in
                 AsyncStream {
                     $0.yield(waiting)
                     $0.finish()
                 }
             }
+            $0.offramp.checkpointCurrencyCode = { nil }
+            $0.offramp.topUpCheckpointMicros = { nil }
         }
 
         await store.send(.payTapped) {
+            $0.isLoading = true
+        }
+        await store.receive(\.payQuoteRefreshed) {
+            $0.isLoading = false
+        }
+        await store.receive(\.payConfirmed) {
             $0.page = .progress
             $0.isLoading = true
         }
@@ -84,6 +101,114 @@ struct OfframpTests {
             $0.isLoading = false
         }
         await store.receive(\.progressFinished)
+        await store.receive(\.checkpointsLoaded)
+    }
+
+    @MainActor
+    @Test func changedCommitTimeQuoteRequiresExplicitConfirmation() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.quote = quote()
+        let refreshed = quote(usdcMicros: "1100000")
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.quote = { _, _ in refreshed }
+        }
+
+        await store.send(.payTapped) { $0.isLoading = true }
+        await store.receive(\.payQuoteRefreshed) {
+            $0.quote = refreshed
+            $0.isLoading = false
+            $0.isPayConfirmationPresented = true
+        }
+        await store.send(.payDismissed) { $0.isPayConfirmationPresented = false }
+    }
+
+    @MainActor
+    @Test func scanningDoesNotCancelPaymentWaitingForDetails() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.quote = quote()
+        let waiting = progress(kind: "waiting_for_payment_details", title: "Merchant accepted")
+        let pair = AsyncStream<OfframpProgressModel>.makeStream()
+        let cancellation = CancellationFlag()
+        pair.continuation.onTermination = { termination in
+            if case .cancelled = termination { cancellation.markCancelled() }
+        }
+        let scan = OfframpScanResult(rawPayload: "upi://pay?pa=merchant", paymentAddress: "merchant", fiatAmount: nil)
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.pay = { _, _ in pair.stream }
+            $0.offramp.parseQR = { _, _ in scan }
+            $0.offramp.submitPaymentDetails = { _ in
+                #expect(!cancellation.isCancelled)
+                pair.continuation.finish()
+            }
+            $0.offramp.checkpointCurrencyCode = { nil }
+            $0.offramp.topUpCheckpointMicros = { nil }
+        }
+
+        await store.send(.payConfirmed) {
+            $0.page = .progress
+            $0.isLoading = true
+        }
+        pair.continuation.yield(waiting)
+        await store.receive(\.progressReceived) {
+            $0.progress = [waiting]
+            $0.page = .scanner
+            $0.isLoading = false
+        }
+        await store.send(.scanPayload(scan.rawPayload)) { $0.isLoading = true }
+        await store.receive(\.scanParsed) {
+            $0.scan = scan
+            $0.page = .progress
+        }
+        await store.receive(\.progressFinished) { $0.isLoading = false }
+        await store.receive(\.checkpointsLoaded)
+        #expect(!cancellation.isCancelled)
+    }
+
+    @MainActor
+    @Test func topUpRequiresPreviewBeforeStartingBridge() async {
+        var state = Offramp.State.initial(page: .topUp, corridorContext: .payment)
+        state.topUpAmount = "2.5"
+        let preview = OfframpBridgePreview(
+            sourceAmount: "0.1",
+            sourceAsset: "ZEC",
+            destinationAmount: "2.5",
+            destinationAsset: "USDC on Base",
+            networkFee: "0.0001",
+            estimatedSeconds: 60
+        )
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.previewTopUp = { _ in preview }
+        }
+
+        await store.send(.startTopUpTapped) { $0.isLoading = true }
+        await store.receive(\.topUpPreviewLoaded) {
+            $0.bridgePreview = preview
+            $0.isLoading = false
+            $0.isTopUpConfirmationPresented = true
+        }
+        await store.send(.topUpDismissed) {
+            $0.bridgePreview = nil
+            $0.isTopUpConfirmationPresented = false
+        }
+    }
+
+    @MainActor
+    @Test func authenticationCancellationRestoresAmountPage() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.quote = quote()
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.pay = { _, _ in throw OfframpClientError.authenticationCancelled }
+        }
+
+        await store.send(.payConfirmed) {
+            $0.page = .progress
+            $0.isLoading = true
+        }
+        await store.receive(\.operationCancelled) {
+            $0.page = .amount
+            $0.isLoading = false
+            $0.errorMessage = OfframpClientError.authenticationCancelled.localizedDescription
+        }
     }
 
     @Test func topUpAmountConvertsToUsdcMicrosWithoutRoundingUp() {
@@ -210,11 +335,11 @@ struct OfframpTests {
         }
     }
 
-    private func quote() -> OfframpQuoteModel {
+    private func quote(usdcMicros: String = "1000000") -> OfframpQuoteModel {
         OfframpQuoteModel(
             currencyCode: "INR",
             fiatAmount: "100",
-            usdcMicros: "1000000",
+            usdcMicros: usdcMicros,
             usdcDisplay: "1",
             sellRate: "100",
             fixedFeeDisplay: "0.1",
@@ -304,5 +429,16 @@ struct OfframpTests {
             amountOutUsd: "2.5",
             timeEstimate: 60
         )
+    }
+}
+
+private final class CancellationFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    var isCancelled: Bool { lock.withLock { value } }
+
+    func markCancelled() {
+        lock.withLock { value = true }
     }
 }

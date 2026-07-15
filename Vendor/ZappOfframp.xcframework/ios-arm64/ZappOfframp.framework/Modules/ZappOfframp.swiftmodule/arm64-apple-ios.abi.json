@@ -9799,6 +9799,57 @@
                       },
                       {
                         "kind": "Var",
+                        "name": "invalidCurrency",
+                        "printedName": "invalidCurrency",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed.Type) -> (ZappOfframp.UpiQrError.InvalidCurrency) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.UpiQrError.InvalidCurrency) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "InvalidCurrency",
+                                    "printedName": "ZappOfframp.UpiQrError.InvalidCurrency",
+                                    "usr": "c:objc(cs)ZappOfframpUpiQrErrorInvalidCurrency"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO15invalidCurrencyyAISo0abefg7InvalidJ0CcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO15invalidCurrencyyAISo0abefg7InvalidJ0CcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 2
+                      },
+                      {
+                        "kind": "Var",
                         "name": "invalidUpiId",
                         "printedName": "invalidUpiId",
                         "children": [
@@ -9846,7 +9897,7 @@
                         "usr": "s:11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO07invalidE2IdyAISo0abefg7InvalideJ0CcAImF",
                         "mangledName": "$s11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO07invalidE2IdyAISo0abefg7InvalideJ0CcAImF",
                         "moduleName": "ZappOfframp",
-                        "fixedbinaryorder": 2
+                        "fixedbinaryorder": 3
                       },
                       {
                         "kind": "Var",
@@ -9897,7 +9948,7 @@
                         "usr": "s:11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO21missingPaymentAddressyAISo0abefg7MissingjK0CcAImF",
                         "mangledName": "$s11ZappOfframp4SkieO0B3LibO10UpiQrErrorO8__SealedO21missingPaymentAddressyAISo0abefg7MissingjK0CcAImF",
                         "moduleName": "ZappOfframp",
-                        "fixedbinaryorder": 3
+                        "fixedbinaryorder": 4
                       },
                       {
                         "kind": "Var",
@@ -44963,6 +45014,36 @@
           },
           {
             "kind": "Function",
+            "name": "discardTopUpCheckpoint",
+            "printedName": "discardTopUpCheckpoint()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E22discardTopUpCheckpointyyYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E22discardTopUpCheckpointyyYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
             "name": "hasCheckpoint",
             "printedName": "hasCheckpoint()",
             "children": [
@@ -44976,6 +45057,37 @@
             "declKind": "Func",
             "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E13hasCheckpointSo0aB7BooleanCyYaKF",
             "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E13hasCheckpointSo0aB7BooleanCyYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hasTopUpCheckpoint",
+            "printedName": "hasTopUpCheckpoint()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "KotlinBoolean",
+                "printedName": "ZappOfframp.KotlinBoolean",
+                "usr": "c:objc(cs)ZappOfframpBoolean"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E18hasTopUpCheckpointSo0aB7BooleanCyYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E18hasTopUpCheckpointSo0aB7BooleanCyYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",
@@ -45101,6 +45213,45 @@
             "declKind": "Func",
             "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E5quote12currencyCode10fiatAmountSo0abcB5QuoteCSS_SStYaKF",
             "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E5quote12currencyCode10fiatAmountSo0abcB5QuoteCSS_SStYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "topUpCheckpointMicros",
+            "printedName": "topUpCheckpointMicros()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E21topUpCheckpointMicrosSSSgyYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E21topUpCheckpointMicrosSSSgyYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",
@@ -45674,6 +45825,136 @@
         "name": "OfframpRefund",
         "printedName": "OfframpRefund",
         "children": [
+          {
+            "kind": "Function",
+            "name": "awaitSettlement",
+            "printedName": "awaitSettlement(handle:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So011ZappOfframpB6RefundP0aB0E15awaitSettlement6handleySS_tYaKF",
+            "mangledName": "$sSo011ZappOfframpB6RefundP0aB0E15awaitSettlement6handleySS_tYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.OfframpRefund>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.OfframpRefund>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "markTransferStarting",
+            "printedName": "markTransferStarting(handle:amount:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ProtocolComposition",
+                "printedName": "Any"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So011ZappOfframpB6RefundP0aB0E20markTransferStarting6handle6amountySS_yptYaKF",
+            "mangledName": "$sSo011ZappOfframpB6RefundP0aB0E20markTransferStarting6handle6amountySS_yptYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.OfframpRefund>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.OfframpRefund>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "markTransferSubmitted",
+            "printedName": "markTransferSubmitted(handle:amount:txHash:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ProtocolComposition",
+                "printedName": "Any"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "TxHash",
+                "printedName": "ZappOfframp.TxHash",
+                "usr": "c:objc(cs)ZappOfframpTxHash"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So011ZappOfframpB6RefundP0aB0E21markTransferSubmitted6handle6amount6txHashySS_ypSo0ab2TxJ0CtYaKF",
+            "mangledName": "$sSo011ZappOfframpB6RefundP0aB0E21markTransferSubmitted6handle6amount6txHashySS_ypSo0ab2TxJ0CtYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.OfframpRefund>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.OfframpRefund>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
           {
             "kind": "Function",
             "name": "pullbackTarget",

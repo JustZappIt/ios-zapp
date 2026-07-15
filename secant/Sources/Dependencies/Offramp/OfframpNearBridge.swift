@@ -5,10 +5,20 @@ import Foundation
 @preconcurrency import ZappOfframp
 @preconcurrency import ZcashLightClientKit
 
+struct OfframpBridgePreview: Equatable, Sendable {
+    let sourceAmount: String
+    let sourceAsset: String
+    let destinationAmount: String
+    let destinationAsset: String
+    let networkFee: String?
+    let estimatedSeconds: Int
+}
+
 /// iOS wallet/1-Click half of the shared bridge contract. Preparing is read-only; execute sends the
 /// already-persisted quote exactly once; resume only polls the existing deposit address.
 final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable {
     private let worker: OfframpNearBridgeWorker
+    private let tasks = OfframpBridgeTaskRegistry()
 
     init(
         account: WalletAccount,
@@ -35,27 +45,29 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
         usdcMicros: String,
         completionHandler: @escaping @Sendable (String?, Error?) -> Void
     ) {
-        Task {
+        guard tasks.launch({ [worker] in
             do { completionHandler(try await worker.prepare(accountAddress: accountAddress, usdcMicros: usdcMicros), nil) }
             catch { completionHandler(nil, error) }
-        }
+        }) else { return completionHandler(nil, CancellationError()) }
     }
 
     func __execute(
         depositAddress: String,
         completionHandler: @escaping @Sendable (AppleBridgeExecution?, Error?) -> Void
     ) {
-        Task {
+        guard tasks.launch({ [worker] in
             do { completionHandler(try await worker.execute(depositAddress: depositAddress), nil) }
             catch { completionHandler(nil, error) }
-        }
+        }) else { return completionHandler(nil, CancellationError()) }
     }
 
     func __resume(
         depositAddress: String,
         completionHandler: @escaping @Sendable (AppleBridgeExecution?, Error?) -> Void
     ) {
-        Task { completionHandler(await worker.poll(depositAddress: depositAddress), nil) }
+        guard tasks.launch({ [worker] in completionHandler(await worker.poll(depositAddress: depositAddress), nil) }) else {
+            return completionHandler(nil, CancellationError())
+        }
     }
 
     func __prepareRefund(
@@ -63,21 +75,78 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
         usdcMicros: String,
         completionHandler: @escaping @Sendable (String?, Error?) -> Void
     ) {
-        Task {
+        guard tasks.launch({ [worker] in
             do {
                 completionHandler(
                     try await worker.prepareRefund(accountAddress: accountAddress, usdcMicros: usdcMicros),
                     nil
                 )
             } catch { completionHandler(nil, error) }
+        }) else { return completionHandler(nil, CancellationError()) }
+    }
+
+    func invalidate() {
+        tasks.invalidate()
+        Task { await worker.invalidate() }
+    }
+
+    func previewTopUp(accountAddress: String, usdcMicros: String) async throws -> OfframpBridgePreview {
+        try await worker.previewTopUp(accountAddress: accountAddress, usdcMicros: usdcMicros)
+    }
+
+    func previewRefund(accountAddress: String, usdcMicros: String) async throws -> OfframpBridgePreview {
+        try await worker.previewRefund(accountAddress: accountAddress, usdcMicros: usdcMicros)
+    }
+}
+
+private final class OfframpBridgeTaskRegistry: @unchecked Sendable {
+    private let lock = NSLock()
+    private var running: [UUID: Task<Void, Never>] = [:]
+    private var isInvalidated = false
+
+    @discardableResult
+    func launch(_ operation: @escaping @Sendable () async -> Void) -> Bool {
+        let id = UUID()
+        return lock.withLock {
+            guard !isInvalidated else { return false }
+            running[id] = Task { [weak self] in
+                await operation()
+                self?.remove(id)
+            }
+            return true
         }
     }
 
+    func invalidate() {
+        let tasks = lock.withLock {
+            isInvalidated = true
+            let tasks = Array(running.values)
+            running.removeAll()
+            return tasks
+        }
+        tasks.forEach { $0.cancel() }
+    }
+
+    private func remove(_ id: UUID) {
+        lock.withLock { running[id] = nil }
+    }
 }
 
 private actor OfframpNearBridgeWorker {
     private struct PreparedBridge {
         let quote: SwapQuote
+        let proposal: Proposal
+    }
+
+    private struct AuthorizedBridge {
+        let quote: SwapQuote
+        let proposal: Proposal
+        let expiresAt: Date
+    }
+
+    private struct AuthorizedRefund {
+        let quote: SwapQuote
+        let expiresAt: Date
     }
 
     private let account: WalletAccount
@@ -88,6 +157,9 @@ private actor OfframpNearBridgeWorker {
     private let derivationTool: DerivationToolClient
     private let environment: ZcashSDKEnvironment
     private var prepared: [String: PreparedBridge] = [:]
+    private var authorizedTopUps: [String: AuthorizedBridge] = [:]
+    private var authorizedRefunds: [String: AuthorizedRefund] = [:]
+    private var isInvalidated = false
 
     init(
         account: WalletAccount,
@@ -108,8 +180,24 @@ private actor OfframpNearBridgeWorker {
     }
 
     func prepare(accountAddress: String, usdcMicros: String) async throws -> String {
+        try requireActive()
+        let key = authorizationKey(accountAddress: accountAddress, usdcMicros: usdcMicros)
+        guard let authorization = authorizedTopUps.removeValue(forKey: key), authorization.expiresAt > Date() else {
+            throw OfframpBridgeError.previewRequired
+        }
+        prepared[authorization.quote.depositAddress] = PreparedBridge(
+            quote: authorization.quote,
+            proposal: authorization.proposal
+        )
+        return authorization.quote.depositAddress
+    }
+
+    func previewTopUp(accountAddress: String, usdcMicros: String) async throws -> OfframpBridgePreview {
+        try requireActive()
         let assets = try await assets()
+        try requireActive()
         let refundAddress = try await privateAddress()
+        try requireActive()
         let quote = try await swapAndPay.quote(
             false,
             false,
@@ -121,6 +209,7 @@ private actor OfframpNearBridgeWorker {
             accountAddress,
             usdcMicros
         )
+        try requireActive()
         try OfframpBridgeQuoteValidator.validate(
             quote,
             requestedMicros: usdcMicros,
@@ -129,11 +218,36 @@ private actor OfframpNearBridgeWorker {
             originAssetId: assets.zec.assetId,
             destinationAssetId: assets.usdc.assetId
         )
-        prepared[quote.depositAddress] = PreparedBridge(quote: quote)
-        return quote.depositAddress
+        let recipient = try Recipient(quote.depositAddress, network: environment.network().networkType)
+        let amount = Zatoshi(NSDecimalNumber(decimal: quote.amountIn).int64Value)
+        let proposal = try await sdkSynchronizer.proposeTransfer(account.id, recipient, amount, nil)
+        try requireActive()
+        let fee = proposal.totalFeeRequired()
+        let balances = try await sdkSynchronizer.getAccountsBalances()
+        try requireActive()
+        guard let balance = balances[account.id] else { throw OfframpBridgeError.balanceUnavailable }
+        let spendable = balance.saplingBalance.spendableValue + balance.orchardBalance.spendableValue
+        guard amount.amount <= Int64.max - fee.amount, amount.amount + fee.amount <= spendable.amount else {
+            throw OfframpBridgeError.insufficientSpendableBalance
+        }
+        let key = authorizationKey(accountAddress: accountAddress, usdcMicros: usdcMicros)
+        authorizedTopUps[key] = AuthorizedBridge(
+            quote: quote,
+            proposal: proposal,
+            expiresAt: Date().addingTimeInterval(Self.authorizationLifetime)
+        )
+        return OfframpBridgePreview(
+            sourceAmount: amount.decimalString(),
+            sourceAsset: "ZEC",
+            destinationAmount: NSDecimalNumber(decimal: quote.amountOut).stringValue,
+            destinationAsset: "USDC on Base",
+            networkFee: fee.decimalString(),
+            estimatedSeconds: Int(quote.timeEstimate)
+        )
     }
 
     func execute(depositAddress: String) async throws -> AppleBridgeExecution {
+        try requireActive()
         guard let bridge = prepared.removeValue(forKey: depositAddress) else {
             return AppleBridgeExecution(
                 succeeded: false,
@@ -149,9 +263,8 @@ private actor OfframpNearBridgeWorker {
             )
         }
 
-        let recipient = try Recipient(bridge.quote.depositAddress, network: environment.network().networkType)
-        let amount = Zatoshi(NSDecimalNumber(decimal: bridge.quote.amountIn).int64Value)
-        let proposal = try await sdkSynchronizer.proposeTransfer(account.id, recipient, amount, nil)
+        try Task.checkCancellation()
+        try requireActive()
         let storedWallet = try walletStorage.exportWallet()
         let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
         let spendingKey = try derivationTool.deriveSpendingKey(
@@ -159,7 +272,9 @@ private actor OfframpNearBridgeWorker {
             accountIndex,
             environment.network().networkType
         )
-        let result = try await sdkSynchronizer.createAndSubmitProposedTransactions(proposal, spendingKey)
+        try Task.checkCancellation()
+        try requireActive()
+        let result = try await sdkSynchronizer.createAndSubmitProposedTransactions(bridge.proposal, spendingKey)
         let txId: String
         switch result {
         case .success(let txIds):
@@ -173,13 +288,25 @@ private actor OfframpNearBridgeWorker {
         case .partial(_, let statuses):
             throw OfframpBridgeError.submissionFailed(statuses.joined(separator: ", "))
         }
-        try? await swapAndPay.submitDepositTxId(txId, depositAddress)
+        try await swapAndPay.submitDepositTxId(txId, depositAddress)
         return await poll(depositAddress: depositAddress)
     }
 
     func prepareRefund(accountAddress: String, usdcMicros: String) async throws -> String {
+        try requireActive()
+        let key = authorizationKey(accountAddress: accountAddress, usdcMicros: usdcMicros)
+        guard let authorization = authorizedRefunds.removeValue(forKey: key), authorization.expiresAt > Date() else {
+            throw OfframpBridgeError.previewRequired
+        }
+        return authorization.quote.depositAddress
+    }
+
+    func previewRefund(accountAddress: String, usdcMicros: String) async throws -> OfframpBridgePreview {
+        try requireActive()
         let assets = try await assets()
+        try requireActive()
         let zecAddress = try await privateAddress()
+        try requireActive()
         let quote = try await swapAndPay.quote(
             false,
             true,
@@ -191,6 +318,7 @@ private actor OfframpNearBridgeWorker {
             accountAddress,
             usdcMicros
         )
+        try requireActive()
         try OfframpBridgeQuoteValidator.validateRefund(
             quote,
             requestedMicros: usdcMicros,
@@ -199,7 +327,20 @@ private actor OfframpNearBridgeWorker {
             originAssetId: assets.usdc.assetId,
             destinationAssetId: assets.zec.assetId
         )
-        return quote.depositAddress
+        guard quote.amountOut > 0 else { throw OfframpBridgeError.zeroOutput }
+        let key = authorizationKey(accountAddress: accountAddress, usdcMicros: usdcMicros)
+        authorizedRefunds[key] = AuthorizedRefund(
+            quote: quote,
+            expiresAt: Date().addingTimeInterval(Self.authorizationLifetime)
+        )
+        return OfframpBridgePreview(
+            sourceAmount: NSDecimalNumber(decimal: quote.amountIn).stringValue,
+            sourceAsset: "USDC on Base",
+            destinationAmount: NSDecimalNumber(decimal: quote.amountOut).stringValue,
+            destinationAsset: "ZEC",
+            networkFee: nil,
+            estimatedSeconds: Int(quote.timeEstimate)
+        )
     }
 
     func poll(depositAddress: String) async -> AppleBridgeExecution {
@@ -230,6 +371,24 @@ private actor OfframpNearBridgeWorker {
         }
         return AppleBridgeExecution(succeeded: false, terminal: false, message: "Bridge polling was cancelled.")
     }
+
+    func invalidate() {
+        isInvalidated = true
+        prepared.removeAll()
+        authorizedTopUps.removeAll()
+        authorizedRefunds.removeAll()
+    }
+
+    private func requireActive() throws {
+        guard !isInvalidated else { throw CancellationError() }
+        try Task.checkCancellation()
+    }
+
+    private func authorizationKey(accountAddress: String, usdcMicros: String) -> String {
+        "\(accountAddress.lowercased()):\(usdcMicros)"
+    }
+
+    private static let authorizationLifetime: TimeInterval = 120
 
     private func privateAddress() async throws -> String {
         if let existing = account.privateUnifiedAddress { return existing }
@@ -353,6 +512,10 @@ enum OfframpBridgeError: LocalizedError {
     case missingTransactionId
     case quoteMismatch(field: String, expected: String, actual: String)
     case submissionFailed(String)
+    case previewRequired
+    case balanceUnavailable
+    case insufficientSpendableBalance
+    case zeroOutput
 
     var errorDescription: String? {
         switch self {
@@ -362,6 +525,10 @@ enum OfframpBridgeError: LocalizedError {
         case .quoteMismatch(let field, let expected, let actual):
             return "Bridge quote \(field) mismatch (expected \(expected), got \(actual))."
         case .submissionFailed(let message): return "The Zcash deposit failed: \(message)"
+        case .previewRequired: return "The bridge quote expired or was not reviewed. Review it again before continuing."
+        case .balanceUnavailable: return "The spendable ZEC balance could not be verified."
+        case .insufficientSpendableBalance: return "The spendable ZEC balance does not cover the bridge amount and network fee."
+        case .zeroOutput: return "The bridge quote would return no ZEC."
         }
     }
 }

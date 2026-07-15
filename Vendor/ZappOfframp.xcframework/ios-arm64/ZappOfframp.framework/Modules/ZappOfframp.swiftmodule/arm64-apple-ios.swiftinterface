@@ -525,13 +525,19 @@ extension ZappOfframp.AppleOfframpClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func discardCheckpoint() async throws
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func discardTopUpCheckpoint() async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func hasCheckpoint() async throws -> ZappOfframp.KotlinBoolean
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func hasTopUpCheckpoint() async throws -> ZappOfframp.KotlinBoolean
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func history() async throws -> [ZappOfframp.AppleOfframpHistoryItem]
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func parsePaymentQr(currencyCode: Swift.String, rawPayload: Swift.String) async throws -> ZappOfframp.ApplePaymentQrResult
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func quote(currencyCode: Swift.String, fiatAmount: Swift.String) async throws -> ZappOfframp.AppleOfframpQuote
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func topUpCheckpointMicros() async throws -> Swift.String?
 }
 extension ZappOfframp.AppleOfframpPaymentDetailsProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -550,6 +556,12 @@ extension ZappOfframp.KotlinSuspendFunction1 {
   public func invoke(p1: Any?) async throws -> Any?
 }
 extension ZappOfframp.OfframpRefund {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func awaitSettlement(handle: Swift.String) async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func markTransferStarting(handle: Swift.String, amount: Any) async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func markTransferSubmitted(handle: Swift.String, amount: Any, txHash: ZappOfframp.TxHash) async throws
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func pullbackTarget(account: ZappOfframp.Address, amount: Any) async throws -> ZappOfframp.Address?
 }
@@ -1750,6 +1762,7 @@ extension ZappOfframp.Skie.OfframpLib.UpiQrError {
   @frozen public enum __Sealed : Swift.Hashable {
     case emptyQr(ZappOfframp.UpiQrError.EmptyQr)
     case invalidAmount(ZappOfframp.UpiQrError.InvalidAmount)
+    case invalidCurrency(ZappOfframp.UpiQrError.InvalidCurrency)
     case invalidUpiId(ZappOfframp.UpiQrError.InvalidUpiId)
     case missingPaymentAddress(ZappOfframp.UpiQrError.MissingPaymentAddress)
     public static func == (a: ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed, b: ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed) -> Swift.Bool
