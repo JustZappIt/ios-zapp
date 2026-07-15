@@ -14,13 +14,82 @@ struct OfframpTests {
         state.draftCurrencyCode = "BRL"
         state.hasCheckpoint = true
         state.checkpointCurrencyCode = "INR"
-        let store = TestStore(initialState: state) { Offramp() }
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.resumePayment = { AsyncStream { $0.finish() } }
+        }
 
         await store.send(.resumeCheckpointTapped) {
             $0.selectedCurrencyCode = "INR"
             $0.draftCurrencyCode = "INR"
             $0.isResumingCheckpoint = true
+            $0.page = .progress
+            $0.isLoading = true
         }
+        await store.receive(\.progressFinished) { $0.isLoading = false }
+    }
+
+    @MainActor
+    @Test func paymentMethodSelectionReturnsToAmount() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.corridors = [corridor("INR"), corridor("BRL")]
+        let store = TestStore(initialState: state) { Offramp() }
+
+        await store.send(.chooseCorridorTapped) {
+            $0.corridorContext = .payment
+            $0.page = .corridors
+        }
+        await store.send(.draftCorridorTapped("BRL")) { $0.draftCurrencyCode = "BRL" }
+        await store.send(.saveCorridorTapped) {
+            $0.selectedCurrencyCode = "BRL"
+            $0.page = .amount
+        }
+    }
+
+    @MainActor
+    @Test func addFundsIsAvailableBeforeQuote() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.account = account()
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.accountSummary = { self.account() }
+        }
+
+        await store.send(.addFundsTapped) {
+            $0.page = .topUp
+            $0.isLoading = true
+        }
+        await store.receive(\.accountLoaded) { $0.isLoading = false }
+    }
+
+    @MainActor
+    @Test func merchantAcceptanceOpensScannerAfterOrderStarts() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.quote = quote()
+        let waiting = progress(kind: "waiting_for_payment_details", title: "Merchant accepted")
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.pay = { _, _ in
+                AsyncStream {
+                    $0.yield(waiting)
+                    $0.finish()
+                }
+            }
+        }
+
+        await store.send(.payTapped) {
+            $0.page = .progress
+            $0.isLoading = true
+        }
+        await store.receive(\.progressReceived) {
+            $0.progress = [waiting]
+            $0.page = .scanner
+            $0.isLoading = false
+        }
+        await store.receive(\.progressFinished)
+    }
+
+    @Test func topUpAmountConvertsToUsdcMicrosWithoutRoundingUp() {
+        #expect(Offramp.usdcMicros("2.5000009") == "2500000")
+        #expect(Offramp.usdcMicros("0") == nil)
+        #expect(Offramp.usdcMicros("") == nil)
     }
 
     @MainActor
@@ -154,6 +223,28 @@ struct OfframpTests {
             shortfallDisplay: "0",
             canPayFromBase: true,
             canBridgeToBase: true
+        )
+    }
+
+    private func corridor(_ code: String) -> OfframpCorridor {
+        OfframpCorridor(
+            currencyCode: code,
+            countryName: code == "INR" ? "India" : "Brazil",
+            paymentRail: code == "INR" ? "UPI" : "PIX",
+            flag: code == "INR" ? "🇮🇳" : "🇧🇷",
+            symbol: code == "INR" ? "₹" : "R$",
+            precision: 2
+        )
+    }
+
+    private func account() -> OfframpAccountModel {
+        OfframpAccountModel(
+            address: "0xBase",
+            balanceMicros: "0",
+            balanceDisplay: "0",
+            explorerURL: nil,
+            canBridgeToBase: true,
+            canRefundToZec: false
         )
     }
 

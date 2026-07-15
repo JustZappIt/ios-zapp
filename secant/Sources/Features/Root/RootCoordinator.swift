@@ -222,7 +222,7 @@ extension Root {
                 return .send(.swapAndPayCoordFlow(.swapAndPay(.enableSwapToZecExperience)))
 
             case .home(.payWithNearTapped):
-                state.offrampState = .initial(page: .scanner)
+                state.offrampState = .initial(page: .amount, corridorContext: .payment)
                 state.path = .offramp
                 return .none
 

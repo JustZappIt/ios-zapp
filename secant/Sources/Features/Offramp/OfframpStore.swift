@@ -5,6 +5,11 @@ import Foundation
 
 @Reducer
 struct Offramp {
+    enum CorridorContext: Equatable {
+        case settings
+        case payment
+    }
+
     enum Page: Equatable {
         case corridors
         case scanner
@@ -17,6 +22,7 @@ struct Offramp {
     @ObservableState
     struct State: Equatable {
         var page: Page
+        var corridorContext: CorridorContext
         var corridors: [OfframpCorridor] = []
         var selectedCurrencyCode: String
         var draftCurrencyCode: String
@@ -31,6 +37,7 @@ struct Offramp {
         var checkpointCurrencyCode: String?
         var isResumingCheckpoint = false
         var account: OfframpAccountModel?
+        var topUpAmount = ""
         var isAddressCopied = false
         var isRefundConfirmationPresented = false
 
@@ -44,14 +51,20 @@ struct Offramp {
 
         var latestProgress: OfframpProgressModel? { progress.last }
 
-        init(page: Page = .scanner) {
+        init(page: Page = .amount, corridorContext: CorridorContext = .settings) {
             let saved = UserDefaults.standard.string(forKey: Offramp.currencyPreferenceKey) ?? "INR"
             self.page = page
+            self.corridorContext = corridorContext
             self.selectedCurrencyCode = saved
             self.draftCurrencyCode = saved
         }
 
-        static func initial(page: Page = .scanner) -> Self { Self(page: page) }
+        static func initial(
+            page: Page = .amount,
+            corridorContext: CorridorContext = .settings
+        ) -> Self {
+            Self(page: page, corridorContext: corridorContext)
+        }
     }
 
     enum Action: Equatable {
@@ -60,6 +73,7 @@ struct Offramp {
         case loadFailed(String)
         case accountLoaded(OfframpAccountModel)
         case draftCorridorTapped(String)
+        case chooseCorridorTapped
         case saveCorridorTapped
         case resumeCheckpointTapped
         case scanPayload(String)
@@ -70,6 +84,7 @@ struct Offramp {
         case quoteLoaded(OfframpQuoteModel)
         case payTapped
         case addFundsTapped
+        case topUpAmountChanged(String)
         case startTopUpTapped
         case progressReceived(OfframpProgressModel)
         case progressFinished
@@ -92,6 +107,8 @@ struct Offramp {
     @Dependency(\.offramp) var offramp
     @Dependency(\.pasteboard) var pasteboard
 
+    private enum CancelID { case payment }
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -109,7 +126,7 @@ struct Offramp {
                             async let account = offramp.accountSummary()
                             await send(.historyLoaded(try await history))
                             await send(.accountLoaded(try await account))
-                        } else if page == .corridors {
+                        } else if page == .corridors || page == .amount || page == .topUp {
                             await send(.accountLoaded(try await offramp.accountSummary()))
                         }
                     } catch {
@@ -142,9 +159,21 @@ struct Offramp {
                 state.draftCurrencyCode = code
                 return .none
 
+            case .chooseCorridorTapped:
+                state.draftCurrencyCode = state.selectedCurrencyCode
+                state.corridorContext = .payment
+                state.page = .corridors
+                return .none
+
             case .saveCorridorTapped:
                 state.selectedCurrencyCode = state.draftCurrencyCode
                 UserDefaults.standard.set(state.selectedCurrencyCode, forKey: Self.currencyPreferenceKey)
+                state.quote = nil
+                state.errorMessage = nil
+                if state.corridorContext == .payment {
+                    state.page = .amount
+                    return .none
+                }
                 return .send(.delegate(.close))
 
             case .resumeCheckpointTapped:
@@ -152,8 +181,20 @@ struct Offramp {
                 state.selectedCurrencyCode = currency
                 state.draftCurrencyCode = currency
                 state.isResumingCheckpoint = true
+                state.page = .progress
+                state.progress = []
+                state.isLoading = true
                 state.errorMessage = nil
-                return .none
+                return .run { send in
+                    do {
+                        let stream = try await offramp.resumePayment()
+                        for await status in stream { await send(.progressReceived(status)) }
+                        await send(.progressFinished)
+                    } catch {
+                        await send(.loadFailed(error.localizedDescription))
+                    }
+                }
+                .cancellable(id: CancelID.payment, cancelInFlight: true)
 
             case .scanPayload(let payload):
                 guard !state.isLoading else { return .none }
@@ -168,11 +209,12 @@ struct Offramp {
 
             case .scanParsed(let scan):
                 state.scan = scan
-                state.fiatAmount = scan.fiatAmount ?? ""
-                state.quote = nil
-                state.page = .amount
-                state.isLoading = false
-                return .none
+                state.page = .progress
+                state.isLoading = true
+                return .run { send in
+                    do { try await offramp.submitPaymentDetails(scan) }
+                    catch { await send(.loadFailed(error.localizedDescription)) }
+                }
 
             case .fiatAmountChanged(let value):
                 state.fiatAmount = Self.sanitizedAmount(value)
@@ -196,22 +238,23 @@ struct Offramp {
                 return .none
 
             case .payTapped:
-                guard let quote = state.quote, let scan = state.scan, !state.isLoading else { return .none }
+                guard let quote = state.quote, quote.canPayFromBase, !state.isLoading else { return .none }
                 state.page = .progress
                 state.progress = []
                 state.isLoading = true
                 return .run { send in
                     do {
-                        let stream = try await offramp.pay(quote, scan, nil)
+                        let stream = try await offramp.pay(quote, nil)
                         for await status in stream { await send(.progressReceived(status)) }
                         await send(.progressFinished)
                     } catch {
                         await send(.loadFailed(error.localizedDescription))
                     }
                 }
+                .cancellable(id: CancelID.payment, cancelInFlight: true)
 
             case .addFundsTapped:
-                guard state.quote != nil else { return .none }
+                state.topUpAmount = state.quote?.shortfallDisplay == "0" ? "" : state.quote?.shortfallDisplay ?? ""
                 state.page = .topUp
                 state.isLoading = true
                 return .run { send in
@@ -219,14 +262,18 @@ struct Offramp {
                     catch { await send(.loadFailed(error.localizedDescription)) }
                 }
 
+            case .topUpAmountChanged(let value):
+                state.topUpAmount = Self.sanitizedAmount(value)
+                return .none
+
             case .startTopUpTapped:
-                guard let quote = state.quote, quote.shortfallMicros != "0", !state.isLoading else { return .none }
+                guard let micros = Self.usdcMicros(state.topUpAmount), !state.isLoading else { return .none }
                 state.page = .progress
                 state.progress = []
                 state.isLoading = true
                 return .run { send in
                     do {
-                        let stream = try await offramp.bridgeToBase(quote.shortfallMicros, nil)
+                        let stream = try await offramp.bridgeToBase(micros, nil)
                         for await status in stream { await send(.progressReceived(status)) }
                         await send(.progressFinished)
                     } catch { await send(.loadFailed(error.localizedDescription)) }
@@ -239,6 +286,10 @@ struct Offramp {
                     state.progress.append(status)
                 }
                 state.isLoading = !status.isTerminal
+                if status.kind == "waiting_for_payment_details" {
+                    state.page = .scanner
+                    state.isLoading = false
+                }
                 if status.isTerminal {
                     state.hasCheckpoint = false
                     state.checkpointCurrencyCode = nil
@@ -316,10 +367,7 @@ struct Offramp {
             case .backTapped:
                 switch state.page {
                 case .amount:
-                    state.page = .scanner
-                    state.scan = nil
-                    state.quote = nil
-                    return .none
+                    return .send(.delegate(.close))
                 case .topUp:
                     state.page = .amount
                     return .none
@@ -327,7 +375,16 @@ struct Offramp {
                     // The checkpoint is persisted before every irreversible transition. Closing
                     // cancels local polling; reopening Pay resumes the same bridge/order.
                     return .send(.delegate(.close))
-                case .corridors, .scanner, .history, .progress:
+                case .corridors where state.corridorContext == .payment:
+                    state.page = .amount
+                    state.draftCurrencyCode = state.selectedCurrencyCode
+                    return .none
+                case .scanner:
+                    return .merge(
+                        .cancel(id: CancelID.payment),
+                        .send(.delegate(.close))
+                    )
+                case .corridors, .history, .progress:
                     return .send(.delegate(.close))
                 }
 
@@ -352,5 +409,13 @@ struct Offramp {
             }
             return false
         }.replacingOccurrences(of: ",", with: ".")
+    }
+
+    static func usdcMicros(_ value: String) -> String? {
+        guard let decimal = Decimal(string: value), decimal > 0 else { return nil }
+        var scaled = decimal * 1_000_000
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &scaled, 0, .down)
+        return NSDecimalNumber(decimal: rounded).stringValue
     }
 }
