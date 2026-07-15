@@ -390,7 +390,10 @@ private actor OfframpSession {
             bridge: bridge,
             rpcUrl: isTestnet ? nil : PartnerKeys.p2pRpcBaseMainnet,
             subgraphUrl: isTestnet ? nil : PartnerKeys.p2pSubgraphMainnet,
-            sponsorshipPolicyId: PartnerKeys.p2pSponsorshipPolicyId
+            sponsorshipPolicyId: PartnerKeys.p2pSponsorshipPolicyId,
+            pixProxyUrl: PartnerKeys.p2pPixProxyUrl,
+            pixJwtPublicKeyBase64: PartnerKeys.p2pPixJwtPublicKeyBase64,
+            pixJwtKeyId: PartnerKeys.p2pPixJwtKeyId
         )
         cachedClient = client
         cachedBridge = bridge as? OfframpNearBridge
