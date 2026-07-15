@@ -491,7 +491,16 @@ extension Root {
                 
             case .initialization(.resetZashiRequest(let areMetadataPreserved)):
                 state.areMetadataPreserved = areMetadataPreserved
-                return .send(.initialization(.resetZashi))
+                return .merge(
+                    .send(.offramp(.cancelAll)),
+                    .run { send in
+                        // Await key/client invalidation before wallet storage is wiped. The child
+                        // cancellation action stops reducer effects; this direct dependency call
+                        // establishes the security boundary even if effect scheduling is reordered.
+                        await offramp.invalidateSession()
+                        await send(.initialization(.resetZashi))
+                    }
+                )
                 
             case .initialization(.resetZashiRequestCanceled):
                 state.alert = nil

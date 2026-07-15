@@ -13,6 +13,8 @@ private struct OfframpStoragePayload: Codable {
     var relayPublicKey: String?
     var paymentAddresses: [String: String] = [:]
     var checkpointJSON: String?
+    var topUpCheckpointJSON: String?
+    var refundCheckpointJSON: String?
 }
 
 enum OfframpStorageError: Error {
@@ -29,8 +31,8 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
     private let fileURL: URL
 
     init(account: Account, walletStorage: WalletStorageClient) throws {
-        guard let keys = try? walletStorage.exportAddressBookEncryptionKeys(),
-              let key = keys.getCached(account: account),
+        let keys = try walletStorage.exportAddressBookEncryptionKeys()
+        guard let key = keys.getCached(account: account),
               let filename = key.offrampFileIdentifier() else {
             throw OfframpStorageError.missingEncryptionKey
         }
@@ -41,47 +43,77 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
         self.fileURL = documents.appendingPathComponent(filename)
     }
 
-    func relayPrivateKey() -> String? { withPayload { $0.relayPrivateKey } }
-    func relayPublicKey() -> String? { withPayload { $0.relayPublicKey } }
-    func paymentAddress(orderId: String) -> String? { withPayload { $0.paymentAddresses[orderId] } }
-    func checkpointJson() -> String? { withPayload { $0.checkpointJSON } }
+    func relayPrivateKey() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.relayPrivateKey })
+    }
 
-    func storeRelay(privateKeyHex: String, publicKeyHex: String) {
-        mutate { payload in
+    func relayPublicKey() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.relayPublicKey })
+    }
+
+    func paymentAddress(orderId: String) throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.paymentAddresses[orderId] })
+    }
+
+    func checkpointJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.checkpointJSON })
+    }
+
+    func topUpCheckpointJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.topUpCheckpointJSON })
+    }
+
+    func refundCheckpointJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.refundCheckpointJSON })
+    }
+
+    func storeRelay(privateKeyHex: String, publicKeyHex: String) throws {
+        try mutate { payload in
             payload.relayPrivateKey = privateKeyHex
             payload.relayPublicKey = publicKeyHex
         }
     }
 
-    func storePaymentAddress(orderId: String, paymentAddress: String) {
-        mutate { $0.paymentAddresses[orderId] = paymentAddress }
+    func storePaymentAddress(orderId: String, paymentAddress: String) throws {
+        try mutate { $0.paymentAddresses[orderId] = paymentAddress }
     }
 
-    func storeCheckpointJson(value: String) {
-        mutate { $0.checkpointJSON = value }
+    func storeCheckpointJson(value: String) throws {
+        try mutate { $0.checkpointJSON = value }
     }
 
-    func clearCheckpoint() {
-        mutate { $0.checkpointJSON = nil }
+    func clearCheckpoint() throws {
+        try mutate { $0.checkpointJSON = nil }
     }
 
-    private func withPayload<T>(_ body: (OfframpStoragePayload) -> T?) -> T? {
+    func storeTopUpCheckpointJson(value: String) throws {
+        try mutate { $0.topUpCheckpointJSON = value }
+    }
+
+    func clearTopUpCheckpoint() throws {
+        try mutate { $0.topUpCheckpointJSON = nil }
+    }
+
+    func storeRefundCheckpointJson(value: String) throws {
+        try mutate { $0.refundCheckpointJSON = value }
+    }
+
+    func clearRefundCheckpoint() throws {
+        try mutate { $0.refundCheckpointJSON = nil }
+    }
+
+    private func withPayload<T>(_ body: (OfframpStoragePayload) -> T?) throws -> T? {
         lock.lock()
         defer { lock.unlock() }
-        return (try? body(load())) ?? nil
+        return body(try load())
     }
 
-    private func mutate(_ body: (inout OfframpStoragePayload) -> Void) {
+    private func mutate(_ body: (inout OfframpStoragePayload) -> Void) throws {
         lock.lock()
         defer { lock.unlock() }
-        do {
-            var payload = try load()
-            body(&payload)
-            try store(payload)
-        } catch {
-            // Kotlin's storage protocol is non-throwing so calls stay Swift-friendly. Refuse to
-            // overwrite unreadable/newer data; the feature surfaces initialization failure later.
-        }
+        var payload = try load()
+        body(&payload)
+        try store(payload)
     }
 
     private func load() throws -> OfframpStoragePayload {
@@ -109,6 +141,14 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
         let plaintext = try JSONEncoder().encode(payload)
         let sealed = try ChaChaPoly.seal(plaintext, using: subKey)
         let version = withUnsafeBytes(of: UInt64(OfframpStoragePayload.version).bigEndian, Array.init)
-        try (Data(version) + salt + sealed.combined).write(to: fileURL, options: .atomic)
+        try (Data(version) + salt + sealed.combined).write(
+            to: fileURL,
+            options: [.atomic, .completeFileProtection]
+        )
+        try FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: fileURL.path)
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        var protectedURL = fileURL
+        try protectedURL.setResourceValues(resourceValues)
     }
 }

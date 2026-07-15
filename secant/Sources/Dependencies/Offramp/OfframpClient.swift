@@ -74,12 +74,16 @@ enum OfframpClientError: LocalizedError, Equatable {
     case configuration(String)
     case invalidQR(String)
     case unsupportedAccount
+    case authenticationCancelled
+    case staleQuote
 
     var errorDescription: String? {
         switch self {
         case .configuration(let message): return message
         case .invalidQR(let code): return "That QR is not valid for this payment method (\(code))."
         case .unsupportedAccount: return "P2P payments currently require a Zapp software wallet."
+        case .authenticationCancelled: return "Authentication was cancelled. No payment was submitted."
+        case .staleQuote: return "The payment quote changed. Review the updated amount before trying again."
         }
     }
 }
@@ -103,14 +107,20 @@ struct OfframpClient {
     var resumePayment: @Sendable () async throws -> AsyncStream<OfframpProgressModel>
     var submitPaymentDetails: @Sendable (_ scan: OfframpScanResult) async throws -> Void
     var bridgeToBase: @Sendable (_ usdcMicros: String, _ resumeHandle: String?) async throws -> AsyncStream<OfframpProgressModel>
+    var previewTopUp: @Sendable (_ usdcMicros: String) async throws -> OfframpBridgePreview
     var history: @Sendable () async throws -> [OfframpHistoryModel]
     var recoverFunds: @Sendable (_ orderId: String?) async throws -> AsyncStream<OfframpProgressModel>
+    var previewRefund: @Sendable () async throws -> OfframpBridgePreview
     var hasCheckpoint: @Sendable () async throws -> Bool
     var checkpointCurrencyCode: @Sendable () async throws -> String?
     var discardCheckpoint: @Sendable () async throws -> Void
+    var hasTopUpCheckpoint: @Sendable () async throws -> Bool
+    var topUpCheckpointMicros: @Sendable () async throws -> String?
+    var discardTopUpCheckpoint: @Sendable () async throws -> Void
     var accountAddress: @Sendable () async throws -> String
     var accountSummary: @Sendable () async throws -> OfframpAccountModel
     var transactionURL: @Sendable (_ txHash: String) async throws -> URL?
+    var invalidateSession: @Sendable () async -> Void
 }
 
 extension OfframpClient: DependencyKey {
@@ -118,11 +128,15 @@ extension OfframpClient: DependencyKey {
 
     static func live() -> Self {
         let paymentDetails = OfframpPaymentDetailsHost()
+        let quoteAuthorization = OfframpQuoteAuthorization()
         return Self(
             corridors: {
                 try await OfframpSession.shared.client().corridors().map(OfframpCorridor.init)
             },
             parseQR: { currency, payload in
+                guard payload.utf8.count <= 16_384 else {
+                    throw OfframpClientError.invalidQR("payload_too_large")
+                }
                 let parsed = try await OfframpSession.shared.client().parsePaymentQr(
                     currencyCode: currency,
                     rawPayload: payload
@@ -133,19 +147,22 @@ extension OfframpClient: DependencyKey {
                 return OfframpScanResult(rawPayload: payload, paymentAddress: address, fiatAmount: parsed.fiatAmount)
             },
             quote: { currency, amount in
-                OfframpQuoteModel(try await OfframpSession.shared.client().quote(
+                let native = try await OfframpSession.shared.client().quote(
                     currencyCode: currency,
                     fiatAmount: amount
-                ))
+                )
+                let model = OfframpQuoteModel(native)
+                quoteAuthorization.authorize(native, model: model)
+                return model
             },
             pay: { quote, payeeName in
                 @Dependency(\.localAuthentication) var authentication
-                guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
+                guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
                 let client = try await OfframpSession.shared.client()
                 await paymentDetails.reset()
-                let nativeQuote = try await client.quote(currencyCode: quote.currencyCode, fiatAmount: quote.fiatAmount)
-                // Re-quote at commit time. This is the same drift guard as Android; never submit the
-                // stale screen quote after the contract rate or fixed fee changes.
+                guard let nativeQuote = quoteAuthorization.consume(matching: quote) else {
+                    throw OfframpClientError.staleQuote
+                }
                 let flow = client.pay(
                     quote: nativeQuote,
                     paymentDetailsProvider: paymentDetails,
@@ -155,7 +172,7 @@ extension OfframpClient: DependencyKey {
             },
             resumePayment: {
                 @Dependency(\.localAuthentication) var authentication
-                guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
+                guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
                 let client = try await OfframpSession.shared.client()
                 await paymentDetails.reset()
                 return client.resumePayment(paymentDetailsProvider: paymentDetails).offrampStream()
@@ -165,21 +182,27 @@ extension OfframpClient: DependencyKey {
             },
             bridgeToBase: { micros, resume in
                 @Dependency(\.localAuthentication) var authentication
-                guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
+                guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
                 let flow = try await OfframpSession.shared.client().bridgeToBase(
                     usdcMicros: micros,
                     resumeDepositAddress: resume
                 )
                 return flow.offrampStream()
             },
+            previewTopUp: { micros in
+                try await OfframpSession.shared.previewTopUp(usdcMicros: micros)
+            },
             history: {
                 try await OfframpSession.shared.client().history().map(OfframpHistoryModel.init)
             },
             recoverFunds: { orderId in
                 @Dependency(\.localAuthentication) var authentication
-                guard await authentication.authenticate() else { return AsyncStream { $0.finish() } }
+                guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
                 let flow = try await OfframpSession.shared.client().recoverFunds(orderId: orderId)
                 return flow.offrampStream()
+            },
+            previewRefund: {
+                try await OfframpSession.shared.previewRefund()
             },
             hasCheckpoint: {
                 try await OfframpSession.shared.client().hasCheckpoint().boolValue
@@ -190,6 +213,15 @@ extension OfframpClient: DependencyKey {
             discardCheckpoint: {
                 try await OfframpSession.shared.client().discardCheckpoint()
             },
+            hasTopUpCheckpoint: {
+                try await OfframpSession.shared.client().hasTopUpCheckpoint().boolValue
+            },
+            topUpCheckpointMicros: {
+                try await OfframpSession.shared.client().topUpCheckpointMicros()
+            },
+            discardTopUpCheckpoint: {
+                try await OfframpSession.shared.client().discardTopUpCheckpoint()
+            },
             accountAddress: {
                 try await OfframpSession.shared.client().accountAddress()
             },
@@ -198,8 +230,34 @@ extension OfframpClient: DependencyKey {
             },
             transactionURL: { hash in
                 URL(string: try await OfframpSession.shared.client().transactionUrl(txHash: hash))
+            },
+            invalidateSession: {
+                await paymentDetails.reset()
+                quoteAuthorization.reset()
+                await OfframpSession.shared.invalidate()
             }
         )
+    }
+}
+
+private final class OfframpQuoteAuthorization: @unchecked Sendable {
+    private let lock = NSLock()
+    private var authorized: (model: OfframpQuoteModel, native: AppleOfframpQuote)?
+
+    func authorize(_ native: AppleOfframpQuote, model: OfframpQuoteModel) {
+        lock.withLock { authorized = (model, native) }
+    }
+
+    func consume(matching model: OfframpQuoteModel) -> AppleOfframpQuote? {
+        lock.withLock {
+            guard let authorized, authorized.model == model else { return nil }
+            self.authorized = nil
+            return authorized.native
+        }
+    }
+
+    func reset() {
+        lock.withLock { authorized = nil }
     }
 }
 
@@ -276,6 +334,7 @@ private actor OfframpSession {
     static let shared = OfframpSession()
 
     private var cachedClient: AppleOfframpClient?
+    private var cachedBridge: OfframpNearBridge?
     private var cachedWalletIdentity: String?
 
     func client() async throws -> AppleOfframpClient {
@@ -296,9 +355,16 @@ private actor OfframpSession {
         // Account UUID alone is not a sufficient wallet-lifecycle boundary. Include the SDK seed
         // fingerprint so a delete + restore in the same process can never retain the prior
         // wallet's Base owner/client. The mnemonic itself is never used as a cache key.
-        let seedFingerprint = account.seedFingerprint?.map { String(format: "%02x", $0) }.joined() ?? ""
+        guard let fingerprint = account.seedFingerprint, !fingerprint.isEmpty else {
+            throw OfframpClientError.configuration("The active wallet identity is unavailable. Reopen the wallet before using P2P payments.")
+        }
+        let seedFingerprint = fingerprint.map { String(format: "%02x", $0) }.joined()
         let walletIdentity = "\(accountID):\(seedFingerprint):\(isTestnet ? "testnet" : "mainnet")"
         if cachedWalletIdentity == walletIdentity, let cachedClient { return cachedClient }
+
+        // Cross the wallet/network boundary before exporting any new mnemonic or creating a new
+        // client. This zeroizes the old Base key and cancels bridge work even if new setup fails.
+        invalidate()
 
         guard let pimlicoKey = PartnerKeys.p2pPimlicoApiKey, !pimlicoKey.isEmpty else {
             throw OfframpClientError.configuration("P2P payments are not configured in PartnerKeys.plist.")
@@ -326,10 +392,77 @@ private actor OfframpSession {
             subgraphUrl: isTestnet ? nil : PartnerKeys.p2pSubgraphMainnet,
             sponsorshipPolicyId: PartnerKeys.p2pSponsorshipPolicyId
         )
-        cachedClient?.close()
         cachedClient = client
+        cachedBridge = bridge as? OfframpNearBridge
         cachedWalletIdentity = walletIdentity
         return client
+    }
+
+    func invalidate() {
+        cachedBridge?.invalidate()
+        cachedClient?.close()
+        cachedBridge = nil
+        cachedClient = nil
+        cachedWalletIdentity = nil
+    }
+
+    func previewTopUp(usdcMicros: String) async throws -> OfframpBridgePreview {
+        let client = try await client()
+        guard let amount = Decimal(string: usdcMicros), amount > 0, amount <= 100_000_000 else {
+            throw OfframpClientError.configuration("Base top-ups are limited to 100 USDC.")
+        }
+        if try await client.hasTopUpCheckpoint().boolValue {
+            guard try await client.topUpCheckpointMicros() == usdcMicros else {
+                throw OfframpClientError.configuration(
+                    "A different Base top-up is already in progress. Resume or discard it first."
+                )
+            }
+            return OfframpBridgePreview(
+                sourceAmount: "Previously authorized",
+                sourceAsset: "ZEC bridge",
+                destinationAmount: OfframpSession.usdcDisplay(usdcMicros),
+                destinationAsset: "USDC on Base",
+                networkFee: nil,
+                estimatedSeconds: 0
+            )
+        }
+        guard let cachedBridge else {
+            throw OfframpClientError.configuration("Automatic ZEC bridging is unavailable on this network.")
+        }
+        return try await cachedBridge.previewTopUp(
+            accountAddress: try await client.accountAddress(),
+            usdcMicros: usdcMicros
+        )
+    }
+
+    func previewRefund() async throws -> OfframpBridgePreview {
+        let client = try await client()
+        guard let cachedBridge else {
+            throw OfframpClientError.configuration("Automatic Base refunds are unavailable on this network.")
+        }
+        let account = try await client.accountSummary()
+        guard let micros = account.balanceMicros, let value = Decimal(string: micros), value > 0 else {
+            guard account.canRefundToZec else {
+                throw OfframpClientError.configuration("The Base USDC balance could not be verified for refund.")
+            }
+            return OfframpBridgePreview(
+                sourceAmount: "Previously authorized",
+                sourceAsset: "Base refund",
+                destinationAmount: "Pending",
+                destinationAsset: "ZEC",
+                networkFee: nil,
+                estimatedSeconds: 0
+            )
+        }
+        return try await cachedBridge.previewRefund(
+            accountAddress: account.address,
+            usdcMicros: micros
+        )
+    }
+
+    private static func usdcDisplay(_ micros: String) -> String {
+        guard let value = Decimal(string: micros) else { return micros }
+        return NSDecimalNumber(decimal: value / 1_000_000).stringValue
     }
 }
 

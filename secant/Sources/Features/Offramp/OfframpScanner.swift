@@ -12,6 +12,7 @@ struct OfframpScanner: View {
     let isLoading: Bool
     let checkpointMessage: String?
     let onCode: (String) -> Void
+    let onCameraFailure: () -> Void
     let onPhotoFailure: () -> Void
     let onResumeCheckpoint: () -> Void
     let onDiscardCheckpoint: () -> Void
@@ -25,7 +26,7 @@ struct OfframpScanner: View {
                 GeometryReader { proxy in
                     QRCodeScanView(
                         rectOfInterest: ScanView.normalizedRectsOfInterest(1).real,
-                        onQRScanningDidFail: { },
+                        onQRScanningDidFail: onCameraFailure,
                         onQRScanningSucceededWithCode: onCode
                     )
                     scannerFrame(proxy.size)
@@ -87,9 +88,14 @@ struct OfframpScanner: View {
         .onChange(of: image) { image in
             guard let image else { return }
             guard let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil),
-                  let ciImage = CIImage(image: image),
-                  let code = detector.features(in: ciImage).compactMap({ ($0 as? CIQRCodeFeature)?.messageString }).first
+                  let ciImage = CIImage(image: image)
             else {
+                onPhotoFailure()
+                self.image = nil
+                return
+            }
+            let codes = detector.features(in: ciImage).compactMap { ($0 as? CIQRCodeFeature)?.messageString }
+            guard codes.count == 1, let code = codes.first else {
                 onPhotoFailure()
                 self.image = nil
                 return
