@@ -22,6 +22,7 @@ extension Root {
                 .chatRoom(.backToHomeTapped),
                 .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
+                .offramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
@@ -221,10 +222,8 @@ extension Root {
                 return .send(.swapAndPayCoordFlow(.swapAndPay(.enableSwapToZecExperience)))
 
             case .home(.payWithNearTapped):
-                state.swapAndPayCoordFlowState = .initial
-                state.swapAndPayCoordFlowState.isSwapExperience = false
-                state.swapAndPayCoordFlowState.swapAndPayState.isSwapExperienceEnabled = false
-                state.path = .swapAndPayCoordFlow
+                state.offrampState = .initial(page: .scanner)
+                state.path = .offramp
                 return .none
 
             case .home(.transactionList(.transactionTapped(let txId))):
@@ -336,6 +335,16 @@ extension Root {
                 state.currencyConversionSetupState = .initial
                 state.currencyConversionSetupState.isSettingsView = true
                 state.path = .currencyConversionSetup
+                return .none
+
+            case .zappTabs(.p2pPaymentMethodTapped):
+                state.offrampState = .initial(page: .corridors)
+                state.path = .offramp
+                return .none
+
+            case .zappTabs(.p2pTransactionsTapped):
+                state.offrampState = .initial(page: .history)
+                state.path = .offramp
                 return .none
 
             case .zappTabs(.readReceiptsTapped):

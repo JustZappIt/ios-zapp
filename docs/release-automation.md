@@ -82,7 +82,9 @@ tests; you do not need it to build or ship.
    ```
    `fastlane/.env` and `*.p8` are gitignored — they are never committed.
 2. **Partner keys.** Put `PartnerKeys.plist` at `secant/Resources/PartnerKeys.plist`
-   (gitignored; required to build).
+   (gitignored; required to build). P2P payments require a non-empty
+   `p2pPimlicoApiKey`. `p2pRpcBaseMainnet`, `p2pSubgraphMainnet`, and
+   `p2pSponsorshipPolicyId` are optional deployment overrides.
 3. **Signing.** You must already be able to Archive and upload the app from Xcode
    by hand (Apple Distribution certificate, automatic signing, team `RLPRR8CPQG`).
    The tooling reuses that identity; it does not manage certificates.

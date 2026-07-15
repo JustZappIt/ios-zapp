@@ -1,0 +1,12369 @@
+#import <Foundation/NSArray.h>
+#import <Foundation/NSDictionary.h>
+#import <Foundation/NSError.h>
+#import <Foundation/NSObject.h>
+#import <Foundation/NSSet.h>
+#import <Foundation/NSString.h>
+#import <Foundation/NSValue.h>
+
+@class ZappOfframp__SkieTypeExportsKt, ZappOfframp__SkieSuspendWrappersKt, ZappOfframpUserOperationV06, ZappOfframpUserOpGasPriceCompanion, ZappOfframpUserOpGasPrice, ZappOfframpUserOpGasEstimateCompanion, ZappOfframpUserOpGasEstimate, ZappOfframpUpiQrParser, ZappOfframpUpiQrParseResultSuccess, ZappOfframpUpiQrParseResultFailure, ZappOfframpUpiQrParseResult, ZappOfframpUpiQrErrorMissingPaymentAddress, ZappOfframpUpiQrErrorInvalidUpiId, ZappOfframpUpiQrErrorInvalidAmount, ZappOfframpUpiQrErrorEmptyQr, ZappOfframpUpiQrError, ZappOfframpUpiPayUri, ZappOfframpUShort, ZappOfframpULong, ZappOfframpUInt, ZappOfframpUByte, ZappOfframpTxHashTxHashSerializer, ZappOfframpTxHashCompanion, ZappOfframpTxHash, ZappOfframpTransactionReceiptCompanion, ZappOfframpTransactionReceipt, ZappOfframpThirdwebSmartAccount, ZappOfframpSubgraphOrderReader, ZappOfframpSubgraphClientCompanion, ZappOfframpSubgraphClient, ZappOfframpStaticOfframpAccountProvider, ZappOfframpSolidityErrors, ZappOfframpSmartOfframpAccountProvider, ZappOfframpSkie_SuspendResultSuccess, ZappOfframpSkie_SuspendResultError, ZappOfframpSkie_SuspendResultCanceled, ZappOfframpSkie_SuspendResult, ZappOfframpSkie_SuspendHandler, ZappOfframpSkie_CancellationHandler, ZappOfframpSkieKotlinStateFlow<T>, ZappOfframpSkieKotlinSharedFlow<T>, ZappOfframpSkieKotlinOptionalStateFlow<T>, ZappOfframpSkieKotlinOptionalSharedFlow<T>, ZappOfframpSkieKotlinOptionalMutableStateFlow<T>, ZappOfframpSkieKotlinOptionalMutableSharedFlow<T>, ZappOfframpSkieKotlinOptionalFlow<T>, ZappOfframpSkieKotlinMutableStateFlow<T>, ZappOfframpSkieKotlinMutableSharedFlow<T>, ZappOfframpSkieKotlinFlow<T>, ZappOfframpSkieColdFlowIterator<E>, ZappOfframpShort, ZappOfframpSelector4Companion, ZappOfframpSelector4, ZappOfframpRpcHttpClientConfig, ZappOfframpRpcHttpClient, ZappOfframpRpcExceptionUnknown, ZappOfframpRpcExceptionTransportError, ZappOfframpRpcExceptionRateLimited, ZappOfframpRpcExceptionMethodNotFound, ZappOfframpRpcExceptionInvalidParams, ZappOfframpRpcExceptionExecutionReverted, ZappOfframpRpcException, ZappOfframpRlpKt, ZappOfframpRlp, ZappOfframpRelayIdentityStoreKt, ZappOfframpRelayIdentityCompanion, ZappOfframpRelayIdentity, ZappOfframpRelayIdentities, ZappOfframpQrisQrParser, ZappOfframpPriceConfigDecoder, ZappOfframpPriceConfigCompanion, ZappOfframpPriceConfig, ZappOfframpPreFundedOfframpFunding, ZappOfframpPlaceOrderArgs, ZappOfframpPixQrParser, ZappOfframpPixProxyClient, ZappOfframpPixFetchException, ZappOfframpPaymentQrParser, ZappOfframpPaymentQrParseResultSuccess, ZappOfframpPaymentQrParseResultFailure, ZappOfframpPaymentQrParseResult, ZappOfframpPaymentQrErrorUnsupportedCurrency, ZappOfframpPaymentQrErrorMissingPaymentAddress, ZappOfframpPaymentQrErrorInvalidPaymentAddress, ZappOfframpPaymentQrErrorInvalidFormat, ZappOfframpPaymentQrErrorInvalidChecksum, ZappOfframpPaymentQrErrorInvalidAmount, ZappOfframpPaymentQrErrorEmptyQr, ZappOfframpPaymentQrErrorDynamicFetchFailed, ZappOfframpPaymentQrError, ZappOfframpPaymentQrDetector, ZappOfframpPaymasterResultCompanion, ZappOfframpPaymasterResult, ZappOfframpPayFeeConfig, ZappOfframpParsedUpiQr, ZappOfframpParsedPaymentQr, ZappOfframpPagoMovilQrParser, ZappOfframpP2pOrderHistorySourceCompanion, ZappOfframpP2pOrderHistorySource, ZappOfframpP2pOrderHistoryKt, ZappOfframpP2pOrderHistoryItem, ZappOfframpP2pNetworks, ZappOfframpP2pNetworkConfig, ZappOfframpP2pConfigProvider, ZappOfframpOrderType, ZappOfframpOrderStatusCompanion, ZappOfframpOrderStatus, ZappOfframpOrderSnapshotSource, ZappOfframpOrderSnapshot, ZappOfframpOrderReader, ZappOfframpOrderRead, ZappOfframpOrderFeeDetailsDecoder, ZappOfframpOrderFeeDetails, ZappOfframpOrderEvents, ZappOfframpOnChainOrderReader, ZappOfframpOfframpStepCompanion, ZappOfframpOfframpStep, ZappOfframpOfframpStatusWaitingForPaymentDetails, ZappOfframpOfframpStatusWaitingForMerchantAcceptance, ZappOfframpOfframpStatusWaitingForCompletion, ZappOfframpOfframpStatusSendingEncryptedUpi, ZappOfframpOfframpStatusSelectingCircle, ZappOfframpOfframpStatusPlacingOrder, ZappOfframpOfframpStatusIdle, ZappOfframpOfframpStatusFundsRecovered, ZappOfframpOfframpStatusFundedFromBase, ZappOfframpOfframpStatusFailed, ZappOfframpOfframpStatusCompleted, ZappOfframpOfframpStatusCancelled, ZappOfframpOfframpStatusBridgingFunds, ZappOfframpOfframpStatusApprovingUsdc, ZappOfframpOfframpStatus, ZappOfframpOfframpSmartAccount, ZappOfframpOfframpRequest, ZappOfframpOfframpPaymentDetails, ZappOfframpOfframpOrchestrator, ZappOfframpOfframpCheckpointCompanion, ZappOfframpOfframpCheckpoint, ZappOfframpNumber, ZappOfframpNoRouteOfframpTopUp, ZappOfframpNoRouteOfframpRefund, ZappOfframpNgnQrParser, ZappOfframpMutableSet<ObjectType>, ZappOfframpMutableDictionary<KeyType, ObjectType>, ZappOfframpMercadoPagoQrParser, ZappOfframpLong, ZappOfframpKtor_utilsWeekDayCompanion, ZappOfframpKtor_utilsWeekDay, ZappOfframpKtor_utilsTypeInfo, ZappOfframpKtor_utilsStringValuesBuilderImpl, ZappOfframpKtor_utilsPipelinePhase, ZappOfframpKtor_utilsPipeline<TSubject, TContext>, ZappOfframpKtor_utilsMonthCompanion, ZappOfframpKtor_utilsMonth, ZappOfframpKtor_utilsGMTDateCompanion, ZappOfframpKtor_utilsGMTDate, ZappOfframpKtor_utilsAttributeKey<T>, ZappOfframpKtor_httpUrlCompanion, ZappOfframpKtor_httpUrl, ZappOfframpKtor_httpURLProtocolCompanion, ZappOfframpKtor_httpURLProtocol, ZappOfframpKtor_httpURLBuilderCompanion, ZappOfframpKtor_httpURLBuilder, ZappOfframpKtor_httpOutgoingContentWriteChannelContent, ZappOfframpKtor_httpOutgoingContentReadChannelContent, ZappOfframpKtor_httpOutgoingContentProtocolUpgrade, ZappOfframpKtor_httpOutgoingContentNoContent, ZappOfframpKtor_httpOutgoingContentContentWrapper, ZappOfframpKtor_httpOutgoingContentByteArrayContent, ZappOfframpKtor_httpOutgoingContent, ZappOfframpKtor_httpHttpStatusCodeCompanion, ZappOfframpKtor_httpHttpStatusCode, ZappOfframpKtor_httpHttpProtocolVersionCompanion, ZappOfframpKtor_httpHttpProtocolVersion, ZappOfframpKtor_httpHttpMethodCompanion, ZappOfframpKtor_httpHttpMethod, ZappOfframpKtor_httpHeadersBuilder, ZappOfframpKtor_httpHeaderValueWithParametersCompanion, ZappOfframpKtor_httpHeaderValueWithParameters, ZappOfframpKtor_httpHeaderValueParam, ZappOfframpKtor_httpContentTypeCompanion, ZappOfframpKtor_httpContentType, ZappOfframpKtor_eventsEvents, ZappOfframpKtor_eventsEventDefinition<T>, ZappOfframpKtor_client_loggingLogLevel, ZappOfframpKtor_client_coreProxyConfig, ZappOfframpKtor_client_coreHttpSendPipelinePhases, ZappOfframpKtor_client_coreHttpSendPipeline, ZappOfframpKtor_client_coreHttpResponsePipelinePhases, ZappOfframpKtor_client_coreHttpResponsePipeline, ZappOfframpKtor_client_coreHttpResponseData, ZappOfframpKtor_client_coreHttpResponseContainer, ZappOfframpKtor_client_coreHttpResponse, ZappOfframpKtor_client_coreHttpRequestPipelinePhases, ZappOfframpKtor_client_coreHttpRequestPipeline, ZappOfframpKtor_client_coreHttpRequestData, ZappOfframpKtor_client_coreHttpRequestBuilderCompanion, ZappOfframpKtor_client_coreHttpRequestBuilder, ZappOfframpKtor_client_coreHttpReceivePipelinePhases, ZappOfframpKtor_client_coreHttpReceivePipeline, ZappOfframpKtor_client_coreHttpClientEngineConfig, ZappOfframpKtor_client_coreHttpClientConfig<T>, ZappOfframpKtor_client_coreHttpClientCallCompanion, ZappOfframpKtor_client_coreHttpClientCall, ZappOfframpKtor_client_coreHttpClient, ZappOfframpKotlinx_serialization_jsonJsonPrimitiveCompanion, ZappOfframpKotlinx_serialization_jsonJsonPrimitive, ZappOfframpKotlinx_serialization_jsonJsonNull, ZappOfframpKotlinx_serialization_jsonJsonElementCompanion, ZappOfframpKotlinx_serialization_jsonJsonElement, ZappOfframpKotlinx_serialization_coreStructureKindOBJECT, ZappOfframpKotlinx_serialization_coreStructureKindMAP, ZappOfframpKotlinx_serialization_coreStructureKindLIST, ZappOfframpKotlinx_serialization_coreStructureKindCLASS, ZappOfframpKotlinx_serialization_coreStructureKind, ZappOfframpKotlinx_serialization_coreSerializersModule, ZappOfframpKotlinx_serialization_coreSerialKindENUM, ZappOfframpKotlinx_serialization_coreSerialKindCONTEXTUAL, ZappOfframpKotlinx_serialization_coreSerialKind, ZappOfframpKotlinx_serialization_corePrimitiveKindSTRING, ZappOfframpKotlinx_serialization_corePrimitiveKindSHORT, ZappOfframpKotlinx_serialization_corePrimitiveKindLONG, ZappOfframpKotlinx_serialization_corePrimitiveKindINT, ZappOfframpKotlinx_serialization_corePrimitiveKindFLOAT, ZappOfframpKotlinx_serialization_corePrimitiveKindDOUBLE, ZappOfframpKotlinx_serialization_corePrimitiveKindCHAR, ZappOfframpKotlinx_serialization_corePrimitiveKindBYTE, ZappOfframpKotlinx_serialization_corePrimitiveKindBOOLEAN, ZappOfframpKotlinx_serialization_corePrimitiveKind, ZappOfframpKotlinx_serialization_corePolymorphicKindSEALED, ZappOfframpKotlinx_serialization_corePolymorphicKindOPEN, ZappOfframpKotlinx_serialization_corePolymorphicKind, ZappOfframpKotlinx_io_coreBuffer, ZappOfframpKotlinx_coroutines_coreCoroutineDispatcherKey, ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher, ZappOfframpKotlinUnit, ZappOfframpKotlinThrowable, ZappOfframpKotlinRuntimeException, ZappOfframpKotlinRandomDefault, ZappOfframpKotlinRandom, ZappOfframpKotlinNothing, ZappOfframpKotlinLongRangeCompanion, ZappOfframpKotlinLongRange, ZappOfframpKotlinLongProgressionCompanion, ZappOfframpKotlinLongProgression, ZappOfframpKotlinLongIterator, ZappOfframpKotlinKVariance, ZappOfframpKotlinKTypeProjectionCompanion, ZappOfframpKotlinKTypeProjection, ZappOfframpKotlinIllegalStateException, ZappOfframpKotlinException, ZappOfframpKotlinEnumCompanion, ZappOfframpKotlinEnum<E>, ZappOfframpKotlinCharIterator, ZappOfframpKotlinCharArray, ZappOfframpKotlinCancellationException, ZappOfframpKotlinByteIterator, ZappOfframpKotlinByteArray, ZappOfframpKotlinArray<T>, ZappOfframpKotlinAbstractCoroutineContextKey<B, E>, ZappOfframpKotlinAbstractCoroutineContextElement, ZappOfframpKnownRevertsLookup, ZappOfframpKnownReverts, ZappOfframpKnownRevertReason, ZappOfframpKnownContractErrorsEntry, ZappOfframpKnownContractErrors, ZappOfframpKeccakKt, ZappOfframpInt, ZappOfframpInMemoryRelayIdentityStore, ZappOfframpInMemoryOrderRecipientUpiCache, ZappOfframpHexBytesKt, ZappOfframpFundingOutcomeBridged, ZappOfframpFundingOutcomeAlreadyFunded, ZappOfframpFloat, ZappOfframpFallbackOrderReader, ZappOfframpEvmLogCompanion, ZappOfframpEvmLog, ZappOfframpEvmKeyDerivation, ZappOfframpEvmKey, ZappOfframpErc4337SubmitterCompanion, ZappOfframpErc4337Submitter, ZappOfframpErc20Calls, ZappOfframpEoaSignerCompanion, ZappOfframpEoaSigner, ZappOfframpEncrypted, ZappOfframpEmvQrTlvEntry, ZappOfframpEmvQr, ZappOfframpEip1559TxCompanion, ZappOfframpEip1559Tx, ZappOfframpEcies, ZappOfframpEcdsaSigner, ZappOfframpEcdsaSignature, ZappOfframpDouble, ZappOfframpDirectPixResolver, ZappOfframpDiamondCalls, ZappOfframpDevOfframpAccountProvider, ZappOfframpDecimalRounding, ZappOfframpCurrencyCodeCompanion, ZappOfframpCurrencyCode, ZappOfframpCopQrParser, ZappOfframpCircleStatusCompanion, ZappOfframpCircleStatus, ZappOfframpCircleScoreStateCompanion, ZappOfframpCircleScoreState, ZappOfframpCircleRouterCompanion, ZappOfframpCircleRouter, ZappOfframpCircleMetricsCompanion, ZappOfframpCircleMetrics, ZappOfframpCircleForRoutingCompanion, ZappOfframpCircleForRouting, ZappOfframpCachingOfframpAccountProvider, ZappOfframpByte, ZappOfframpBundlerClientCompanion, ZappOfframpBundlerClient, ZappOfframpBridgeToBaseStatusIdle, ZappOfframpBridgeToBaseStatusFailed, ZappOfframpBridgeToBaseStatusComplete, ZappOfframpBridgeToBaseStatusBridging, ZappOfframpBoolean, ZappOfframpBlockHeaderCompanion, ZappOfframpBlockHeader, ZappOfframpBigIntegerIosKt, ZappOfframpBigIntegerHexKt, ZappOfframpBigInteger, ZappOfframpBigDecimalIosKt, ZappOfframpBigDecimal, ZappOfframpBaseRpcClientCompanion, ZappOfframpBaseRpcClient, ZappOfframpBase, ZappOfframpApplePaymentQrResult, ZappOfframpApplePaymentCorridor, ZappOfframpAppleOfframpStatus, ZappOfframpAppleOfframpQuote, ZappOfframpAppleOfframpHistoryItem, ZappOfframpAppleOfframpClientCompanion, ZappOfframpAppleOfframpClient, ZappOfframpAppleOfframpAccountSummary, ZappOfframpAppleBridgeTerminalException, ZappOfframpAppleBridgeExecution, ZappOfframpAddressCompanion, ZappOfframpAddressAddressSerializer, ZappOfframpAddress, ZappOfframpAbiUintArray, ZappOfframpAbiUint8, ZappOfframpAbiUint, ZappOfframpAbiString, ZappOfframpAbiInt, ZappOfframpAbiEncoder, ZappOfframpAbiDecoderCompanion, ZappOfframpAbiDecoder, ZappOfframpAbiBytes32, ZappOfframpAbiBytes, ZappOfframpAbiBool, ZappOfframpAbiAddress, ZappOfframpAaOfframpDriver, NSString, NSSet<ObjectType>, NSObject, NSNumber, NSMutableSet<ObjectType>, NSMutableDictionary<KeyType, ObjectType>, NSMutableArray<ObjectType>, NSError, NSDictionary<KeyType, ObjectType>, NSArray<ObjectType>;
+
+@protocol ZappOfframpTxSubmitter, ZappOfframpSkie_DispatcherDelegate, ZappOfframpSeedPhraseSource, ZappOfframpRlpItem, ZappOfframpRelayIdentityStore, ZappOfframpOrderRecipientUpiCache, ZappOfframpOrderReadSource, ZappOfframpOrderReadLogger, ZappOfframpOfframpTopUp, ZappOfframpOfframpRefund, ZappOfframpOfframpPaymentDetailsProvider, ZappOfframpOfframpFunding, ZappOfframpOfframpDriver, ZappOfframpOfframpAccountProvider, ZappOfframpKtor_utilsStringValuesBuilder, ZappOfframpKtor_utilsStringValues, ZappOfframpKtor_utilsAttributes, ZappOfframpKtor_ioJvmSerializable, ZappOfframpKtor_ioCloseable, ZappOfframpKtor_ioByteWriteChannel, ZappOfframpKtor_ioByteReadChannel, ZappOfframpKtor_httpParametersBuilder, ZappOfframpKtor_httpParameters, ZappOfframpKtor_httpHttpMessageBuilder, ZappOfframpKtor_httpHttpMessage, ZappOfframpKtor_httpHeaders, ZappOfframpKtor_client_loggingLogger, ZappOfframpKtor_client_coreHttpRequest, ZappOfframpKtor_client_coreHttpClientPlugin, ZappOfframpKtor_client_coreHttpClientEngineFactory, ZappOfframpKtor_client_coreHttpClientEngineCapability, ZappOfframpKtor_client_coreHttpClientEngine, ZappOfframpKotlinx_serialization_coreSerializersModuleCollector, ZappOfframpKotlinx_serialization_coreSerializationStrategy, ZappOfframpKotlinx_serialization_coreSerialDescriptor, ZappOfframpKotlinx_serialization_coreKSerializer, ZappOfframpKotlinx_serialization_coreEncoder, ZappOfframpKotlinx_serialization_coreDeserializationStrategy, ZappOfframpKotlinx_serialization_coreDecoder, ZappOfframpKotlinx_serialization_coreCompositeEncoder, ZappOfframpKotlinx_serialization_coreCompositeDecoder, ZappOfframpKotlinx_io_coreSource, ZappOfframpKotlinx_io_coreSink, ZappOfframpKotlinx_io_coreRawSource, ZappOfframpKotlinx_io_coreRawSink, ZappOfframpKotlinx_coroutines_coreStateFlow, ZappOfframpKotlinx_coroutines_coreSharedFlow, ZappOfframpKotlinx_coroutines_coreSelectInstance, ZappOfframpKotlinx_coroutines_coreSelectClause2, ZappOfframpKotlinx_coroutines_coreSelectClause1, ZappOfframpKotlinx_coroutines_coreSelectClause0, ZappOfframpKotlinx_coroutines_coreSelectClause, ZappOfframpKotlinx_coroutines_coreRunnable, ZappOfframpKotlinx_coroutines_coreParentJob, ZappOfframpKotlinx_coroutines_coreMutableStateFlow, ZappOfframpKotlinx_coroutines_coreMutableSharedFlow, ZappOfframpKotlinx_coroutines_coreJob, ZappOfframpKotlinx_coroutines_coreFlowCollector, ZappOfframpKotlinx_coroutines_coreFlow, ZappOfframpKotlinx_coroutines_coreDisposableHandle, ZappOfframpKotlinx_coroutines_coreCoroutineScope, ZappOfframpKotlinx_coroutines_coreChildJob, ZappOfframpKotlinx_coroutines_coreChildHandle, ZappOfframpKotlinSuspendFunction2, ZappOfframpKotlinSuspendFunction1, ZappOfframpKotlinSequence, ZappOfframpKotlinOpenEndRange, ZappOfframpKotlinMapEntry, ZappOfframpKotlinKType, ZappOfframpKotlinKDeclarationContainer, ZappOfframpKotlinKClassifier, ZappOfframpKotlinKClass, ZappOfframpKotlinKAnnotatedElement, ZappOfframpKotlinIterator, ZappOfframpKotlinIterable, ZappOfframpKotlinFunction, ZappOfframpKotlinCoroutineContextKey, ZappOfframpKotlinCoroutineContextElement, ZappOfframpKotlinCoroutineContext, ZappOfframpKotlinContinuationInterceptor, ZappOfframpKotlinContinuation, ZappOfframpKotlinComparable, ZappOfframpKotlinClosedRange, ZappOfframpKotlinAutoCloseable, ZappOfframpKotlinAnnotation, ZappOfframpFundingOutcome, ZappOfframpDynamicPixResolver, ZappOfframpBridgeToBaseStatus, ZappOfframpAppleOfframpStorage, ZappOfframpAppleOfframpBridge, ZappOfframpAbiArg, NSCopying;
+
+// Due to an Obj-C/Swift interop limitation, SKIE cannot generate Swift types with a lambda type argument.
+// Example of such type is: A<() -> Unit> where A<T> is a generic class.
+// To avoid compilation errors SKIE replaces these type arguments with __SkieLambdaErrorType, resulting in A<__SkieLambdaErrorType>.
+// Generated declarations that reference __SkieLambdaErrorType cannot be called in any way and the __SkieLambdaErrorType class cannot be used.
+// The original declarations can still be used in the same way as other declarations hidden by SKIE (and with the same limitations as without SKIE).
+@interface __SkieLambdaErrorType : NSObject
+- (instancetype _Nonnull)init __attribute__((unavailable));
++ (instancetype _Nonnull)new __attribute__((unavailable));
+@end
+
+// Due to an Obj-C/Swift interop limitation, SKIE cannot generate Swift code that uses external Obj-C types for which SKIE doesn't know a fully qualified name.
+// This problem occurs when custom Cinterop bindings are used because those do not contain the name of the Framework that provides implementation for those binding.
+// The name can be configured manually using the SKIE Gradle configuration key 'ClassInterop.CInteropFrameworkName' in the same way as other SKIE features.
+// To avoid compilation errors SKIE replaces types with unknown Framework name with __SkieUnknownCInteropFrameworkErrorType.
+// Generated declarations that reference __SkieUnknownCInteropFrameworkErrorType cannot be called in any way and the __SkieUnknownCInteropFrameworkErrorType class cannot be used.
+@interface __SkieUnknownCInteropFrameworkErrorType : NSObject
+- (instancetype _Nonnull)init __attribute__((unavailable));
++ (instancetype _Nonnull)new __attribute__((unavailable));
+@end
+
+
+NS_ASSUME_NONNULL_BEGIN
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wincompatible-property-type"
+#pragma clang diagnostic ignored "-Wnullability"
+
+#pragma push_macro("_Nullable_result")
+#if !__has_feature(nullability_nullable_result)
+#undef _Nullable_result
+#define _Nullable_result _Nullable
+#endif
+
+__attribute__((swift_name("KotlinBase")))
+@interface ZappOfframpBase : NSObject
+- (instancetype)init __attribute__((unavailable));
++ (instancetype)new __attribute__((unavailable));
++ (void)initialize __attribute__((objc_requires_super));
+@end
+
+@interface ZappOfframpBase (ZappOfframpBaseCopying) <NSCopying>
+@end
+
+__attribute__((swift_name("KotlinMutableSet")))
+@interface ZappOfframpMutableSet<ObjectType> : NSMutableSet<ObjectType>
+@end
+
+__attribute__((swift_name("KotlinMutableDictionary")))
+@interface ZappOfframpMutableDictionary<KeyType, ObjectType> : NSMutableDictionary<KeyType, ObjectType>
+@end
+
+@interface NSError (NSErrorZappOfframpKotlinException)
+@property (readonly) id _Nullable kotlinException;
+@end
+
+__attribute__((swift_name("KotlinNumber")))
+@interface ZappOfframpNumber : NSNumber
+- (instancetype)initWithChar:(char)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedChar:(unsigned char)value __attribute__((unavailable));
+- (instancetype)initWithShort:(short)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedShort:(unsigned short)value __attribute__((unavailable));
+- (instancetype)initWithInt:(int)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedInt:(unsigned int)value __attribute__((unavailable));
+- (instancetype)initWithLong:(long)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedLong:(unsigned long)value __attribute__((unavailable));
+- (instancetype)initWithLongLong:(long long)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedLongLong:(unsigned long long)value __attribute__((unavailable));
+- (instancetype)initWithFloat:(float)value __attribute__((unavailable));
+- (instancetype)initWithDouble:(double)value __attribute__((unavailable));
+- (instancetype)initWithBool:(BOOL)value __attribute__((unavailable));
+- (instancetype)initWithInteger:(NSInteger)value __attribute__((unavailable));
+- (instancetype)initWithUnsignedInteger:(NSUInteger)value __attribute__((unavailable));
++ (instancetype)numberWithChar:(char)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedChar:(unsigned char)value __attribute__((unavailable));
++ (instancetype)numberWithShort:(short)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedShort:(unsigned short)value __attribute__((unavailable));
++ (instancetype)numberWithInt:(int)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedInt:(unsigned int)value __attribute__((unavailable));
++ (instancetype)numberWithLong:(long)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedLong:(unsigned long)value __attribute__((unavailable));
++ (instancetype)numberWithLongLong:(long long)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedLongLong:(unsigned long long)value __attribute__((unavailable));
++ (instancetype)numberWithFloat:(float)value __attribute__((unavailable));
++ (instancetype)numberWithDouble:(double)value __attribute__((unavailable));
++ (instancetype)numberWithBool:(BOOL)value __attribute__((unavailable));
++ (instancetype)numberWithInteger:(NSInteger)value __attribute__((unavailable));
++ (instancetype)numberWithUnsignedInteger:(NSUInteger)value __attribute__((unavailable));
+@end
+
+__attribute__((swift_name("KotlinByte")))
+@interface ZappOfframpByte : ZappOfframpNumber
+- (instancetype)initWithChar:(char)value;
++ (instancetype)numberWithChar:(char)value;
+@end
+
+__attribute__((swift_name("KotlinUByte")))
+@interface ZappOfframpUByte : ZappOfframpNumber
+- (instancetype)initWithUnsignedChar:(unsigned char)value;
++ (instancetype)numberWithUnsignedChar:(unsigned char)value;
+@end
+
+__attribute__((swift_name("KotlinShort")))
+@interface ZappOfframpShort : ZappOfframpNumber
+- (instancetype)initWithShort:(short)value;
++ (instancetype)numberWithShort:(short)value;
+@end
+
+__attribute__((swift_name("KotlinUShort")))
+@interface ZappOfframpUShort : ZappOfframpNumber
+- (instancetype)initWithUnsignedShort:(unsigned short)value;
++ (instancetype)numberWithUnsignedShort:(unsigned short)value;
+@end
+
+__attribute__((swift_name("KotlinInt")))
+@interface ZappOfframpInt : ZappOfframpNumber
+- (instancetype)initWithInt:(int)value;
++ (instancetype)numberWithInt:(int)value;
+@end
+
+__attribute__((swift_name("KotlinUInt")))
+@interface ZappOfframpUInt : ZappOfframpNumber
+- (instancetype)initWithUnsignedInt:(unsigned int)value;
++ (instancetype)numberWithUnsignedInt:(unsigned int)value;
+@end
+
+__attribute__((swift_name("KotlinLong")))
+@interface ZappOfframpLong : ZappOfframpNumber
+- (instancetype)initWithLongLong:(long long)value;
++ (instancetype)numberWithLongLong:(long long)value;
+@end
+
+__attribute__((swift_name("KotlinULong")))
+@interface ZappOfframpULong : ZappOfframpNumber
+- (instancetype)initWithUnsignedLongLong:(unsigned long long)value;
++ (instancetype)numberWithUnsignedLongLong:(unsigned long long)value;
+@end
+
+__attribute__((swift_name("KotlinFloat")))
+@interface ZappOfframpFloat : ZappOfframpNumber
+- (instancetype)initWithFloat:(float)value;
++ (instancetype)numberWithFloat:(float)value;
+@end
+
+__attribute__((swift_name("KotlinDouble")))
+@interface ZappOfframpDouble : ZappOfframpNumber
+- (instancetype)initWithDouble:(double)value;
++ (instancetype)numberWithDouble:(double)value;
+@end
+
+__attribute__((swift_name("KotlinBoolean")))
+@interface ZappOfframpBoolean : ZappOfframpNumber
+- (instancetype)initWithBool:(BOOL)value;
++ (instancetype)numberWithBool:(BOOL)value;
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieColdFlowIterator")))
+@interface ZappOfframpSkieColdFlowIterator<E> : ZappOfframpBase
+- (instancetype)initWithFlow:(id<ZappOfframpKotlinx_coroutines_coreFlow>)flow __attribute__((swift_name("init(flow:)"))) __attribute__((objc_designated_initializer));
+- (void)cancel __attribute__((swift_name("cancel()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)hasNextWithCompletionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("hasNext(completionHandler:)")));
+- (E _Nullable)next __attribute__((swift_name("next()")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreFlow")))
+@protocol ZappOfframpKotlinx_coroutines_coreFlow
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinFlow")))
+@interface ZappOfframpSkieKotlinFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreFlow>
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreSharedFlow")))
+@protocol ZappOfframpKotlinx_coroutines_coreSharedFlow <ZappOfframpKotlinx_coroutines_coreFlow>
+@required
+@property (readonly) NSArray<id> *replayCache __attribute__((swift_name("replayCache")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreFlowCollector")))
+@protocol ZappOfframpKotlinx_coroutines_coreFlowCollector
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(id _Nullable)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreMutableSharedFlow")))
+@protocol ZappOfframpKotlinx_coroutines_coreMutableSharedFlow <ZappOfframpKotlinx_coroutines_coreSharedFlow, ZappOfframpKotlinx_coroutines_coreFlowCollector>
+@required
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+- (void)resetReplayCache __attribute__((swift_name("resetReplayCache()")));
+- (BOOL)tryEmitValue:(id _Nullable)value __attribute__((swift_name("tryEmit(value:)")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreStateFlow> subscriptionCount __attribute__((swift_name("subscriptionCount")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinMutableSharedFlow")))
+@interface ZappOfframpSkieKotlinMutableSharedFlow<T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreMutableSharedFlow>
+@property (readonly) NSArray<T> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreStateFlow> subscriptionCount __attribute__((swift_name("subscriptionCount")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreMutableSharedFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(T)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+- (void)resetReplayCache __attribute__((swift_name("resetReplayCache()")));
+- (BOOL)tryEmitValue:(T)value __attribute__((swift_name("tryEmit(value:)")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreStateFlow")))
+@protocol ZappOfframpKotlinx_coroutines_coreStateFlow <ZappOfframpKotlinx_coroutines_coreSharedFlow>
+@required
+@property (readonly) id _Nullable value __attribute__((swift_name("value")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreMutableStateFlow")))
+@protocol ZappOfframpKotlinx_coroutines_coreMutableStateFlow <ZappOfframpKotlinx_coroutines_coreStateFlow, ZappOfframpKotlinx_coroutines_coreMutableSharedFlow>
+@required
+- (void)setValue:(id _Nullable)value __attribute__((swift_name("setValue(_:)")));
+- (BOOL)compareAndSetExpect:(id _Nullable)expect update:(id _Nullable)update __attribute__((swift_name("compareAndSet(expect:update:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinMutableStateFlow")))
+@interface ZappOfframpSkieKotlinMutableStateFlow<T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreMutableStateFlow>
+@property (readonly) NSArray<T> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreStateFlow> subscriptionCount __attribute__((swift_name("subscriptionCount")));
+@property T value __attribute__((swift_name("value")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreMutableStateFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+- (BOOL)compareAndSetExpect:(T)expect update:(T)update __attribute__((swift_name("compareAndSet(expect:update:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(T)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+- (void)resetReplayCache __attribute__((swift_name("resetReplayCache()")));
+- (BOOL)tryEmitValue:(T)value __attribute__((swift_name("tryEmit(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinOptionalFlow")))
+@interface ZappOfframpSkieKotlinOptionalFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreFlow>
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinOptionalMutableSharedFlow")))
+@interface ZappOfframpSkieKotlinOptionalMutableSharedFlow<T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreMutableSharedFlow>
+@property (readonly) NSArray<id> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreStateFlow> subscriptionCount __attribute__((swift_name("subscriptionCount")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreMutableSharedFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(T _Nullable)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+- (void)resetReplayCache __attribute__((swift_name("resetReplayCache()")));
+- (BOOL)tryEmitValue:(T _Nullable)value __attribute__((swift_name("tryEmit(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinOptionalMutableStateFlow")))
+@interface ZappOfframpSkieKotlinOptionalMutableStateFlow<T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreMutableStateFlow>
+@property (readonly) NSArray<id> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreStateFlow> subscriptionCount __attribute__((swift_name("subscriptionCount")));
+@property T _Nullable value __attribute__((swift_name("value")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreMutableStateFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+- (BOOL)compareAndSetExpect:(T _Nullable)expect update:(T _Nullable)update __attribute__((swift_name("compareAndSet(expect:update:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(T _Nullable)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+- (void)resetReplayCache __attribute__((swift_name("resetReplayCache()")));
+- (BOOL)tryEmitValue:(T _Nullable)value __attribute__((swift_name("tryEmit(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinOptionalSharedFlow")))
+@interface ZappOfframpSkieKotlinOptionalSharedFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreSharedFlow>
+@property (readonly) NSArray<id> *replayCache __attribute__((swift_name("replayCache")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreSharedFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinOptionalStateFlow")))
+@interface ZappOfframpSkieKotlinOptionalStateFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreStateFlow>
+@property (readonly) NSArray<id> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) T _Nullable value __attribute__((swift_name("value")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreStateFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinSharedFlow")))
+@interface ZappOfframpSkieKotlinSharedFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreSharedFlow>
+@property (readonly) NSArray<T> *replayCache __attribute__((swift_name("replayCache")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreSharedFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SkieKotlinStateFlow")))
+@interface ZappOfframpSkieKotlinStateFlow<__covariant T> : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreStateFlow>
+@property (readonly) NSArray<T> *replayCache __attribute__((swift_name("replayCache")));
+@property (readonly) T value __attribute__((swift_name("value")));
+- (instancetype)initWithDelegate:(id<ZappOfframpKotlinx_coroutines_coreStateFlow>)delegate __attribute__((swift_name("init(_:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Skie_CancellationHandler")))
+@interface ZappOfframpSkie_CancellationHandler : ZappOfframpBase
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (void)cancel __attribute__((swift_name("cancel()")));
+@end
+
+__attribute__((swift_name("Skie_DispatcherDelegate")))
+@protocol ZappOfframpSkie_DispatcherDelegate
+@required
+- (void)dispatchBlock:(id<ZappOfframpKotlinx_coroutines_coreRunnable>)block __attribute__((swift_name("dispatch(block:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Skie_SuspendHandler")))
+@interface ZappOfframpSkie_SuspendHandler : ZappOfframpBase
+- (instancetype)initWithCancellationHandler:(ZappOfframpSkie_CancellationHandler *)cancellationHandler dispatcherDelegate:(id<ZappOfframpSkie_DispatcherDelegate>)dispatcherDelegate onResult:(void (^)(ZappOfframpSkie_SuspendResult *))onResult __attribute__((swift_name("init(cancellationHandler:dispatcherDelegate:onResult:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("Skie_SuspendResult")))
+@interface ZappOfframpSkie_SuspendResult : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Skie_SuspendResult.Canceled")))
+@interface ZappOfframpSkie_SuspendResultCanceled : ZappOfframpSkie_SuspendResult
+@property (class, readonly, getter=shared) ZappOfframpSkie_SuspendResultCanceled *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)canceled __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Skie_SuspendResult.Error")))
+@interface ZappOfframpSkie_SuspendResultError : ZappOfframpSkie_SuspendResult
+@property (readonly) NSError *error __attribute__((swift_name("error")));
+- (instancetype)initWithError:(NSError *)error __attribute__((swift_name("init(error:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpSkie_SuspendResultError *)doCopyError:(NSError *)error __attribute__((swift_name("doCopy(error:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Skie_SuspendResult.Success")))
+@interface ZappOfframpSkie_SuspendResultSuccess : ZappOfframpSkie_SuspendResult
+@property (readonly) id _Nullable value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(id _Nullable)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpSkie_SuspendResultSuccess *)doCopyValue:(id _Nullable)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("AbiArg")))
+@protocol ZappOfframpAbiArg
+@required
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiAddress")))
+@interface ZappOfframpAbiAddress : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) ZappOfframpAddress *address __attribute__((swift_name("address")));
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+- (instancetype)initWithAddress:(ZappOfframpAddress *)address __attribute__((swift_name("init(address:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiAddress *)doCopyAddress:(ZappOfframpAddress *)address __attribute__((swift_name("doCopy(address:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiBool")))
+@interface ZappOfframpAbiBool : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) BOOL value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(BOOL)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiBool *)doCopyValue:(BOOL)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiBytes")))
+@interface ZappOfframpAbiBytes : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) ZappOfframpKotlinByteArray *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(ZappOfframpKotlinByteArray *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiBytes *)doCopyValue:(ZappOfframpKotlinByteArray *)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiBytes32")))
+@interface ZappOfframpAbiBytes32 : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) ZappOfframpKotlinByteArray *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(ZappOfframpKotlinByteArray *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiBytes32 *)doCopyValue:(ZappOfframpKotlinByteArray *)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Minimal ABI return-data reader — the decode-side counterpart to [AbiEncoder]. Wraps a buffer and
+ * exposes word-indexed accessors for the fixed-layout tuples the p2p.me Diamond returns. Not a
+ * general ABI codec: it covers the static-word and dynamic-`string` shapes those calls use, and
+ * fails loudly on out-of-bounds reads so a malformed response can't masquerade as valid data.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiDecoder")))
+@interface ZappOfframpAbiDecoder : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpAbiDecoderCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int32_t byteSize __attribute__((swift_name("byteSize")));
+- (instancetype)initWithData:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("init(data:)"))) __attribute__((objc_designated_initializer));
+
+/** The low 20 bytes of the word at [wordIndex] as an [Address]. */
+- (ZappOfframpAddress *)addressWordIndex:(int32_t)wordIndex __attribute__((swift_name("address(wordIndex:)")));
+
+/** Like [address], but returns null when the word is all-zero (the contract's "unset" sentinel). */
+- (ZappOfframpAddress * _Nullable)addressOrNullWordIndex:(int32_t)wordIndex __attribute__((swift_name("addressOrNull(wordIndex:)")));
+
+/**
+ * Decodes a dynamic `string` whose tail starts at [byteOffset] (relative to this buffer).
+ * Offset 0 is the contract's sentinel for an unset field and a zero-length string is
+ * legitimately empty — both yield "". Any offset/length pointing outside the buffer is corrupt
+ * return data and throws, rather than yielding a plausible-but-empty value that could silently
+ * stall a caller polling on the decoded result.
+ */
+- (NSString *)dynamicStringAtByteOffset:(int32_t)byteOffset __attribute__((swift_name("dynamicStringAt(byteOffset:)")));
+
+/** Asserts the buffer holds at least [words] 32-byte words. */
+- (void)requireWordsWords:(int32_t)words __attribute__((swift_name("requireWords(words:)")));
+
+/** The word at [wordIndex] as an unsigned big-endian integer. */
+- (ZappOfframpBigInteger *)uintWordIndex:(int32_t)wordIndex __attribute__((swift_name("uint(wordIndex:)")));
+
+/** The low byte of the word at [wordIndex] — the ABI encoding of a small `uint8`/enum value. */
+- (int32_t)uint8WordIndex:(int32_t)wordIndex __attribute__((swift_name("uint8(wordIndex:)")));
+
+/** The raw 32-byte word at [wordIndex]. */
+- (ZappOfframpKotlinByteArray *)wordWordIndex:(int32_t)wordIndex __attribute__((swift_name("word(wordIndex:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiDecoder.Companion")))
+@interface ZappOfframpAbiDecoderCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpAbiDecoderCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t WORD __attribute__((swift_name("WORD")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiEncoder")))
+@interface ZappOfframpAbiEncoder : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpAbiEncoder *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)abiEncoder __attribute__((swift_name("init()")));
+- (ZappOfframpAbiBytes32 *)bytes32StringS:(NSString *)s __attribute__((swift_name("bytes32String(s:)")));
+- (ZappOfframpKotlinByteArray *)encodeArgs:(NSArray<id<ZappOfframpAbiArg>> *)args __attribute__((swift_name("encode(args:)")));
+- (ZappOfframpKotlinByteArray *)encodeFunctionCallCanonicalSignature:(NSString *)canonicalSignature args:(NSArray<id<ZappOfframpAbiArg>> *)args __attribute__((swift_name("encodeFunctionCall(canonicalSignature:args:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiInt")))
+@interface ZappOfframpAbiInt : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) ZappOfframpBigInteger *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(ZappOfframpBigInteger *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiInt *)doCopyValue:(ZappOfframpBigInteger *)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiString")))
+@interface ZappOfframpAbiString : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) ZappOfframpKotlinByteArray *bytes __attribute__((swift_name("bytes")));
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(NSString *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiString *)doCopyValue:(NSString *)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiUint")))
+@interface ZappOfframpAbiUint : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) ZappOfframpBigInteger *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(ZappOfframpBigInteger *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiUint *)doCopyValue:(ZappOfframpBigInteger *)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiUint8")))
+@interface ZappOfframpAbiUint8 : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) int32_t value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(int32_t)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiUint8 *)doCopyValue:(int32_t)value __attribute__((swift_name("doCopy(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AbiUintArray")))
+@interface ZappOfframpAbiUintArray : ZappOfframpBase <ZappOfframpAbiArg>
+@property (readonly) BOOL isDynamic __attribute__((swift_name("isDynamic")));
+@property (readonly) NSArray<ZappOfframpBigInteger *> *values __attribute__((swift_name("values")));
+- (instancetype)initWithValues:(NSArray<ZappOfframpBigInteger *> *)values __attribute__((swift_name("init(values:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAbiUintArray *)doCopyValues:(NSArray<ZappOfframpBigInteger *> *)values __attribute__((swift_name("doCopy(values:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)head __attribute__((swift_name("head()")));
+- (ZappOfframpKotlinByteArray *)tail __attribute__((swift_name("tail()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Selector4")))
+@interface ZappOfframpSelector4 : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpSelector4Companion *companion __attribute__((swift_name("companion")));
+@property (readonly) ZappOfframpKotlinByteArray *bytes __attribute__((swift_name("bytes")));
+@property (readonly) NSString *hex __attribute__((swift_name("hex")));
+- (instancetype)initWithBytes:(ZappOfframpKotlinByteArray *)bytes __attribute__((swift_name("init(bytes:)"))) __attribute__((objc_designated_initializer));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Selector4.Companion")))
+@interface ZappOfframpSelector4Companion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpSelector4Companion *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t LEN __attribute__((swift_name("LEN")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpSelector4 * _Nullable)fromBytesPrefixBytes:(ZappOfframpKotlinByteArray *)bytes __attribute__((swift_name("fromBytesPrefix(bytes:)")));
+- (ZappOfframpSelector4 *)fromCanonicalSignatureSignature:(NSString *)signature __attribute__((swift_name("fromCanonicalSignature(signature:)")));
+- (ZappOfframpSelector4 *)fromHexHex:(NSString *)hex __attribute__((swift_name("fromHex(hex:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SolidityErrors")))
+@interface ZappOfframpSolidityErrors : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpSolidityErrors *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpSelector4 *ERROR_STRING_SELECTOR __attribute__((swift_name("ERROR_STRING_SELECTOR")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)solidityErrors __attribute__((swift_name("init()")));
+
+/**
+ * Decodes the ABI payload of an `Error(string)` revert. Returns `null` if the data does not
+ * conform: missing selector, malformed head/length, or non-UTF8 body.
+ */
+- (NSString * _Nullable)decodeErrorStringRevertData:(ZappOfframpKotlinByteArray *)revertData __attribute__((swift_name("decodeErrorString(revertData:)")));
+
+/** Selector for the standard `Error(string)` Solidity revert. */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ecies")))
+@interface ZappOfframpEcies : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEcies *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)ecies __attribute__((swift_name("init()")));
+- (ZappOfframpEncrypted *)cipherParseS:(NSString *)s __attribute__((swift_name("cipherParse(s:)")));
+- (NSString *)cipherStringifyEncrypted:(ZappOfframpEncrypted *)encrypted __attribute__((swift_name("cipherStringify(encrypted:)")));
+- (NSString *)decryptWithPrivateKeyPrivateKeyHex:(NSString *)privateKeyHex encrypted:(ZappOfframpEncrypted *)encrypted __attribute__((swift_name("decryptWithPrivateKey(privateKeyHex:encrypted:)")));
+- (ZappOfframpEncrypted *)encryptWithPublicKeyPublicKeyHex:(NSString *)publicKeyHex message:(NSString *)message __attribute__((swift_name("encryptWithPublicKey(publicKeyHex:message:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Encrypted")))
+@interface ZappOfframpEncrypted : ZappOfframpBase
+@property (readonly) NSString *ciphertext __attribute__((swift_name("ciphertext")));
+@property (readonly) NSString *ephemPublicKey __attribute__((swift_name("ephemPublicKey")));
+@property (readonly) NSString *iv __attribute__((swift_name("iv")));
+@property (readonly) NSString *mac __attribute__((swift_name("mac")));
+- (instancetype)initWithIv:(NSString *)iv ephemPublicKey:(NSString *)ephemPublicKey ciphertext:(NSString *)ciphertext mac:(NSString *)mac __attribute__((swift_name("init(iv:ephemPublicKey:ciphertext:mac:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpEncrypted *)doCopyIv:(NSString *)iv ephemPublicKey:(NSString *)ephemPublicKey ciphertext:(NSString *)ciphertext mac:(NSString *)mac __attribute__((swift_name("doCopy(iv:ephemPublicKey:ciphertext:mac:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EvmKey")))
+@interface ZappOfframpEvmKey : ZappOfframpBase
+@property (readonly) ZappOfframpAddress *address __attribute__((swift_name("address")));
+@property (readonly) ZappOfframpKotlinByteArray *publicKey __attribute__((swift_name("publicKey")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (ZappOfframpKotlinByteArray *)exportPrivateKeyBytes __attribute__((swift_name("exportPrivateKeyBytes()")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpEcdsaSignature *)signRecoverableMessageHash:(ZappOfframpKotlinByteArray *)messageHash __attribute__((swift_name("signRecoverable(messageHash:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+- (void)zeroize __attribute__((swift_name("zeroize()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EvmKeyDerivation")))
+@interface ZappOfframpEvmKeyDerivation : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEvmKeyDerivation *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)evmKeyDerivation __attribute__((swift_name("init()")));
+- (ZappOfframpEvmKey *)deriveMnemonic:(ZappOfframpKotlinCharArray *)mnemonic accountIndex:(int32_t)accountIndex passphrase:(NSString *)passphrase __attribute__((swift_name("derive(mnemonic:accountIndex:passphrase:)")));
+- (ZappOfframpEvmKey *)deriveMnemonic:(NSString *)mnemonic accountIndex:(int32_t)accountIndex passphrase_:(NSString *)passphrase __attribute__((swift_name("derive(mnemonic:accountIndex:passphrase_:)")));
+- (ZappOfframpEvmKey *)fromPrivateKeyPrivBytes:(ZappOfframpKotlinByteArray *)privBytes __attribute__((swift_name("fromPrivateKey(privBytes:)")));
+@end
+
+__attribute__((swift_name("KotlinComparable")))
+@protocol ZappOfframpKotlinComparable
+@required
+- (int32_t)compareToOther:(id _Nullable)other __attribute__((swift_name("compareTo(other:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BigDecimal")))
+@interface ZappOfframpBigDecimal : ZappOfframpBase <ZappOfframpKotlinComparable>
+- (instancetype)initWithValue:(NSString *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (int32_t)compareToOther:(ZappOfframpBigDecimal *)other __attribute__((swift_name("compareTo(other:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (int32_t)signum __attribute__((swift_name("signum()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BigInteger")))
+@interface ZappOfframpBigInteger : ZappOfframpBase <ZappOfframpKotlinComparable>
+- (instancetype)initWithValue:(NSString *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithSignum:(int32_t)signum magnitude:(ZappOfframpKotlinByteArray *)magnitude __attribute__((swift_name("init(signum:magnitude:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithValue:(NSString *)value radix:(int32_t)radix __attribute__((swift_name("init(value:radix:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpBigInteger *)addOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("add(other:)")));
+- (int32_t)bitLength __attribute__((swift_name("bitLength()")));
+- (int32_t)compareToOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("compareTo(other:)")));
+- (ZappOfframpBigInteger *)divideOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("divide(other:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpBigInteger *)modModulus:(ZappOfframpBigInteger *)modulus __attribute__((swift_name("mod(modulus:)")));
+- (ZappOfframpBigInteger *)modInverseModulus:(ZappOfframpBigInteger *)modulus __attribute__((swift_name("modInverse(modulus:)")));
+- (ZappOfframpBigInteger *)multiplyOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("multiply(other:)")));
+- (ZappOfframpBigInteger *)negate __attribute__((swift_name("negate()")));
+- (ZappOfframpBigInteger *)powExponent:(int32_t)exponent __attribute__((swift_name("pow(exponent:)")));
+- (ZappOfframpBigInteger *)remainderOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("remainder(other:)")));
+- (ZappOfframpBigInteger *)shiftLeftDistance:(int32_t)distance __attribute__((swift_name("shiftLeft(distance:)")));
+- (ZappOfframpBigInteger *)shiftRightDistance:(int32_t)distance __attribute__((swift_name("shiftRight(distance:)")));
+- (int32_t)signum __attribute__((swift_name("signum()")));
+- (ZappOfframpBigInteger *)subtractOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("subtract(other:)")));
+
+/** Matches java.math.BigInteger's minimal two's-complement encoding exactly. */
+- (ZappOfframpKotlinByteArray *)toByteArray __attribute__((swift_name("toByteArray()")));
+- (int32_t)toInt __attribute__((swift_name("toInt()")));
+- (int64_t)toLong __attribute__((swift_name("toLong()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+- (NSString *)toStringRadix:(int32_t)radix __attribute__((swift_name("toString(radix:)")));
+@end
+
+__attribute__((swift_name("KotlinEnum")))
+@interface ZappOfframpKotlinEnum<E> : ZappOfframpBase <ZappOfframpKotlinComparable>
+@property (class, readonly, getter=companion) ZappOfframpKotlinEnumCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer));
+- (int32_t)compareToOther:(E)other __attribute__((swift_name("compareTo(other:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DecimalRounding")))
+@interface ZappOfframpDecimalRounding : ZappOfframpKotlinEnum<ZappOfframpDecimalRounding *>
+@property (class, readonly) ZappOfframpDecimalRounding *halfUp __attribute__((swift_name("halfUp")));
+@property (class, readonly) ZappOfframpDecimalRounding *down __attribute__((swift_name("down")));
+@property (class, readonly) NSArray<ZappOfframpDecimalRounding *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpDecimalRounding *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BaseRpcClient")))
+@interface ZappOfframpBaseRpcClient : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpBaseRpcClientCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithHttpClient:(ZappOfframpKtor_client_coreHttpClient *)httpClient rpcUrl:(NSString *)rpcUrl __attribute__((swift_name("init(httpClient:rpcUrl:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethCallTo:(ZappOfframpAddress *)to data:(ZappOfframpKotlinByteArray *)data blockTag:(NSString *)blockTag completionHandler:(void (^)(ZappOfframpKotlinByteArray * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethCall(to:data:blockTag:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethChainIdWithCompletionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethChainId(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethEstimateGasFrom:(ZappOfframpAddress *)from to:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethEstimateGas(from:to:value:data:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethGasPriceWithCompletionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethGasPrice(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethGetBlockByNumberBlockTag:(NSString *)blockTag completionHandler:(void (^)(ZappOfframpBlockHeader * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethGetBlockByNumber(blockTag:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethGetCodeAddress:(ZappOfframpAddress *)address blockTag:(NSString *)blockTag completionHandler:(void (^)(ZappOfframpKotlinByteArray * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethGetCode(address:blockTag:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethGetTransactionCountAddress:(ZappOfframpAddress *)address blockTag:(NSString *)blockTag completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethGetTransactionCount(address:blockTag:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethGetTransactionReceiptTxHash:(ZappOfframpTxHash *)txHash completionHandler:(void (^)(ZappOfframpTransactionReceipt * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("ethGetTransactionReceipt(txHash:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethMaxPriorityFeePerGasWithCompletionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethMaxPriorityFeePerGas(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ethSendRawTransactionRawTxHex:(NSString *)rawTxHex completionHandler:(void (^)(ZappOfframpTxHash * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ethSendRawTransaction(rawTxHex:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BaseRpcClient.Companion")))
+@interface ZappOfframpBaseRpcClientCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpBaseRpcClientCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlockHeader")))
+@interface ZappOfframpBlockHeader : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpBlockHeaderCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) id _Nullable baseFee __attribute__((swift_name("baseFee")));
+@property (readonly) NSString * _Nullable baseFeePerGas __attribute__((swift_name("baseFeePerGas")));
+@property (readonly) NSString *number __attribute__((swift_name("number")));
+@property (readonly) NSString *timestamp __attribute__((swift_name("timestamp")));
+- (instancetype)initWithNumber:(NSString *)number timestamp:(NSString *)timestamp baseFeePerGas:(NSString * _Nullable)baseFeePerGas __attribute__((swift_name("init(number:timestamp:baseFeePerGas:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpBlockHeader *)doCopyNumber:(NSString *)number timestamp:(NSString *)timestamp baseFeePerGas:(NSString * _Nullable)baseFeePerGas __attribute__((swift_name("doCopy(number:timestamp:baseFeePerGas:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/** The EIP-1559 base fee as a typed [Wei] amount, or null on a pre-EIP-1559 block. */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlockHeader.Companion")))
+@interface ZappOfframpBlockHeaderCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpBlockHeaderCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * ERC-4337 bundler + ERC-7677 verifying-paymaster JSON-RPC, hosted by Pimlico. Self-custodial: the
+ * caller signs each [UserOperationV06] locally; this client never holds a key. Distinct from
+ * [BaseRpcClient] (the node RPC) — it targets `https://api.pimlico.io/v2/<chainId>/rpc?apikey=…`
+ * and speaks UserOperation methods rather than `eth_sendRawTransaction`. The API key is in the URL
+ * query string per Pimlico's spec, so callers should not log the bundler URL verbatim.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BundlerClient")))
+@interface ZappOfframpBundlerClient : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpBundlerClientCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithHttpClient:(ZappOfframpKtor_client_coreHttpClient *)httpClient bundlerUrl:(NSString *)bundlerUrl entryPoint:(ZappOfframpAddress *)entryPoint chainId:(int64_t)chainId sponsorshipPolicyId:(NSString * _Nullable)sponsorshipPolicyId __attribute__((swift_name("init(httpClient:bundlerUrl:entryPoint:chainId:sponsorshipPolicyId:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)estimateUserOperationGasOp:(ZappOfframpUserOperationV06 *)op completionHandler:(void (^)(ZappOfframpUserOpGasEstimate * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("estimateUserOperationGas(op:completionHandler:)")));
+
+/**
+ * Placeholder paymaster data (same shape/length as the real thing) so gas estimation accounts
+ * for the paymaster's validation. ERC-7677 step before [estimateUserOperationGas].
+ *
+ * Pimlico's stub method is non-standard: 3rd param is the chain ID hex string, not an ERC-7677
+ * context object (that's what [sponsorUserOperation] takes). See Pimlico paymaster docs.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getPaymasterStubDataOp:(ZappOfframpUserOperationV06 *)op completionHandler:(void (^)(ZappOfframpPaymasterResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getPaymasterStubData(op:completionHandler:)")));
+
+/**
+ * Pimlico returns three priority tiers (`slow`/`standard`/`fast`). We pick `standard` as the
+ * default — `fast` overpays for normal use, `slow` risks bundler rejection if mempool conditions
+ * shift between estimation and submission. Swap tiers here if a single chain needs different
+ * latency/cost trade-offs.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getUserOperationGasPriceWithCompletionHandler:(void (^)(ZappOfframpUserOpGasPrice * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getUserOperationGasPrice(completionHandler:)")));
+
+/** The mined transaction receipt for a userOp, or null while it is still pending.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getUserOperationReceiptUserOpHash:(ZappOfframpTxHash *)userOpHash completionHandler:(void (^)(ZappOfframpTransactionReceipt * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("getUserOperationReceipt(userOpHash:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)sendUserOperationOp:(ZappOfframpUserOperationV06 *)op completionHandler:(void (^)(ZappOfframpTxHash * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("sendUserOperation(op:completionHandler:)")));
+
+/** Asks the paymaster to sponsor [op]; the returned [PaymasterResult.paymasterAndData] goes back into the op.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)sponsorUserOperationOp:(ZappOfframpUserOperationV06 *)op completionHandler:(void (^)(ZappOfframpPaymasterResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("sponsorUserOperation(op:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BundlerClient.Companion")))
+@interface ZappOfframpBundlerClientCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpBundlerClientCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Pimlico's bundler + verifying-paymaster URL for [chainId]. The API key is appended as a
+ * query parameter per Pimlico's spec (no header auth). Pimlico accepts both the numeric
+ * chain ID and a slug like "base" / "base-sepolia"; we use the numeric form so all chains
+ * share one URL shape. Fails closed if [apiKey] is blank — surfaces at DI time rather than
+ * the first network round-trip.
+ */
+- (NSString *)urlForChainId:(int64_t)chainId apiKey:(NSString *)apiKey __attribute__((swift_name("urlFor(chainId:apiKey:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EvmLog")))
+@interface ZappOfframpEvmLog : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpEvmLogCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *address __attribute__((swift_name("address")));
+@property (readonly) NSString *blockNumber __attribute__((swift_name("blockNumber")));
+@property (readonly) NSString *data __attribute__((swift_name("data")));
+@property (readonly) NSString *logIndex __attribute__((swift_name("logIndex")));
+@property (readonly) BOOL removed __attribute__((swift_name("removed")));
+@property (readonly) NSArray<NSString *> *topics __attribute__((swift_name("topics")));
+@property (readonly) NSString *transactionHash __attribute__((swift_name("transactionHash")));
+- (instancetype)initWithAddress:(NSString *)address topics:(NSArray<NSString *> *)topics data:(NSString *)data blockNumber:(NSString *)blockNumber transactionHash:(NSString *)transactionHash logIndex:(NSString *)logIndex removed:(BOOL)removed __attribute__((swift_name("init(address:topics:data:blockNumber:transactionHash:logIndex:removed:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpEvmLog *)doCopyAddress:(NSString *)address topics:(NSArray<NSString *> *)topics data:(NSString *)data blockNumber:(NSString *)blockNumber transactionHash:(NSString *)transactionHash logIndex:(NSString *)logIndex removed:(BOOL)removed __attribute__((swift_name("doCopy(address:topics:data:blockNumber:transactionHash:logIndex:removed:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EvmLog.Companion")))
+@interface ZappOfframpEvmLogCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEvmLogCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymasterResult")))
+@interface ZappOfframpPaymasterResult : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpPaymasterResultCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString * _Nullable paymaster __attribute__((swift_name("paymaster")));
+@property (readonly) NSString *paymasterAndData __attribute__((swift_name("paymasterAndData")));
+- (instancetype)initWithPaymasterAndData:(NSString *)paymasterAndData paymaster:(NSString * _Nullable)paymaster __attribute__((swift_name("init(paymasterAndData:paymaster:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymasterResult *)doCopyPaymasterAndData:(NSString *)paymasterAndData paymaster:(NSString * _Nullable)paymaster __attribute__((swift_name("doCopy(paymasterAndData:paymaster:)")));
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymasterResult.Companion")))
+@interface ZappOfframpPaymasterResultCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPaymasterResultCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/** Result of `pm_sponsorUserOperation`; for v0.6 only [paymasterAndData] is used. */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((swift_name("KotlinThrowable")))
+@interface ZappOfframpKotlinThrowable : ZappOfframpBase
+@property (readonly) ZappOfframpKotlinThrowable * _Nullable cause __attribute__((swift_name("cause")));
+@property (readonly) NSString * _Nullable message __attribute__((swift_name("message")));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note annotations
+ *   kotlin.experimental.ExperimentalNativeApi
+*/
+- (ZappOfframpKotlinArray<NSString *> *)getStackTrace __attribute__((swift_name("getStackTrace()")));
+- (void)printStackTrace __attribute__((swift_name("printStackTrace()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+- (NSError *)asError __attribute__((swift_name("asError()")));
+@end
+
+__attribute__((swift_name("KotlinException")))
+@interface ZappOfframpKotlinException : ZappOfframpKotlinThrowable
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("KotlinRuntimeException")))
+@interface ZappOfframpKotlinRuntimeException : ZappOfframpKotlinException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("RpcException")))
+@interface ZappOfframpRpcException : ZappOfframpKotlinRuntimeException
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (instancetype)new __attribute__((unavailable));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/** The JSON-RPC server returned `error.code == 3` (or vendor variant) with revert data. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.ExecutionReverted")))
+@interface ZappOfframpRpcExceptionExecutionReverted : ZappOfframpRpcException
+@property (readonly) ZappOfframpKotlinByteArray *data __attribute__((swift_name("data")));
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+@property (readonly) ZappOfframpSelector4 * _Nullable selector __attribute__((swift_name("selector")));
+@property (readonly) NSString * _Nullable solidityErrorString __attribute__((swift_name("solidityErrorString")));
+- (instancetype)initWithMethod:(NSString *)method selector:(ZappOfframpSelector4 * _Nullable)selector data:(ZappOfframpKotlinByteArray *)data solidityErrorString:(NSString * _Nullable)solidityErrorString rawMessage:(NSString *)rawMessage __attribute__((swift_name("init(method:selector:data:solidityErrorString:rawMessage:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.InvalidParams")))
+@interface ZappOfframpRpcExceptionInvalidParams : ZappOfframpRpcException
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+@property (readonly) NSString *reason __attribute__((swift_name("reason")));
+- (instancetype)initWithMethod:(NSString *)method reason:(NSString *)reason __attribute__((swift_name("init(method:reason:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.MethodNotFound")))
+@interface ZappOfframpRpcExceptionMethodNotFound : ZappOfframpRpcException
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+- (instancetype)initWithMethod:(NSString *)method __attribute__((swift_name("init(method:)"))) __attribute__((objc_designated_initializer));
+@end
+
+
+/** HTTP 429 surfaced into the typed layer; cause carries the original ktor exception. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.RateLimited")))
+@interface ZappOfframpRpcExceptionRateLimited : ZappOfframpRpcException
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+@property (readonly) ZappOfframpLong * _Nullable retryAfterMillis __attribute__((swift_name("retryAfterMillis")));
+- (instancetype)initWithMethod:(NSString *)method retryAfterMillis:(ZappOfframpLong * _Nullable)retryAfterMillis cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(method:retryAfterMillis:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.TransportError")))
+@interface ZappOfframpRpcExceptionTransportError : ZappOfframpRpcException
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+- (instancetype)initWithMethod:(NSString *)method cause:(ZappOfframpKotlinThrowable *)cause __attribute__((swift_name("init(method:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+
+/** Any JSON-RPC error code we do not specifically classify. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcException.Unknown")))
+@interface ZappOfframpRpcExceptionUnknown : ZappOfframpRpcException
+@property (readonly) ZappOfframpInt * _Nullable code __attribute__((swift_name("code")));
+@property (readonly) NSString * _Nullable errorMessage __attribute__((swift_name("errorMessage")));
+@property (readonly) NSString *method __attribute__((swift_name("method")));
+@property (readonly) NSString *raw __attribute__((swift_name("raw")));
+- (instancetype)initWithMethod:(NSString *)method code:(ZappOfframpInt * _Nullable)code raw:(NSString *)raw errorMessage:(NSString * _Nullable)errorMessage __attribute__((swift_name("init(method:code:raw:errorMessage:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcHttpClient")))
+@interface ZappOfframpRpcHttpClient : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpRpcHttpClient *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)rpcHttpClient __attribute__((swift_name("init()")));
+- (ZappOfframpKtor_client_coreHttpClient *)createConfig:(ZappOfframpRpcHttpClientConfig *)config __attribute__((swift_name("create(config:)")));
+- (ZappOfframpKtor_client_coreHttpClient *)createEngine:(id<ZappOfframpKtor_client_coreHttpClientEngine>)engine config:(ZappOfframpRpcHttpClientConfig *)config __attribute__((swift_name("create(engine:config:)")));
+- (ZappOfframpKtor_client_coreHttpClient *)createEngineFactory:(id<ZappOfframpKtor_client_coreHttpClientEngineFactory>)engineFactory config:(ZappOfframpRpcHttpClientConfig *)config engineBlock:(void (^)(ZappOfframpKtor_client_coreHttpClientEngineConfig *))engineBlock __attribute__((swift_name("create(engineFactory:config:engineBlock:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RpcHttpClient.Config")))
+@interface ZappOfframpRpcHttpClientConfig : ZappOfframpBase
+@property (readonly) int64_t connectTimeoutMillis __attribute__((swift_name("connectTimeoutMillis")));
+@property (readonly) ZappOfframpKtor_client_loggingLogLevel *logLevel __attribute__((swift_name("logLevel")));
+@property (readonly) id<ZappOfframpKtor_client_loggingLogger> _Nullable logger __attribute__((swift_name("logger")));
+@property (readonly) int64_t maxBackoffMillis __attribute__((swift_name("maxBackoffMillis")));
+@property (readonly) int32_t maxRetries __attribute__((swift_name("maxRetries")));
+@property (readonly) int64_t randomJitterMillis __attribute__((swift_name("randomJitterMillis")));
+@property (readonly) int64_t requestTimeoutMillis __attribute__((swift_name("requestTimeoutMillis")));
+@property (readonly) int64_t socketTimeoutMillis __attribute__((swift_name("socketTimeoutMillis")));
+- (instancetype)initWithConnectTimeoutMillis:(int64_t)connectTimeoutMillis requestTimeoutMillis:(int64_t)requestTimeoutMillis socketTimeoutMillis:(int64_t)socketTimeoutMillis maxRetries:(int32_t)maxRetries maxBackoffMillis:(int64_t)maxBackoffMillis randomJitterMillis:(int64_t)randomJitterMillis logger:(id<ZappOfframpKtor_client_loggingLogger> _Nullable)logger logLevel:(ZappOfframpKtor_client_loggingLogLevel *)logLevel __attribute__((swift_name("init(connectTimeoutMillis:requestTimeoutMillis:socketTimeoutMillis:maxRetries:maxBackoffMillis:randomJitterMillis:logger:logLevel:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpRpcHttpClientConfig *)doCopyConnectTimeoutMillis:(int64_t)connectTimeoutMillis requestTimeoutMillis:(int64_t)requestTimeoutMillis socketTimeoutMillis:(int64_t)socketTimeoutMillis maxRetries:(int32_t)maxRetries maxBackoffMillis:(int64_t)maxBackoffMillis randomJitterMillis:(int64_t)randomJitterMillis logger:(id<ZappOfframpKtor_client_loggingLogger> _Nullable)logger logLevel:(ZappOfframpKtor_client_loggingLogLevel *)logLevel __attribute__((swift_name("doCopy(connectTimeoutMillis:requestTimeoutMillis:socketTimeoutMillis:maxRetries:maxBackoffMillis:randomJitterMillis:logger:logLevel:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * Optional ktor [Logging] sink. Defaults to null (off) so jvmTest mock-engine tests stay
+ * quiet; production wiring in `ProviderModule` passes a Twig-backed logger so subgraph +
+ * RPC failures appear in logcat alongside the rest of the app's HTTP traffic.
+ */
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("TransactionReceipt")))
+@interface ZappOfframpTransactionReceipt : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpTransactionReceiptCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *blockNumber __attribute__((swift_name("blockNumber")));
+@property (readonly) NSString * _Nullable contractAddress __attribute__((swift_name("contractAddress")));
+@property (readonly) NSString * _Nullable effectiveGasPrice __attribute__((swift_name("effectiveGasPrice")));
+@property (readonly) NSString *gasUsed __attribute__((swift_name("gasUsed")));
+@property (readonly) NSArray<ZappOfframpEvmLog *> *logs __attribute__((swift_name("logs")));
+@property (readonly) NSString *status __attribute__((swift_name("status")));
+@property (readonly) BOOL success __attribute__((swift_name("success")));
+@property (readonly) NSString *transactionHash __attribute__((swift_name("transactionHash")));
+- (instancetype)initWithTransactionHash:(NSString *)transactionHash blockNumber:(NSString *)blockNumber status:(NSString *)status gasUsed:(NSString *)gasUsed effectiveGasPrice:(NSString * _Nullable)effectiveGasPrice contractAddress:(NSString * _Nullable)contractAddress logs:(NSArray<ZappOfframpEvmLog *> *)logs __attribute__((swift_name("init(transactionHash:blockNumber:status:gasUsed:effectiveGasPrice:contractAddress:logs:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpTransactionReceipt *)doCopyTransactionHash:(NSString *)transactionHash blockNumber:(NSString *)blockNumber status:(NSString *)status gasUsed:(NSString *)gasUsed effectiveGasPrice:(NSString * _Nullable)effectiveGasPrice contractAddress:(NSString * _Nullable)contractAddress logs:(NSArray<ZappOfframpEvmLog *> *)logs __attribute__((swift_name("doCopy(transactionHash:blockNumber:status:gasUsed:effectiveGasPrice:contractAddress:logs:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("TransactionReceipt.Companion")))
+@interface ZappOfframpTransactionReceiptCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpTransactionReceiptCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserOpGasEstimate")))
+@interface ZappOfframpUserOpGasEstimate : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpUserOpGasEstimateCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *callGasLimit __attribute__((swift_name("callGasLimit")));
+@property (readonly) NSString *preVerificationGas __attribute__((swift_name("preVerificationGas")));
+@property (readonly) NSString *verificationGasLimit __attribute__((swift_name("verificationGasLimit")));
+- (instancetype)initWithPreVerificationGas:(NSString *)preVerificationGas verificationGasLimit:(NSString *)verificationGasLimit callGasLimit:(NSString *)callGasLimit __attribute__((swift_name("init(preVerificationGas:verificationGasLimit:callGasLimit:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUserOpGasEstimate *)doCopyPreVerificationGas:(NSString *)preVerificationGas verificationGasLimit:(NSString *)verificationGasLimit callGasLimit:(NSString *)callGasLimit __attribute__((swift_name("doCopy(preVerificationGas:verificationGasLimit:callGasLimit:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserOpGasEstimate.Companion")))
+@interface ZappOfframpUserOpGasEstimateCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpUserOpGasEstimateCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserOpGasPrice")))
+@interface ZappOfframpUserOpGasPrice : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpUserOpGasPriceCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *maxFeePerGas __attribute__((swift_name("maxFeePerGas")));
+@property (readonly) NSString *maxPriorityFeePerGas __attribute__((swift_name("maxPriorityFeePerGas")));
+- (instancetype)initWithMaxFeePerGas:(NSString *)maxFeePerGas maxPriorityFeePerGas:(NSString *)maxPriorityFeePerGas __attribute__((swift_name("init(maxFeePerGas:maxPriorityFeePerGas:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUserOpGasPrice *)doCopyMaxFeePerGas:(NSString *)maxFeePerGas maxPriorityFeePerGas:(NSString *)maxPriorityFeePerGas __attribute__((swift_name("doCopy(maxFeePerGas:maxPriorityFeePerGas:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserOpGasPrice.Companion")))
+@interface ZappOfframpUserOpGasPriceCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpUserOpGasPriceCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EcdsaSignature")))
+@interface ZappOfframpEcdsaSignature : ZappOfframpBase
+@property (readonly) ZappOfframpBigInteger *r __attribute__((swift_name("r")));
+@property (readonly) ZappOfframpBigInteger *s __attribute__((swift_name("s")));
+@property (readonly) int8_t yParity __attribute__((swift_name("yParity")));
+- (instancetype)initWithR:(ZappOfframpBigInteger *)r s:(ZappOfframpBigInteger *)s yParity:(int8_t)yParity __attribute__((swift_name("init(r:s:yParity:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpEcdsaSignature *)doCopyR:(ZappOfframpBigInteger *)r s:(ZappOfframpBigInteger *)s yParity:(int8_t)yParity __attribute__((swift_name("doCopy(r:s:yParity:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EcdsaSigner")))
+@interface ZappOfframpEcdsaSigner : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEcdsaSigner *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)ecdsaSigner __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinByteArray * _Nullable)recoverPublicKeyBytesRecId:(int32_t)recId r:(ZappOfframpBigInteger *)r s:(ZappOfframpBigInteger *)s messageHash:(ZappOfframpKotlinByteArray *)messageHash __attribute__((swift_name("recoverPublicKeyBytes(recId:r:s:messageHash:)")));
+- (ZappOfframpEcdsaSignature *)signMessageHash:(ZappOfframpKotlinByteArray *)messageHash privateKey:(ZappOfframpBigInteger *)privateKey __attribute__((swift_name("sign(messageHash:privateKey:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Eip1559Tx")))
+@interface ZappOfframpEip1559Tx : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpEip1559TxCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int64_t chainId __attribute__((swift_name("chainId")));
+@property (readonly) ZappOfframpKotlinByteArray *data __attribute__((swift_name("data")));
+@property (readonly) id gasLimit __attribute__((swift_name("gasLimit")));
+@property (readonly) id maxFeePerGas __attribute__((swift_name("maxFeePerGas")));
+@property (readonly) id maxPriorityFeePerGas __attribute__((swift_name("maxPriorityFeePerGas")));
+@property (readonly) id nonce __attribute__((swift_name("nonce")));
+@property (readonly) ZappOfframpAddress *to __attribute__((swift_name("to")));
+@property (readonly) id value __attribute__((swift_name("value")));
+- (instancetype)initWithChainId:(int64_t)chainId nonce:(id)nonce maxPriorityFeePerGas:(id)maxPriorityFeePerGas maxFeePerGas:(id)maxFeePerGas gasLimit:(id)gasLimit to:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("init(chainId:nonce:maxPriorityFeePerGas:maxFeePerGas:gasLimit:to:value:data:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpEip1559Tx *)doCopyChainId:(int64_t)chainId nonce:(id)nonce maxPriorityFeePerGas:(id)maxPriorityFeePerGas maxFeePerGas:(id)maxFeePerGas gasLimit:(id)gasLimit to:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("doCopy(chainId:nonce:maxPriorityFeePerGas:maxFeePerGas:gasLimit:to:value:data:)")));
+- (ZappOfframpKotlinByteArray *)encodeSignedSig:(ZappOfframpEcdsaSignature *)sig __attribute__((swift_name("encodeSigned(sig:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpKotlinByteArray *)signingHash __attribute__((swift_name("signingHash()")));
+- (ZappOfframpKotlinByteArray *)signingPayload __attribute__((swift_name("signingPayload()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Eip1559Tx.Companion")))
+@interface ZappOfframpEip1559TxCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEip1559TxCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * The orchestrator's only coupling to how a call reaches the chain. An EOA signs and broadcasts a
+ * raw tx; the ERC-4337 path wraps the same `{to, value, data}` in a sponsored UserOperation. Both
+ * return a 32-byte handle — a tx hash for the EOA, a userOpHash for 4337 — that [awaitReceipt]
+ * resolves to the mined [TransactionReceipt] (its inner logs are identical, so receipt log parsing
+ * is unaffected by which path produced it).
+ */
+__attribute__((swift_name("TxSubmitter")))
+@protocol ZappOfframpTxSubmitter
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)awaitReceiptTxHash:(ZappOfframpTxHash *)txHash completionHandler:(void (^)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("awaitReceipt(txHash:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)sendTransactionTo:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data completionHandler:(void (^)(ZappOfframpTxHash * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("sendTransaction(to:value:data:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EoaSigner")))
+@interface ZappOfframpEoaSigner : ZappOfframpBase <ZappOfframpTxSubmitter>
+@property (class, readonly, getter=companion) ZappOfframpEoaSignerCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc chainId:(int64_t)chainId account:(ZappOfframpEvmKey *)account baseFeeMultiplier:(int32_t)baseFeeMultiplier gasLimitBufferPercent:(int32_t)gasLimitBufferPercent receiptTimeoutMs:(int64_t)receiptTimeoutMs receiptPollIntervalMs:(int64_t)receiptPollIntervalMs __attribute__((swift_name("init(rpc:chainId:account:baseFeeMultiplier:gasLimitBufferPercent:receiptTimeoutMs:receiptPollIntervalMs:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)awaitReceiptTxHash:(ZappOfframpTxHash *)txHash completionHandler:(void (^)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("awaitReceipt(txHash:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)sendTransactionTo:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data completionHandler:(void (^)(ZappOfframpTxHash * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("sendTransaction(to:value:data:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EoaSigner.Companion")))
+@interface ZappOfframpEoaSignerCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEoaSignerCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Sends each `{to, value, data}` as a gas-sponsored ERC-4337 v0.6 UserOperation. The owner key
+ * signs locally (self-custody); the bundler (Pimlico) relays and its verifying paymaster pays. The
+ * first op for an undeployed account carries the factory initCode (lazy deploy); subsequent ops
+ * carry none.
+ *
+ * The returned [TxHash] is the userOpHash; [awaitReceipt] resolves it to the mined transaction
+ * receipt via the bundler, whose inner logs are identical to a normal tx — so downstream log
+ * parsing is unchanged from the EOA path.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Erc4337Submitter")))
+@interface ZappOfframpErc4337Submitter : ZappOfframpBase <ZappOfframpTxSubmitter>
+@property (class, readonly, getter=companion) ZappOfframpErc4337SubmitterCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc bundler:(ZappOfframpBundlerClient *)bundler entryPoint:(ZappOfframpAddress *)entryPoint accountFactory:(ZappOfframpAddress *)accountFactory owner:(ZappOfframpEvmKey *)owner smartAccount:(ZappOfframpAddress *)smartAccount chainId:(int64_t)chainId gasLimitBufferPercent:(int32_t)gasLimitBufferPercent receiptTimeoutMs:(int64_t)receiptTimeoutMs receiptPollIntervalMs:(int64_t)receiptPollIntervalMs __attribute__((swift_name("init(rpc:bundler:entryPoint:accountFactory:owner:smartAccount:chainId:gasLimitBufferPercent:receiptTimeoutMs:receiptPollIntervalMs:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)awaitReceiptTxHash:(ZappOfframpTxHash *)txHash completionHandler:(void (^)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("awaitReceipt(txHash:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)sendTransactionTo:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data completionHandler:(void (^)(ZappOfframpTxHash * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("sendTransaction(to:value:data:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Erc4337Submitter.Companion")))
+@interface ZappOfframpErc4337SubmitterCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpErc4337SubmitterCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Rlp")))
+@interface ZappOfframpRlp : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpRlp *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)rlp __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinByteArray *)encodeItem:(id<ZappOfframpRlpItem>)item __attribute__((swift_name("encode(item:)")));
+@end
+
+__attribute__((swift_name("RlpItem")))
+@protocol ZappOfframpRlpItem
+@required
+@end
+
+
+/**
+ * Calldata for thirdweb's prebuilt ERC-4337 v0.6 `Account` and its `AccountFactory` — the same
+ * contract family p2p.me uses. The factory is pre-deployed by thirdweb on every chain at one
+ * address (see [P2pNetworkConfig]); we deploy nothing.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ThirdwebSmartAccount")))
+@interface ZappOfframpThirdwebSmartAccount : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpThirdwebSmartAccount *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Calldata for thirdweb's prebuilt ERC-4337 v0.6 `Account` and its `AccountFactory` — the same
+ * contract family p2p.me uses. The factory is pre-deployed by thirdweb on every chain at one
+ * address (see [P2pNetworkConfig]); we deploy nothing.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)thirdwebSmartAccount __attribute__((swift_name("init()")));
+
+/** `AccountFactory.createAccount(admin, data)` — runs inside the first UserOp's initCode. */
+- (ZappOfframpKotlinByteArray *)createAccountCalldataOwner:(ZappOfframpAddress *)owner data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("createAccountCalldata(owner:data:)")));
+
+/** `Account.execute(target, value, data)` — the single inner call a UserOperation carries. */
+- (ZappOfframpKotlinByteArray *)executeCalldataTo:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("executeCalldata(to:value:data:)")));
+
+/** `AccountFactory.getAddress(admin, data)` — view call returning the counterfactual account address. */
+- (ZappOfframpKotlinByteArray *)getAddressCalldataOwner:(ZappOfframpAddress *)owner data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("getAddressCalldata(owner:data:)")));
+
+/** v0.6 initCode = factory address ‖ createAccount calldata. Empty once the account is deployed. */
+- (ZappOfframpKotlinByteArray *)doInitCodeFactory:(ZappOfframpAddress *)factory owner:(ZappOfframpAddress *)owner data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("doInitCode(factory:owner:data:)")));
+@end
+
+
+/**
+ * An ERC-4337 v0.6 UserOperation. [signature] is excluded from [userOpHash] by design: the hash is
+ * the message the owner key signs, so it has to be computable before the signature exists.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserOperationV06")))
+@interface ZappOfframpUserOperationV06 : ZappOfframpBase
+@property (readonly) ZappOfframpKotlinByteArray *callData __attribute__((swift_name("callData")));
+@property (readonly) ZappOfframpBigInteger *callGasLimit __attribute__((swift_name("callGasLimit")));
+@property (readonly, getter=doInitCode) ZappOfframpKotlinByteArray *initCode __attribute__((swift_name("initCode")));
+@property (readonly) ZappOfframpBigInteger *maxFeePerGas __attribute__((swift_name("maxFeePerGas")));
+@property (readonly) ZappOfframpBigInteger *maxPriorityFeePerGas __attribute__((swift_name("maxPriorityFeePerGas")));
+@property (readonly) ZappOfframpBigInteger *nonce __attribute__((swift_name("nonce")));
+@property (readonly) ZappOfframpKotlinByteArray *paymasterAndData __attribute__((swift_name("paymasterAndData")));
+@property (readonly) ZappOfframpBigInteger *preVerificationGas __attribute__((swift_name("preVerificationGas")));
+@property (readonly) ZappOfframpAddress *sender __attribute__((swift_name("sender")));
+@property (readonly) ZappOfframpKotlinByteArray *signature __attribute__((swift_name("signature")));
+@property (readonly) ZappOfframpBigInteger *verificationGasLimit __attribute__((swift_name("verificationGasLimit")));
+- (instancetype)initWithSender:(ZappOfframpAddress *)sender nonce:(ZappOfframpBigInteger *)nonce initCode:(ZappOfframpKotlinByteArray *)initCode callData:(ZappOfframpKotlinByteArray *)callData callGasLimit:(ZappOfframpBigInteger *)callGasLimit verificationGasLimit:(ZappOfframpBigInteger *)verificationGasLimit preVerificationGas:(ZappOfframpBigInteger *)preVerificationGas maxFeePerGas:(ZappOfframpBigInteger *)maxFeePerGas maxPriorityFeePerGas:(ZappOfframpBigInteger *)maxPriorityFeePerGas paymasterAndData:(ZappOfframpKotlinByteArray *)paymasterAndData signature:(ZappOfframpKotlinByteArray *)signature __attribute__((swift_name("init(sender:nonce:initCode:callData:callGasLimit:verificationGasLimit:preVerificationGas:maxFeePerGas:maxPriorityFeePerGas:paymasterAndData:signature:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUserOperationV06 *)doCopySender:(ZappOfframpAddress *)sender nonce:(ZappOfframpBigInteger *)nonce initCode:(ZappOfframpKotlinByteArray *)initCode callData:(ZappOfframpKotlinByteArray *)callData callGasLimit:(ZappOfframpBigInteger *)callGasLimit verificationGasLimit:(ZappOfframpBigInteger *)verificationGasLimit preVerificationGas:(ZappOfframpBigInteger *)preVerificationGas maxFeePerGas:(ZappOfframpBigInteger *)maxFeePerGas maxPriorityFeePerGas:(ZappOfframpBigInteger *)maxPriorityFeePerGas paymasterAndData:(ZappOfframpKotlinByteArray *)paymasterAndData signature:(ZappOfframpKotlinByteArray *)signature __attribute__((swift_name("doCopy(sender:nonce:initCode:callData:callGasLimit:verificationGasLimit:preVerificationGas:maxFeePerGas:maxPriorityFeePerGas:paymasterAndData:signature:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * An ERC-4337 v0.6 UserOperation. [signature] is excluded from [userOpHash] by design: the hash is
+ * the message the owner key signs, so it has to be computable before the signature exists.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+- (ZappOfframpKotlinByteArray *)userOpHashEntryPoint:(ZappOfframpAddress *)entryPoint chainId:(int64_t)chainId __attribute__((swift_name("userOpHash(entryPoint:chainId:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=xyz/justzappit/evm/types/Address.AddressSerializer))
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Address")))
+@interface ZappOfframpAddress : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpAddressCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) ZappOfframpKotlinByteArray *bytes __attribute__((swift_name("bytes")));
+@property (readonly) NSString *checksumHex __attribute__((swift_name("checksumHex")));
+@property (readonly) NSString *lowercaseHex __attribute__((swift_name("lowercaseHex")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Serialization strategy defines the serial form of a type [T], including its structural description,
+ * declared by the [descriptor] and the actual serialization process, defined by the implementation
+ * of the [serialize] method.
+ *
+ * [serialize] method takes an instance of [T] and transforms it into its serial form (a sequence of primitives),
+ * calling the corresponding [Encoder] methods.
+ *
+ * A serial form of the type is a transformation of the concrete instance into a sequence of primitive values
+ * and vice versa. The serial form is not required to completely mimic the structure of the class, for example,
+ * a specific implementation may represent multiple integer values as a single string, omit or add some
+ * values that are present in the type, but not in the instance.
+ *
+ * For a more detailed explanation of the serialization process, please refer to [KSerializer] documentation.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
+@protocol ZappOfframpKotlinx_serialization_coreSerializationStrategy
+@required
+
+/**
+ * Serializes the [value] of type [T] using the format that is represented by the given [encoder].
+ * [serialize] method is format-agnostic and operates with a high-level structured [Encoder] API.
+ * Throws [SerializationException] if value cannot be serialized.
+ *
+ * Example of serialize method:
+ * ```
+ * class MyData(int: Int, stringList: List<String>, alwaysZero: Long)
+ *
+ * fun serialize(encoder: Encoder, value: MyData): Unit = encoder.encodeStructure(descriptor) {
+ *     // encodeStructure encodes beginning and end of the structure
+ *     // encode 'int' property as Int
+ *     encodeIntElement(descriptor, index = 0, value.int)
+ *     // encode 'stringList' property as List<String>
+ *     encodeSerializableElement(descriptor, index = 1, serializer<List<String>>, value.stringList)
+ *     // don't encode 'alwaysZero' property because we decided to do so
+ * } // end of the structure
+ * ```
+ *
+ * @throws SerializationException in case of any serialization-specific error
+ * @throws IllegalArgumentException if the supplied input does not comply encoder's specification
+ * @see KSerializer for additional information about general contracts and exception specifics
+ */
+- (void)serializeEncoder:(id<ZappOfframpKotlinx_serialization_coreEncoder>)encoder value:(id _Nullable)value __attribute__((swift_name("serialize(encoder:value:)")));
+
+/**
+ * Describes the structure of the serializable representation of [T], produced
+ * by this serializer.
+ */
+@property (readonly) id<ZappOfframpKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
+@end
+
+
+/**
+ * Deserialization strategy defines the serial form of a type [T], including its structural description,
+ * declared by the [descriptor] and the actual deserialization process, defined by the implementation
+ * of the [deserialize] method.
+ *
+ * [deserialize] method takes an instance of [Decoder], and, knowing the serial form of the [T],
+ * invokes primitive retrieval methods on the decoder and then transforms the received primitives
+ * to an instance of [T].
+ *
+ * A serial form of the type is a transformation of the concrete instance into a sequence of primitive values
+ * and vice versa. The serial form is not required to completely mimic the structure of the class, for example,
+ * a specific implementation may represent multiple integer values as a single string, omit or add some
+ * values that are present in the type, but not in the instance.
+ *
+ * For a more detailed explanation of the serialization process, please refer to [KSerializer] documentation.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreDeserializationStrategy")))
+@protocol ZappOfframpKotlinx_serialization_coreDeserializationStrategy
+@required
+
+/**
+ * Deserializes the value of type [T] using the format that is represented by the given [decoder].
+ * [deserialize] method is format-agnostic and operates with a high-level structured [Decoder] API.
+ * As long as most of the formats imply an arbitrary order of properties, deserializer should be able
+ * to decode these properties in an arbitrary order and in a format-agnostic way.
+ * For that purposes, [CompositeDecoder.decodeElementIndex]-based loop is used: decoder firstly
+ * signals property at which index it is ready to decode and then expects caller to decode
+ * property with the given index.
+ *
+ * Throws [SerializationException] if value cannot be deserialized.
+ *
+ * Example of deserialize method:
+ * ```
+ * class MyData(int: Int, stringList: List<String>, alwaysZero: Long)
+ *
+ * fun deserialize(decoder: Decoder): MyData = decoder.decodeStructure(descriptor) {
+ *     // decodeStructure decodes beginning and end of the structure
+ *     var int: Int? = null
+ *     var list: List<String>? = null
+ *     loop@ while (true) {
+ *         when (val index = decodeElementIndex(descriptor)) {
+ *             DECODE_DONE -> break@loop
+ *             0 -> {
+ *                 // Decode 'int' property as Int
+ *                 int = decodeIntElement(descriptor, index = 0)
+ *             }
+ *             1 -> {
+ *                 // Decode 'stringList' property as List<String>
+ *                 list = decodeSerializableElement(descriptor, index = 1, serializer<List<String>>())
+ *             }
+ *             else -> throw SerializationException("Unexpected index $index")
+ *         }
+ *      }
+ *     if (int == null || list == null) throwMissingFieldException()
+ *     // Always use 0 as a value for alwaysZero property because we decided to do so.
+ *     return MyData(int, list, alwaysZero = 0L)
+ * }
+ * ```
+ *
+ * @throws MissingFieldException if non-optional fields were not found during deserialization
+ * @throws SerializationException in case of any deserialization-specific error
+ * @throws IllegalArgumentException if the decoded input is not a valid instance of [T]
+ * @see KSerializer for additional information about general contracts and exception specifics
+ */
+- (id _Nullable)deserializeDecoder:(id<ZappOfframpKotlinx_serialization_coreDecoder>)decoder __attribute__((swift_name("deserialize(decoder:)")));
+
+/**
+ * Describes the structure of the serializable representation of [T], that current
+ * deserializer is able to deserialize.
+ */
+@property (readonly) id<ZappOfframpKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
+@end
+
+
+/**
+ * KSerializer is responsible for the representation of a serial form of a type [T]
+ * in terms of [encoders][Encoder] and [decoders][Decoder] and for constructing and deconstructing [T]
+ * from/to a sequence of encoding primitives. For classes marked with [@Serializable][Serializable], can be
+ * obtained from generated companion extension `.serializer()` or from [serializer<T>()][serializer] function.
+ *
+ * Serialization is decoupled from the encoding process to make it completely format-agnostic.
+ * Serialization represents a type as its serial form and is abstracted from the actual
+ * format (whether its JSON, ProtoBuf or a hashing) and unaware of the underlying storage
+ * (whether it is a string builder, byte array or a network socket), while
+ * encoding/decoding is abstracted from a particular type and its serial form and is responsible
+ * for transforming primitives ("here in an int property 'foo'" call from a serializer) into a particular
+ * format-specific representation ("for a given int, append a property name in quotation marks,
+ * then append a colon, then append an actual value" for JSON) and how to retrieve a primitive
+ * ("give me an int that is 'foo' property") from the underlying representation ("expect the next string to be 'foo',
+ * parse it, then parse colon, then parse a string until the next comma as an int and return it).
+ *
+ * Serial form consists of a structural description, declared by the [descriptor] and
+ * actual serialization and deserialization processes, defined by the corresponding
+ * [serialize] and [deserialize] methods implementation.
+ *
+ * Structural description specifies how the [T] is represented in the serial form:
+ * its [kind][SerialKind] (e.g. whether it is represented as a primitive, a list or a class),
+ * its [elements][SerialDescriptor.elementNames] and their [positional names][SerialDescriptor.getElementName].
+ *
+ * Serialization process is defined as a sequence of calls to an [Encoder], and transforms a type [T]
+ * into a stream of format-agnostic primitives that represent [T], such as "here is an int, here is a double
+ * and here is another nested object". It can be demonstrated by the example:
+ * ```
+ * class MyData(int: Int, stringList: List<String>, alwaysZero: Long)
+ *
+ * // .. serialize method of a corresponding serializer
+ * fun serialize(encoder: Encoder, value: MyData): Unit = encoder.encodeStructure(descriptor) {
+ *     // encodeStructure encodes beginning and end of the structure
+ *     // encode 'int' property as Int
+ *     encodeIntElement(descriptor, index = 0, value.int)
+ *     // encode 'stringList' property as List<String>
+ *     encodeSerializableElement(descriptor, index = 1, serializer<List<String>>, value.stringList)
+ *     // don't encode 'alwaysZero' property because we decided to do so
+ * } // end of the structure
+ * ```
+ *
+ * Deserialization process is symmetric and uses [Decoder].
+ *
+ * ### Exception types for `KSerializer` implementation
+ *
+ * Implementations of [serialize] and [deserialize] methods are allowed to throw
+ * any subtype of [IllegalArgumentException] in order to indicate serialization
+ * and deserialization errors.
+ *
+ * For serializer implementations, it is recommended to throw subclasses of [SerializationException] for
+ * any serialization-specific errors related to invalid or unsupported format of the data
+ * and [IllegalStateException] for errors during validation of the data.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
+@protocol ZappOfframpKotlinx_serialization_coreKSerializer <ZappOfframpKotlinx_serialization_coreSerializationStrategy, ZappOfframpKotlinx_serialization_coreDeserializationStrategy>
+@required
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Address.AddressSerializer")))
+@interface ZappOfframpAddressAddressSerializer : ZappOfframpBase <ZappOfframpKotlinx_serialization_coreKSerializer>
+@property (class, readonly, getter=shared) ZappOfframpAddressAddressSerializer *shared __attribute__((swift_name("shared")));
+@property (readonly) id<ZappOfframpKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)addressSerializer __attribute__((swift_name("init()")));
+- (ZappOfframpAddress *)deserializeDecoder:(id<ZappOfframpKotlinx_serialization_coreDecoder>)decoder __attribute__((swift_name("deserialize(decoder:)")));
+- (void)serializeEncoder:(id<ZappOfframpKotlinx_serialization_coreEncoder>)encoder value:(ZappOfframpAddress *)value __attribute__((swift_name("serialize(encoder:value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Address.Companion")))
+@interface ZappOfframpAddressCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpAddressCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t HEX_LEN __attribute__((swift_name("HEX_LEN")));
+@property (readonly) int32_t LEN_BYTES __attribute__((swift_name("LEN_BYTES")));
+@property (readonly) NSString *PREFIX __attribute__((swift_name("PREFIX")));
+@property (readonly) ZappOfframpAddress *ZERO __attribute__((swift_name("ZERO")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpAddress *)fromBytesBytes:(ZappOfframpKotlinByteArray *)bytes __attribute__((swift_name("fromBytes(bytes:)")));
+- (ZappOfframpAddress *)parseInput:(NSString *)input __attribute__((swift_name("parse(input:)")));
+- (ZappOfframpAddress * _Nullable)parseOrNullInput:(NSString *)input __attribute__((swift_name("parseOrNull(input:)")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=xyz/justzappit/evm/types/TxHash.TxHashSerializer))
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("TxHash")))
+@interface ZappOfframpTxHash : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpTxHashCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) ZappOfframpKotlinByteArray *bytes __attribute__((swift_name("bytes")));
+@property (readonly) NSString *hex __attribute__((swift_name("hex")));
+- (instancetype)initWithBytes:(ZappOfframpKotlinByteArray *)bytes __attribute__((swift_name("init(bytes:)"))) __attribute__((objc_designated_initializer));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("TxHash.Companion")))
+@interface ZappOfframpTxHashCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpTxHashCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t LEN __attribute__((swift_name("LEN")));
+@property (readonly) NSString *PREFIX __attribute__((swift_name("PREFIX")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpTxHash *)fromHexHex:(NSString *)hex __attribute__((swift_name("fromHex(hex:)")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("TxHash.TxHashSerializer")))
+@interface ZappOfframpTxHashTxHashSerializer : ZappOfframpBase <ZappOfframpKotlinx_serialization_coreKSerializer>
+@property (class, readonly, getter=shared) ZappOfframpTxHashTxHashSerializer *shared __attribute__((swift_name("shared")));
+@property (readonly) id<ZappOfframpKotlinx_serialization_coreSerialDescriptor> descriptor __attribute__((swift_name("descriptor")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)txHashSerializer __attribute__((swift_name("init()")));
+- (ZappOfframpTxHash *)deserializeDecoder:(id<ZappOfframpKotlinx_serialization_coreDecoder>)decoder __attribute__((swift_name("deserialize(decoder:)")));
+- (void)serializeEncoder:(id<ZappOfframpKotlinx_serialization_coreEncoder>)encoder value:(ZappOfframpTxHash *)value __attribute__((swift_name("serialize(encoder:value:)")));
+@end
+
+__attribute__((swift_name("OfframpAccountProvider")))
+@protocol ZappOfframpOfframpAccountProvider
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)nextOfframpAccountWithCompletionHandler:(void (^)(ZappOfframpEvmKey * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("nextOfframpAccount(completionHandler:)")));
+@end
+
+
+/**
+ * Caches the derived [EvmKey] so the wrapped provider runs at most once per process — the
+ * mnemonic crosses the [SeedPhraseSource] seam once per app lifetime, not once per order.
+ * Concurrent first-callers coalesce on a [Mutex].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CachingOfframpAccountProvider")))
+@interface ZappOfframpCachingOfframpAccountProvider : ZappOfframpBase <ZappOfframpOfframpAccountProvider>
+- (instancetype)initWithDelegate:(id<ZappOfframpOfframpAccountProvider>)delegate __attribute__((swift_name("init(delegate:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)nextOfframpAccountWithCompletionHandler:(void (^)(ZappOfframpEvmKey * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("nextOfframpAccount(completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DevOfframpAccountProvider")))
+@interface ZappOfframpDevOfframpAccountProvider : ZappOfframpBase <ZappOfframpOfframpAccountProvider>
+@property (class, readonly, getter=shared) ZappOfframpDevOfframpAccountProvider *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpAddress *address __attribute__((swift_name("address")));
+@property (readonly) ZappOfframpEvmKey *key __attribute__((swift_name("key")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)devOfframpAccountProvider __attribute__((swift_name("init()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)nextOfframpAccountWithCompletionHandler:(void (^)(ZappOfframpEvmKey * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("nextOfframpAccount(completionHandler:)")));
+@end
+
+
+/**
+ * The owner key (self-custodial, from the seed via [OfframpAccountProvider]) plus the ERC-4337
+ * smart-account [address] it controls. The owner signs UserOperations and EIP-191 messages; the
+ * smart account is the on-chain identity — the `msg.sender` the Diamond sees, the recipient of
+ * placed orders, and the bridge-in target (it can hold USDC while still counterfactual).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpSmartAccount")))
+@interface ZappOfframpOfframpSmartAccount : ZappOfframpBase
+@property (readonly) ZappOfframpAddress *address __attribute__((swift_name("address")));
+@property (readonly) ZappOfframpEvmKey *owner __attribute__((swift_name("owner")));
+- (instancetype)initWithOwner:(ZappOfframpEvmKey *)owner address:(ZappOfframpAddress *)address __attribute__((swift_name("init(owner:address:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpSmartAccount *)doCopyOwner:(ZappOfframpEvmKey *)owner address:(ZappOfframpAddress *)address __attribute__((swift_name("doCopy(owner:address:)")));
+
+/**
+ * The owner key (self-custodial, from the seed via [OfframpAccountProvider]) plus the ERC-4337
+ * smart-account [address] it controls. The owner signs UserOperations and EIP-191 messages; the
+ * smart account is the on-chain identity — the `msg.sender` the Diamond sees, the recipient of
+ * placed orders, and the bridge-in target (it can hold USDC while still counterfactual).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * The owner key (self-custodial, from the seed via [OfframpAccountProvider]) plus the ERC-4337
+ * smart-account [address] it controls. The owner signs UserOperations and EIP-191 messages; the
+ * smart account is the on-chain identity — the `msg.sender` the Diamond sees, the recipient of
+ * placed orders, and the bridge-in target (it can hold USDC while still counterfactual).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * The owner key (self-custodial, from the seed via [OfframpAccountProvider]) plus the ERC-4337
+ * smart-account [address] it controls. The owner signs UserOperations and EIP-191 messages; the
+ * smart account is the on-chain identity — the `msg.sender` the Diamond sees, the recipient of
+ * placed orders, and the bridge-in target (it can hold USDC while still counterfactual).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Yields the wallet mnemonic as a [CharArray] (not `String`) so callers can zeroize after use.
+ * The caller is expected to wipe the returned array (`Arrays.fill(array, ' ')`).
+ */
+__attribute__((swift_name("SeedPhraseSource")))
+@protocol ZappOfframpSeedPhraseSource
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getSeedPhraseWithCompletionHandler:(void (^)(ZappOfframpKotlinCharArray * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getSeedPhrase(completionHandler:)")));
+@end
+
+
+/**
+ * Resolves the smart account by deriving the owner key and asking the factory for the
+ * counterfactual address (`getAddress`). Works before deployment — the address is deterministic
+ * from the owner key, and the account is lazily deployed inside its first sponsored UserOp.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SmartOfframpAccountProvider")))
+@interface ZappOfframpSmartOfframpAccountProvider : ZappOfframpBase
+- (instancetype)initWithAccountProvider:(id<ZappOfframpOfframpAccountProvider>)accountProvider rpc:(ZappOfframpBaseRpcClient *)rpc accountFactory:(ZappOfframpAddress *)accountFactory __attribute__((swift_name("init(accountProvider:rpc:accountFactory:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)resolveWithCompletionHandler:(void (^)(ZappOfframpOfframpSmartAccount * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("resolve(completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("StaticOfframpAccountProvider")))
+@interface ZappOfframpStaticOfframpAccountProvider : ZappOfframpBase <ZappOfframpOfframpAccountProvider>
+- (instancetype)initWithSeedPhraseSource:(id<ZappOfframpSeedPhraseSource>)seedPhraseSource fixedAccountIndex:(int32_t)fixedAccountIndex __attribute__((swift_name("init(seedPhraseSource:fixedAccountIndex:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)nextOfframpAccountWithCompletionHandler:(void (^)(ZappOfframpEvmKey * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("nextOfframpAccount(completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleBridgeExecution")))
+@interface ZappOfframpAppleBridgeExecution : ZappOfframpBase
+@property (readonly) NSString * _Nullable message __attribute__((swift_name("message")));
+@property (readonly) BOOL succeeded __attribute__((swift_name("succeeded")));
+@property (readonly) BOOL terminal __attribute__((swift_name("terminal")));
+- (instancetype)initWithSucceeded:(BOOL)succeeded terminal:(BOOL)terminal message:(NSString * _Nullable)message __attribute__((swift_name("init(succeeded:terminal:message:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAppleBridgeExecution *)doCopySucceeded:(BOOL)succeeded terminal:(BOOL)terminal message:(NSString * _Nullable)message __attribute__((swift_name("doCopy(succeeded:terminal:message:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("KotlinIllegalStateException")))
+@interface ZappOfframpKotlinIllegalStateException : ZappOfframpKotlinRuntimeException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleBridgeTerminalException")))
+@interface ZappOfframpAppleBridgeTerminalException : ZappOfframpKotlinIllegalStateException
+- (instancetype)initWithMessage:(NSString *)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (instancetype)new __attribute__((unavailable));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpAccountSummary")))
+@interface ZappOfframpAppleOfframpAccountSummary : ZappOfframpBase
+@property (readonly) NSString *address __attribute__((swift_name("address")));
+@property (readonly) NSString *balanceDisplay __attribute__((swift_name("balanceDisplay")));
+@property (readonly) NSString *balanceMicros __attribute__((swift_name("balanceMicros")));
+@property (readonly) BOOL canRefundToZec __attribute__((swift_name("canRefundToZec")));
+@property (readonly) NSString *explorerUrl __attribute__((swift_name("explorerUrl")));
+- (instancetype)initWithAddress:(NSString *)address balanceMicros:(NSString *)balanceMicros balanceDisplay:(NSString *)balanceDisplay explorerUrl:(NSString *)explorerUrl canRefundToZec:(BOOL)canRefundToZec __attribute__((swift_name("init(address:balanceMicros:balanceDisplay:explorerUrl:canRefundToZec:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAppleOfframpAccountSummary *)doCopyAddress:(NSString *)address balanceMicros:(NSString *)balanceMicros balanceDisplay:(NSString *)balanceDisplay explorerUrl:(NSString *)explorerUrl canRefundToZec:(BOOL)canRefundToZec __attribute__((swift_name("doCopy(address:balanceMicros:balanceDisplay:explorerUrl:canRefundToZec:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * iOS-owned half of the mainnet NEAR bridge. The app already owns its Zcash proposal/submission
+ * pipeline and the 1-Click client, so the KMP engine deliberately asks the host to prepare and run
+ * that bridge instead of duplicating wallet signing code.
+ *
+ * [prepare] MUST only create a quote and return its deposit address. [execute] may move ZEC. The
+ * adapter persists the returned address through `onBridgeStarted` between those calls, preserving
+ * the Android crash-safety invariant. [resume] only polls an existing address and must never quote
+ * or send again.
+ */
+__attribute__((swift_name("AppleOfframpBridge")))
+@protocol ZappOfframpAppleOfframpBridge
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)executeDepositAddress:(NSString *)depositAddress completionHandler:(void (^)(ZappOfframpAppleBridgeExecution * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("execute(depositAddress:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)prepareAccountAddress:(NSString *)accountAddress usdcMicros:(NSString *)usdcMicros completionHandler:(void (^)(NSString * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("prepare(accountAddress:usdcMicros:completionHandler:)")));
+
+/** Base deposit address for a USDC -> ZEC 1-Click quote.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)prepareRefundAccountAddress:(NSString *)accountAddress usdcMicros:(NSString *)usdcMicros completionHandler:(void (^)(NSString * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("prepareRefund(accountAddress:usdcMicros:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)resumeDepositAddress:(NSString *)depositAddress completionHandler:(void (^)(ZappOfframpAppleBridgeExecution * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("resume(depositAddress:completionHandler:)")));
+@end
+
+
+/**
+ * Swift-friendly facade over the shared state machine. Every amount crossing this boundary is a
+ * decimal string or a 6-decimal micro-unit string; no Kotlin inline value class is exposed as Any.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpClient")))
+@interface ZappOfframpAppleOfframpClient : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpAppleOfframpClientCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *explorerUrl __attribute__((swift_name("explorerUrl")));
+@property (readonly) NSString *networkName __attribute__((swift_name("networkName")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)accountAddressWithCompletionHandler:(void (^)(NSString * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("accountAddress(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)accountSummaryWithCompletionHandler:(void (^)(ZappOfframpAppleOfframpAccountSummary * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("accountSummary(completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeToBaseUsdcMicros:(NSString *)usdcMicros resumeDepositAddress:(NSString * _Nullable)resumeDepositAddress __attribute__((swift_name("bridgeToBase(usdcMicros:resumeDepositAddress:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)checkpointCurrencyCodeWithCompletionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("checkpointCurrencyCode(completionHandler:)")));
+- (void)close __attribute__((swift_name("close()")));
+- (NSArray<ZappOfframpApplePaymentCorridor *> *)corridors __attribute__((swift_name("corridors()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)discardCheckpointWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("discardCheckpoint(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)hasCheckpointWithCompletionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("hasCheckpoint(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)historyWithCompletionHandler:(void (^)(NSArray<ZappOfframpAppleOfframpHistoryItem *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("history(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)parsePaymentQrCurrencyCode:(NSString *)currencyCode rawPayload:(NSString *)rawPayload completionHandler:(void (^)(ZappOfframpApplePaymentQrResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("parsePaymentQr(currencyCode:rawPayload:completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)payQuote:(ZappOfframpAppleOfframpQuote *)quote rawPayload:(NSString *)rawPayload paymentAddress:(NSString *)paymentAddress payeeName:(NSString * _Nullable)payeeName __attribute__((swift_name("pay(quote:rawPayload:paymentAddress:payeeName:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)quoteCurrencyCode:(NSString *)currencyCode fiatAmount:(NSString *)fiatAmount completionHandler:(void (^)(ZappOfframpAppleOfframpQuote * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("quote(currencyCode:fiatAmount:completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)recoverFundsOrderId:(NSString * _Nullable)orderId __attribute__((swift_name("recoverFunds(orderId:)")));
+- (NSString *)transactionUrlTxHash:(NSString *)txHash __attribute__((swift_name("transactionUrl(txHash:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpClient.Companion")))
+@interface ZappOfframpAppleOfframpClientCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpAppleOfframpClientCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)createNetworkName:(NSString *)networkName seedPhrase:(NSString *)seedPhrase pimlicoApiKey:(NSString *)pimlicoApiKey storage:(id<ZappOfframpAppleOfframpStorage>)storage bridge:(id<ZappOfframpAppleOfframpBridge> _Nullable)bridge rpcUrl:(NSString * _Nullable)rpcUrl subgraphUrl:(NSString * _Nullable)subgraphUrl sponsorshipPolicyId:(NSString * _Nullable)sponsorshipPolicyId completionHandler:(void (^)(ZappOfframpAppleOfframpClient * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpHistoryItem")))
+@interface ZappOfframpAppleOfframpHistoryItem : ZappOfframpBase
+@property (readonly) ZappOfframpLong * _Nullable cancelledAtEpochSeconds __attribute__((swift_name("cancelledAtEpochSeconds")));
+@property (readonly) ZappOfframpLong * _Nullable completedAtEpochSeconds __attribute__((swift_name("completedAtEpochSeconds")));
+@property (readonly) NSString *currencyCode __attribute__((swift_name("currencyCode")));
+@property (readonly) NSString *fiatMicros __attribute__((swift_name("fiatMicros")));
+@property (readonly) NSString * _Nullable fixedFeeMicros __attribute__((swift_name("fixedFeeMicros")));
+@property (readonly) NSString * _Nullable merchantAddress __attribute__((swift_name("merchantAddress")));
+@property (readonly) NSString *orderId __attribute__((swift_name("orderId")));
+@property (readonly) NSString *orderType __attribute__((swift_name("orderType")));
+@property (readonly) NSString * _Nullable paymentAddress __attribute__((swift_name("paymentAddress")));
+@property (readonly) ZappOfframpLong * _Nullable placedAtEpochSeconds __attribute__((swift_name("placedAtEpochSeconds")));
+@property (readonly) NSString *status __attribute__((swift_name("status")));
+@property (readonly) NSString *usdcMicros __attribute__((swift_name("usdcMicros")));
+- (instancetype)initWithOrderId:(NSString *)orderId status:(NSString *)status orderType:(NSString *)orderType currencyCode:(NSString *)currencyCode usdcMicros:(NSString *)usdcMicros fiatMicros:(NSString *)fiatMicros placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds paymentAddress:(NSString * _Nullable)paymentAddress merchantAddress:(NSString * _Nullable)merchantAddress fixedFeeMicros:(NSString * _Nullable)fixedFeeMicros __attribute__((swift_name("init(orderId:status:orderType:currencyCode:usdcMicros:fiatMicros:placedAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:paymentAddress:merchantAddress:fixedFeeMicros:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAppleOfframpHistoryItem *)doCopyOrderId:(NSString *)orderId status:(NSString *)status orderType:(NSString *)orderType currencyCode:(NSString *)currencyCode usdcMicros:(NSString *)usdcMicros fiatMicros:(NSString *)fiatMicros placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds paymentAddress:(NSString * _Nullable)paymentAddress merchantAddress:(NSString * _Nullable)merchantAddress fixedFeeMicros:(NSString * _Nullable)fixedFeeMicros __attribute__((swift_name("doCopy(orderId:status:orderType:currencyCode:usdcMicros:fiatMicros:placedAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:paymentAddress:merchantAddress:fixedFeeMicros:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpQuote")))
+@interface ZappOfframpAppleOfframpQuote : ZappOfframpBase
+@property (readonly) NSString *baseBalanceDisplay __attribute__((swift_name("baseBalanceDisplay")));
+@property (readonly) NSString *baseBalanceMicros __attribute__((swift_name("baseBalanceMicros")));
+@property (readonly) BOOL canBridgeToBase __attribute__((swift_name("canBridgeToBase")));
+@property (readonly) BOOL canPayFromBase __attribute__((swift_name("canPayFromBase")));
+@property (readonly) NSString *currencyCode __attribute__((swift_name("currencyCode")));
+@property (readonly) NSString *fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) NSString *fixedFeeDisplay __attribute__((swift_name("fixedFeeDisplay")));
+@property (readonly) NSString *fixedFeeMicros __attribute__((swift_name("fixedFeeMicros")));
+@property (readonly) NSString *requiredBalanceMicros __attribute__((swift_name("requiredBalanceMicros")));
+@property (readonly) NSString *sellRate __attribute__((swift_name("sellRate")));
+@property (readonly) NSString *shortfallDisplay __attribute__((swift_name("shortfallDisplay")));
+@property (readonly) NSString *shortfallMicros __attribute__((swift_name("shortfallMicros")));
+@property (readonly) NSString *usdcDisplay __attribute__((swift_name("usdcDisplay")));
+@property (readonly) NSString *usdcMicros __attribute__((swift_name("usdcMicros")));
+- (instancetype)initWithCurrencyCode:(NSString *)currencyCode fiatAmount:(NSString *)fiatAmount usdcMicros:(NSString *)usdcMicros usdcDisplay:(NSString *)usdcDisplay sellRate:(NSString *)sellRate fixedFeeMicros:(NSString *)fixedFeeMicros fixedFeeDisplay:(NSString *)fixedFeeDisplay requiredBalanceMicros:(NSString *)requiredBalanceMicros baseBalanceMicros:(NSString *)baseBalanceMicros baseBalanceDisplay:(NSString *)baseBalanceDisplay shortfallMicros:(NSString *)shortfallMicros shortfallDisplay:(NSString *)shortfallDisplay canPayFromBase:(BOOL)canPayFromBase canBridgeToBase:(BOOL)canBridgeToBase __attribute__((swift_name("init(currencyCode:fiatAmount:usdcMicros:usdcDisplay:sellRate:fixedFeeMicros:fixedFeeDisplay:requiredBalanceMicros:baseBalanceMicros:baseBalanceDisplay:shortfallMicros:shortfallDisplay:canPayFromBase:canBridgeToBase:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAppleOfframpQuote *)doCopyCurrencyCode:(NSString *)currencyCode fiatAmount:(NSString *)fiatAmount usdcMicros:(NSString *)usdcMicros usdcDisplay:(NSString *)usdcDisplay sellRate:(NSString *)sellRate fixedFeeMicros:(NSString *)fixedFeeMicros fixedFeeDisplay:(NSString *)fixedFeeDisplay requiredBalanceMicros:(NSString *)requiredBalanceMicros baseBalanceMicros:(NSString *)baseBalanceMicros baseBalanceDisplay:(NSString *)baseBalanceDisplay shortfallMicros:(NSString *)shortfallMicros shortfallDisplay:(NSString *)shortfallDisplay canPayFromBase:(BOOL)canPayFromBase canBridgeToBase:(BOOL)canBridgeToBase __attribute__((swift_name("doCopy(currencyCode:fiatAmount:usdcMicros:usdcDisplay:sellRate:fixedFeeMicros:fixedFeeDisplay:requiredBalanceMicros:baseBalanceMicros:baseBalanceDisplay:shortfallMicros:shortfallDisplay:canPayFromBase:canBridgeToBase:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AppleOfframpStatus")))
+@interface ZappOfframpAppleOfframpStatus : ZappOfframpBase
+@property (readonly) NSString * _Nullable bridgeDepositAddress __attribute__((swift_name("bridgeDepositAddress")));
+@property (readonly) NSString * _Nullable detail __attribute__((swift_name("detail")));
+@property (readonly) BOOL isSuccess __attribute__((swift_name("isSuccess")));
+@property (readonly) BOOL isTerminal __attribute__((swift_name("isTerminal")));
+@property (readonly) NSString *kind __attribute__((swift_name("kind")));
+@property (readonly) NSString * _Nullable orderId __attribute__((swift_name("orderId")));
+@property (readonly) NSString *step __attribute__((swift_name("step")));
+@property (readonly) NSString *title __attribute__((swift_name("title")));
+@property (readonly) NSString * _Nullable txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithKind:(NSString *)kind step:(NSString *)step title:(NSString *)title detail:(NSString * _Nullable)detail orderId:(NSString * _Nullable)orderId txHash:(NSString * _Nullable)txHash bridgeDepositAddress:(NSString * _Nullable)bridgeDepositAddress isTerminal:(BOOL)isTerminal isSuccess:(BOOL)isSuccess __attribute__((swift_name("init(kind:step:title:detail:orderId:txHash:bridgeDepositAddress:isTerminal:isSuccess:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpAppleOfframpStatus *)doCopyKind:(NSString *)kind step:(NSString *)step title:(NSString *)title detail:(NSString * _Nullable)detail orderId:(NSString * _Nullable)orderId txHash:(NSString * _Nullable)txHash bridgeDepositAddress:(NSString * _Nullable)bridgeDepositAddress isTerminal:(BOOL)isTerminal isSuccess:(BOOL)isSuccess __attribute__((swift_name("doCopy(kind:step:title:detail:orderId:txHash:bridgeDepositAddress:isTerminal:isSuccess:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/** Small encrypted-storage surface implemented by iOS. Values are scoped to the selected wallet. */
+__attribute__((swift_name("AppleOfframpStorage")))
+@protocol ZappOfframpAppleOfframpStorage
+@required
+- (NSString * _Nullable)checkpointJson __attribute__((swift_name("checkpointJson()")));
+- (void)clearCheckpoint __attribute__((swift_name("clearCheckpoint()")));
+- (NSString * _Nullable)paymentAddressOrderId:(NSString *)orderId __attribute__((swift_name("paymentAddress(orderId:)")));
+- (NSString * _Nullable)relayPrivateKey __attribute__((swift_name("relayPrivateKey()")));
+- (NSString * _Nullable)relayPublicKey __attribute__((swift_name("relayPublicKey()")));
+- (void)storeCheckpointJsonValue:(NSString *)value __attribute__((swift_name("storeCheckpointJson(value:)")));
+- (void)storePaymentAddressOrderId:(NSString *)orderId paymentAddress:(NSString *)paymentAddress __attribute__((swift_name("storePaymentAddress(orderId:paymentAddress:)")));
+- (void)storeRelayPrivateKeyHex:(NSString *)privateKeyHex publicKeyHex:(NSString *)publicKeyHex __attribute__((swift_name("storeRelay(privateKeyHex:publicKeyHex:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ApplePaymentCorridor")))
+@interface ZappOfframpApplePaymentCorridor : ZappOfframpBase
+@property (readonly) NSString *countryName __attribute__((swift_name("countryName")));
+@property (readonly) NSString *currencyCode __attribute__((swift_name("currencyCode")));
+@property (readonly) NSString *flag __attribute__((swift_name("flag")));
+@property (readonly) NSString *paymentRail __attribute__((swift_name("paymentRail")));
+@property (readonly) int32_t precision __attribute__((swift_name("precision")));
+@property (readonly) NSString *symbol __attribute__((swift_name("symbol")));
+- (instancetype)initWithCurrencyCode:(NSString *)currencyCode countryName:(NSString *)countryName paymentRail:(NSString *)paymentRail flag:(NSString *)flag symbol:(NSString *)symbol precision:(int32_t)precision __attribute__((swift_name("init(currencyCode:countryName:paymentRail:flag:symbol:precision:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpApplePaymentCorridor *)doCopyCurrencyCode:(NSString *)currencyCode countryName:(NSString *)countryName paymentRail:(NSString *)paymentRail flag:(NSString *)flag symbol:(NSString *)symbol precision:(int32_t)precision __attribute__((swift_name("doCopy(currencyCode:countryName:paymentRail:flag:symbol:precision:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ApplePaymentQrResult")))
+@interface ZappOfframpApplePaymentQrResult : ZappOfframpBase
+@property (readonly) NSString * _Nullable errorCode __attribute__((swift_name("errorCode")));
+@property (readonly) NSString * _Nullable fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) BOOL isValid __attribute__((swift_name("isValid")));
+@property (readonly) NSString * _Nullable paymentAddress __attribute__((swift_name("paymentAddress")));
+- (instancetype)initWithIsValid:(BOOL)isValid paymentAddress:(NSString * _Nullable)paymentAddress fiatAmount:(NSString * _Nullable)fiatAmount errorCode:(NSString * _Nullable)errorCode __attribute__((swift_name("init(isValid:paymentAddress:fiatAmount:errorCode:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpApplePaymentQrResult *)doCopyIsValid:(BOOL)isValid paymentAddress:(NSString * _Nullable)paymentAddress fiatAmount:(NSString * _Nullable)fiatAmount errorCode:(NSString * _Nullable)errorCode __attribute__((swift_name("doCopy(isValid:paymentAddress:fiatAmount:errorCode:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pConfigProvider")))
+@interface ZappOfframpP2pConfigProvider : ZappOfframpBase
+- (instancetype)initWithNetworkName:(NSString *)networkName rpcUrlOverride:(NSString * _Nullable)rpcUrlOverride subgraphUrlOverride:(NSString * _Nullable)subgraphUrlOverride __attribute__((swift_name("init(networkName:rpcUrlOverride:subgraphUrlOverride:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpP2pNetworkConfig *)current __attribute__((swift_name("current()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pNetworkConfig")))
+@interface ZappOfframpP2pNetworkConfig : ZappOfframpBase
+@property (readonly) ZappOfframpAddress *accountFactoryAddress __attribute__((swift_name("accountFactoryAddress")));
+@property (readonly) NSString *baseExplorerUrl __attribute__((swift_name("baseExplorerUrl")));
+@property (readonly) int64_t chainId __attribute__((swift_name("chainId")));
+@property (readonly) ZappOfframpAddress *diamondAddress __attribute__((swift_name("diamondAddress")));
+@property (readonly) ZappOfframpAddress *entryPointAddress __attribute__((swift_name("entryPointAddress")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) NSString *rpcUrl __attribute__((swift_name("rpcUrl")));
+@property (readonly) NSString *subgraphUrl __attribute__((swift_name("subgraphUrl")));
+@property (readonly) ZappOfframpAddress *usdcAddress __attribute__((swift_name("usdcAddress")));
+- (instancetype)initWithName:(NSString *)name chainId:(int64_t)chainId rpcUrl:(NSString *)rpcUrl diamondAddress:(ZappOfframpAddress *)diamondAddress usdcAddress:(ZappOfframpAddress *)usdcAddress subgraphUrl:(NSString *)subgraphUrl baseExplorerUrl:(NSString *)baseExplorerUrl entryPointAddress:(ZappOfframpAddress *)entryPointAddress accountFactoryAddress:(ZappOfframpAddress *)accountFactoryAddress __attribute__((swift_name("init(name:chainId:rpcUrl:diamondAddress:usdcAddress:subgraphUrl:baseExplorerUrl:entryPointAddress:accountFactoryAddress:)"))) __attribute__((objc_designated_initializer));
+- (NSString *)addressUrlAddressHex:(NSString *)addressHex __attribute__((swift_name("addressUrl(addressHex:)")));
+- (ZappOfframpP2pNetworkConfig *)doCopyName:(NSString *)name chainId:(int64_t)chainId rpcUrl:(NSString *)rpcUrl diamondAddress:(ZappOfframpAddress *)diamondAddress usdcAddress:(ZappOfframpAddress *)usdcAddress subgraphUrl:(NSString *)subgraphUrl baseExplorerUrl:(NSString *)baseExplorerUrl entryPointAddress:(ZappOfframpAddress *)entryPointAddress accountFactoryAddress:(ZappOfframpAddress *)accountFactoryAddress __attribute__((swift_name("doCopy(name:chainId:rpcUrl:diamondAddress:usdcAddress:subgraphUrl:baseExplorerUrl:entryPointAddress:accountFactoryAddress:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+- (NSString *)txUrlTxHash:(NSString *)txHash __attribute__((swift_name("txUrl(txHash:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pNetworks")))
+@interface ZappOfframpP2pNetworks : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpP2pNetworks *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *ACCOUNT_FACTORY_V06 __attribute__((swift_name("ACCOUNT_FACTORY_V06")));
+@property (readonly) NSString *ENTRYPOINT_V06 __attribute__((swift_name("ENTRYPOINT_V06")));
+@property (readonly) NSString *MAINNET_BASE_EXPLORER_URL __attribute__((swift_name("MAINNET_BASE_EXPLORER_URL")));
+@property (readonly) int64_t MAINNET_CHAIN_ID __attribute__((swift_name("MAINNET_CHAIN_ID")));
+@property (readonly) NSString *MAINNET_DIAMOND_ADDRESS __attribute__((swift_name("MAINNET_DIAMOND_ADDRESS")));
+@property (readonly) NSString *MAINNET_NAME __attribute__((swift_name("MAINNET_NAME")));
+@property (readonly) NSString *MAINNET_USDC_ADDRESS __attribute__((swift_name("MAINNET_USDC_ADDRESS")));
+@property (readonly) ZappOfframpP2pNetworkConfig *SEPOLIA __attribute__((swift_name("SEPOLIA")));
+@property (readonly) NSString *SEPOLIA_NAME __attribute__((swift_name("SEPOLIA_NAME")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)p2pNetworks __attribute__((swift_name("init()")));
+- (ZappOfframpP2pNetworkConfig *)mainnetRpcUrl:(NSString *)rpcUrl subgraphUrl:(NSString *)subgraphUrl __attribute__((swift_name("mainnet(rpcUrl:subgraphUrl:)")));
+@end
+
+
+/**
+ * What the funding seam ended up doing. Lets the orchestrator surface a distinct UI status for the
+ * skipped-bridge path (the smart account already held enough USDC — common after a cancelled order
+ * left USDC refunded into the account) vs. the actually-bridged path.
+ */
+__attribute__((swift_name("FundingOutcome")))
+@protocol ZappOfframpFundingOutcome
+@required
+@end
+
+
+/** Account already held [currentBalance] ≥ the order amount; no bridge ran. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FundingOutcomeAlreadyFunded")))
+@interface ZappOfframpFundingOutcomeAlreadyFunded : ZappOfframpBase <ZappOfframpFundingOutcome>
+@property (readonly) id currentBalance __attribute__((swift_name("currentBalance")));
+- (instancetype)initWithCurrentBalance:(id)currentBalance __attribute__((swift_name("init(currentBalance:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpFundingOutcomeAlreadyFunded *)doCopyCurrentBalance:(id)currentBalance __attribute__((swift_name("doCopy(currentBalance:)")));
+
+/** Account already held [currentBalance] ≥ the order amount; no bridge ran. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Account already held [currentBalance] ≥ the order amount; no bridge ran. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Account already held [currentBalance] ≥ the order amount; no bridge ran. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/** A bridge was opened at [depositAddress] and settled successfully. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FundingOutcomeBridged")))
+@interface ZappOfframpFundingOutcomeBridged : ZappOfframpBase <ZappOfframpFundingOutcome>
+@property (readonly) NSString *depositAddress __attribute__((swift_name("depositAddress")));
+- (instancetype)initWithDepositAddress:(NSString *)depositAddress __attribute__((swift_name("init(depositAddress:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpFundingOutcomeBridged *)doCopyDepositAddress:(NSString *)depositAddress __attribute__((swift_name("doCopy(depositAddress:)")));
+
+/** A bridge was opened at [depositAddress] and settled successfully. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** A bridge was opened at [depositAddress] and settled successfully. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** A bridge was opened at [depositAddress] and settled successfully. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Decides where a cancelled order's refunded USDC should go to return to the user as ZEC. The
+ * orchestrator does the sponsored `USDC.transfer` itself; this seam only resolves the destination,
+ * so the NEAR-specific logic stays isolated and network-toggled.
+ *
+ * Mainnet resolves a NEAR Intents 1-Click deposit address (USDC→ZEC, §3.6). Testnet returns null —
+ * no NEAR route — and the refunded USDC simply stays in the self-custodial smart account (safe).
+ */
+__attribute__((swift_name("OfframpRefund")))
+@protocol ZappOfframpOfframpRefund
+@required
+
+/** Base address to send the refunded USDC to, or null to leave it in the account (testnet).
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)pullbackTargetAccount:(ZappOfframpAddress *)account amount:(id)amount completionHandler:(void (^)(ZappOfframpAddress * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("pullbackTarget(account:amount:completionHandler:)")));
+@end
+
+
+/** Testnet/dev: no NEAR route. The refunded USDC remains in the smart account (already self-custodial). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NoRouteOfframpRefund")))
+@interface ZappOfframpNoRouteOfframpRefund : ZappOfframpBase <ZappOfframpOfframpRefund>
+
+/** Testnet/dev: no NEAR route. The refunded USDC remains in the smart account (already self-custodial). */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/** Testnet/dev: no NEAR route. The refunded USDC remains in the smart account (already self-custodial). */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)pullbackTargetAccount:(ZappOfframpAddress *)account amount:(id)amount completionHandler:(void (^)(ZappOfframpAddress * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("pullbackTarget(account:amount:completionHandler:)")));
+@end
+
+
+/**
+ * Adds USDC to the reusable Base balance by bridging ZEC, independent of any order. Distinct from
+ * [OfframpFunding] (which funds *to* an order amount and short-circuits when already funded): this
+ * always bridges the requested [usdc], so the user can deliberately top up their Base balance ahead
+ * of paying. Network-toggled in DI — only mainnet has a NEAR route.
+ *
+ * Resume-safe and idempotent, same contract as [OfframpFunding]: a non-null [resumeHandle] re-polls
+ * the already-opened 1-Click deposit address instead of quoting a second bridge, and
+ * [onBridgeStarted] fires the instant the deposit address is known (before any ZEC moves) so the
+ * caller can persist it first and close the crash-during-deposit double-send window.
+ */
+__attribute__((swift_name("OfframpTopUp")))
+@protocol ZappOfframpOfframpTopUp
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)bridgeAccount:(ZappOfframpAddress *)account usdc:(id)usdc resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted completionHandler:(void (^)(id<ZappOfframpFundingOutcome> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("bridge(account:usdc:resumeHandle:onBridgeStarted:completionHandler:)")));
+@end
+
+
+/** Testnet/dev: no NEAR route, so Base must be funded manually. Fails fast with an actionable message. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NoRouteOfframpTopUp")))
+@interface ZappOfframpNoRouteOfframpTopUp : ZappOfframpBase <ZappOfframpOfframpTopUp>
+
+/** Testnet/dev: no NEAR route, so Base must be funded manually. Fails fast with an actionable message. */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/** Testnet/dev: no NEAR route, so Base must be funded manually. Fails fast with an actionable message. */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)bridgeAccount:(ZappOfframpAddress *)account usdc:(id)usdc resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted completionHandler:(void (^)(id<ZappOfframpFundingOutcome> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("bridge(account:usdc:resumeHandle:onBridgeStarted:completionHandler:)")));
+@end
+
+
+/**
+ * Makes the smart account hold the USDC an order needs. Called by the orchestrator **after** the
+ * circle-eligibility gate and **before** approve/placeOrder, so we never fund (bridge) into a market
+ * with no merchant. Network-toggled in DI: [PreFundedOfframpFunding] on testnet (expects manual
+ * funding); on mainnet a NEAR-bridge implementation that lives in ui-lib and reuses the app's
+ * existing 1-Click swap stack (it needs the wallet + `SwapDataSource`, which offramp-lib can't see).
+ *
+ * The mainnet bridge is asynchronous (quote → ZEC deposit → poll until USDC lands), so this seam is
+ * **resumable and must be idempotent**:
+ *
+ *  - [resumeHandle] is the 1-Click deposit address persisted on a prior attempt, or null on a fresh
+ *    start. A non-null handle MUST be resumed (re-polled to completion), never re-quoted — re-quoting
+ *    opens a second bridge and the user double-sends ZEC.
+ *  - [onBridgeStarted] is invoked with the deposit address the instant a bridge is opened (after the
+ *    quote, before any ZEC moves) so the orchestrator can persist it first, closing the
+ *    crash-during-deposit window.
+ *
+ * Implementations return a [FundingOutcome] only once [account] verifiably holds at least
+ * `request.usdcAmount`; otherwise they throw (fail-closed — the order is never placed unfunded).
+ */
+__attribute__((swift_name("OfframpFunding")))
+@protocol ZappOfframpOfframpFunding
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ensureFundedAccount:(ZappOfframpAddress *)account request:(ZappOfframpOfframpRequest *)request resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted completionHandler:(void (^)(id<ZappOfframpFundingOutcome> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ensureFunded(account:request:resumeHandle:onBridgeStarted:completionHandler:)")));
+@end
+
+
+/**
+ * Testnet/dev funding: no bridge (NEAR has no testnet route). Verifies the account already holds the
+ * order amount and fails fast with an actionable message otherwise. The resume/bridge parameters are
+ * unused — there is nothing to resume when funding is manual.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PreFundedOfframpFunding")))
+@interface ZappOfframpPreFundedOfframpFunding : ZappOfframpBase <ZappOfframpOfframpFunding>
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc usdc:(ZappOfframpAddress *)usdc __attribute__((swift_name("init(rpc:usdc:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ensureFundedAccount:(ZappOfframpAddress *)account request:(ZappOfframpOfframpRequest *)request resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted completionHandler:(void (^)(id<ZappOfframpFundingOutcome> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ensureFunded(account:request:resumeHandle:onBridgeStarted:completionHandler:)")));
+@end
+
+__attribute__((swift_name("OfframpDriver")))
+@protocol ZappOfframpOfframpDriver
+@required
+
+/**
+ * "Get my USDC back to ZEC". Cleanup-call selection depends on on-chain order state:
+ *  - ACCEPTED / PAID    → `cancelOrder` (user-permitted, refunds escrow) + transfer
+ *  - PLACED + expired   → `autoCancelExpiredOrders` (permissionless cleanup) + transfer
+ *  - PLACED + active    → transfer only (PAY/SELL escrow nothing at PLACED)
+ *  - CANCELLED / null   → transfer only
+ */
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeFundsBackToZecOrderId:(ZappOfframpBigInteger * _Nullable)orderId __attribute__((swift_name("bridgeFundsBackToZec(orderId:)")));
+
+/**
+ * Standalone "top up Base": bridge [addUsdc] of ZEC onto the reusable Base balance, with no order
+ * placed. [resumeBridgeHandle] is a persisted 1-Click deposit address — non-null forces the bridge
+ * to re-poll the existing deposit instead of opening a second one, so a crash mid-bridge can't
+ * double-send the user's ZEC.
+ */
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeToBaseAddUsdc:(id)addUsdc resumeBridgeHandle:(NSString * _Nullable)resumeBridgeHandle __attribute__((swift_name("bridgeToBase(addUsdc:resumeBridgeHandle:)")));
+
+/**
+ * Whether any eligible circle currently has an assignable merchant for an [usdc]/[currency] order.
+ * Best-effort gate shown before a top-up bridge; returns false on RPC failure or no eligible circle.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)isMerchantAvailableUsdc:(id)usdc currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("isMerchantAvailable(usdc:currency:completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)resumeCheckpoint:(ZappOfframpOfframpCheckpoint *)checkpoint paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("resume(checkpoint:paymentDetailsProvider:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)runRequest:(ZappOfframpOfframpRequest *)request paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("run(request:paymentDetailsProvider:)")));
+@end
+
+
+/**
+ * Production [OfframpDriver] for the ERC-4337 path. The smart-account address needs an async
+ * `factory.getAddress` call, which Koin's synchronous factories can't await — so resolution and
+ * submitter construction happen lazily inside the flow (a suspend context), then delegate to a
+ * plain [OfframpOrchestrator]. Tests drive the orchestrator directly with an EOA [TxSubmitter].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("AaOfframpDriver")))
+@interface ZappOfframpAaOfframpDriver : ZappOfframpBase <ZappOfframpOfframpDriver>
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc bundler:(ZappOfframpBundlerClient *)bundler network:(ZappOfframpP2pNetworkConfig *)network accountProvider:(ZappOfframpSmartOfframpAccountProvider *)accountProvider subgraph:(ZappOfframpSubgraphClient *)subgraph orderReader:(id<ZappOfframpOrderReadSource>)orderReader funding:(id<ZappOfframpOfframpFunding>)funding refund:(id<ZappOfframpOfframpRefund>)refund topUp:(id<ZappOfframpOfframpTopUp>)topUp router:(ZappOfframpCircleRouter *)router relayIdentityStore:(id<ZappOfframpRelayIdentityStore>)relayIdentityStore orderRecipientUpiCache:(id<ZappOfframpOrderRecipientUpiCache>)orderRecipientUpiCache __attribute__((swift_name("init(rpc:bundler:network:accountProvider:subgraph:orderReader:funding:refund:topUp:router:relayIdentityStore:orderRecipientUpiCache:)"))) __attribute__((objc_designated_initializer));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeFundsBackToZecOrderId:(ZappOfframpBigInteger * _Nullable)orderId __attribute__((swift_name("bridgeFundsBackToZec(orderId:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeToBaseAddUsdc:(id)addUsdc resumeBridgeHandle:(NSString * _Nullable)resumeBridgeHandle __attribute__((swift_name("bridgeToBase(addUsdc:resumeBridgeHandle:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)isMerchantAvailableUsdc:(id)usdc currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("isMerchantAvailable(usdc:currency:completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)resumeCheckpoint:(ZappOfframpOfframpCheckpoint *)checkpoint paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("resume(checkpoint:paymentDetailsProvider:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)runRequest:(ZappOfframpOfframpRequest *)request paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("run(request:paymentDetailsProvider:)")));
+@end
+
+
+/**
+ * Progress of a standalone "top up Base" bridge ([OfframpDriver.bridgeToBase]). Kept separate from
+ * [OfframpStatus] because a top-up has no order, no circle, and no merchant — conflating the two
+ * state machines would force every order-step consumer to handle bridge-only states and vice versa.
+ */
+__attribute__((swift_name("BridgeToBaseStatus")))
+@protocol ZappOfframpBridgeToBaseStatus
+@required
+@end
+
+
+/** ZEC→USDC bridge in flight. [depositAddress] is the 1-Click handle, null until the quote returns. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BridgeToBaseStatusBridging")))
+@interface ZappOfframpBridgeToBaseStatusBridging : ZappOfframpBase <ZappOfframpBridgeToBaseStatus>
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) NSString * _Nullable depositAddress __attribute__((swift_name("depositAddress")));
+- (instancetype)initWithAmount:(id)amount depositAddress:(NSString * _Nullable)depositAddress __attribute__((swift_name("init(amount:depositAddress:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpBridgeToBaseStatusBridging *)doCopyAmount:(id)amount depositAddress:(NSString * _Nullable)depositAddress __attribute__((swift_name("doCopy(amount:depositAddress:)")));
+
+/** ZEC→USDC bridge in flight. [depositAddress] is the 1-Click handle, null until the quote returns. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** ZEC→USDC bridge in flight. [depositAddress] is the 1-Click handle, null until the quote returns. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** ZEC→USDC bridge in flight. [depositAddress] is the 1-Click handle, null until the quote returns. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/** Bridge settled; the account now holds [baseBalance], having added [addedAmount]. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BridgeToBaseStatusComplete")))
+@interface ZappOfframpBridgeToBaseStatusComplete : ZappOfframpBase <ZappOfframpBridgeToBaseStatus>
+@property (readonly) id addedAmount __attribute__((swift_name("addedAmount")));
+@property (readonly) id baseBalance __attribute__((swift_name("baseBalance")));
+- (instancetype)initWithAddedAmount:(id)addedAmount baseBalance:(id)baseBalance __attribute__((swift_name("init(addedAmount:baseBalance:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpBridgeToBaseStatusComplete *)doCopyAddedAmount:(id)addedAmount baseBalance:(id)baseBalance __attribute__((swift_name("doCopy(addedAmount:baseBalance:)")));
+
+/** Bridge settled; the account now holds [baseBalance], having added [addedAmount]. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Bridge settled; the account now holds [baseBalance], having added [addedAmount]. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Bridge settled; the account now holds [baseBalance], having added [addedAmount]. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Bridge failed. [depositAddress] is non-null once a bridge was opened (so a transient failure
+ * can be resumed); [cause] lets the UI distinguish a terminal 1-Click failure from a retryable one.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BridgeToBaseStatusFailed")))
+@interface ZappOfframpBridgeToBaseStatusFailed : ZappOfframpBase <ZappOfframpBridgeToBaseStatus>
+@property (readonly) ZappOfframpKotlinThrowable * _Nullable cause __attribute__((swift_name("cause")));
+@property (readonly) NSString * _Nullable depositAddress __attribute__((swift_name("depositAddress")));
+@property (readonly) NSString *message __attribute__((swift_name("message")));
+- (instancetype)initWithMessage:(NSString *)message depositAddress:(NSString * _Nullable)depositAddress cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:depositAddress:cause:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpBridgeToBaseStatusFailed *)doCopyMessage:(NSString *)message depositAddress:(NSString * _Nullable)depositAddress cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("doCopy(message:depositAddress:cause:)")));
+
+/**
+ * Bridge failed. [depositAddress] is non-null once a bridge was opened (so a transient failure
+ * can be resumed); [cause] lets the UI distinguish a terminal 1-Click failure from a retryable one.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Bridge failed. [depositAddress] is non-null once a bridge was opened (so a transient failure
+ * can be resumed); [cause] lets the UI distinguish a terminal 1-Click failure from a retryable one.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Bridge failed. [depositAddress] is non-null once a bridge was opened (so a transient failure
+ * can be resumed); [cause] lets the UI distinguish a terminal 1-Click failure from a retryable one.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BridgeToBaseStatusIdle")))
+@interface ZappOfframpBridgeToBaseStatusIdle : ZappOfframpBase <ZappOfframpBridgeToBaseStatus>
+@property (class, readonly, getter=shared) ZappOfframpBridgeToBaseStatusIdle *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)idle __attribute__((swift_name("init()")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Wholesale port of the p2p.me Diamond's custom-error selector table. Every selector the
+ * contract emits is mapped to its canonical SDK code (`contracts/errors.ts`) and English
+ * fallback copy (`contracts/error-messages.ts`). Keeps us byte-aligned with the SDK; do not
+ * edit by hand. See the generator header for regeneration.
+ *
+ * Curated PAY-flow reverts render localised `R.string.*` copy via [KnownRevertReason]; the
+ * uncurated long tail falls back to the English [Entry.message] here.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KnownContractErrors")))
+@interface ZappOfframpKnownContractErrors : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKnownContractErrors *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t size __attribute__((swift_name("size")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Wholesale port of the p2p.me Diamond's custom-error selector table. Every selector the
+ * contract emits is mapped to its canonical SDK code (`contracts/errors.ts`) and English
+ * fallback copy (`contracts/error-messages.ts`). Keeps us byte-aligned with the SDK; do not
+ * edit by hand. See the generator header for regeneration.
+ *
+ * Curated PAY-flow reverts render localised `R.string.*` copy via [KnownRevertReason]; the
+ * uncurated long tail falls back to the English [Entry.message] here.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)knownContractErrors __attribute__((swift_name("init()")));
+
+/** Full SDK entry (code + English message) for [selector], or null. */
+- (ZappOfframpKnownContractErrorsEntry * _Nullable)entryForSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("entryFor(selector:)")));
+
+/** English fallback message (`"Order expired"`) for [selector], or null. */
+- (NSString * _Nullable)messageForSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("messageFor(selector:)")));
+
+/** Canonical SDK code (`ORDER_EXPIRED`) for [selector], or null. */
+- (NSString * _Nullable)nameForSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("nameFor(selector:)")));
+
+/** Total count of mapped selectors. Exposed for SDK-parity tests. */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KnownContractErrors.Entry")))
+@interface ZappOfframpKnownContractErrorsEntry : ZappOfframpBase
+@property (readonly) NSString *message __attribute__((swift_name("message")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+- (instancetype)initWithName:(NSString *)name message:(NSString *)message __attribute__((swift_name("init(name:message:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKnownContractErrorsEntry *)doCopyName:(NSString *)name message:(NSString *)message __attribute__((swift_name("doCopy(name:message:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Curated subset of [KnownContractErrors] that the PAY offramp flow can surface with a localised,
+ * user-actionable message. Add a variant here only if the UI knows how to explain it; otherwise
+ * let the orchestrator fall through to the raw SDK error name from [KnownContractErrors.nameFor].
+ *
+ * Names match the canonical p2p.me SDK constants (`p2pdotme-sdk/src/contracts/errors.ts`) for
+ * cross-referencing. The UI layer maps each variant to a `R.string.*` resource; this module stays
+ * free of English copy. (The long-tail [KnownContractErrors.messageFor] carries SDK copy for the
+ * uncurated errors — that is a deliberate exception, scoped to non-PAY-flow diagnostics.)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KnownRevertReason")))
+@interface ZappOfframpKnownRevertReason : ZappOfframpKotlinEnum<ZappOfframpKnownRevertReason *>
+@property (class, readonly) ZappOfframpKnownRevertReason *buyorderamountexceedslimit __attribute__((swift_name("buyorderamountexceedslimit")));
+@property (class, readonly) ZappOfframpKnownRevertReason *insufficientreputation __attribute__((swift_name("insufficientreputation")));
+@property (class, readonly) ZappOfframpKnownRevertReason *orderamountexceedslimit __attribute__((swift_name("orderamountexceedslimit")));
+@property (class, readonly) ZappOfframpKnownRevertReason *sellamountexceedsfiatlimit __attribute__((swift_name("sellamountexceedsfiatlimit")));
+@property (class, readonly) ZappOfframpKnownRevertReason *currencynotsupported __attribute__((swift_name("currencynotsupported")));
+@property (class, readonly) ZappOfframpKnownRevertReason *userisblacklisted __attribute__((swift_name("userisblacklisted")));
+@property (class, readonly) ZappOfframpKnownRevertReason *exchangenotoperational __attribute__((swift_name("exchangenotoperational")));
+@property (class, readonly) ZappOfframpKnownRevertReason *notenougheligiblemerchants __attribute__((swift_name("notenougheligiblemerchants")));
+@property (class, readonly) ZappOfframpKnownRevertReason *orderexpired __attribute__((swift_name("orderexpired")));
+@property (class, readonly) ZappOfframpKnownRevertReason *upialreadysent __attribute__((swift_name("upialreadysent")));
+@property (class, readonly) ZappOfframpKnownRevertReason *invalidorderupi __attribute__((swift_name("invalidorderupi")));
+@property (class, readonly) ZappOfframpKnownRevertReason *ordernotaccepted __attribute__((swift_name("ordernotaccepted")));
+@property (class, readonly) ZappOfframpKnownRevertReason *usdctransferfailed __attribute__((swift_name("usdctransferfailed")));
+@property (class, readonly) ZappOfframpKnownRevertReason *notauthorized __attribute__((swift_name("notauthorized")));
+@property (class, readonly) NSArray<ZappOfframpKnownRevertReason *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Curated subset of [KnownContractErrors] that the PAY offramp flow can surface with a localised,
+ * user-actionable message. Add a variant here only if the UI knows how to explain it; otherwise
+ * let the orchestrator fall through to the raw SDK error name from [KnownContractErrors.nameFor].
+ *
+ * Names match the canonical p2p.me SDK constants (`p2pdotme-sdk/src/contracts/errors.ts`) for
+ * cross-referencing. The UI layer maps each variant to a `R.string.*` resource; this module stays
+ * free of English copy. (The long-tail [KnownContractErrors.messageFor] carries SDK copy for the
+ * uncurated errors — that is a deliberate exception, scoped to non-PAY-flow diagnostics.)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpKnownRevertReason *> *)values __attribute__((swift_name("values()")));
+@end
+
+
+/**
+ * Two-layer revert decoder:
+ *
+ * 1. [explain] returns a [KnownRevertReason] for selectors we want to surface with a
+ *    user-actionable, localised message. Curated against the PAY flow.
+ * 2. [sdkName] / [sdkMessage] fall through to the wholesale [KnownContractErrors] table
+ *    (generated from `p2pdotme-sdk/src/contracts/errors.ts` + `error-messages.ts`).
+ *
+ * The orchestrator usually wants all three at once: call [lookup] for a single map probe.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KnownReverts")))
+@interface ZappOfframpKnownReverts : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKnownReverts *shared __attribute__((swift_name("shared")));
+@property (readonly) NSSet<ZappOfframpSelector4 *> *curatedSelectors __attribute__((swift_name("curatedSelectors")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Two-layer revert decoder:
+ *
+ * 1. [explain] returns a [KnownRevertReason] for selectors we want to surface with a
+ *    user-actionable, localised message. Curated against the PAY flow.
+ * 2. [sdkName] / [sdkMessage] fall through to the wholesale [KnownContractErrors] table
+ *    (generated from `p2pdotme-sdk/src/contracts/errors.ts` + `error-messages.ts`).
+ *
+ * The orchestrator usually wants all three at once: call [lookup] for a single map probe.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)knownReverts __attribute__((swift_name("init()")));
+- (ZappOfframpKnownRevertReason * _Nullable)explainSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("explain(selector:)")));
+
+/** One map probe returning the curated reason + SDK name + SDK message together. */
+- (ZappOfframpKnownRevertsLookup *)lookupSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("lookup(selector:)")));
+- (NSString * _Nullable)sdkMessageSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("sdkMessage(selector:)")));
+- (NSString * _Nullable)sdkNameSelector:(ZappOfframpSelector4 * _Nullable)selector __attribute__((swift_name("sdkName(selector:)")));
+
+/**
+ * Extracts a 4-byte revert selector from a bundler/JSON-RPC error message, if one is present.
+ * ERC-4337 reverts surface as an [xyz.justzappit.evm.rpc.RpcException.Unknown] message rather than a
+ * structured `ExecutionReverted`, so this lets the orchestrator recover the selector and map it
+ * through [explain] / [sdkName] just like a node-level revert.
+ */
+- (ZappOfframpSelector4 * _Nullable)selectorFromMessageMessage:(NSString * _Nullable)message __attribute__((swift_name("selectorFromMessage(message:)")));
+
+/**
+ * The selectors that have a curated [KnownRevertReason]. Exposed so the wholesale-table
+ * coverage test can iterate over the actual source of truth — adding a CURATED entry
+ * automatically extends test coverage, instead of silently bypassing it.
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KnownReverts.Lookup")))
+@interface ZappOfframpKnownRevertsLookup : ZappOfframpBase
+@property (readonly) ZappOfframpKnownRevertReason * _Nullable reason __attribute__((swift_name("reason")));
+@property (readonly) NSString * _Nullable sdkMessage __attribute__((swift_name("sdkMessage")));
+@property (readonly) NSString * _Nullable sdkName __attribute__((swift_name("sdkName")));
+- (instancetype)initWithReason:(ZappOfframpKnownRevertReason * _Nullable)reason sdkName:(NSString * _Nullable)sdkName sdkMessage:(NSString * _Nullable)sdkMessage __attribute__((swift_name("init(reason:sdkName:sdkMessage:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKnownRevertsLookup *)doCopyReason:(ZappOfframpKnownRevertReason * _Nullable)reason sdkName:(NSString * _Nullable)sdkName sdkMessage:(NSString * _Nullable)sdkMessage __attribute__((swift_name("doCopy(reason:sdkName:sdkMessage:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpCheckpoint")))
+@interface ZappOfframpOfframpCheckpoint : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpOfframpCheckpointCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) ZappOfframpTxHash * _Nullable approveTxHash __attribute__((swift_name("approveTxHash")));
+@property (readonly) NSString * _Nullable bridgeDepositAddress __attribute__((swift_name("bridgeDepositAddress")));
+@property (readonly) int64_t createdAtMillis __attribute__((swift_name("createdAtMillis")));
+@property (readonly) ZappOfframpCurrencyCode *currency __attribute__((swift_name("currency")));
+@property (readonly) ZappOfframpOfframpStep *currentStep __attribute__((swift_name("currentStep")));
+@property (readonly) id _Nullable fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) id _Nullable fiatAmountLimit __attribute__((swift_name("fiatAmountLimit")));
+@property (readonly) NSString * _Nullable fiatAmountLimitMicroDecimal __attribute__((swift_name("fiatAmountLimitMicroDecimal")));
+@property (readonly) NSString * _Nullable fiatAmountMicroDecimal __attribute__((swift_name("fiatAmountMicroDecimal")));
+@property (readonly) NSString * _Nullable orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpBigInteger * _Nullable orderIdBig __attribute__((swift_name("orderIdBig")));
+@property (readonly) NSString * _Nullable payeeName __attribute__((swift_name("payeeName")));
+@property (readonly) ZappOfframpTxHash * _Nullable placeOrderTxHash __attribute__((swift_name("placeOrderTxHash")));
+@property (readonly) NSString *recipientUpi __attribute__((swift_name("recipientUpi")));
+@property (readonly) ZappOfframpTxHash * _Nullable setUpiTxHash __attribute__((swift_name("setUpiTxHash")));
+@property (readonly) id usdcAmount __attribute__((swift_name("usdcAmount")));
+@property (readonly) NSString *usdcAmountMicroDecimal __attribute__((swift_name("usdcAmountMicroDecimal")));
+- (instancetype)initWithOrderId:(NSString * _Nullable)orderId currentStep:(ZappOfframpOfframpStep *)currentStep bridgeDepositAddress:(NSString * _Nullable)bridgeDepositAddress approveTxHash:(ZappOfframpTxHash * _Nullable)approveTxHash placeOrderTxHash:(ZappOfframpTxHash * _Nullable)placeOrderTxHash setUpiTxHash:(ZappOfframpTxHash * _Nullable)setUpiTxHash recipientUpi:(NSString *)recipientUpi usdcAmountMicroDecimal:(NSString *)usdcAmountMicroDecimal fiatAmountMicroDecimal:(NSString * _Nullable)fiatAmountMicroDecimal fiatAmountLimitMicroDecimal:(NSString * _Nullable)fiatAmountLimitMicroDecimal payeeName:(NSString * _Nullable)payeeName currency:(ZappOfframpCurrencyCode *)currency createdAtMillis:(int64_t)createdAtMillis __attribute__((swift_name("init(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpCheckpoint *)doCopyOrderId:(NSString * _Nullable)orderId currentStep:(ZappOfframpOfframpStep *)currentStep bridgeDepositAddress:(NSString * _Nullable)bridgeDepositAddress approveTxHash:(ZappOfframpTxHash * _Nullable)approveTxHash placeOrderTxHash:(ZappOfframpTxHash * _Nullable)placeOrderTxHash setUpiTxHash:(ZappOfframpTxHash * _Nullable)setUpiTxHash recipientUpi:(NSString *)recipientUpi usdcAmountMicroDecimal:(NSString *)usdcAmountMicroDecimal fiatAmountMicroDecimal:(NSString * _Nullable)fiatAmountMicroDecimal fiatAmountLimitMicroDecimal:(NSString * _Nullable)fiatAmountLimitMicroDecimal payeeName:(NSString * _Nullable)payeeName currency:(ZappOfframpCurrencyCode *)currency createdAtMillis:(int64_t)createdAtMillis __attribute__((swift_name("doCopy(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)")));
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpOfframpRequest *)toRequestFallbackFiatAmount:(id)fallbackFiatAmount __attribute__((swift_name("toRequest(fallbackFiatAmount:)")));
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * 1-Click deposit address of an in-flight ZEC→USDC bridge (mainnet), persisted the moment the
+ * bridge opens — before any ZEC moves. On resume a non-null value is re-polled to completion
+ * rather than re-quoted, so a crash mid-bridge can never open a second bridge (double-send).
+ * Null on testnet (pre-funded) and once the order has been placed.
+ */
+
+/**
+ * Nullable for back-compat with checkpoints written before fiat was tracked; resume falls back
+ * to live sellPrice.
+ */
+@end
+
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpCheckpoint.Companion")))
+@interface ZappOfframpOfframpCheckpointCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOfframpCheckpointCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Resumable snapshot of an in-flight offramp order. Persisted after every on-chain checkpoint so
+ * that process death between broadcasts doesn't orphan the user's USDC.
+ *
+ * Wire format intentionally stores the orderId + amount as decimal strings: encrypted preferences
+ * are human-readable enough to triage and we don't want a serialization-library upgrade silently
+ * changing how `BigInteger`/`Usdc6` round-trip. [orderIdBig] / [usdcAmount] convert on read; the
+ * primary constructor validates eagerly so a corrupt blob fails at decode time, not later inside
+ * the resume path.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpOrchestrator")))
+@interface ZappOfframpOfframpOrchestrator : ZappOfframpBase <ZappOfframpOfframpDriver>
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc submitter:(id<ZappOfframpTxSubmitter>)submitter accountAddress:(ZappOfframpAddress *)accountAddress network:(ZappOfframpP2pNetworkConfig *)network subgraph:(ZappOfframpSubgraphClient *)subgraph orderReader:(id<ZappOfframpOrderReadSource>)orderReader funding:(id<ZappOfframpOfframpFunding>)funding refund:(id<ZappOfframpOfframpRefund>)refund topUp:(id<ZappOfframpOfframpTopUp>)topUp router:(ZappOfframpCircleRouter *)router pollIntervalMs:(int64_t)pollIntervalMs stalledAfterMs:(int64_t)stalledAfterMs clockMs:(ZappOfframpLong *(^)(void))clockMs onChainOrderReader:(id<ZappOfframpOrderReadSource>)onChainOrderReader relayIdentityStore:(id<ZappOfframpRelayIdentityStore>)relayIdentityStore orderRecipientUpiCache:(id<ZappOfframpOrderRecipientUpiCache>)orderRecipientUpiCache __attribute__((swift_name("init(rpc:submitter:accountAddress:network:subgraph:orderReader:funding:refund:topUp:router:pollIntervalMs:stalledAfterMs:clockMs:onChainOrderReader:relayIdentityStore:orderRecipientUpiCache:)"))) __attribute__((objc_designated_initializer));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeFundsBackToZecOrderId:(ZappOfframpBigInteger * _Nullable)orderId __attribute__((swift_name("bridgeFundsBackToZec(orderId:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)bridgeToBaseAddUsdc:(id)addUsdc resumeBridgeHandle:(NSString * _Nullable)resumeBridgeHandle __attribute__((swift_name("bridgeToBase(addUsdc:resumeBridgeHandle:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)isMerchantAvailableUsdc:(id)usdc currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("isMerchantAvailable(usdc:currency:completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)resumeCheckpoint:(ZappOfframpOfframpCheckpoint *)checkpoint paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("resume(checkpoint:paymentDetailsProvider:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreFlow>)runRequest:(ZappOfframpOfframpRequest *)request paymentDetailsProvider:(id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable)paymentDetailsProvider __attribute__((swift_name("run(request:paymentDetailsProvider:)")));
+@end
+
+
+/**
+ * Merchant payment details captured after a PAY order is accepted.
+ *
+ * [rawPayload] is the exact scanned QR payload to sign/encrypt for setSellOrderUpi. This mirrors the
+ * p2p.me web client, which validates the QR but submits the original scanned string.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpPaymentDetails")))
+@interface ZappOfframpOfframpPaymentDetails : ZappOfframpBase
+@property (readonly) ZappOfframpBigDecimal * _Nullable fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) NSString *paymentAddress __attribute__((swift_name("paymentAddress")));
+@property (readonly) NSString *rawPayload __attribute__((swift_name("rawPayload")));
+- (instancetype)initWithRawPayload:(NSString *)rawPayload paymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("init(rawPayload:paymentAddress:fiatAmount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpPaymentDetails *)doCopyRawPayload:(NSString *)rawPayload paymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("doCopy(rawPayload:paymentAddress:fiatAmount:)")));
+
+/**
+ * Merchant payment details captured after a PAY order is accepted.
+ *
+ * [rawPayload] is the exact scanned QR payload to sign/encrypt for setSellOrderUpi. This mirrors the
+ * p2p.me web client, which validates the QR but submits the original scanned string.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Merchant payment details captured after a PAY order is accepted.
+ *
+ * [rawPayload] is the exact scanned QR payload to sign/encrypt for setSellOrderUpi. This mirrors the
+ * p2p.me web client, which validates the QR but submits the original scanned string.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Merchant payment details captured after a PAY order is accepted.
+ *
+ * [rawPayload] is the exact scanned QR payload to sign/encrypt for setSellOrderUpi. This mirrors the
+ * p2p.me web client, which validates the QR but submits the original scanned string.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("OfframpPaymentDetailsProvider")))
+@protocol ZappOfframpOfframpPaymentDetailsProvider
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)requestPaymentDetailsOrderId:(ZappOfframpBigInteger *)orderId accepted:(ZappOfframpOrderSnapshot *)accepted request:(ZappOfframpOfframpRequest *)request completionHandler:(void (^)(ZappOfframpOfframpPaymentDetails * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("requestPaymentDetails(orderId:accepted:request:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpRequest")))
+@interface ZappOfframpOfframpRequest : ZappOfframpBase
+@property (readonly) ZappOfframpCurrencyCode *currency __attribute__((swift_name("currency")));
+@property (readonly) id fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) id _Nullable fiatAmountLimit __attribute__((swift_name("fiatAmountLimit")));
+@property (readonly) NSString * _Nullable payeeName __attribute__((swift_name("payeeName")));
+@property (readonly) NSString *recipientUpi __attribute__((swift_name("recipientUpi")));
+@property (readonly) id usdcAmount __attribute__((swift_name("usdcAmount")));
+- (instancetype)initWithRecipientUpi:(NSString *)recipientUpi usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currency:(ZappOfframpCurrencyCode *)currency payeeName:(NSString * _Nullable)payeeName fiatAmountLimit:(id _Nullable)fiatAmountLimit __attribute__((swift_name("init(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpRequest *)doCopyRecipientUpi:(NSString *)recipientUpi usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currency:(ZappOfframpCurrencyCode *)currency payeeName:(NSString * _Nullable)payeeName fiatAmountLimit:(id _Nullable)fiatAmountLimit __attribute__((swift_name("doCopy(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * User-quoted fiat in 6-decimal micros (e.g. `37_280_000` ⇒ ₹37.28). For Scan & Pay this is
+ * the amount used to place the PAY order; the accepted merchant receives the scanned QR payload
+ * later through [OfframpPaymentDetailsProvider].
+ */
+
+/** `placeOrder._fiatAmountLimit`: contract slippage floor. Null/ZERO disables it. */
+
+/** Optional `pn=` display name. */
+
+/**
+ * Legacy/manual path recipient. Scan & Pay orders leave this blank until the merchant accepts,
+ * then provide the scanned QR payload through [OfframpPaymentDetailsProvider].
+ */
+@end
+
+__attribute__((swift_name("OfframpStatus")))
+@interface ZappOfframpOfframpStatus : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.ApprovingUsdc")))
+@interface ZappOfframpOfframpStatusApprovingUsdc : ZappOfframpOfframpStatus
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) ZappOfframpTxHash *txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithTxHash:(ZappOfframpTxHash *)txHash amount:(id)amount __attribute__((swift_name("init(txHash:amount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusApprovingUsdc *)doCopyTxHash:(ZappOfframpTxHash *)txHash amount:(id)amount __attribute__((swift_name("doCopy(txHash:amount:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Mainnet only: a ZEC→USDC NEAR bridge is in flight to fund the smart account. [depositAddress]
+ * is the 1-Click handle the orchestrator persists so the bridge can be resumed after process
+ * death; null until the quote returns. Testnet skips this (the account is pre-funded).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.BridgingFunds")))
+@interface ZappOfframpOfframpStatusBridgingFunds : ZappOfframpOfframpStatus
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) NSString * _Nullable depositAddress __attribute__((swift_name("depositAddress")));
+- (instancetype)initWithAmount:(id)amount depositAddress:(NSString * _Nullable)depositAddress __attribute__((swift_name("init(amount:depositAddress:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusBridgingFunds *)doCopyAmount:(id)amount depositAddress:(NSString * _Nullable)depositAddress __attribute__((swift_name("doCopy(amount:depositAddress:)")));
+
+/**
+ * Mainnet only: a ZEC→USDC NEAR bridge is in flight to fund the smart account. [depositAddress]
+ * is the 1-Click handle the orchestrator persists so the bridge can be resumed after process
+ * death; null until the quote returns. Testnet skips this (the account is pre-funded).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Mainnet only: a ZEC→USDC NEAR bridge is in flight to fund the smart account. [depositAddress]
+ * is the 1-Click handle the orchestrator persists so the bridge can be resumed after process
+ * death; null until the quote returns. Testnet skips this (the account is pre-funded).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Mainnet only: a ZEC→USDC NEAR bridge is in flight to fund the smart account. [depositAddress]
+ * is the 1-Click handle the orchestrator persists so the bridge can be resumed after process
+ * death; null until the quote returns. Testnet skips this (the account is pre-funded).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Order observed in on-chain CANCELLED status. Normal terminal: either the user called
+ * cancelOrder themselves, or the executor's order-sweeper auto-cancelled after the Diamond's
+ * 30-min expiry window. USDC has been refunded to the offramp account on-chain. Distinct from
+ * [Failed], which signals a genuine error (revert, RPC death, etc.).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.Cancelled")))
+@interface ZappOfframpOfframpStatusCancelled : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpAddress * _Nullable acceptedMerchant __attribute__((swift_name("acceptedMerchant")));
+@property (readonly) ZappOfframpLong * _Nullable cancelledAtEpochSeconds __attribute__((swift_name("cancelledAtEpochSeconds")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) id _Nullable refundedUsdcAmount __attribute__((swift_name("refundedUsdcAmount")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds refundedUsdcAmount:(id _Nullable)refundedUsdcAmount acceptedMerchant:(ZappOfframpAddress * _Nullable)acceptedMerchant __attribute__((swift_name("init(orderId:cancelledAtEpochSeconds:refundedUsdcAmount:acceptedMerchant:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusCancelled *)doCopyOrderId:(ZappOfframpBigInteger *)orderId cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds refundedUsdcAmount:(id _Nullable)refundedUsdcAmount acceptedMerchant:(ZappOfframpAddress * _Nullable)acceptedMerchant __attribute__((swift_name("doCopy(orderId:cancelledAtEpochSeconds:refundedUsdcAmount:acceptedMerchant:)")));
+
+/**
+ * Order observed in on-chain CANCELLED status. Normal terminal: either the user called
+ * cancelOrder themselves, or the executor's order-sweeper auto-cancelled after the Diamond's
+ * 30-min expiry window. USDC has been refunded to the offramp account on-chain. Distinct from
+ * [Failed], which signals a genuine error (revert, RPC death, etc.).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Order observed in on-chain CANCELLED status. Normal terminal: either the user called
+ * cancelOrder themselves, or the executor's order-sweeper auto-cancelled after the Diamond's
+ * 30-min expiry window. USDC has been refunded to the offramp account on-chain. Distinct from
+ * [Failed], which signals a genuine error (revert, RPC death, etc.).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Order observed in on-chain CANCELLED status. Normal terminal: either the user called
+ * cancelOrder themselves, or the executor's order-sweeper auto-cancelled after the Diamond's
+ * 30-min expiry window. USDC has been refunded to the offramp account on-chain. Distinct from
+ * [Failed], which signals a genuine error (revert, RPC death, etc.).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.Completed")))
+@interface ZappOfframpOfframpStatusCompleted : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) ZappOfframpAddress *acceptedMerchant __attribute__((swift_name("acceptedMerchant")));
+@property (readonly) ZappOfframpLong * _Nullable completedAtEpochSeconds __attribute__((swift_name("completedAtEpochSeconds")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpLong * _Nullable paidAtEpochSeconds __attribute__((swift_name("paidAtEpochSeconds")));
+@property (readonly) ZappOfframpLong * _Nullable placedAtEpochSeconds __attribute__((swift_name("placedAtEpochSeconds")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId acceptedMerchant:(ZappOfframpAddress *)acceptedMerchant placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds __attribute__((swift_name("init(orderId:acceptedMerchant:placedAtEpochSeconds:acceptedAtEpochSeconds:paidAtEpochSeconds:completedAtEpochSeconds:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusCompleted *)doCopyOrderId:(ZappOfframpBigInteger *)orderId acceptedMerchant:(ZappOfframpAddress *)acceptedMerchant placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds __attribute__((swift_name("doCopy(orderId:acceptedMerchant:placedAtEpochSeconds:acceptedAtEpochSeconds:paidAtEpochSeconds:completedAtEpochSeconds:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.Failed")))
+@interface ZappOfframpOfframpStatusFailed : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpKotlinThrowable * _Nullable cause __attribute__((swift_name("cause")));
+@property (readonly) ZappOfframpKnownRevertReason * _Nullable knownRevertReason __attribute__((swift_name("knownRevertReason")));
+@property (readonly) NSString *message __attribute__((swift_name("message")));
+@property (readonly) ZappOfframpBigInteger * _Nullable orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpSelector4 * _Nullable revertSelector __attribute__((swift_name("revertSelector")));
+@property (readonly) NSString * _Nullable sdkErrorMessage __attribute__((swift_name("sdkErrorMessage")));
+@property (readonly) NSString * _Nullable sdkErrorName __attribute__((swift_name("sdkErrorName")));
+@property (readonly) NSString * _Nullable solidityErrorString __attribute__((swift_name("solidityErrorString")));
+@property (readonly) ZappOfframpOfframpStep *step __attribute__((swift_name("step")));
+@property (readonly) ZappOfframpTxHash * _Nullable txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithMessage:(NSString *)message orderId:(ZappOfframpBigInteger * _Nullable)orderId step:(ZappOfframpOfframpStep *)step txHash:(ZappOfframpTxHash * _Nullable)txHash revertSelector:(ZappOfframpSelector4 * _Nullable)revertSelector knownRevertReason:(ZappOfframpKnownRevertReason * _Nullable)knownRevertReason sdkErrorName:(NSString * _Nullable)sdkErrorName sdkErrorMessage:(NSString * _Nullable)sdkErrorMessage solidityErrorString:(NSString * _Nullable)solidityErrorString cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusFailed *)doCopyMessage:(NSString *)message orderId:(ZappOfframpBigInteger * _Nullable)orderId step:(ZappOfframpOfframpStep *)step txHash:(ZappOfframpTxHash * _Nullable)txHash revertSelector:(ZappOfframpSelector4 * _Nullable)revertSelector knownRevertReason:(ZappOfframpKnownRevertReason * _Nullable)knownRevertReason sdkErrorName:(NSString * _Nullable)sdkErrorName sdkErrorMessage:(NSString * _Nullable)sdkErrorMessage solidityErrorString:(NSString * _Nullable)solidityErrorString cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("doCopy(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * Human-readable English copy for [sdkErrorName] from [KnownContractErrors]. The UI shows
+ * this for the long tail so the user reads "Order expired" rather than the raw
+ * `ORDER_EXPIRED` code; `null` when the selector is outside the SDK table.
+ */
+
+/**
+ * Long-tail SDK error name from [KnownContractErrors] when [knownRevertReason] is null but
+ * the selector is one the SDK recognises. Lets the UI render "Contract error: FOO" instead
+ * of dumping the raw 4-byte selector for the ~115 errors we don't curate.
+ */
+@end
+
+
+/**
+ * Funding step short-circuited: the smart account already held [baseBalance] ≥ the order
+ * amount, so no NEAR bridge ran. Distinct from [BridgingFunds] so the UI can render
+ * "Using Base balance" instead of "Bridging funds".
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.FundedFromBase")))
+@interface ZappOfframpOfframpStatusFundedFromBase : ZappOfframpOfframpStatus
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) id baseBalance __attribute__((swift_name("baseBalance")));
+- (instancetype)initWithAmount:(id)amount baseBalance:(id)baseBalance __attribute__((swift_name("init(amount:baseBalance:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusFundedFromBase *)doCopyAmount:(id)amount baseBalance:(id)baseBalance __attribute__((swift_name("doCopy(amount:baseBalance:)")));
+
+/**
+ * Funding step short-circuited: the smart account already held [baseBalance] ≥ the order
+ * amount, so no NEAR bridge ran. Distinct from [BridgingFunds] so the UI can render
+ * "Using Base balance" instead of "Bridging funds".
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Funding step short-circuited: the smart account already held [baseBalance] ≥ the order
+ * amount, so no NEAR bridge ran. Distinct from [BridgingFunds] so the UI can render
+ * "Using Base balance" instead of "Bridging funds".
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Funding step short-circuited: the smart account already held [baseBalance] ≥ the order
+ * amount, so no NEAR bridge ran. Distinct from [BridgingFunds] so the UI can render
+ * "Using Base balance" instead of "Bridging funds".
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Terminal state for the funded-but-unplaced recovery: a mainnet funding bridge delivered USDC
+ * but the order was never placed (e.g. the route vanished or placeOrder reverted), so the user
+ * pulled the stranded USDC back out of the smart account. [amount] is what was recovered;
+ * [target] is the pull-back destination (a NEAR deposit address on mainnet), null if the USDC was
+ * left in the self-custodial account (testnet / no route).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.FundsRecovered")))
+@interface ZappOfframpOfframpStatusFundsRecovered : ZappOfframpOfframpStatus
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) ZappOfframpAddress * _Nullable target __attribute__((swift_name("target")));
+@property (readonly) ZappOfframpTxHash * _Nullable txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithAmount:(id)amount target:(ZappOfframpAddress * _Nullable)target txHash:(ZappOfframpTxHash * _Nullable)txHash __attribute__((swift_name("init(amount:target:txHash:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusFundsRecovered *)doCopyAmount:(id)amount target:(ZappOfframpAddress * _Nullable)target txHash:(ZappOfframpTxHash * _Nullable)txHash __attribute__((swift_name("doCopy(amount:target:txHash:)")));
+
+/**
+ * Terminal state for the funded-but-unplaced recovery: a mainnet funding bridge delivered USDC
+ * but the order was never placed (e.g. the route vanished or placeOrder reverted), so the user
+ * pulled the stranded USDC back out of the smart account. [amount] is what was recovered;
+ * [target] is the pull-back destination (a NEAR deposit address on mainnet), null if the USDC was
+ * left in the self-custodial account (testnet / no route).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Terminal state for the funded-but-unplaced recovery: a mainnet funding bridge delivered USDC
+ * but the order was never placed (e.g. the route vanished or placeOrder reverted), so the user
+ * pulled the stranded USDC back out of the smart account. [amount] is what was recovered;
+ * [target] is the pull-back destination (a NEAR deposit address on mainnet), null if the USDC was
+ * left in the self-custodial account (testnet / no route).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Terminal state for the funded-but-unplaced recovery: a mainnet funding bridge delivered USDC
+ * but the order was never placed (e.g. the route vanished or placeOrder reverted), so the user
+ * pulled the stranded USDC back out of the smart account. [amount] is what was recovered;
+ * [target] is the pull-back destination (a NEAR deposit address on mainnet), null if the USDC was
+ * left in the self-custodial account (testnet / no route).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.Idle")))
+@interface ZappOfframpOfframpStatusIdle : ZappOfframpOfframpStatus
+@property (class, readonly, getter=shared) ZappOfframpOfframpStatusIdle *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)idle __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.PlacingOrder")))
+@interface ZappOfframpOfframpStatusPlacingOrder : ZappOfframpOfframpStatus
+@property (readonly) id amount __attribute__((swift_name("amount")));
+@property (readonly) ZappOfframpBigInteger *circleId __attribute__((swift_name("circleId")));
+@property (readonly) ZappOfframpTxHash *txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithTxHash:(ZappOfframpTxHash *)txHash circleId:(ZappOfframpBigInteger *)circleId amount:(id)amount __attribute__((swift_name("init(txHash:circleId:amount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusPlacingOrder *)doCopyTxHash:(ZappOfframpTxHash *)txHash circleId:(ZappOfframpBigInteger *)circleId amount:(id)amount __attribute__((swift_name("doCopy(txHash:circleId:amount:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.SelectingCircle")))
+@interface ZappOfframpOfframpStatusSelectingCircle : ZappOfframpOfframpStatus
+@property (readonly) int32_t candidateCount __attribute__((swift_name("candidateCount")));
+@property (readonly) ZappOfframpBigInteger * _Nullable selectedCircleId __attribute__((swift_name("selectedCircleId")));
+- (instancetype)initWithCandidateCount:(int32_t)candidateCount selectedCircleId:(ZappOfframpBigInteger * _Nullable)selectedCircleId __attribute__((swift_name("init(candidateCount:selectedCircleId:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusSelectingCircle *)doCopyCandidateCount:(int32_t)candidateCount selectedCircleId:(ZappOfframpBigInteger * _Nullable)selectedCircleId __attribute__((swift_name("doCopy(candidateCount:selectedCircleId:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.SendingEncryptedUpi")))
+@interface ZappOfframpOfframpStatusSendingEncryptedUpi : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) ZappOfframpAddress *merchantAddress __attribute__((swift_name("merchantAddress")));
+@property (readonly) NSString *merchantPubKey __attribute__((swift_name("merchantPubKey")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) NSString *paymentAddress __attribute__((swift_name("paymentAddress")));
+@property (readonly) ZappOfframpTxHash *txHash __attribute__((swift_name("txHash")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId txHash:(ZappOfframpTxHash *)txHash merchantAddress:(ZappOfframpAddress *)merchantAddress merchantPubKey:(NSString *)merchantPubKey paymentAddress:(NSString *)paymentAddress acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds __attribute__((swift_name("init(orderId:txHash:merchantAddress:merchantPubKey:paymentAddress:acceptedAtEpochSeconds:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusSendingEncryptedUpi *)doCopyOrderId:(ZappOfframpBigInteger *)orderId txHash:(ZappOfframpTxHash *)txHash merchantAddress:(ZappOfframpAddress *)merchantAddress merchantPubKey:(NSString *)merchantPubKey paymentAddress:(NSString *)paymentAddress acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds __attribute__((swift_name("doCopy(orderId:txHash:merchantAddress:merchantPubKey:paymentAddress:acceptedAtEpochSeconds:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.WaitingForCompletion")))
+@interface ZappOfframpOfframpStatusWaitingForCompletion : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) BOOL expired __attribute__((swift_name("expired")));
+@property (readonly) ZappOfframpOrderStatus * _Nullable lastObservedStatus __attribute__((swift_name("lastObservedStatus")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpLong * _Nullable paidAtEpochSeconds __attribute__((swift_name("paidAtEpochSeconds")));
+@property (readonly) int32_t pollAttempts __attribute__((swift_name("pollAttempts")));
+@property (readonly) BOOL stalled __attribute__((swift_name("stalled")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId pollAttempts:(int32_t)pollAttempts lastObservedStatus:(ZappOfframpOrderStatus * _Nullable)lastObservedStatus stalled:(BOOL)stalled expired:(BOOL)expired acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds __attribute__((swift_name("init(orderId:pollAttempts:lastObservedStatus:stalled:expired:acceptedAtEpochSeconds:paidAtEpochSeconds:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusWaitingForCompletion *)doCopyOrderId:(ZappOfframpBigInteger *)orderId pollAttempts:(int32_t)pollAttempts lastObservedStatus:(ZappOfframpOrderStatus * _Nullable)lastObservedStatus stalled:(BOOL)stalled expired:(BOOL)expired acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds __attribute__((swift_name("doCopy(orderId:pollAttempts:lastObservedStatus:stalled:expired:acceptedAtEpochSeconds:paidAtEpochSeconds:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.WaitingForMerchantAcceptance")))
+@interface ZappOfframpOfframpStatusWaitingForMerchantAcceptance : ZappOfframpOfframpStatus
+@property (readonly) BOOL expired __attribute__((swift_name("expired")));
+@property (readonly) ZappOfframpOrderStatus * _Nullable lastObservedStatus __attribute__((swift_name("lastObservedStatus")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) int32_t pollAttempts __attribute__((swift_name("pollAttempts")));
+@property (readonly) BOOL stalled __attribute__((swift_name("stalled")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId pollAttempts:(int32_t)pollAttempts lastObservedStatus:(ZappOfframpOrderStatus * _Nullable)lastObservedStatus stalled:(BOOL)stalled expired:(BOOL)expired __attribute__((swift_name("init(orderId:pollAttempts:lastObservedStatus:stalled:expired:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusWaitingForMerchantAcceptance *)doCopyOrderId:(ZappOfframpBigInteger *)orderId pollAttempts:(int32_t)pollAttempts lastObservedStatus:(ZappOfframpOrderStatus * _Nullable)lastObservedStatus stalled:(BOOL)stalled expired:(BOOL)expired __attribute__((swift_name("doCopy(orderId:pollAttempts:lastObservedStatus:stalled:expired:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStatus.WaitingForPaymentDetails")))
+@interface ZappOfframpOfframpStatusWaitingForPaymentDetails : ZappOfframpOfframpStatus
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) ZappOfframpAddress *merchantAddress __attribute__((swift_name("merchantAddress")));
+@property (readonly) NSString *merchantPubKey __attribute__((swift_name("merchantPubKey")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId merchantAddress:(ZappOfframpAddress *)merchantAddress merchantPubKey:(NSString *)merchantPubKey acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds __attribute__((swift_name("init(orderId:merchantAddress:merchantPubKey:acceptedAtEpochSeconds:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOfframpStatusWaitingForPaymentDetails *)doCopyOrderId:(ZappOfframpBigInteger *)orderId merchantAddress:(ZappOfframpAddress *)merchantAddress merchantPubKey:(NSString *)merchantPubKey acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds __attribute__((swift_name("doCopy(orderId:merchantAddress:merchantPubKey:acceptedAtEpochSeconds:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Canonical state-machine step. Shared between orchestrator state tracking, [OfframpStatus.Failed.step],
+ * and the UI progress indicator — no parallel encodings.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStep")))
+@interface ZappOfframpOfframpStep : ZappOfframpKotlinEnum<ZappOfframpOfframpStep *>
+@property (class, readonly, getter=companion) ZappOfframpOfframpStepCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpOfframpStep *initialization __attribute__((swift_name("initialization")));
+@property (class, readonly) ZappOfframpOfframpStep *selectingCircle __attribute__((swift_name("selectingCircle")));
+@property (class, readonly) ZappOfframpOfframpStep *funding __attribute__((swift_name("funding")));
+@property (class, readonly) ZappOfframpOfframpStep *approvingUsdc __attribute__((swift_name("approvingUsdc")));
+@property (class, readonly) ZappOfframpOfframpStep *placingOrder __attribute__((swift_name("placingOrder")));
+@property (class, readonly) ZappOfframpOfframpStep *waitingForAcceptance __attribute__((swift_name("waitingForAcceptance")));
+@property (class, readonly) ZappOfframpOfframpStep *waitingForPaymentDetails __attribute__((swift_name("waitingForPaymentDetails")));
+@property (class, readonly) ZappOfframpOfframpStep *encryptingUpi __attribute__((swift_name("encryptingUpi")));
+@property (class, readonly) ZappOfframpOfframpStep *sendingUpi __attribute__((swift_name("sendingUpi")));
+@property (class, readonly) ZappOfframpOfframpStep *waitingForCompletion __attribute__((swift_name("waitingForCompletion")));
+@property (class, readonly) NSArray<ZappOfframpOfframpStep *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Canonical state-machine step. Shared between orchestrator state tracking, [OfframpStatus.Failed.step],
+ * and the UI progress indicator — no parallel encodings.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpOfframpStep *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfframpStep.Companion")))
+@interface ZappOfframpOfframpStepCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOfframpStepCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) NSArray<ZappOfframpOfframpStep *> *UI_PROGRESS __attribute__((swift_name("UI_PROGRESS")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/** Steps surfaced to the UI progress indicator (skips INITIALIZATION + ENCRYPTING_UPI). */
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleForRouting")))
+@interface ZappOfframpCircleForRouting : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpCircleForRoutingCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *circleId __attribute__((swift_name("circleId")));
+@property (readonly) NSString *currency __attribute__((swift_name("currency")));
+@property (readonly) id id __attribute__((swift_name("id")));
+@property (readonly) ZappOfframpCircleMetrics *metrics __attribute__((swift_name("metrics")));
+- (instancetype)initWithCircleId:(NSString *)circleId currency:(NSString *)currency metrics:(ZappOfframpCircleMetrics *)metrics __attribute__((swift_name("init(circleId:currency:metrics:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpCircleForRouting *)doCopyCircleId:(NSString *)circleId currency:(NSString *)currency metrics:(ZappOfframpCircleMetrics *)metrics __attribute__((swift_name("doCopy(circleId:currency:metrics:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/** The circle's on-chain numeric id, parsed once from the subgraph's decimal string. */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleForRouting.Companion")))
+@interface ZappOfframpCircleForRoutingCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCircleForRoutingCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleMetrics")))
+@interface ZappOfframpCircleMetrics : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpCircleMetricsCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *circleScore __attribute__((swift_name("circleScore")));
+@property (readonly) NSString *circleStatus __attribute__((swift_name("circleStatus")));
+@property (readonly) double score __attribute__((swift_name("score")));
+@property (readonly) ZappOfframpCircleScoreState *scoreState __attribute__((swift_name("scoreState")));
+@property (readonly) ZappOfframpCircleStatus *status __attribute__((swift_name("status")));
+- (instancetype)initWithCircleScore:(NSString *)circleScore circleStatus:(NSString *)circleStatus scoreState:(ZappOfframpCircleScoreState *)scoreState __attribute__((swift_name("init(circleScore:circleStatus:scoreState:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpCircleMetrics *)doCopyCircleScore:(NSString *)circleScore circleStatus:(NSString *)circleStatus scoreState:(ZappOfframpCircleScoreState *)scoreState __attribute__((swift_name("doCopy(circleScore:circleStatus:scoreState:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleMetrics.Companion")))
+@interface ZappOfframpCircleMetricsCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCircleMetricsCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleRouter")))
+@interface ZappOfframpCircleRouter : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpCircleRouterCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithRandom:(ZappOfframpKotlinRandom *)random epsilon:(double)epsilon recoveryScale:(double)recoveryScale bootstrapMaxWeight:(double)bootstrapMaxWeight maxValidationAttempts:(int32_t)maxValidationAttempts __attribute__((swift_name("init(random:epsilon:recoveryScale:bootstrapMaxWeight:maxValidationAttempts:)"))) __attribute__((objc_designated_initializer));
+- (double)circleWeightC:(ZappOfframpCircleForRouting *)c __attribute__((swift_name("circleWeight(c:)")));
+- (NSArray<ZappOfframpCircleForRouting *> *)filterEligibleCircles:(NSArray<ZappOfframpCircleForRouting *> *)circles currency:(NSString *)currency __attribute__((swift_name("filterEligible(circles:currency:)")));
+- (ZappOfframpCircleForRouting * _Nullable)selectCircleEligible:(NSArray<ZappOfframpCircleForRouting *> *)eligible __attribute__((swift_name("selectCircle(eligible:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)selectCircleForOrderCircles:(NSArray<ZappOfframpCircleForRouting *> *)circles orderCurrency:(NSString *)orderCurrency validateCircle:(id<ZappOfframpKotlinSuspendFunction1>)validateCircle completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("selectCircleForOrder(circles:orderCurrency:validateCircle:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleRouter.Companion")))
+@interface ZappOfframpCircleRouterCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCircleRouterCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) double BOOTSTRAP_MAX_WEIGHT __attribute__((swift_name("BOOTSTRAP_MAX_WEIGHT")));
+@property (readonly) double EPSILON __attribute__((swift_name("EPSILON")));
+@property (readonly) int32_t MAX_VALIDATION_ATTEMPTS __attribute__((swift_name("MAX_VALIDATION_ATTEMPTS")));
+@property (readonly) double RECOVERY_SCALE __attribute__((swift_name("RECOVERY_SCALE")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleScoreState")))
+@interface ZappOfframpCircleScoreState : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpCircleScoreStateCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *activeMerchantsCount __attribute__((swift_name("activeMerchantsCount")));
+- (instancetype)initWithActiveMerchantsCount:(NSString *)activeMerchantsCount __attribute__((swift_name("init(activeMerchantsCount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpCircleScoreState *)doCopyActiveMerchantsCount:(NSString *)activeMerchantsCount __attribute__((swift_name("doCopy(activeMerchantsCount:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleScoreState.Companion")))
+@interface ZappOfframpCircleScoreStateCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCircleScoreStateCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleStatus")))
+@interface ZappOfframpCircleStatus : ZappOfframpKotlinEnum<ZappOfframpCircleStatus *>
+@property (class, readonly, getter=companion) ZappOfframpCircleStatusCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpCircleStatus *paused __attribute__((swift_name("paused")));
+@property (class, readonly) ZappOfframpCircleStatus *bootstrap __attribute__((swift_name("bootstrap")));
+@property (class, readonly) ZappOfframpCircleStatus *active __attribute__((swift_name("active")));
+@property (class, readonly) ZappOfframpCircleStatus *unknown __attribute__((swift_name("unknown")));
+@property (class, readonly) NSArray<ZappOfframpCircleStatus *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpCircleStatus *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CircleStatus.Companion")))
+@interface ZappOfframpCircleStatusCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCircleStatusCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/** Maps the subgraph's status string; an unrecognised value is [UNKNOWN], never a crash. */
+- (ZappOfframpCircleStatus *)fromWireWire:(NSString *)wire __attribute__((swift_name("fromWire(wire:)")));
+@end
+
+
+/**
+ * Parses a Colombian QR in either DIAN electronic-invoice or EMVCo form. Byte-compatible with
+ * `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/cop.ts`).
+ *
+ * - **DIAN** (`key:value` text with `CUFE`/`NumFac`): tried first. Once a DIAN marker is present the
+ *   result commits — a missing CUFE/NumFac is a hard failure, not a fall-through to EMV. Fields split
+ *   on `[\n,;]+`, first-`:` per segment, first-wins. Address is `CUFE` (any case) else `NumFac`.
+ * - **EMVCo** (Nequi, Bre-B/RBM): requires BOTH the CO country tag (`5802CO`) AND the COP currency
+ *   tag (`5303170`). Merchant name is tag 59 (or `"MERCHANT_NOT_FOUND"`), and a present-but-bad
+ *   amount (tag 54) is silently dropped the way PIX does — never an error. No CRC on either path.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CopQrParser")))
+@interface ZappOfframpCopQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCopQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses a Colombian QR in either DIAN electronic-invoice or EMVCo form. Byte-compatible with
+ * `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/cop.ts`).
+ *
+ * - **DIAN** (`key:value` text with `CUFE`/`NumFac`): tried first. Once a DIAN marker is present the
+ *   result commits — a missing CUFE/NumFac is a hard failure, not a fall-through to EMV. Fields split
+ *   on `[\n,;]+`, first-`:` per segment, first-wins. Address is `CUFE` (any case) else `NumFac`.
+ * - **EMVCo** (Nequi, Bre-B/RBM): requires BOTH the CO country tag (`5802CO`) AND the COP currency
+ *   tag (`5303170`). Merchant name is tag 59 (or `"MERCHANT_NOT_FOUND"`), and a present-but-bad
+ *   amount (tag 54) is silently dropped the way PIX does — never an error. No CRC on either path.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)copQrParser __attribute__((swift_name("init()")));
+- (ZappOfframpPaymentQrParseResult *)parseQrData:(NSString *)qrData __attribute__((swift_name("parse(qrData:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CurrencyCode")))
+@interface ZappOfframpCurrencyCode : ZappOfframpKotlinEnum<ZappOfframpCurrencyCode *>
+@property (class, readonly, getter=companion) ZappOfframpCurrencyCodeCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpCurrencyCode *inr __attribute__((swift_name("inr")));
+@property (class, readonly) ZappOfframpCurrencyCode *brl __attribute__((swift_name("brl")));
+@property (class, readonly) ZappOfframpCurrencyCode *idr __attribute__((swift_name("idr")));
+@property (class, readonly) ZappOfframpCurrencyCode *ars __attribute__((swift_name("ars")));
+@property (class, readonly) ZappOfframpCurrencyCode *ven __attribute__((swift_name("ven")));
+@property (class, readonly) ZappOfframpCurrencyCode *ngn __attribute__((swift_name("ngn")));
+@property (class, readonly) ZappOfframpCurrencyCode *cop __attribute__((swift_name("cop")));
+@property (class, readonly) NSArray<ZappOfframpCurrencyCode *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *code __attribute__((swift_name("code")));
+@property (readonly) BOOL paymentAddressIsOpaque __attribute__((swift_name("paymentAddressIsOpaque")));
+@property (readonly) int32_t precision __attribute__((swift_name("precision")));
+@property (readonly) NSString *symbol __attribute__((swift_name("symbol")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpCurrencyCode *> *)values __attribute__((swift_name("values()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CurrencyCode.Companion")))
+@interface ZappOfframpCurrencyCodeCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpCurrencyCodeCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpCurrencyCode *)fromCodeCode:(NSString *)code __attribute__((swift_name("fromCode(code:)")));
+- (ZappOfframpCurrencyCode * _Nullable)fromCodeOrNullCode:(NSString *)code __attribute__((swift_name("fromCodeOrNull(code:)")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(ZappOfframpKotlinArray<id<ZappOfframpKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DiamondCalls")))
+@interface ZappOfframpDiamondCalls : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpDiamondCalls *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)diamondCalls __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinByteArray *)autoCancelExpiredOrdersCalldataOrderIds:(NSArray<ZappOfframpBigInteger *> *)orderIds __attribute__((swift_name("autoCancelExpiredOrdersCalldata(orderIds:)")));
+- (ZappOfframpKotlinByteArray *)cancelOrderCalldataOrderId:(ZappOfframpBigInteger *)orderId __attribute__((swift_name("cancelOrderCalldata(orderId:)")));
+- (ZappOfframpKotlinByteArray *)getAdditionalOrderDetailsCalldataOrderId:(ZappOfframpBigInteger *)orderId __attribute__((swift_name("getAdditionalOrderDetailsCalldata(orderId:)")));
+- (ZappOfframpKotlinByteArray *)getAssignableMerchantsFromCircleCalldataCircleId:(ZappOfframpBigInteger *)circleId assignUpTo:(ZappOfframpBigInteger *)assignUpTo currency:(ZappOfframpCurrencyCode *)currency user:(ZappOfframpAddress *)user usdtAmount:(id)usdtAmount fiatAmount:(id)fiatAmount orderType:(ZappOfframpOrderType *)orderType preferredPCConfigId:(ZappOfframpBigInteger *)preferredPCConfigId __attribute__((swift_name("getAssignableMerchantsFromCircleCalldata(circleId:assignUpTo:currency:user:usdtAmount:fiatAmount:orderType:preferredPCConfigId:)")));
+- (ZappOfframpKotlinByteArray *)getOrdersByIdCalldataOrderId:(ZappOfframpBigInteger *)orderId __attribute__((swift_name("getOrdersByIdCalldata(orderId:)")));
+- (ZappOfframpKotlinByteArray *)getPriceConfigCalldataCurrency:(ZappOfframpCurrencyCode *)currency __attribute__((swift_name("getPriceConfigCalldata(currency:)")));
+- (ZappOfframpKotlinByteArray *)getSmallOrderFixedFeePayCalldataCurrency:(ZappOfframpCurrencyCode *)currency __attribute__((swift_name("getSmallOrderFixedFeePayCalldata(currency:)")));
+- (ZappOfframpKotlinByteArray *)getSmallOrderThresholdCalldataCurrency:(ZappOfframpCurrencyCode *)currency __attribute__((swift_name("getSmallOrderThresholdCalldata(currency:)")));
+- (ZappOfframpKotlinByteArray *)isOrderExpiredCalldataOrderId:(ZappOfframpBigInteger *)orderId __attribute__((swift_name("isOrderExpiredCalldata(orderId:)")));
+- (ZappOfframpKotlinByteArray *)placeOrderCalldataArgs:(ZappOfframpPlaceOrderArgs *)args __attribute__((swift_name("placeOrderCalldata(args:)")));
+- (ZappOfframpKotlinByteArray *)setSellOrderUpiCalldataOrderId:(ZappOfframpBigInteger *)orderId encryptedUpiHex:(NSString *)encryptedUpiHex updatedAmount:(ZappOfframpBigInteger *)updatedAmount __attribute__((swift_name("setSellOrderUpiCalldata(orderId:encryptedUpiHex:updatedAmount:)")));
+@end
+
+
+/**
+ * Resolves the amount of a dynamic PIX QR, whose value lives behind a bank `location` URL rather
+ * than in the QR itself. [resolveAmount] returns the fiat amount string (the bank JWT's
+ * `valor.original`, e.g. "89.90"), or null when the response carries no amount (the parser then
+ * falls back to any static tag-54 amount). It must THROW on a transport failure — non-2xx,
+ * unparseable JWT, or network error — which [PixQrParser] maps to
+ * [PaymentQrError.DynamicFetchFailed]. [DirectPixResolver] is the default implementation; [PixProxyClient]
+ * is the proxy-routed alternative.
+ */
+__attribute__((swift_name("DynamicPixResolver")))
+@protocol ZappOfframpDynamicPixResolver
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)resolveAmountLocationUrl:(NSString *)locationUrl orderId:(NSString * _Nullable)orderId completionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("resolveAmount(locationUrl:orderId:completionHandler:)")));
+@end
+
+
+/**
+ * Resolves dynamic-PIX amounts by fetching the issuing bank's `location` endpoint DIRECTLY from the
+ * device. Native HTTP has no CORS restriction (unlike the browser the official web app runs in), so
+ * no server-side forwarding proxy is required: GET the location URL and read `valor.original` from
+ * the returned JWT. This is the default resolver for the app. [PixProxyClient] is the alternative
+ * when routing through a hosted `/pix` proxy is preferred (e.g. to normalise flaky bank endpoints).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DirectPixResolver")))
+@interface ZappOfframpDirectPixResolver : ZappOfframpBase <ZappOfframpDynamicPixResolver>
+- (instancetype)initWithHttpClient:(ZappOfframpKtor_client_coreHttpClient *)httpClient __attribute__((swift_name("init(httpClient:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)resolveAmountLocationUrl:(NSString *)locationUrl orderId:(NSString * _Nullable)orderId completionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("resolveAmount(locationUrl:orderId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EmvQr")))
+@interface ZappOfframpEmvQr : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpEmvQr *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)emvQr __attribute__((swift_name("init()")));
+- (NSString *)calculateCrc16Data:(NSString *)data __attribute__((swift_name("calculateCrc16(data:)")));
+- (NSDictionary<NSString *, NSString *> *)extractTagsData:(NSString *)data tags:(NSSet<NSString *> *)tags __attribute__((swift_name("extractTags(data:tags:)")));
+- (NSArray<ZappOfframpEmvQrTlvEntry *> *)parseTlvData:(NSString *)data __attribute__((swift_name("parseTlv(data:)")));
+- (BOOL)verifyCrc16QrData:(NSString *)qrData __attribute__((swift_name("verifyCrc16(qrData:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("EmvQr.TlvEntry")))
+@interface ZappOfframpEmvQrTlvEntry : ZappOfframpBase
+@property (readonly) NSString *tag __attribute__((swift_name("tag")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+- (instancetype)initWithTag:(NSString *)tag value:(NSString *)value __attribute__((swift_name("init(tag:value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpEmvQrTlvEntry *)doCopyTag:(NSString *)tag value:(NSString *)value __attribute__((swift_name("doCopy(tag:value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Erc20Calls")))
+@interface ZappOfframpErc20Calls : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpErc20Calls *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)erc20Calls __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinByteArray *)approveCalldataSpender:(ZappOfframpAddress *)spender amount:(id)amount __attribute__((swift_name("approveCalldata(spender:amount:)")));
+- (ZappOfframpKotlinByteArray *)balanceOfCalldataOwner:(ZappOfframpAddress *)owner __attribute__((swift_name("balanceOfCalldata(owner:)")));
+- (ZappOfframpKotlinByteArray *)transferCalldataTo:(ZappOfframpAddress *)to amount:(id)amount __attribute__((swift_name("transferCalldata(to:amount:)")));
+@end
+
+__attribute__((swift_name("OrderReadSource")))
+@protocol ZappOfframpOrderReadSource
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)fetchOrderOrderId:(ZappOfframpBigInteger *)orderId completionHandler:(void (^)(ZappOfframpOrderSnapshot * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("fetchOrder(orderId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FallbackOrderReader")))
+@interface ZappOfframpFallbackOrderReader : ZappOfframpBase <ZappOfframpOrderReadSource>
+- (instancetype)initWithPrimary:(id<ZappOfframpOrderReadSource>)primary fallback:(id<ZappOfframpOrderReadSource>)fallback logger:(id<ZappOfframpOrderReadLogger> _Nullable)logger __attribute__((swift_name("init(primary:fallback:logger:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)fetchOrderOrderId:(ZappOfframpBigInteger *)orderId completionHandler:(void (^)(ZappOfframpOrderSnapshot * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("fetchOrder(orderId:completionHandler:)")));
+@end
+
+
+/**
+ * Local cache of `orderId → recipient UPI` populated at placement time.
+ *
+ * The chain stores `encUpi` encrypted to the **merchant's** public key — that's the field the
+ * merchant decrypts to know where to send the INR. The user cannot decrypt their own `encUpi`,
+ * so the only way to surface "you paid VPA X" in the history list is to cache it locally when
+ * the order is placed. Mirrors `getPaymentAddressFromOrderDetails` in the official user-app-client.
+ *
+ * `encMerchantUpi` (encrypted to the user's relay pubkey at `completeOrder`) IS user-decryptable,
+ * but the merchant pool we hit on mainnet leaves it empty in practice, so we can't rely on it.
+ */
+__attribute__((swift_name("OrderRecipientUpiCache")))
+@protocol ZappOfframpOrderRecipientUpiCache
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getOrderId:(NSString *)orderId completionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("get(orderId:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)putOrderId:(NSString *)orderId recipientUpi:(NSString *)recipientUpi completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("put(orderId:recipientUpi:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InMemoryOrderRecipientUpiCache")))
+@interface ZappOfframpInMemoryOrderRecipientUpiCache : ZappOfframpBase <ZappOfframpOrderRecipientUpiCache>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getOrderId:(NSString *)orderId completionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("get(orderId:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)putOrderId:(NSString *)orderId recipientUpi:(NSString *)recipientUpi completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("put(orderId:recipientUpi:completionHandler:)")));
+@end
+
+
+/**
+ * Persistent home for the user's ECDH relay identity. SEPARATE from the EOA / smart-account
+ * keypair that signs transactions: the relay key seals the user's UPI to merchants and decrypts
+ * `encMerchantUpi` on completion. Losing it makes every past order's merchant UPI permanently
+ * undecryptable — see §7 of the offramp findings doc.
+ */
+__attribute__((swift_name("RelayIdentityStore")))
+@protocol ZappOfframpRelayIdentityStore
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getWithCompletionHandler:(void (^)(ZappOfframpRelayIdentity * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("get(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)setIdentity:(ZappOfframpRelayIdentity *)identity completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("set(identity:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InMemoryRelayIdentityStore")))
+@interface ZappOfframpInMemoryRelayIdentityStore : ZappOfframpBase <ZappOfframpRelayIdentityStore>
+- (instancetype)initWithInitial:(ZappOfframpRelayIdentity * _Nullable)initial __attribute__((swift_name("init(initial:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getWithCompletionHandler:(void (^)(ZappOfframpRelayIdentity * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("get(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)setIdentity:(ZappOfframpRelayIdentity *)identity completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("set(identity:completionHandler:)")));
+@end
+
+
+/**
+ * Parses an Argentine MercadoPago / Transferencias-3.0 (EMVCo MPM) merchant QR. Byte-compatible with
+ * `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/ars.ts`): gate on the ARS currency tag (`5303032`) OR
+ * the AR country tag (`5802AR`), verify the EMVCo CRC (tag 63), then take the merchant name (tag 59,
+ * or `"Unknown"`). ARS merchant QRs never fix a payer amount, so [ParsedPaymentQr.fiatAmount] is
+ * always null and — unlike QRIS — a missing merchant name is not an error.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("MercadoPagoQrParser")))
+@interface ZappOfframpMercadoPagoQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpMercadoPagoQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses an Argentine MercadoPago / Transferencias-3.0 (EMVCo MPM) merchant QR. Byte-compatible with
+ * `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/ars.ts`): gate on the ARS currency tag (`5303032`) OR
+ * the AR country tag (`5802AR`), verify the EMVCo CRC (tag 63), then take the merchant name (tag 59,
+ * or `"Unknown"`). ARS merchant QRs never fix a payer amount, so [ParsedPaymentQr.fiatAmount] is
+ * always null and — unlike QRIS — a missing merchant name is not an error.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)mercadoPagoQrParser __attribute__((swift_name("init()")));
+- (ZappOfframpPaymentQrParseResult *)parseQrData:(NSString *)qrData __attribute__((swift_name("parse(qrData:)")));
+@end
+
+
+/**
+ * Parses a Nigerian NIP QR in either NIBSS NQR (EMVCo MPM) or SPD (Czech Short Payment Descriptor)
+ * form. Byte-compatible with `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/ngn.ts`).
+ *
+ * - **NQR** (`parseEMVCoNQR`): verify the CRC, gate on the NIBSS AID / NGN currency tag (`5303566`) /
+ *   NG country tag (`5802NG`), require the merchant name (tag 59), and hard-fail a present-but-bad
+ *   amount (tag 54) the way QRIS does.
+ * - **SPD** (`SPD*1.0*ACC:<nuban>*AM:<amount>*…`): the account (`ACC`) is the payment address and the
+ *   `AM` amount has its thousands commas stripped before parsing. Duplicate keys are last-wins.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NgnQrParser")))
+@interface ZappOfframpNgnQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpNgnQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses a Nigerian NIP QR in either NIBSS NQR (EMVCo MPM) or SPD (Czech Short Payment Descriptor)
+ * form. Byte-compatible with `@p2pdotme/sdk` v1.2.4 (`qr-parsers/parsers/ngn.ts`).
+ *
+ * - **NQR** (`parseEMVCoNQR`): verify the CRC, gate on the NIBSS AID / NGN currency tag (`5303566`) /
+ *   NG country tag (`5802NG`), require the merchant name (tag 59), and hard-fail a present-but-bad
+ *   amount (tag 54) the way QRIS does.
+ * - **SPD** (`SPD*1.0*ACC:<nuban>*AM:<amount>*…`): the account (`ACC`) is the payment address and the
+ *   `AM` amount has its thousands commas stripped before parsing. Duplicate keys are last-wins.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)ngnQrParser __attribute__((swift_name("init()")));
+- (ZappOfframpPaymentQrParseResult *)parseQrData:(NSString *)qrData __attribute__((swift_name("parse(qrData:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OnChainOrderReader")))
+@interface ZappOfframpOnChainOrderReader : ZappOfframpBase <ZappOfframpOrderReadSource>
+- (instancetype)initWithRpc:(ZappOfframpBaseRpcClient *)rpc network:(ZappOfframpP2pNetworkConfig *)network __attribute__((swift_name("init(rpc:network:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)fetchOrderOrderId:(ZappOfframpBigInteger *)orderId completionHandler:(void (^)(ZappOfframpOrderSnapshot * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("fetchOrder(orderId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderEvents")))
+@interface ZappOfframpOrderEvents : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOrderEvents *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *ORDER_PLACED_TOPIC __attribute__((swift_name("ORDER_PLACED_TOPIC")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)orderEvents __attribute__((swift_name("init()")));
+- (ZappOfframpBigInteger * _Nullable)parseOrderIdFromLogLog:(ZappOfframpEvmLog *)log __attribute__((swift_name("parseOrderIdFromLog(log:)")));
+- (ZappOfframpBigInteger * _Nullable)parseOrderIdFromReceiptReceipt:(ZappOfframpTransactionReceipt *)receipt diamondAddress:(ZappOfframpAddress *)diamondAddress userAddress:(ZappOfframpAddress *)userAddress __attribute__((swift_name("parseOrderIdFromReceipt(receipt:diamondAddress:userAddress:)")));
+@end
+
+
+/**
+ * Post-execution detail bundle the p2p.me Diamond returns from `getAdditionalOrderDetails(uint256)`.
+ * Authoritative source for the "you sent / fee / you received" breakdown — subgraph snapshots
+ * have the amounts but never `fixedFeePaid` (the contract's per-order fixed fee, distinct from
+ * any circle fee rate).
+ *
+ * Fields populate progressively as the order moves: [acceptedAtEpochSeconds] flips non-null on
+ * ACCEPTED, [paidAtEpochSeconds] on PAID, and [fixedFeePaid] / [actualUsdcAmount] /
+ * [actualFiatAmount] settle to their final values on COMPLETED. Reading earlier is safe but
+ * gives zeros for fields not yet written by the contract.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderFeeDetails")))
+@interface ZappOfframpOrderFeeDetails : ZappOfframpBase
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) id actualFiatAmount __attribute__((swift_name("actualFiatAmount")));
+@property (readonly) id actualUsdcAmount __attribute__((swift_name("actualUsdcAmount")));
+@property (readonly) id fixedFeePaid __attribute__((swift_name("fixedFeePaid")));
+@property (readonly) ZappOfframpLong * _Nullable paidAtEpochSeconds __attribute__((swift_name("paidAtEpochSeconds")));
+- (instancetype)initWithFixedFeePaid:(id)fixedFeePaid acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds actualUsdcAmount:(id)actualUsdcAmount actualFiatAmount:(id)actualFiatAmount __attribute__((swift_name("init(fixedFeePaid:acceptedAtEpochSeconds:paidAtEpochSeconds:actualUsdcAmount:actualFiatAmount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOrderFeeDetails *)doCopyFixedFeePaid:(id)fixedFeePaid acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds actualUsdcAmount:(id)actualUsdcAmount actualFiatAmount:(id)actualFiatAmount __attribute__((swift_name("doCopy(fixedFeePaid:acceptedAtEpochSeconds:paidAtEpochSeconds:actualUsdcAmount:actualFiatAmount:)")));
+
+/**
+ * Post-execution detail bundle the p2p.me Diamond returns from `getAdditionalOrderDetails(uint256)`.
+ * Authoritative source for the "you sent / fee / you received" breakdown — subgraph snapshots
+ * have the amounts but never `fixedFeePaid` (the contract's per-order fixed fee, distinct from
+ * any circle fee rate).
+ *
+ * Fields populate progressively as the order moves: [acceptedAtEpochSeconds] flips non-null on
+ * ACCEPTED, [paidAtEpochSeconds] on PAID, and [fixedFeePaid] / [actualUsdcAmount] /
+ * [actualFiatAmount] settle to their final values on COMPLETED. Reading earlier is safe but
+ * gives zeros for fields not yet written by the contract.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Post-execution detail bundle the p2p.me Diamond returns from `getAdditionalOrderDetails(uint256)`.
+ * Authoritative source for the "you sent / fee / you received" breakdown — subgraph snapshots
+ * have the amounts but never `fixedFeePaid` (the contract's per-order fixed fee, distinct from
+ * any circle fee rate).
+ *
+ * Fields populate progressively as the order moves: [acceptedAtEpochSeconds] flips non-null on
+ * ACCEPTED, [paidAtEpochSeconds] on PAID, and [fixedFeePaid] / [actualUsdcAmount] /
+ * [actualFiatAmount] settle to their final values on COMPLETED. Reading earlier is safe but
+ * gives zeros for fields not yet written by the contract.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Post-execution detail bundle the p2p.me Diamond returns from `getAdditionalOrderDetails(uint256)`.
+ * Authoritative source for the "you sent / fee / you received" breakdown — subgraph snapshots
+ * have the amounts but never `fixedFeePaid` (the contract's per-order fixed fee, distinct from
+ * any circle fee rate).
+ *
+ * Fields populate progressively as the order moves: [acceptedAtEpochSeconds] flips non-null on
+ * ACCEPTED, [paidAtEpochSeconds] on PAID, and [fixedFeePaid] / [actualUsdcAmount] /
+ * [actualFiatAmount] settle to their final values on COMPLETED. Reading earlier is safe but
+ * gives zeros for fields not yet written by the contract.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderFeeDetailsDecoder")))
+@interface ZappOfframpOrderFeeDetailsDecoder : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOrderFeeDetailsDecoder *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)orderFeeDetailsDecoder __attribute__((swift_name("init()")));
+
+/**
+ * Decodes the `getAdditionalOrderDetails` return — a top-level tuple with all-static fields,
+ * so no leading offset pointer (cf. `getOrdersById`, whose tuple is dynamic). The 7 words
+ * land back-to-back: uint64(fixedFeePaid), uint64(tipsPaid), uint128(acceptedTimestamp),
+ * uint128(paidTimestamp), uint128(reserved2), uint256(actualUsdtAmount), uint256(actualFiatAmount).
+ * Each is left-padded to 32 bytes per ABI spec. Slots 1 and 4 are intentionally skipped:
+ * tipsPaid has no UI consumer and reserved2 is contract-reserved for future use.
+ */
+- (ZappOfframpOrderFeeDetails *)decodeReturnData:(ZappOfframpKotlinByteArray *)returnData __attribute__((swift_name("decode(returnData:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderRead")))
+@interface ZappOfframpOrderRead : ZappOfframpBase
+@property (readonly) ZappOfframpAddress * _Nullable acceptedMerchant __attribute__((swift_name("acceptedMerchant")));
+@property (readonly) NSString *merchantPubKey __attribute__((swift_name("merchantPubKey")));
+@property (readonly) ZappOfframpOrderStatus *status __attribute__((swift_name("status")));
+- (instancetype)initWithStatus:(ZappOfframpOrderStatus *)status acceptedMerchant:(ZappOfframpAddress * _Nullable)acceptedMerchant merchantPubKey:(NSString *)merchantPubKey __attribute__((swift_name("init(status:acceptedMerchant:merchantPubKey:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOrderRead *)doCopyStatus:(ZappOfframpOrderStatus *)status acceptedMerchant:(ZappOfframpAddress * _Nullable)acceptedMerchant merchantPubKey:(NSString *)merchantPubKey __attribute__((swift_name("doCopy(status:acceptedMerchant:merchantPubKey:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("OrderReadLogger")))
+@protocol ZappOfframpOrderReadLogger
+@required
+- (void)warnMessage:(NSString *)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("warn(message:cause:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderReader")))
+@interface ZappOfframpOrderReader : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOrderReader *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)orderReader __attribute__((swift_name("init()")));
+- (BOOL)decodeAddressArrayNonEmptyReturnData:(ZappOfframpKotlinByteArray *)returnData __attribute__((swift_name("decodeAddressArrayNonEmpty(returnData:)")));
+- (ZappOfframpOrderRead *)decodeOrderReturnData:(ZappOfframpKotlinByteArray *)returnData __attribute__((swift_name("decodeOrder(returnData:)")));
+- (ZappOfframpOrderSnapshot *)decodeOrderSnapshotReturnData:(ZappOfframpKotlinByteArray *)returnData orderId:(ZappOfframpBigInteger *)orderId __attribute__((swift_name("decodeOrderSnapshot(returnData:orderId:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderSnapshot")))
+@interface ZappOfframpOrderSnapshot : ZappOfframpBase
+@property (readonly) ZappOfframpLong * _Nullable acceptedAtEpochSeconds __attribute__((swift_name("acceptedAtEpochSeconds")));
+@property (readonly) ZappOfframpAddress * _Nullable acceptedMerchantAddress __attribute__((swift_name("acceptedMerchantAddress")));
+@property (readonly) id _Nullable actualFiatAmount __attribute__((swift_name("actualFiatAmount")));
+@property (readonly) id _Nullable actualUsdcAmount __attribute__((swift_name("actualUsdcAmount")));
+@property (readonly) ZappOfframpLong * _Nullable cancelledAtEpochSeconds __attribute__((swift_name("cancelledAtEpochSeconds")));
+@property (readonly) ZappOfframpBigInteger *circleId __attribute__((swift_name("circleId")));
+@property (readonly) ZappOfframpLong * _Nullable completedAtEpochSeconds __attribute__((swift_name("completedAtEpochSeconds")));
+@property (readonly) NSString *currencyHex __attribute__((swift_name("currencyHex")));
+@property (readonly) NSString *encryptedMerchantUpi __attribute__((swift_name("encryptedMerchantUpi")));
+@property (readonly) NSString *encryptedUserUpi __attribute__((swift_name("encryptedUserUpi")));
+@property (readonly) id fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) BOOL isAccepted __attribute__((swift_name("isAccepted")));
+@property (readonly) NSString *merchantPubKey __attribute__((swift_name("merchantPubKey")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpOrderType *orderType __attribute__((swift_name("orderType")));
+@property (readonly) ZappOfframpLong * _Nullable paidAtEpochSeconds __attribute__((swift_name("paidAtEpochSeconds")));
+@property (readonly) ZappOfframpLong * _Nullable placedAtEpochSeconds __attribute__((swift_name("placedAtEpochSeconds")));
+@property (readonly) ZappOfframpTxHash * _Nullable placedTxHash __attribute__((swift_name("placedTxHash")));
+@property (readonly) ZappOfframpOrderSnapshotSource *source __attribute__((swift_name("source")));
+@property (readonly) ZappOfframpOrderStatus *status __attribute__((swift_name("status")));
+@property (readonly) id usdcAmount __attribute__((swift_name("usdcAmount")));
+@property (readonly) ZappOfframpAddress *userAddress __attribute__((swift_name("userAddress")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId status:(ZappOfframpOrderStatus *)status orderType:(ZappOfframpOrderType *)orderType circleId:(ZappOfframpBigInteger *)circleId userAddress:(ZappOfframpAddress *)userAddress usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currencyHex:(NSString *)currencyHex acceptedMerchantAddress:(ZappOfframpAddress * _Nullable)acceptedMerchantAddress merchantPubKey:(NSString *)merchantPubKey encryptedUserUpi:(NSString *)encryptedUserUpi encryptedMerchantUpi:(NSString *)encryptedMerchantUpi placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds actualUsdcAmount:(id _Nullable)actualUsdcAmount actualFiatAmount:(id _Nullable)actualFiatAmount placedTxHash:(ZappOfframpTxHash * _Nullable)placedTxHash source:(ZappOfframpOrderSnapshotSource *)source __attribute__((swift_name("init(orderId:status:orderType:circleId:userAddress:usdcAmount:fiatAmount:currencyHex:acceptedMerchantAddress:merchantPubKey:encryptedUserUpi:encryptedMerchantUpi:placedAtEpochSeconds:acceptedAtEpochSeconds:paidAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:actualUsdcAmount:actualFiatAmount:placedTxHash:source:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpOrderSnapshot *)doCopyOrderId:(ZappOfframpBigInteger *)orderId status:(ZappOfframpOrderStatus *)status orderType:(ZappOfframpOrderType *)orderType circleId:(ZappOfframpBigInteger *)circleId userAddress:(ZappOfframpAddress *)userAddress usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currencyHex:(NSString *)currencyHex acceptedMerchantAddress:(ZappOfframpAddress * _Nullable)acceptedMerchantAddress merchantPubKey:(NSString *)merchantPubKey encryptedUserUpi:(NSString *)encryptedUserUpi encryptedMerchantUpi:(NSString *)encryptedMerchantUpi placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds acceptedAtEpochSeconds:(ZappOfframpLong * _Nullable)acceptedAtEpochSeconds paidAtEpochSeconds:(ZappOfframpLong * _Nullable)paidAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds actualUsdcAmount:(id _Nullable)actualUsdcAmount actualFiatAmount:(id _Nullable)actualFiatAmount placedTxHash:(ZappOfframpTxHash * _Nullable)placedTxHash source:(ZappOfframpOrderSnapshotSource *)source __attribute__((swift_name("doCopy(orderId:status:orderType:circleId:userAddress:usdcAmount:fiatAmount:currencyHex:acceptedMerchantAddress:merchantPubKey:encryptedUserUpi:encryptedMerchantUpi:placedAtEpochSeconds:acceptedAtEpochSeconds:paidAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:actualUsdcAmount:actualFiatAmount:placedTxHash:source:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderSnapshot.Source")))
+@interface ZappOfframpOrderSnapshotSource : ZappOfframpKotlinEnum<ZappOfframpOrderSnapshotSource *>
+@property (class, readonly) ZappOfframpOrderSnapshotSource *subgraph __attribute__((swift_name("subgraph")));
+@property (class, readonly) ZappOfframpOrderSnapshotSource *onchain __attribute__((swift_name("onchain")));
+@property (class, readonly) NSArray<ZappOfframpOrderSnapshotSource *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpOrderSnapshotSource *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderStatus")))
+@interface ZappOfframpOrderStatus : ZappOfframpKotlinEnum<ZappOfframpOrderStatus *>
+@property (class, readonly, getter=companion) ZappOfframpOrderStatusCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpOrderStatus *placed __attribute__((swift_name("placed")));
+@property (class, readonly) ZappOfframpOrderStatus *accepted __attribute__((swift_name("accepted")));
+@property (class, readonly) ZappOfframpOrderStatus *paid __attribute__((swift_name("paid")));
+@property (class, readonly) ZappOfframpOrderStatus *completed __attribute__((swift_name("completed")));
+@property (class, readonly) ZappOfframpOrderStatus *cancelled __attribute__((swift_name("cancelled")));
+@property (class, readonly) NSArray<ZappOfframpOrderStatus *> *entries __attribute__((swift_name("entries")));
+@property (readonly) int32_t onChain __attribute__((swift_name("onChain")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpOrderStatus *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderStatus.Companion")))
+@interface ZappOfframpOrderStatusCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpOrderStatusCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpOrderStatus *)fromOnChainValue:(int32_t)value __attribute__((swift_name("fromOnChain(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OrderType")))
+@interface ZappOfframpOrderType : ZappOfframpKotlinEnum<ZappOfframpOrderType *>
+@property (class, readonly) ZappOfframpOrderType *buy __attribute__((swift_name("buy")));
+@property (class, readonly) ZappOfframpOrderType *sell __attribute__((swift_name("sell")));
+@property (class, readonly) ZappOfframpOrderType *pay __attribute__((swift_name("pay")));
+@property (class, readonly) NSArray<ZappOfframpOrderType *> *entries __attribute__((swift_name("entries")));
+@property (readonly) int32_t onChain __attribute__((swift_name("onChain")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpOrderType *> *)values __attribute__((swift_name("values()")));
+@end
+
+
+/**
+ * Display-ready row for the P2P transactions screen.
+ *
+ *  - [recipientUpiPlain]: the destination VPA the user typed at placement. Sourced primarily
+ *    from [OrderRecipientUpiCache] (written by the orchestrator on placeOrder success) because
+ *    on-chain `encUpi` is encrypted to the **merchant's** public key for PAY/SELL and the user
+ *    cannot recover it from the chain. Falls back to decrypting `encUpi` with the relay key
+ *    only for BUY (where the merchant seals their own pay-to VPA to the user's relay pubkey).
+ *  - [merchantUpiPlain]: decrypted `encMerchantUpi`. Populated only after the merchant calls
+ *    completeOrder with a non-empty `encMerchantUpi` (empty in practice for many merchants).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pOrderHistoryItem")))
+@interface ZappOfframpP2pOrderHistoryItem : ZappOfframpBase
+@property (readonly) ZappOfframpAddress * _Nullable acceptedMerchantAddress __attribute__((swift_name("acceptedMerchantAddress")));
+@property (readonly) ZappOfframpLong * _Nullable cancelledAtEpochSeconds __attribute__((swift_name("cancelledAtEpochSeconds")));
+@property (readonly) ZappOfframpLong * _Nullable completedAtEpochSeconds __attribute__((swift_name("completedAtEpochSeconds")));
+@property (readonly) NSString *currencyHex __attribute__((swift_name("currencyHex")));
+@property (readonly) id fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) id _Nullable fixedFeePaid __attribute__((swift_name("fixedFeePaid")));
+@property (readonly) NSString * _Nullable merchantUpiPlain __attribute__((swift_name("merchantUpiPlain")));
+@property (readonly) ZappOfframpBigInteger *orderId __attribute__((swift_name("orderId")));
+@property (readonly) ZappOfframpOrderType *orderType __attribute__((swift_name("orderType")));
+@property (readonly) ZappOfframpLong * _Nullable placedAtEpochSeconds __attribute__((swift_name("placedAtEpochSeconds")));
+@property (readonly) NSString * _Nullable recipientUpiPlain __attribute__((swift_name("recipientUpiPlain")));
+@property (readonly) ZappOfframpOrderStatus *status __attribute__((swift_name("status")));
+@property (readonly) id usdcAmount __attribute__((swift_name("usdcAmount")));
+- (instancetype)initWithOrderId:(ZappOfframpBigInteger *)orderId orderType:(ZappOfframpOrderType *)orderType status:(ZappOfframpOrderStatus *)status usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currencyHex:(NSString *)currencyHex placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds acceptedMerchantAddress:(ZappOfframpAddress * _Nullable)acceptedMerchantAddress recipientUpiPlain:(NSString * _Nullable)recipientUpiPlain merchantUpiPlain:(NSString * _Nullable)merchantUpiPlain fixedFeePaid:(id _Nullable)fixedFeePaid __attribute__((swift_name("init(orderId:orderType:status:usdcAmount:fiatAmount:currencyHex:placedAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:acceptedMerchantAddress:recipientUpiPlain:merchantUpiPlain:fixedFeePaid:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpP2pOrderHistoryItem *)doCopyOrderId:(ZappOfframpBigInteger *)orderId orderType:(ZappOfframpOrderType *)orderType status:(ZappOfframpOrderStatus *)status usdcAmount:(id)usdcAmount fiatAmount:(id)fiatAmount currencyHex:(NSString *)currencyHex placedAtEpochSeconds:(ZappOfframpLong * _Nullable)placedAtEpochSeconds completedAtEpochSeconds:(ZappOfframpLong * _Nullable)completedAtEpochSeconds cancelledAtEpochSeconds:(ZappOfframpLong * _Nullable)cancelledAtEpochSeconds acceptedMerchantAddress:(ZappOfframpAddress * _Nullable)acceptedMerchantAddress recipientUpiPlain:(NSString * _Nullable)recipientUpiPlain merchantUpiPlain:(NSString * _Nullable)merchantUpiPlain fixedFeePaid:(id _Nullable)fixedFeePaid __attribute__((swift_name("doCopy(orderId:orderType:status:usdcAmount:fiatAmount:currencyHex:placedAtEpochSeconds:completedAtEpochSeconds:cancelledAtEpochSeconds:acceptedMerchantAddress:recipientUpiPlain:merchantUpiPlain:fixedFeePaid:)")));
+
+/**
+ * Display-ready row for the P2P transactions screen.
+ *
+ *  - [recipientUpiPlain]: the destination VPA the user typed at placement. Sourced primarily
+ *    from [OrderRecipientUpiCache] (written by the orchestrator on placeOrder success) because
+ *    on-chain `encUpi` is encrypted to the **merchant's** public key for PAY/SELL and the user
+ *    cannot recover it from the chain. Falls back to decrypting `encUpi` with the relay key
+ *    only for BUY (where the merchant seals their own pay-to VPA to the user's relay pubkey).
+ *  - [merchantUpiPlain]: decrypted `encMerchantUpi`. Populated only after the merchant calls
+ *    completeOrder with a non-empty `encMerchantUpi` (empty in practice for many merchants).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Display-ready row for the P2P transactions screen.
+ *
+ *  - [recipientUpiPlain]: the destination VPA the user typed at placement. Sourced primarily
+ *    from [OrderRecipientUpiCache] (written by the orchestrator on placeOrder success) because
+ *    on-chain `encUpi` is encrypted to the **merchant's** public key for PAY/SELL and the user
+ *    cannot recover it from the chain. Falls back to decrypting `encUpi` with the relay key
+ *    only for BUY (where the merchant seals their own pay-to VPA to the user's relay pubkey).
+ *  - [merchantUpiPlain]: decrypted `encMerchantUpi`. Populated only after the merchant calls
+ *    completeOrder with a non-empty `encMerchantUpi` (empty in practice for many merchants).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Display-ready row for the P2P transactions screen.
+ *
+ *  - [recipientUpiPlain]: the destination VPA the user typed at placement. Sourced primarily
+ *    from [OrderRecipientUpiCache] (written by the orchestrator on placeOrder success) because
+ *    on-chain `encUpi` is encrypted to the **merchant's** public key for PAY/SELL and the user
+ *    cannot recover it from the chain. Falls back to decrypting `encUpi` with the relay key
+ *    only for BUY (where the merchant seals their own pay-to VPA to the user's relay pubkey).
+ *  - [merchantUpiPlain]: decrypted `encMerchantUpi`. Populated only after the merchant calls
+ *    completeOrder with a non-empty `encMerchantUpi` (empty in practice for many merchants).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Paginates the subgraph and decrypts the per-order UPI ciphertexts using the persisted relay
+ * identity. Stateless and idempotent — the screen VM owns the fetch lifecycle.
+ *
+ * Strategy: one subgraph round-trip per page (up to [PAGE_SIZE] rows), N parallel ECIES decryptions,
+ * and bounded optional on-chain reads. The on-chain reads mirror the official web UI's
+ * `getAdditionalOrderDetails(orderId)` enrichment and recover `encMerchantUpi` if the subgraph row
+ * is missing it.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pOrderHistorySource")))
+@interface ZappOfframpP2pOrderHistorySource : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpP2pOrderHistorySourceCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithSubgraph:(ZappOfframpSubgraphClient *)subgraph relayIdentityStore:(id<ZappOfframpRelayIdentityStore>)relayIdentityStore orderRecipientUpiCache:(id<ZappOfframpOrderRecipientUpiCache>)orderRecipientUpiCache onChainOrderReader:(id<ZappOfframpOrderReadSource> _Nullable)onChainOrderReader rpc:(ZappOfframpBaseRpcClient * _Nullable)rpc network:(ZappOfframpP2pNetworkConfig * _Nullable)network __attribute__((swift_name("init(subgraph:relayIdentityStore:orderRecipientUpiCache:onChainOrderReader:rpc:network:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)fetchAllUserAddress:(ZappOfframpAddress *)userAddress maxOrders:(int32_t)maxOrders completionHandler:(void (^)(NSArray<ZappOfframpP2pOrderHistoryItem *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("fetchAll(userAddress:maxOrders:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pOrderHistorySource.Companion")))
+@interface ZappOfframpP2pOrderHistorySourceCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpP2pOrderHistorySourceCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Parses a Venezuelan Pago Móvil QR. Byte-compatible with `@p2pdotme/sdk` v1.2.4
+ * (`qr-parsers/parsers/ven.ts`): the payload is a base64 blob followed by `?` and a suffix — not
+ * EMVCo — so only the prefix before `?` is validated (base64 alphabet) and the *entire* raw string
+ * (blob + `?` + suffix) becomes the [ParsedPaymentQr.paymentAddress] the merchant is paid at. No
+ * fixed amount, no CRC. Because there is no EMVCo currency tag, [PaymentQrDetector] can't route this
+ * corridor from a generic scan — VEN is only reached when the order currency is already VEN.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PagoMovilQrParser")))
+@interface ZappOfframpPagoMovilQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPagoMovilQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses a Venezuelan Pago Móvil QR. Byte-compatible with `@p2pdotme/sdk` v1.2.4
+ * (`qr-parsers/parsers/ven.ts`): the payload is a base64 blob followed by `?` and a suffix — not
+ * EMVCo — so only the prefix before `?` is validated (base64 alphabet) and the *entire* raw string
+ * (blob + `?` + suffix) becomes the [ParsedPaymentQr.paymentAddress] the merchant is paid at. No
+ * fixed amount, no CRC. Because there is no EMVCo currency tag, [PaymentQrDetector] can't route this
+ * corridor from a generic scan — VEN is only reached when the order currency is already VEN.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)pagoMovilQrParser __attribute__((swift_name("init()")));
+- (ZappOfframpPaymentQrParseResult *)parseQrData:(NSString *)qrData __attribute__((swift_name("parse(qrData:)")));
+@end
+
+
+/**
+ * A scanned merchant payment QR, reduced to the two fields the offramp needs: the [paymentAddress]
+ * the merchant is paid at (a UPI VPA, a PIX merchant name, or a QRIS merchant name) and the
+ * optional [fiatAmount] the QR fixes. A null amount means an open/payer-defined QR. The raw scanned
+ * payload — not this parsed form — is what gets encrypted to the merchant on-chain; this exists to
+ * pre-validate the scan and to prefill the amount field.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ParsedPaymentQr")))
+@interface ZappOfframpParsedPaymentQr : ZappOfframpBase
+@property (readonly) ZappOfframpBigDecimal * _Nullable fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) NSString *paymentAddress __attribute__((swift_name("paymentAddress")));
+- (instancetype)initWithPaymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("init(paymentAddress:fiatAmount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpParsedPaymentQr *)doCopyPaymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("doCopy(paymentAddress:fiatAmount:)")));
+
+/**
+ * A scanned merchant payment QR, reduced to the two fields the offramp needs: the [paymentAddress]
+ * the merchant is paid at (a UPI VPA, a PIX merchant name, or a QRIS merchant name) and the
+ * optional [fiatAmount] the QR fixes. A null amount means an open/payer-defined QR. The raw scanned
+ * payload — not this parsed form — is what gets encrypted to the merchant on-chain; this exists to
+ * pre-validate the scan and to prefill the amount field.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A scanned merchant payment QR, reduced to the two fields the offramp needs: the [paymentAddress]
+ * the merchant is paid at (a UPI VPA, a PIX merchant name, or a QRIS merchant name) and the
+ * optional [fiatAmount] the QR fixes. A null amount means an open/payer-defined QR. The raw scanned
+ * payload — not this parsed form — is what gets encrypted to the merchant on-chain; this exists to
+ * pre-validate the scan and to prefill the amount field.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A scanned merchant payment QR, reduced to the two fields the offramp needs: the [paymentAddress]
+ * the merchant is paid at (a UPI VPA, a PIX merchant name, or a QRIS merchant name) and the
+ * optional [fiatAmount] the QR fixes. A null amount means an open/payer-defined QR. The raw scanned
+ * payload — not this parsed form — is what gets encrypted to the merchant on-chain; this exists to
+ * pre-validate the scan and to prefill the amount field.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ParsedUpiQr")))
+@interface ZappOfframpParsedUpiQr : ZappOfframpBase
+@property (readonly) ZappOfframpBigDecimal * _Nullable fiatAmount __attribute__((swift_name("fiatAmount")));
+@property (readonly) NSString *paymentAddress __attribute__((swift_name("paymentAddress")));
+- (instancetype)initWithPaymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("init(paymentAddress:fiatAmount:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpParsedUpiQr *)doCopyPaymentAddress:(NSString *)paymentAddress fiatAmount:(ZappOfframpBigDecimal * _Nullable)fiatAmount __attribute__((swift_name("doCopy(paymentAddress:fiatAmount:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PayFeeConfig")))
+@interface ZappOfframpPayFeeConfig : ZappOfframpBase
+@property (readonly) id fixedFee __attribute__((swift_name("fixedFee")));
+@property (readonly) id threshold __attribute__((swift_name("threshold")));
+- (instancetype)initWithThreshold:(id)threshold fixedFee:(id)fixedFee __attribute__((swift_name("init(threshold:fixedFee:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPayFeeConfig *)doCopyThreshold:(id)threshold fixedFee:(id)fixedFee __attribute__((swift_name("doCopy(threshold:fixedFee:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (id)feeForAmount:(id)amount __attribute__((swift_name("feeFor(amount:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrDetector")))
+@interface ZappOfframpPaymentQrDetector : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrDetector *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)paymentQrDetector __attribute__((swift_name("init()")));
+- (ZappOfframpCurrencyCode * _Nullable)detectQrData:(NSString *)qrData __attribute__((swift_name("detect(qrData:)")));
+@end
+
+
+/** Why a scan was rejected. UI surfaces a per-case message; finer-grained than the SDK's codes. */
+__attribute__((swift_name("PaymentQrError")))
+@interface ZappOfframpPaymentQrError : ZappOfframpBase
+@end
+
+
+/** Dynamic PIX: no resolver configured, or the bank-endpoint fetch failed. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.DynamicFetchFailed")))
+@interface ZappOfframpPaymentQrErrorDynamicFetchFailed : ZappOfframpPaymentQrError
+@property (readonly) NSString *reason __attribute__((swift_name("reason")));
+- (instancetype)initWithReason:(NSString *)reason __attribute__((swift_name("init(reason:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrErrorDynamicFetchFailed *)doCopyReason:(NSString *)reason __attribute__((swift_name("doCopy(reason:)")));
+
+/** Dynamic PIX: no resolver configured, or the bank-endpoint fetch failed. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Dynamic PIX: no resolver configured, or the bank-endpoint fetch failed. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Dynamic PIX: no resolver configured, or the bank-endpoint fetch failed. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.EmptyQr")))
+@interface ZappOfframpPaymentQrErrorEmptyQr : ZappOfframpPaymentQrError
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrErrorEmptyQr *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)emptyQr __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.InvalidAmount")))
+@interface ZappOfframpPaymentQrErrorInvalidAmount : ZappOfframpPaymentQrError
+@property (readonly) NSString *raw __attribute__((swift_name("raw")));
+- (instancetype)initWithRaw:(NSString *)raw __attribute__((swift_name("init(raw:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrErrorInvalidAmount *)doCopyRaw:(NSString *)raw __attribute__((swift_name("doCopy(raw:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/** EMVCo CRC-16 checksum did not verify (PIX). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.InvalidChecksum")))
+@interface ZappOfframpPaymentQrErrorInvalidChecksum : ZappOfframpPaymentQrError
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrErrorInvalidChecksum *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/** EMVCo CRC-16 checksum did not verify (PIX). */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)invalidChecksum __attribute__((swift_name("init()")));
+@end
+
+
+/** Structurally not the expected EMV/URI shape (e.g. PIX missing the payload-format tag). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.InvalidFormat")))
+@interface ZappOfframpPaymentQrErrorInvalidFormat : ZappOfframpPaymentQrError
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrErrorInvalidFormat *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Structurally not the expected EMV/URI shape (e.g. PIX missing the payload-format tag). */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)invalidFormat __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.InvalidPaymentAddress")))
+@interface ZappOfframpPaymentQrErrorInvalidPaymentAddress : ZappOfframpPaymentQrError
+@property (readonly) NSString *raw __attribute__((swift_name("raw")));
+- (instancetype)initWithRaw:(NSString *)raw __attribute__((swift_name("init(raw:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrErrorInvalidPaymentAddress *)doCopyRaw:(NSString *)raw __attribute__((swift_name("doCopy(raw:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.MissingPaymentAddress")))
+@interface ZappOfframpPaymentQrErrorMissingPaymentAddress : ZappOfframpPaymentQrError
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrErrorMissingPaymentAddress *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)missingPaymentAddress __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrError.UnsupportedCurrency")))
+@interface ZappOfframpPaymentQrErrorUnsupportedCurrency : ZappOfframpPaymentQrError
+@property (readonly) NSString *code __attribute__((swift_name("code")));
+- (instancetype)initWithCode:(NSString *)code __attribute__((swift_name("init(code:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrErrorUnsupportedCurrency *)doCopyCode:(NSString *)code __attribute__((swift_name("doCopy(code:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("PaymentQrParseResult")))
+@interface ZappOfframpPaymentQrParseResult : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrParseResult.Failure")))
+@interface ZappOfframpPaymentQrParseResultFailure : ZappOfframpPaymentQrParseResult
+@property (readonly) ZappOfframpPaymentQrError *error __attribute__((swift_name("error")));
+- (instancetype)initWithError:(ZappOfframpPaymentQrError *)error __attribute__((swift_name("init(error:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrParseResultFailure *)doCopyError:(ZappOfframpPaymentQrError *)error __attribute__((swift_name("doCopy(error:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrParseResult.Success")))
+@interface ZappOfframpPaymentQrParseResultSuccess : ZappOfframpPaymentQrParseResult
+@property (readonly) ZappOfframpParsedPaymentQr *parsed __attribute__((swift_name("parsed")));
+- (instancetype)initWithParsed:(ZappOfframpParsedPaymentQr *)parsed __attribute__((swift_name("init(parsed:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPaymentQrParseResultSuccess *)doCopyParsed:(ZappOfframpParsedPaymentQr *)parsed __attribute__((swift_name("doCopy(parsed:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Parses [qrData] for [currency], dispatching to the per-rail parser exactly as the SDK's
+ * `parseQR` switches on currency (`qr-parsers/parse-qr.ts`) — the rail is taken from the order's
+ * currency, never sniffed from the QR. `suspend` only because dynamic PIX must fetch the amount
+ * from the issuing bank; UPI and QRIS resolve synchronously.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PaymentQrParser")))
+@interface ZappOfframpPaymentQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPaymentQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses [qrData] for [currency], dispatching to the per-rail parser exactly as the SDK's
+ * `parseQR` switches on currency (`qr-parsers/parse-qr.ts`) — the rail is taken from the order's
+ * currency, never sniffed from the QR. `suspend` only because dynamic PIX must fetch the amount
+ * from the issuing bank; UPI and QRIS resolve synchronously.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)paymentQrParser __attribute__((swift_name("init()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)parseCurrency:(ZappOfframpCurrencyCode *)currency qrData:(NSString *)qrData dynamicPixResolver:(id<ZappOfframpDynamicPixResolver> _Nullable)dynamicPixResolver orderId:(NSString * _Nullable)orderId completionHandler:(void (^)(ZappOfframpPaymentQrParseResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("parse(currency:qrData:dynamicPixResolver:orderId:completionHandler:)")));
+@end
+
+
+/** A dynamic-PIX fetch failed (transport error, non-2xx, or an unparseable JWT). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PixFetchException")))
+@interface ZappOfframpPixFetchException : ZappOfframpKotlinException
+- (instancetype)initWithMessage:(NSString *)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (instancetype)new __attribute__((unavailable));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/**
+ * Resolves dynamic-PIX amounts via a hosted p2p.me PIX proxy: `GET {proxyUrl}/pix?locationUrl=…`
+ * (with an optional `orderId` for tracing). The proxy fetches the bank endpoint server-side and
+ * returns its JWT. Mirrors `fetchDynamicData` (`@p2pdotme/sdk` `qr-parsers/parsers/brl.ts`), which
+ * exists because the official web app cannot call the bank directly from the browser (CORS). The
+ * app itself uses [DirectPixResolver]; this is the alternative when a proxy is preferred.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PixProxyClient")))
+@interface ZappOfframpPixProxyClient : ZappOfframpBase <ZappOfframpDynamicPixResolver>
+- (instancetype)initWithHttpClient:(ZappOfframpKtor_client_coreHttpClient *)httpClient proxyUrl:(NSString *)proxyUrl __attribute__((swift_name("init(httpClient:proxyUrl:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)resolveAmountLocationUrl:(NSString *)locationUrl orderId:(NSString * _Nullable)orderId completionHandler:(void (^)(NSString * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("resolveAmount(locationUrl:orderId:completionHandler:)")));
+@end
+
+
+/**
+ * Parses a Brazilian PIX "copia e cola" (EMVCo MPM) merchant QR. Byte-compatible with
+ * `@p2pdotme/sdk` v1.1.7 (`qr-parsers/parsers/brl.ts`): verify the CRC, require the payload-format
+ * tag (00), take the merchant name (tag 59, or "MERCHANT_NOT_FOUND"), and resolve the amount from
+ * the static tag 54 — or, for a dynamic QR whose tag 26 embeds a bank `location` URL, by fetching
+ * it through [DynamicPixResolver]. A present-but-unparseable amount is rejected instead of being
+ * treated as payer-defined; otherwise Android could encrypt a payload whose amount disagrees with
+ * the amount sent to the contract.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PixQrParser")))
+@interface ZappOfframpPixQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPixQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses a Brazilian PIX "copia e cola" (EMVCo MPM) merchant QR. Byte-compatible with
+ * `@p2pdotme/sdk` v1.1.7 (`qr-parsers/parsers/brl.ts`): verify the CRC, require the payload-format
+ * tag (00), take the merchant name (tag 59, or "MERCHANT_NOT_FOUND"), and resolve the amount from
+ * the static tag 54 — or, for a dynamic QR whose tag 26 embeds a bank `location` URL, by fetching
+ * it through [DynamicPixResolver]. A present-but-unparseable amount is rejected instead of being
+ * treated as payer-defined; otherwise Android could encrypt a payload whose amount disagrees with
+ * the amount sent to the contract.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)pixQrParser __attribute__((swift_name("init()")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)parseQrData:(NSString *)qrData resolver:(id<ZappOfframpDynamicPixResolver> _Nullable)resolver orderId:(NSString * _Nullable)orderId completionHandler:(void (^)(ZappOfframpPaymentQrParseResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("parse(qrData:resolver:orderId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PlaceOrderArgs")))
+@interface ZappOfframpPlaceOrderArgs : ZappOfframpBase
+@property (readonly) ZappOfframpBigInteger *circleId __attribute__((swift_name("circleId")));
+@property (readonly) ZappOfframpCurrencyCode *currency __attribute__((swift_name("currency")));
+@property (readonly) id fiatAmountLimit __attribute__((swift_name("fiatAmountLimit")));
+@property (readonly) ZappOfframpOrderType *orderType __attribute__((swift_name("orderType")));
+@property (readonly) ZappOfframpBigInteger *preferredPaymentChannelConfigId __attribute__((swift_name("preferredPaymentChannelConfigId")));
+@property (readonly) ZappOfframpAddress *recipientAddress __attribute__((swift_name("recipientAddress")));
+@property (readonly) NSString *relayPubKeyEthCrypto __attribute__((swift_name("relayPubKeyEthCrypto")));
+@property (readonly) id usdcAmount __attribute__((swift_name("usdcAmount")));
+- (instancetype)initWithRelayPubKeyEthCrypto:(NSString *)relayPubKeyEthCrypto usdcAmount:(id)usdcAmount recipientAddress:(ZappOfframpAddress *)recipientAddress orderType:(ZappOfframpOrderType *)orderType currency:(ZappOfframpCurrencyCode *)currency circleId:(ZappOfframpBigInteger *)circleId fiatAmountLimit:(id)fiatAmountLimit preferredPaymentChannelConfigId:(ZappOfframpBigInteger *)preferredPaymentChannelConfigId __attribute__((swift_name("init(relayPubKeyEthCrypto:usdcAmount:recipientAddress:orderType:currency:circleId:fiatAmountLimit:preferredPaymentChannelConfigId:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPlaceOrderArgs *)doCopyRelayPubKeyEthCrypto:(NSString *)relayPubKeyEthCrypto usdcAmount:(id)usdcAmount recipientAddress:(ZappOfframpAddress *)recipientAddress orderType:(ZappOfframpOrderType *)orderType currency:(ZappOfframpCurrencyCode *)currency circleId:(ZappOfframpBigInteger *)circleId fiatAmountLimit:(id)fiatAmountLimit preferredPaymentChannelConfigId:(ZappOfframpBigInteger *)preferredPaymentChannelConfigId __attribute__((swift_name("doCopy(relayPubKeyEthCrypto:usdcAmount:recipientAddress:orderType:currency:circleId:fiatAmountLimit:preferredPaymentChannelConfigId:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * `sellPrice` is expressed in the same 6-decimal unit as USDC by the diamond contract (e.g.
+ * `sellPrice = 89_178_176` ⇒ 1 USDC ≈ 89.178176 fiat). Wrapping in [Usdc6] prevents accidentally
+ * treating the value as a fiat or USDC whole-token quantity at any callsite.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PriceConfig")))
+@interface ZappOfframpPriceConfig : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpPriceConfigCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) id sellPrice __attribute__((swift_name("sellPrice")));
+- (instancetype)initWithSellPrice:(id)sellPrice __attribute__((swift_name("init(sellPrice:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpPriceConfig *)doCopySellPrice:(id)sellPrice __attribute__((swift_name("doCopy(sellPrice:)")));
+
+/**
+ * `sellPrice` is expressed in the same 6-decimal unit as USDC by the diamond contract (e.g.
+ * `sellPrice = 89_178_176` ⇒ 1 USDC ≈ 89.178176 fiat). Wrapping in [Usdc6] prevents accidentally
+ * treating the value as a fiat or USDC whole-token quantity at any callsite.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (ZappOfframpBigDecimal *)fiatForUsdcUsdcAmount:(ZappOfframpBigDecimal *)usdcAmount fiatScale:(int32_t)fiatScale __attribute__((swift_name("fiatForUsdc(usdcAmount:fiatScale:)")));
+
+/**
+ * `sellPrice` is expressed in the same 6-decimal unit as USDC by the diamond contract (e.g.
+ * `sellPrice = 89_178_176` ⇒ 1 USDC ≈ 89.178176 fiat). Wrapping in [Usdc6] prevents accidentally
+ * treating the value as a fiat or USDC whole-token quantity at any callsite.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (ZappOfframpBigDecimal *)sellPriceAsRate __attribute__((swift_name("sellPriceAsRate()")));
+
+/**
+ * `sellPrice` is expressed in the same 6-decimal unit as USDC by the diamond contract (e.g.
+ * `sellPrice = 89_178_176` ⇒ 1 USDC ≈ 89.178176 fiat). Wrapping in [Usdc6] prevents accidentally
+ * treating the value as a fiat or USDC whole-token quantity at any callsite.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+- (ZappOfframpBigDecimal *)usdcForFiatFiatAmount:(ZappOfframpBigDecimal *)fiatAmount usdcScale:(int32_t)usdcScale __attribute__((swift_name("usdcForFiat(fiatAmount:usdcScale:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PriceConfig.Companion")))
+@interface ZappOfframpPriceConfigCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPriceConfigCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PriceConfigDecoder")))
+@interface ZappOfframpPriceConfigDecoder : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpPriceConfigDecoder *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)priceConfigDecoder __attribute__((swift_name("init()")));
+
+/** Decodes `getPriceConfig(bytes32)` — four packed uint256 words; only `sellPrice` is surfaced. */
+- (ZappOfframpPriceConfig *)decodeReturnData:(ZappOfframpKotlinByteArray *)returnData __attribute__((swift_name("decode(returnData:)")));
+@end
+
+
+/**
+ * Parses an Indonesian QRIS (EMVCo MPM) merchant QR. Byte-compatible with `@p2pdotme/sdk` v1.1.7
+ * (`qr-parsers/parsers/idr.ts`): the payment address is the merchant name (tag 59), the amount is
+ * optional (tag 54, payer-defined when absent), and a present-but-unparseable amount is a hard
+ * error — unlike PIX, which drops it. The EMVCo CRC (tag 63) is left unverified to mirror the SDK's
+ * `parseQRIS` (PIX, by contrast, checks it).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("QrisQrParser")))
+@interface ZappOfframpQrisQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpQrisQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Parses an Indonesian QRIS (EMVCo MPM) merchant QR. Byte-compatible with `@p2pdotme/sdk` v1.1.7
+ * (`qr-parsers/parsers/idr.ts`): the payment address is the merchant name (tag 59), the amount is
+ * optional (tag 54, payer-defined when absent), and a present-but-unparseable amount is a hard
+ * error — unlike PIX, which drops it. The EMVCo CRC (tag 63) is left unverified to mirror the SDK's
+ * `parseQRIS` (PIX, by contrast, checks it).
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)qrisQrParser __attribute__((swift_name("init()")));
+- (ZappOfframpPaymentQrParseResult *)parseQrData:(NSString *)qrData __attribute__((swift_name("parse(qrData:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RelayIdentities")))
+@interface ZappOfframpRelayIdentities : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpRelayIdentities *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)relayIdentities __attribute__((swift_name("init()")));
+- (ZappOfframpRelayIdentity *)generate __attribute__((swift_name("generate()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RelayIdentity")))
+@interface ZappOfframpRelayIdentity : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpRelayIdentityCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *privateKeyHex __attribute__((swift_name("privateKeyHex")));
+@property (readonly) NSString *publicKeyHex __attribute__((swift_name("publicKeyHex")));
+- (instancetype)initWithPrivateKeyHex:(NSString *)privateKeyHex publicKeyHex:(NSString *)publicKeyHex __attribute__((swift_name("init(privateKeyHex:publicKeyHex:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpRelayIdentity *)doCopyPrivateKeyHex:(NSString *)privateKeyHex publicKeyHex:(NSString *)publicKeyHex __attribute__((swift_name("doCopy(privateKeyHex:publicKeyHex:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RelayIdentity.Companion")))
+@interface ZappOfframpRelayIdentityCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpRelayIdentityCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SubgraphClient")))
+@interface ZappOfframpSubgraphClient : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpSubgraphClientCompanion *companion __attribute__((swift_name("companion")));
+- (instancetype)initWithHttpClient:(ZappOfframpKtor_client_coreHttpClient *)httpClient subgraphUrl:(NSString *)subgraphUrl __attribute__((swift_name("init(httpClient:subgraphUrl:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)circlesForRoutingCurrencyBytes32Hex:(NSString *)currencyBytes32Hex completionHandler:(void (^)(NSArray<ZappOfframpCircleForRouting *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("circlesForRouting(currencyBytes32Hex:completionHandler:)")));
+
+/**
+ * One page of orders for [userAddress] sorted by `placedAt desc`. Mirrors
+ * `OrdersCollectionWithDateFilter` in `user-app-client`; callers walk pages until a page
+ * returns fewer than [first] rows.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)ordersForUserUserAddress:(NSString *)userAddress first:(int32_t)first skip:(int32_t)skip completionHandler:(void (^)(NSArray<NSDictionary<NSString *, ZappOfframpKotlinx_serialization_jsonJsonElement *> *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("ordersForUser(userAddress:first:skip:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)rawOrderByIdOrderId:(NSString *)orderId completionHandler:(void (^)(NSDictionary<NSString *, ZappOfframpKotlinx_serialization_jsonJsonElement *> * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("rawOrderById(orderId:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SubgraphClient.Companion")))
+@interface ZappOfframpSubgraphClientCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpSubgraphClientCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *CIRCLES_FOR_ROUTING_QUERY __attribute__((swift_name("CIRCLES_FOR_ROUTING_QUERY")));
+@property (readonly) NSString *ORDER_BY_ID_QUERY __attribute__((swift_name("ORDER_BY_ID_QUERY")));
+@property (readonly) NSString *USER_ORDERS_QUERY __attribute__((swift_name("USER_ORDERS_QUERY")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SubgraphOrderReader")))
+@interface ZappOfframpSubgraphOrderReader : ZappOfframpBase <ZappOfframpOrderReadSource>
+- (instancetype)initWithSubgraph:(ZappOfframpSubgraphClient *)subgraph __attribute__((swift_name("init(subgraph:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)fetchOrderOrderId:(ZappOfframpBigInteger *)orderId completionHandler:(void (^)(ZappOfframpOrderSnapshot * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("fetchOrder(orderId:completionHandler:)")));
+@end
+
+
+/**
+ * Builds the `upi://pay?…` URI the merchant decrypts and runs through `parseQR` to settle an
+ * accepted PAY order. Sending a bare VPA + `updatedAmount=0` to setSellOrderUpi makes the Diamond
+ * auto-cancel the order in the same tx; the merchant pool also runs the SDK's `parseUPI` on the
+ * decrypted payload, so the input must parse with at least `pa` and `am` (§6 of the findings).
+ *
+ * Shape mirrors `@p2pdotme/sdk` v1.1.7 / `qr-parsers/parsers/inr.ts`:
+ *   upi://pay?pa=<vpa>&pn=<payee-name>&am=<inr-amount>&cu=INR
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiPayUri")))
+@interface ZappOfframpUpiPayUri : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpUpiPayUri *shared __attribute__((swift_name("shared")));
+@property (readonly) int32_t INR_DECIMAL_PLACES __attribute__((swift_name("INR_DECIMAL_PLACES")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Builds the `upi://pay?…` URI the merchant decrypts and runs through `parseQR` to settle an
+ * accepted PAY order. Sending a bare VPA + `updatedAmount=0` to setSellOrderUpi makes the Diamond
+ * auto-cancel the order in the same tx; the merchant pool also runs the SDK's `parseUPI` on the
+ * decrypted payload, so the input must parse with at least `pa` and `am` (§6 of the findings).
+ *
+ * Shape mirrors `@p2pdotme/sdk` v1.1.7 / `qr-parsers/parsers/inr.ts`:
+ *   upi://pay?pa=<vpa>&pn=<payee-name>&am=<inr-amount>&cu=INR
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)upiPayUri __attribute__((swift_name("init()")));
+- (NSString *)buildVpa:(NSString *)vpa payeeName:(NSString * _Nullable)payeeName inrAmount:(ZappOfframpBigDecimal *)inrAmount currencyCode:(NSString *)currencyCode __attribute__((swift_name("build(vpa:payeeName:inrAmount:currencyCode:)")));
+
+/** Mirrors `parseAmount` in the SDK: floor(fiat / sellPrice, 6) — never round up. */
+- (int64_t)parsedUsdcMicrosInrAmount:(ZappOfframpBigDecimal *)inrAmount sellPriceInrPerUsdc:(ZappOfframpBigDecimal *)sellPriceInrPerUsdc __attribute__((swift_name("parsedUsdcMicros(inrAmount:sellPriceInrPerUsdc:)")));
+
+/**
+ * Decimals retained in the URI's `am=` field. Diamond reads `am=` from the merchant-decrypted
+ * URI and re-derives USDC at setSellOrderUpi; if the caller's `updatedAmount` doesn't equal
+ * `floor(am × 1e6 / sellPrice)` the order is atomically cancelled. Surfaced so callers can snap
+ * their INR amount to the same precision before computing `updatedAmount`.
+ */
+@end
+
+__attribute__((swift_name("UpiQrError")))
+@interface ZappOfframpUpiQrError : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrError.EmptyQr")))
+@interface ZappOfframpUpiQrErrorEmptyQr : ZappOfframpUpiQrError
+@property (class, readonly, getter=shared) ZappOfframpUpiQrErrorEmptyQr *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)emptyQr __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrError.InvalidAmount")))
+@interface ZappOfframpUpiQrErrorInvalidAmount : ZappOfframpUpiQrError
+@property (readonly) NSString *raw __attribute__((swift_name("raw")));
+- (instancetype)initWithRaw:(NSString *)raw __attribute__((swift_name("init(raw:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUpiQrErrorInvalidAmount *)doCopyRaw:(NSString *)raw __attribute__((swift_name("doCopy(raw:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrError.InvalidUpiId")))
+@interface ZappOfframpUpiQrErrorInvalidUpiId : ZappOfframpUpiQrError
+@property (readonly) NSString *raw __attribute__((swift_name("raw")));
+- (instancetype)initWithRaw:(NSString *)raw __attribute__((swift_name("init(raw:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUpiQrErrorInvalidUpiId *)doCopyRaw:(NSString *)raw __attribute__((swift_name("doCopy(raw:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrError.MissingPaymentAddress")))
+@interface ZappOfframpUpiQrErrorMissingPaymentAddress : ZappOfframpUpiQrError
+@property (class, readonly, getter=shared) ZappOfframpUpiQrErrorMissingPaymentAddress *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)missingPaymentAddress __attribute__((swift_name("init()")));
+@end
+
+__attribute__((swift_name("UpiQrParseResult")))
+@interface ZappOfframpUpiQrParseResult : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrParseResult.Failure")))
+@interface ZappOfframpUpiQrParseResultFailure : ZappOfframpUpiQrParseResult
+@property (readonly) ZappOfframpUpiQrError *error __attribute__((swift_name("error")));
+- (instancetype)initWithError:(ZappOfframpUpiQrError *)error __attribute__((swift_name("init(error:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUpiQrParseResultFailure *)doCopyError:(ZappOfframpUpiQrError *)error __attribute__((swift_name("doCopy(error:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrParseResult.Success")))
+@interface ZappOfframpUpiQrParseResultSuccess : ZappOfframpUpiQrParseResult
+@property (readonly) ZappOfframpParsedUpiQr *parsed __attribute__((swift_name("parsed")));
+- (instancetype)initWithParsed:(ZappOfframpParsedUpiQr *)parsed __attribute__((swift_name("init(parsed:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpUpiQrParseResultSuccess *)doCopyParsed:(ZappOfframpParsedUpiQr *)parsed __attribute__((swift_name("doCopy(parsed:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Validates and parses INR/UPI payment QR codes. Two regexes intentionally diverge — they mirror
+ * the split in `@p2pdotme/sdk` v1.1.7:
+ *
+ * - [VALIDATE_REGEX] is the **strict** form (mirrors `country/currencies/inr.ts validateUPIId`):
+ *   2-256 chars local part, 2-64 alphanumeric bank handle. Use for user-typed UPI IDs entered
+ *   into the form. Examples that must pass: `john@paytm`, `user.name@ybl`, `8658404239@kotak811`.
+ *
+ * - [PARSE_REGEX] is the **lenient** form (mirrors `qr-parsers/parsers/inr.ts UPI_ID_REGEX`):
+ *   allows `.` and `-` in the bank handle. Use only for the `pa` parameter pulled out of a
+ *   scanned `upi://pay?...` URI, where real-world merchant QRs occasionally include those.
+ *
+ * Keeping both lets the form be strict on what the user types while still accepting merchant
+ * QRs the SDK would accept. Diverging from these regexes will cause some merchant payments to
+ * fail on the SDK side after we've already broadcast `placeOrder`, so do NOT relax either
+ * without coordinating with the p2p.me SDK.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UpiQrParser")))
+@interface ZappOfframpUpiQrParser : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpUpiQrParser *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Validates and parses INR/UPI payment QR codes. Two regexes intentionally diverge — they mirror
+ * the split in `@p2pdotme/sdk` v1.1.7:
+ *
+ * - [VALIDATE_REGEX] is the **strict** form (mirrors `country/currencies/inr.ts validateUPIId`):
+ *   2-256 chars local part, 2-64 alphanumeric bank handle. Use for user-typed UPI IDs entered
+ *   into the form. Examples that must pass: `john@paytm`, `user.name@ybl`, `8658404239@kotak811`.
+ *
+ * - [PARSE_REGEX] is the **lenient** form (mirrors `qr-parsers/parsers/inr.ts UPI_ID_REGEX`):
+ *   allows `.` and `-` in the bank handle. Use only for the `pa` parameter pulled out of a
+ *   scanned `upi://pay?...` URI, where real-world merchant QRs occasionally include those.
+ *
+ * Keeping both lets the form be strict on what the user types while still accepting merchant
+ * QRs the SDK would accept. Diverging from these regexes will cause some merchant payments to
+ * fail on the SDK side after we've already broadcast `placeOrder`, so do NOT relax either
+ * without coordinating with the p2p.me SDK.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)upiQrParser __attribute__((swift_name("init()")));
+
+/**
+ * Best-effort `pa=` extraction from any UPI-shaped payload (`upi://pay?…`, bare `?…` query, or
+ * a raw VPA). Returns the input verbatim when no `pa` parameter is present, matching the SELL
+ * flow's "bare VPA in encUpi" convention. Use [parseQr] for the structured QR-validation path.
+ */
+- (NSString *)extractPaPayload:(NSString *)payload __attribute__((swift_name("extractPa(payload:)")));
+
+/**
+ * Parses a scanned UPI QR payload. Accepts:
+ * - Full URI: `upi://pay?pa=merchant@upi&pn=Name&am=250&cu=INR`
+ * - Bare query string: `pa=merchant@upi&am=100`
+ * - Trimmed whitespace.
+ *
+ * Returns a [UpiQrParseResult] sum type so callers can pattern-match on the failure mode
+ * (UI surfaces a different message per case).
+ */
+- (ZappOfframpUpiQrParseResult *)parseQrQrData:(NSString *)qrData __attribute__((swift_name("parseQr(qrData:)")));
+
+/**
+ * Strict validation for a UPI ID typed into the form. Mirrors `validateUPIId` in
+ * `@p2pdotme/sdk` v1.1.7 byte-for-byte.
+ */
+- (BOOL)validateUpiIdUpiId:(NSString *)upiId __attribute__((swift_name("validateUpiId(upiId:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinByteArray")))
+@interface ZappOfframpKotlinByteArray : ZappOfframpBase
+@property (readonly) int32_t size __attribute__((swift_name("size")));
++ (instancetype)arrayWithSize:(int32_t)size __attribute__((swift_name("init(size:)")));
++ (instancetype)arrayWithSize:(int32_t)size init:(ZappOfframpByte *(^)(ZappOfframpInt *))init __attribute__((swift_name("init(size:init:)")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (int8_t)getIndex:(int32_t)index __attribute__((swift_name("get(index:)")));
+- (ZappOfframpKotlinByteIterator *)iterator __attribute__((swift_name("iterator()")));
+- (void)setIndex:(int32_t)index value:(int8_t)value __attribute__((swift_name("set(index:value:)")));
+@end
+
+@interface ZappOfframpKotlinByteArray (Extensions)
+
+/** Left-pads (or left-truncates) this byte array to one canonical 32-byte EVM word. */
+- (ZappOfframpKotlinByteArray *)padLeftToWord __attribute__((swift_name("padLeftToWord()")));
+- (NSString *)toHex __attribute__((swift_name("toHex()")));
+@end
+
+@interface ZappOfframpBigInteger (Extensions)
+- (ZappOfframpBigInteger *)divOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("div(other:)")));
+- (ZappOfframpBigInteger *)minusOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("minus(other:)")));
+- (ZappOfframpBigInteger *)plusOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("plus(other:)")));
+- (ZappOfframpBigInteger *)remOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("rem(other:)")));
+- (ZappOfframpBigInteger *)timesOther:(ZappOfframpBigInteger *)other __attribute__((swift_name("times(other:)")));
+@end
+
+@interface ZappOfframpBaseRpcClient (Extensions)
+
+/** Calls `diamondAddress.getAdditionalOrderDetails(orderId)` and decodes the fee-bundle tuple.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getAdditionalOrderDetailsDiamondAddress:(ZappOfframpAddress *)diamondAddress orderId:(ZappOfframpBigInteger *)orderId completionHandler:(void (^)(ZappOfframpOrderFeeDetails * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getAdditionalOrderDetails(diamondAddress:orderId:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getPayFeeConfigDiamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(ZappOfframpPayFeeConfig * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getPayFeeConfig(diamondAddress:currency:completionHandler:)")));
+
+/** Calls `diamondAddress.getPriceConfig(currency)` and decodes the four-word return.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getPriceConfigDiamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(ZappOfframpPriceConfig * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getPriceConfig(diamondAddress:currency:completionHandler:)")));
+
+/**
+ * Reads `getSmallOrderFixedFeePay(currency)` — the fixed USDC fee the Diamond pulls as a *second*
+ * `transferFrom` inside `setSellOrderUpi` for PAY orders at or below [getSmallOrderThreshold].
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getSmallOrderFixedFeePayDiamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getSmallOrderFixedFeePay(diamondAddress:currency:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getSmallOrderThresholdDiamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getSmallOrderThreshold(diamondAddress:currency:completionHandler:)")));
+
+/** Reads `usdcAddress.balanceOf(owner)` and returns the 6-decimal micros as a typed [Usdc6].
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)getUsdcBalanceUsdcAddress:(ZappOfframpAddress *)usdcAddress owner:(ZappOfframpAddress *)owner completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getUsdcBalance(usdcAddress:owner:completionHandler:)")));
+@end
+
+@interface ZappOfframpOfframpStatus (Extensions)
+@property (readonly) ZappOfframpBigInteger * _Nullable orderId_ __attribute__((swift_name("orderId_")));
+@property (readonly) ZappOfframpOfframpStep *step_ __attribute__((swift_name("step_")));
+
+/** The on-chain order id once the flow has placed one, else null (pre-order steps + Idle). */
+
+/** Derives the canonical [OfframpStep] from any [OfframpStatus] instance. */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BigDecimalIosKt")))
+@interface ZappOfframpBigDecimalIosKt : ZappOfframpBase
++ (ZappOfframpBigDecimal *)bigDecimalFromBigIntegerValue:(ZappOfframpBigInteger *)value __attribute__((swift_name("bigDecimalFromBigInteger(value:)")));
++ (ZappOfframpBigDecimal *)decimalDivideDividend:(ZappOfframpBigDecimal *)dividend divisor:(ZappOfframpBigDecimal *)divisor scale:(int32_t)scale rounding:(ZappOfframpDecimalRounding *)rounding __attribute__((swift_name("decimalDivide(dividend:divisor:scale:rounding:)")));
++ (ZappOfframpBigDecimal *)decimalMovePointLeftValue:(ZappOfframpBigDecimal *)value distance:(int32_t)distance __attribute__((swift_name("decimalMovePointLeft(value:distance:)")));
++ (ZappOfframpBigDecimal *)decimalMovePointRightValue:(ZappOfframpBigDecimal *)value distance:(int32_t)distance __attribute__((swift_name("decimalMovePointRight(value:distance:)")));
++ (ZappOfframpBigDecimal *)decimalMultiplyLeft:(ZappOfframpBigDecimal *)left right:(ZappOfframpBigDecimal *)right __attribute__((swift_name("decimalMultiply(left:right:)")));
++ (ZappOfframpBigDecimal *)decimalSetScaleValue:(ZappOfframpBigDecimal *)value scale:(int32_t)scale rounding:(ZappOfframpDecimalRounding *)rounding __attribute__((swift_name("decimalSetScale(value:scale:rounding:)")));
++ (ZappOfframpBigDecimal *)decimalStripTrailingZerosValue:(ZappOfframpBigDecimal *)value __attribute__((swift_name("decimalStripTrailingZeros(value:)")));
++ (ZappOfframpBigInteger *)decimalToBigIntegerValue:(ZappOfframpBigDecimal *)value __attribute__((swift_name("decimalToBigInteger(value:)")));
++ (int64_t)decimalToLongValue:(ZappOfframpBigDecimal *)value __attribute__((swift_name("decimalToLong(value:)")));
++ (NSString *)decimalToPlainStringValue:(ZappOfframpBigDecimal *)value __attribute__((swift_name("decimalToPlainString(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BigIntegerHexKt")))
+@interface ZappOfframpBigIntegerHexKt : ZappOfframpBase
+
+/**
+ * Parses a hex string (with or without `0x` prefix) as an unsigned [BigInteger]. Empty or `"0x"`
+ * → [BigInteger.ZERO]. Used everywhere RPC responses return hex-encoded numeric fields
+ * (eth_chainId, eth_gasPrice, block.baseFeePerGas, UserOp gas limits, …).
+ */
++ (ZappOfframpBigInteger *)hexToBigIntegerHex:(NSString *)hex __attribute__((swift_name("hexToBigInteger(hex:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BigIntegerIosKt")))
+@interface ZappOfframpBigIntegerIosKt : ZappOfframpBase
+@property (class, readonly) ZappOfframpBigInteger *bigIntegerOne __attribute__((swift_name("bigIntegerOne")));
+@property (class, readonly) ZappOfframpBigInteger *bigIntegerZero __attribute__((swift_name("bigIntegerZero")));
++ (ZappOfframpBigInteger *)bigIntegerValueOfValue:(int64_t)value __attribute__((swift_name("bigIntegerValueOf(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("HexBytesKt")))
+@interface ZappOfframpHexBytesKt : ZappOfframpBase
++ (ZappOfframpKotlinByteArray *)hexToBytes:(NSString *)receiver __attribute__((swift_name("hexToBytes(_:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KeccakKt")))
+@interface ZappOfframpKeccakKt : ZappOfframpBase
+
+/** Ethereum's legacy Keccak-256 (not the NIST SHA3-256 padding variant). */
++ (ZappOfframpKotlinByteArray *)keccak256Data:(ZappOfframpKotlinByteArray *)data __attribute__((swift_name("keccak256(data:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("P2pOrderHistoryKt")))
+@interface ZappOfframpP2pOrderHistoryKt : ZappOfframpBase
+
+/**
+ * If [plain] is a `upi://pay?…` URI, returns the `pa=` VPA; otherwise returns the input verbatim
+ * (the SELL flow seals a bare VPA into encUpi, not a URI). Thin delegate over [UpiQrParser.extractPa]
+ * to keep a single canonical UPI parser.
+ */
++ (NSString *)extractUpiVpaPlain:(NSString *)plain __attribute__((swift_name("extractUpiVpa(plain:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RelayIdentityStoreKt")))
+@interface ZappOfframpRelayIdentityStoreKt : ZappOfframpBase
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
++ (void)getOrCreate:(id<ZappOfframpRelayIdentityStore>)receiver generate:(ZappOfframpRelayIdentity *(^)(void))generate completionHandler:(void (^)(ZappOfframpRelayIdentity * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getOrCreate(_:generate:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RlpKt")))
+@interface ZappOfframpRlpKt : ZappOfframpBase
++ (id<ZappOfframpRlpItem>)rlpBytesB:(ZappOfframpKotlinByteArray *)b __attribute__((swift_name("rlpBytes(b:)")));
++ (id<ZappOfframpRlpItem>)rlpEmpty __attribute__((swift_name("rlpEmpty()")));
++ (id<ZappOfframpRlpItem>)rlpIntV:(int64_t)v __attribute__((swift_name("rlpInt(v:)")));
++ (id<ZappOfframpRlpItem>)rlpIntV_:(ZappOfframpBigInteger *)v __attribute__((swift_name("rlpInt(v_:)")));
++ (id<ZappOfframpRlpItem>)rlpListItems:(ZappOfframpKotlinArray<id<ZappOfframpRlpItem>> *)items __attribute__((swift_name("rlpList(items:)")));
++ (id<ZappOfframpRlpItem>)rlpListItems_:(NSArray<id<ZappOfframpRlpItem>> *)items __attribute__((swift_name("rlpList(items_:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("__SkieSuspendWrappersKt")))
+@interface ZappOfframp__SkieSuspendWrappersKt : ZappOfframpBase
++ (void)Skie_Suspend__0__getOrCreateExtensionReceiver:(id<ZappOfframpRelayIdentityStore>)extensionReceiver generate:(ZappOfframpRelayIdentity *(^)(void))generate suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__0__getOrCreate(extensionReceiver:generate:suspendHandler:)")));
++ (void)Skie_Suspend__10__ethSendRawTransactionDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver rawTxHex:(NSString *)rawTxHex suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__10__ethSendRawTransaction(dispatchReceiver:rawTxHex:suspendHandler:)")));
++ (void)Skie_Suspend__11__joinDispatchReceiver:(id<ZappOfframpKotlinx_coroutines_coreJob>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__11__join(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__12__executeDispatchReceiver:(ZappOfframpKtor_utilsPipeline<id, id> *)dispatchReceiver context:(id)context subject:(id)subject suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__12__execute(dispatchReceiver:context:subject:suspendHandler:)")));
++ (void)Skie_Suspend__13__invokeDispatchReceiver:(id<ZappOfframpKotlinSuspendFunction2>)dispatchReceiver p1:(id _Nullable)p1 p2:(id _Nullable)p2 suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__13__invoke(dispatchReceiver:p1:p2:suspendHandler:)")));
++ (void)Skie_Suspend__14__bodyDispatchReceiver:(ZappOfframpKtor_client_coreHttpClientCall *)dispatchReceiver info:(ZappOfframpKtor_utilsTypeInfo *)info suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__14__body(dispatchReceiver:info:suspendHandler:)")));
++ (void)Skie_Suspend__15__bodyNullableDispatchReceiver:(ZappOfframpKtor_client_coreHttpClientCall *)dispatchReceiver info:(ZappOfframpKtor_utilsTypeInfo *)info suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__15__bodyNullable(dispatchReceiver:info:suspendHandler:)")));
+
+/**
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
++ (void)Skie_Suspend__16__getResponseContentDispatchReceiver:(ZappOfframpKtor_client_coreHttpClientCall *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__16__getResponseContent(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__17__awaitContentDispatchReceiver:(id<ZappOfframpKtor_ioByteReadChannel>)dispatchReceiver min:(int32_t)min suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__17__awaitContent(dispatchReceiver:min:suspendHandler:)")));
++ (void)Skie_Suspend__18__executeDispatchReceiver:(id<ZappOfframpKtor_client_coreHttpClientEngine>)dispatchReceiver data:(ZappOfframpKtor_client_coreHttpRequestData *)data suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__18__execute(dispatchReceiver:data:suspendHandler:)")));
++ (void)Skie_Suspend__19__estimateUserOperationGasDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver op:(ZappOfframpUserOperationV06 *)op suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__19__estimateUserOperationGas(dispatchReceiver:op:suspendHandler:)")));
++ (void)Skie_Suspend__1__ethCallDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver to:(ZappOfframpAddress *)to data:(ZappOfframpKotlinByteArray *)data blockTag:(NSString *)blockTag suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__1__ethCall(dispatchReceiver:to:data:blockTag:suspendHandler:)")));
++ (void)Skie_Suspend__20__getPaymasterStubDataDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver op:(ZappOfframpUserOperationV06 *)op suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__20__getPaymasterStubData(dispatchReceiver:op:suspendHandler:)")));
++ (void)Skie_Suspend__21__getUserOperationGasPriceDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__21__getUserOperationGasPrice(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__22__getUserOperationReceiptDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver userOpHash:(ZappOfframpTxHash *)userOpHash suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__22__getUserOperationReceipt(dispatchReceiver:userOpHash:suspendHandler:)")));
++ (void)Skie_Suspend__23__sendUserOperationDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver op:(ZappOfframpUserOperationV06 *)op suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__23__sendUserOperation(dispatchReceiver:op:suspendHandler:)")));
++ (void)Skie_Suspend__24__sponsorUserOperationDispatchReceiver:(ZappOfframpBundlerClient *)dispatchReceiver op:(ZappOfframpUserOperationV06 *)op suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__24__sponsorUserOperation(dispatchReceiver:op:suspendHandler:)")));
++ (void)Skie_Suspend__25__awaitReceiptDispatchReceiver:(id<ZappOfframpTxSubmitter>)dispatchReceiver txHash:(ZappOfframpTxHash *)txHash suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__25__awaitReceipt(dispatchReceiver:txHash:suspendHandler:)")));
++ (void)Skie_Suspend__26__sendTransactionDispatchReceiver:(id<ZappOfframpTxSubmitter>)dispatchReceiver to:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__26__sendTransaction(dispatchReceiver:to:value:data:suspendHandler:)")));
++ (void)Skie_Suspend__27__hasNextDispatchReceiver:(ZappOfframpSkieColdFlowIterator<id> *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__27__hasNext(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__28__collectDispatchReceiver:(id<ZappOfframpKotlinx_coroutines_coreFlow>)dispatchReceiver collector:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)collector suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__28__collect(dispatchReceiver:collector:suspendHandler:)")));
++ (void)Skie_Suspend__29__emitDispatchReceiver:(id<ZappOfframpKotlinx_coroutines_coreFlowCollector>)dispatchReceiver value:(id _Nullable)value suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__29__emit(dispatchReceiver:value:suspendHandler:)")));
++ (void)Skie_Suspend__2__ethChainIdDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__2__ethChainId(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__30__nextOfframpAccountDispatchReceiver:(id<ZappOfframpOfframpAccountProvider>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__30__nextOfframpAccount(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__31__getSeedPhraseDispatchReceiver:(id<ZappOfframpSeedPhraseSource>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__31__getSeedPhrase(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__32__resolveDispatchReceiver:(ZappOfframpSmartOfframpAccountProvider *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__32__resolve(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__33__executeDispatchReceiver:(id<ZappOfframpAppleOfframpBridge>)dispatchReceiver depositAddress:(NSString *)depositAddress suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__33__execute(dispatchReceiver:depositAddress:suspendHandler:)")));
++ (void)Skie_Suspend__34__prepareDispatchReceiver:(id<ZappOfframpAppleOfframpBridge>)dispatchReceiver accountAddress:(NSString *)accountAddress usdcMicros:(NSString *)usdcMicros suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__34__prepare(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)")));
++ (void)Skie_Suspend__35__prepareRefundDispatchReceiver:(id<ZappOfframpAppleOfframpBridge>)dispatchReceiver accountAddress:(NSString *)accountAddress usdcMicros:(NSString *)usdcMicros suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__35__prepareRefund(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)")));
++ (void)Skie_Suspend__36__resumeDispatchReceiver:(id<ZappOfframpAppleOfframpBridge>)dispatchReceiver depositAddress:(NSString *)depositAddress suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__36__resume(dispatchReceiver:depositAddress:suspendHandler:)")));
++ (void)Skie_Suspend__37__accountAddressDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__37__accountAddress(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__38__accountSummaryDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__38__accountSummary(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__39__checkpointCurrencyCodeDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__39__checkpointCurrencyCode(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__3__ethEstimateGasDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver from:(ZappOfframpAddress *)from to:(ZappOfframpAddress *)to value:(id)value data:(ZappOfframpKotlinByteArray *)data suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__3__ethEstimateGas(dispatchReceiver:from:to:value:data:suspendHandler:)")));
++ (void)Skie_Suspend__40__discardCheckpointDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__40__discardCheckpoint(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__41__hasCheckpointDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__41__hasCheckpoint(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__42__historyDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__42__history(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__43__parsePaymentQrDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver currencyCode:(NSString *)currencyCode rawPayload:(NSString *)rawPayload suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__43__parsePaymentQr(dispatchReceiver:currencyCode:rawPayload:suspendHandler:)")));
++ (void)Skie_Suspend__44__quoteDispatchReceiver:(ZappOfframpAppleOfframpClient *)dispatchReceiver currencyCode:(NSString *)currencyCode fiatAmount:(NSString *)fiatAmount suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__44__quote(dispatchReceiver:currencyCode:fiatAmount:suspendHandler:)")));
++ (void)Skie_Suspend__45__createDispatchReceiver:(ZappOfframpAppleOfframpClientCompanion *)dispatchReceiver networkName:(NSString *)networkName seedPhrase:(NSString *)seedPhrase pimlicoApiKey:(NSString *)pimlicoApiKey storage:(id<ZappOfframpAppleOfframpStorage>)storage bridge:(id<ZappOfframpAppleOfframpBridge> _Nullable)bridge rpcUrl:(NSString * _Nullable)rpcUrl subgraphUrl:(NSString * _Nullable)subgraphUrl sponsorshipPolicyId:(NSString * _Nullable)sponsorshipPolicyId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__45__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)")));
++ (void)Skie_Suspend__46__ensureFundedDispatchReceiver:(id<ZappOfframpOfframpFunding>)dispatchReceiver account:(ZappOfframpAddress *)account request:(ZappOfframpOfframpRequest *)request resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__46__ensureFunded(dispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:)")));
++ (void)Skie_Suspend__47__invokeDispatchReceiver:(id<ZappOfframpKotlinSuspendFunction1>)dispatchReceiver p1:(id _Nullable)p1 suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__47__invoke(dispatchReceiver:p1:suspendHandler:)")));
++ (void)Skie_Suspend__48__pullbackTargetDispatchReceiver:(id<ZappOfframpOfframpRefund>)dispatchReceiver account:(ZappOfframpAddress *)account amount:(id)amount suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__48__pullbackTarget(dispatchReceiver:account:amount:suspendHandler:)")));
++ (void)Skie_Suspend__49__bridgeDispatchReceiver:(id<ZappOfframpOfframpTopUp>)dispatchReceiver account:(ZappOfframpAddress *)account usdc:(id)usdc resumeHandle:(NSString * _Nullable)resumeHandle onBridgeStarted:(id<ZappOfframpKotlinSuspendFunction1>)onBridgeStarted suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__49__bridge(dispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:)")));
++ (void)Skie_Suspend__4__ethGasPriceDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__4__ethGasPrice(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__50__requestPaymentDetailsDispatchReceiver:(id<ZappOfframpOfframpPaymentDetailsProvider>)dispatchReceiver orderId:(ZappOfframpBigInteger *)orderId accepted:(ZappOfframpOrderSnapshot *)accepted request:(ZappOfframpOfframpRequest *)request suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__50__requestPaymentDetails(dispatchReceiver:orderId:accepted:request:suspendHandler:)")));
++ (void)Skie_Suspend__51__getDispatchReceiver:(id<ZappOfframpOrderRecipientUpiCache>)dispatchReceiver orderId:(NSString *)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__51__get(dispatchReceiver:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__52__putDispatchReceiver:(id<ZappOfframpOrderRecipientUpiCache>)dispatchReceiver orderId:(NSString *)orderId recipientUpi:(NSString *)recipientUpi suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__52__put(dispatchReceiver:orderId:recipientUpi:suspendHandler:)")));
++ (void)Skie_Suspend__53__getDispatchReceiver:(id<ZappOfframpRelayIdentityStore>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__53__get(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__54__setDispatchReceiver:(id<ZappOfframpRelayIdentityStore>)dispatchReceiver identity:(ZappOfframpRelayIdentity *)identity suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__54__set(dispatchReceiver:identity:suspendHandler:)")));
++ (void)Skie_Suspend__55__selectCircleForOrderDispatchReceiver:(ZappOfframpCircleRouter *)dispatchReceiver circles:(NSArray<ZappOfframpCircleForRouting *> *)circles orderCurrency:(NSString *)orderCurrency validateCircle:(id<ZappOfframpKotlinSuspendFunction1>)validateCircle suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__55__selectCircleForOrder(dispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:)")));
++ (void)Skie_Suspend__56__fetchOrderDispatchReceiver:(id<ZappOfframpOrderReadSource>)dispatchReceiver orderId:(ZappOfframpBigInteger *)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__56__fetchOrder(dispatchReceiver:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__57__circlesForRoutingDispatchReceiver:(ZappOfframpSubgraphClient *)dispatchReceiver currencyBytes32Hex:(NSString *)currencyBytes32Hex suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__57__circlesForRouting(dispatchReceiver:currencyBytes32Hex:suspendHandler:)")));
++ (void)Skie_Suspend__58__ordersForUserDispatchReceiver:(ZappOfframpSubgraphClient *)dispatchReceiver userAddress:(NSString *)userAddress first:(int32_t)first skip:(int32_t)skip suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__58__ordersForUser(dispatchReceiver:userAddress:first:skip:suspendHandler:)")));
++ (void)Skie_Suspend__59__rawOrderByIdDispatchReceiver:(ZappOfframpSubgraphClient *)dispatchReceiver orderId:(NSString *)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__59__rawOrderById(dispatchReceiver:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__5__ethGetBlockByNumberDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver blockTag:(NSString *)blockTag suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__5__ethGetBlockByNumber(dispatchReceiver:blockTag:suspendHandler:)")));
++ (void)Skie_Suspend__60__isMerchantAvailableDispatchReceiver:(id<ZappOfframpOfframpDriver>)dispatchReceiver usdc:(id)usdc currency:(ZappOfframpCurrencyCode *)currency suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__60__isMerchantAvailable(dispatchReceiver:usdc:currency:suspendHandler:)")));
++ (void)Skie_Suspend__61__resolveAmountDispatchReceiver:(id<ZappOfframpDynamicPixResolver>)dispatchReceiver locationUrl:(NSString *)locationUrl orderId:(NSString * _Nullable)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__61__resolveAmount(dispatchReceiver:locationUrl:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__62__fetchAllDispatchReceiver:(ZappOfframpP2pOrderHistorySource *)dispatchReceiver userAddress:(ZappOfframpAddress *)userAddress maxOrders:(int32_t)maxOrders suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__62__fetchAll(dispatchReceiver:userAddress:maxOrders:suspendHandler:)")));
++ (void)Skie_Suspend__63__parseDispatchReceiver:(ZappOfframpPaymentQrParser *)dispatchReceiver currency:(ZappOfframpCurrencyCode *)currency qrData:(NSString *)qrData dynamicPixResolver:(id<ZappOfframpDynamicPixResolver> _Nullable)dynamicPixResolver orderId:(NSString * _Nullable)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__63__parse(dispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__64__parseDispatchReceiver:(ZappOfframpPixQrParser *)dispatchReceiver qrData:(NSString *)qrData resolver:(id<ZappOfframpDynamicPixResolver> _Nullable)resolver orderId:(NSString * _Nullable)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__64__parse(dispatchReceiver:qrData:resolver:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__65__upgradeDispatchReceiver:(ZappOfframpKtor_httpOutgoingContentProtocolUpgrade *)dispatchReceiver input:(id<ZappOfframpKtor_ioByteReadChannel>)input output:(id<ZappOfframpKtor_ioByteWriteChannel>)output engineContext:(id<ZappOfframpKotlinCoroutineContext>)engineContext userContext:(id<ZappOfframpKotlinCoroutineContext>)userContext suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__65__upgrade(dispatchReceiver:input:output:engineContext:userContext:suspendHandler:)")));
++ (void)Skie_Suspend__66__flushDispatchReceiver:(id<ZappOfframpKtor_ioByteWriteChannel>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__66__flush(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__67__flushAndCloseDispatchReceiver:(id<ZappOfframpKtor_ioByteWriteChannel>)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__67__flushAndClose(dispatchReceiver:suspendHandler:)")));
++ (void)Skie_Suspend__68__writeToDispatchReceiver:(ZappOfframpKtor_httpOutgoingContentWriteChannelContent *)dispatchReceiver channel:(id<ZappOfframpKtor_ioByteWriteChannel>)channel suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__68__writeTo(dispatchReceiver:channel:suspendHandler:)")));
++ (void)Skie_Suspend__69__getUsdcBalanceExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver usdcAddress:(ZappOfframpAddress *)usdcAddress owner:(ZappOfframpAddress *)owner suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__69__getUsdcBalance(extensionReceiver:usdcAddress:owner:suspendHandler:)")));
++ (void)Skie_Suspend__6__ethGetCodeDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver address:(ZappOfframpAddress *)address blockTag:(NSString *)blockTag suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__6__ethGetCode(dispatchReceiver:address:blockTag:suspendHandler:)")));
++ (void)Skie_Suspend__70__getAdditionalOrderDetailsExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver diamondAddress:(ZappOfframpAddress *)diamondAddress orderId:(ZappOfframpBigInteger *)orderId suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__70__getAdditionalOrderDetails(extensionReceiver:diamondAddress:orderId:suspendHandler:)")));
++ (void)Skie_Suspend__71__getPriceConfigExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver diamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__71__getPriceConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)")));
++ (void)Skie_Suspend__72__getPayFeeConfigExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver diamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__72__getPayFeeConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)")));
++ (void)Skie_Suspend__73__getSmallOrderFixedFeePayExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver diamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__73__getSmallOrderFixedFeePay(extensionReceiver:diamondAddress:currency:suspendHandler:)")));
++ (void)Skie_Suspend__74__getSmallOrderThresholdExtensionReceiver:(ZappOfframpBaseRpcClient *)extensionReceiver diamondAddress:(ZappOfframpAddress *)diamondAddress currency:(ZappOfframpCurrencyCode *)currency suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__74__getSmallOrderThreshold(extensionReceiver:diamondAddress:currency:suspendHandler:)")));
++ (void)Skie_Suspend__7__ethGetTransactionCountDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver address:(ZappOfframpAddress *)address blockTag:(NSString *)blockTag suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__7__ethGetTransactionCount(dispatchReceiver:address:blockTag:suspendHandler:)")));
++ (void)Skie_Suspend__8__ethGetTransactionReceiptDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver txHash:(ZappOfframpTxHash *)txHash suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__8__ethGetTransactionReceipt(dispatchReceiver:txHash:suspendHandler:)")));
++ (void)Skie_Suspend__9__ethMaxPriorityFeePerGasDispatchReceiver:(ZappOfframpBaseRpcClient *)dispatchReceiver suspendHandler:(ZappOfframpSkie_SuspendHandler *)suspendHandler __attribute__((swift_name("Skie_Suspend__9__ethMaxPriorityFeePerGas(dispatchReceiver:suspendHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("__SkieTypeExportsKt")))
+@interface ZappOfframp__SkieTypeExportsKt : ZappOfframpBase
++ (void)skieTypeExports_0P0:(ZappOfframpKtor_httpOutgoingContentByteArrayContent *)p0 p1:(ZappOfframpKtor_httpOutgoingContentContentWrapper *)p1 p2:(ZappOfframpKtor_httpOutgoingContentNoContent *)p2 p3:(ZappOfframpKtor_httpOutgoingContentProtocolUpgrade *)p3 p4:(ZappOfframpKtor_httpOutgoingContentReadChannelContent *)p4 p5:(ZappOfframpKtor_httpOutgoingContentWriteChannelContent *)p5 p6:(id<ZappOfframpKotlinx_coroutines_coreSelectClause1>)p6 p7:(id<ZappOfframpKotlinx_coroutines_coreSelectClause2>)p7 p8:(ZappOfframpKotlinx_serialization_corePolymorphicKind *)p8 p9:(ZappOfframpKotlinx_serialization_corePolymorphicKindOPEN *)p9 p10:(ZappOfframpKotlinx_serialization_corePolymorphicKindSEALED *)p10 p11:(ZappOfframpKotlinx_serialization_corePrimitiveKind *)p11 p12:(ZappOfframpKotlinx_serialization_corePrimitiveKindBOOLEAN *)p12 p13:(ZappOfframpKotlinx_serialization_corePrimitiveKindBYTE *)p13 p14:(ZappOfframpKotlinx_serialization_corePrimitiveKindCHAR *)p14 p15:(ZappOfframpKotlinx_serialization_corePrimitiveKindDOUBLE *)p15 p16:(ZappOfframpKotlinx_serialization_corePrimitiveKindFLOAT *)p16 p17:(ZappOfframpKotlinx_serialization_corePrimitiveKindINT *)p17 p18:(ZappOfframpKotlinx_serialization_corePrimitiveKindLONG *)p18 p19:(ZappOfframpKotlinx_serialization_corePrimitiveKindSHORT *)p19 p20:(ZappOfframpKotlinx_serialization_corePrimitiveKindSTRING *)p20 p21:(ZappOfframpKotlinx_serialization_coreSerialKindCONTEXTUAL *)p21 p22:(ZappOfframpKotlinx_serialization_coreSerialKindENUM *)p22 p23:(ZappOfframpKotlinx_serialization_coreStructureKind *)p23 p24:(ZappOfframpKotlinx_serialization_coreStructureKindCLASS *)p24 p25:(ZappOfframpKotlinx_serialization_coreStructureKindLIST *)p25 p26:(ZappOfframpKotlinx_serialization_coreStructureKindMAP *)p26 p27:(ZappOfframpKotlinx_serialization_coreStructureKindOBJECT *)p27 p28:(ZappOfframpKotlinx_serialization_jsonJsonNull *)p28 p29:(ZappOfframpKotlinx_serialization_jsonJsonPrimitive *)p29 __attribute__((swift_name("skieTypeExports_0(p0:p1:p2:p3:p4:p5:p6:p7:p8:p9:p10:p11:p12:p13:p14:p15:p16:p17:p18:p19:p20:p21:p22:p23:p24:p25:p26:p27:p28:p29:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.4")
+*/
+__attribute__((swift_name("KotlinCancellationException")))
+@interface ZappOfframpKotlinCancellationException : ZappOfframpKotlinIllegalStateException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreRunnable")))
+@protocol ZappOfframpKotlinx_coroutines_coreRunnable
+@required
+- (void)run __attribute__((swift_name("run()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinCharArray")))
+@interface ZappOfframpKotlinCharArray : ZappOfframpBase
+@property (readonly) int32_t size __attribute__((swift_name("size")));
++ (instancetype)arrayWithSize:(int32_t)size __attribute__((swift_name("init(size:)")));
++ (instancetype)arrayWithSize:(int32_t)size init:(id (^)(ZappOfframpInt *))init __attribute__((swift_name("init(size:init:)")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (unichar)getIndex:(int32_t)index __attribute__((swift_name("get(index:)")));
+- (ZappOfframpKotlinCharIterator *)iterator __attribute__((swift_name("iterator()")));
+- (void)setIndex:(int32_t)index value:(unichar)value __attribute__((swift_name("set(index:value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinEnumCompanion")))
+@interface ZappOfframpKotlinEnumCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinEnumCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinArray")))
+@interface ZappOfframpKotlinArray<T> : ZappOfframpBase
+@property (readonly) int32_t size __attribute__((swift_name("size")));
++ (instancetype)arrayWithSize:(int32_t)size init:(T _Nullable (^)(ZappOfframpInt *))init __attribute__((swift_name("init(size:init:)")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (T _Nullable)getIndex:(int32_t)index __attribute__((swift_name("get(index:)")));
+- (id<ZappOfframpKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
+- (void)setIndex:(int32_t)index value:(T _Nullable)value __attribute__((swift_name("set(index:value:)")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreCoroutineScope")))
+@protocol ZappOfframpKotlinx_coroutines_coreCoroutineScope
+@required
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> coroutineContext __attribute__((swift_name("coroutineContext")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="2.0")
+*/
+__attribute__((swift_name("KotlinAutoCloseable")))
+@protocol ZappOfframpKotlinAutoCloseable
+@required
+- (void)close __attribute__((swift_name("close()")));
+@end
+
+__attribute__((swift_name("Ktor_ioCloseable")))
+@protocol ZappOfframpKtor_ioCloseable <ZappOfframpKotlinAutoCloseable>
+@required
+@end
+
+
+/**
+ * A multiplatform asynchronous HTTP client that allows you to make requests, handle responses,
+ * and extend its functionality with plugins such as authentication, JSON serialization, and more.
+ *
+ * # Creating client
+ * To create a new client, you can call:
+ * ```kotlin
+ * val client = HttpClient()
+ * ```
+ * You can create as many clients as you need.
+ *
+ * If you no longer need the client, please consider closing it to release resources:
+ * ```
+ * client.close()
+ * ```
+ *
+ * To learn more on how to create and configure an [HttpClient] see the tutorial page:
+ * [Creating and configuring a client](https://ktor.io/docs/create-client.html).
+ *
+ * # Making API Requests
+ * For every HTTP method (GET, POST, PUT, etc.), there is a corresponding function:
+ * ```kotlin
+ * val response: HttpResponse = client.get("https://ktor.io/")
+ * val body = response.bodyAsText()
+ * ```
+ * See [Making HTTP requests](https://ktor.io/docs/client-requests.html) for more details.
+ *
+ * # Query Parameters
+ * Add query parameters to your request using the `parameter` function:
+ * ```kotlin
+ * val response = client.get("https://google.com/search") {
+ *     url {
+ *         parameter("q", "REST API with Ktor")
+ *     }
+ * }
+ * ```
+ * For more information, refer to [Passing request parameters](https://ktor.io/docs/client-requests.html#parameters).
+ *
+ * # Adding Headers
+ * Include headers in your request using the `headers` builder or the `header` function:
+ * ```kotlin
+ * val response = client.get("https://httpbin.org/bearer") {
+ *     headers {
+ *         append("Authorization", "Bearer your_token_here")
+ *         append("Accept", "application/json")
+ *     }
+ * }
+ * ```
+ * Learn more at [Adding headers to a request](https://ktor.io/docs/client-requests.html#headers).
+ *
+ * # JSON Serialization
+ * Add dependencies:
+ * - io.ktor:ktor-client-content-negotiation:3.+
+ * - io.ktor:ktor-serialization-kotlinx-json:3.+
+ * Add Gradle plugin:
+ * ```
+ * plugins {
+ *     kotlin("plugin.serialization")
+ * }
+ * ```
+ *
+ * Send and receive JSON data by installing the `ContentNegotiation` plugin with `kotlinx.serialization`:
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(ContentNegotiation) {
+ *         json()
+ *     }
+ * }
+ *
+ * @Serializable
+ * data class MyRequestType(val someData: String)
+ *
+ * @Serializable
+ * data class MyResponseType(val someResponseData: String)
+ *
+ * val response: MyResponseType = client.post("https://api.example.com/data") {
+ *     contentType(ContentType.Application.Json)
+ *     setBody(MyRequestType(someData = "value"))
+ * }.body()
+ * ```
+ * See [Serializing JSON data](https://ktor.io/docs/client-serialization.html) for maven configuration and other details.
+ *
+ * # Submitting Forms
+ * Submit form data using `FormDataContent` or the `submitForm` function:
+ * ```kotlin
+ * // Using FormDataContent
+ * val response = client.post("https://example.com/submit") {
+ *     setBody(FormDataContent(Parameters.build {
+ *         append("username", "user")
+ *         append("password", "pass")
+ *     }))
+ * }
+ *
+ * // Or using submitForm
+ * val response = client.submitForm(
+ *     url = "https://example.com/submit",
+ *     formParameters = Parameters.build {
+ *         append("username", "user")
+ *         append("password", "pass")
+ *     }
+ * )
+ * ```
+ * More information is available at [Submitting form parameters](https://ktor.io/docs/client-requests.html#form_parameters).
+ *
+ * # Handling Authentication
+ * Add dependency: io.ktor:ktor-client-auth:3.+
+ *
+ * Use the `Auth` plugin to handle various authentication schemes like Basic or Bearer token authentication:
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(Auth) {
+ *         bearer {
+ *             loadTokens {
+ *                 BearerTokens(accessToken = "your_access_token", refreshToken = "your_refresh_token")
+ *             }
+ *         }
+ *     }
+ * }
+ *
+ * val response = client.get("https://api.example.com/protected")
+ * ```
+ * Refer to [Client authentication](https://ktor.io/docs/client-auth.html) for more details.
+ *
+ * # Setting Timeouts and Retries
+ * Configure timeouts and implement retry logic for your requests:
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(HttpTimeout) {
+ *         requestTimeoutMillis = 10000
+ *         connectTimeoutMillis = 5000
+ *         socketTimeoutMillis = 15000
+ *     }
+ * }
+ * ```
+ *
+ * For the request timeout:
+ * ```kotlin
+ * client.get("") {
+ *     timeout {
+ *         requestTimeoutMillis = 1000
+ *     }
+ * }
+ * ```
+ * See [Timeout](https://ktor.io/docs/client-timeout.html) for more information.
+ *
+ * # Handling Cookies
+ *
+ * Manage cookies automatically by installing the `HttpCookies` plugin:
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(HttpCookies) {
+ *         storage = AcceptAllCookiesStorage()
+ *     }
+ * }
+ *
+ * // Accessing cookies
+ * val cookies: List<Cookie> = client.cookies("https://example.com")
+ * ```
+ * Learn more at [Cookies](https://ktor.io/docs/client-cookies.html).
+ *
+ * # Uploading Files
+ * Upload files using multipart/form-data requests:
+ * ```kotlin
+ * client.submitFormWithBinaryData(
+ *      url = "https://example.com/upload",
+ *      formData = formData {
+ *          append("description", "File upload example")
+ *          append("file", {
+ *              File("path/to/file.txt").readChannel()
+ *          })
+ *      }
+ *  )
+ *
+ * See [Uploading data](https://ktor.io/docs/client-requests.html#upload_file) for details.
+ *
+ * # Using WebSockets
+ *
+ * Communicate over WebSockets using the `webSocket` function:
+ * ```kotlin
+ * client.webSocket("wss://echo.websocket.org") {
+ *     send(Frame.Text("Hello, WebSocket!"))
+ *     val frame = incoming.receive()
+ *     if (frame is Frame.Text) {
+ *         println("Received: ${frame.readText()}")
+ *     }
+ * }
+ * ```
+ * Learn more at [Client WebSockets](https://ktor.io/docs/client-websockets.html).
+ *
+ * # Error Handling
+ * Handle exceptions and HTTP error responses gracefully:
+ * val client = HttpClient {
+ *     HttpResponseValidator {
+ *         validateResponse { response ->
+ *             val statusCode = response.status.value
+ *             when (statusCode) {
+ *                 in 300..399 -> error("Redirects are not allowed")
+ *             }
+ *         }
+ *     }
+ * }
+ * See [Error handling](https://ktor.io/docs/client-response-validation.html) for more information.
+ *
+ * # Configuring SSL/TLS
+ *
+ * Customize SSL/TLS settings for secure connections is engine-specific. Please refer to the following page for
+ * the details: [Client SSL/TLS](https://ktor.io/docs/client-ssl.html).
+ *
+ * # Using Proxies
+ * Route requests through an HTTP or SOCKS proxy:
+ * ```kotlin
+ * val client = HttpClient() {
+ *     engine {
+ *         proxy = ProxyBuilder.http("http://proxy.example.com:8080")
+ *         // For a SOCKS proxy:
+ *         // proxy = ProxyBuilder.socks(host = "proxy.example.com", port = 1080)
+ *     }
+ * }
+ * ```
+ * See [Using a proxy](https://ktor.io/docs/client-proxy.html) for details.
+ *
+ * # Streaming Data
+ *
+ * Stream large data efficiently without loading it entirely into memory.
+ *
+ * Stream request:
+ * ```kotlin
+ * val response = client.post("https://example.com/upload") {
+ *      setBody(object: OutgoingContent.WriteChannelContent() {
+ *          override suspend fun writeTo(channel: ByteWriteChannel) {
+ *              repeat(1000) {
+ *                  channel.writeString("Hello!")
+ *              }
+ *          }
+ *      })
+ * }
+ * ```
+ *
+ * Stream response:
+ * ```kotlin
+ * client.prepareGet("https://example.com/largefile.zip").execute { response ->
+ *     val channel: ByteReadChannel = response.bodyAsChannel()
+ *
+ *     while (!channel.exhausted()) {
+ *         val chunk = channel.readBuffer()
+ *         // ...
+ *     }
+ * }
+ * ```
+ * Learn more at [Streaming data](https://ktor.io/docs/client-responses.html#streaming).
+ *
+ * # Using SSE
+ * Server-Sent Events (SSE) is a technology that allows a server to continuously push events to a client over an HTTP
+ * connection. It's particularly useful in cases where the server needs to send event-based updates without requiring
+ * the client to repeatedly poll the server.
+ *
+ * Install the plugin:
+ * ```kotlin
+ * val client = HttpClient(CIO) {
+ *     install(SSE)
+ * }
+ * ```
+ *
+ * ```
+ * client.sse(host = "0.0.0.0", port = 8080, path = "/events") {
+ *     while (true) {
+ *         for (event in incoming) {
+ *             println("Event from server:")
+ *             println(event)
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * Visit [Using SSE](https://ktor.io/docs/client-server-sent-events.html#install_plugin) to learn more.
+ *
+ * # Customizing a client with plugins
+ * To extend out-of-the-box functionality, you can install plugins for a Ktor client:
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(ContentNegotiation) {
+ *         json()
+ *     }
+ * }
+ * ```
+ *
+ * There are many plugins available out of the box, and you can write your own. See
+ * [Create custom client plugins](https://ktor.io/docs/client-custom-plugins.html) to learn more.
+ *
+ * # Service Loader and Default Engine
+ * On JVM, calling `HttpClient()` without specifying an engine uses a service loader mechanism to
+ * determine the appropriate default engine. This can introduce a performance overhead, especially on
+ * slower devices, such as Android.
+ *
+ * **Performance Note**: If you are targeting platforms where initialization speed is critical,
+ * consider explicitly specifying an engine to avoid the service loader lookup.
+ *
+ * Example with manual engine specification:
+ * ```
+ * val client = HttpClient(Apache5) // Explicitly uses Apache5 engine, bypassing service loader
+ * ```
+ *
+ * By directly setting the engine (e.g., `Apache5`, `OkHttp`), you can optimize startup performance
+ * by preventing the default service loader mechanism.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpClient")))
+@interface ZappOfframpKtor_client_coreHttpClient : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreCoroutineScope, ZappOfframpKtor_ioCloseable>
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> coroutineContext __attribute__((swift_name("coroutineContext")));
+@property (readonly) id<ZappOfframpKtor_client_coreHttpClientEngine> engine __attribute__((swift_name("engine")));
+@property (readonly) ZappOfframpKtor_client_coreHttpClientEngineConfig *engineConfig __attribute__((swift_name("engineConfig")));
+@property (readonly) ZappOfframpKtor_eventsEvents *monitor __attribute__((swift_name("monitor")));
+@property (readonly) ZappOfframpKtor_client_coreHttpReceivePipeline *receivePipeline __attribute__((swift_name("receivePipeline")));
+@property (readonly) ZappOfframpKtor_client_coreHttpRequestPipeline *requestPipeline __attribute__((swift_name("requestPipeline")));
+@property (readonly) ZappOfframpKtor_client_coreHttpResponsePipeline *responsePipeline __attribute__((swift_name("responsePipeline")));
+@property (readonly) ZappOfframpKtor_client_coreHttpSendPipeline *sendPipeline __attribute__((swift_name("sendPipeline")));
+- (instancetype)initWithEngine:(id<ZappOfframpKtor_client_coreHttpClientEngine>)engine userConfig:(ZappOfframpKtor_client_coreHttpClientConfig<ZappOfframpKtor_client_coreHttpClientEngineConfig *> *)userConfig __attribute__((swift_name("init(engine:userConfig:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Initiates the shutdown process for the `HttpClient`. This is a non-blocking call, which
+ * means it returns immediately and begins the client closure in the background.
+ *
+ * ## Usage
+ * ```
+ * val client = HttpClient()
+ * client.close()
+ * client.coroutineContext.job.join() // Waits for complete termination if necessary
+ * ```
+ *
+ * ## Important Notes
+ * - **Non-blocking**: `close()` only starts the closing process and does not wait for it to complete.
+ * - **Coroutine Context**: To wait for all client resources to be freed, use `client.coroutineContext.job.join()`
+ *   or `client.coroutineContext.cancel()` to terminate ongoing tasks.
+ * - **Manual Engine Management**: If a custom `engine` was manually created, it must be closed explicitly
+ *   after calling `client.close()` to release all resources.
+ *
+ * Example with custom engine management:
+ * ```
+ * val engine = HttpClientEngine() // Custom engine instance
+ * val client = HttpClient(engine)
+ *
+ * client.close()
+ * engine.close() // Ensure manually created engine is also closed
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.close)
+ */
+- (void)close __attribute__((swift_name("close()")));
+
+/**
+ * Returns a new [HttpClient] by copying this client's configuration
+ * and additionally configured by the [block] parameter.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.config)
+ */
+- (ZappOfframpKtor_client_coreHttpClient *)configBlock:(void (^)(ZappOfframpKtor_client_coreHttpClientConfig<id> *))block __attribute__((swift_name("config(block:)")));
+
+/**
+ * Checks if the specified [capability] is supported by this client.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.isSupported)
+ */
+- (BOOL)isSupportedCapability:(id<ZappOfframpKtor_client_coreHttpClientEngineCapability>)capability __attribute__((swift_name("isSupported(capability:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * Typed attributes used as a lightweight container for this client.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.attributes)
+ */
+
+/**
+ * Provides access to the client's engine configuration.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.engineConfig)
+ */
+
+/**
+ * Provides access to the events of the client's lifecycle.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.monitor)
+ */
+
+/**
+ * A pipeline used for receiving a request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.receivePipeline)
+ */
+
+/**
+ * A pipeline used for processing all requests sent by this client.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.requestPipeline)
+ */
+
+/**
+ * A pipeline used for processing all responses sent by the server.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.responsePipeline)
+ */
+
+/**
+ * A pipeline used for sending a request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClient.sendPipeline)
+ */
+@end
+
+
+/**
+ * Serves as the base interface for an [HttpClient]'s engine.
+ *
+ * An `HttpClientEngine` represents the underlying network implementation that
+ * performs HTTP requests and handles responses.
+ * Developers can implement this interface to create custom engines for use with [HttpClient].
+ *
+ * This interface provides a set of properties and methods that define the
+ * contract for configuring, executing, and managing HTTP requests within the engine.
+ *
+ * For a base implementation that handles common engine functionality, see [HttpClientEngineBase].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine)
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientEngine")))
+@protocol ZappOfframpKtor_client_coreHttpClientEngine <ZappOfframpKotlinx_coroutines_coreCoroutineScope, ZappOfframpKtor_ioCloseable>
+@required
+
+/**
+ * Executes an HTTP request and produces an HTTP response.
+ *
+ * This function takes [HttpRequestData], which contains all details of the HTTP request,
+ * and returns [HttpResponseData] with the server's response, including headers, status code, and body.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine.execute)
+ *
+ * @param data The [HttpRequestData] representing the request to be executed.
+ * @return An [HttpResponseData] object containing the server's response.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)executeData:(ZappOfframpKtor_client_coreHttpRequestData *)data completionHandler:(void (^)(ZappOfframpKtor_client_coreHttpResponseData * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("execute(data:completionHandler:)")));
+
+/**
+ * Installs the engine into an [HttpClient].
+ *
+ * This method is called when the engine is being set up within an `HttpClient`.
+ * Use it to register interceptors, validate configuration, or prepare the engine
+ * for use with the client.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine.install)
+ *
+ * @param client The [HttpClient] instance to which the engine is being installed.
+ */
+- (void)installClient:(ZappOfframpKtor_client_coreHttpClient *)client __attribute__((swift_name("install(client:)")));
+
+/**
+ * Provides access to the engine's configuration via [HttpClientEngineConfig].
+ *
+ * The [config] object stores user-defined parameters or settings that control
+ * how the engine operates. When creating a custom engine, this property
+ * should return the specific configuration implementation.
+ *
+ * Example:
+ * ```kotlin
+ * override val config: HttpClientEngineConfig = CustomEngineConfig()
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine.config)
+ */
+@property (readonly) ZappOfframpKtor_client_coreHttpClientEngineConfig *config __attribute__((swift_name("config")));
+
+/**
+ * Specifies the [CoroutineDispatcher] for I/O operations in the engine.
+ *
+ * This dispatcher is used for all network-related operations, such as
+ * sending requests and receiving responses.
+ * By default, it should be optimized for I/O tasks.
+ *
+ * Example:
+ * ```kotlin
+ * override val dispatcher: CoroutineDispatcher = Dispatchers.IO
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine.dispatcher)
+ */
+@property (readonly) ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher *dispatcher __attribute__((swift_name("dispatcher")));
+
+/**
+ * Specifies the set of capabilities supported by this HTTP client engine.
+ *
+ * Capabilities provide a mechanism for plugins and other components to
+ * determine whether the engine supports specific features such as timeouts,
+ * WebSocket communication, HTTP/2, HTTP/3, or other advanced networking
+ * capabilities. This allows seamless integration of features based on the
+ * engine's functionality.
+ *
+ * Each capability is represented as an instance of [HttpClientEngineCapability],
+ * which can carry additional metadata or configurations for the capability.
+ *
+ * Example:
+ * ```kotlin
+ * override val supportedCapabilities: Set<HttpClientEngineCapability<*>> = setOf(
+ *     WebSocketCapability,
+ *     Http2Capability,
+ *     TimeoutCapability
+ * )
+ * ```
+ *
+ * **Usage in Plugins**:
+ * Plugins can check if the engine supports a specific capability before
+ * applying behavior:
+ * ```kotlin
+ * if (engine.supportedCapabilities.contains(WebSocketCapability)) {
+ *     // Configure WebSocket-specific settings
+ * }
+ * ```
+ *
+ * When implementing a custom engine, ensure this property accurately reflects
+ * the engine's abilities to avoid unexpected plugin behavior or runtime errors.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngine.supportedCapabilities)
+ */
+@property (readonly) NSSet<id<ZappOfframpKtor_client_coreHttpClientEngineCapability>> *supportedCapabilities __attribute__((swift_name("supportedCapabilities")));
+@end
+
+
+/**
+ * A factory for creating instances of [HttpClientEngine] with a specific configuration type [T].
+ *
+ * This interface defines how to produce custom HTTP client engines that implement [HttpClientEngine].
+ * Each engine is initialized with a configuration object of type [T], which extends [HttpClientEngineConfig].
+ *
+ * Factories implementing this interface are commonly passed to the [io.ktor.client.HttpClient] constructor to specify the
+ * underlying engine that will handle HTTP requests. This allows users to seamlessly plug in different
+ * engines based on their requirements, such as for performance, platform compatibility, or protocol support.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineFactory)
+ *
+ * @param T The type of [HttpClientEngineConfig] used to configure the engine.
+ *
+ * Example:
+ * ```kotlin
+ * object MyCustomEngine: HttpClientEngineFactory<MyEngineConfig> {
+ *    // ...
+ * }
+ *
+ * val client = HttpClient(MyCustomEngine) {
+ *     engine {
+ *         timeout = 10_000
+ *         customSetting = "example"
+ *     }
+ * }
+ * ```
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientEngineFactory")))
+@protocol ZappOfframpKtor_client_coreHttpClientEngineFactory
+@required
+
+/**
+ * Creates or retrieves an instance of [HttpClientEngine], applying optional configurations.
+ *
+ * This method is responsible for deciding whether to create a new engine instance or reuse
+ * an existing one, based on the factory's internal logic and the configuration provided in
+ * the [block]. This allows for efficient resource management by avoiding unnecessary engine
+ * instantiation when possible.
+ *
+ * The [block] parameter enables users to customize the engine's [T] configuration during creation.
+ * If no block is provided, the factory should apply default configurations or reuse an engine
+ * with the default settings.
+ *
+ * Typically, this method is invoked internally by the [io.ktor.client.HttpClient] constructor when the factory
+ * is passed to it. Users can, however, call it directly to explicitly control engine instantiation.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineFactory.create)
+ *
+ * @param block A lambda that applies additional configurations to the engine's [T] object.
+ * @return An [HttpClientEngine] instance, which may be newly created or reused.
+ *
+ * Example with explicit engine creation:
+ * ```kotlin
+ * val engine = MyCustomEngineFactory.create {
+ *     timeout = 5_000
+ *     customHeader = "example"
+ * }
+ * ```
+ *
+ * Example when used with `HttpClient`:
+ * ```kotlin
+ * val client = HttpClient(MyCustomEngineFactory) {
+ *     engine {
+ *         timeout = 5_000
+ *         customHeader = "example"
+ *     }
+ * }
+ * ```
+ *
+ * **Contracts for Implementors**:
+ * - If reusing an existing engine, ensure its configuration matches the one provided in [block].
+ * - Ensure thread safety when managing a shared engine instance across multiple [create] calls.
+ * - Provide meaningful default configurations when no block is provided.
+ * - Properly release resources of reused engines when the [io.ktor.client.HttpClient]] or engine is closed.
+ */
+- (id<ZappOfframpKtor_client_coreHttpClientEngine>)createBlock:(void (^)(ZappOfframpKtor_client_coreHttpClientEngineConfig *))block __attribute__((swift_name("create(block:)")));
+@end
+
+
+/**
+ * Base configuration for [HttpClientEngine].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig)
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientEngineConfig")))
+@interface ZappOfframpKtor_client_coreHttpClientEngineConfig : ZappOfframpBase
+@property ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher * _Nullable dispatcher __attribute__((swift_name("dispatcher")));
+@property BOOL pipelining __attribute__((swift_name("pipelining")));
+@property ZappOfframpKtor_client_coreProxyConfig * _Nullable proxy __attribute__((swift_name("proxy")));
+@property int32_t threadsCount __attribute__((swift_name("threadsCount"))) __attribute__((unavailable("The [threadsCount] property is deprecated. Consider setting [dispatcher] instead.")));
+
+/**
+ * Base configuration for [HttpClientEngine].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Base configuration for [HttpClientEngine].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Allow specifying the coroutine dispatcher to use for IO operations.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig.dispatcher)
+ */
+
+/**
+ * Enables HTTP pipelining advice.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig.pipelining)
+ */
+
+/**
+ * Specifies a proxy address to use.
+ * Uses a system proxy by default.
+ *
+ * You can learn more from [Proxy](https://ktor.io/docs/proxy.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig.proxy)
+ */
+
+/**
+ * Specifies network threads count advice.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineConfig.threadsCount)
+ */
+@end
+
+
+/**
+ * [HttpClient] Logger.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.logging.Logger)
+ */
+__attribute__((swift_name("Ktor_client_loggingLogger")))
+@protocol ZappOfframpKtor_client_loggingLogger
+@required
+
+/**
+ * Add [message] to log.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.logging.Logger.log)
+ */
+- (void)logMessage:(NSString *)message __attribute__((swift_name("log(message:)")));
+@end
+
+
+/**
+ * [Logging]  log level.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.logging.LogLevel)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_loggingLogLevel")))
+@interface ZappOfframpKtor_client_loggingLogLevel : ZappOfframpKotlinEnum<ZappOfframpKtor_client_loggingLogLevel *>
+@property (class, readonly) ZappOfframpKtor_client_loggingLogLevel *all __attribute__((swift_name("all")));
+@property (class, readonly) ZappOfframpKtor_client_loggingLogLevel *headers __attribute__((swift_name("headers")));
+@property (class, readonly) ZappOfframpKtor_client_loggingLogLevel *body __attribute__((swift_name("body")));
+@property (class, readonly) ZappOfframpKtor_client_loggingLogLevel *info __attribute__((swift_name("info")));
+@property (class, readonly) ZappOfframpKtor_client_loggingLogLevel *none __attribute__((swift_name("none")));
+@property (class, readonly) NSArray<ZappOfframpKtor_client_loggingLogLevel *> *entries __attribute__((swift_name("entries")));
+@property (readonly) BOOL body __attribute__((swift_name("body")));
+@property (readonly) BOOL headers __attribute__((swift_name("headers")));
+@property (readonly) BOOL info __attribute__((swift_name("info")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * [Logging]  log level.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.logging.LogLevel)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpKtor_client_loggingLogLevel *> *)values __attribute__((swift_name("values()")));
+@end
+
+
+/**
+ * Encoder is a core serialization primitive that encapsulates the knowledge of the underlying
+ * format and its storage, exposing only structural methods to the serializer, making it completely
+ * format-agnostic. Serialization process transforms a single value into the sequence of its
+ * primitive elements, also called its serial form, while encoding transforms these primitive elements into an actual
+ * format representation: JSON string, ProtoBuf ByteArray, in-memory map representation etc.
+ *
+ * Encoder provides high-level API that operates with basic primitive types, collections
+ * and nested structures. Internally, encoder represents output storage and operates with its state
+ * and lower level format-specific details.
+ *
+ * To be more specific, serialization transforms a value into a sequence of "here is an int, here is
+ * a double, here a list of strings and here is another object that is a nested int", while encoding
+ * transforms this sequence into a format-specific commands such as "insert opening curly bracket
+ * for a nested object start, insert a name of the value, and the value separated with colon for an int etc."
+ *
+ * The symmetric interface for the deserialization process is [Decoder].
+ *
+ * ### Serialization. Primitives
+ *
+ * If a class is represented as a single [primitive][PrimitiveKind] value in its serialized form,
+ * then one of the `encode*` methods (e.g. [encodeInt]) can be used directly.
+ *
+ * ### Serialization. Structured types.
+ *
+ * If a class is represented as a structure or has multiple values in its serialized form,
+ * `encode*` methods are not that helpful, because they do not allow working with collection types or establish structure boundaries.
+ * All these capabilities are delegated to the [CompositeEncoder] interface with a more specific API surface.
+ * To denote a structure start, [beginStructure] should be used.
+ * ```
+ * // Denote the structure start,
+ * val composite = encoder.beginStructure(descriptor)
+ * // Encoding all elements within the structure using 'composite'
+ * ...
+ * // Denote the structure end
+ * composite.endStructure(descriptor)
+ * ```
+ *
+ * E.g. if the encoder belongs to JSON format, then [beginStructure] will write an opening bracket
+ * (`{` or `[`, depending on the descriptor kind), returning the [CompositeEncoder] that is aware of colon separator,
+ * that should be appended between each key-value pair, whilst [CompositeEncoder.endStructure] will write a closing bracket.
+ *
+ * ### Exception guarantees
+ *
+ * For the regular exceptions, such as invalid input, conflicting serial names,
+ * [SerializationException] can be thrown by any encoder methods.
+ * It is recommended to declare a format-specific subclass of [SerializationException] and throw it.
+ *
+ * ### Exception safety
+ *
+ * In general, catching [SerializationException] from any of `encode*` methods is not allowed and produces unspecified behaviour.
+ * After thrown exception, the current encoder is left in an arbitrary state, no longer suitable for further encoding.
+ *
+ * ### Format encapsulation
+ *
+ * For example, for the following serializer:
+ * ```
+ * class StringHolder(val stringValue: String)
+ *
+ * object StringPairDeserializer : SerializationStrategy<StringHolder> {
+ *    override val descriptor = ...
+ *
+ *    override fun serializer(encoder: Encoder, value: StringHolder) {
+ *        // Denotes start of the structure, StringHolder is not a "plain" data type
+ *        val composite = encoder.beginStructure(descriptor)
+ *        // Encode the nested string value
+ *        composite.encodeStringElement(descriptor, index = 0)
+ *        // Denotes end of the structure
+ *        composite.endStructure(descriptor)
+ *    }
+ * }
+ * ```
+ *
+ * This serializer does not know anything about the underlying storage and will work with any properly-implemented encoder.
+ * JSON, for example, writes an opening bracket `{` during the `beginStructure` call, writes `stringValue` key along
+ * with its value in `encodeStringElement` and writes the closing bracket `}` during the `endStructure`.
+ * XML would do roughly the same, but with different separators and structures, while ProtoBuf
+ * machinery could be completely different.
+ * In any case, all these parsing details are encapsulated by an encoder.
+ *
+ * ### Encoder implementation.
+ *
+ * While being strictly typed, an underlying format can transform actual types in the way it wants.
+ * For example, a format can support only string types and encode/decode all primitives in a string form:
+ * ```
+ * StringFormatEncoder : Encoder {
+ *
+ *     ...
+ *     override fun encodeDouble(value: Double) = encodeString(value.toString())
+ *     override fun encodeInt(value: Int) = encodeString(value.toString())
+ *     ...
+ * }
+ * ```
+ *
+ * ### Not stable for inheritance
+ *
+ * `Encoder` interface is not stable for inheritance in 3rd party libraries, as new methods
+ * might be added to this interface or contracts of the existing methods can be changed.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreEncoder")))
+@protocol ZappOfframpKotlinx_serialization_coreEncoder
+@required
+
+/**
+ * Encodes the beginning of the collection with size [collectionSize] and the given serializer of its type parameters.
+ * This method has to be implemented only if you need to know collection size in advance, otherwise, [beginStructure] can be used.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreCompositeEncoder>)beginCollectionDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor collectionSize:(int32_t)collectionSize __attribute__((swift_name("beginCollection(descriptor:collectionSize:)")));
+
+/**
+ * Encodes the beginning of the nested structure in a serialized form
+ * and returns [CompositeDecoder] responsible for encoding this very structure.
+ * E.g the hierarchy:
+ * ```
+ * class StringHolder(val stringValue: String)
+ * class Holder(val stringHolder: StringHolder)
+ * ```
+ *
+ * with the following serialized form in JSON:
+ * ```
+ * {
+ *   "stringHolder" : { "stringValue": "value" }
+ * }
+ * ```
+ *
+ * will be roughly represented as the following sequence of calls:
+ * ```
+ * // Holder serializer
+ * fun serialize(encoder: Encoder, value: Holder) {
+ *     val composite = encoder.beginStructure(descriptor) // the very first opening bracket '{'
+ *     composite.encodeSerializableElement(descriptor, 0, value.stringHolder) // Serialize nested StringHolder
+ *     composite.endStructure(descriptor) // The very last closing bracket
+ * }
+ *
+ * // StringHolder serializer
+ * fun serialize(encoder: Encoder, value: StringHolder) {
+ *     val composite = encoder.beginStructure(descriptor) // One more '{' when the key "stringHolder" is already written
+ *     composite.encodeStringElement(descriptor, 0, value.stringValue) // Serialize actual value
+ *     composite.endStructure(descriptor) // Closing bracket
+ * }
+ * ```
+ */
+- (id<ZappOfframpKotlinx_serialization_coreCompositeEncoder>)beginStructureDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
+
+/**
+ * Encodes a boolean value.
+ * Corresponding kind is [PrimitiveKind.BOOLEAN].
+ */
+- (void)encodeBooleanValue:(BOOL)value __attribute__((swift_name("encodeBoolean(value:)")));
+
+/**
+ * Encodes a single byte value.
+ * Corresponding kind is [PrimitiveKind.BYTE].
+ */
+- (void)encodeByteValue:(int8_t)value __attribute__((swift_name("encodeByte(value:)")));
+
+/**
+ * Encodes a 16-bit unicode character value.
+ * Corresponding kind is [PrimitiveKind.CHAR].
+ */
+- (void)encodeCharValue:(unichar)value __attribute__((swift_name("encodeChar(value:)")));
+
+/**
+ * Encodes a 64-bit IEEE 754 floating point value.
+ * Corresponding kind is [PrimitiveKind.DOUBLE].
+ */
+- (void)encodeDoubleValue:(double)value __attribute__((swift_name("encodeDouble(value:)")));
+
+/**
+ * Encodes a enum value that is stored at the [index] in [enumDescriptor] elements collection.
+ * Corresponding kind is [SerialKind.ENUM].
+ *
+ * E.g. for the enum `enum class Letters { A, B, C, D }` and
+ * serializable value "C", [encodeEnum] method should be called with `2` as am index.
+ *
+ * This method does not imply any restrictions on the output format,
+ * the format is free to store the enum by its name, index, ordinal or any other
+ */
+- (void)encodeEnumEnumDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)enumDescriptor index:(int32_t)index __attribute__((swift_name("encodeEnum(enumDescriptor:index:)")));
+
+/**
+ * Encodes a 32-bit IEEE 754 floating point value.
+ * Corresponding kind is [PrimitiveKind.FLOAT].
+ */
+- (void)encodeFloatValue:(float)value __attribute__((swift_name("encodeFloat(value:)")));
+
+/**
+ * Returns [Encoder] for encoding an underlying type of a value class in an inline manner.
+ * [descriptor] describes a serializable value class.
+ *
+ * Namely, for the `@Serializable @JvmInline value class MyInt(val my: Int)`,
+ * the following sequence is used:
+ * ```
+ * thisEncoder.encodeInline(MyInt.serializer().descriptor).encodeInt(my)
+ * ```
+ *
+ * Current encoder may return any other instance of [Encoder] class, depending on the provided [descriptor].
+ * For example, when this function is called on Json encoder with `UInt.serializer().descriptor`, the returned encoder is able
+ * to encode unsigned integers.
+ *
+ * Note that this function returns [Encoder] instead of the [CompositeEncoder]
+ * because value classes always have the single property.
+ * Calling [Encoder.beginStructure] on returned instance leads to an unspecified behavior and, in general, is prohibited.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreEncoder>)encodeInlineDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("encodeInline(descriptor:)")));
+
+/**
+ * Encodes a 32-bit integer value.
+ * Corresponding kind is [PrimitiveKind.INT].
+ */
+- (void)encodeIntValue:(int32_t)value __attribute__((swift_name("encodeInt(value:)")));
+
+/**
+ * Encodes a 64-bit integer value.
+ * Corresponding kind is [PrimitiveKind.LONG].
+ */
+- (void)encodeLongValue:(int64_t)value __attribute__((swift_name("encodeLong(value:)")));
+
+/**
+ * Notifies the encoder that value of a nullable type that is
+ * being serialized is not null. It should be called before writing a non-null value
+ * of nullable type:
+ * ```
+ * // Could be String? serialize method
+ * if (value != null) {
+ *     encoder.encodeNotNullMark()
+ *     encoder.encodeStringValue(value)
+ * } else {
+ *     encoder.encodeNull()
+ * }
+ * ```
+ *
+ * This method has a use in highly-performant binary formats and can
+ * be safely ignore by most of the regular formats.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (void)encodeNotNullMark __attribute__((swift_name("encodeNotNullMark()")));
+
+/**
+ * Encodes `null` value.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (void)encodeNull __attribute__((swift_name("encodeNull()")));
+
+/**
+ * Encodes the nullable [value] of type [T] by delegating the encoding process to the given [serializer].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (void)encodeNullableSerializableValueSerializer:(id<ZappOfframpKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeNullableSerializableValue(serializer:value:)")));
+
+/**
+ * Encodes the [value] of type [T] by delegating the encoding process to the given [serializer].
+ * For example, `encodeInt` call is equivalent to delegating integer encoding to [Int.serializer][Int.Companion.serializer]:
+ * `encodeSerializableValue(Int.serializer())`
+ */
+- (void)encodeSerializableValueSerializer:(id<ZappOfframpKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeSerializableValue(serializer:value:)")));
+
+/**
+ * Encodes a 16-bit short value.
+ * Corresponding kind is [PrimitiveKind.SHORT].
+ */
+- (void)encodeShortValue:(int16_t)value __attribute__((swift_name("encodeShort(value:)")));
+
+/**
+ * Encodes a string value.
+ * Corresponding kind is [PrimitiveKind.STRING].
+ */
+- (void)encodeStringValue:(NSString *)value __attribute__((swift_name("encodeString(value:)")));
+
+/**
+ * Context of the current serialization process, including contextual and polymorphic serialization and,
+ * potentially, a format-specific configuration.
+ */
+@property (readonly) ZappOfframpKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
+@end
+
+
+/**
+ * Serial descriptor is an inherent property of [KSerializer] that describes the structure of the serializable type.
+ * The structure of the serializable type is not only the characteristic of the type itself, but also of the serializer as well,
+ * meaning that one type can have multiple descriptors that have completely different structures.
+ *
+ * For example, the class `class Color(val rgb: Int)` can have multiple serializable representations,
+ * such as `{"rgb": 255}`, `"#0000FF"`, `[0, 0, 255]` and `{"red": 0, "green": 0, "blue": 255}`.
+ * Representations are determined by serializers, and each such serializer has its own descriptor that identifies
+ * each structure in a distinguishable and format-agnostic manner.
+ *
+ * ### Structure
+ * Serial descriptor is identified by its [name][serialName] and consists of a kind, potentially empty set of
+ * children elements, and additional metadata.
+ *
+ * * [serialName] uniquely identifies the descriptor (and the corresponding serializer) for non-generic types.
+ *   For generic types, the actual type substitution is omitted from the string representation, and the name
+ *   identifies the family of the serializers without type substitutions. However, type substitution is accounted for
+ *   in [equals] and [hashCode] operations, meaning that descriptors of generic classes with the same name but different type
+ *   arguments are not equal to each other.
+ *   [serialName] is typically used to specify the type of the target class during serialization of polymorphic and sealed
+ *   classes, for observability and diagnostics.
+ * * [Kind][SerialKind] defines what this descriptor represents: primitive, enum, object, collection, etc.
+ * * Children elements are represented as serial descriptors as well and define the structure of the type's elements.
+ * * Metadata carries additional information, such as [nullability][nullable], [optionality][isElementOptional]
+ *   and [serial annotations][getElementAnnotations].
+ *
+ * ### Usages
+ * There are two general usages of the descriptors: THE serialization process and serialization introspection.
+ *
+ * #### Serialization
+ * Serial descriptor is used as a bridge between decoders/encoders and serializers.
+ * When asking for a next element, the serializer provides an expected descriptor to the decoder, and,
+ * based on the descriptor content, the decoder decides how to parse its input.
+ * In JSON, for example, when the encoder is asked to encode the next element and this element
+ * is a subtype of [List], the encoder receives a descriptor with [StructureKind.LIST] and, based on that,
+ * first writes an opening square bracket before writing the content of the list.
+ *
+ * Serial descriptor _encapsulates_ the structure of the data, so serializers can be free from
+ * format-specific details. `ListSerializer` knows nothing about JSON and square brackets, providing
+ * only the structure of the data and delegating encoding decision to the format itself.
+ *
+ * #### Introspection
+ * Another usage of a serial descriptor is type introspection without its serialization.
+ * Introspection can be used to check whether the given serializable class complies the
+ * corresponding scheme and to generate JSON or ProtoBuf schema from the given class.
+ *
+ * ### Indices
+ * Serial descriptor API operates with children indices.
+ * For the fixed-size structures, such as regular classes, index is represented by a value in
+ * the range from zero to [elementsCount] and represent and index of the property in this class.
+ * Consequently, primitives do not have children and their element count is zero.
+ *
+ * For collections and maps indices do not have a fixed bound. Regular collections descriptors usually
+ * have one element (`T`, maps have two, one for keys and one for values), but potentially unlimited
+ * number of actual children values. Valid indices range is not known statically,
+ * and implementations of such a descriptor should provide consistent and unbounded names and indices.
+ *
+ * In practice, for regular classes it is allowed to invoke `getElement*(index)` methods
+ * with an index from `0` to [elementsCount] range and the element at the particular index corresponds to the
+ * serializable property at the given position.
+ * For collections and maps, index parameter for `getElement*(index)` methods is effectively bounded
+ * by the maximal number of collection/map elements.
+ *
+ * ### Thread-safety and mutability
+ * Serial descriptor implementation should be immutable and, thus, thread-safe.
+ *
+ * ### Equality and caching
+ * Serial descriptor can be used as a unique identifier for format-specific data or schemas and
+ * this implies the following restrictions on its `equals` and `hashCode`:
+ *
+ * An [equals] implementation should use both [serialName] and elements structure.
+ * Comparing [elementDescriptors] directly is discouraged,
+ * because it may cause a stack overflow error, e.g., if a serializable class `T` contains elements of type `T`.
+ * To avoid it, a serial descriptor implementation should compare only descriptors
+ * of class' type parameters, in a way that `serializer<Box<Int>>().descriptor != serializer<Box<String>>().descriptor`.
+ * If type parameters are equal, descriptor structure should be compared by using children elements
+ * descriptors' [serialName]s, which correspond to class names
+ * (do not confuse with elements' own names, which correspond to properties' names); and/or other [SerialDescriptor]
+ * properties, such as [kind].
+ * An example of [equals] implementation:
+ * ```
+ * if (this === other) return true
+ * if (other::class != this::class) return false
+ * if (serialName != other.serialName) return false
+ * if (!typeParametersAreEqual(other)) return false
+ * if (this.elementDescriptors().map { it.serialName } != other.elementDescriptors().map { it.serialName }) return false
+ * return true
+ * ```
+ *
+ * [hashCode] implementation should use the same properties for computing the result.
+ *
+ * ### User-defined serial descriptors
+ * The best way to define a custom descriptor is to use [buildClassSerialDescriptor] builder function, where
+ * for each serializable property the corresponding element is declared.
+ *
+ * Example:
+ * ```
+ * // Class with custom serializer and custom serial descriptor
+ * class Data(
+ *     val intField: Int, // This field is ignored by custom serializer
+ *     val longField: Long, // This field is written as long, but in serialized form is named as "_longField"
+ *     val stringList: List<String> // This field is written as regular list of strings
+ * )
+ *
+ * // Descriptor for such class:
+ * buildClassSerialDescriptor("my.package.Data") {
+ *     // intField is deliberately ignored by serializer -- not present in the descriptor as well
+ *     element<Long>("_longField") // longField is named as _longField
+ *     element("stringField", listSerialDescriptor<String>())
+ * }
+ *
+ * // Example of 'serialize' function for such descriptor
+ * override fun serialize(encoder: Encoder, value: Data) {
+ *     encoder.encodeStructure(descriptor) {
+ *         encodeLongElement(descriptor, 0, value.longField) // Will be written as "_longField" because descriptor's child at index 0 says so
+ *         encodeSerializableElement(descriptor, 1, ListSerializer(String.serializer()), value.stringList)
+ *     }
+ * }
+ * ```
+ *
+ * For classes that are represented as a single primitive value, [PrimitiveSerialDescriptor] builder function can be used instead.
+ *
+ * ### Consistency violations
+ * An implementation of [SerialDescriptor] should be consistent with the implementation of the corresponding [KSerializer].
+ * Yet it is not type-checked statically, thus making it possible to declare a non-consistent implementation of descriptor and serializer.
+ * In such cases, the behavior of an underlying format is unspecified and may lead to both runtime errors and encoding of
+ * corrupted data that is impossible to decode back.
+ *
+ * ### Not for implementation
+ *
+ * `SerialDescriptor` interface should not be implemented in 3rd party libraries, as new methods
+ * might be added to this interface when kotlinx.serialization adds support for new Kotlin features.
+ * This interface is safe to use and construct via [buildClassSerialDescriptor], [PrimitiveSerialDescriptor], and `SerialDescriptor` factory function.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreSerialDescriptor")))
+@protocol ZappOfframpKotlinx_serialization_coreSerialDescriptor
+@required
+
+/**
+ * Returns serial annotations of the child element at the given [index].
+ * This method differs from `getElementDescriptor(index).annotations` by reporting only
+ * element-specific annotations:
+ * ```
+ * @Serializable
+ * @OnClassSerialAnnotation
+ * class Nested(...)
+ *
+ * @Serializable
+ * class Outer(@OnPropertySerialAnnotation val nested: Nested)
+ *
+ * val outerDescriptor = Outer.serializer().descriptor
+ *
+ * outerDescriptor.getElementAnnotations(0) // Returns [@OnPropertySerialAnnotation]
+ * outerDescriptor.getElementDescriptor(0).annotations // Returns [@OnClassSerialAnnotation]
+ * ```
+ * Only annotations marked with [SerialInfo] are added to the resulting list.
+ *
+ * @throws IndexOutOfBoundsException for an illegal [index] values.
+ * @throws IllegalStateException if the current descriptor does not support children elements (e.g. is a primitive).
+ */
+- (NSArray<id<ZappOfframpKotlinAnnotation>> *)getElementAnnotationsIndex:(int32_t)index __attribute__((swift_name("getElementAnnotations(index:)")));
+
+/**
+ * Retrieves the descriptor of the child element for the given [index].
+ * For the property of type `T` on the position `i`, `getElementDescriptor(i)` yields the same result
+ * as for `T.serializer().descriptor`, if the serializer for this property is not explicitly overridden
+ * with `@Serializable(with = ...`)`, [Polymorphic] or [Contextual].
+ * This method can be used to completely introspect the type that the current descriptor describes.
+ *
+ * Example:
+ * ```
+ * @Serializable
+ * @OnClassSerialAnnotation
+ * class Nested(...)
+ *
+ * @Serializable
+ * class Outer(val nested: Nested)
+ *
+ * val outerDescriptor = Outer.serializer().descriptor
+ *
+ * outerDescriptor.getElementDescriptor(0).serialName // Returns "Nested"
+ * outerDescriptor.getElementDescriptor(0).annotations // Returns [@OnClassSerialAnnotation]
+ * ```
+ *
+ * @throws IndexOutOfBoundsException for illegal [index] values.
+ * @throws IllegalStateException if the current descriptor does not support children elements (e.g. is a primitive).
+ */
+- (id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)getElementDescriptorIndex:(int32_t)index __attribute__((swift_name("getElementDescriptor(index:)")));
+
+/**
+ * Returns an index in the children list of the given element by its name or [CompositeDecoder.UNKNOWN_NAME]
+ * if there is no such element.
+ * The resulting index, if it is not [CompositeDecoder.UNKNOWN_NAME], is guaranteed to be usable with [getElementName].
+ *
+ * Example:
+ *
+ * ```
+ * @Serializable
+ * class User(val name: String, val alias: String?)
+ *
+ * val userDescriptor = User.serializer().descriptor
+ *
+ * userDescriptor.getElementIndex("name") // Returns 0
+ * userDescriptor.getElementIndex("alias") // Returns 1
+ * userDescriptor.getElementIndex("lastName") // Returns CompositeDecoder.UNKNOWN_NAME = -3
+ * ```
+ */
+- (int32_t)getElementIndexName:(NSString *)name __attribute__((swift_name("getElementIndex(name:)")));
+
+/**
+ * Returns a positional name of the child at the given [index].
+ * Positional name represents a corresponding property name in the class, associated with
+ * the current descriptor.
+ *
+ * Do not confuse with [serialName], which returns class name:
+ *
+ * ```
+ * package my.app
+ *
+ * @Serializable
+ * class User(val name: String)
+ *
+ * val userDescriptor = User.serializer().descriptor
+ *
+ * userDescriptor.serialName // Returns "my.app.User"
+ * userDescriptor.getElementName(0) // Returns "name"
+ * ```
+ *
+ * @throws IndexOutOfBoundsException for an illegal [index] values.
+ * @throws IllegalStateException if the current descriptor does not support children elements (e.g. is a primitive)
+ */
+- (NSString *)getElementNameIndex:(int32_t)index __attribute__((swift_name("getElementName(index:)")));
+
+/**
+ * Whether the element at the given [index] is optional (can be absent in serialized form).
+ * For generated descriptors, all elements that have a corresponding default parameter value are
+ * marked as optional. Custom serializers can treat optional values in a serialization-specific manner
+ * without a default parameters constraint.
+ *
+ * Example of optionality:
+ * ```
+ * @Serializable
+ * class Holder(
+ *     val a: Int, // isElementOptional(0) == false
+ *     val b: Int?, // isElementOptional(1) == false
+ *     val c: Int? = null, // isElementOptional(2) == true
+ *     val d: List<Int>, // isElementOptional(3) == false
+ *     val e: List<Int> = listOf(1), // isElementOptional(4) == true
+ * )
+ * ```
+ * Returns `false` for valid indices of collections, maps, and enums.
+ *
+ * @throws IndexOutOfBoundsException for an illegal [index] values.
+ * @throws IllegalStateException if the current descriptor does not support children elements (e.g. is a primitive).
+ */
+- (BOOL)isElementOptionalIndex:(int32_t)index __attribute__((swift_name("isElementOptional(index:)")));
+
+/**
+ * Returns serial annotations of the associated class.
+ * Serial annotations can be used to specify additional metadata that may be used during serialization.
+ * Only annotations marked with [SerialInfo] are added to the resulting list.
+ *
+ * Do not confuse with [getElementAnnotations]:
+ * ```
+ * @Serializable
+ * @OnClassSerialAnnotation
+ * class Nested(...)
+ *
+ * @Serializable
+ * class Outer(@OnPropertySerialAnnotation val nested: Nested)
+ *
+ * val outerDescriptor = Outer.serializer().descriptor
+ *
+ * outerDescriptor.getElementAnnotations(0) // Returns [@OnPropertySerialAnnotation]
+ * outerDescriptor.getElementDescriptor(0).annotations // Returns [@OnClassSerialAnnotation]
+ * ```
+ */
+@property (readonly) NSArray<id<ZappOfframpKotlinAnnotation>> *annotations __attribute__((swift_name("annotations")));
+
+/**
+ * The number of elements this descriptor describes, besides from the class itself.
+ * [elementsCount] describes the number of **semantic** elements, not the number
+ * of actual fields/properties in the serialized form, even though they frequently match.
+ *
+ * For example, for the following class
+ * `class Complex(val real: Long, val imaginary: Long)` the corresponding descriptor
+ * and the serialized form both have two elements, while for `List<Int>`
+ * the corresponding descriptor has a single element (`IntDescriptor`, the type of list element),
+ * but from zero up to `Int.MAX_VALUE` values in the serialized form:
+ *
+ * ```
+ * @Serializable
+ * class Complex(val real: Long, val imaginary: Long)
+ *
+ * Complex.serializer().descriptor.elementsCount // Returns 2
+ *
+ * @Serializable
+ * class OuterList(val list: List<Int>)
+ *
+ * OuterList.serializer().descriptor.getElementDescriptor(0).elementsCount // Returns 1
+ * ```
+ */
+@property (readonly) int32_t elementsCount __attribute__((swift_name("elementsCount")));
+
+/**
+ * Returns `true` if this descriptor describes a serializable value class which underlying value
+ * is serialized directly.
+ *
+ * This property is true for serializable `@JvmInline value` classes:
+ * ```
+ * @Serializable
+ * class User(val name: Name)
+ *
+ * @Serializable
+ * @JvmInline
+ * value class Name(val value: String)
+ *
+ * User.serializer().descriptor.isInline // false
+ * User.serializer().descriptor.getElementDescriptor(0).isInline // true
+ * Name.serializer().descriptor.isInline // true
+ * ```
+ */
+@property (readonly) BOOL isInline __attribute__((swift_name("isInline")));
+
+/**
+ * Whether the descriptor describes a nullable type.
+ * Returns `true` if associated serializer can serialize/deserialize nullable elements of the described type.
+ *
+ * Example:
+ *
+ * ```
+ * @Serializable
+ * class User(val name: String, val alias: String?)
+ *
+ * val userDescriptor = User.serializer().descriptor
+ *
+ * userDescriptor.isNullable // Returns false
+ * userDescriptor.getElementDescriptor(0).isNullable // Returns false
+ * userDescriptor.getElementDescriptor(1).isNullable // Returns true
+ * ```
+ */
+@property (readonly) BOOL isNullable __attribute__((swift_name("isNullable")));
+
+/**
+ * The kind of the serialized form that determines **the shape** of the serialized data.
+ * Formats use serial kind to add and parse serializer-agnostic metadata to the result.
+ *
+ * For example, JSON format wraps [classes][StructureKind.CLASS] and [StructureKind.MAP] into
+ * brackets, while ProtoBuf just serialize these types in separate ways.
+ *
+ * Kind should be consistent with the implementation, for example, if it is a [primitive][PrimitiveKind],
+ * then its element count should be zero and vice versa.
+ *
+ * Example of introspecting kinds:
+ *
+ * ```
+ * @Serializable
+ * class User(val name: String)
+ *
+ * val userDescriptor = User.serializer().descriptor
+ *
+ * userDescriptor.kind // Returns StructureKind.CLASS
+ * userDescriptor.getElementDescriptor(0).kind // Returns PrimitiveKind.STRING
+ * ```
+ */
+@property (readonly) ZappOfframpKotlinx_serialization_coreSerialKind *kind __attribute__((swift_name("kind")));
+
+/**
+ * Serial name of the descriptor that identifies a pair of the associated serializer and target class.
+ *
+ * For generated and default serializers, the serial name is equal to the corresponding class's fully qualified name
+ * or, if overridden, [SerialName].
+ * Custom serializers should provide a unique serial name that identifies both the serializable class and
+ * the serializer itself, ignoring type arguments if they are present, for example: `my.package.LongAsTrimmedString`.
+ *
+ * Do not confuse with [getElementName], which returns property name:
+ *
+ * ```
+ * package my.app
+ *
+ * @Serializable
+ * class User(val name: String)
+ *
+ * val userDescriptor = User.serializer().descriptor
+ *
+ * userDescriptor.serialName // Returns "my.app.User"
+ * userDescriptor.getElementName(0) // Returns "name"
+ * ```
+ */
+@property (readonly) NSString *serialName __attribute__((swift_name("serialName")));
+@end
+
+
+/**
+ * Decoder is a core deserialization primitive that encapsulates the knowledge of the underlying
+ * format and an underlying storage, exposing only structural methods to the deserializer, making it completely
+ * format-agnostic. Deserialization process takes a decoder and asks him for a sequence of primitive elements,
+ * defined by a deserializer serial form, while decoder knows how to retrieve these primitive elements from an actual format
+ * representations.
+ *
+ * Decoder provides high-level API that operates with basic primitive types, collections
+ * and nested structures. Internally, the decoder represents input storage, and operates with its state
+ * and lower level format-specific details.
+ *
+ * To be more specific, serialization asks a decoder for a sequence of "give me an int, give me
+ * a double, give me a list of strings and give me another object that is a nested int", while decoding
+ * transforms this sequence into a format-specific commands such as "parse the part of the string until the next quotation mark
+ * as an int to retrieve an int, parse everything within the next curly braces to retrieve elements of a nested object etc."
+ *
+ * The symmetric interface for the serialization process is [Encoder].
+ *
+ * ### Deserialization. Primitives
+ *
+ * If a class is represented as a single [primitive][PrimitiveKind] value in its serialized form,
+ * then one of the `decode*` methods (e.g. [decodeInt]) can be used directly.
+ *
+ * ### Deserialization. Structured types
+ *
+ * If a class is represented as a structure or has multiple values in its serialized form,
+ * `decode*` methods are not that helpful, because format may not require a strict order of data
+ * (e.g. JSON or XML), do not allow working with collection types or establish structure boundaries.
+ * All these capabilities are delegated to the [CompositeDecoder] interface with a more specific API surface.
+ * To denote a structure start, [beginStructure] should be used.
+ * ```
+ * // Denote the structure start,
+ * val composite = decoder.beginStructure(descriptor)
+ * // Decode all elements within the structure using 'composite'
+ * ...
+ * // Denote the structure end
+ * composite.endStructure(descriptor)
+ * ```
+ *
+ * E.g. if the decoder belongs to JSON format, then [beginStructure] will parse an opening bracket
+ * (`{` or `[`, depending on the descriptor kind), returning the [CompositeDecoder] that is aware of colon separator,
+ * that should be read after each key-value pair, whilst [CompositeDecoder.endStructure] will parse a closing bracket.
+ *
+ * ### Exception guarantees
+ *
+ * For the regular exceptions, such as invalid input, missing control symbols or attributes, and unknown symbols,
+ * [SerializationException] can be thrown by any decoder methods. It is recommended to declare a format-specific
+ * subclass of [SerializationException] and throw it.
+ *
+ * ### Exception safety
+ *
+ * In general, catching [SerializationException] from any of `decode*` methods is not allowed and produces unspecified behavior.
+ * After thrown exception, the current decoder is left in an arbitrary state, no longer suitable for further decoding.
+ *
+ * ### Format encapsulation
+ *
+ * For example, for the following deserializer:
+ * ```
+ * class StringHolder(val stringValue: String)
+ *
+ * object StringPairDeserializer : DeserializationStrategy<StringHolder> {
+ *    override val descriptor = ...
+ *
+ *    override fun deserializer(decoder: Decoder): StringHolder {
+ *        // Denotes start of the structure, StringHolder is not a "plain" data type
+ *        val composite = decoder.beginStructure(descriptor)
+ *        if (composite.decodeElementIndex(descriptor) != 0)
+ *            throw MissingFieldException("Field 'stringValue' is missing")
+ *        // Decode the nested string value
+ *        val value = composite.decodeStringElement(descriptor, index = 0)
+ *        // Denotes end of the structure
+ *        composite.endStructure(descriptor)
+ *    }
+ * }
+ * ```
+ *
+ * This deserializer does not know anything about the underlying data and will work with any properly-implemented decoder.
+ * JSON, for example, parses an opening bracket `{` during the `beginStructure` call, checks that the next key
+ * after this bracket is `stringValue` (using the descriptor), returns the value after the colon as string value
+ * and parses closing bracket `}` during the `endStructure`.
+ * XML would do roughly the same, but with different separators and parsing structures, while ProtoBuf
+ * machinery could be completely different.
+ * In any case, all these parsing details are encapsulated by a decoder.
+ *
+ * ### Decoder implementation
+ *
+ * While being strictly typed, an underlying format can transform actual types in the way it wants.
+ * For example, a format can support only string types and encode/decode all primitives in a string form:
+ * ```
+ * StringFormatDecoder : Decoder {
+ *
+ *     ...
+ *     override fun decodeDouble(): Double = decodeString().toDouble()
+ *     override fun decodeInt(): Int = decodeString().toInt()
+ *     ...
+ * }
+ * ```
+ *
+ * ### Not stable for inheritance
+ *
+ * `Decoder` interface is not stable for inheritance in 3rd-party libraries, as new methods
+ * might be added to this interface or contracts of the existing methods can be changed.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreDecoder")))
+@protocol ZappOfframpKotlinx_serialization_coreDecoder
+@required
+
+/**
+ * Decodes the beginning of the nested structure in a serialized form
+ * and returns [CompositeDecoder] responsible for decoding this very structure.
+ *
+ * Typically, classes, collections and maps are represented as a nested structure in a serialized form.
+ * E.g. the following JSON
+ * ```
+ * {
+ *     "a": 2,
+ *     "b": { "nested": "c" }
+ *     "c": [1, 2, 3],
+ *     "d": null
+ * }
+ * ```
+ * has three nested structures: the very beginning of the data, "b" value and "c" value.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreCompositeDecoder>)beginStructureDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("beginStructure(descriptor:)")));
+
+/**
+ * Decodes a boolean value.
+ * Corresponding kind is [PrimitiveKind.BOOLEAN].
+ */
+- (BOOL)decodeBoolean __attribute__((swift_name("decodeBoolean()")));
+
+/**
+ * Decodes a single byte value.
+ * Corresponding kind is [PrimitiveKind.BYTE].
+ */
+- (int8_t)decodeByte __attribute__((swift_name("decodeByte()")));
+
+/**
+ * Decodes a 16-bit unicode character value.
+ * Corresponding kind is [PrimitiveKind.CHAR].
+ */
+- (unichar)decodeChar __attribute__((swift_name("decodeChar()")));
+
+/**
+ * Decodes a 64-bit IEEE 754 floating point value.
+ * Corresponding kind is [PrimitiveKind.DOUBLE].
+ */
+- (double)decodeDouble __attribute__((swift_name("decodeDouble()")));
+
+/**
+ * Decodes a enum value and returns its index in [enumDescriptor] elements collection.
+ * Corresponding kind is [SerialKind.ENUM].
+ *
+ * E.g. for the enum `enum class Letters { A, B, C, D }` and
+ * underlying input "C", [decodeEnum] method should return `2` as a result.
+ *
+ * This method does not imply any restrictions on the input format,
+ * the format is free to store the enum by its name, index, ordinal or any other enum representation.
+ */
+- (int32_t)decodeEnumEnumDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)enumDescriptor __attribute__((swift_name("decodeEnum(enumDescriptor:)")));
+
+/**
+ * Decodes a 32-bit IEEE 754 floating point value.
+ * Corresponding kind is [PrimitiveKind.FLOAT].
+ */
+- (float)decodeFloat __attribute__((swift_name("decodeFloat()")));
+
+/**
+ * Returns [Decoder] for decoding an underlying type of a value class in an inline manner.
+ * [descriptor] describes a target value class.
+ *
+ * Namely, for the `@Serializable @JvmInline value class MyInt(val my: Int)`, the following sequence is used:
+ * ```
+ * thisDecoder.decodeInline(MyInt.serializer().descriptor).decodeInt()
+ * ```
+ *
+ * Current decoder may return any other instance of [Decoder] class, depending on the provided [descriptor].
+ * For example, when this function is called on `Json` decoder with
+ * `UInt.serializer().descriptor`, the returned decoder is able to decode unsigned integers.
+ *
+ * Note that this function returns [Decoder] instead of the [CompositeDecoder]
+ * because value classes always have the single property.
+ *
+ * Calling [Decoder.beginStructure] on returned instance leads to an unspecified behavior and, in general, is prohibited.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreDecoder>)decodeInlineDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("decodeInline(descriptor:)")));
+
+/**
+ * Decodes a 32-bit integer value.
+ * Corresponding kind is [PrimitiveKind.INT].
+ */
+- (int32_t)decodeInt __attribute__((swift_name("decodeInt()")));
+
+/**
+ * Decodes a 64-bit integer value.
+ * Corresponding kind is [PrimitiveKind.LONG].
+ */
+- (int64_t)decodeLong __attribute__((swift_name("decodeLong()")));
+
+/**
+ * Returns `true` if the current value in decoder is not null, false otherwise.
+ * This method is usually used to decode potentially nullable data:
+ * ```
+ * // Could be String? deserialize() method
+ * public fun deserialize(decoder: Decoder): String? {
+ *     if (decoder.decodeNotNullMark()) {
+ *         return decoder.decodeString()
+ *     } else {
+ *         return decoder.decodeNull()
+ *     }
+ * }
+ * ```
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (BOOL)decodeNotNullMark __attribute__((swift_name("decodeNotNullMark()")));
+
+/**
+ * Decodes the `null` value and returns it.
+ *
+ * It is expected that `decodeNotNullMark` was called
+ * prior to `decodeNull` invocation and the case when it returned `true` was handled.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (ZappOfframpKotlinNothing * _Nullable)decodeNull __attribute__((swift_name("decodeNull()")));
+
+/**
+ * Decodes the nullable value of type [T] by delegating the decoding process to the given [deserializer].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (id _Nullable)decodeNullableSerializableValueDeserializer:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeNullableSerializableValue(deserializer:)")));
+
+/**
+ * Decodes the value of type [T] by delegating the decoding process to the given [deserializer].
+ * For example, `decodeInt` call is equivalent to delegating integer decoding to [Int.serializer][Int.Companion.serializer]:
+ * `decodeSerializableValue(Int.serializer())`
+ */
+- (id _Nullable)decodeSerializableValueDeserializer:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy>)deserializer __attribute__((swift_name("decodeSerializableValue(deserializer:)")));
+
+/**
+ * Decodes a 16-bit short value.
+ * Corresponding kind is [PrimitiveKind.SHORT].
+ */
+- (int16_t)decodeShort __attribute__((swift_name("decodeShort()")));
+
+/**
+ * Decodes a string value.
+ * Corresponding kind is [PrimitiveKind.STRING].
+ */
+- (NSString *)decodeString __attribute__((swift_name("decodeString()")));
+
+/**
+ * Context of the current serialization process, including contextual and polymorphic serialization and,
+ * potentially, a format-specific configuration.
+ */
+@property (readonly) ZappOfframpKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
+@end
+
+__attribute__((swift_name("KotlinFunction")))
+@protocol ZappOfframpKotlinFunction
+@required
+@end
+
+__attribute__((swift_name("KotlinSuspendFunction1")))
+@protocol ZappOfframpKotlinSuspendFunction1 <ZappOfframpKotlinFunction>
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)invokeP1:(id _Nullable)p1 completionHandler:(void (^)(id _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("invoke(p1:completionHandler:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+*/
+__attribute__((swift_name("KotlinRandom")))
+@interface ZappOfframpKotlinRandom : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKotlinRandomDefault *companion __attribute__((swift_name("companion")));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (int32_t)nextBitsBitCount:(int32_t)bitCount __attribute__((swift_name("nextBits(bitCount:)")));
+- (BOOL)nextBoolean __attribute__((swift_name("nextBoolean()")));
+
+/**
+ * @note annotations
+ *   kotlin.IgnorableReturnValue
+*/
+- (ZappOfframpKotlinByteArray *)nextBytesArray:(ZappOfframpKotlinByteArray *)array __attribute__((swift_name("nextBytes(array:)")));
+- (ZappOfframpKotlinByteArray *)nextBytesSize:(int32_t)size __attribute__((swift_name("nextBytes(size:)")));
+
+/**
+ * @note annotations
+ *   kotlin.IgnorableReturnValue
+*/
+- (ZappOfframpKotlinByteArray *)nextBytesArray:(ZappOfframpKotlinByteArray *)array fromIndex:(int32_t)fromIndex toIndex:(int32_t)toIndex __attribute__((swift_name("nextBytes(array:fromIndex:toIndex:)")));
+- (double)nextDouble __attribute__((swift_name("nextDouble()")));
+- (double)nextDoubleUntil:(double)until __attribute__((swift_name("nextDouble(until:)")));
+- (double)nextDoubleFrom:(double)from until:(double)until __attribute__((swift_name("nextDouble(from:until:)")));
+- (float)nextFloat __attribute__((swift_name("nextFloat()")));
+- (int32_t)nextInt __attribute__((swift_name("nextInt()")));
+- (int32_t)nextIntUntil:(int32_t)until __attribute__((swift_name("nextInt(until:)")));
+- (int32_t)nextIntFrom:(int32_t)from until:(int32_t)until __attribute__((swift_name("nextInt(from:until:)")));
+- (int64_t)nextLong __attribute__((swift_name("nextLong()")));
+- (int64_t)nextLongUntil:(int64_t)until __attribute__((swift_name("nextLong(until:)")));
+- (int64_t)nextLongFrom:(int64_t)from until:(int64_t)until __attribute__((swift_name("nextLong(from:until:)")));
+@end
+
+
+/**
+ * Class representing single JSON element.
+ * Can be [JsonPrimitive], [JsonArray] or [JsonObject].
+ *
+ * [JsonElement.toString] properly prints JSON tree as valid JSON, taking into account quoted values and primitives.
+ * Whole hierarchy is serializable, but only when used with [Json] as [JsonElement] is purely JSON-specific structure
+ * which has a meaningful schemaless semantics only for JSON.
+ *
+ * The whole hierarchy is [serializable][Serializable] only by [Json] format.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/serialization/json/JsonElementSerializer))
+*/
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement")))
+@interface ZappOfframpKotlinx_serialization_jsonJsonElement : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKotlinx_serialization_jsonJsonElementCompanion *companion __attribute__((swift_name("companion")));
+@end
+
+__attribute__((swift_name("KotlinIterator")))
+@protocol ZappOfframpKotlinIterator
+@required
+- (BOOL)hasNext __attribute__((swift_name("hasNext()")));
+- (id _Nullable)next __attribute__((swift_name("next()")));
+@end
+
+__attribute__((swift_name("KotlinByteIterator")))
+@interface ZappOfframpKotlinByteIterator : ZappOfframpBase <ZappOfframpKotlinIterator>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (ZappOfframpByte *)next __attribute__((swift_name("next()")));
+- (int8_t)nextByte __attribute__((swift_name("nextByte()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+*/
+__attribute__((swift_name("KotlinCoroutineContext")))
+@protocol ZappOfframpKotlinCoroutineContext
+@required
+- (id _Nullable)foldInitial:(id _Nullable)initial operation:(id _Nullable (^)(id _Nullable, id<ZappOfframpKotlinCoroutineContextElement>))operation __attribute__((swift_name("fold(initial:operation:)")));
+- (id<ZappOfframpKotlinCoroutineContextElement> _Nullable)getKey:(id<ZappOfframpKotlinCoroutineContextKey>)key __attribute__((swift_name("get(key:)")));
+- (id<ZappOfframpKotlinCoroutineContext>)minusKeyKey:(id<ZappOfframpKotlinCoroutineContextKey>)key __attribute__((swift_name("minusKey(key:)")));
+- (id<ZappOfframpKotlinCoroutineContext>)plusContext:(id<ZappOfframpKotlinCoroutineContext>)context __attribute__((swift_name("plus(context:)")));
+@end
+
+__attribute__((swift_name("KotlinCoroutineContextElement")))
+@protocol ZappOfframpKotlinCoroutineContextElement <ZappOfframpKotlinCoroutineContext>
+@required
+@property (readonly) id<ZappOfframpKotlinCoroutineContextKey> key __attribute__((swift_name("key")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreJob")))
+@protocol ZappOfframpKotlinx_coroutines_coreJob <ZappOfframpKotlinCoroutineContextElement>
+@required
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (id<ZappOfframpKotlinx_coroutines_coreChildHandle>)attachChildChild:(id<ZappOfframpKotlinx_coroutines_coreChildJob>)child __attribute__((swift_name("attachChild(child:)")));
+- (void)cancelCause:(ZappOfframpKotlinCancellationException * _Nullable)cause __attribute__((swift_name("cancel(cause:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (ZappOfframpKotlinCancellationException *)getCancellationException __attribute__((swift_name("getCancellationException()")));
+- (id<ZappOfframpKotlinx_coroutines_coreDisposableHandle>)invokeOnCompletionHandler:(void (^)(ZappOfframpKotlinThrowable * _Nullable cause))handler __attribute__((swift_name("invokeOnCompletion(handler:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (id<ZappOfframpKotlinx_coroutines_coreDisposableHandle>)invokeOnCompletionOnCancelling:(BOOL)onCancelling invokeImmediately:(BOOL)invokeImmediately handler:(void (^)(ZappOfframpKotlinThrowable * _Nullable cause))handler __attribute__((swift_name("invokeOnCompletion(onCancelling:invokeImmediately:handler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)joinWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("join(completionHandler:)")));
+- (id<ZappOfframpKotlinx_coroutines_coreJob>)plusOther:(id<ZappOfframpKotlinx_coroutines_coreJob>)other __attribute__((swift_name("plus(other:)"))) __attribute__((unavailable("Operator '+' on two Job objects is meaningless. Job is a coroutine context element and `+` is a set-sum operator for coroutine contexts. The job to the right of `+` just replaces the job the left of `+`.")));
+- (BOOL)start __attribute__((swift_name("start()")));
+@property (readonly) id<ZappOfframpKotlinSequence> children __attribute__((swift_name("children")));
+@property (readonly) BOOL isActive __attribute__((swift_name("isActive")));
+@property (readonly) BOOL isCancelled __attribute__((swift_name("isCancelled")));
+@property (readonly) BOOL isCompleted __attribute__((swift_name("isCompleted")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreSelectClause0> onJoin __attribute__((swift_name("onJoin")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.ExperimentalCoroutinesApi
+*/
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreJob> _Nullable parent __attribute__((swift_name("parent")));
+@end
+
+
+/**
+ * Represents an execution pipeline for asynchronous extensible computations
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline)
+ */
+__attribute__((swift_name("Ktor_utilsPipeline")))
+@interface ZappOfframpKtor_utilsPipeline<TSubject, TContext> : ZappOfframpBase
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+@property (readonly) BOOL developmentMode __attribute__((swift_name("developmentMode")));
+@property (readonly) BOOL isEmpty __attribute__((swift_name("isEmpty")));
+@property (readonly) NSArray<ZappOfframpKtor_utilsPipelinePhase *> *items __attribute__((swift_name("items")));
+- (instancetype)initWithPhases:(ZappOfframpKotlinArray<ZappOfframpKtor_utilsPipelinePhase *> *)phases __attribute__((swift_name("init(phases:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase interceptors:(NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptors __attribute__((swift_name("init(phase:interceptors:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Adds [phase] to the end of this pipeline
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.addPhase)
+ */
+- (void)addPhasePhase:(ZappOfframpKtor_utilsPipelinePhase *)phase __attribute__((swift_name("addPhase(phase:)")));
+
+/**
+ * Invoked after an interceptor has been installed
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.afterIntercepted)
+ */
+- (void)afterIntercepted __attribute__((swift_name("afterIntercepted()")));
+
+/**
+ * Executes this pipeline in the given [context] and with the given [subject]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.execute)
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)executeContext:(TContext)context subject:(TSubject)subject completionHandler:(void (^)(TSubject _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("execute(context:subject:completionHandler:)")));
+
+/**
+ * Inserts [phase] after the [reference] phase. If there are other phases inserted after [reference], then [phase]
+ * will be inserted after them.
+ * Example:
+ * ```
+ * val pipeline = Pipeline<String, String>(a)
+ * pipeline.insertPhaseAfter(a, b)
+ * pipeline.insertPhaseAfter(a, c)
+ * assertEquals(listOf(a, b, c), pipeline.items)
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.insertPhaseAfter)
+ */
+- (void)insertPhaseAfterReference:(ZappOfframpKtor_utilsPipelinePhase *)reference phase:(ZappOfframpKtor_utilsPipelinePhase *)phase __attribute__((swift_name("insertPhaseAfter(reference:phase:)")));
+
+/**
+ * Inserts [phase] before the [reference] phase.
+ * Example:
+ * ```
+ * val pipeline = Pipeline<String, String>(c)
+ * pipeline.insertPhaseBefore(c, a)
+ * pipeline.insertPhaseBefore(c, b)
+ * assertEquals(listOf(a, b, c), pipeline.items)
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.insertPhaseBefore)
+ */
+- (void)insertPhaseBeforeReference:(ZappOfframpKtor_utilsPipelinePhase *)reference phase:(ZappOfframpKtor_utilsPipelinePhase *)phase __attribute__((swift_name("insertPhaseBefore(reference:phase:)")));
+
+/**
+ * Adds [block] to the [phase] of this pipeline
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.intercept)
+ */
+- (void)interceptPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase block:(id<ZappOfframpKotlinSuspendFunction2>)block __attribute__((swift_name("intercept(phase:block:)")));
+- (NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptorsForPhasePhase:(ZappOfframpKtor_utilsPipelinePhase *)phase __attribute__((swift_name("interceptorsForPhase(phase:)")));
+
+/**
+ * Merges another pipeline into this pipeline, maintaining relative phases order
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.merge)
+ */
+- (void)mergeFrom:(ZappOfframpKtor_utilsPipeline<TSubject, TContext> *)from __attribute__((swift_name("merge(from:)")));
+- (void)mergePhasesFrom:(ZappOfframpKtor_utilsPipeline<TSubject, TContext> *)from __attribute__((swift_name("mergePhases(from:)")));
+
+/**
+ * Reset current pipeline from other.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.resetFrom)
+ */
+- (void)resetFromFrom:(ZappOfframpKtor_utilsPipeline<TSubject, TContext> *)from __attribute__((swift_name("resetFrom(from:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * Provides common place to store pipeline attributes
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.attributes)
+ */
+
+/**
+ * Indicated if debug mode is enabled. In debug mode users will get more details in the stacktrace.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.developmentMode)
+ */
+
+/**
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.isEmpty)
+ *
+ * @return `true` if there are no interceptors installed regardless number of phases
+ */
+
+/**
+ * Phases of this pipeline
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.Pipeline.items)
+ */
+@end
+
+__attribute__((swift_name("KotlinSuspendFunction2")))
+@protocol ZappOfframpKotlinSuspendFunction2 <ZappOfframpKotlinFunction>
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)invokeP1:(id _Nullable)p1 p2:(id _Nullable)p2 completionHandler:(void (^)(id _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("invoke(p1:p2:completionHandler:)")));
+@end
+
+
+/**
+ * A pair of a [request] and [response] for a specific [HttpClient].
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall)
+ *
+ * @property client the client that executed the call.
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientCall")))
+@interface ZappOfframpKtor_client_coreHttpClientCall : ZappOfframpBase <ZappOfframpKotlinx_coroutines_coreCoroutineScope>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpClientCallCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) BOOL allowDoubleReceive __attribute__((swift_name("allowDoubleReceive")));
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+@property (readonly) ZappOfframpKtor_client_coreHttpClient *client __attribute__((swift_name("client")));
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> coroutineContext __attribute__((swift_name("coroutineContext")));
+@property id<ZappOfframpKtor_client_coreHttpRequest> request __attribute__((swift_name("request")));
+@property ZappOfframpKtor_client_coreHttpResponse *response __attribute__((swift_name("response")));
+- (instancetype)initWithClient:(ZappOfframpKtor_client_coreHttpClient *)client __attribute__((swift_name("init(client:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithClient:(ZappOfframpKtor_client_coreHttpClient *)client requestData:(ZappOfframpKtor_client_coreHttpRequestData *)requestData responseData:(ZappOfframpKtor_client_coreHttpResponseData *)responseData __attribute__((swift_name("init(client:requestData:responseData:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Tries to receive the payload of the [response] as a specific expected type provided in [info].
+ * Returns [response] if [info] corresponds to [HttpResponse].
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall.body)
+ *
+ * @throws NoTransformationFoundException If no transformation is found for the type [info].
+ * @throws DoubleReceiveException If already called [body].
+ * @throws NullPointerException If content is `null`.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)bodyInfo:(ZappOfframpKtor_utilsTypeInfo *)info completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("body(info:completionHandler:)")));
+
+/**
+ * Tries to receive the payload of the [response] as a specific expected type provided in [info].
+ * Returns [response] if [info] corresponds to [HttpResponse].
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall.bodyNullable)
+ *
+ * @throws NoTransformationFoundException If no transformation is found for the type [info].
+ * @throws DoubleReceiveException If already called [body].
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)bodyNullableInfo:(ZappOfframpKtor_utilsTypeInfo *)info completionHandler:(void (^)(id _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("bodyNullable(info:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+- (void)getResponseContentWithCompletionHandler:(void (^)(id<ZappOfframpKtor_ioByteReadChannel> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("getResponseContent(completionHandler:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note This property has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+
+/**
+ * Typed [Attributes] associated to this call serving as a lightweight container.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall.attributes)
+ */
+
+/**
+ * The [request] sent by the client.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall.request)
+ */
+
+/**
+ * The [response] sent by the server.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.call.HttpClientCall.response)
+ */
+@end
+
+
+/**
+ * Ktor type information.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.reflect.TypeInfo)
+ *
+ * @property type Source KClass<*>
+ * @property kotlinType Kotlin reified type with all generic type parameters.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsTypeInfo")))
+@interface ZappOfframpKtor_utilsTypeInfo : ZappOfframpBase
+@property (readonly) id<ZappOfframpKotlinKType> _Nullable kotlinType __attribute__((swift_name("kotlinType")));
+@property (readonly) id<ZappOfframpKotlinKClass> type __attribute__((swift_name("type")));
+- (instancetype)initWithType:(id<ZappOfframpKotlinKClass>)type kotlinType:(id<ZappOfframpKotlinKType> _Nullable)kotlinType __attribute__((swift_name("init(type:kotlinType:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithType:(id<ZappOfframpKotlinKClass>)type reifiedType:(id<ZappOfframpKotlinKType>)reifiedType kotlinType:(id<ZappOfframpKotlinKType> _Nullable)kotlinType __attribute__((swift_name("init(type:reifiedType:kotlinType:)"))) __attribute__((objc_designated_initializer)) __attribute__((deprecated("Use constructor without reifiedType parameter.")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Channel for asynchronous reading of sequences of bytes.
+ * This is a **single-reader channel**.
+ *
+ * Operations on this channel cannot be invoked concurrently.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.utils.io.ByteReadChannel)
+ */
+__attribute__((swift_name("Ktor_ioByteReadChannel")))
+@protocol ZappOfframpKtor_ioByteReadChannel
+@required
+
+/**
+ * Suspend the channel until it has [min] bytes or gets closed. Throws exception if the channel was closed with an
+ * error. If there are bytes available in the channel, this function returns immediately.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.utils.io.ByteReadChannel.awaitContent)
+ *
+ * @return return `false` eof is reached, otherwise `true`.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)awaitContentMin:(int32_t)min completionHandler:(void (^)(ZappOfframpBoolean * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("awaitContent(min:completionHandler:)")));
+- (void)cancelCause_:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("cancel(cause_:)")));
+@property (readonly) ZappOfframpKotlinThrowable * _Nullable closedCause __attribute__((swift_name("closedCause")));
+@property (readonly) BOOL isClosedForRead __attribute__((swift_name("isClosedForRead")));
+@property (readonly) id<ZappOfframpKotlinx_io_coreSource> readBuffer __attribute__((swift_name("readBuffer")));
+@end
+
+
+/**
+ * Actual data of the [HttpRequest], including [url], [method], [headers], [body] and [executionContext].
+ * Built by [HttpRequestBuilder].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestData)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpRequestData")))
+@interface ZappOfframpKtor_client_coreHttpRequestData : ZappOfframpBase
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+@property (readonly) ZappOfframpKtor_httpOutgoingContent *body __attribute__((swift_name("body")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreJob> executionContext __attribute__((swift_name("executionContext")));
+@property (readonly) id<ZappOfframpKtor_httpHeaders> headers __attribute__((swift_name("headers")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *method __attribute__((swift_name("method")));
+@property (readonly) ZappOfframpKtor_httpUrl *url __attribute__((swift_name("url")));
+- (instancetype)initWithUrl:(ZappOfframpKtor_httpUrl *)url method:(ZappOfframpKtor_httpHttpMethod *)method headers:(id<ZappOfframpKtor_httpHeaders>)headers body:(ZappOfframpKtor_httpOutgoingContent *)body executionContext:(id<ZappOfframpKotlinx_coroutines_coreJob>)executionContext attributes:(id<ZappOfframpKtor_utilsAttributes>)attributes __attribute__((swift_name("init(url:method:headers:body:executionContext:attributes:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Retrieve extension by its key.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestData.getCapabilityOrNull)
+ */
+- (id _Nullable)getCapabilityOrNullKey:(id<ZappOfframpKtor_client_coreHttpClientEngineCapability>)key __attribute__((swift_name("getCapabilityOrNull(key:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Information about the content to be sent to the peer, recognized by a client or server engine
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent")))
+@interface ZappOfframpKtor_httpOutgoingContent : ZappOfframpBase
+@property (readonly) ZappOfframpLong * _Nullable contentLength __attribute__((swift_name("contentLength")));
+@property (readonly) ZappOfframpKtor_httpContentType * _Nullable contentType __attribute__((swift_name("contentType")));
+@property (readonly) id<ZappOfframpKtor_httpHeaders> headers __attribute__((swift_name("headers")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode * _Nullable status __attribute__((swift_name("status")));
+
+/**
+ * Gets an extension property for this content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.getProperty)
+ */
+- (id _Nullable)getPropertyKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("getProperty(key:)")));
+
+/**
+ * Sets an extension property for this content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.setProperty)
+ */
+- (void)setPropertyKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key value:(id _Nullable)value __attribute__((swift_name("setProperty(key:value:)")));
+
+/**
+ * Trailers to set when sending this content, will be ignored if request is not in HTTP2 mode
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.trailers)
+ */
+- (id<ZappOfframpKtor_httpHeaders> _Nullable)trailers __attribute__((swift_name("trailers()")));
+
+/**
+ * Specifies content length in bytes for this resource.
+ *
+ * If null, the resources will be sent as `Transfer-Encoding: chunked`
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.contentLength)
+ */
+
+/**
+ * Specifies [ContentType] for this resource.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.contentType)
+ */
+
+/**
+ * Headers to set when sending this content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.headers)
+ */
+
+/**
+ * Status code to set when sending this content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.status)
+ */
+@end
+
+
+/**
+ * Variant of a [OutgoingContent] for upgrading an HTTP connection
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ProtocolUpgrade)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.ProtocolUpgrade")))
+@interface ZappOfframpKtor_httpOutgoingContentProtocolUpgrade : ZappOfframpKtor_httpOutgoingContent
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *status __attribute__((swift_name("status")));
+
+/**
+ * Variant of a [OutgoingContent] for upgrading an HTTP connection
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ProtocolUpgrade)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Variant of a [OutgoingContent] for upgrading an HTTP connection
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ProtocolUpgrade)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Upgrades an HTTP connection
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ProtocolUpgrade.upgrade)
+ *
+ * @param input is a [ByteReadChannel] for an upgraded connection
+ * @param output is a [ByteWriteChannel] for an upgraded connection
+ * @param engineContext is a [CoroutineContext] to execute non-blocking code, such as parsing or processing
+ * @param userContext is a [CoroutineContext] to execute user-provided callbacks or code potentially blocking
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upgradeInput:(id<ZappOfframpKtor_ioByteReadChannel>)input output:(id<ZappOfframpKtor_ioByteWriteChannel>)output engineContext:(id<ZappOfframpKotlinCoroutineContext>)engineContext userContext:(id<ZappOfframpKotlinCoroutineContext>)userContext completionHandler:(void (^)(id<ZappOfframpKotlinx_coroutines_coreJob> _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("upgrade(input:output:engineContext:userContext:completionHandler:)")));
+@end
+
+
+/**
+ * Channel for asynchronous writing of sequences of bytes.
+ * This is a **single-writer channel**.
+ *
+ * Operations on this channel cannot be invoked concurrently, unless explicitly specified otherwise
+ * in the description. Exceptions are [close] and [flush].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.utils.io.ByteWriteChannel)
+ */
+__attribute__((swift_name("Ktor_ioByteWriteChannel")))
+@protocol ZappOfframpKtor_ioByteWriteChannel
+@required
+- (void)cancelCause_:(ZappOfframpKotlinThrowable * _Nullable)cause __attribute__((swift_name("cancel(cause_:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)flushWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("flush(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)flushAndCloseWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("flushAndClose(completionHandler:)")));
+@property (readonly) BOOL autoFlush __attribute__((swift_name("autoFlush")));
+@property (readonly) ZappOfframpKotlinThrowable * _Nullable closedCause __attribute__((swift_name("closedCause")));
+@property (readonly) BOOL isClosedForWrite __attribute__((swift_name("isClosedForWrite")));
+@property (readonly) id<ZappOfframpKotlinx_io_coreSink> writeBuffer __attribute__((swift_name("writeBuffer")));
+@end
+
+
+/**
+ * Variant of a [OutgoingContent] with payload written to [ByteWriteChannel]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.WriteChannelContent)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.WriteChannelContent")))
+@interface ZappOfframpKtor_httpOutgoingContentWriteChannelContent : ZappOfframpKtor_httpOutgoingContent
+
+/**
+ * Variant of a [OutgoingContent] with payload written to [ByteWriteChannel]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.WriteChannelContent)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Variant of a [OutgoingContent] with payload written to [ByteWriteChannel]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.WriteChannelContent)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Receives [channel] provided by the engine and writes all data to it
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.WriteChannelContent.writeTo)
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)writeToChannel:(id<ZappOfframpKtor_ioByteWriteChannel>)channel completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("writeTo(channel:completionHandler:)")));
+@end
+
+
+/**
+ * Variant of a [OutgoingContent] with payload represented as [ByteArray]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ByteArrayContent)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.ByteArrayContent")))
+@interface ZappOfframpKtor_httpOutgoingContentByteArrayContent : ZappOfframpKtor_httpOutgoingContent
+
+/**
+ * Variant of a [OutgoingContent] with payload represented as [ByteArray]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ByteArrayContent)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Variant of a [OutgoingContent] with payload represented as [ByteArray]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ByteArrayContent)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Provides [ByteArray] which engine will send to peer
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ByteArrayContent.bytes)
+ */
+- (ZappOfframpKotlinByteArray *)bytes __attribute__((swift_name("bytes()")));
+@end
+
+
+/**
+ * Variant of an [OutgoingContent] which delegates to provided [OutgoingContent]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ContentWrapper)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.ContentWrapper")))
+@interface ZappOfframpKtor_httpOutgoingContentContentWrapper : ZappOfframpKtor_httpOutgoingContent
+@property (readonly) ZappOfframpLong * _Nullable contentLength __attribute__((swift_name("contentLength")));
+@property (readonly) ZappOfframpKtor_httpContentType * _Nullable contentType __attribute__((swift_name("contentType")));
+@property (readonly) id<ZappOfframpKtor_httpHeaders> headers __attribute__((swift_name("headers")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode * _Nullable status __attribute__((swift_name("status")));
+- (instancetype)initWithDelegate:(ZappOfframpKtor_httpOutgoingContent *)delegate __attribute__((swift_name("init(delegate:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Returns a copy of this implementation of [ContentWrapper] with provided [OutgoingContent]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ContentWrapper.copy)
+ */
+- (ZappOfframpKtor_httpOutgoingContentContentWrapper *)doCopyDelegate:(ZappOfframpKtor_httpOutgoingContent *)delegate __attribute__((swift_name("doCopy(delegate:)")));
+- (ZappOfframpKtor_httpOutgoingContent *)delegate __attribute__((swift_name("delegate()")));
+- (id _Nullable)getPropertyKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("getProperty(key:)")));
+- (void)setPropertyKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key value:(id _Nullable)value __attribute__((swift_name("setProperty(key:value:)")));
+@end
+
+
+/**
+ * Variant of a [OutgoingContent] without a payload
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.NoContent)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.NoContent")))
+@interface ZappOfframpKtor_httpOutgoingContentNoContent : ZappOfframpKtor_httpOutgoingContent
+
+/**
+ * Variant of a [OutgoingContent] without a payload
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.NoContent)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Variant of a [OutgoingContent] without a payload
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.NoContent)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+@end
+
+
+/**
+ * Variant of a [OutgoingContent] with payload read from [ByteReadChannel]
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ReadChannelContent)
+ */
+__attribute__((swift_name("Ktor_httpOutgoingContent.ReadChannelContent")))
+@interface ZappOfframpKtor_httpOutgoingContentReadChannelContent : ZappOfframpKtor_httpOutgoingContent
+
+/**
+ * Variant of a [OutgoingContent] with payload read from [ByteReadChannel]
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ReadChannelContent)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Variant of a [OutgoingContent] with payload read from [ByteReadChannel]
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ReadChannelContent)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Provides [ByteReadChannel] for the content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ReadChannelContent.readFrom)
+ */
+- (id<ZappOfframpKtor_ioByteReadChannel>)readFrom __attribute__((swift_name("readFrom()")));
+
+/**
+ * Provides [ByteReadChannel] for the given range of the content
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.content.OutgoingContent.ReadChannelContent.readFrom)
+ */
+- (id<ZappOfframpKtor_ioByteReadChannel>)readFromRange:(ZappOfframpKotlinLongRange *)range __attribute__((swift_name("readFrom(range:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+__attribute__((swift_name("Kotlinx_coroutines_coreSelectClause")))
+@protocol ZappOfframpKotlinx_coroutines_coreSelectClause
+@required
+@property (readonly) id clauseObject __attribute__((swift_name("clauseObject")));
+@property (readonly) ZappOfframpKotlinUnit *(^(^ _Nullable onCancellationConstructor)(id<ZappOfframpKotlinx_coroutines_coreSelectInstance> select, id _Nullable param, id _Nullable internalResult))(ZappOfframpKotlinThrowable *, id _Nullable, id<ZappOfframpKotlinCoroutineContext>) __attribute__((swift_name("onCancellationConstructor")));
+@property (readonly) id _Nullable (^processResFunc)(id clauseObject, id _Nullable param, id _Nullable clauseResult) __attribute__((swift_name("processResFunc")));
+@property (readonly) void (^regFunc)(id clauseObject, id<ZappOfframpKotlinx_coroutines_coreSelectInstance> select, id _Nullable param) __attribute__((swift_name("regFunc")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreSelectClause1")))
+@protocol ZappOfframpKotlinx_coroutines_coreSelectClause1 <ZappOfframpKotlinx_coroutines_coreSelectClause>
+@required
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreSelectClause2")))
+@protocol ZappOfframpKotlinx_coroutines_coreSelectClause2 <ZappOfframpKotlinx_coroutines_coreSelectClause>
+@required
+@end
+
+
+/**
+ * Serial kind is an intrinsic property of [SerialDescriptor] that indicates how
+ * the corresponding type is structurally represented by its serializer.
+ *
+ * Kind is used by serialization formats to determine how exactly the given type
+ * should be serialized. For example, JSON format detects the kind of the value and,
+ * depending on that, may write it as a plain value for primitive kinds, open a
+ * curly brace '{' for class-like structures and square bracket '[' for list- and array- like structures.
+ *
+ * Kinds are used both during serialization, to serialize a value properly and statically, and
+ * to introspect the type structure or build serialization schema.
+ *
+ * Kind should match the structure of the serialized form, not the structure of the corresponding Kotlin class.
+ * Meaning that if serializable class `class IntPair(val left: Int, val right: Int)` is represented by the serializer
+ * as a single `Long` value, its descriptor should have [PrimitiveKind.LONG] without nested elements even though the class itself
+ * represents a structure with two primitive fields.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreSerialKind")))
+@interface ZappOfframpKotlinx_serialization_coreSerialKind : ZappOfframpBase
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Polymorphic kind represents a (bounded) polymorphic value, that is referred
+ * by some base class or interface, but its structure is defined by one of the possible implementations.
+ * Polymorphic kind is, by its definition, a union kind and is extracted to its own subtype to emphasize
+ * bounded and sealed polymorphism common property: not knowing the actual type statically and requiring
+ * formats to additionally encode it.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+__attribute__((swift_name("Kotlinx_serialization_corePolymorphicKind")))
+@interface ZappOfframpKotlinx_serialization_corePolymorphicKind : ZappOfframpKotlinx_serialization_coreSerialKind
+@end
+
+
+/**
+ * Open polymorphic kind represents statically unknown type that is hidden behind a given base class or interface.
+ * [PolymorphicSerializer] can be used as an example of polymorphic serialization.
+ *
+ * Due to security concerns and typical mistakes that arises from polymorphic serialization, by default
+ * `kotlinx.serialization` provides only bounded polymorphic serialization, forcing users to register all possible
+ * serializers for a given base class or interface.
+ *
+ * To introspect descriptor of this kind (e.g. list possible subclasses), an instance of [SerializersModule] is required.
+ * See [capturedKClass] extension property for more details.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePolymorphicKind.OPEN")))
+@interface ZappOfframpKotlinx_serialization_corePolymorphicKindOPEN : ZappOfframpKotlinx_serialization_corePolymorphicKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePolymorphicKindOPEN *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Open polymorphic kind represents statically unknown type that is hidden behind a given base class or interface.
+ * [PolymorphicSerializer] can be used as an example of polymorphic serialization.
+ *
+ * Due to security concerns and typical mistakes that arises from polymorphic serialization, by default
+ * `kotlinx.serialization` provides only bounded polymorphic serialization, forcing users to register all possible
+ * serializers for a given base class or interface.
+ *
+ * To introspect descriptor of this kind (e.g. list possible subclasses), an instance of [SerializersModule] is required.
+ * See [capturedKClass] extension property for more details.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)oPEN __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Sealed kind represents Kotlin sealed classes, where all subclasses are known statically at the moment of declaration.
+ * [SealedClassSerializer] can be used as an example of sealed serialization.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePolymorphicKind.SEALED")))
+@interface ZappOfframpKotlinx_serialization_corePolymorphicKindSEALED : ZappOfframpKotlinx_serialization_corePolymorphicKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePolymorphicKindSEALED *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Sealed kind represents Kotlin sealed classes, where all subclasses are known statically at the moment of declaration.
+ * [SealedClassSerializer] can be used as an example of sealed serialization.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)sEALED __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Values of primitive kinds usually are represented as a single value.
+ * All default serializers for Kotlin [primitives types](https://kotlinlang.org/docs/tutorials/kotlin-for-py/primitive-data-types-and-their-limitations.html)
+ * and [String] have primitive kind.
+ *
+ * ### Serializers interaction
+ *
+ * Serialization formats typically handle these kinds by calling a corresponding primitive method on encoder or decoder.
+ * For example, if the following serializable class `class Color(val red: Byte, val green: Byte, val blue: Byte)` is represented by your serializer
+ * as a single [Int] value, a typical serializer will serialize its value in the following manner:
+ * ```
+ * val intValue = color.rgbToInt()
+ * encoder.encodeInt(intValue)
+ * ```
+ * and a corresponding [Decoder] counterpart.
+ *
+ * ### Implementation note
+ *
+ * Serial descriptors for primitive kinds are not expected to have any nested elements, thus its element count should be zero.
+ * If a class is represented as a primitive value, its corresponding serial name *should not* be equal to the corresponding primitive type name.
+ * For the `Color` example, represented as single [Int], its descriptor should have [INT] kind, zero elements and serial name **not equals**
+ * to `kotlin.Int`: `PrimitiveDescriptor("my.package.ColorAsInt", PrimitiveKind.INT)`
+ */
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKind : ZappOfframpKotlinx_serialization_coreSerialKind
+@end
+
+
+/**
+ * Primitive kind that represents a boolean `true`/`false` value.
+ * Corresponding Kotlin primitive is [Boolean].
+ * Corresponding encoder and decoder methods are [Encoder.encodeBoolean] and [Decoder.decodeBoolean].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.BOOLEAN")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindBOOLEAN : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindBOOLEAN *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a boolean `true`/`false` value.
+ * Corresponding Kotlin primitive is [Boolean].
+ * Corresponding encoder and decoder methods are [Encoder.encodeBoolean] and [Decoder.decodeBoolean].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)bOOLEAN __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a single byte value.
+ * Corresponding Kotlin primitive is [Byte].
+ * Corresponding encoder and decoder methods are [Encoder.encodeByte] and [Decoder.decodeByte].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.BYTE")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindBYTE : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindBYTE *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a single byte value.
+ * Corresponding Kotlin primitive is [Byte].
+ * Corresponding encoder and decoder methods are [Encoder.encodeByte] and [Decoder.decodeByte].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)bYTE __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 16-bit unicode character value.
+ * Corresponding Kotlin primitive is [Char].
+ * Corresponding encoder and decoder methods are [Encoder.encodeChar] and [Decoder.decodeChar].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.CHAR")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindCHAR : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindCHAR *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 16-bit unicode character value.
+ * Corresponding Kotlin primitive is [Char].
+ * Corresponding encoder and decoder methods are [Encoder.encodeChar] and [Decoder.decodeChar].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)cHAR __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 64-bit IEEE 754 floating point value.
+ * Corresponding Kotlin primitive is [Double].
+ * Corresponding encoder and decoder methods are [Encoder.encodeDouble] and [Decoder.decodeDouble].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.DOUBLE")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindDOUBLE : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindDOUBLE *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 64-bit IEEE 754 floating point value.
+ * Corresponding Kotlin primitive is [Double].
+ * Corresponding encoder and decoder methods are [Encoder.encodeDouble] and [Decoder.decodeDouble].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)dOUBLE __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 32-bit IEEE 754 floating point value.
+ * Corresponding Kotlin primitive is [Float].
+ * Corresponding encoder and decoder methods are [Encoder.encodeFloat] and [Decoder.decodeFloat].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.FLOAT")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindFLOAT : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindFLOAT *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 32-bit IEEE 754 floating point value.
+ * Corresponding Kotlin primitive is [Float].
+ * Corresponding encoder and decoder methods are [Encoder.encodeFloat] and [Decoder.decodeFloat].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)fLOAT __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 32-bit int value.
+ * Corresponding Kotlin primitive is [Int].
+ * Corresponding encoder and decoder methods are [Encoder.encodeInt] and [Decoder.decodeInt].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.INT")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindINT : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindINT *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 32-bit int value.
+ * Corresponding Kotlin primitive is [Int].
+ * Corresponding encoder and decoder methods are [Encoder.encodeInt] and [Decoder.decodeInt].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)iNT __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 64-bit long value.
+ * Corresponding Kotlin primitive is [Long].
+ * Corresponding encoder and decoder methods are [Encoder.encodeLong] and [Decoder.decodeLong].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.LONG")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindLONG : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindLONG *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 64-bit long value.
+ * Corresponding Kotlin primitive is [Long].
+ * Corresponding encoder and decoder methods are [Encoder.encodeLong] and [Decoder.decodeLong].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)lONG __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a 16-bit short value.
+ * Corresponding Kotlin primitive is [Short].
+ * Corresponding encoder and decoder methods are [Encoder.encodeShort] and [Decoder.decodeShort].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.SHORT")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindSHORT : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindSHORT *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a 16-bit short value.
+ * Corresponding Kotlin primitive is [Short].
+ * Corresponding encoder and decoder methods are [Encoder.encodeShort] and [Decoder.decodeShort].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)sHORT __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Primitive kind that represents a string value.
+ * Corresponding Kotlin primitive is [String].
+ * Corresponding encoder and decoder methods are [Encoder.encodeString] and [Decoder.decodeString].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_corePrimitiveKind.STRING")))
+@interface ZappOfframpKotlinx_serialization_corePrimitiveKindSTRING : ZappOfframpKotlinx_serialization_corePrimitiveKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_corePrimitiveKindSTRING *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Primitive kind that represents a string value.
+ * Corresponding Kotlin primitive is [String].
+ * Corresponding encoder and decoder methods are [Encoder.encodeString] and [Decoder.decodeString].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)sTRING __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Represents an "unknown" type that will be known only at the moment of the serialization.
+ * Effectively it defers the choice of the serializer to a moment of the serialization, and can
+ * be used for [contextual][Contextual] serialization.
+ *
+ * To introspect descriptor of this kind, an instance of [SerializersModule] is required.
+ * See [capturedKClass] extension property for more details.
+ * However, if possible options are known statically (e.g. for sealed classes), they can be
+ * enumerated in child descriptors similarly to [ENUM].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreSerialKind.CONTEXTUAL")))
+@interface ZappOfframpKotlinx_serialization_coreSerialKindCONTEXTUAL : ZappOfframpKotlinx_serialization_coreSerialKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreSerialKindCONTEXTUAL *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Represents an "unknown" type that will be known only at the moment of the serialization.
+ * Effectively it defers the choice of the serializer to a moment of the serialization, and can
+ * be used for [contextual][Contextual] serialization.
+ *
+ * To introspect descriptor of this kind, an instance of [SerializersModule] is required.
+ * See [capturedKClass] extension property for more details.
+ * However, if possible options are known statically (e.g. for sealed classes), they can be
+ * enumerated in child descriptors similarly to [ENUM].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)cONTEXTUAL __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Represents a Kotlin [Enum] with statically known values.
+ * All enum values should be enumerated in descriptor elements.
+ * Each element descriptor of a [Enum] kind represents an instance of a particular enum
+ * and has an [StructureKind.OBJECT] kind.
+ * Each [positional name][SerialDescriptor.getElementName] contains a corresponding enum element [name][Enum.name].
+ *
+ * Corresponding encoder and decoder methods are [Encoder.encodeEnum] and [Decoder.decodeEnum].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreSerialKind.ENUM")))
+@interface ZappOfframpKotlinx_serialization_coreSerialKindENUM : ZappOfframpKotlinx_serialization_coreSerialKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreSerialKindENUM *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Represents a Kotlin [Enum] with statically known values.
+ * All enum values should be enumerated in descriptor elements.
+ * Each element descriptor of a [Enum] kind represents an instance of a particular enum
+ * and has an [StructureKind.OBJECT] kind.
+ * Each [positional name][SerialDescriptor.getElementName] contains a corresponding enum element [name][Enum.name].
+ *
+ * Corresponding encoder and decoder methods are [Encoder.encodeEnum] and [Decoder.decodeEnum].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)eNUM __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Structure kind represents values with composite structure of nested elements of depth and arbitrary number.
+ * We acknowledge following structured kinds:
+ *
+ * ### Regular classes
+ * The most common case for serialization, that represents an arbitrary structure with fixed count of elements.
+ * When the regular Kotlin class is marked as [Serializable], its descriptor kind will be [CLASS].
+ *
+ * ### Lists
+ * [LIST] represent a structure with potentially unknown in advance number of elements of the same type.
+ * All standard serializable [List] implementors and arrays are represented as [LIST] kind of the same type.
+ *
+ * ### Maps
+ * [MAP] represent a structure with potentially unknown in advance number of key-value pairs of the same type.
+ * All standard serializable [Map] implementors are represented as [Map] kind of the same type.
+ *
+ * ### Kotlin objects
+ * A singleton object defined with `object` keyword with an [OBJECT] kind.
+ * By default, objects are serialized as empty structures without any states and their identity is preserved
+ * across serialization within the same process, so you always have the same instance of the object.
+ *
+ * ### Serializers interaction
+ * Serialization formats typically handle these kinds by marking structure start and end.
+ * E.g. the following serializable class `class IntHolder(myValue: Int)` of structure kind [CLASS] is handled by
+ * serializer as the following call sequence:
+ * ```
+ * val composite = encoder.beginStructure(descriptor) // Denotes the start of the structure
+ * composite.encodeIntElement(descriptor, index = 0, holder.myValue)
+ * composite.endStructure(descriptor) // Denotes the end of the structure
+ * ```
+ * and its corresponding [Decoder] counterpart.
+ *
+ * ### Serial descriptor implementors note
+ * These kinds can be used not only for collection and regular classes.
+ * For example, provided serializer for [Map.Entry] represents it as [Map] type, so it is serialized
+ * as `{"actualKey": "actualValue"}` map directly instead of `{"key": "actualKey", "value": "actualValue"}`
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreStructureKind")))
+@interface ZappOfframpKotlinx_serialization_coreStructureKind : ZappOfframpKotlinx_serialization_coreSerialKind
+@end
+
+
+/**
+ * Structure kind for regular classes with an arbitrary, but known statically, structure.
+ * Serializers typically encode classes with calls to [Encoder.beginStructure] and [CompositeEncoder.endStructure],
+ * writing the elements of the class between these calls.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreStructureKind.CLASS")))
+@interface ZappOfframpKotlinx_serialization_coreStructureKindCLASS : ZappOfframpKotlinx_serialization_coreStructureKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreStructureKindCLASS *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Structure kind for regular classes with an arbitrary, but known statically, structure.
+ * Serializers typically encode classes with calls to [Encoder.beginStructure] and [CompositeEncoder.endStructure],
+ * writing the elements of the class between these calls.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)cLASS __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Structure kind for lists and arrays of an arbitrary length.
+ * Serializers typically encode classes with calls to [Encoder.beginCollection] and [CompositeEncoder.endStructure],
+ * writing the elements of the list between these calls.
+ * Built-in list serializers treat elements as homogeneous, though application-specific serializers may impose
+ * application-specific restrictions on specific [LIST] types.
+ *
+ * Example of such application-specific serialization may be class `class ListOfThreeElements() : List<Any>`,
+ * for which an author of the serializer knows that while it is `List<Any>`, in fact, is always has three elements
+ * of a known type (e.g. the first is always a string, the second one is always an int etc.)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreStructureKind.LIST")))
+@interface ZappOfframpKotlinx_serialization_coreStructureKindLIST : ZappOfframpKotlinx_serialization_coreStructureKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreStructureKindLIST *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Structure kind for lists and arrays of an arbitrary length.
+ * Serializers typically encode classes with calls to [Encoder.beginCollection] and [CompositeEncoder.endStructure],
+ * writing the elements of the list between these calls.
+ * Built-in list serializers treat elements as homogeneous, though application-specific serializers may impose
+ * application-specific restrictions on specific [LIST] types.
+ *
+ * Example of such application-specific serialization may be class `class ListOfThreeElements() : List<Any>`,
+ * for which an author of the serializer knows that while it is `List<Any>`, in fact, is always has three elements
+ * of a known type (e.g. the first is always a string, the second one is always an int etc.)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)lIST __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Structure kind for maps of an arbitrary length.
+ * Serializers typically encode classes with calls to [Encoder.beginCollection] and [CompositeEncoder.endStructure],
+ * writing the elements of the map between these calls.
+ *
+ * Built-in map serializers treat elements as homogeneous, though application-specific serializers may impose
+ * application-specific restrictions on specific [MAP] types.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreStructureKind.MAP")))
+@interface ZappOfframpKotlinx_serialization_coreStructureKindMAP : ZappOfframpKotlinx_serialization_coreStructureKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreStructureKindMAP *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Structure kind for maps of an arbitrary length.
+ * Serializers typically encode classes with calls to [Encoder.beginCollection] and [CompositeEncoder.endStructure],
+ * writing the elements of the map between these calls.
+ *
+ * Built-in map serializers treat elements as homogeneous, though application-specific serializers may impose
+ * application-specific restrictions on specific [MAP] types.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)mAP __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Structure kind for singleton objects defined with `object` keyword.
+ * By default, objects are serialized as empty structures without any state and their identity is preserved
+ * across serialization within the same process, so you always have the same instance of the object.
+ *
+ * Empty structure is represented as a call to [Encoder.beginStructure] with the following [CompositeEncoder.endStructure]
+ * without any intermediate encodings.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_coreStructureKind.OBJECT")))
+@interface ZappOfframpKotlinx_serialization_coreStructureKindOBJECT : ZappOfframpKotlinx_serialization_coreStructureKind
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_coreStructureKindOBJECT *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Structure kind for singleton objects defined with `object` keyword.
+ * By default, objects are serialized as empty structures without any state and their identity is preserved
+ * across serialization within the same process, so you always have the same instance of the object.
+ *
+ * Empty structure is represented as a call to [Encoder.beginStructure] with the following [CompositeEncoder.endStructure]
+ * without any intermediate encodings.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)oBJECT __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * Class representing JSON primitive value.
+ * JSON primitives include numbers, strings, booleans and special null value [JsonNull].
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/serialization/json/JsonPrimitiveSerializer))
+*/
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonPrimitive")))
+@interface ZappOfframpKotlinx_serialization_jsonJsonPrimitive : ZappOfframpKotlinx_serialization_jsonJsonElement
+@property (class, readonly, getter=companion) ZappOfframpKotlinx_serialization_jsonJsonPrimitiveCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *content __attribute__((swift_name("content")));
+@property (readonly) BOOL isString __attribute__((swift_name("isString")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * Content of given element without quotes. For [JsonNull], this method returns a "null" string.
+ * [JsonPrimitive.contentOrNull] should be used for [JsonNull] to get a `null`.
+ */
+
+/**
+ * Indicates whether the primitive was explicitly constructed from [String] and
+ * whether it should be serialized as one. E.g. `JsonPrimitive("42")` is represented
+ * by a string, while `JsonPrimitive(42)` is not.
+ * These primitives will be serialized as `"42"` and `42` respectively.
+ */
+@end
+
+
+/**
+ * Class representing JSON `null` value
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/serialization/json/JsonNullSerializer))
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonNull")))
+@interface ZappOfframpKotlinx_serialization_jsonJsonNull : ZappOfframpKotlinx_serialization_jsonJsonPrimitive
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_jsonJsonNull *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *content __attribute__((swift_name("content")));
+@property (readonly) BOOL isString __attribute__((swift_name("isString")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Class representing JSON `null` value
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)jsonNull __attribute__((swift_name("init()")));
+
+/**
+ * Class representing JSON `null` value
+ */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+
+/**
+ * Class representing JSON `null` value
+ */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(ZappOfframpKotlinArray<id<ZappOfframpKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
+@end
+
+__attribute__((swift_name("KotlinCharIterator")))
+@interface ZappOfframpKotlinCharIterator : ZappOfframpBase <ZappOfframpKotlinIterator>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (id)next __attribute__((swift_name("next()")));
+- (unichar)nextChar __attribute__((swift_name("nextChar()")));
+@end
+
+
+/**
+ * A mutable [HttpClient] configuration used to adjust settings, install plugins and interceptors.
+ *
+ * This configuration can be provided as a lambda in the [HttpClient] constructor or the [HttpClient.config] builder:
+ * ```kotlin
+ * val client = HttpClient { // HttpClientConfig<Engine>()
+ *     // Configure engine settings
+ *     engine { // HttpClientEngineConfig
+ *         threadsCount = 4
+ *         pipelining = true
+ *     }
+ *
+ *     // Install and configure plugins
+ *     install(ContentNegotiation) {
+ *         json()
+ *     }
+ *
+ *     // Configure default request parameters
+ *     defaultRequest {
+ *         url("https://api.example.com")
+ *         header("X-Custom-Header", "value")
+ *     }
+ *
+ *     // Configure client-wide settings
+ *     expectSuccess = true
+ *     followRedirects = true
+ * }
+ * ```
+ * ## Configuring [HttpClientEngine]
+ *
+ * If the engine is specified explicitly, engine-specific properties will be available in the `engine` block:
+ * ```kotlin
+ * val client = HttpClient(CIO) { // HttpClientConfig<CIOEngineConfig>.() -> Unit
+ *     engine { // CIOEngineConfig.() -> Unit
+ *         // engine specific properties
+ *     }
+ * }
+ * ```
+ *
+ * Learn more about the client's configuration from
+ * [Creating and configuring a client](https://ktor.io/docs/create-client.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpClientConfig")))
+@interface ZappOfframpKtor_client_coreHttpClientConfig<T> : ZappOfframpBase
+@property BOOL developmentMode __attribute__((swift_name("developmentMode"))) __attribute__((deprecated("Development mode is no longer required. The property will be removed in the future.")));
+@property BOOL expectSuccess __attribute__((swift_name("expectSuccess")));
+@property BOOL followRedirects __attribute__((swift_name("followRedirects")));
+@property BOOL useDefaultTransformers __attribute__((swift_name("useDefaultTransformers")));
+
+/**
+ * A mutable [HttpClient] configuration used to adjust settings, install plugins and interceptors.
+ *
+ * This configuration can be provided as a lambda in the [HttpClient] constructor or the [HttpClient.config] builder:
+ * ```kotlin
+ * val client = HttpClient { // HttpClientConfig<Engine>()
+ *     // Configure engine settings
+ *     engine { // HttpClientEngineConfig
+ *         threadsCount = 4
+ *         pipelining = true
+ *     }
+ *
+ *     // Install and configure plugins
+ *     install(ContentNegotiation) {
+ *         json()
+ *     }
+ *
+ *     // Configure default request parameters
+ *     defaultRequest {
+ *         url("https://api.example.com")
+ *         header("X-Custom-Header", "value")
+ *     }
+ *
+ *     // Configure client-wide settings
+ *     expectSuccess = true
+ *     followRedirects = true
+ * }
+ * ```
+ * ## Configuring [HttpClientEngine]
+ *
+ * If the engine is specified explicitly, engine-specific properties will be available in the `engine` block:
+ * ```kotlin
+ * val client = HttpClient(CIO) { // HttpClientConfig<CIOEngineConfig>.() -> Unit
+ *     engine { // CIOEngineConfig.() -> Unit
+ *         // engine specific properties
+ *     }
+ * }
+ * ```
+ *
+ * Learn more about the client's configuration from
+ * [Creating and configuring a client](https://ktor.io/docs/create-client.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * A mutable [HttpClient] configuration used to adjust settings, install plugins and interceptors.
+ *
+ * This configuration can be provided as a lambda in the [HttpClient] constructor or the [HttpClient.config] builder:
+ * ```kotlin
+ * val client = HttpClient { // HttpClientConfig<Engine>()
+ *     // Configure engine settings
+ *     engine { // HttpClientEngineConfig
+ *         threadsCount = 4
+ *         pipelining = true
+ *     }
+ *
+ *     // Install and configure plugins
+ *     install(ContentNegotiation) {
+ *         json()
+ *     }
+ *
+ *     // Configure default request parameters
+ *     defaultRequest {
+ *         url("https://api.example.com")
+ *         header("X-Custom-Header", "value")
+ *     }
+ *
+ *     // Configure client-wide settings
+ *     expectSuccess = true
+ *     followRedirects = true
+ * }
+ * ```
+ * ## Configuring [HttpClientEngine]
+ *
+ * If the engine is specified explicitly, engine-specific properties will be available in the `engine` block:
+ * ```kotlin
+ * val client = HttpClient(CIO) { // HttpClientConfig<CIOEngineConfig>.() -> Unit
+ *     engine { // CIOEngineConfig.() -> Unit
+ *         // engine specific properties
+ *     }
+ * }
+ * ```
+ *
+ * Learn more about the client's configuration from
+ * [Creating and configuring a client](https://ktor.io/docs/create-client.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Clones this [HttpClientConfig] by duplicating all the [plugins] and [customInterceptors].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.clone)
+ */
+- (ZappOfframpKtor_client_coreHttpClientConfig<T> *)clone __attribute__((swift_name("clone()")));
+
+/**
+ * A builder for configuring engine-specific settings in [HttpClientEngineConfig],
+ * such as dispatcher, thread count, proxy, and more.
+ *
+ * ```kotlin
+ * val client = HttpClient(CIO) { // HttpClientConfig<CIOEngineConfig>
+ *     engine { // CIOEngineConfig.() -> Unit
+ *         proxy = ProxyBuilder.http("proxy.example.com", 8080)
+ *     }
+ * ```
+ *
+ * You can learn more from [Engines](https://ktor.io/docs/http-client-engines.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.engine)
+ */
+- (void)engineBlock:(void (^)(T))block __attribute__((swift_name("engine(block:)")));
+
+/**
+ * Applies all the installed [plugins] and [customInterceptors] from this configuration
+ * into the specified [client].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.install)
+ */
+- (void)installClient:(ZappOfframpKtor_client_coreHttpClient *)client __attribute__((swift_name("install(client:)")));
+
+/**
+ * Installs the specified [plugin] and optionally configures it using the [configure] block.
+ *
+ * ```kotlin
+ * val client = HttpClient {
+ *     install(ContentNegotiation) {
+ *         // configuration block
+ *         json()
+ *     }
+ * }
+ * ```
+ *
+ * If the plugin is already installed, the configuration block will be applied to the existing configuration class.
+ *
+ * Learn more from [Plugins](https://ktor.io/docs/http-client-plugins.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.install)
+ */
+- (void)installPlugin:(id<ZappOfframpKtor_client_coreHttpClientPlugin>)plugin configure:(void (^)(id))configure __attribute__((swift_name("install(plugin:configure:)")));
+
+/**
+ * Installs an interceptor defined by [block].
+ * The [key] parameter is used as a unique name, that also prevents installing duplicated interceptors.
+ *
+ * If the [key] is already used, the new interceptor will replace the old one.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.install)
+ */
+- (void)installKey:(NSString *)key block:(void (^)(ZappOfframpKtor_client_coreHttpClient *))block __attribute__((swift_name("install(key:block:)")));
+
+/**
+ * Installs the specified [plugin] and optionally configures it using the [configure] block.
+ * If the plugin is already installed, the configuration block will replace the existing configuration class.
+ *
+ * ```kotlin
+ * val client = HttpClient {
+ *     installOrReplace(ContentNegotiation) {
+ *         // configuration block
+ *         json()
+ *     }
+ * }
+ * ```
+ *
+ * Learn more from [Plugins](https://ktor.io/docs/http-client-plugins.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.installOrReplace)
+ */
+- (void)installOrReplacePlugin:(id<ZappOfframpKtor_client_coreHttpClientPlugin>)plugin configure:(void (^)(id))configure __attribute__((swift_name("installOrReplace(plugin:configure:)")));
+
+/**
+ * Installs the plugin from the [other] client's configuration.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.plusAssign)
+ */
+- (void)plusAssignOther:(ZappOfframpKtor_client_coreHttpClientConfig<T> *)other __attribute__((swift_name("plusAssign(other:)")));
+
+/**
+ * Development mode is no longer required all functionality is enabled by default. The property is safe to remove.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.developmentMode)
+ */
+
+/**
+ * Terminates [HttpClient.receivePipeline] if the status code is not successful (>=300).
+ * Learn more from [Response validation](https://ktor.io/docs/response-validation.html).
+ *
+ * For more details, see the [HttpCallValidator] documentation.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.expectSuccess)
+ */
+
+/**
+ * Specifies whether the client redirects to URLs provided in the `Location` header.
+ * You can disable redirections by setting this property to `false`.
+ *
+ * For an advanced redirection configuration, use the [HttpRedirect] plugin.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.followRedirects)
+ */
+
+/**
+ * Enables body transformations for many common types like [String], [ByteArray], [ByteReadChannel], etc.
+ * These transformations are applied to the request and response bodies.
+ *
+ * The transformers will be used when the response body is received with a type:
+ * ```kotlin
+ * val client = HttpClient()
+ * val bytes = client.get("https://ktor.io")
+ *                   .body<ByteArray>()
+ * ```
+ *
+ * This flag is enabled by default.
+ * You might want to disable it if you want to write your own transformers or handle body manually.
+ *
+ * For more details, see the [defaultTransformers] documentation.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.HttpClientConfig.useDefaultTransformers)
+ */
+@end
+
+
+/**
+ * Represents a capability that an [HttpClientEngine] can support, with [T] representing the type
+ * of configuration or metadata associated with the capability.
+ *
+ * Capabilities are used to declare optional features or behaviors that an engine may support,
+ * such as WebSocket communication, HTTP/2, or custom timeouts. They enable plugins and request
+ * builders to configure engine-specific functionality by associating a capability with a
+ * specific configuration.
+ *
+ * Capabilities can be set on a per-request basis using the `HttpRequestBuilder.setCapability` method,
+ * allowing users to configure engine-specific behavior for individual requests.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.HttpClientEngineCapability)
+ *
+ * @param T The type of the configuration or metadata associated with this capability.
+ *
+ * Example:
+ * Suppose you have a custom capability for WebSocket support that requires a specific configuration:
+ * ```kotlin
+ * object WebSocketCapability : HttpClientEngineCapability<WebSocketConfig>
+ *
+ * data class WebSocketConfig(val maxFrameSize: Int, val pingIntervalMillis: Long)
+ * ```
+ *
+ * Setting a capability in a request:
+ * ```kotlin
+ * client.request {
+ *     setCapability(WebSocketCapability, WebSocketConfig(
+ *         maxFrameSize = 65536,
+ *         pingIntervalMillis = 30000
+ *     ))
+ * }
+ * ```
+ *
+ * Engine Example:
+ * A custom engine implementation can declare support for specific capabilities in its `supportedCapabilities` property:
+ * ```kotlin
+ * override val supportedCapabilities: Set<HttpClientEngineCapability<*>> = setOf(WebSocketCapability)
+ * ```
+ *
+ * Plugin Integration Example:
+ * Plugins use capabilities to interact with engine-specific features. For example:
+ * ```kotlin
+ * if (engine.supportedCapabilities.contains(WebSocketCapability)) {
+ *     // Configure WebSocket behavior if supported by the engine
+ * }
+ * ```
+ *
+ * When creating a custom capability:
+ * - Define a singleton object implementing `HttpClientEngineCapability`.
+ * - Use the type parameter [T] to provide the associated configuration type or metadata.
+ * - Ensure that engines supporting the capability handle the associated configuration properly.
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientEngineCapability")))
+@protocol ZappOfframpKtor_client_coreHttpClientEngineCapability
+@required
+@end
+
+
+/**
+ * Map of attributes accessible by [AttributeKey] in a typed manner
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes)
+ */
+__attribute__((swift_name("Ktor_utilsAttributes")))
+@protocol ZappOfframpKtor_utilsAttributes
+@required
+
+/**
+ * Gets a value of the attribute for the specified [key], or calls supplied [block] to compute its value
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.computeIfAbsent)
+ */
+- (id)computeIfAbsentKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key block:(id (^)(void))block __attribute__((swift_name("computeIfAbsent(key:block:)")));
+
+/**
+ * Checks if an attribute with the specified [key] exists
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.contains)
+ */
+- (BOOL)containsKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("contains(key:)")));
+
+/**
+ * Gets a value of the attribute for the specified [key], or throws an exception if an attribute doesn't exist
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.get)
+ */
+- (id)getKey_:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("get(key_:)")));
+
+/**
+ * Gets a value of the attribute for the specified [key], or return `null` if an attribute doesn't exist
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.getOrNull)
+ */
+- (id _Nullable)getOrNullKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("getOrNull(key:)")));
+
+/**
+ * Creates or changes an attribute with the specified [key] using [value]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.put)
+ */
+- (void)putKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key value:(id)value __attribute__((swift_name("put(key:value:)")));
+
+/**
+ * Removes an attribute with the specified [key]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.remove)
+ */
+- (void)removeKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("remove(key:)")));
+
+/**
+ * Creates or changes an attribute with the specified [key] using [value]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.set)
+ */
+- (void)setKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key value:(id)value __attribute__((swift_name("set(key:value:)")));
+
+/**
+ * Removes an attribute with the specified [key] and returns its current value, throws an exception if an attribute doesn't exist
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.take)
+ */
+- (id)takeKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("take(key:)")));
+
+/**
+ * Removes an attribute with the specified [key] and returns its current value, returns `null` if an attribute doesn't exist
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.takeOrNull)
+ */
+- (id _Nullable)takeOrNullKey:(ZappOfframpKtor_utilsAttributeKey<id> *)key __attribute__((swift_name("takeOrNull(key:)")));
+
+/**
+ * Returns [List] of all [AttributeKey] instances in this map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.Attributes.allKeys)
+ */
+@property (readonly) NSArray<ZappOfframpKtor_utilsAttributeKey<id> *> *allKeys __attribute__((swift_name("allKeys")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_eventsEvents")))
+@interface ZappOfframpKtor_eventsEvents : ZappOfframpBase
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Raises the event specified by [definition] with the [value] and calls all handlers.
+ *
+ * Handlers are called in order of subscriptions.
+ * If some handler throws an exception, all remaining handlers will still run. The exception will eventually be re-thrown.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.Events.raise)
+ */
+- (void)raiseDefinition:(ZappOfframpKtor_eventsEventDefinition<id> *)definition value:(id _Nullable)value __attribute__((swift_name("raise(definition:value:)")));
+
+/**
+ * Subscribe [handler] to an event specified by [definition]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.Events.subscribe)
+ */
+- (id<ZappOfframpKotlinx_coroutines_coreDisposableHandle>)subscribeDefinition:(ZappOfframpKtor_eventsEventDefinition<id> *)definition handler:(void (^)(id _Nullable))handler __attribute__((swift_name("subscribe(definition:handler:)")));
+
+/**
+ * Unsubscribe [handler] from an event specified by [definition]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.Events.unsubscribe)
+ */
+- (void)unsubscribeDefinition:(ZappOfframpKtor_eventsEventDefinition<id> *)definition handler:(void (^)(id _Nullable))handler __attribute__((swift_name("unsubscribe(definition:handler:)")));
+@end
+
+
+/**
+ * [HttpClient] Pipeline used for receiving [HttpResponse] without any processing.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpReceivePipeline)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpReceivePipeline")))
+@interface ZappOfframpKtor_client_coreHttpReceivePipeline : ZappOfframpKtor_utilsPipeline<ZappOfframpKtor_client_coreHttpResponse *, ZappOfframpKotlinUnit *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpReceivePipelinePhases *companion __attribute__((swift_name("companion")));
+@property (readonly) BOOL developmentMode __attribute__((swift_name("developmentMode")));
+- (instancetype)initWithDevelopmentMode:(BOOL)developmentMode __attribute__((swift_name("init(developmentMode:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithPhases:(ZappOfframpKotlinArray<ZappOfframpKtor_utilsPipelinePhase *> *)phases __attribute__((swift_name("init(phases:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase interceptors:(NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptors __attribute__((swift_name("init(phase:interceptors:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/**
+ * An [HttpClient]'s pipeline used for executing [HttpRequest].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpRequestPipeline")))
+@interface ZappOfframpKtor_client_coreHttpRequestPipeline : ZappOfframpKtor_utilsPipeline<id, ZappOfframpKtor_client_coreHttpRequestBuilder *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpRequestPipelinePhases *companion __attribute__((swift_name("companion")));
+@property (readonly) BOOL developmentMode __attribute__((swift_name("developmentMode")));
+- (instancetype)initWithDevelopmentMode:(BOOL)developmentMode __attribute__((swift_name("init(developmentMode:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithPhases:(ZappOfframpKotlinArray<ZappOfframpKtor_utilsPipelinePhase *> *)phases __attribute__((swift_name("init(phases:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase interceptors:(NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptors __attribute__((swift_name("init(phase:interceptors:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/**
+ * [HttpClient] Pipeline used for executing [HttpResponse].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpResponsePipeline")))
+@interface ZappOfframpKtor_client_coreHttpResponsePipeline : ZappOfframpKtor_utilsPipeline<ZappOfframpKtor_client_coreHttpResponseContainer *, ZappOfframpKtor_client_coreHttpClientCall *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpResponsePipelinePhases *companion __attribute__((swift_name("companion")));
+@property (readonly) BOOL developmentMode __attribute__((swift_name("developmentMode")));
+- (instancetype)initWithDevelopmentMode:(BOOL)developmentMode __attribute__((swift_name("init(developmentMode:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithPhases:(ZappOfframpKotlinArray<ZappOfframpKtor_utilsPipelinePhase *> *)phases __attribute__((swift_name("init(phases:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase interceptors:(NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptors __attribute__((swift_name("init(phase:interceptors:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/**
+ * An [HttpClient]'s pipeline used for sending [HttpRequest] to a remote server.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpSendPipeline")))
+@interface ZappOfframpKtor_client_coreHttpSendPipeline : ZappOfframpKtor_utilsPipeline<id, ZappOfframpKtor_client_coreHttpRequestBuilder *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpSendPipelinePhases *companion __attribute__((swift_name("companion")));
+@property (readonly) BOOL developmentMode __attribute__((swift_name("developmentMode")));
+- (instancetype)initWithDevelopmentMode:(BOOL)developmentMode __attribute__((swift_name("init(developmentMode:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithPhases:(ZappOfframpKotlinArray<ZappOfframpKtor_utilsPipelinePhase *> *)phases __attribute__((swift_name("init(phases:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (instancetype)initWithPhase:(ZappOfframpKtor_utilsPipelinePhase *)phase interceptors:(NSArray<id<ZappOfframpKotlinSuspendFunction2>> *)interceptors __attribute__((swift_name("init(phase:interceptors:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@end
+
+
+/**
+ * Data prepared for [HttpResponse].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpResponseData)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpResponseData")))
+@interface ZappOfframpKtor_client_coreHttpResponseData : ZappOfframpBase
+@property (readonly) id body __attribute__((swift_name("body")));
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> callContext __attribute__((swift_name("callContext")));
+@property (readonly) id<ZappOfframpKtor_httpHeaders> headers __attribute__((swift_name("headers")));
+@property (readonly) ZappOfframpKtor_utilsGMTDate *requestTime __attribute__((swift_name("requestTime")));
+@property (readonly) ZappOfframpKtor_utilsGMTDate *responseTime __attribute__((swift_name("responseTime")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *statusCode __attribute__((swift_name("statusCode")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *version __attribute__((swift_name("version")));
+- (instancetype)initWithStatusCode:(ZappOfframpKtor_httpHttpStatusCode *)statusCode requestTime:(ZappOfframpKtor_utilsGMTDate *)requestTime headers:(id<ZappOfframpKtor_httpHeaders>)headers version:(ZappOfframpKtor_httpHttpProtocolVersion *)version body:(id)body callContext:(id<ZappOfframpKotlinCoroutineContext>)callContext __attribute__((swift_name("init(statusCode:requestTime:headers:version:body:callContext:)"))) __attribute__((objc_designated_initializer));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+*/
+__attribute__((swift_name("KotlinAbstractCoroutineContextElement")))
+@interface ZappOfframpKotlinAbstractCoroutineContextElement : ZappOfframpBase <ZappOfframpKotlinCoroutineContextElement>
+@property (readonly) id<ZappOfframpKotlinCoroutineContextKey> key __attribute__((swift_name("key")));
+- (instancetype)initWithKey:(id<ZappOfframpKotlinCoroutineContextKey>)key __attribute__((swift_name("init(key:)"))) __attribute__((objc_designated_initializer));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+*/
+__attribute__((swift_name("KotlinContinuationInterceptor")))
+@protocol ZappOfframpKotlinContinuationInterceptor <ZappOfframpKotlinCoroutineContextElement>
+@required
+- (id<ZappOfframpKotlinContinuation>)interceptContinuationContinuation:(id<ZappOfframpKotlinContinuation>)continuation __attribute__((swift_name("interceptContinuation(continuation:)")));
+- (void)releaseInterceptedContinuationContinuation:(id<ZappOfframpKotlinContinuation>)continuation __attribute__((swift_name("releaseInterceptedContinuation(continuation:)")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreCoroutineDispatcher")))
+@interface ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher : ZappOfframpKotlinAbstractCoroutineContextElement <ZappOfframpKotlinContinuationInterceptor>
+@property (class, readonly, getter=companion) ZappOfframpKotlinx_coroutines_coreCoroutineDispatcherKey *companion __attribute__((swift_name("companion")));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithKey:(id<ZappOfframpKotlinCoroutineContextKey>)key __attribute__((swift_name("init(key:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (void)dispatchContext:(id<ZappOfframpKotlinCoroutineContext>)context block:(id<ZappOfframpKotlinx_coroutines_coreRunnable>)block __attribute__((swift_name("dispatch(context:block:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (void)dispatchYieldContext:(id<ZappOfframpKotlinCoroutineContext>)context block:(id<ZappOfframpKotlinx_coroutines_coreRunnable>)block __attribute__((swift_name("dispatchYield(context:block:)")));
+- (id<ZappOfframpKotlinContinuation>)interceptContinuationContinuation:(id<ZappOfframpKotlinContinuation>)continuation __attribute__((swift_name("interceptContinuation(continuation:)")));
+- (BOOL)isDispatchNeededContext:(id<ZappOfframpKotlinCoroutineContext>)context __attribute__((swift_name("isDispatchNeeded(context:)")));
+- (ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher *)limitedParallelismParallelism:(int32_t)parallelism name:(NSString * _Nullable)name __attribute__((swift_name("limitedParallelism(parallelism:name:)")));
+- (ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher *)plusOther_:(ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher *)other __attribute__((swift_name("plus(other_:)"))) __attribute__((unavailable("Operator '+' on two CoroutineDispatcher objects is meaningless. CoroutineDispatcher is a coroutine context element and `+` is a set-sum operator for coroutine contexts. The dispatcher to the right of `+` just replaces the dispatcher to the left.")));
+- (void)releaseInterceptedContinuationContinuation:(id<ZappOfframpKotlinContinuation>)continuation __attribute__((swift_name("releaseInterceptedContinuation(continuation:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Proxy configuration.
+ *
+ * See [ProxyBuilder] to create proxy.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.engine.ProxyConfig)
+ *
+ * @param url: proxy url address.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreProxyConfig")))
+@interface ZappOfframpKtor_client_coreProxyConfig : ZappOfframpBase
+@property (readonly) ZappOfframpKtor_httpUrl *url __attribute__((swift_name("url")));
+- (instancetype)initWithUrl:(ZappOfframpKtor_httpUrl *)url __attribute__((swift_name("init(url:)"))) __attribute__((objc_designated_initializer));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * [CompositeEncoder] is a part of encoding process that is bound to a particular structured part of
+ * the serialized form, described by the serial descriptor passed to [Encoder.beginStructure].
+ *
+ * All `encode*` methods have `index` and `serialDescriptor` parameters with a strict semantics and constraints:
+ *   * `descriptor` is always the same as one used in [Encoder.beginStructure]. While this parameter may seem redundant,
+ *      it is required for efficient serialization process to avoid excessive field spilling.
+ *      If you are writing your own format, you can safely ignore this parameter and use one used in `beginStructure`
+ *      for simplicity.
+ *   * `index` of the element being encoded. This element at this index in the descriptor should be associated with
+ *      the one being written.
+ *
+ * The symmetric interface for the deserialization process is [CompositeDecoder].
+ *
+ * ### Not stable for inheritance
+ *
+ * `CompositeEncoder` interface is not stable for inheritance in 3rd party libraries, as new methods
+ * might be added to this interface or contracts of the existing methods can be changed.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreCompositeEncoder")))
+@protocol ZappOfframpKotlinx_serialization_coreCompositeEncoder
+@required
+
+/**
+ * Encodes a boolean [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.BOOLEAN] kind.
+ */
+- (void)encodeBooleanElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(BOOL)value __attribute__((swift_name("encodeBooleanElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a single byte [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.BYTE] kind.
+ */
+- (void)encodeByteElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int8_t)value __attribute__((swift_name("encodeByteElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a 16-bit unicode character [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.CHAR] kind.
+ */
+- (void)encodeCharElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(unichar)value __attribute__((swift_name("encodeCharElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a 64-bit IEEE 754 floating point [value] associated with an element
+ * at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.DOUBLE] kind.
+ */
+- (void)encodeDoubleElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(double)value __attribute__((swift_name("encodeDoubleElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a 32-bit IEEE 754 floating point [value] associated with an element
+ * at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.FLOAT] kind.
+ */
+- (void)encodeFloatElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(float)value __attribute__((swift_name("encodeFloatElement(descriptor:index:value:)")));
+
+/**
+ * Returns [Encoder] for decoding an underlying type of a value class in an inline manner.
+ * Serializable value class is described by the [child descriptor][SerialDescriptor.getElementDescriptor]
+ * of given [descriptor] at [index].
+ *
+ * Namely, for the `@Serializable @JvmInline value class MyInt(val my: Int)`,
+ * and `@Serializable class MyData(val myInt: MyInt)` the following sequence is used:
+ * ```
+ * thisEncoder.encodeInlineElement(MyData.serializer.descriptor, 0).encodeInt(my)
+ * ```
+ *
+ * This method provides an opportunity for the optimization to avoid boxing of a carried value
+ * and its invocation should be equivalent to the following:
+ * ```
+ * thisEncoder.encodeSerializableElement(MyData.serializer.descriptor, 0, MyInt.serializer(), myInt)
+ * ```
+ *
+ * Current encoder may return any other instance of [Encoder] class, depending on provided descriptor.
+ * For example, when this function is called on Json encoder with descriptor that has
+ * `UInt.serializer().descriptor` at the given [index], the returned encoder is able
+ * to encode unsigned integers.
+ *
+ * Note that this function returns [Encoder] instead of the [CompositeEncoder]
+ * because value classes always have the single property.
+ * Calling [Encoder.beginStructure] on returned instance leads to an unspecified behavior and, in general, is prohibited.
+ *
+ * @see Encoder.encodeInline
+ * @see SerialDescriptor.getElementDescriptor
+ */
+- (id<ZappOfframpKotlinx_serialization_coreEncoder>)encodeInlineElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("encodeInlineElement(descriptor:index:)")));
+
+/**
+ * Encodes a 32-bit integer [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.INT] kind.
+ */
+- (void)encodeIntElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int32_t)value __attribute__((swift_name("encodeIntElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a 64-bit integer [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.LONG] kind.
+ */
+- (void)encodeLongElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int64_t)value __attribute__((swift_name("encodeLongElement(descriptor:index:value:)")));
+
+/**
+ * Delegates nullable [value] encoding of the type [T] to the given [serializer].
+ * [value] is associated with an element at the given [index] in [serial descriptor][descriptor].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (void)encodeNullableSerializableElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index serializer:(id<ZappOfframpKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeNullableSerializableElement(descriptor:index:serializer:value:)")));
+
+/**
+ * Delegates [value] encoding of the type [T] to the given [serializer].
+ * [value] is associated with an element at the given [index] in [serial descriptor][descriptor].
+ */
+- (void)encodeSerializableElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index serializer:(id<ZappOfframpKotlinx_serialization_coreSerializationStrategy>)serializer value:(id _Nullable)value __attribute__((swift_name("encodeSerializableElement(descriptor:index:serializer:value:)")));
+
+/**
+ * Encodes a 16-bit short [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.SHORT] kind.
+ */
+- (void)encodeShortElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(int16_t)value __attribute__((swift_name("encodeShortElement(descriptor:index:value:)")));
+
+/**
+ * Encodes a string [value] associated with an element at the given [index] in [serial descriptor][descriptor].
+ * The element at the given [index] should have [PrimitiveKind.STRING] kind.
+ */
+- (void)encodeStringElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index value:(NSString *)value __attribute__((swift_name("encodeStringElement(descriptor:index:value:)")));
+
+/**
+ * Denotes the end of the structure associated with current encoder.
+ * For example, composite encoder of JSON format will write
+ * a closing bracket in the underlying input and reduce the number of nesting for pretty printing.
+ */
+- (void)endStructureDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("endStructure(descriptor:)")));
+
+/**
+ * Whether the format should encode values that are equal to the default values.
+ * This method is used by plugin-generated serializers for properties with default values:
+ * ```
+ * @Serializable
+ * class WithDefault(val int: Int = 42)
+ * // serialize method
+ * if (value.int != 42 || output.shouldEncodeElementDefault(serialDesc, 0)) {
+ *    encoder.encodeIntElement(serialDesc, 0, value.int);
+ * }
+ * ```
+ *
+ * This method is never invoked for properties annotated with [EncodeDefault].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (BOOL)shouldEncodeElementDefaultDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("shouldEncodeElementDefault(descriptor:index:)")));
+
+/**
+ * Context of the current serialization process, including contextual and polymorphic serialization and,
+ * potentially, a format-specific configuration.
+ */
+@property (readonly) ZappOfframpKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
+@end
+
+
+/**
+ * [SerializersModule] is a collection of serializers used by [ContextualSerializer] and [PolymorphicSerializer]
+ * to override or provide serializers at the runtime, whereas at the compile-time they provided by the serialization plugin.
+ * It can be considered as a map where serializers can be found using their statically known KClasses.
+ *
+ * To enable runtime serializers resolution, one of the special annotations must be used on target types
+ * ([Polymorphic] or [Contextual]), and a serial module with serializers should be used during construction of [SerialFormat].
+ *
+ * Serializers module can be built with `SerializersModule {}` builder function.
+ * Empty module can be obtained with `EmptySerializersModule()` factory function.
+ *
+ * @see Contextual
+ * @see Polymorphic
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreSerializersModule")))
+@interface ZappOfframpKotlinx_serialization_coreSerializersModule : ZappOfframpBase
+
+/**
+ * Copies contents of this module to the given [collector].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (void)dumpToCollector:(id<ZappOfframpKotlinx_serialization_coreSerializersModuleCollector>)collector __attribute__((swift_name("dumpTo(collector:)")));
+
+/**
+ * Returns a contextual serializer associated with a given [kClass].
+ * If given class has generic parameters and module has provider for [kClass],
+ * [typeArgumentsSerializers] are used to create serializer.
+ * This method is used in context-sensitive operations on a property marked with [Contextual] by a [ContextualSerializer].
+ *
+ * @see SerializersModuleBuilder.contextual
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer> _Nullable)getContextualKClass:(id<ZappOfframpKotlinKClass>)kClass typeArgumentsSerializers:(NSArray<id<ZappOfframpKotlinx_serialization_coreKSerializer>> *)typeArgumentsSerializers __attribute__((swift_name("getContextual(kClass:typeArgumentsSerializers:)")));
+
+/**
+ * Returns a polymorphic serializer registered for a class of the given [value] in the scope of [baseClass].
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (id<ZappOfframpKotlinx_serialization_coreSerializationStrategy> _Nullable)getPolymorphicBaseClass:(id<ZappOfframpKotlinKClass>)baseClass value:(id)value __attribute__((swift_name("getPolymorphic(baseClass:value:)")));
+
+/**
+ * Returns a polymorphic deserializer registered for a [serializedClassName] in the scope of [baseClass]
+ * or default value constructed from [serializedClassName] if a default serializer provider was registered.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy> _Nullable)getPolymorphicBaseClass:(id<ZappOfframpKotlinKClass>)baseClass serializedClassName:(NSString * _Nullable)serializedClassName __attribute__((swift_name("getPolymorphic(baseClass:serializedClassName:)")));
+@end
+
+__attribute__((swift_name("KotlinAnnotation")))
+@protocol ZappOfframpKotlinAnnotation
+@required
+@end
+
+
+/**
+ * [CompositeDecoder] is a part of decoding process that is bound to a particular structured part of
+ * the serialized form, described by the serial descriptor passed to [Decoder.beginStructure].
+ *
+ * Typically, for unordered data, [CompositeDecoder] is used by a serializer withing a [decodeElementIndex]-based
+ * loop that decodes all the required data one-by-one in any order and then terminates by calling [endStructure].
+ * Please refer to [decodeElementIndex] for example of such loop.
+ *
+ * All `decode*` methods have `index` and `serialDescriptor` parameters with a strict semantics and constraints:
+ *   * `descriptor` argument is always the same as one used in [Decoder.beginStructure].
+ *   * `index` of the element being decoded. For [sequential][decodeSequentially] decoding, it is always a monotonic
+ *      sequence from `0` to `descriptor.elementsCount` and for indexing-loop it is always an index that [decodeElementIndex]
+ *      has returned from the last call.
+ *
+ * The symmetric interface for the serialization process is [CompositeEncoder].
+ *
+ * ### Not stable for inheritance
+ *
+ * `CompositeDecoder` interface is not stable for inheritance in 3rd party libraries, as new methods
+ * might be added to this interface or contracts of the existing methods can be changed.
+ */
+__attribute__((swift_name("Kotlinx_serialization_coreCompositeDecoder")))
+@protocol ZappOfframpKotlinx_serialization_coreCompositeDecoder
+@required
+
+/**
+ * Decodes a boolean value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.BOOLEAN] kind.
+ */
+- (BOOL)decodeBooleanElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeBooleanElement(descriptor:index:)")));
+
+/**
+ * Decodes a single byte value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.BYTE] kind.
+ */
+- (int8_t)decodeByteElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeByteElement(descriptor:index:)")));
+
+/**
+ * Decodes a 16-bit unicode character value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.CHAR] kind.
+ */
+- (unichar)decodeCharElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeCharElement(descriptor:index:)")));
+
+/**
+ * Method to decode collection size that may be called before the collection decoding.
+ * Collection type includes [Collection], [Map] and [Array] (including primitive arrays).
+ * Method can return `-1` if the size is not known in advance, though for [sequential decoding][decodeSequentially]
+ * knowing precise size is a mandatory requirement.
+ */
+- (int32_t)decodeCollectionSizeDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("decodeCollectionSize(descriptor:)")));
+
+/**
+ * Decodes a 64-bit IEEE 754 floating point value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.DOUBLE] kind.
+ */
+- (double)decodeDoubleElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeDoubleElement(descriptor:index:)")));
+
+/**
+ *  Decodes the index of the next element to be decoded.
+ *  Index represents a position of the current element in the serial descriptor element that can be found
+ *  with [SerialDescriptor.getElementIndex].
+ *
+ *  If this method returns non-negative index, the caller should call one of the `decode*Element` methods
+ *  with a resulting index.
+ *  Apart from positive values, this method can return [DECODE_DONE] to indicate that no more elements
+ *  are left or [UNKNOWN_NAME] to indicate that symbol with an unknown name was encountered.
+ *
+ * Example of usage:
+ * ```
+ * class MyPair(i: Int, d: Double)
+ *
+ * object MyPairSerializer : KSerializer<MyPair> {
+ *     // ... other methods omitted
+ *
+ *    fun deserialize(decoder: Decoder): MyPair {
+ *        val composite = decoder.beginStructure(descriptor)
+ *        var i: Int? = null
+ *        var d: Double? = null
+ *        while (true) {
+ *            when (val index = composite.decodeElementIndex(descriptor)) {
+ *                0 -> i = composite.decodeIntElement(descriptor, 0)
+ *                1 -> d = composite.decodeDoubleElement(descriptor, 1)
+ *                DECODE_DONE -> break // Input is over
+ *                else -> error("Unexpected index: $index)
+ *            }
+ *        }
+ *        composite.endStructure(descriptor)
+ *        require(i != null && d != null)
+ *        return MyPair(i, d)
+ *    }
+ * }
+ * ```
+ * This example is a rough equivalent of what serialization plugin generates for serializable pair class.
+ *
+ * The need in such a loop comes from unstructured nature of most serialization formats.
+ * For example, JSON for the following input `{"d": 2.0, "i": 1}`, will first read `d` key with index `1`
+ * and only after `i` with the index `0`.
+ *
+ * A potential implementation of this method for JSON format can be the following:
+ * ```
+ * fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+ *     // Ignore arrays
+ *     val nextKey: String? = myStringJsonParser.nextKey()
+ *     if (nextKey == null) return DECODE_DONE
+ *     return descriptor.getElementIndex(nextKey) // getElementIndex can return UNKNOWN_NAME
+ * }
+ * ```
+ *
+ * If [decodeSequentially] returns `true`, the caller might skip calling this method.
+ */
+- (int32_t)decodeElementIndexDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("decodeElementIndex(descriptor:)")));
+
+/**
+ * Decodes a 32-bit IEEE 754 floating point value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.FLOAT] kind.
+ */
+- (float)decodeFloatElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeFloatElement(descriptor:index:)")));
+
+/**
+ * Returns [Decoder] for decoding an underlying type of a value class in an inline manner.
+ * Serializable value class is described by the [child descriptor][SerialDescriptor.getElementDescriptor]
+ * of given [descriptor] at [index].
+ *
+ * Namely, for the `@Serializable @JvmInline value class MyInt(val my: Int)`,
+ * and `@Serializable class MyData(val myInt: MyInt)` the following sequence is used:
+ * ```
+ * thisDecoder.decodeInlineElement(MyData.serializer().descriptor, 0).decodeInt()
+ * ```
+ *
+ * This method provides an opportunity for the optimization to avoid boxing of a carried value
+ * and its invocation should be equivalent to the following:
+ * ```
+ * thisDecoder.decodeSerializableElement(MyData.serializer.descriptor, 0, MyInt.serializer())
+ * ```
+ *
+ * Current decoder may return any other instance of [Decoder] class, depending on the provided descriptor.
+ * For example, when this function is called on `Json` decoder with descriptor that has
+ * `UInt.serializer().descriptor` at the given [index], the returned decoder is able
+ * to decode unsigned integers.
+ *
+ * Note that this function returns [Decoder] instead of the [CompositeDecoder]
+ * because value classes always have the single property.
+ * Calling [Decoder.beginStructure] on returned instance leads to an unspecified behavior and, in general, is prohibited.
+ *
+ * @see Decoder.decodeInline
+ * @see SerialDescriptor.getElementDescriptor
+ */
+- (id<ZappOfframpKotlinx_serialization_coreDecoder>)decodeInlineElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeInlineElement(descriptor:index:)")));
+
+/**
+ * Decodes a 32-bit integer value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.INT] kind.
+ */
+- (int32_t)decodeIntElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeIntElement(descriptor:index:)")));
+
+/**
+ * Decodes a 64-bit integer value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.LONG] kind.
+ */
+- (int64_t)decodeLongElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeLongElement(descriptor:index:)")));
+
+/**
+ * Decodes nullable value of the type [T] with the given [deserializer].
+ *
+ * If value at given [index] was already decoded with previous [decodeSerializableElement] call with the same index,
+ * [previousValue] would contain a previously decoded value.
+ * This parameter can be used to aggregate multiple values of the given property to the only one.
+ * Implementation can safely ignore it and return a new value, efficiently using 'the last one wins' strategy,
+ * or apply format-specific aggregating strategies, e.g. appending scattered Protobuf lists to a single one.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (id _Nullable)decodeNullableSerializableElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index deserializer:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy>)deserializer previousValue:(id _Nullable)previousValue __attribute__((swift_name("decodeNullableSerializableElement(descriptor:index:deserializer:previousValue:)")));
+
+/**
+ * Checks whether the current decoder supports strictly ordered decoding of the data
+ * without calling to [decodeElementIndex].
+ * If the method returns `true`, the caller might skip [decodeElementIndex] calls
+ * and start invoking `decode*Element` directly, incrementing the index of the element one by one.
+ * This method can be called by serializers (either generated or user-defined) as a performance optimization,
+ * but there is no guarantee that the method will be ever called. Practically, it means that implementations
+ * that may benefit from sequential decoding should also support a regular [decodeElementIndex]-based decoding as well.
+ *
+ * Example of usage:
+ * ```
+ * class MyPair(i: Int, d: Double)
+ *
+ * object MyPairSerializer : KSerializer<MyPair> {
+ *     // ... other methods omitted
+ *
+ *    fun deserialize(decoder: Decoder): MyPair {
+ *        val composite = decoder.beginStructure(descriptor)
+ *        if (composite.decodeSequentially()) {
+ *            val i = composite.decodeIntElement(descriptor, index = 0) // Mind the sequential indexing
+ *            val d = composite.decodeIntElement(descriptor, index = 1)
+ *            composite.endStructure(descriptor)
+ *            return MyPair(i, d)
+ *        } else {
+ *            // Fallback to `decodeElementIndex` loop, refer to its documentation for details
+ *        }
+ *    }
+ * }
+ * ```
+ * This example is a rough equivalent of what serialization plugin generates for serializable pair class.
+ *
+ * Sequential decoding is a performance optimization for formats with strictly ordered schema,
+ * usually binary ones. Regular formats such as JSON or ProtoBuf cannot use this optimization,
+ * because e.g. in the latter example, the same data can be represented both as
+ * `{"i": 1, "d": 1.0}` and `{"d": 1.0, "i": 1}` (thus, unordered).
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+- (BOOL)decodeSequentially __attribute__((swift_name("decodeSequentially()")));
+
+/**
+ * Decodes value of the type [T] with the given [deserializer].
+ *
+ * Implementations of [CompositeDecoder] may use their format-specific deserializers
+ * for particular data types, e.g. handle [ByteArray] specifically if format is binary.
+ *
+ * If value at given [index] was already decoded with previous [decodeSerializableElement] call with the same index,
+ * [previousValue] would contain a previously decoded value.
+ * This parameter can be used to aggregate multiple values of the given property to the only one.
+ * Implementation can safely ignore it and return a new value, effectively using 'the last one wins' strategy,
+ * or apply format-specific aggregating strategies, e.g. appending scattered Protobuf lists to a single one.
+ */
+- (id _Nullable)decodeSerializableElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index deserializer:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy>)deserializer previousValue:(id _Nullable)previousValue __attribute__((swift_name("decodeSerializableElement(descriptor:index:deserializer:previousValue:)")));
+
+/**
+ * Decodes a 16-bit short value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.SHORT] kind.
+ */
+- (int16_t)decodeShortElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeShortElement(descriptor:index:)")));
+
+/**
+ * Decodes a string value from the underlying input.
+ * The resulting value is associated with the [descriptor] element at the given [index].
+ * The element at the given index should have [PrimitiveKind.STRING] kind.
+ */
+- (NSString *)decodeStringElementDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor index:(int32_t)index __attribute__((swift_name("decodeStringElement(descriptor:index:)")));
+
+/**
+ * Denotes the end of the structure associated with current decoder.
+ * For example, composite decoder of JSON format will expect (and parse)
+ * a closing bracket in the underlying input.
+ */
+- (void)endStructureDescriptor:(id<ZappOfframpKotlinx_serialization_coreSerialDescriptor>)descriptor __attribute__((swift_name("endStructure(descriptor:)")));
+
+/**
+ * Context of the current decoding process, including contextual and polymorphic serialization and,
+ * potentially, a format-specific configuration.
+ */
+@property (readonly) ZappOfframpKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinNothing")))
+@interface ZappOfframpKotlinNothing : ZappOfframpBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinRandom.Default")))
+@interface ZappOfframpKotlinRandomDefault : ZappOfframpKotlinRandom
+@property (class, readonly, getter=shared) ZappOfframpKotlinRandomDefault *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (instancetype)new __attribute__((unavailable));
++ (instancetype)default_ __attribute__((swift_name("init()")));
+- (int32_t)nextBitsBitCount:(int32_t)bitCount __attribute__((swift_name("nextBits(bitCount:)")));
+- (BOOL)nextBoolean __attribute__((swift_name("nextBoolean()")));
+
+/**
+ * @note annotations
+ *   kotlin.IgnorableReturnValue
+*/
+- (ZappOfframpKotlinByteArray *)nextBytesArray:(ZappOfframpKotlinByteArray *)array __attribute__((swift_name("nextBytes(array:)")));
+- (ZappOfframpKotlinByteArray *)nextBytesSize:(int32_t)size __attribute__((swift_name("nextBytes(size:)")));
+- (ZappOfframpKotlinByteArray *)nextBytesArray:(ZappOfframpKotlinByteArray *)array fromIndex:(int32_t)fromIndex toIndex:(int32_t)toIndex __attribute__((swift_name("nextBytes(array:fromIndex:toIndex:)")));
+- (double)nextDouble __attribute__((swift_name("nextDouble()")));
+- (double)nextDoubleUntil:(double)until __attribute__((swift_name("nextDouble(until:)")));
+- (double)nextDoubleFrom:(double)from until:(double)until __attribute__((swift_name("nextDouble(from:until:)")));
+- (float)nextFloat __attribute__((swift_name("nextFloat()")));
+- (int32_t)nextInt __attribute__((swift_name("nextInt()")));
+- (int32_t)nextIntUntil:(int32_t)until __attribute__((swift_name("nextInt(until:)")));
+- (int32_t)nextIntFrom:(int32_t)from until:(int32_t)until __attribute__((swift_name("nextInt(from:until:)")));
+- (int64_t)nextLong __attribute__((swift_name("nextLong()")));
+- (int64_t)nextLongUntil:(int64_t)until __attribute__((swift_name("nextLong(until:)")));
+- (int64_t)nextLongFrom:(int64_t)from until:(int64_t)until __attribute__((swift_name("nextLong(from:until:)")));
+@end
+
+
+/**
+ * Class representing single JSON element.
+ * Can be [JsonPrimitive], [JsonArray] or [JsonObject].
+ *
+ * [JsonElement.toString] properly prints JSON tree as valid JSON, taking into account quoted values and primitives.
+ * Whole hierarchy is serializable, but only when used with [Json] as [JsonElement] is purely JSON-specific structure
+ * which has a meaningful schemaless semantics only for JSON.
+ *
+ * The whole hierarchy is [serializable][Serializable] only by [Json] format.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement.Companion")))
+@interface ZappOfframpKotlinx_serialization_jsonJsonElementCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_jsonJsonElementCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Class representing single JSON element.
+ * Can be [JsonPrimitive], [JsonArray] or [JsonObject].
+ *
+ * [JsonElement.toString] properly prints JSON tree as valid JSON, taking into account quoted values and primitives.
+ * Whole hierarchy is serializable, but only when used with [Json] as [JsonElement] is purely JSON-specific structure
+ * which has a meaningful schemaless semantics only for JSON.
+ *
+ * The whole hierarchy is [serializable][Serializable] only by [Json] format.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Class representing single JSON element.
+ * Can be [JsonPrimitive], [JsonArray] or [JsonObject].
+ *
+ * [JsonElement.toString] properly prints JSON tree as valid JSON, taking into account quoted values and primitives.
+ * Whole hierarchy is serializable, but only when used with [Json] as [JsonElement] is purely JSON-specific structure
+ * which has a meaningful schemaless semantics only for JSON.
+ *
+ * The whole hierarchy is [serializable][Serializable] only by [Json] format.
+ */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreDisposableHandle")))
+@protocol ZappOfframpKotlinx_coroutines_coreDisposableHandle
+@required
+- (void)dispose __attribute__((swift_name("dispose()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+__attribute__((swift_name("Kotlinx_coroutines_coreChildHandle")))
+@protocol ZappOfframpKotlinx_coroutines_coreChildHandle <ZappOfframpKotlinx_coroutines_coreDisposableHandle>
+@required
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (BOOL)childCancelledCause:(ZappOfframpKotlinThrowable *)cause __attribute__((swift_name("childCancelled(cause:)")));
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreJob> _Nullable parent __attribute__((swift_name("parent")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+__attribute__((swift_name("Kotlinx_coroutines_coreChildJob")))
+@protocol ZappOfframpKotlinx_coroutines_coreChildJob <ZappOfframpKotlinx_coroutines_coreJob>
+@required
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (void)parentCancelledParentJob:(id<ZappOfframpKotlinx_coroutines_coreParentJob>)parentJob __attribute__((swift_name("parentCancelled(parentJob:)")));
+@end
+
+__attribute__((swift_name("KotlinSequence")))
+@protocol ZappOfframpKotlinSequence
+@required
+- (id<ZappOfframpKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreSelectClause0")))
+@protocol ZappOfframpKotlinx_coroutines_coreSelectClause0 <ZappOfframpKotlinx_coroutines_coreSelectClause>
+@required
+@end
+
+__attribute__((swift_name("KotlinCoroutineContextKey")))
+@protocol ZappOfframpKotlinCoroutineContextKey
+@required
+@end
+
+
+/**
+ * Represents a phase in a pipeline
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.pipeline.PipelinePhase)
+ *
+ * @param name a name for this phase
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsPipelinePhase")))
+@interface ZappOfframpKtor_utilsPipelinePhase : ZappOfframpBase
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+- (instancetype)initWithName:(NSString *)name __attribute__((swift_name("init(name:)"))) __attribute__((objc_designated_initializer));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpClientCall.Companion")))
+@interface ZappOfframpKtor_client_coreHttpClientCallCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpClientCallCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * A message either from the client or the server,
+ * that has [headers] associated.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMessage)
+ */
+__attribute__((swift_name("Ktor_httpHttpMessage")))
+@protocol ZappOfframpKtor_httpHttpMessage
+@required
+
+/**
+ * Message [Headers]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMessage.headers)
+ */
+@property (readonly) id<ZappOfframpKtor_httpHeaders> headers_ __attribute__((swift_name("headers_")));
+@end
+
+
+/**
+ * A request for [HttpClient], first part of [HttpClientCall].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest)
+ */
+__attribute__((swift_name("Ktor_client_coreHttpRequest")))
+@protocol ZappOfframpKtor_client_coreHttpRequest <ZappOfframpKtor_httpHttpMessage, ZappOfframpKotlinx_coroutines_coreCoroutineScope>
+@required
+
+/**
+ * Typed [Attributes] associated to this call serving as a lightweight container.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest.attributes)
+ */
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+
+/**
+ * The associated [HttpClientCall] containing both
+ * the underlying [HttpClientCall.request] and [HttpClientCall.response].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest.call)
+ */
+@property (readonly) ZappOfframpKtor_client_coreHttpClientCall *call __attribute__((swift_name("call")));
+
+/**
+ * An [OutgoingContent] representing the request body
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest.content)
+ */
+@property (readonly) ZappOfframpKtor_httpOutgoingContent *content __attribute__((swift_name("content")));
+
+/**
+ * The [HttpMethod] or HTTP VERB used for this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest.method)
+ */
+@property (readonly) ZappOfframpKtor_httpHttpMethod *method __attribute__((swift_name("method")));
+
+/**
+ * The [Url] representing the endpoint and the uri for this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequest.url)
+ */
+@property (readonly) ZappOfframpKtor_httpUrl *url __attribute__((swift_name("url")));
+@end
+
+
+/**
+ * An [HttpClient]'s response, a second part of [HttpClientCall].
+ *
+ * Learn more from [Receiving responses](https://ktor.io/docs/response.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse)
+ */
+__attribute__((swift_name("Ktor_client_coreHttpResponse")))
+@interface ZappOfframpKtor_client_coreHttpResponse : ZappOfframpBase <ZappOfframpKtor_httpHttpMessage, ZappOfframpKotlinx_coroutines_coreCoroutineScope>
+@property (readonly) ZappOfframpKtor_client_coreHttpClientCall *call __attribute__((swift_name("call")));
+@property (readonly) id<ZappOfframpKtor_ioByteReadChannel> rawContent __attribute__((swift_name("rawContent")));
+@property (readonly) ZappOfframpKtor_utilsGMTDate *requestTime __attribute__((swift_name("requestTime")));
+@property (readonly) ZappOfframpKtor_utilsGMTDate *responseTime __attribute__((swift_name("responseTime")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *status __attribute__((swift_name("status")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *version __attribute__((swift_name("version")));
+
+/**
+ * An [HttpClient]'s response, a second part of [HttpClientCall].
+ *
+ * Learn more from [Receiving responses](https://ktor.io/docs/response.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * An [HttpClient]'s response, a second part of [HttpClientCall].
+ *
+ * Learn more from [Receiving responses](https://ktor.io/docs/response.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * The associated [HttpClientCall] containing both
+ * the underlying [HttpClientCall.request] and [HttpClientCall.response].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.call)
+ */
+
+/**
+ * Provides a raw [ByteReadChannel] to the response content as it is read from the network.
+ * This content can be still compressed or encoded.
+ *
+ * This content doesn't go through any interceptors from [HttpResponsePipeline].
+ *
+ * If you need to read the content as decoded bytes, use the [bodyAsChannel] method instead.
+ *
+ * This property produces a new channel every time it's accessed.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.rawContent)
+ */
+
+/**
+ * [GMTDate] of the request start.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.requestTime)
+ */
+
+/**
+ * [GMTDate] of the response start.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.responseTime)
+ */
+
+/**
+ * The [HttpStatusCode] returned by the server. It includes both,
+ * the [HttpStatusCode.description] and the [HttpStatusCode.value] (code).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.status)
+ */
+
+/**
+ * HTTP version. Usually [HttpProtocolVersion.HTTP_1_1] or [HttpProtocolVersion.HTTP_2_0].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponse.version)
+ */
+@end
+
+__attribute__((swift_name("KotlinKDeclarationContainer")))
+@protocol ZappOfframpKotlinKDeclarationContainer
+@required
+@end
+
+__attribute__((swift_name("KotlinKAnnotatedElement")))
+@protocol ZappOfframpKotlinKAnnotatedElement
+@required
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+__attribute__((swift_name("KotlinKClassifier")))
+@protocol ZappOfframpKotlinKClassifier
+@required
+@end
+
+__attribute__((swift_name("KotlinKClass")))
+@protocol ZappOfframpKotlinKClass <ZappOfframpKotlinKDeclarationContainer, ZappOfframpKotlinKAnnotatedElement, ZappOfframpKotlinKClassifier>
+@required
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+- (BOOL)isInstanceValue:(id _Nullable)value __attribute__((swift_name("isInstance(value:)")));
+@property (readonly) NSString * _Nullable qualifiedName __attribute__((swift_name("qualifiedName")));
+@property (readonly) NSString * _Nullable simpleName __attribute__((swift_name("simpleName")));
+@end
+
+__attribute__((swift_name("KotlinKType")))
+@protocol ZappOfframpKotlinKType
+@required
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+@property (readonly) NSArray<ZappOfframpKotlinKTypeProjection *> *arguments __attribute__((swift_name("arguments")));
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+@property (readonly) id<ZappOfframpKotlinKClassifier> _Nullable classifier __attribute__((swift_name("classifier")));
+@property (readonly) BOOL isMarkedNullable __attribute__((swift_name("isMarkedNullable")));
+@end
+
+
+/**
+ * Supplies a stream of bytes. RawSource is a base interface for `kotlinx-io` data suppliers.
+ *
+ * The interface should be implemented to read data from wherever it's located: from the network, storage,
+ * or a buffer in memory. Sources may be layered to transform supplied data, such as to decompress, decrypt,
+ * or remove protocol framing.
+ *
+ * Most applications shouldn't operate on a raw source directly, but rather on a buffered [Source] which
+ * is both more efficient and more convenient. Use [buffered] to wrap any raw source with a buffer.
+ *
+ * Implementors should abstain from throwing exceptions other than those that are documented for RawSource methods.
+ *
+ * ### Thread-safety guarantees
+ *
+ * [RawSource] implementations are not required to be thread safe.
+ * However, if an implementation provides some thread safety guarantees, it is recommended to explicitly document them.
+ *
+ * @sample kotlinx.io.samples.RC4SourceSample.rc4
+ */
+__attribute__((swift_name("Kotlinx_io_coreRawSource")))
+@protocol ZappOfframpKotlinx_io_coreRawSource <ZappOfframpKotlinAutoCloseable>
+@required
+
+/**
+ * Removes at least 1, and up to [byteCount] bytes from this source and appends them to [sink].
+ * Returns the number of bytes read, or -1 if this source is exhausted.
+ *
+ * @param sink the destination to write the data from this source.
+ * @param byteCount the number of bytes to read.
+ *
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readAtMostToSink
+ */
+- (int64_t)readAtMostToSink:(ZappOfframpKotlinx_io_coreBuffer *)sink byteCount:(int64_t)byteCount __attribute__((swift_name("readAtMostTo(sink:byteCount:)")));
+@end
+
+
+/**
+ * A source that facilitates typed data reads and keeps a buffer internally so that callers can read chunks of data
+ * without requesting it from a downstream on every call.
+ *
+ * [Source] is the main `kotlinx-io` interface to read data in client's code,
+ * any [RawSource] could be converted into [Source] using [RawSource.buffered].
+ *
+ * Depending on the kind of downstream and the number of bytes read, buffering may improve the performance by hiding
+ * the latency of small reads.
+ *
+ * The buffer is refilled on reads as necessary, but it is also possible to ensure it contains enough data
+ * using [require] or [request].
+ * [Sink] also allows skipping unneeded prefix of data using [skip] and
+ * provides look ahead into incoming data, buffering as much as necessary, using [peek].
+ *
+ * Source's read* methods have different guarantees of how much data will be consumed from the source
+ * and what to expect in case of error.
+ *
+ * ### Read methods' behavior and naming conventions
+ *
+ * Unless stated otherwise, all read methods consume the exact number of bytes
+ * requested (or the number of bytes required to represent a value of a requested type).
+ * If a source contains fewer bytes than requested, these methods will throw an exception.
+ *
+ * Methods reading up to requested number of bytes are named as `readAtMost`
+ * in contrast to methods reading exact number of bytes, which don't have `AtMost` suffix in their names.
+ * If a source contains fewer bytes than requested, these methods will not treat it as en error and will return
+ * gracefully.
+ *
+ * Methods returning a value as a result are named `read<Type>`, like [readInt] or [readByte].
+ * These methods don't consume source's content in case of an error.
+ *
+ * Methods reading data into a consumer supplied as one of its arguments are named `read*To`,
+ * like [readTo] or [readAtMostTo]. These methods consume a source even when an error occurs.
+ *
+ * Methods moving all data from a source to some other sink are named `transferTo`, like [transferTo].
+ *
+ * It is recommended to follow the same naming convention for Source extensions.
+ *
+ * ### Thread-safety guarantees
+ *
+ * Until stated otherwise, [Source] implementations are not thread safe.
+ * If a [Source] needs to be accessed from multiple threads, an additional synchronization is required.
+ */
+__attribute__((swift_name("Kotlinx_io_coreSource")))
+@protocol ZappOfframpKotlinx_io_coreSource <ZappOfframpKotlinx_io_coreRawSource>
+@required
+
+/**
+ * Returns true if there are no more bytes in this source.
+ *
+ * The call of this method will block until there are bytes to read or the source is definitely exhausted.
+ *
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.exhausted
+ */
+- (BOOL)exhausted __attribute__((swift_name("exhausted()")));
+
+/**
+ * Returns a new [Source] that can read data from this source without consuming it.
+ * The returned source becomes invalid once this source is next read or closed.
+ *
+ * Peek could be used to lookahead and read the same data multiple times.
+ *
+ * If peek source needs to access more data that this [Source] has in its buffer,
+ * more data will be requested from the underlying source and on success,
+ * it'll be added to the buffer of this [Source].
+ * If the underlying source was exhausted or some error occurred on attempt to fill the buffer,
+ * a corresponding exception will be thrown.
+ *
+ * @throws IllegalStateException when the source is closed.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.peekSample
+ */
+- (id<ZappOfframpKotlinx_io_coreSource>)peek __attribute__((swift_name("peek()")));
+
+/**
+ * Removes up to `endIndex - startIndex` bytes from this source, copies them into [sink] subrange starting at
+ * [startIndex] and ending at [endIndex], and returns the number of bytes read, or -1 if this source is exhausted.
+ *
+ * @param sink the array to which data will be written from this source.
+ * @param startIndex the startIndex (inclusive) of the [sink] subrange to read data into, 0 by default.
+ * @param endIndex the endIndex (exclusive) of the [sink] subrange to read data into, `sink.size` by default.
+ *
+ * @throws IndexOutOfBoundsException when [startIndex] or [endIndex] is out of range of [sink] array indices.
+ * @throws IllegalArgumentException when `startIndex > endIndex`.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readAtMostToByteArray
+ */
+- (int32_t)readAtMostToSink:(ZappOfframpKotlinByteArray *)sink startIndex:(int32_t)startIndex endIndex:(int32_t)endIndex __attribute__((swift_name("readAtMostTo(sink:startIndex:endIndex:)")));
+
+/**
+ * Removes a byte from this source and returns it.
+ *
+ * @throws EOFException when there are no more bytes to read.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readByte
+ */
+- (int8_t)readByte __attribute__((swift_name("readByte()")));
+
+/**
+ * Removes four bytes from this source and returns an integer composed of it according to the big-endian order.
+ *
+ * @throws EOFException when there are not enough data to read an int value.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readInt
+ */
+- (int32_t)readInt __attribute__((swift_name("readInt()")));
+
+/**
+ * Removes eight bytes from this source and returns a long integer composed of it according to the big-endian order.
+ *
+ * @throws EOFException when there are not enough data to read a long value.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readLong
+ */
+- (int64_t)readLong __attribute__((swift_name("readLong()")));
+
+/**
+ * Removes two bytes from this source and returns a short integer composed of it according to the big-endian order.
+ *
+ * @throws EOFException when there are not enough data to read a short value.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readShort
+ */
+- (int16_t)readShort __attribute__((swift_name("readShort()")));
+
+/**
+ * Removes exactly [byteCount] bytes from this source and writes them to [sink].
+ *
+ * @param sink the sink to which data will be written from this source.
+ * @param byteCount the number of bytes that should be written into [sink]
+ *
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws EOFException when the requested number of bytes cannot be read.
+ * @throws IllegalStateException when the source or [sink] is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.readSourceToSink
+ */
+- (void)readToSink:(id<ZappOfframpKotlinx_io_coreRawSink>)sink byteCount:(int64_t)byteCount __attribute__((swift_name("readTo(sink:byteCount:)")));
+
+/**
+ * Attempts to fill the buffer with at least [byteCount] bytes of data from the underlying source
+ * and returns a value indicating if the requirement was successfully fulfilled.
+ *
+ * `false` value returned by this method indicates that the underlying source was exhausted before
+ * filling the buffer with [byteCount] bytes of data.
+ *
+ * @param byteCount the number of bytes that the buffer should contain.
+ *
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.request
+ */
+- (BOOL)requestByteCount:(int64_t)byteCount __attribute__((swift_name("request(byteCount:)")));
+
+/**
+ * Attempts to fill the buffer with at least [byteCount] bytes of data from the underlying source
+ * and throw [EOFException] when the source is exhausted before fulfilling the requirement.
+ *
+ * If the buffer already contains required number of bytes then there will be no requests to
+ * the underlying source.
+ *
+ * @param byteCount the number of bytes that the buffer should contain.
+ *
+ * @throws EOFException when the source is exhausted before the required bytes count could be read.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.require
+ */
+- (void)requireByteCount:(int64_t)byteCount __attribute__((swift_name("require(byteCount:)")));
+
+/**
+ * Reads and discards [byteCount] bytes from this source.
+ *
+ * @param byteCount the number of bytes to be skipped.
+ *
+ * @throws EOFException when the source is exhausted before the requested number of bytes can be skipped.
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws IllegalStateException when the source is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.skip
+ */
+- (void)skipByteCount:(int64_t)byteCount __attribute__((swift_name("skip(byteCount:)")));
+
+/**
+ * Removes all bytes from this source, writes them to [sink], and returns the total number of bytes
+ * written to [sink].
+ *
+ * Return 0 if this source is exhausted.
+ *
+ * @param sink the sink to which data will be written from this source.
+ *
+ * @throws IllegalStateException when the source or [sink] is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.transferTo
+ *
+ * @note annotations
+ *   kotlin.IgnorableReturnValue
+*/
+- (int64_t)transferToSink:(id<ZappOfframpKotlinx_io_coreRawSink>)sink __attribute__((swift_name("transferTo(sink:)")));
+
+/**
+ * This source's internal buffer. It contains data fetched from the downstream, but not yet consumed by the upstream.
+ *
+ * Incorrect use of the buffer may cause data loss or unexpected data being read by the upstream.
+ * Consider using alternative APIs to read data from the source, if possible:
+ * - use [peek] for lookahead into a source;
+ * - implement [RawSource] and wrap a downstream source into it to intercept data being read.
+ *
+ * @note annotations
+ *   kotlinx.io.InternalIoApi
+*/
+@property (readonly) ZappOfframpKotlinx_io_coreBuffer *buffer __attribute__((swift_name("buffer")));
+@end
+
+__attribute__((swift_name("Ktor_ioJvmSerializable")))
+@protocol ZappOfframpKtor_ioJvmSerializable
+@required
+@end
+
+
+/**
+ * Represents an immutable URL
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Url)
+ *
+ * @property protocol
+ * @property host name without port (domain)
+ * @property port the specified port or protocol default port
+ * @property specifiedPort port number that was specified to override protocol's default
+ * @property encodedPath encoded path without query string
+ * @property parameters URL query parameters
+ * @property fragment URL fragment (anchor name)
+ * @property user username part of URL
+ * @property password password part of URL
+ * @property trailingQuery keep trailing question character even if there are no query parameters
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=io/ktor/http/UrlSerializer))
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpUrl")))
+@interface ZappOfframpKtor_httpUrl : ZappOfframpBase <ZappOfframpKtor_ioJvmSerializable>
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpUrlCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *encodedFragment __attribute__((swift_name("encodedFragment")));
+@property (readonly) NSString * _Nullable encodedPassword __attribute__((swift_name("encodedPassword")));
+@property (readonly) NSString *encodedPath __attribute__((swift_name("encodedPath")));
+@property (readonly) NSString *encodedPathAndQuery __attribute__((swift_name("encodedPathAndQuery")));
+@property (readonly) NSString *encodedQuery __attribute__((swift_name("encodedQuery")));
+@property (readonly) NSString * _Nullable encodedUser __attribute__((swift_name("encodedUser")));
+@property (readonly) NSString *fragment __attribute__((swift_name("fragment")));
+@property (readonly) NSString *host __attribute__((swift_name("host")));
+@property (readonly) id<ZappOfframpKtor_httpParameters> parameters __attribute__((swift_name("parameters")));
+@property (readonly) NSString * _Nullable password __attribute__((swift_name("password")));
+@property (readonly) NSArray<NSString *> *pathSegments __attribute__((swift_name("pathSegments"))) __attribute__((deprecated("\n        `pathSegments` is deprecated.\n\n        This property will contain an empty path segment at the beginning for URLs with a hostname,\n        and an empty path segment at the end for the URLs with a trailing slash. If you need to keep this behaviour please\n        use [rawSegments]. If you only need to access the meaningful parts of the path, consider using [segments] instead.\n             \n        Please decide if you need [rawSegments] or [segments] explicitly.\n        ")));
+@property (readonly) int32_t port __attribute__((swift_name("port")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *protocol __attribute__((swift_name("protocol")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol * _Nullable protocolOrNull __attribute__((swift_name("protocolOrNull")));
+@property (readonly) NSArray<NSString *> *rawSegments __attribute__((swift_name("rawSegments")));
+@property (readonly) NSArray<NSString *> *segments __attribute__((swift_name("segments")));
+@property (readonly) int32_t specifiedPort __attribute__((swift_name("specifiedPort")));
+@property (readonly) BOOL trailingQuery __attribute__((swift_name("trailingQuery")));
+@property (readonly) NSString * _Nullable user __attribute__((swift_name("user")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * A list containing the segments of the URL path.
+ *
+ * This property was designed to distinguish between absolute and relative paths,
+ * so it will have an empty segment at the beginning for URLs with a hostname
+ * and an empty segment at the end for URLs with a trailing slash.
+ *
+ * ```kotlin
+ * val fullUrl = Url("http://ktor.io/docs/")
+ * fullUrl.pathSegments == listOf("", "docs", "")
+ *
+ * val absolute = Url("/docs/")
+ * absolute.pathSegments == listOf("", "docs", "")
+ *
+ * val relative = Url("docs")
+ * relative.pathSegments == listOf("docs")
+ * ```
+ *
+ * This behaviour may not be ideal if you're working only with full URLs.
+ * If you don't require the specific handling of empty segments, consider using the [segments] property instead:
+ *
+ * ```kotlin
+ * val fullUrl = Url("http://ktor.io/docs/")
+ * fullUrl.segments == listOf("docs")
+ *
+ * val absolute = Url("/docs/")
+ * absolute.segments == listOf("docs")
+ *
+ * val relative = Url("docs")
+ * relative.segments == listOf("docs")
+ * ```
+ *
+ * To address this issue, the current [pathSegments] property will be renamed to [rawSegments].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Url.pathSegments)
+ */
+
+/**
+ * A list containing the segments of the URL path.
+ *
+ * This property is designed to distinguish between absolute and relative paths,
+ * so it will have an empty segment at the beginning for URLs with a hostname
+ * and an empty segment at the end for URLs with a trailing slash.
+ *
+ * ```kotlin
+ * val fullUrl = Url("http://ktor.io/docs/")
+ * fullUrl.rawSegments == listOf("", "docs", "")
+ *
+ * val absolute = Url("/docs/")
+ * absolute.rawSegments == listOf("", "docs", "")
+ *
+ * val relative = Url("docs")
+ * relative.rawSegments == listOf("docs")
+ * ```
+ *
+ * This behaviour may not be ideal if you're working only with full URLs.
+ * If you don't require the specific handling of empty segments, consider using the [segments] property instead:
+ *
+ * ```kotlin
+ * val fullUrl = Url("http://ktor.io/docs/")
+ * fullUrl.segments == listOf("docs")
+ *
+ * val absolute = Url("/docs/")
+ * absolute.segments == listOf("docs")
+ *
+ * val relative = Url("docs")
+ * relative.segments == listOf("docs")
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Url.rawSegments)
+ */
+
+/**
+ * A list of path segments derived from the URL, excluding any leading
+ * and trailing empty segments.
+ *
+ * ```kotlin
+ * val fullUrl = Url("http://ktor.io/docs/")
+ * fullUrl.segments == listOf("docs")
+ *
+ * val absolute = Url("/docs/")
+ * absolute.segments == listOf("docs")
+ * val relative = Url("docs")
+ * relative.segments == listOf("docs")
+ * ```
+ *
+ * If you need to check for trailing slash and relative/absolute paths, please check the [rawSegments] property.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Url.segments)
+ **/
+@end
+
+
+/**
+ * Represents an HTTP method (verb)
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMethod)
+ *
+ * @property value contains method name
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpMethod")))
+@interface ZappOfframpKtor_httpHttpMethod : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpHttpMethodCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(NSString *)value __attribute__((swift_name("init(value:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_httpHttpMethod *)doCopyValue:(NSString *)value __attribute__((swift_name("doCopy(value:)")));
+
+/**
+ * Represents an HTTP method (verb)
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMethod)
+ *
+ * @property value contains method name
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Represents an HTTP method (verb)
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMethod)
+ *
+ * @property value contains method name
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Provides data structure for associating a [String] with a [List] of Strings
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues)
+ */
+__attribute__((swift_name("Ktor_utilsStringValues")))
+@protocol ZappOfframpKtor_utilsStringValues
+@required
+
+/**
+ * Checks if the given [name] exists in the map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.contains)
+ */
+- (BOOL)containsName:(NSString *)name __attribute__((swift_name("contains(name:)")));
+
+/**
+ * Checks if the given [name] and [value] pair exists in the map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.contains)
+ */
+- (BOOL)containsName:(NSString *)name value:(NSString *)value __attribute__((swift_name("contains(name:value:)")));
+
+/**
+ * Gets all entries from the map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.entries)
+ */
+- (NSSet<id<ZappOfframpKotlinMapEntry>> *)entries __attribute__((swift_name("entries()")));
+
+/**
+ * Iterates over all entries in this map and calls [body] for each pair
+ *
+ * Can be optimized in implementations
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.forEach)
+ */
+- (void)forEachBody:(void (^)(NSString *, NSArray<NSString *> *))body __attribute__((swift_name("forEach(body:)")));
+
+/**
+ * Gets first value from the list of values associated with a [name], or null if the name is not present
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.get)
+ */
+- (NSString * _Nullable)getName:(NSString *)name __attribute__((swift_name("get(name:)")));
+
+/**
+ * Gets all values associated with the [name], or null if the name is not present
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.getAll)
+ */
+- (NSArray<NSString *> * _Nullable)getAllName:(NSString *)name __attribute__((swift_name("getAll(name:)")));
+
+/**
+ * Checks if this map is empty
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.isEmpty)
+ */
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+
+/**
+ * Gets all names from the map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.names)
+ */
+- (NSSet<NSString *> *)names __attribute__((swift_name("names()")));
+
+/**
+ * Specifies if map has case-sensitive or case-insensitive names
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.StringValues.caseInsensitiveName)
+ */
+@property (readonly) BOOL caseInsensitiveName __attribute__((swift_name("caseInsensitiveName")));
+@end
+
+
+/**
+ * Represents HTTP headers as a map from case-insensitive names to collection of [String] values
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Headers)
+ */
+__attribute__((swift_name("Ktor_httpHeaders")))
+@protocol ZappOfframpKtor_httpHeaders <ZappOfframpKtor_utilsStringValues>
+@required
+@end
+
+
+/**
+ * Specifies a key for an attribute in [Attributes]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.AttributeKey)
+ *
+ * @param T is a type of the value stored in the attribute
+ * @property name is a name of the attribute for diagnostic purposes. Can't be blank
+ * @property type the recorded kotlin type of T
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsAttributeKey")))
+@interface ZappOfframpKtor_utilsAttributeKey<T> : ZappOfframpBase
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+- (instancetype)initWithName:(NSString *)name type:(ZappOfframpKtor_utilsTypeInfo *)type __attribute__((swift_name("init(name:type:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_utilsAttributeKey<T> *)doCopyName:(NSString *)name type:(ZappOfframpKtor_utilsTypeInfo *)type __attribute__((swift_name("doCopy(name:type:)")));
+
+/**
+ * Specifies a key for an attribute in [Attributes]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.AttributeKey)
+ *
+ * @param T is a type of the value stored in the attribute
+ * @property name is a name of the attribute for diagnostic purposes. Can't be blank
+ * @property type the recorded kotlin type of T
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Specifies a key for an attribute in [Attributes]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.AttributeKey)
+ *
+ * @param T is a type of the value stored in the attribute
+ * @property name is a name of the attribute for diagnostic purposes. Can't be blank
+ * @property type the recorded kotlin type of T
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Represents a header value that consist of [content] followed by [parameters].
+ * Useful for headers such as `Content-Type`, `Content-Disposition` and so on.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HeaderValueWithParameters)
+ *
+ * @property content header's content without parameters
+ * @property parameters
+ */
+__attribute__((swift_name("Ktor_httpHeaderValueWithParameters")))
+@interface ZappOfframpKtor_httpHeaderValueWithParameters : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpHeaderValueWithParametersCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *content __attribute__((swift_name("content")));
+@property (readonly) NSArray<ZappOfframpKtor_httpHeaderValueParam *> *parameters __attribute__((swift_name("parameters")));
+- (instancetype)initWithContent:(NSString *)content parameters:(NSArray<ZappOfframpKtor_httpHeaderValueParam *> *)parameters __attribute__((swift_name("init(content:parameters:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * The first value for the parameter with [name] comparing case-insensitively or `null` if no such parameters found
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HeaderValueWithParameters.parameter)
+ */
+- (NSString * _Nullable)parameterName:(NSString *)name __attribute__((swift_name("parameter(name:)")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note This property has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+@end
+
+
+/**
+ * Represents a value for a `Content-Type` header.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType)
+ *
+ * @property contentType represents a type part of the media type.
+ * @property contentSubtype represents a subtype part of the media type.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpContentType")))
+@interface ZappOfframpKtor_httpContentType : ZappOfframpKtor_httpHeaderValueWithParameters
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpContentTypeCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *contentSubtype __attribute__((swift_name("contentSubtype")));
+@property (readonly) NSString *contentType __attribute__((swift_name("contentType")));
+- (instancetype)initWithContentType:(NSString *)contentType contentSubtype:(NSString *)contentSubtype parameters:(NSArray<ZappOfframpKtor_httpHeaderValueParam *> *)parameters __attribute__((swift_name("init(contentType:contentSubtype:parameters:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithContent:(NSString *)content parameters:(NSArray<ZappOfframpKtor_httpHeaderValueParam *> *)parameters __attribute__((swift_name("init(content:parameters:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Checks if `this` type matches a [pattern] type taking into account placeholder symbols `*` and parameters.
+ * The `this` type must be a more specific type than the [pattern] type. In other words:
+ *
+ * ```kotlin
+ * ContentType("a", "b").match(ContentType("a", "b").withParameter("foo", "bar")) === false
+ * ContentType("a", "b").withParameter("foo", "bar").match(ContentType("a", "b")) === true
+ * ContentType("a", "*").match(ContentType("a", "b")) === false
+ * ContentType("a", "b").match(ContentType("a", "*")) === true
+ * ```
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.match)
+ */
+- (BOOL)matchPattern:(ZappOfframpKtor_httpContentType *)pattern __attribute__((swift_name("match(pattern:)")));
+
+/**
+ * Checks if `this` type matches a [pattern] type taking into account placeholder symbols `*` and parameters.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.match)
+ */
+- (BOOL)matchPattern_:(NSString *)pattern __attribute__((swift_name("match(pattern_:)")));
+
+/**
+ * Creates a copy of `this` type with the added parameter with the [name] and [value].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.withParameter)
+ */
+- (ZappOfframpKtor_httpContentType *)withParameterName:(NSString *)name value:(NSString *)value __attribute__((swift_name("withParameter(name:value:)")));
+
+/**
+ * Creates a copy of `this` type without any parameters
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.withoutParameters)
+ */
+- (ZappOfframpKtor_httpContentType *)withoutParameters __attribute__((swift_name("withoutParameters()")));
+@end
+
+
+/**
+ * Represents an HTTP status code and description.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpStatusCode)
+ *
+ * @param value is a numeric code.
+ * @param description is a free form description of a status.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpStatusCode")))
+@interface ZappOfframpKtor_httpHttpStatusCode : ZappOfframpBase <ZappOfframpKotlinComparable>
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpHttpStatusCodeCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) NSString *description_ __attribute__((swift_name("description_")));
+@property (readonly) int32_t value __attribute__((swift_name("value")));
+- (instancetype)initWithValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("init(value:description:)"))) __attribute__((objc_designated_initializer));
+- (int32_t)compareToOther:(ZappOfframpKtor_httpHttpStatusCode *)other __attribute__((swift_name("compareTo(other:)")));
+- (ZappOfframpKtor_httpHttpStatusCode *)doCopyValue:(int32_t)value description:(NSString *)description __attribute__((swift_name("doCopy(value:description:)")));
+
+/**
+ * Returns a copy of `this` code with a description changed to [value].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpStatusCode.description)
+ */
+- (ZappOfframpKtor_httpHttpStatusCode *)descriptionValue:(NSString *)value __attribute__((swift_name("description(value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("Kotlinx_io_coreRawSink")))
+@protocol ZappOfframpKotlinx_io_coreRawSink <ZappOfframpKotlinAutoCloseable>
+@required
+- (void)flush __attribute__((swift_name("flush()")));
+- (void)writeSource:(ZappOfframpKotlinx_io_coreBuffer *)source byteCount_:(int64_t)byteCount __attribute__((swift_name("write(source:byteCount_:)")));
+@end
+
+
+/**
+ * A sink that facilitates typed data writes and keeps a buffer internally so that caller can write some data without
+ * sending it directly to an upstream.
+ *
+ * [Sink] is the main `kotlinx-io` interface to write data in client's code,
+ * any [RawSink] could be turned into [Sink] using [RawSink.buffered].
+ *
+ * Depending on the kind of upstream and the number of bytes written, buffering may improve the performance
+ * by hiding the latency of small writes.
+ *
+ * Data stored inside the internal buffer could be sent to an upstream using [flush], [emit], or [hintEmit]:
+ * - [flush] writes the whole buffer to an upstream and then flushes the upstream.
+ * - [emit] writes all data from the buffer into the upstream without flushing it.
+ * - [hintEmit] hints the source that current write operation is now finished and a part of data from the buffer
+ * may be partially emitted into the upstream.
+ * The latter is aimed to reduce memory footprint by keeping the buffer as small as possible without excessive writes
+ * to the upstream.
+ * All write operations implicitly calls [hintEmit].
+ *
+ * ### Write methods' behavior and naming conventions
+ *
+ * Methods writing a value of some type are usually named `write<Type>`, like [writeByte] or [writeInt], except methods
+ * writing data from a some collection of bytes, like `write(ByteArray, Int, Int)` or
+ * `write(source: RawSource, byteCount: Long)`.
+ * In the latter case, if a collection is consumable (i.e., once data was read from it will no longer be available for
+ * reading again), write method will consume as many bytes as it was requested to write.
+ *
+ * Methods fully consuming its argument are named `transferFrom`, like [transferFrom].
+ *
+ * It is recommended to follow the same naming convention for Sink extensions.
+ *
+ * ### Thread-safety guarantees
+ *
+ * Until stated otherwise, [Sink] implementations are not thread safe.
+ * If a [Sink] needs to be accessed from multiple threads, an additional synchronization is required.
+ */
+__attribute__((swift_name("Kotlinx_io_coreSink")))
+@protocol ZappOfframpKotlinx_io_coreSink <ZappOfframpKotlinx_io_coreRawSink>
+@required
+
+/**
+ * Writes all buffered data to the underlying sink if one exists.
+ * The underlying sink will not be explicitly flushed.
+ *
+ * This method behaves like [flush], but has weaker guarantees.
+ * Call this method before a buffered sink goes out of scope so that its data can reach its destination.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.emit
+ */
+- (void)emit __attribute__((swift_name("emit()")));
+
+/**
+ * Hints that the buffer may be *partially* emitted (see [emit]) to the underlying sink.
+ * The underlying sink will not be explicitly flushed.
+ * There are no guarantees that this call will cause emit of buffered data as well as
+ * there are no guarantees how many bytes will be emitted.
+ *
+ * Typically, application code will not need to call this: it is only necessary when
+ * application code writes directly to this [buffered].
+ * Use this to limit the memory held in the buffer.
+ *
+ * Consider using [Sink.writeToInternalBuffer] for writes into [buffered] followed by [hintEmit] call.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @note annotations
+ *   kotlinx.io.InternalIoApi
+*/
+- (void)hintEmit __attribute__((swift_name("hintEmit()")));
+
+/**
+ * Removes all bytes from [source] and write them to this sink.
+ * Returns the number of bytes read which will be 0 if [source] is exhausted.
+ *
+ * @param source the source to consume data from.
+ *
+ * @throws IllegalStateException when the sink or [source] is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.transferFrom
+ *
+ * @note annotations
+ *   kotlin.IgnorableReturnValue
+*/
+- (int64_t)transferFromSource:(id<ZappOfframpKotlinx_io_coreRawSource>)source __attribute__((swift_name("transferFrom(source:)")));
+
+/**
+ * Removes [byteCount] bytes from [source] and write them to this sink.
+ *
+ * If [source] will be exhausted before reading [byteCount] from it then an exception throws on
+ * an attempt to read remaining bytes will be propagated to a caller of this method.
+ *
+ * @param source the source to consume data from.
+ * @param byteCount the number of bytes to read from [source] and to write into this sink.
+ *
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ * @throws IllegalStateException when the sink or [source] is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeSourceToSink
+ */
+- (void)writeSource:(id<ZappOfframpKotlinx_io_coreRawSource>)source byteCount:(int64_t)byteCount __attribute__((swift_name("write(source:byteCount:)")));
+
+/**
+ * Writes bytes from [source] array or its subrange to this sink.
+ *
+ * @param source the array from which bytes will be written into this sink.
+ * @param startIndex the start index (inclusive) of the [source] subrange to be written, 0 by default.
+ * @param endIndex the endIndex (exclusive) of the [source] subrange to be written, size of the [source] by default.
+ *
+ * @throws IndexOutOfBoundsException when [startIndex] or [endIndex] is out of range of [source] array indices.
+ * @throws IllegalArgumentException when `startIndex > endIndex`.
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeByteArrayToSink
+ */
+- (void)writeSource:(ZappOfframpKotlinByteArray *)source startIndex:(int32_t)startIndex endIndex:(int32_t)endIndex __attribute__((swift_name("write(source:startIndex:endIndex:)")));
+
+/**
+ * Writes a byte to this sink.
+ *
+ * @param byte the byte to be written.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeByte
+ */
+- (void)writeByteByte:(int8_t)byte __attribute__((swift_name("writeByte(byte:)")));
+
+/**
+ * Writes four bytes containing [int], in the big-endian order, to this sink.
+ *
+ * @param int the integer to be written.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeInt
+ */
+- (void)writeIntInt:(int32_t)int_ __attribute__((swift_name("writeInt(int:)")));
+
+/**
+ * Writes eight bytes containing [long], in the big-endian order, to this sink.
+ *
+ * @param long the long integer to be written.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeLong
+ */
+- (void)writeLongLong:(int64_t)long_ __attribute__((swift_name("writeLong(long:)")));
+
+/**
+ * Writes two bytes containing [short], in the big-endian order, to this sink.
+ *
+ * @param short the short integer to be written.
+ *
+ * @throws IllegalStateException when the sink is closed.
+ * @throws IOException when some I/O error occurs.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.writeShort
+ */
+- (void)writeShortShort:(int16_t)short_ __attribute__((swift_name("writeShort(short:)")));
+
+/**
+ * This sink's internal buffer. It contains data written to the sink, but not yet flushed to the upstream.
+ *
+ * Incorrect use of the buffer may cause data loss or unexpected data being sent to the upstream.
+ * Consider using alternative APIs to write data into the sink, if possible:
+ * - write data into separate [Buffer] instance and write that buffer into the sink and then flush the sink to
+ *   ensure that the upstream will receive complete data;
+ * - implement [RawSink] and wrap an upstream sink into it to intercept data being written.
+ *
+ * If there is an actual need to write data directly into the buffer, consider using [Sink.writeToInternalBuffer] instead.
+ *
+ * @note annotations
+ *   kotlinx.io.InternalIoApi
+*/
+@property (readonly) ZappOfframpKotlinx_io_coreBuffer *buffer __attribute__((swift_name("buffer")));
+@end
+
+__attribute__((swift_name("KotlinIterable")))
+@protocol ZappOfframpKotlinIterable
+@required
+- (id<ZappOfframpKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
+@end
+
+__attribute__((swift_name("KotlinLongProgression")))
+@interface ZappOfframpKotlinLongProgression : ZappOfframpBase <ZappOfframpKotlinIterable>
+@property (class, readonly, getter=companion) ZappOfframpKotlinLongProgressionCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int64_t first __attribute__((swift_name("first")));
+@property (readonly) int64_t last __attribute__((swift_name("last")));
+@property (readonly) int64_t step __attribute__((swift_name("step")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+- (ZappOfframpKotlinLongIterator *)iterator __attribute__((swift_name("iterator()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((swift_name("KotlinClosedRange")))
+@protocol ZappOfframpKotlinClosedRange
+@required
+- (BOOL)containsValue:(id)value __attribute__((swift_name("contains(value:)")));
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+@property (readonly) id endInclusive __attribute__((swift_name("endInclusive")));
+@property (readonly, getter=start_) id start __attribute__((swift_name("start")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.9")
+*/
+__attribute__((swift_name("KotlinOpenEndRange")))
+@protocol ZappOfframpKotlinOpenEndRange
+@required
+- (BOOL)containsValue_:(id)value __attribute__((swift_name("contains(value_:)")));
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+@property (readonly) id endExclusive __attribute__((swift_name("endExclusive")));
+@property (readonly, getter=start_) id start __attribute__((swift_name("start")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinLongRange")))
+@interface ZappOfframpKotlinLongRange : ZappOfframpKotlinLongProgression <ZappOfframpKotlinClosedRange, ZappOfframpKotlinOpenEndRange>
+@property (class, readonly, getter=companion) ZappOfframpKotlinLongRangeCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) ZappOfframpLong *endExclusive __attribute__((swift_name("endExclusive"))) __attribute__((deprecated("Can throw an exception when it's impossible to represent the value with Long type, for example, when the range includes MAX_VALUE. It's recommended to use 'endInclusive' property that doesn't throw.")));
+@property (readonly) ZappOfframpLong *endInclusive __attribute__((swift_name("endInclusive")));
+@property (readonly, getter=start_) ZappOfframpLong *start __attribute__((swift_name("start")));
+- (instancetype)initWithStart:(int64_t)start endInclusive:(int64_t)endInclusive __attribute__((swift_name("init(start:endInclusive:)"))) __attribute__((objc_designated_initializer));
+- (BOOL)containsValue:(ZappOfframpLong *)value __attribute__((swift_name("contains(value:)")));
+- (BOOL)containsValue_:(ZappOfframpLong *)value __attribute__((swift_name("contains(value_:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.9")
+*/
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinUnit")))
+@interface ZappOfframpKotlinUnit : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinUnit *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)unit __attribute__((swift_name("init()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+__attribute__((swift_name("Kotlinx_coroutines_coreSelectInstance")))
+@protocol ZappOfframpKotlinx_coroutines_coreSelectInstance
+@required
+- (void)disposeOnCompletionDisposableHandle:(id<ZappOfframpKotlinx_coroutines_coreDisposableHandle>)disposableHandle __attribute__((swift_name("disposeOnCompletion(disposableHandle:)")));
+- (void)selectInRegistrationPhaseInternalResult:(id _Nullable)internalResult __attribute__((swift_name("selectInRegistrationPhase(internalResult:)")));
+- (BOOL)trySelectClauseObject:(id)clauseObject result:(id _Nullable)result __attribute__((swift_name("trySelect(clauseObject:result:)")));
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> context __attribute__((swift_name("context")));
+@end
+
+
+/**
+ * Class representing JSON primitive value.
+ * JSON primitives include numbers, strings, booleans and special null value [JsonNull].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonPrimitive.Companion")))
+@interface ZappOfframpKotlinx_serialization_jsonJsonPrimitiveCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_serialization_jsonJsonPrimitiveCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Class representing JSON primitive value.
+ * JSON primitives include numbers, strings, booleans and special null value [JsonNull].
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Class representing JSON primitive value.
+ * JSON primitives include numbers, strings, booleans and special null value [JsonNull].
+ */
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * Base interface representing a [HttpClient] plugin.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.HttpClientPlugin)
+ */
+__attribute__((swift_name("Ktor_client_coreHttpClientPlugin")))
+@protocol ZappOfframpKtor_client_coreHttpClientPlugin
+@required
+
+/**
+ * Installs the [plugin] class for a [HttpClient] defined at [scope].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.HttpClientPlugin.install)
+ */
+- (void)installPlugin:(id)plugin scope:(ZappOfframpKtor_client_coreHttpClient *)scope __attribute__((swift_name("install(plugin:scope:)")));
+
+/**
+ * Builds a [TPlugin] by calling the [block] with a [TConfig] config instance as receiver.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.HttpClientPlugin.prepare)
+ */
+- (id)prepareBlock:(void (^)(id))block __attribute__((swift_name("prepare(block:)")));
+
+/**
+ * The [AttributeKey] for this plugin.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.plugins.HttpClientPlugin.key)
+ */
+@property (readonly) ZappOfframpKtor_utilsAttributeKey<id> *key __attribute__((swift_name("key")));
+@end
+
+
+/**
+ * Definition of an event.
+ * Event is used as a key so both [hashCode] and [equals] need to be implemented properly.
+ * Inheriting of this class is an experimental feature.
+ * Instantiate directly if inheritance not necessary.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.EventDefinition)
+ *
+ * @param T specifies what is a type of value passed to the event
+ */
+__attribute__((swift_name("Ktor_eventsEventDefinition")))
+@interface ZappOfframpKtor_eventsEventDefinition<T> : ZappOfframpBase
+
+/**
+ * Definition of an event.
+ * Event is used as a key so both [hashCode] and [equals] need to be implemented properly.
+ * Inheriting of this class is an experimental feature.
+ * Instantiate directly if inheritance not necessary.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.EventDefinition)
+ *
+ * @param T specifies what is a type of value passed to the event
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Definition of an event.
+ * Event is used as a key so both [hashCode] and [equals] need to be implemented properly.
+ * Inheriting of this class is an experimental feature.
+ * Instantiate directly if inheritance not necessary.
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.events.EventDefinition)
+ *
+ * @param T specifies what is a type of value passed to the event
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpReceivePipeline.Phases")))
+@interface ZappOfframpKtor_client_coreHttpReceivePipelinePhases : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpReceivePipelinePhases *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *After __attribute__((swift_name("After")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Before __attribute__((swift_name("Before")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *State __attribute__((swift_name("State")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)phases __attribute__((swift_name("init()")));
+
+/**
+ * Latest response pipeline phase
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpReceivePipeline.Phases.After)
+ */
+
+/**
+ * The earliest phase that happens before any other
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpReceivePipeline.Phases.Before)
+ */
+
+/**
+ * Use this phase to store request shared state
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpReceivePipeline.Phases.State)
+ */
+@end
+
+
+/**
+ * All interceptors accept payload as [subject] and try to convert it to [OutgoingContent].
+ * Last phase should proceed with [HttpClientCall].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpRequestPipeline.Phases")))
+@interface ZappOfframpKtor_client_coreHttpRequestPipelinePhases : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpRequestPipelinePhases *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Before __attribute__((swift_name("Before")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Render __attribute__((swift_name("Render")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Send __attribute__((swift_name("Send")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *State __attribute__((swift_name("State")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Transform __attribute__((swift_name("Transform")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * All interceptors accept payload as [subject] and try to convert it to [OutgoingContent].
+ * Last phase should proceed with [HttpClientCall].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)phases __attribute__((swift_name("init()")));
+
+/**
+ * The earliest phase that happens before any other.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases.Before)
+ */
+
+/**
+ * Encode a request body to [OutgoingContent].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases.Render)
+ */
+
+/**
+ * A phase for the [HttpSend] plugin.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases.Send)
+ */
+
+/**
+ * Use this phase to modify a request with a shared state.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases.State)
+ */
+
+/**
+ * Transform a request body to supported render format.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestPipeline.Phases.Transform)
+ */
+@end
+
+
+/**
+ * A builder message either for the client or the server,
+ * that has a [headers] builder associated.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMessageBuilder)
+ */
+__attribute__((swift_name("Ktor_httpHttpMessageBuilder")))
+@protocol ZappOfframpKtor_httpHttpMessageBuilder
+@required
+
+/**
+ * MessageBuilder [HeadersBuilder]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMessageBuilder.headers)
+ */
+@property (readonly) ZappOfframpKtor_httpHeadersBuilder *headers_ __attribute__((swift_name("headers_")));
+@end
+
+
+/**
+ * Contains parameters used to make an HTTP request.
+ *
+ * Learn more from [Making requests](https://ktor.io/docs/request.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpRequestBuilder")))
+@interface ZappOfframpKtor_client_coreHttpRequestBuilder : ZappOfframpBase <ZappOfframpKtor_httpHttpMessageBuilder>
+@property (class, readonly, getter=companion) ZappOfframpKtor_client_coreHttpRequestBuilderCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) id<ZappOfframpKtor_utilsAttributes> attributes __attribute__((swift_name("attributes")));
+@property id body __attribute__((swift_name("body")));
+@property ZappOfframpKtor_utilsTypeInfo * _Nullable bodyType __attribute__((swift_name("bodyType")));
+@property (readonly) id<ZappOfframpKotlinx_coroutines_coreJob> executionContext __attribute__((swift_name("executionContext")));
+@property (readonly) ZappOfframpKtor_httpHeadersBuilder *headers_ __attribute__((swift_name("headers_")));
+@property ZappOfframpKtor_httpHttpMethod *method __attribute__((swift_name("method")));
+@property (readonly) ZappOfframpKtor_httpURLBuilder *url __attribute__((swift_name("url")));
+
+/**
+ * Contains parameters used to make an HTTP request.
+ *
+ * Learn more from [Making requests](https://ktor.io/docs/request.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder)
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Contains parameters used to make an HTTP request.
+ *
+ * Learn more from [Making requests](https://ktor.io/docs/request.html).
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder)
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Creates immutable [HttpRequestData].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.build)
+ */
+- (ZappOfframpKtor_client_coreHttpRequestData *)build __attribute__((swift_name("build()")));
+
+/**
+ * Retrieves capability by the key.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.getCapabilityOrNull)
+ */
+- (id _Nullable)getCapabilityOrNullKey:(id<ZappOfframpKtor_client_coreHttpClientEngineCapability>)key __attribute__((swift_name("getCapabilityOrNull(key:)")));
+
+/**
+ * Sets request-specific attributes specified by [block].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.setAttributes)
+ */
+- (void)setAttributesBlock:(void (^)(id<ZappOfframpKtor_utilsAttributes>))block __attribute__((swift_name("setAttributes(block:)")));
+
+/**
+ * Sets capability configuration.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.setCapability)
+ */
+- (void)setCapabilityKey:(id<ZappOfframpKtor_client_coreHttpClientEngineCapability>)key capability:(id)capability __attribute__((swift_name("setCapability(key:capability:)")));
+
+/**
+ * Mutates [this] by copying all the data but execution context from another [builder] using it as the base.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.takeFrom)
+ */
+- (ZappOfframpKtor_client_coreHttpRequestBuilder *)takeFromBuilder:(ZappOfframpKtor_client_coreHttpRequestBuilder *)builder __attribute__((swift_name("takeFrom(builder:)")));
+
+/**
+ * Mutates [this] copying all the data from another [builder] using it as the base.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.takeFromWithExecutionContext)
+ */
+- (ZappOfframpKtor_client_coreHttpRequestBuilder *)takeFromWithExecutionContextBuilder:(ZappOfframpKtor_client_coreHttpRequestBuilder *)builder __attribute__((swift_name("takeFromWithExecutionContext(builder:)")));
+
+/**
+ * Executes a [block] that configures the [URLBuilder] associated to this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.url)
+ */
+- (void)urlBlock:(void (^)(ZappOfframpKtor_httpURLBuilder *, ZappOfframpKtor_httpURLBuilder *))block __attribute__((swift_name("url(block:)")));
+
+/**
+ * Provides access to attributes specific for this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.attributes)
+ */
+
+/**
+ * The [body] for this request. Initially [EmptyContent].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.body)
+ */
+
+/**
+ * The [KType] of [body] for this request. Null for default types that don't need serialization.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.bodyType)
+ */
+
+/**
+ * A deferred used to control the execution of this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.executionContext)
+ */
+
+/**
+ * [HeadersBuilder] to configure the headers for this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.headers)
+ */
+
+/**
+ * [HttpMethod] used by this request. [HttpMethod.Get] by default.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.method)
+ */
+
+/**
+ * [URLBuilder] to configure the URL for this request.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpRequestBuilder.url)
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpResponsePipeline.Phases")))
+@interface ZappOfframpKtor_client_coreHttpResponsePipelinePhases : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpResponsePipelinePhases *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *After __attribute__((swift_name("After")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Parse __attribute__((swift_name("Parse")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Receive __attribute__((swift_name("Receive")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *State __attribute__((swift_name("State")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Transform __attribute__((swift_name("Transform")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)phases __attribute__((swift_name("init()")));
+
+/**
+ * Latest response pipeline phase
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline.Phases.After)
+ */
+
+/**
+ * Decode response body
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline.Phases.Parse)
+ */
+
+/**
+ * The earliest phase that happens before any other
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline.Phases.Receive)
+ */
+
+/**
+ * Use this phase to store request shared state
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline.Phases.State)
+ */
+
+/**
+ * Transform response body to expected format
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponsePipeline.Phases.Transform)
+ */
+@end
+
+
+/**
+ * Class representing a typed [response] with an attached [expectedType].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponseContainer)
+ *
+ * @param expectedType: information about expected type.
+ * @param response: current response state.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpResponseContainer")))
+@interface ZappOfframpKtor_client_coreHttpResponseContainer : ZappOfframpBase
+@property (readonly) ZappOfframpKtor_utilsTypeInfo *expectedType __attribute__((swift_name("expectedType")));
+@property (readonly) id response __attribute__((swift_name("response")));
+- (instancetype)initWithExpectedType:(ZappOfframpKtor_utilsTypeInfo *)expectedType response:(id)response __attribute__((swift_name("init(expectedType:response:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_client_coreHttpResponseContainer *)doCopyExpectedType:(ZappOfframpKtor_utilsTypeInfo *)expectedType response:(id)response __attribute__((swift_name("doCopy(expectedType:response:)")));
+
+/**
+ * Class representing a typed [response] with an attached [expectedType].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponseContainer)
+ *
+ * @param expectedType: information about expected type.
+ * @param response: current response state.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Class representing a typed [response] with an attached [expectedType].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponseContainer)
+ *
+ * @param expectedType: information about expected type.
+ * @param response: current response state.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Class representing a typed [response] with an attached [expectedType].
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.statement.HttpResponseContainer)
+ *
+ * @param expectedType: information about expected type.
+ * @param response: current response state.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpSendPipeline.Phases")))
+@interface ZappOfframpKtor_client_coreHttpSendPipelinePhases : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpSendPipelinePhases *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Before __attribute__((swift_name("Before")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Engine __attribute__((swift_name("Engine")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Monitoring __attribute__((swift_name("Monitoring")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *Receive __attribute__((swift_name("Receive")));
+@property (readonly) ZappOfframpKtor_utilsPipelinePhase *State __attribute__((swift_name("State")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)phases __attribute__((swift_name("init()")));
+
+/**
+ * The earliest phase that happens before any other.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline.Phases.Before)
+ */
+
+/**
+ * Send a request to a remote server.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline.Phases.Engine)
+ */
+
+/**
+ * Use this phase for logging and other actions that don't modify a request or shared data.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline.Phases.Monitoring)
+ */
+
+/**
+ * Receive a pipeline execution phase.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline.Phases.Receive)
+ */
+
+/**
+ * Use this phase to modify request with a shared state.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.client.request.HttpSendPipeline.Phases.State)
+ */
+@end
+
+
+/**
+ * Date in GMT timezone
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.GMTDate)
+ *
+ * @property seconds: seconds from 0 to 60(last is for leap second)
+ * @property minutes: minutes from 0 to 59
+ * @property hours: hours from 0 to 23
+ * @property dayOfWeek an instance of the corresponding day of week
+ * @property dayOfMonth: day of month from 1 to 31
+ * @property dayOfYear: day of year from 1 to 366
+ * @property month an instance of the corresponding month
+ * @property year: year in common era(CE: https://en.wikipedia.org/wiki/Common_Era)
+ *
+ * @property timestamp is a number of epoch milliseconds
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsGMTDate")))
+@interface ZappOfframpKtor_utilsGMTDate : ZappOfframpBase <ZappOfframpKotlinComparable>
+@property (class, readonly, getter=companion) ZappOfframpKtor_utilsGMTDateCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int32_t dayOfMonth __attribute__((swift_name("dayOfMonth")));
+@property (readonly) ZappOfframpKtor_utilsWeekDay *dayOfWeek __attribute__((swift_name("dayOfWeek")));
+@property (readonly) int32_t dayOfYear __attribute__((swift_name("dayOfYear")));
+@property (readonly) int32_t hours __attribute__((swift_name("hours")));
+@property (readonly) int32_t minutes __attribute__((swift_name("minutes")));
+@property (readonly) ZappOfframpKtor_utilsMonth *month __attribute__((swift_name("month")));
+@property (readonly) int32_t seconds __attribute__((swift_name("seconds")));
+@property (readonly) int64_t timestamp __attribute__((swift_name("timestamp")));
+@property (readonly) int32_t year __attribute__((swift_name("year")));
+- (instancetype)initWithSeconds:(int32_t)seconds minutes:(int32_t)minutes hours:(int32_t)hours dayOfWeek:(ZappOfframpKtor_utilsWeekDay *)dayOfWeek dayOfMonth:(int32_t)dayOfMonth dayOfYear:(int32_t)dayOfYear month:(ZappOfframpKtor_utilsMonth *)month year:(int32_t)year timestamp:(int64_t)timestamp __attribute__((swift_name("init(seconds:minutes:hours:dayOfWeek:dayOfMonth:dayOfYear:month:year:timestamp:)"))) __attribute__((objc_designated_initializer));
+- (int32_t)compareToOther:(ZappOfframpKtor_utilsGMTDate *)other __attribute__((swift_name("compareTo(other:)")));
+- (ZappOfframpKtor_utilsGMTDate *)doCopy __attribute__((swift_name("doCopy()")));
+- (ZappOfframpKtor_utilsGMTDate *)doCopySeconds:(int32_t)seconds minutes:(int32_t)minutes hours:(int32_t)hours dayOfWeek:(ZappOfframpKtor_utilsWeekDay *)dayOfWeek dayOfMonth:(int32_t)dayOfMonth dayOfYear:(int32_t)dayOfYear month:(ZappOfframpKtor_utilsMonth *)month year:(int32_t)year timestamp:(int64_t)timestamp __attribute__((swift_name("doCopy(seconds:minutes:hours:dayOfWeek:dayOfMonth:dayOfYear:month:year:timestamp:)")));
+
+/**
+ * Date in GMT timezone
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.GMTDate)
+ *
+ * @property seconds: seconds from 0 to 60(last is for leap second)
+ * @property minutes: minutes from 0 to 59
+ * @property hours: hours from 0 to 23
+ * @property dayOfWeek an instance of the corresponding day of week
+ * @property dayOfMonth: day of month from 1 to 31
+ * @property dayOfYear: day of year from 1 to 366
+ * @property month an instance of the corresponding month
+ * @property year: year in common era(CE: https://en.wikipedia.org/wiki/Common_Era)
+ *
+ * @property timestamp is a number of epoch milliseconds
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Date in GMT timezone
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.GMTDate)
+ *
+ * @property seconds: seconds from 0 to 60(last is for leap second)
+ * @property minutes: minutes from 0 to 59
+ * @property hours: hours from 0 to 23
+ * @property dayOfWeek an instance of the corresponding day of week
+ * @property dayOfMonth: day of month from 1 to 31
+ * @property dayOfYear: day of year from 1 to 366
+ * @property month an instance of the corresponding month
+ * @property year: year in common era(CE: https://en.wikipedia.org/wiki/Common_Era)
+ *
+ * @property timestamp is a number of epoch milliseconds
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Date in GMT timezone
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.GMTDate)
+ *
+ * @property seconds: seconds from 0 to 60(last is for leap second)
+ * @property minutes: minutes from 0 to 59
+ * @property hours: hours from 0 to 23
+ * @property dayOfWeek an instance of the corresponding day of week
+ * @property dayOfMonth: day of month from 1 to 31
+ * @property dayOfYear: day of year from 1 to 366
+ * @property month an instance of the corresponding month
+ * @property year: year in common era(CE: https://en.wikipedia.org/wiki/Common_Era)
+ *
+ * @property timestamp is a number of epoch milliseconds
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Represents an HTTP protocol version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion)
+ *
+ * @property name specifies name of the protocol, e.g. "HTTP".
+ * @property major specifies protocol major version.
+ * @property minor specifies protocol minor version.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpProtocolVersion")))
+@interface ZappOfframpKtor_httpHttpProtocolVersion : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpHttpProtocolVersionCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int32_t major __attribute__((swift_name("major")));
+@property (readonly) int32_t minor __attribute__((swift_name("minor")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+- (instancetype)initWithName:(NSString *)name major:(int32_t)major minor:(int32_t)minor __attribute__((swift_name("init(name:major:minor:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_httpHttpProtocolVersion *)doCopyName:(NSString *)name major:(int32_t)major minor:(int32_t)minor __attribute__((swift_name("doCopy(name:major:minor:)")));
+
+/**
+ * Represents an HTTP protocol version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion)
+ *
+ * @property name specifies name of the protocol, e.g. "HTTP".
+ * @property major specifies protocol major version.
+ * @property minor specifies protocol minor version.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Represents an HTTP protocol version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion)
+ *
+ * @property name specifies name of the protocol, e.g. "HTTP".
+ * @property major specifies protocol major version.
+ * @property minor specifies protocol minor version.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+*/
+__attribute__((swift_name("KotlinContinuation")))
+@protocol ZappOfframpKotlinContinuation
+@required
+- (void)resumeWithResult:(id _Nullable)result __attribute__((swift_name("resumeWith(result:)")));
+@property (readonly) id<ZappOfframpKotlinCoroutineContext> context __attribute__((swift_name("context")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.3")
+ *   kotlin.ExperimentalStdlibApi
+*/
+__attribute__((swift_name("KotlinAbstractCoroutineContextKey")))
+@interface ZappOfframpKotlinAbstractCoroutineContextKey<B, E> : ZappOfframpBase <ZappOfframpKotlinCoroutineContextKey>
+- (instancetype)initWithBaseKey:(id<ZappOfframpKotlinCoroutineContextKey>)baseKey safeCast:(E _Nullable (^)(id<ZappOfframpKotlinCoroutineContextElement> element))safeCast __attribute__((swift_name("init(baseKey:safeCast:)"))) __attribute__((objc_designated_initializer));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.ExperimentalStdlibApi
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_coroutines_coreCoroutineDispatcher.Key")))
+@interface ZappOfframpKotlinx_coroutines_coreCoroutineDispatcherKey : ZappOfframpKotlinAbstractCoroutineContextKey<id<ZappOfframpKotlinContinuationInterceptor>, ZappOfframpKotlinx_coroutines_coreCoroutineDispatcher *>
+@property (class, readonly, getter=shared) ZappOfframpKotlinx_coroutines_coreCoroutineDispatcherKey *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithBaseKey:(id<ZappOfframpKotlinCoroutineContextKey>)baseKey safeCast:(id<ZappOfframpKotlinCoroutineContextElement> _Nullable (^)(id<ZappOfframpKotlinCoroutineContextElement> element))safeCast __attribute__((swift_name("init(baseKey:safeCast:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (instancetype)key __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * [SerializersModuleCollector] can introspect and accumulate content of any [SerializersModule] via [SerializersModule.dumpTo],
+ * using a visitor-like pattern: [contextual] and [polymorphic] functions are invoked for each registered serializer.
+ *
+ * ### Not stable for inheritance
+ *
+ * `SerializersModuleCollector` interface is not stable for inheritance in 3rd party libraries, as new methods
+ * might be added to this interface or contracts of the existing methods can be changed.
+ *
+ * @note annotations
+ *   kotlinx.serialization.ExperimentalSerializationApi
+*/
+__attribute__((swift_name("Kotlinx_serialization_coreSerializersModuleCollector")))
+@protocol ZappOfframpKotlinx_serialization_coreSerializersModuleCollector
+@required
+
+/**
+ * Accept a provider, associated with generic [kClass] for contextual serialization.
+ */
+- (void)contextualKClass:(id<ZappOfframpKotlinKClass>)kClass provider:(id<ZappOfframpKotlinx_serialization_coreKSerializer> (^)(NSArray<id<ZappOfframpKotlinx_serialization_coreKSerializer>> *typeArgumentsSerializers))provider __attribute__((swift_name("contextual(kClass:provider:)")));
+
+/**
+ * Accept a serializer, associated with [kClass] for contextual serialization.
+ */
+- (void)contextualKClass:(id<ZappOfframpKotlinKClass>)kClass serializer:(id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("contextual(kClass:serializer:)")));
+
+/**
+ * Accept a serializer, associated with [actualClass] for polymorphic serialization.
+ */
+- (void)polymorphicBaseClass:(id<ZappOfframpKotlinKClass>)baseClass actualClass:(id<ZappOfframpKotlinKClass>)actualClass actualSerializer:(id<ZappOfframpKotlinx_serialization_coreKSerializer>)actualSerializer __attribute__((swift_name("polymorphic(baseClass:actualClass:actualSerializer:)")));
+
+/**
+ * Accept a default deserializer provider, associated with the [baseClass] for polymorphic deserialization.
+ *
+ * This function affect only deserialization process. To avoid confusion, it was deprecated and replaced with [polymorphicDefaultDeserializer].
+ * To affect serialization process, use [SerializersModuleCollector.polymorphicDefaultSerializer].
+ *
+ * [defaultDeserializerProvider] is invoked when no polymorphic serializers associated with the `className`
+ * in the scope of [baseClass] were found. `className` could be `null` for formats that support nullable class discriminators
+ * (currently only `Json` with `useArrayPolymorphism` set to `false`).
+ *
+ * [defaultDeserializerProvider] can be stateful and lookup a serializer for the missing type dynamically.
+ *
+ * @see SerializersModuleCollector.polymorphicDefaultDeserializer
+ * @see SerializersModuleCollector.polymorphicDefaultSerializer
+ */
+- (void)polymorphicDefaultBaseClass:(id<ZappOfframpKotlinKClass>)baseClass defaultDeserializerProvider:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy> _Nullable (^)(NSString * _Nullable className))defaultDeserializerProvider __attribute__((swift_name("polymorphicDefault(baseClass:defaultDeserializerProvider:)"))) __attribute__((deprecated("Deprecated in favor of function with more precise name: polymorphicDefaultDeserializer")));
+
+/**
+ * Accept a default deserializer provider, associated with the [baseClass] for polymorphic deserialization.
+ * [defaultDeserializerProvider] is invoked when no polymorphic serializers associated with the `className`
+ * in the scope of [baseClass] were found. `className` could be `null` for formats that support nullable class discriminators
+ * (currently only `Json` with `useArrayPolymorphism` set to `false`).
+ *
+ * Default deserializers provider affects only deserialization process. Serializers are accepted in the
+ * [SerializersModuleCollector.polymorphicDefaultSerializer] method.
+ *
+ * [defaultDeserializerProvider] can be stateful and lookup a serializer for the missing type dynamically.
+ */
+- (void)polymorphicDefaultDeserializerBaseClass:(id<ZappOfframpKotlinKClass>)baseClass defaultDeserializerProvider:(id<ZappOfframpKotlinx_serialization_coreDeserializationStrategy> _Nullable (^)(NSString * _Nullable className))defaultDeserializerProvider __attribute__((swift_name("polymorphicDefaultDeserializer(baseClass:defaultDeserializerProvider:)")));
+
+/**
+ * Accept a default serializer provider, associated with the [baseClass] for polymorphic serialization.
+ * [defaultSerializerProvider] is invoked when no polymorphic serializers for `value` in the scope of [baseClass] were found.
+ *
+ * Default serializers provider affects only serialization process. Deserializers are accepted in the
+ * [SerializersModuleCollector.polymorphicDefaultDeserializer] method.
+ *
+ * [defaultSerializerProvider] can be stateful and lookup a serializer for the missing type dynamically.
+ */
+- (void)polymorphicDefaultSerializerBaseClass:(id<ZappOfframpKotlinKClass>)baseClass defaultSerializerProvider:(id<ZappOfframpKotlinx_serialization_coreSerializationStrategy> _Nullable (^)(id value))defaultSerializerProvider __attribute__((swift_name("polymorphicDefaultSerializer(baseClass:defaultSerializerProvider:)")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+__attribute__((swift_name("Kotlinx_coroutines_coreParentJob")))
+@protocol ZappOfframpKotlinx_coroutines_coreParentJob <ZappOfframpKotlinx_coroutines_coreJob>
+@required
+
+/**
+ * @note annotations
+ *   kotlinx.coroutines.InternalCoroutinesApi
+*/
+- (ZappOfframpKotlinCancellationException *)getChildJobCancellationCause __attribute__((swift_name("getChildJobCancellationCause()")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinKTypeProjection")))
+@interface ZappOfframpKotlinKTypeProjection : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKotlinKTypeProjectionCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) id<ZappOfframpKotlinKType> _Nullable type __attribute__((swift_name("type")));
+@property (readonly) ZappOfframpKotlinKVariance * _Nullable variance __attribute__((swift_name("variance")));
+- (instancetype)initWithVariance:(ZappOfframpKotlinKVariance * _Nullable)variance type:(id<ZappOfframpKotlinKType> _Nullable)type __attribute__((swift_name("init(variance:type:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKotlinKTypeProjection *)doCopyVariance:(ZappOfframpKotlinKVariance * _Nullable)variance type:(id<ZappOfframpKotlinKType> _Nullable)type __attribute__((swift_name("doCopy(variance:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * A collection of bytes in memory.
+ *
+ * The buffer can be viewed as an unbound queue whose size grows with the data being written
+ * and shrinks with data being consumed. Internally, the buffer consists of data segments,
+ * and the buffer's capacity grows and shrinks in units of data segments instead of individual bytes.
+ *
+ * The buffer was designed to reduce memory allocations when possible. Instead of copying bytes
+ * from one place in memory to another, this class just changes ownership of the underlying data segments.
+ *
+ * To reduce allocations and speed up the buffer's extension, it may use data segments pooling.
+ *
+ * [Buffer] implements both [Source] and [Sink] and could be used as a source or a sink,
+ * but unlike regular sinks and sources its [close], [flush], [emit], [hintEmit]
+ * does not affect buffer's state and [exhausted] only indicates that a buffer is empty.
+ *
+ * ### Thread-safety guarantees
+ *
+ * [Buffer] does not provide any thread-safety guarantees.
+ * If a [Buffer] needs to be accessed from multiple threads, an additional synchronization is required.
+ * Failure to do so will result in possible data corruption, loss, and runtime errors.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_io_coreBuffer")))
+@interface ZappOfframpKotlinx_io_coreBuffer : ZappOfframpBase <ZappOfframpKotlinx_io_coreSource, ZappOfframpKotlinx_io_coreSink>
+@property (readonly) ZappOfframpKotlinx_io_coreBuffer *buffer __attribute__((swift_name("buffer")));
+@property (readonly) int64_t size __attribute__((swift_name("size")));
+
+/**
+ * A collection of bytes in memory.
+ *
+ * The buffer can be viewed as an unbound queue whose size grows with the data being written
+ * and shrinks with data being consumed. Internally, the buffer consists of data segments,
+ * and the buffer's capacity grows and shrinks in units of data segments instead of individual bytes.
+ *
+ * The buffer was designed to reduce memory allocations when possible. Instead of copying bytes
+ * from one place in memory to another, this class just changes ownership of the underlying data segments.
+ *
+ * To reduce allocations and speed up the buffer's extension, it may use data segments pooling.
+ *
+ * [Buffer] implements both [Source] and [Sink] and could be used as a source or a sink,
+ * but unlike regular sinks and sources its [close], [flush], [emit], [hintEmit]
+ * does not affect buffer's state and [exhausted] only indicates that a buffer is empty.
+ *
+ * ### Thread-safety guarantees
+ *
+ * [Buffer] does not provide any thread-safety guarantees.
+ * If a [Buffer] needs to be accessed from multiple threads, an additional synchronization is required.
+ * Failure to do so will result in possible data corruption, loss, and runtime errors.
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * A collection of bytes in memory.
+ *
+ * The buffer can be viewed as an unbound queue whose size grows with the data being written
+ * and shrinks with data being consumed. Internally, the buffer consists of data segments,
+ * and the buffer's capacity grows and shrinks in units of data segments instead of individual bytes.
+ *
+ * The buffer was designed to reduce memory allocations when possible. Instead of copying bytes
+ * from one place in memory to another, this class just changes ownership of the underlying data segments.
+ *
+ * To reduce allocations and speed up the buffer's extension, it may use data segments pooling.
+ *
+ * [Buffer] implements both [Source] and [Sink] and could be used as a source or a sink,
+ * but unlike regular sinks and sources its [close], [flush], [emit], [hintEmit]
+ * does not affect buffer's state and [exhausted] only indicates that a buffer is empty.
+ *
+ * ### Thread-safety guarantees
+ *
+ * [Buffer] does not provide any thread-safety guarantees.
+ * If a [Buffer] needs to be accessed from multiple threads, an additional synchronization is required.
+ * Failure to do so will result in possible data corruption, loss, and runtime errors.
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+
+/**
+ * Discards all bytes in this buffer.
+ *
+ * Call to this method is equivalent to [skip] with `byteCount = size`.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.bufferClear
+ */
+- (void)clear __attribute__((swift_name("clear()")));
+
+/**
+ * This method does not affect the buffer.
+ */
+- (void)close __attribute__((swift_name("close()")));
+
+/**
+ * Returns a deep copy of this buffer.
+ */
+- (ZappOfframpKotlinx_io_coreBuffer *)doCopy __attribute__((swift_name("doCopy()")));
+
+/**
+ * Copies bytes from this buffer's subrange starting at [startIndex] and ending at [endIndex], to [out] buffer.
+ * This method does not consume data from the buffer.
+ *
+ * @param out the destination buffer to copy data into.
+ * @param startIndex the index (inclusive) of the first byte of data in this buffer to copy,
+ * 0 by default.
+ * @param endIndex the index (exclusive) of the last byte of data in this buffer to copy, `buffer.size` by default.
+ *
+ * @throws IndexOutOfBoundsException when [startIndex] or [endIndex] is out of this buffer bounds
+ * (`[0..buffer.size)`).
+ * @throws IllegalArgumentException when `startIndex > endIndex`.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.bufferCopy
+ */
+- (void)doCopyToOut:(ZappOfframpKotlinx_io_coreBuffer *)out startIndex:(int64_t)startIndex endIndex:(int64_t)endIndex __attribute__((swift_name("doCopyTo(out:startIndex:endIndex:)")));
+
+/**
+ * This method does not affect the buffer's content as there is no upstream to write data to.
+ */
+- (void)emit __attribute__((swift_name("emit()")));
+- (BOOL)exhausted __attribute__((swift_name("exhausted()")));
+
+/**
+ * This method does not affect the buffer's content as there is no upstream to write data to.
+ */
+- (void)flush __attribute__((swift_name("flush()")));
+
+/**
+ * Returns the byte at [position].
+ *
+ * Use of this method may expose significant performance penalties and it's not recommended to use it
+ * for sequential access to a range of bytes within the buffer.
+ *
+ * @throws IndexOutOfBoundsException when [position] is negative or greater or equal to [Buffer.size].
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.bufferGetByte
+ */
+- (int8_t)getPosition:(int64_t)position __attribute__((swift_name("get(position:)")));
+
+/**
+ * This method does not affect the buffer's content as there is no upstream to write data to.
+ *
+ * @note annotations
+ *   kotlinx.io.InternalIoApi
+*/
+- (void)hintEmit __attribute__((swift_name("hintEmit()")));
+- (id<ZappOfframpKotlinx_io_coreSource>)peek __attribute__((swift_name("peek()")));
+- (int64_t)readAtMostToSink:(ZappOfframpKotlinx_io_coreBuffer *)sink byteCount:(int64_t)byteCount __attribute__((swift_name("readAtMostTo(sink:byteCount:)")));
+- (int32_t)readAtMostToSink:(ZappOfframpKotlinByteArray *)sink startIndex:(int32_t)startIndex endIndex:(int32_t)endIndex __attribute__((swift_name("readAtMostTo(sink:startIndex:endIndex:)")));
+- (int8_t)readByte __attribute__((swift_name("readByte()")));
+- (int32_t)readInt __attribute__((swift_name("readInt()")));
+- (int64_t)readLong __attribute__((swift_name("readLong()")));
+- (int16_t)readShort __attribute__((swift_name("readShort()")));
+- (void)readToSink:(id<ZappOfframpKotlinx_io_coreRawSink>)sink byteCount:(int64_t)byteCount __attribute__((swift_name("readTo(sink:byteCount:)")));
+- (BOOL)requestByteCount:(int64_t)byteCount __attribute__((swift_name("request(byteCount:)")));
+- (void)requireByteCount:(int64_t)byteCount __attribute__((swift_name("require(byteCount:)")));
+
+/**
+ * Discards [byteCount] bytes from the head of this buffer.
+ *
+ * @throws IllegalArgumentException when [byteCount] is negative.
+ */
+- (void)skipByteCount:(int64_t)byteCount __attribute__((swift_name("skip(byteCount:)")));
+
+/**
+ * Returns a human-readable string that describes the contents of this buffer. For buffers containing
+ * few bytes, this is a string like `Buffer(size=4 hex=0000ffff)`. However, if the buffer is too large,
+ * a string will contain its size and only a prefix of data, like `Buffer(size=1024 hex=01234…)`.
+ * Thus, the string could not be used to compare buffers or verify buffer's content.
+ *
+ * @sample kotlinx.io.samples.KotlinxIoCoreCommonSamples.bufferToString
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+- (int64_t)transferFromSource:(id<ZappOfframpKotlinx_io_coreRawSource>)source __attribute__((swift_name("transferFrom(source:)")));
+- (int64_t)transferToSink:(id<ZappOfframpKotlinx_io_coreRawSink>)sink __attribute__((swift_name("transferTo(sink:)")));
+- (void)writeSource:(ZappOfframpKotlinx_io_coreBuffer *)source byteCount_:(int64_t)byteCount __attribute__((swift_name("write(source:byteCount_:)")));
+- (void)writeSource:(id<ZappOfframpKotlinx_io_coreRawSource>)source byteCount:(int64_t)byteCount __attribute__((swift_name("write(source:byteCount:)")));
+- (void)writeSource:(ZappOfframpKotlinByteArray *)source startIndex:(int32_t)startIndex endIndex:(int32_t)endIndex __attribute__((swift_name("write(source:startIndex:endIndex:)")));
+- (void)writeByteByte:(int8_t)byte __attribute__((swift_name("writeByte(byte:)")));
+- (void)writeIntInt:(int32_t)int_ __attribute__((swift_name("writeInt(int:)")));
+- (void)writeLongLong:(int64_t)long_ __attribute__((swift_name("writeLong(long:)")));
+- (void)writeShortShort:(int16_t)short_ __attribute__((swift_name("writeShort(short:)")));
+
+/**
+ * Returns the buffer itself.
+ *
+ * @note annotations
+ *   kotlinx.io.InternalIoApi
+*/
+
+/**
+ * The number of bytes accessible for read from this buffer.
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpUrl.Companion")))
+@interface ZappOfframpKtor_httpUrlCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpUrlCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * Represents HTTP parameters as a map from case-insensitive names to collection of [String] values
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.Parameters)
+ */
+__attribute__((swift_name("Ktor_httpParameters")))
+@protocol ZappOfframpKtor_httpParameters <ZappOfframpKtor_utilsStringValues>
+@required
+@end
+
+
+/**
+ * Represents URL protocol
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol)
+ *
+ * @property name of protocol (schema)
+ * @property defaultPort default port for protocol or `-1` if not known
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpURLProtocol")))
+@interface ZappOfframpKtor_httpURLProtocol : ZappOfframpBase <ZappOfframpKtor_ioJvmSerializable>
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpURLProtocolCompanion *companion __attribute__((swift_name("companion")));
+@property (readonly) int32_t defaultPort __attribute__((swift_name("defaultPort")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+- (instancetype)initWithName:(NSString *)name defaultPort:(int32_t)defaultPort __attribute__((swift_name("init(name:defaultPort:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_httpURLProtocol *)doCopyName:(NSString *)name defaultPort:(int32_t)defaultPort __attribute__((swift_name("doCopy(name:defaultPort:)")));
+
+/**
+ * Represents URL protocol
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol)
+ *
+ * @property name of protocol (schema)
+ * @property defaultPort default port for protocol or `-1` if not known
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Represents URL protocol
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol)
+ *
+ * @property name of protocol (schema)
+ * @property defaultPort default port for protocol or `-1` if not known
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Represents URL protocol
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol)
+ *
+ * @property name of protocol (schema)
+ * @property defaultPort default port for protocol or `-1` if not known
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpMethod.Companion")))
+@interface ZappOfframpKtor_httpHttpMethodCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpHttpMethodCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) NSArray<ZappOfframpKtor_httpHttpMethod *> *DefaultMethods __attribute__((swift_name("DefaultMethods")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Delete __attribute__((swift_name("Delete")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Get __attribute__((swift_name("Get")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Head __attribute__((swift_name("Head")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Options __attribute__((swift_name("Options")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Patch __attribute__((swift_name("Patch")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Post __attribute__((swift_name("Post")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Put __attribute__((swift_name("Put")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Query __attribute__((swift_name("Query")));
+@property (readonly) ZappOfframpKtor_httpHttpMethod *Trace __attribute__((swift_name("Trace")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (NSArray<ZappOfframpKtor_httpHttpMethod *> *)getDefaultMethods __attribute__((swift_name("getDefaultMethods()"))) __attribute__((deprecated("Use DefaultMethods const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getDelete __attribute__((swift_name("getDelete()"))) __attribute__((deprecated("Use Delete const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getGet __attribute__((swift_name("getGet()"))) __attribute__((deprecated("Use Get const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getHead __attribute__((swift_name("getHead()"))) __attribute__((deprecated("Use Head const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getOptions __attribute__((swift_name("getOptions()"))) __attribute__((deprecated("Use Options const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getPatch __attribute__((swift_name("getPatch()"))) __attribute__((deprecated("Use Patch const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getPost __attribute__((swift_name("getPost()"))) __attribute__((deprecated("Use Post const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getPut __attribute__((swift_name("getPut()"))) __attribute__((deprecated("Use Put const instead")));
+- (ZappOfframpKtor_httpHttpMethod *)getTrace __attribute__((swift_name("getTrace()"))) __attribute__((deprecated("Use Trace const instead")));
+
+/**
+ * Parse HTTP method by [method] string
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMethod.Companion.parse)
+ */
+- (ZappOfframpKtor_httpHttpMethod *)parseMethod:(NSString *)method __attribute__((swift_name("parse(method:)")));
+
+/**
+ * A list of default HTTP methods
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpMethod.Companion.DefaultMethods)
+ */
+@end
+
+__attribute__((swift_name("KotlinMapEntry")))
+@protocol ZappOfframpKotlinMapEntry
+@required
+@property (readonly) id _Nullable key __attribute__((swift_name("key")));
+@property (readonly) id _Nullable value __attribute__((swift_name("value")));
+@end
+
+
+/**
+ * Represents a single value parameter
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HeaderValueParam)
+ *
+ * @property name of parameter
+ * @property value of parameter
+ * @property escapeValue specifies if the value should be escaped
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHeaderValueParam")))
+@interface ZappOfframpKtor_httpHeaderValueParam : ZappOfframpBase
+@property (readonly) BOOL escapeValue __attribute__((swift_name("escapeValue")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+- (instancetype)initWithName:(NSString *)name value:(NSString *)value __attribute__((swift_name("init(name:value:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithName:(NSString *)name value:(NSString *)value escapeValue:(BOOL)escapeValue __attribute__((swift_name("init(name:value:escapeValue:)"))) __attribute__((objc_designated_initializer));
+- (ZappOfframpKtor_httpHeaderValueParam *)doCopyName:(NSString *)name value:(NSString *)value escapeValue:(BOOL)escapeValue __attribute__((swift_name("doCopy(name:value:escapeValue:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Represents a single value parameter
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HeaderValueParam)
+ *
+ * @property name of parameter
+ * @property value of parameter
+ * @property escapeValue specifies if the value should be escaped
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHeaderValueWithParameters.Companion")))
+@interface ZappOfframpKtor_httpHeaderValueWithParametersCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpHeaderValueWithParametersCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Parse header with parameter and pass it to [init] function to instantiate particular type
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HeaderValueWithParameters.Companion.parse)
+ */
+- (id _Nullable)parseValue:(NSString *)value init:(id _Nullable (^)(NSString *, NSArray<ZappOfframpKtor_httpHeaderValueParam *> *))init __attribute__((swift_name("parse(value:init:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpContentType.Companion")))
+@interface ZappOfframpKtor_httpContentTypeCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpContentTypeCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_httpContentType *Any __attribute__((swift_name("Any")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Parses a string representing a `Content-Type` header into a [ContentType] instance.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.Companion.parse)
+ */
+- (ZappOfframpKtor_httpContentType *)parseValue:(NSString *)value __attribute__((swift_name("parse(value:)")));
+
+/**
+ * Represents a pattern `* / *` to match any content type.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.ContentType.Companion.Any)
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpStatusCode.Companion")))
+@interface ZappOfframpKtor_httpHttpStatusCodeCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpHttpStatusCodeCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Accepted __attribute__((swift_name("Accepted")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *BadGateway __attribute__((swift_name("BadGateway")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *BadRequest __attribute__((swift_name("BadRequest")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Conflict __attribute__((swift_name("Conflict")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Continue __attribute__((swift_name("Continue")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Created __attribute__((swift_name("Created")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *ExpectationFailed __attribute__((swift_name("ExpectationFailed")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *FailedDependency __attribute__((swift_name("FailedDependency")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Forbidden __attribute__((swift_name("Forbidden")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Found __attribute__((swift_name("Found")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *GatewayTimeout __attribute__((swift_name("GatewayTimeout")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Gone __attribute__((swift_name("Gone")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *InsufficientStorage __attribute__((swift_name("InsufficientStorage")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *InternalServerError __attribute__((swift_name("InternalServerError")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *LengthRequired __attribute__((swift_name("LengthRequired")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Locked __attribute__((swift_name("Locked")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *MethodNotAllowed __attribute__((swift_name("MethodNotAllowed")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *MovedPermanently __attribute__((swift_name("MovedPermanently")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *MultiStatus __attribute__((swift_name("MultiStatus")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *MultipleChoices __attribute__((swift_name("MultipleChoices")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NoContent __attribute__((swift_name("NoContent")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NonAuthoritativeInformation __attribute__((swift_name("NonAuthoritativeInformation")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NotAcceptable __attribute__((swift_name("NotAcceptable")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NotFound __attribute__((swift_name("NotFound")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NotImplemented __attribute__((swift_name("NotImplemented")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *NotModified __attribute__((swift_name("NotModified")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *OK __attribute__((swift_name("OK")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *PartialContent __attribute__((swift_name("PartialContent")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *PayloadTooLarge __attribute__((swift_name("PayloadTooLarge")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *PaymentRequired __attribute__((swift_name("PaymentRequired")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *PermanentRedirect __attribute__((swift_name("PermanentRedirect")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *PreconditionFailed __attribute__((swift_name("PreconditionFailed")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Processing __attribute__((swift_name("Processing")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *ProxyAuthenticationRequired __attribute__((swift_name("ProxyAuthenticationRequired")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *RequestHeaderFieldTooLarge __attribute__((swift_name("RequestHeaderFieldTooLarge")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *RequestTimeout __attribute__((swift_name("RequestTimeout")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *RequestURITooLong __attribute__((swift_name("RequestURITooLong")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *RequestedRangeNotSatisfiable __attribute__((swift_name("RequestedRangeNotSatisfiable")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *ResetContent __attribute__((swift_name("ResetContent")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *SeeOther __attribute__((swift_name("SeeOther")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *ServiceUnavailable __attribute__((swift_name("ServiceUnavailable")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *SwitchProxy __attribute__((swift_name("SwitchProxy")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *SwitchingProtocols __attribute__((swift_name("SwitchingProtocols")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *TemporaryRedirect __attribute__((swift_name("TemporaryRedirect")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *TooEarly __attribute__((swift_name("TooEarly")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *TooManyRequests __attribute__((swift_name("TooManyRequests")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *Unauthorized __attribute__((swift_name("Unauthorized")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *UnprocessableEntity __attribute__((swift_name("UnprocessableEntity")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *UnsupportedMediaType __attribute__((swift_name("UnsupportedMediaType")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *UpgradeRequired __attribute__((swift_name("UpgradeRequired")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *UseProxy __attribute__((swift_name("UseProxy")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *VariantAlsoNegotiates __attribute__((swift_name("VariantAlsoNegotiates")));
+@property (readonly) ZappOfframpKtor_httpHttpStatusCode *VersionNotSupported __attribute__((swift_name("VersionNotSupported")));
+@property (readonly) NSArray<ZappOfframpKtor_httpHttpStatusCode *> *allStatusCodes __attribute__((swift_name("allStatusCodes")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Creates an instance of [HttpStatusCode] with the given numeric value.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpStatusCode.Companion.fromValue)
+ */
+- (ZappOfframpKtor_httpHttpStatusCode *)fromValueValue:(int32_t)value __attribute__((swift_name("fromValue(value:)")));
+
+/**
+ * All known status codes
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpStatusCode.Companion.allStatusCodes)
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinLongProgression.Companion")))
+@interface ZappOfframpKotlinLongProgressionCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinLongProgressionCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinLongProgression *)fromClosedRangeRangeStart:(int64_t)rangeStart rangeEnd:(int64_t)rangeEnd step:(int64_t)step __attribute__((swift_name("fromClosedRange(rangeStart:rangeEnd:step:)")));
+@end
+
+__attribute__((swift_name("KotlinLongIterator")))
+@interface ZappOfframpKotlinLongIterator : ZappOfframpBase <ZappOfframpKotlinIterator>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (ZappOfframpLong *)next __attribute__((swift_name("next()")));
+- (int64_t)nextLong __attribute__((swift_name("nextLong()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinLongRange.Companion")))
+@interface ZappOfframpKotlinLongRangeCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinLongRangeCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKotlinLongRange *EMPTY __attribute__((swift_name("EMPTY")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((swift_name("Ktor_utilsStringValuesBuilder")))
+@protocol ZappOfframpKtor_utilsStringValuesBuilder
+@required
+- (void)appendName:(NSString *)name value:(NSString *)value __attribute__((swift_name("append(name:value:)")));
+- (void)appendAllStringValues:(id<ZappOfframpKtor_utilsStringValues>)stringValues __attribute__((swift_name("appendAll(stringValues:)")));
+- (void)appendAllName:(NSString *)name values:(id)values __attribute__((swift_name("appendAll(name:values:)")));
+- (void)appendMissingStringValues:(id<ZappOfframpKtor_utilsStringValues>)stringValues __attribute__((swift_name("appendMissing(stringValues:)")));
+- (void)appendMissingName:(NSString *)name values:(id)values __attribute__((swift_name("appendMissing(name:values:)")));
+- (id<ZappOfframpKtor_utilsStringValues>)build __attribute__((swift_name("build()")));
+- (void)clear __attribute__((swift_name("clear()")));
+- (BOOL)containsName:(NSString *)name __attribute__((swift_name("contains(name:)")));
+- (BOOL)containsName:(NSString *)name value:(NSString *)value __attribute__((swift_name("contains(name:value:)")));
+- (NSSet<id<ZappOfframpKotlinMapEntry>> *)entries __attribute__((swift_name("entries()")));
+- (NSString * _Nullable)getName:(NSString *)name __attribute__((swift_name("get(name:)")));
+- (NSArray<NSString *> * _Nullable)getAllName:(NSString *)name __attribute__((swift_name("getAll(name:)")));
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+- (NSSet<NSString *> *)names __attribute__((swift_name("names()")));
+- (void)removeName:(NSString *)name __attribute__((swift_name("remove(name:)")));
+- (BOOL)removeName:(NSString *)name value:(NSString *)value __attribute__((swift_name("remove(name:value:)")));
+- (void)removeKeysWithNoEntries __attribute__((swift_name("removeKeysWithNoEntries()")));
+- (void)setName:(NSString *)name value:(NSString *)value __attribute__((swift_name("set(name:value:)")));
+@property (readonly) BOOL caseInsensitiveName __attribute__((swift_name("caseInsensitiveName")));
+@end
+
+__attribute__((swift_name("Ktor_utilsStringValuesBuilderImpl")))
+@interface ZappOfframpKtor_utilsStringValuesBuilderImpl : ZappOfframpBase <ZappOfframpKtor_utilsStringValuesBuilder>
+@property (readonly) BOOL caseInsensitiveName __attribute__((swift_name("caseInsensitiveName")));
+@property (readonly) ZappOfframpMutableDictionary<NSString *, NSMutableArray<NSString *> *> *values __attribute__((swift_name("values")));
+- (instancetype)initWithCaseInsensitiveName:(BOOL)caseInsensitiveName size:(int32_t)size __attribute__((swift_name("init(caseInsensitiveName:size:)"))) __attribute__((objc_designated_initializer));
+- (void)appendName:(NSString *)name value:(NSString *)value __attribute__((swift_name("append(name:value:)")));
+- (void)appendAllStringValues:(id<ZappOfframpKtor_utilsStringValues>)stringValues __attribute__((swift_name("appendAll(stringValues:)")));
+- (void)appendAllName:(NSString *)name values:(id)values __attribute__((swift_name("appendAll(name:values:)")));
+- (void)appendMissingStringValues:(id<ZappOfframpKtor_utilsStringValues>)stringValues __attribute__((swift_name("appendMissing(stringValues:)")));
+- (void)appendMissingName:(NSString *)name values:(id)values __attribute__((swift_name("appendMissing(name:values:)")));
+- (id<ZappOfframpKtor_utilsStringValues>)build __attribute__((swift_name("build()")));
+- (void)clear __attribute__((swift_name("clear()")));
+- (BOOL)containsName:(NSString *)name __attribute__((swift_name("contains(name:)")));
+- (BOOL)containsName:(NSString *)name value:(NSString *)value __attribute__((swift_name("contains(name:value:)")));
+- (NSSet<id<ZappOfframpKotlinMapEntry>> *)entries __attribute__((swift_name("entries()")));
+- (NSString * _Nullable)getName:(NSString *)name __attribute__((swift_name("get(name:)")));
+- (NSArray<NSString *> * _Nullable)getAllName:(NSString *)name __attribute__((swift_name("getAll(name:)")));
+- (BOOL)isEmpty_ __attribute__((swift_name("isEmpty()")));
+- (NSSet<NSString *> *)names __attribute__((swift_name("names()")));
+- (void)removeName:(NSString *)name __attribute__((swift_name("remove(name:)")));
+- (BOOL)removeName:(NSString *)name value:(NSString *)value __attribute__((swift_name("remove(name:value:)")));
+- (void)removeKeysWithNoEntries __attribute__((swift_name("removeKeysWithNoEntries()")));
+- (void)setName:(NSString *)name value:(NSString *)value __attribute__((swift_name("set(name:value:)")));
+
+/**
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+- (void)validateNameName:(NSString *)name __attribute__((swift_name("validateName(name:)")));
+
+/**
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+- (void)validateValueValue:(NSString *)value __attribute__((swift_name("validateValue(value:)")));
+
+/**
+ * @note This property has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHeadersBuilder")))
+@interface ZappOfframpKtor_httpHeadersBuilder : ZappOfframpKtor_utilsStringValuesBuilderImpl
+- (instancetype)initWithSize:(int32_t)size __attribute__((swift_name("init(size:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCaseInsensitiveName:(BOOL)caseInsensitiveName size:(int32_t)size __attribute__((swift_name("init(caseInsensitiveName:size:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+- (id<ZappOfframpKtor_httpHeaders>)build __attribute__((swift_name("build()")));
+
+/**
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+- (void)validateNameName:(NSString *)name __attribute__((swift_name("validateName(name:)")));
+
+/**
+ * @note This method has protected visibility in Kotlin source and is intended only for use by subclasses.
+*/
+- (void)validateValueValue:(NSString *)value __attribute__((swift_name("validateValue(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_client_coreHttpRequestBuilder.Companion")))
+@interface ZappOfframpKtor_client_coreHttpRequestBuilderCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_client_coreHttpRequestBuilderCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+
+/**
+ * A URL builder with all mutable components
+ *
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLBuilder)
+ *
+ * @property protocol URL protocol (scheme)
+ * @property host name without port (domain)
+ * @property port port number
+ * @property user username part (optional)
+ * @property password password part (optional)
+ * @property pathSegments URL path without query
+ * @property parameters URL query parameters
+ * @property fragment URL fragment (anchor name)
+ * @property trailingQuery keep a trailing question character even if there are no query parameters
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpURLBuilder")))
+@interface ZappOfframpKtor_httpURLBuilder : ZappOfframpBase
+@property (class, readonly, getter=companion) ZappOfframpKtor_httpURLBuilderCompanion *companion __attribute__((swift_name("companion")));
+@property NSString *encodedFragment __attribute__((swift_name("encodedFragment")));
+@property id<ZappOfframpKtor_httpParametersBuilder> encodedParameters __attribute__((swift_name("encodedParameters")));
+@property NSString * _Nullable encodedPassword __attribute__((swift_name("encodedPassword")));
+@property NSArray<NSString *> *encodedPathSegments __attribute__((swift_name("encodedPathSegments")));
+@property NSString * _Nullable encodedUser __attribute__((swift_name("encodedUser")));
+@property NSString *fragment __attribute__((swift_name("fragment")));
+@property NSString *host __attribute__((swift_name("host")));
+@property (readonly) id<ZappOfframpKtor_httpParametersBuilder> parameters __attribute__((swift_name("parameters")));
+@property NSString * _Nullable password __attribute__((swift_name("password")));
+@property NSArray<NSString *> *pathSegments __attribute__((swift_name("pathSegments")));
+@property int32_t port __attribute__((swift_name("port")));
+@property ZappOfframpKtor_httpURLProtocol *protocol __attribute__((swift_name("protocol")));
+@property ZappOfframpKtor_httpURLProtocol * _Nullable protocolOrNull __attribute__((swift_name("protocolOrNull")));
+@property BOOL trailingQuery __attribute__((swift_name("trailingQuery")));
+@property NSString * _Nullable user __attribute__((swift_name("user")));
+- (instancetype)initWithProtocol:(ZappOfframpKtor_httpURLProtocol * _Nullable)protocol host:(NSString *)host port:(int32_t)port user:(NSString * _Nullable)user password:(NSString * _Nullable)password pathSegments:(NSArray<NSString *> *)pathSegments parameters:(id<ZappOfframpKtor_httpParameters>)parameters fragment:(NSString *)fragment trailingQuery:(BOOL)trailingQuery __attribute__((swift_name("init(protocol:host:port:user:password:pathSegments:parameters:fragment:trailingQuery:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * Build a [Url] instance (everything is copied to a new instance)
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLBuilder.build)
+ */
+- (ZappOfframpKtor_httpUrl *)build __attribute__((swift_name("build()")));
+
+/**
+ * Build a URL string
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLBuilder.buildString)
+ */
+- (NSString *)buildString __attribute__((swift_name("buildString()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+
+/**
+ * Day of week
+ * [value] is 3 letter shortcut
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.WeekDay)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsWeekDay")))
+@interface ZappOfframpKtor_utilsWeekDay : ZappOfframpKotlinEnum<ZappOfframpKtor_utilsWeekDay *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_utilsWeekDayCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *monday __attribute__((swift_name("monday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *tuesday __attribute__((swift_name("tuesday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *wednesday __attribute__((swift_name("wednesday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *thursday __attribute__((swift_name("thursday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *friday __attribute__((swift_name("friday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *saturday __attribute__((swift_name("saturday")));
+@property (class, readonly) ZappOfframpKtor_utilsWeekDay *sunday __attribute__((swift_name("sunday")));
+@property (class, readonly) NSArray<ZappOfframpKtor_utilsWeekDay *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Day of week
+ * [value] is 3 letter shortcut
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.WeekDay)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpKtor_utilsWeekDay *> *)values __attribute__((swift_name("values()")));
+@end
+
+
+/**
+ * Month
+ * [value] is 3 letter shortcut
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.Month)
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsMonth")))
+@interface ZappOfframpKtor_utilsMonth : ZappOfframpKotlinEnum<ZappOfframpKtor_utilsMonth *>
+@property (class, readonly, getter=companion) ZappOfframpKtor_utilsMonthCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *january __attribute__((swift_name("january")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *february __attribute__((swift_name("february")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *march __attribute__((swift_name("march")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *april __attribute__((swift_name("april")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *may __attribute__((swift_name("may")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *june __attribute__((swift_name("june")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *july __attribute__((swift_name("july")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *august __attribute__((swift_name("august")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *september __attribute__((swift_name("september")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *october __attribute__((swift_name("october")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *november __attribute__((swift_name("november")));
+@property (class, readonly) ZappOfframpKtor_utilsMonth *december __attribute__((swift_name("december")));
+@property (class, readonly) NSArray<ZappOfframpKtor_utilsMonth *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Month
+ * [value] is 3 letter shortcut
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.Month)
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpKtor_utilsMonth *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsGMTDate.Companion")))
+@interface ZappOfframpKtor_utilsGMTDateCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_utilsGMTDateCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_utilsGMTDate *START __attribute__((swift_name("START")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (id<ZappOfframpKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+
+/**
+ * An instance of [GMTDate] corresponding to the epoch beginning
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.GMTDate.Companion.START)
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpHttpProtocolVersion.Companion")))
+@interface ZappOfframpKtor_httpHttpProtocolVersionCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpHttpProtocolVersionCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *HTTP_1_0 __attribute__((swift_name("HTTP_1_0")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *HTTP_1_1 __attribute__((swift_name("HTTP_1_1")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *HTTP_2_0 __attribute__((swift_name("HTTP_2_0")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *HTTP_3_0 __attribute__((swift_name("HTTP_3_0")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *QUIC __attribute__((swift_name("QUIC")));
+@property (readonly) ZappOfframpKtor_httpHttpProtocolVersion *SPDY_3 __attribute__((swift_name("SPDY_3")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Creates an instance of [HttpProtocolVersion] from the given parameters.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.fromValue)
+ */
+- (ZappOfframpKtor_httpHttpProtocolVersion *)fromValueName:(NSString *)name major:(int32_t)major minor:(int32_t)minor __attribute__((swift_name("fromValue(name:major:minor:)")));
+
+/**
+ * Create an instance of [HttpProtocolVersion] from http string representation.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.parse)
+ */
+- (ZappOfframpKtor_httpHttpProtocolVersion *)parseValue:(id)value __attribute__((swift_name("parse(value:)")));
+
+/**
+ * HTTP/1.0 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.HTTP_1_0)
+ */
+
+/**
+ * HTTP/1.1 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.HTTP_1_1)
+ */
+
+/**
+ * HTTP/2.0 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.HTTP_2_0)
+ */
+
+/**
+ * HTTP/3.0 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.HTTP_3_0)
+ */
+
+/**
+ * QUIC/1.0 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.QUIC)
+ */
+
+/**
+ * SPDY/3.0 version.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.HttpProtocolVersion.Companion.SPDY_3)
+ */
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.1")
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinKVariance")))
+@interface ZappOfframpKotlinKVariance : ZappOfframpKotlinEnum<ZappOfframpKotlinKVariance *>
+@property (class, readonly) ZappOfframpKotlinKVariance *invariant __attribute__((swift_name("invariant")));
+@property (class, readonly) ZappOfframpKotlinKVariance *in __attribute__((swift_name("in")));
+@property (class, readonly) ZappOfframpKotlinKVariance *out __attribute__((swift_name("out")));
+@property (class, readonly) NSArray<ZappOfframpKotlinKVariance *> *entries __attribute__((swift_name("entries")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
++ (ZappOfframpKotlinArray<ZappOfframpKotlinKVariance *> *)values __attribute__((swift_name("values()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinKTypeProjection.Companion")))
+@interface ZappOfframpKotlinKTypeProjectionCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKotlinKTypeProjectionCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKotlinKTypeProjection *STAR __attribute__((swift_name("STAR")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+- (ZappOfframpKotlinKTypeProjection *)contravariantType:(id<ZappOfframpKotlinKType>)type __attribute__((swift_name("contravariant(type:)")));
+- (ZappOfframpKotlinKTypeProjection *)covariantType:(id<ZappOfframpKotlinKType>)type __attribute__((swift_name("covariant(type:)")));
+- (ZappOfframpKotlinKTypeProjection *)invariantType:(id<ZappOfframpKotlinKType>)type __attribute__((swift_name("invariant(type:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpURLProtocol.Companion")))
+@interface ZappOfframpKtor_httpURLProtocolCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpURLProtocolCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *HTTP __attribute__((swift_name("HTTP")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *HTTPS __attribute__((swift_name("HTTPS")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *SOCKS __attribute__((swift_name("SOCKS")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *WS __attribute__((swift_name("WS")));
+@property (readonly) ZappOfframpKtor_httpURLProtocol *WSS __attribute__((swift_name("WSS")));
+@property (readonly) NSDictionary<NSString *, ZappOfframpKtor_httpURLProtocol *> *byName __attribute__((swift_name("byName")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Create an instance by [name] or use already existing instance
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.createOrDefault)
+ */
+- (ZappOfframpKtor_httpURLProtocol *)createOrDefaultName:(NSString *)name __attribute__((swift_name("createOrDefault(name:)")));
+
+/**
+ * HTTP with port 80
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.HTTP)
+ */
+
+/**
+ * secure HTTPS with port 443
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.HTTPS)
+ */
+
+/**
+ * Socks proxy url protocol.
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.SOCKS)
+ */
+
+/**
+ * Web socket over HTTP on port 80
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.WS)
+ */
+
+/**
+ * Web socket over secure HTTPS on port 443
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.WSS)
+ */
+
+/**
+ * Protocols by names map
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.http.URLProtocol.Companion.byName)
+ */
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_httpURLBuilder.Companion")))
+@interface ZappOfframpKtor_httpURLBuilderCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_httpURLBuilderCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@end
+
+__attribute__((swift_name("Ktor_httpParametersBuilder")))
+@protocol ZappOfframpKtor_httpParametersBuilder <ZappOfframpKtor_utilsStringValuesBuilder>
+@required
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsWeekDay.Companion")))
+@interface ZappOfframpKtor_utilsWeekDayCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_utilsWeekDayCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Lookup an instance by [ordinal]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.WeekDay.Companion.from)
+ */
+- (ZappOfframpKtor_utilsWeekDay *)fromOrdinal:(int32_t)ordinal __attribute__((swift_name("from(ordinal:)")));
+
+/**
+ * Lookup an instance by short week day name [WeekDay.value]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.WeekDay.Companion.from)
+ */
+- (ZappOfframpKtor_utilsWeekDay *)fromValue:(NSString *)value __attribute__((swift_name("from(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Ktor_utilsMonth.Companion")))
+@interface ZappOfframpKtor_utilsMonthCompanion : ZappOfframpBase
+@property (class, readonly, getter=shared) ZappOfframpKtor_utilsMonthCompanion *shared __attribute__((swift_name("shared")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+
+/**
+ * Lookup an instance by [ordinal]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.Month.Companion.from)
+ */
+- (ZappOfframpKtor_utilsMonth *)fromOrdinal:(int32_t)ordinal __attribute__((swift_name("from(ordinal:)")));
+
+/**
+ * Lookup an instance by short month name [Month.value]
+ *
+ * [Report a problem](https://ktor.io/feedback/?fqname=io.ktor.util.date.Month.Companion.from)
+ */
+- (ZappOfframpKtor_utilsMonth *)fromValue:(NSString *)value __attribute__((swift_name("from(value:)")));
+@end
+
+#pragma pop_macro("_Nullable_result")
+#pragma clang diagnostic pop
+NS_ASSUME_NONNULL_END

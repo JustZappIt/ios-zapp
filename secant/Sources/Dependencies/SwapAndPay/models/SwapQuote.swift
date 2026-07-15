@@ -11,6 +11,14 @@ import Foundation
 struct SwapQuote: Codable, Equatable, Hashable {
     /// Deposit address (ZEC)
     let depositAddress: String
+    /// Destination address echoed by the quote provider.
+    let destinationAddress: String
+    /// Refund address echoed by the quote provider.
+    let refundAddress: String
+    /// Origin asset identifier echoed by the quote provider.
+    let originAssetId: String
+    /// Destination asset identifier echoed by the quote provider.
+    let destinationAssetId: String
     /// Amount of Zatoshi
     let amountIn: Decimal
     /// USD value of the Zatoshi amount, localized (0.1 vs. 0,1)
@@ -26,6 +34,10 @@ struct SwapQuote: Codable, Equatable, Hashable {
     
     init(
         depositAddress: String,
+        destinationAddress: String,
+        refundAddress: String,
+        originAssetId: String,
+        destinationAssetId: String,
         amountIn: Decimal,
         amountInUsd: String,
         minAmountIn: Decimal,
@@ -34,6 +46,10 @@ struct SwapQuote: Codable, Equatable, Hashable {
         timeEstimate: TimeInterval
     ) {
         self.depositAddress = depositAddress
+        self.destinationAddress = destinationAddress
+        self.refundAddress = refundAddress
+        self.originAssetId = originAssetId
+        self.destinationAssetId = destinationAssetId
         self.amountIn = amountIn
         self.amountInUsd = amountInUsd
         self.minAmountIn = minAmountIn

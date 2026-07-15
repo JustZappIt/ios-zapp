@@ -8,8 +8,8 @@
 import Foundation
 
 struct PartnerKeys {
-    // NOTE: this key list is mirrored by Scripts/validate-partner-keys.sh, which
-    // fails an *archive* build when a required key is missing. Keep both in sync.
+    // Scripts/validate-partner-keys.sh contains the subset that must be present
+    // for archive builds. Keys with safe runtime defaults remain optional.
     private enum Constants {
         static let cbProjectId = "cbProjectId"
         static let flexaPublishableKey = "flexaPublishableKey"
@@ -17,6 +17,10 @@ struct PartnerKeys {
         static let nearKey = "nearKey"
         static let cmcKey = "cmcKey"
         static let nearFeeDepositAddress = "nearFeeDepositAddress"
+        static let p2pPimlicoApiKey = "p2pPimlicoApiKey"
+        static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
+        static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
+        static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
 #if DEBUG
         static let testSeed = "testSeed"
 #endif
@@ -44,6 +48,22 @@ struct PartnerKeys {
     
     static var nearFeeDepositAddress: String? {
         PartnerKeys.value(for: Constants.nearFeeDepositAddress)
+    }
+
+    static var p2pPimlicoApiKey: String? {
+        PartnerKeys.value(for: Constants.p2pPimlicoApiKey)
+    }
+
+    static var p2pRpcBaseMainnet: String? {
+        PartnerKeys.value(for: Constants.p2pRpcBaseMainnet)
+    }
+
+    static var p2pSubgraphMainnet: String? {
+        PartnerKeys.value(for: Constants.p2pSubgraphMainnet)
+    }
+
+    static var p2pSponsorshipPolicyId: String? {
+        PartnerKeys.value(for: Constants.p2pSponsorshipPolicyId)
     }
     
 #if DEBUG

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AFFAA0000000000000000C0 /* ZappOfframp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */; };
+		5AFFAA0000000000000000C1 /* ZappOfframp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */; };
+		5AFFAA0000000000000000C2 /* ZappOfframp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */; };
+		5AFFAA0000000000000000C3 /* ZappOfframp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */; };
 		5A99EE0000000000000000C0 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B0 /* ZappMessaging */; };
 		5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B1 /* ZappMessaging */; };
 		5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B2 /* ZappMessaging */; };
@@ -66,6 +70,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Vendor/ZappOfframp.xcframework; sourceTree = "<group>"; };
 		0D4E7A1626B364180058B01E /* zodlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = zodlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E41FFBB2CB2814500783CFD /* zodl-testnet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zodl-testnet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E4A01762B0C9ABD005AFC7E /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
@@ -135,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFFAA0000000000000000C0 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C0 /* ZappMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -143,6 +149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFFAA0000000000000000C1 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */,
 				34AA77832F8582F100D244E2 /* ZcashPaymentURI in Frameworks */,
 				34AA774B2F85815200D244E2 /* URLRouting in Frameworks */,
@@ -165,6 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFFAA0000000000000000C2 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */,
 				34AA777F2F8582E600D244E2 /* ZcashPaymentURI in Frameworks */,
 				34AA77472F85814600D244E2 /* URLRouting in Frameworks */,
@@ -187,6 +195,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFFAA0000000000000000C3 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C3 /* ZappMessaging in Frameworks */,
 				9E4841532F869F5F00D0649B /* ZcashLightClientKit in Frameworks */,
 				34AA77812F8582EB00D244E2 /* ZcashPaymentURI in Frameworks */,
@@ -237,6 +246,7 @@
 		343CF3F429BB5A14009E44DF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5AFFAA0000000000000000A0 /* ZappOfframp.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

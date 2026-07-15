@@ -152,4 +152,19 @@ struct AddressBookKey: Codable, Equatable, Redactable {
 
         return "zapp-chat-contacts-\(fileIdentifier)"
     }
+
+    /// Domain-separated encrypted file for P2P relay identity, resumable checkpoint, and the
+    /// user's local order-to-payment-address cache. It is intentionally not stored in Keychain or
+    /// mixed into either contact database, and reset follows the wallet-derived key lifecycle.
+    func offrampFileIdentifier() -> String? {
+        guard let info = "offramp_file_identifier".data(using: .utf8) else {
+            fatalError("Unable to prepare offramp_file_identifier")
+        }
+
+        let hkdfKey = HKDF<SHA256>.deriveKey(inputKeyMaterial: key, info: info, outputByteCount: 32)
+        let fileIdentifier = hkdfKey.withUnsafeBytes { rawBytes in
+            rawBytes.map { String(format: "%02x", $0) }.joined()
+        }
+        return "zapp-offramp-\(fileIdentifier)"
+    }
 }
