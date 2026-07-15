@@ -7595,9 +7595,9 @@ Classes:
 - Name: "ZappOfframpAppleOfframpClientCompanion"
   SwiftName: "AppleOfframpClient.Companion"
   Methods:
-  - Selector: "createNetworkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:"
+  - Selector: "createNetworkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:pixProxyUrl:pixJwtPublicKeyBase64:pixJwtKeyId:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:)"
+    SwiftName: "__create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:pixProxyUrl:pixJwtPublicKeyBase64:pixJwtKeyId:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
@@ -7618,6 +7618,12 @@ Classes:
     - Position: 7
       Type: "NSString * _Nullable"
     - Position: 8
+      Type: "NSString * _Nullable"
+    - Position: 9
+      Type: "NSString * _Nullable"
+    - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
       Type: "void (^ _Nonnull)(ZappOfframpAppleOfframpClient * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpAppleOfframpPaymentDetails"
   SwiftName: "AppleOfframpPaymentDetails"
@@ -11446,12 +11452,35 @@ Classes:
 - Name: "ZappOfframpDirectPixResolver"
   SwiftName: "DirectPixResolver"
   Methods:
-  - Selector: "initWithHttpClient:"
+  - Selector: "initWithHttpClient:jwtVerifier:"
     MethodKind: "Instance"
-    SwiftName: "init(httpClient:)"
+    SwiftName: "init(httpClient:jwtVerifier:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpKtor_client_coreHttpClient * _Nonnull"
+    - Position: 1
+      Type: "id<ZappOfframpPixJwtVerifier> _Nonnull"
+  - Selector: "resolveAmountLocationUrl:orderId:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__resolveAmount(locationUrl:orderId:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
+- Name: "ZappOfframpUnavailableDynamicPixResolver"
+  SwiftName: "UnavailableDynamicPixResolver"
+  Methods:
+  - Selector: "initWithReason:"
+    MethodKind: "Instance"
+    SwiftName: "init(reason:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
   - Selector: "resolveAmountLocationUrl:orderId:completionHandler:"
     MethodKind: "Instance"
     SwiftName: "__resolveAmount(locationUrl:orderId:completionHandler:)"
@@ -12277,17 +12306,43 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "init(cause:)"
     Availability: "nonswift"
+- Name: "ZappOfframpRsa256PixJwtVerifier"
+  SwiftName: "Rsa256PixJwtVerifier"
+  Methods:
+  - Selector: "initWithPublicKeyDerBase64:expectedKeyId:"
+    MethodKind: "Instance"
+    SwiftName: "init(publicKeyDerBase64:expectedKeyId:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+  - Selector: "verifyAlgorithm:keyId:signingInput:signature:"
+    MethodKind: "Instance"
+    SwiftName: "verify(algorithm:keyId:signingInput:signature:)"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "ZappOfframpKotlinByteArray * _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpKotlinByteArray * _Nonnull"
 - Name: "ZappOfframpPixProxyClient"
   SwiftName: "PixProxyClient"
   Methods:
-  - Selector: "initWithHttpClient:proxyUrl:"
+  - Selector: "initWithHttpClient:proxyUrl:jwtVerifier:"
     MethodKind: "Instance"
-    SwiftName: "init(httpClient:proxyUrl:)"
+    SwiftName: "init(httpClient:proxyUrl:jwtVerifier:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpKtor_client_coreHttpClient * _Nonnull"
     - Position: 1
       Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "id<ZappOfframpPixJwtVerifier> _Nonnull"
   - Selector: "resolveAmountLocationUrl:orderId:completionHandler:"
     MethodKind: "Instance"
     SwiftName: "__resolveAmount(locationUrl:orderId:completionHandler:)"
@@ -13525,9 +13580,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__49__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:"
+  - Selector: "Skie_Suspend__49__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:pixProxyUrl:pixJwtPublicKeyBase64:pixJwtKeyId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__49__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__49__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:pixProxyUrl:pixJwtPublicKeyBase64:pixJwtKeyId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -13550,6 +13605,12 @@ Classes:
     - Position: 8
       Type: "NSString * _Nullable"
     - Position: 9
+      Type: "NSString * _Nullable"
+    - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
+      Type: "NSString * _Nullable"
+    - Position: 12
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
   - Selector: "Skie_Suspend__50__ensureFundedDispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:"
     MethodKind: "Class"
@@ -16377,6 +16438,22 @@ Protocols:
       Type: "id<ZappOfframpOfframpPaymentDetailsProvider> _Nullable"
 - Name: "ZappOfframpBridgeToBaseStatus"
   SwiftName: "BridgeToBaseStatus"
+- Name: "ZappOfframpPixJwtVerifier"
+  SwiftName: "PixJwtVerifier"
+  Methods:
+  - Selector: "verifyAlgorithm:keyId:signingInput:signature:"
+    MethodKind: "Instance"
+    SwiftName: "verify(algorithm:keyId:signingInput:signature:)"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "ZappOfframpKotlinByteArray * _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpKotlinByteArray * _Nonnull"
 - Name: "ZappOfframpDynamicPixResolver"
   SwiftName: "DynamicPixResolver"
   Methods:

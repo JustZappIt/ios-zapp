@@ -21,6 +21,9 @@ struct PartnerKeys {
         static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
         static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
         static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
+        static let p2pPixProxyUrl = "p2pPixProxyUrl"
+        static let p2pPixJwtPublicKeyBase64 = "p2pPixJwtPublicKeyBase64"
+        static let p2pPixJwtKeyId = "p2pPixJwtKeyId"
 #if DEBUG
         static let testSeed = "testSeed"
 #endif
@@ -64,6 +67,18 @@ struct PartnerKeys {
 
     static var p2pSponsorshipPolicyId: String? {
         PartnerKeys.value(for: Constants.p2pSponsorshipPolicyId)
+    }
+
+    static var p2pPixProxyUrl: String? {
+        PartnerKeys.value(for: Constants.p2pPixProxyUrl)
+    }
+
+    static var p2pPixJwtPublicKeyBase64: String? {
+        PartnerKeys.value(for: Constants.p2pPixJwtPublicKeyBase64)
+    }
+
+    static var p2pPixJwtKeyId: String? {
+        PartnerKeys.value(for: Constants.p2pPixJwtKeyId)
     }
     
 #if DEBUG

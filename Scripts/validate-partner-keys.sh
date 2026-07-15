@@ -21,7 +21,7 @@ PLIST="${SRCROOT}/secant/Resources/PartnerKeys.plist"
 
 # Each key must be present, of type String, and non-empty. testSeed is
 # #if DEBUG-only and intentionally excluded from archive validation.
-REQUIRED_KEYS="flexaPublishableKey flexaPublishableTestKey nearKey cmcKey nearFeeDepositAddress p2pPimlicoApiKey p2pRpcBaseMainnet p2pSubgraphMainnet"
+REQUIRED_KEYS="flexaPublishableKey flexaPublishableTestKey nearKey cmcKey nearFeeDepositAddress p2pPimlicoApiKey p2pRpcBaseMainnet p2pSubgraphMainnet p2pPixProxyUrl p2pPixJwtPublicKeyBase64 p2pPixJwtKeyId"
 
 errors=()
 
