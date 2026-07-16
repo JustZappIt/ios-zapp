@@ -2,9 +2,7 @@
 //  ZappBalanceCard.swift
 //  Zapp
 //
-//  The Pay tab hero, mirroring `WalletBalanceCard.kt` minus the chart: iOS has no BalanceChart
-//  reducer and building one is a new subsystem, so the delta line, the sparkline and the period
-//  selector are all absent rather than faked.
+//  The Pay tab hero, mirroring Android's `WalletBalanceCard.kt`.
 //
 
 import ComposableArchitecture
@@ -34,6 +32,7 @@ struct ZappBalanceCard: View {
     let showsBreakdown: Bool
     let canShield: Bool
     let tokenName: String
+    let transactions: [TransactionState]
     let showZecAsPrimary: Bool
     let onToggleBalanceDisplay: () -> Void
     let onShieldTapped: () -> Void
@@ -45,6 +44,11 @@ struct ZappBalanceCard: View {
                     .padding(.bottom, 8)
 
                 amount
+
+                if totalBalance.amount > 0 {
+                    ZappBalanceChart(transactions: transactions, tokenName: tokenName)
+                        .padding(.top, 10)
+                }
 
                 if showsBreakdown {
                     breakdown

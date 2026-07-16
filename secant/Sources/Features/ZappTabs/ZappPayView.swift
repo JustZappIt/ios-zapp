@@ -106,6 +106,7 @@ struct ZappPayView: View {
                 showsBreakdown: store.walletBalancesState.transparentBalance.amount > 0,
                 canShield: store.walletBalancesState.transparentBalance >= store.walletBalancesState.autoShieldingThreshold,
                 tokenName: tokenName,
+                transactions: Array(store.transactionListState.transactions),
                 showZecAsPrimary: showZecAsPrimary,
                 onToggleBalanceDisplay: { showZecAsPrimary.toggle() },
                 onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }

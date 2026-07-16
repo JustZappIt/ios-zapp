@@ -220,15 +220,21 @@ private actor OfframpNearBridgeWorker {
         )
         let recipient = try Recipient(quote.depositAddress, network: environment.network().networkType)
         let amount = Zatoshi(NSDecimalNumber(decimal: quote.amountIn).int64Value)
-        let proposal = try await sdkSynchronizer.proposeTransfer(account.id, recipient, amount, nil)
-        try requireActive()
-        let fee = proposal.totalFeeRequired()
         let balances = try await sdkSynchronizer.getAccountsBalances()
         try requireActive()
         guard let balance = balances[account.id] else { throw OfframpBridgeError.balanceUnavailable }
         let spendable = balance.saplingBalance.spendableValue + balance.orchardBalance.spendableValue
+        // Check the quoted principal before asking the SDK to build a proposal. Otherwise an empty
+        // wallet can fail inside the SDK bridge as an opaque interop error before we can present the
+        // Android-style spendable-balance validation.
+        guard amount.amount <= spendable.amount else {
+            throw OfframpBridgeError.insufficientSpendableBalance(spendable.decimalString())
+        }
+        let proposal = try await sdkSynchronizer.proposeTransfer(account.id, recipient, amount, nil)
+        try requireActive()
+        let fee = proposal.totalFeeRequired()
         guard amount.amount <= Int64.max - fee.amount, amount.amount + fee.amount <= spendable.amount else {
-            throw OfframpBridgeError.insufficientSpendableBalance
+            throw OfframpBridgeError.insufficientSpendableBalance(spendable.decimalString())
         }
         let key = authorizationKey(accountAddress: accountAddress, usdcMicros: usdcMicros)
         authorizedTopUps[key] = AuthorizedBridge(
@@ -514,7 +520,7 @@ enum OfframpBridgeError: LocalizedError {
     case submissionFailed(String)
     case previewRequired
     case balanceUnavailable
-    case insufficientSpendableBalance
+    case insufficientSpendableBalance(String)
     case zeroOutput
 
     var errorDescription: String? {
@@ -527,7 +533,8 @@ enum OfframpBridgeError: LocalizedError {
         case .submissionFailed(let message): return "The Zcash deposit failed: \(message)"
         case .previewRequired: return "The bridge quote expired or was not reviewed. Review it again before continuing."
         case .balanceUnavailable: return "The spendable ZEC balance could not be verified."
-        case .insufficientSpendableBalance: return "The spendable ZEC balance does not cover the bridge amount and network fee."
+        case .insufficientSpendableBalance(let spendable):
+            return "Not enough ZEC. Your spendable balance is \(spendable) ZEC."
         case .zeroOutput: return "The bridge quote would return no ZEC."
         }
     }
