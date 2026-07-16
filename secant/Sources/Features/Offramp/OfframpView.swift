@@ -128,14 +128,17 @@ struct OfframpView: View {
                         }
                     }
                     .background(ZappColors.surface.color(colorScheme))
-                    .overlay(Rectangle().stroke(ZappColors.border.color(colorScheme), lineWidth: 1))
+                    .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
                 }
-                .padding(.horizontal, 18)
-                .padding(.top, 16)
+                .padding(.horizontal, 14)
+                .padding(.top, 12)
                 .padding(.bottom, 110)
             }
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                ZappButton(title: text("general.save", "Save")) { store.send(.saveCorridorTapped) }
+                ZappButton(
+                    title: text("general.save", "Save"),
+                    isEnabled: store.canSaveCorridor
+                ) { store.send(.saveCorridorTapped) }
             }
         }
     }
@@ -607,7 +610,9 @@ struct OfframpView: View {
     private func corridorRow(_ corridor: OfframpCorridor) -> some View {
         Button { store.send(.draftCorridorTapped(corridor.currencyCode)) } label: {
             HStack(spacing: 14) {
-                Text(corridor.flag).font(.system(size: 28))
+                Text(corridor.flag)
+                    .font(.system(size: 25))
+                    .frame(width: 30, height: 20)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(corridor.countryName).zappFont(.rowTitle, style: ZappColors.text)
                     Text("\(corridor.paymentRail) · \(corridor.currencyCode)")
@@ -615,10 +620,14 @@ struct OfframpView: View {
                 }
                 Spacer()
                 if corridor.currencyCode == store.draftCurrencyCode {
-                    Asset.Assets.Icons.checkSolid.image.zImage(width: 20, height: 20, style: ZappColors.accent)
+                    Asset.Assets.Icons.checkSolid.image
+                        .zImage(width: 18, height: 18, style: ZappColors.accentText)
+                        .frame(width: 18, height: 20)
                 }
             }
-            .padding(.vertical, 14)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
