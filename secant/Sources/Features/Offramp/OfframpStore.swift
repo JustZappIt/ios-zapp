@@ -63,6 +63,10 @@ struct Offramp {
 
         var latestProgress: OfframpProgressModel? { progress.last }
 
+        var canSaveCorridor: Bool {
+            !isLoading && draftCurrencyCode != selectedCurrencyCode
+        }
+
         init(page: Page = .amount, corridorContext: CorridorContext = .settings) {
             let saved = UserDefaults.standard.string(forKey: Offramp.currencyPreferenceKey) ?? "INR"
             self.page = page
@@ -214,6 +218,7 @@ struct Offramp {
                 return .none
 
             case .saveCorridorTapped:
+                guard state.canSaveCorridor else { return .none }
                 state.selectedCurrencyCode = state.draftCurrencyCode
                 UserDefaults.standard.set(state.selectedCurrencyCode, forKey: Self.currencyPreferenceKey)
                 state.quote = nil
