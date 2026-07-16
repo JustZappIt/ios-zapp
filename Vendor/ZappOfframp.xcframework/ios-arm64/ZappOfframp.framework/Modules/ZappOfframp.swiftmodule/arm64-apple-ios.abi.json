@@ -45443,7 +45443,7 @@
           {
             "kind": "Function",
             "name": "create",
-            "printedName": "create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:pixProxyUrl:pixJwtPublicKeyBase64:pixJwtKeyId:)",
+            "printedName": "create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -45530,53 +45530,11 @@
                   }
                 ],
                 "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
               }
             ],
             "declKind": "Func",
-            "usr": "s:So016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyId08pixProxyQ00v9JwtPublicM6Base640vxmU0So0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA5UtYaKF",
-            "mangledName": "$sSo016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyId08pixProxyQ00v9JwtPublicM6Base640vxmU0So0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA5UtYaKF",
+            "usr": "s:So016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyIdSo0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA2RtYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyIdSo0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA2RtYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",
