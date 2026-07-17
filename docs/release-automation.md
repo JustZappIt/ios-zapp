@@ -103,9 +103,9 @@ independent — a build number only has to beat that variant's own history.
 
 | `--variant` | Scheme | App Store Connect app | Goes to |
 |---|---|---|---|
-| `internal` | `zodl-internal` | `co.electriccoin.secant-testnet` | TestFlight |
-| `testnet` | `zodl-testnet` | `co.ecc.zashi-testnet` | TestFlight |
-| `appstore` | `zodl-AppStore` | `co.electriccoin.secant-mainnet` | App Store |
+| `internal` | `zodl-internal` | `xyz.justzappit.zapp.internal` | TestFlight |
+| `testnet` | `zodl-testnet` | `xyz.justzappit.zapp.testnet` | TestFlight |
+| `appstore` | `zodl-AppStore` | `xyz.justzappit.zapp` | App Store |
 | `internal-testnet` | — | both of the above | builds `internal` then `testnet`, running tests once |
 
 ## Everyday use — the release flow

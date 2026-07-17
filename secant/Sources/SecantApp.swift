@@ -15,6 +15,7 @@ struct SecantApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
+    @Dependency(\.pushNotifications) private var pushNotifications
 
     init() {
         FontFamily.registerAllCustomFonts()
@@ -32,9 +33,11 @@ struct SecantApp: App {
                 .custom(FontFamily.Inter.regular.name, size: 17)
             )
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                pushNotifications.setForeground(true)
                 appDelegate.rootStore.send(.initialization(.appDelegate(.willEnterForeground)))
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+                pushNotifications.setForeground(false)
                 appDelegate.rootStore.send(.initialization(.appDelegate(.didEnterBackground)))
                 appDelegate.scheduleBackgroundTask()
                 appDelegate.scheduleSchedulerBackgroundTask()

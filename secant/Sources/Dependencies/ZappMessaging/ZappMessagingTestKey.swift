@@ -23,6 +23,8 @@ extension ZappMessagingClient: TestDependencyKey {
         latestState: { ZappMessagingState() },
         conversationsStream: { Empty().eraseToAnyPublisher() },
         refreshConversations: { },
+        getPushTopicSnapshot: { throw ZMError.notInitialized },
+        pushTopicsChangedStream: { Empty().eraseToAnyPublisher() },
         createDirectConversation: { publicKey, displayName in
             ZMConversation(
                 id: publicKey,

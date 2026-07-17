@@ -1601,6 +1601,40 @@
         }
       }
     },
+    "chatNotifications.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receive generic doorbells for direct chats. FCM sees only this installation, opaque topic membership, and timing; messages remain encrypted in Hypercore."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recibe avisos genéricos para chats directos. FCM solo ve esta instalación, temas opacos y horarios; los mensajes permanecen cifrados en Hypercore."
+          }
+        }
+      }
+    },
+    "chatNotifications.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chat notifications"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notificaciones de chat"
+          }
+        }
+      }
+    },
     "chatProfile.displayName": {
       "extractionState": "manual",
       "localizations": {

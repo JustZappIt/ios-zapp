@@ -75,8 +75,9 @@ iOSInjectionProject/
 #ignore Pods directory for example project 
 Pods
 
-# do not commit Google Firebase config PLIST file
-GoogleService-info.plist
+# Per-target Firebase credentials are injected by the build script. The canonical
+# filename is case-sensitive on CI and must never be committed at any depth.
+**/GoogleService-Info.plist
 
 # do not commit PartnerKeys.plist
 PartnerKeys.plist

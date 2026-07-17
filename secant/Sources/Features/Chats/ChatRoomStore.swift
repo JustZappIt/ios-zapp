@@ -151,6 +151,7 @@ struct ChatRoom {
     }
 
     @Dependency(\.zappMessaging) var zappMessaging
+    @Dependency(\.pushNotifications) var pushNotifications
 
     init() { }
 
@@ -160,6 +161,7 @@ struct ChatRoom {
             case .onAppear:
                 let conversationId = state.conversationId
                 zappMessaging.setActiveConversation(conversationId)
+                pushNotifications.setActiveConversation(conversationId)
 
                 return .merge(
                     .run { _ in
@@ -203,6 +205,7 @@ struct ChatRoom {
 
             case .onDisappear:
                 zappMessaging.setActiveConversation(nil)
+                pushNotifications.setActiveConversation(nil)
 
                 return .merge(
                     .cancel(id: state.messageReceivedCancelId),

@@ -18,6 +18,7 @@ struct ChatProfile {
     @ObservableState
     struct State: Equatable {
         var messagingCancelId = UUID()
+        var pushStateCancelId = UUID()
 
         /// The edited field. Sanitized on every keystroke, so it is always a candidate name.
         var displayName = ""
@@ -34,12 +35,14 @@ struct ChatProfile {
 
         var readReceiptsEnabled = true
         var presenceVisible = true
+        var notificationsEnabled = false
 
         /// A privacy call is in flight. The stream still carries the OLD value until the worklet
         /// acknowledges, so an unrelated emission (a peer count tick) would otherwise snap the
         /// optimistic toggle back mid-flight.
         var isReadReceiptsBusy = false
         var isPresenceBusy = false
+        var isNotificationsBusy = false
 
         var isNameValid: Bool { UsernameRules.isValid(displayName) }
         var isNameChanged: Bool { displayName != savedDisplayName }
@@ -54,6 +57,7 @@ struct ChatProfile {
         case onDisappear
         case backToHomeTapped
         case messagingStateChanged(ZappMessagingState)
+        case pushStateChanged(PushNotificationState)
         case displayNameChanged(String)
         case saveTapped
         case saveSucceeded(String)
@@ -64,11 +68,14 @@ struct ChatProfile {
         case readReceiptsFinished(Bool)
         case presenceToggled
         case presenceFinished(Bool)
+        case notificationsToggled
+        case notificationsFinished(Bool)
     }
 
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
+    @Dependency(\.pushNotifications) var pushNotifications
 
     init() { }
 
@@ -79,22 +86,38 @@ struct ChatProfile {
             switch action {
             case .onAppear:
                 seed(&state, from: zappMessaging.latestState())
+                state.notificationsEnabled = pushNotifications.latestState().isDeliveryEnabled
 
-                return .publisher {
-                    zappMessaging.stateStream()
-                        .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
-                        .map(Action.messagingStateChanged)
-                }
-                .cancellable(id: state.messagingCancelId, cancelInFlight: true)
+                return .merge(
+                    .publisher {
+                        zappMessaging.stateStream()
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
+                            .map(Action.messagingStateChanged)
+                    }
+                    .cancellable(id: state.messagingCancelId, cancelInFlight: true),
+                    .publisher {
+                        pushNotifications.stateStream()
+                            .receive(on: mainQueue)
+                            .map(Action.pushStateChanged)
+                    }
+                    .cancellable(id: state.pushStateCancelId, cancelInFlight: true)
+                )
 
             case .onDisappear:
                 return .merge(
                     .cancel(id: state.messagingCancelId),
+                    .cancel(id: state.pushStateCancelId),
                     .cancel(id: CancelID.copyIndicator)
                 )
 
             case .messagingStateChanged(let messagingState):
                 seed(&state, from: messagingState)
+                return .none
+
+            case .pushStateChanged(let pushState):
+                if !state.isNotificationsBusy {
+                    state.notificationsEnabled = pushState.isDeliveryEnabled
+                }
                 return .none
 
             case .displayNameChanged(let value):
@@ -194,6 +217,23 @@ struct ChatProfile {
             case .presenceFinished(let value):
                 state.presenceVisible = value
                 state.isPresenceBusy = false
+                return .none
+
+            case .notificationsToggled:
+                guard !state.isNotificationsBusy else { return .none }
+
+                let next = !state.notificationsEnabled
+                state.notificationsEnabled = next
+                state.isNotificationsBusy = true
+
+                return .run { send in
+                    let applied = await pushNotifications.setDeliveryEnabled(next)
+                    await send(.notificationsFinished(next && applied))
+                }
+
+            case .notificationsFinished(let value):
+                state.notificationsEnabled = value
+                state.isNotificationsBusy = false
                 return .none
 
             case .backToHomeTapped:
