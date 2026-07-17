@@ -326,6 +326,19 @@ private extension RootView {
                                 }
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .chatNotifications {
+                                ChatPrivacySettingView(
+                                    store: store.scope(
+                                        state: \.chatProfileState,
+                                        action: \.chatProfile
+                                    ),
+                                    setting: .notifications,
+                                    initialValue: store.chatProfileState.notificationsEnabled
+                                ) {
+                                    store.send(.backToHomeFromChatPrivacyTapped)
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .chatProfile {
                                 ChatProfileView(
                                     store: store.scope(

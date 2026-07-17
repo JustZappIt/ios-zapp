@@ -29,7 +29,7 @@ extension Root {
             case .chatContactsLoaded(let contacts):
                 state.$chatContacts.withLock { $0 = contacts }
                 zappMessaging.setBlockedKeys(contacts.blockedKeys)
-                return .none
+                return .send(.reconcilePushNotifications)
 
             default: return .none
             }

@@ -119,6 +119,12 @@ struct ZappMessagingClient {
     }
     var refreshConversations: @Sendable () async throws -> Void
 
+    /// JavaScript is the sole authority for blinded discovery-topic derivation.
+    var getPushTopicSnapshot: @Sendable () async throws -> ZMPushTopicSnapshot
+    var pushTopicsChangedStream: @Sendable () -> AnyPublisher<Void, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
     /// Start (or re-open) a direct conversation with a peer's Ed25519 public key.
     /// Returns the existing conversation if one already exists for that peer.
     var createDirectConversation: @Sendable (

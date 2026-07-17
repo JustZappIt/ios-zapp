@@ -61,6 +61,16 @@ struct SettingsTabContent: View {
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
                             ZappRow(
+                                title: String(localizable: .chatNotificationsTitle),
+                                subtitle: String(localizable: .chatNotificationsSubtitle),
+                                icon: Asset.Assets.Icons.messageChat.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) { store.send(.notificationsTapped) }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
                                 title: String(localizable: .settingsYouTorTitle),
                                 subtitle: String(localizable: .settingsYouTorSubtitle),
                                 icon: Asset.Assets.shield.image,

@@ -352,6 +352,10 @@ extension Root {
                 state.path = .chatReadReceipts
                 return .none
 
+            case .zappTabs(.notificationsTapped):
+                state.path = .chatNotifications
+                return .none
+
             case .zappTabs(.onlineStatusTapped):
                 state.path = .chatOnlineStatus
                 return .none

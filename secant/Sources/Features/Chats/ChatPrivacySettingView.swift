@@ -7,11 +7,13 @@ import ComposableArchitecture
 import SwiftUI
 
 enum ChatPrivacySetting {
+    case notifications
     case readReceipts
     case onlineStatus
 
     var title: String {
         switch self {
+        case .notifications: String(localizable: .chatNotificationsTitle)
         case .readReceipts: String(localizable: .chatProfileReadReceipts)
         case .onlineStatus: String(localizable: .chatProfilePresence)
         }
@@ -19,6 +21,7 @@ enum ChatPrivacySetting {
 
     var subtitle: String {
         switch self {
+        case .notifications: String(localizable: .chatNotificationsSubtitle)
         case .readReceipts: String(localizable: .chatProfileReadReceiptsHint)
         case .onlineStatus: String(localizable: .chatProfilePresenceHint)
         }
@@ -26,6 +29,7 @@ enum ChatPrivacySetting {
 
     var icon: Image {
         switch self {
+        case .notifications: Asset.Assets.Icons.messageChat.image
         case .readReceipts: Asset.Assets.Icons.checkSolid.image
         case .onlineStatus: Asset.Assets.Icons.user.image
         }
@@ -93,6 +97,7 @@ struct ChatPrivacySettingView: View {
 
     private var currentValue: Bool {
         switch setting {
+        case .notifications: store.notificationsEnabled
         case .readReceipts: store.readReceiptsEnabled
         case .onlineStatus: store.presenceVisible
         }
@@ -100,6 +105,7 @@ struct ChatPrivacySettingView: View {
 
     private var isBusy: Bool {
         switch setting {
+        case .notifications: store.isNotificationsBusy
         case .readReceipts: store.isReadReceiptsBusy
         case .onlineStatus: store.isPresenceBusy
         }
@@ -109,6 +115,8 @@ struct ChatPrivacySettingView: View {
         guard draftValue != currentValue, !isBusy else { return }
 
         switch setting {
+        case .notifications:
+            store.send(.notificationsToggled)
         case .readReceipts:
             store.send(.readReceiptsToggled)
         case .onlineStatus:

@@ -16,8 +16,10 @@ import UserNotifications
 
 // swiftlint:disable indentation_width
 final class AppDelegate: NSObject, UIApplicationDelegate {
-    private let bcgTaskId = "co.electriccoin.power_wifi_sync"
-    private let bcgSchedulerTaskId = "co.electriccoin.scheduler"
+    @Dependency(\.pushNotifications) private var pushNotifications
+
+    private var bcgTaskId: String { "\(Bundle.main.bundleIdentifier ?? "xyz.justzappit.zapp").power_wifi_sync" }
+    private var bcgSchedulerTaskId: String { "\(Bundle.main.bundleIdentifier ?? "xyz.justzappit.zapp").scheduler" }
     private var monitor: NWPathMonitor?
     private let workerQueue = DispatchQueue(label: "Monitor")
     private let isConnectedToWifi = ManagedAtomic(false)
@@ -38,6 +40,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         guard !_XCTIsTesting else { return true }
         walletLogger = OSLogger(logLevel: .debug, category: LoggerConstants.walletLogs)
 #endif
+        pushNotifications.configure()
         handleBackgroundTask()
 
         // set the default behavior for the NSDecimalNumber
@@ -46,6 +49,20 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         rootStore.send(.initialization(.appDelegate(.didFinishLaunching)))
 
         return true
+    }
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        pushNotifications.didRegisterForRemoteNotifications(deviceToken)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        pushNotifications.didFailToRegisterForRemoteNotifications()
     }
 
     func application(

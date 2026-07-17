@@ -16,6 +16,7 @@ struct Root {
         enum Path {
             case addKeystoneHWWalletCoordFlow
             case chatContacts
+            case chatNotifications
             case chatOnlineStatus
             case chatProfile
             case chatReadReceipts
@@ -57,6 +58,8 @@ struct Root {
         var CancelFlexaId = UUID()
         var shieldingProcessorCancelId = UUID()
         var zappMessagingCancelId = UUID()
+        var pushNotificationEventsCancelId = UUID()
+        var pushTopicsCancelId = UUID()
         var automaticServerRefreshCancelId = UUID()
 
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
@@ -161,7 +164,7 @@ struct Root {
                 return true
             case .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
+            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatNotifications, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .groupInfo,
                  .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
@@ -214,6 +217,9 @@ struct Root {
         case chatContactsLoaded(ChatContacts)
         case observeZappMessaging
         case zappMessagingStateChanged(ZappMessagingState)
+        case observePushNotifications
+        case pushNotificationEvent(PushNotificationEvent)
+        case reconcilePushNotifications
         case deeplinkWarning(DeeplinkWarning.Action)
         case destination(DestinationAction)
         case exportLogs(ExportLogs.Action)
@@ -346,6 +352,7 @@ struct Root {
     @Dependency(\.readTransactionsStorage) var readTransactionsStorage
     @Dependency(\.chatContacts) var chatContacts
     @Dependency(\.zappMessaging) var zappMessaging
+    @Dependency(\.pushNotifications) var pushNotifications
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
     init() { }
@@ -491,6 +498,8 @@ struct Root {
         chatContactsReduce()
 
         zappMessagingReduce()
+
+        pushNotificationsReduce()
         
         torInitCheckReduce()
         

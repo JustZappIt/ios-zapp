@@ -33,7 +33,7 @@ extension Root {
                 state.zappTabsState.chatUnreadCount = messagingState.totalUnreadCount
                 state.zappTabsState.hasChatIdentity = messagingState.identity != nil
                 state.zappTabsState.displayName = messagingState.identity?.displayName
-                return .none
+                return messagingState.isReady ? .send(.reconcilePushNotifications) : .none
 
             default: return .none
             }

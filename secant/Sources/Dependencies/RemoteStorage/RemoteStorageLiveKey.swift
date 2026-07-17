@@ -9,10 +9,6 @@ import Foundation
 import ComposableArchitecture
 
 extension RemoteStorageClient: DependencyKey {
-    private enum Constants {
-        static let ubiquityContainerIdentifier = "iCloud.com.electriccoinco.zashi"
-    }
-    
     enum RemoteStorageError: Error {
         case containerURL
         case fileDoesntExist
@@ -57,7 +53,10 @@ extension RemoteStorageClient: DependencyKey {
     }
     
     private static func path(_ fileManager: FileManager, filename: String) -> URL? {
-        fileManager.url(
-            forUbiquityContainerIdentifier: Constants.ubiquityContainerIdentifier)?.appendingPathComponent("Documents").appendingPathComponent(filename)
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
+
+        return fileManager.url(
+            forUbiquityContainerIdentifier: "iCloud.\(bundleIdentifier)"
+        )?.appendingPathComponent("Documents").appendingPathComponent(filename)
     }
 }

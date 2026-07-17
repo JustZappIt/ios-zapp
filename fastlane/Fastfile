@@ -24,7 +24,7 @@ TEST_SCHEME = "zodl-internal"        # only scheme wired to the zodlTests target
 TEST_DEVICE = "iPhone 17 Pro"
 PARTNER_KEYS_REL = "secant/Resources/PartnerKeys.plist"
 FASTLANE_DIR = __dir__
-TEAM_ID = "RLPRR8CPQG"               # Apple Developer team (matches DEVELOPMENT_TEAM in the project)
+TEAM_ID = ENV.fetch("ZAPP_DEVELOPMENT_TEAM", "")
 
 # Swift macros (TCA, swift-dependencies, swift-perception, swift-case-paths) and
 # SPM build-tool plugins (SwiftGen, SwiftLint, XCStringsTool) must be trusted

@@ -36,6 +36,8 @@ extension ZappMessagingClient: DependencyKey {
             latestState: { impl.stateSubject.value },
             conversationsStream: { impl.conversationsSubject.eraseToAnyPublisher() },
             refreshConversations: { try await impl.refreshConversations() },
+            getPushTopicSnapshot: { try await impl.getPushTopicSnapshot() },
+            pushTopicsChangedStream: { impl.pushTopicsChangedSubject.eraseToAnyPublisher() },
             createDirectConversation: { try await impl.createDirectConversation(publicKey: $0, displayName: $1) },
             createGroup: { try await impl.createGroup(name: $0, participantKeys: $1) },
             renameGroup: { try await impl.renameGroup(conversationId: $0, name: $1) },
@@ -76,6 +78,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
 
     let stateSubject = CurrentValueSubject<ZappMessagingState, Never>(ZappMessagingState())
     let conversationsSubject = CurrentValueSubject<[ZMConversation], Never>([])
+    let pushTopicsChangedSubject = PassthroughSubject<Void, Never>()
     let messageReceivedSubject = PassthroughSubject<ZMMessage, Never>()
     let messageStatusSubject = PassthroughSubject<(messageId: String, conversationId: String, status: String), Never>()
     let mediaProgressSubject = PassthroughSubject<(mediaId: String, progress: Double), Never>()
@@ -247,6 +250,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         conversationsSubject.send(await sdk.conversations)
     }
 
+    func getPushTopicSnapshot() async throws -> ZMPushTopicSnapshot {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.getPushTopicSnapshot()
+    }
+
     @MainActor
     func createDirectConversation(publicKey: String, displayName: String?) async throws -> ZMConversation {
         guard let sdk else { throw ZMError.notInitialized }
@@ -267,6 +275,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             displayName: displayName
         )
         conversationsSubject.send(sdk.conversations)
+        pushTopicsChangedSubject.send(())
         return conversation
     }
 
@@ -333,6 +342,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard let sdk else { throw ZMError.notInitialized }
         try await sdk.leaveConversation(conversationId)
         conversationsSubject.send(await sdk.conversations)
+        pushTopicsChangedSubject.send(())
         clearUnread(for: conversationId)
     }
 
@@ -340,6 +350,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard let sdk else { throw ZMError.notInitialized }
         try await sdk.removeConversation(conversationId)
         conversationsSubject.send(await sdk.conversations)
+        pushTopicsChangedSubject.send(())
         clearUnread(for: conversationId)
     }
 
@@ -429,6 +440,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         sdk.messageStatus
             .receive(on: mainQueue)
             .sink { [weak self] status in self?.messageStatusSubject.send(status) }
+            .store(in: &cancellables)
+
+        sdk.pushTopicsChanged
+            .receive(on: mainQueue)
+            .sink { [weak self] in self?.pushTopicsChangedSubject.send(()) }
             .store(in: &cancellables)
 
         // Keyed by CONVERSATION, not peer: the core truncates peerId to 12 chars, so
