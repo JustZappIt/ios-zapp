@@ -79,17 +79,19 @@ struct AddKeystoneHWWalletView: View {
                 .padding(.vertical, 1)
                 
                 Spacer()
-                
-                ZashiButton(String(localizable: .keystoneAddHWWalletReadyToScan)) {
-                    store.send(.readyToScanTapped)
-                }
-                .padding(.vertical, 24)
             }
             .screenHorizontalPadding()
             .onAppear { store.send(.onAppear) }
-            .zashiBack() {
-                store.send(.backToHomeTapped)
-            }
+            .zashiBack(
+                primaryAction: {
+                    ZashiButton(String(localizable: .keystoneAddHWWalletReadyToScan)) {
+                        store.send(.readyToScanTapped)
+                    }
+                },
+                customDismiss: {
+                    store.send(.backToHomeTapped)
+                }
+            )
             .zashiSheet(isPresented: $store.isHelpSheetPresented) {
                 helpSheetContent()
             }

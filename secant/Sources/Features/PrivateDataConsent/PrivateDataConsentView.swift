@@ -46,28 +46,7 @@ struct PrivateDataConsentView: View {
                 )
                 .padding(.vertical, 24)
                 .padding(.leading, 1)
-                
-                if store.isExportingData {
-                    ZashiButton(
-                        String(localizable: .settingsExportPrivateData),
-                        type: .secondary,
-                        accessoryView: ProgressView()
-                    ) {
-                        store.send(.exportRequested)
-                    }
-                    .disabled(true)
-                    .padding(.bottom, 8)
-                } else {
-                    ZashiButton(
-                        String(localizable: .settingsExportPrivateData),
-                        type: .secondary
-                    ) {
-                        store.send(.exportRequested)
-                    }
-                    .disabled(!store.isExportPossible)
-                    .padding(.bottom, 8)
-                }
-                
+
 #if DEBUG
                 if store.isExportingLogs {
                     ZashiButton(
@@ -89,7 +68,28 @@ struct PrivateDataConsentView: View {
                 }
 #endif
             }
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    if store.isExportingData {
+                        ZashiButton(
+                            String(localizable: .settingsExportPrivateData),
+                            type: .secondary,
+                            accessoryView: ProgressView()
+                        ) {
+                            store.send(.exportRequested)
+                        }
+                        .disabled(true)
+                    } else {
+                        ZashiButton(
+                            String(localizable: .settingsExportPrivateData),
+                            type: .secondary
+                        ) {
+                            store.send(.exportRequested)
+                        }
+                        .disabled(!store.isExportPossible)
+                    }
+                }
+            )
             .onAppear { store.send(.onAppear)}
 
             shareLogsView()

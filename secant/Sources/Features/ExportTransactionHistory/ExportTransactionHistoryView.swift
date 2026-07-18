@@ -27,25 +27,25 @@ struct ExportTransactionHistoryView: View {
                     .padding(.top, 12)
                 
                 Spacer()
-                
-                if store.isExportingData {
-                    ZashiButton(
-                        String(localizable: .taxExportDownload),
-                        accessoryView: ProgressView()
-                    ) {
-                        store.send(.exportRequested)
-                    }
-                    .disabled(true)
-                    .padding(.bottom, 24)
-                } else {
-                    ZashiButton(String(localizable: .taxExportDownload)) {
-                        store.send(.exportRequested)
-                    }
-                    .disabled(!store.isExportPossible)
-                    .padding(.bottom, 24)
-                }
             }
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    if store.isExportingData {
+                        ZashiButton(
+                            String(localizable: .taxExportDownload),
+                            accessoryView: ProgressView()
+                        ) {
+                            store.send(.exportRequested)
+                        }
+                        .disabled(true)
+                    } else {
+                        ZashiButton(String(localizable: .taxExportDownload)) {
+                            store.send(.exportRequested)
+                        }
+                        .disabled(!store.isExportPossible)
+                    }
+                }
+            )
 
             shareLogsView()
         }

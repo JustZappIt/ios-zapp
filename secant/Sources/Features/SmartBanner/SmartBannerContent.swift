@@ -17,6 +17,13 @@ extension SmartBannerView {
         Design.Utility.Purple._200.color(.light)
     }
 
+    // Transparent balance in the selected fiat, shown with the ZEC amount when a rate is available.
+    var shieldingFiat: String? {
+        guard let currencyConversion else { return nil }
+        let fiat: String = currencyConversion.convert(store.transparentBalance)
+        return fiat
+    }
+
     @ViewBuilder func priorityContent() -> some View {
         WithPerceptionTracking {
             switch store.priorityContent {
@@ -185,6 +192,11 @@ extension SmartBannerView {
                 
                 ZatoshiText(store.transparentBalance, .expanded, store.tokenName)
                     .zFont(.medium, size: 12, color: infoStyle())
+
+                if let shieldingFiat {
+                    Text(shieldingFiat)
+                        .zFont(.medium, size: 12, color: infoStyle())
+                }
             }
             
             Spacer()

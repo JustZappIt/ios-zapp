@@ -107,17 +107,16 @@ struct ProposalListView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 12)
-                    .padding(.bottom, showCTA ? 96 : 24)
+                    .padding(.bottom, 24)
                 }
                 .padding(.vertical, 1)
-
-                if showCTA {
-                    bottomCTA(proposals: proposals, choices: displayedChoices)
-                }
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))
-            .zashiBack()
+            .zashiBack(
+                hasPrimaryAction: showCTA,
+                primaryAction: { bottomCTA(proposals: proposals, choices: displayedChoices) }
+            )
         }
     }
 
@@ -434,21 +433,7 @@ struct ProposalListView: View {
             }
         }
 
-        return VStack(spacing: 0) {
-            ZashiButton(title, action: action)
-        }
-        .padding(.horizontal, 24)
-        .padding(.bottom, 24)
-        .background(
-            LinearGradient(
-                colors: [
-                    Design.Surfaces.bgPrimary.color(colorScheme).opacity(0),
-                    Design.Surfaces.bgPrimary.color(colorScheme).opacity(0.95)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        return ZashiButton(title, action: action)
     }
 }
 

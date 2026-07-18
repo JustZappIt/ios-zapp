@@ -45,24 +45,6 @@ struct DisconnectHWWalletView: View {
                 keystoneBadge()
                     .padding(.bottom, Design.Spacing._3xl)
 
-                if store.isProcessing {
-                    ZashiButton(
-                        String(localizable: .disconnectHWWalletTitle),
-                        type: .destructive1,
-                        accessoryView: ProgressView()
-                    ) { }
-                    .disabled(true)
-                    .padding(.bottom, 24)
-                } else {
-                    ZashiButton(
-                        String(localizable: .disconnectHWWalletTitle),
-                        type: .destructive1
-                    ) {
-                        store.send(.disconnectTapped)
-                    }
-                    .padding(.bottom, 24)
-                }
-
                 shareView()
 
                 if let supportData = store.supportData {
@@ -88,7 +70,25 @@ struct DisconnectHWWalletView: View {
         .screenHorizontalPadding()
         .applyScreenBackground()
         .navigationBarTitleDisplayMode(.inline)
-        .zashiBack()
+        .zashiBack(
+            primaryAction: {
+                if store.isProcessing {
+                    ZashiButton(
+                        String(localizable: .disconnectHWWalletTitle),
+                        type: .destructive1,
+                        accessoryView: ProgressView()
+                    ) { }
+                    .disabled(true)
+                } else {
+                    ZashiButton(
+                        String(localizable: .disconnectHWWalletTitle),
+                        type: .destructive1
+                    ) {
+                        store.send(.disconnectTapped)
+                    }
+                }
+            }
+        )
         .screenTitle(String(localizable: .disconnectHWWalletTitle))
     }
 

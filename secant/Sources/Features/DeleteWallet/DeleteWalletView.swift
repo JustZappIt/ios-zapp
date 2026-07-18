@@ -61,27 +61,28 @@ struct DeleteWalletView: View {
                         .fill(Design.Utility.WarningYellow._50.color(colorScheme))
                 }
                 .padding(.bottom, 32)
-
-                if store.isProcessing {
-                    ZashiButton(
-                        String(localizable: .deleteWalletActionButtonTitle),
-                        type: .destructive1,
-                        accessoryView: ProgressView()
-                    ) { }
-                    .disabled(true)
-                    .padding(.bottom, 24)
-                } else {
-                    ZashiButton(
-                        String(localizable: .deleteWalletActionButtonTitle),
-                        type: .destructive1
-                    ) {
-                        store.send(.deleteRequested)
-                    }
-                    .disabled(store.isProcessing)
-                    .padding(.bottom, 24)
-                }
             }
-            .zashiBack(store.isProcessing)
+            .zashiBack(
+                store.isProcessing,
+                primaryAction: {
+                    if store.isProcessing {
+                        ZashiButton(
+                            String(localizable: .deleteWalletActionButtonTitle),
+                            type: .destructive1,
+                            accessoryView: ProgressView()
+                        ) { }
+                        .disabled(true)
+                    } else {
+                        ZashiButton(
+                            String(localizable: .deleteWalletActionButtonTitle),
+                            type: .destructive1
+                        ) {
+                            store.send(.deleteRequested)
+                        }
+                        .disabled(store.isProcessing)
+                    }
+                }
+            )
             .zashiSheet(isPresented: $store.isSheetUp) {
                 helpSheetContent()
             }

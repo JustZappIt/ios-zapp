@@ -52,30 +52,32 @@ struct WalletBirthdayView: View {
                     .zFont(size: 12, style: Design.Text.tertiary)
                 
                 Spacer()
-                
-                if !store.isKeystoneFlow && !store.isResyncFlow && !keyboardVisible {
-                    ZashiButton(
-                        String(localizable: .restoreWalletBirthdayEstimate),
-                        type: .ghost
-                    ) {
-                        store.send(.estimateHeightTapped)
-                    }
-                    .padding(.bottom, 12)
-                }
-
-                ZashiButton(
-                    store.isKeystoneFlow
-                    ? String(localizable: .keystoneAddHWWalletConnect)
-                    : store.isResyncFlow
-                    ? String(localizable: .generalConfirm)
-                    : String(localizable: .importWalletButtonRestoreWallet)
-                ) {
-                    store.send(.restoreTapped)
-                }
-                .disabled(!store.isValidBirthday)
-                .padding(.bottom, keyboardVisible ? 48 : 24)
             }
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    HStack(spacing: 12) {
+                        if !store.isKeystoneFlow && !store.isResyncFlow && !keyboardVisible {
+                            ZashiButton(
+                                String(localizable: .restoreWalletBirthdayEstimate),
+                                type: .ghost
+                            ) {
+                                store.send(.estimateHeightTapped)
+                            }
+                        }
+
+                        ZashiButton(
+                            store.isKeystoneFlow
+                            ? String(localizable: .keystoneAddHWWalletConnect)
+                            : store.isResyncFlow
+                            ? String(localizable: .generalConfirm)
+                            : String(localizable: .importWalletButtonRestoreWallet)
+                        ) {
+                            store.send(.restoreTapped)
+                        }
+                        .disabled(!store.isValidBirthday)
+                    }
+                }
+            )
             .onAppear {
                 if store.isResyncFlow || store.isKeystoneFlow {
                     isBirthdayFocused = true

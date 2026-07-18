@@ -18,7 +18,8 @@ struct SmartBannerView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @Perception.Bindable var store: StoreOf<SmartBanner>
-    
+    @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
+
     @State private var realHeight: CGFloat = 100
     @State private var isUnhidden = false
     @State private var height: CGFloat = 0

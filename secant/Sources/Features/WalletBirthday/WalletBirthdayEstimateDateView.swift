@@ -70,23 +70,6 @@ struct WalletBirthdayEstimateDateView: View {
                 }
                 
                 Spacer()
-
-                if store.isKeystoneFlow || store.isResyncFlow {
-                    ZashiButton(
-                        String(localizable: .keystoneAddHWWalletEnterManually),
-                        type: .ghost
-                    ) {
-                        store.send(.enterManuallyTapped)
-                    }
-                    .padding(.bottom, 12)
-                }
-
-                ZashiButton(String(localizable: .generalNext)) {
-                    store.send(.binding(.set(\.selectedMonth, selectedMonth)))
-                    store.send(.binding(.set(\.selectedYear, selectedYear)))
-                    store.send(.estimateHeightRequested)
-                }
-                .padding(.bottom, 24)
             }
             .onAppear {
                 store.send(.onAppear)
@@ -96,7 +79,26 @@ struct WalletBirthdayEstimateDateView: View {
             .onChange(of: store.selectedMonth) { newMonth in
                 selectedMonth = newMonth
             }
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    HStack(spacing: 12) {
+                        if store.isKeystoneFlow || store.isResyncFlow {
+                            ZashiButton(
+                                String(localizable: .keystoneAddHWWalletEnterManually),
+                                type: .ghost
+                            ) {
+                                store.send(.enterManuallyTapped)
+                            }
+                        }
+
+                        ZashiButton(String(localizable: .generalNext)) {
+                            store.send(.binding(.set(\.selectedMonth, selectedMonth)))
+                            store.send(.binding(.set(\.selectedYear, selectedYear)))
+                            store.send(.estimateHeightRequested)
+                        }
+                    }
+                }
+            )
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 trailing:

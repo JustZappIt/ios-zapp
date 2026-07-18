@@ -77,11 +77,13 @@ struct CurrencyConversionSetupView: View {
                 .padding(.vertical, 1)
 
             Spacer()
-            learnMoreFooter()
         }
         .navigationBarTitleDisplayMode(.inline)
         .applyScreenBackground()
-        .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
+        .zashiBack(
+            primaryAction: { learnMoreFooter() },
+            customDismiss: { store.send(.backToHomeTapped) }
+        )
         .zashiSheet(isPresented: $store.isTorSheetPresented) {
             torSheetContent()
         }
@@ -262,16 +264,9 @@ struct CurrencyConversionSetupView: View {
     }
  
     private func learnMoreFooter() -> some View {
-        VStack {
-            secondaryButton(String(localizable: .currencyConversionSkipBtn)) {
-                store.send(.skipTapped)
-            }
-            
-            primaryButton(String(localizable: .currencyConversionEnable)) {
-                store.send(.enableTapped)
-            }
+        primaryButton(String(localizable: .currencyConversionEnable)) {
+            store.send(.enableTapped)
         }
-        .padding(.bottom, 24)
     }
 }
 

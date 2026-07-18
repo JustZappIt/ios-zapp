@@ -38,16 +38,16 @@ struct IneligibleView: View {
                 .padding(.horizontal, 24)
 
                 Spacer()
-
-                ZashiButton(String(localizable: .coinVoteCommonGotIt)) {
-                    store.send(.dismissFlow)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    ZashiButton(String(localizable: .coinVoteCommonGotIt)) {
+                        store.send(.dismissFlow)
+                    }
+                }
+            )
         }
     }
 }

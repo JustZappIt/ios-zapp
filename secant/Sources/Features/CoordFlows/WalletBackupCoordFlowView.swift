@@ -27,7 +27,14 @@ struct WalletBackupCoordFlowView: View {
                             action: \.recoveryPhraseDisplay
                         )
                 )
-                .zashiBack() { store.send(.backToHomeTapped) }
+                .zashiBack(
+                    primaryAction: {
+                        ZashiButton(String(localizable: .generalNext)) {
+                            store.send(.recoveryPhraseDisplay(.securityWarningNextTapped))
+                        }
+                    },
+                    customDismiss: { store.send(.backToHomeTapped) }
+                )
                 .screenTitle(String(localizable: .recoveryPhraseDisplayScreenTitle).uppercased())
             } destination: { store in
                 switch store.case {

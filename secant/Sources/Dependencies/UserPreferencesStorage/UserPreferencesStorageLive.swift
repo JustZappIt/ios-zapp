@@ -28,8 +28,12 @@ extension UserPreferencesStorageClient: DependencyKey {
 
 extension UserPreferencesStorage {
     static let live = UserPreferencesStorage(
-        defaultExchangeRate: Data(),
+        defaultExchangeRate: defaultExchangeRateOn,
         defaultServer: Data(),
         userDefaults: .live()
     )
+
+    // Currency conversion is on by default (opt-out); an explicit choice in settings overrides this.
+    private static let defaultExchangeRateOn: Data =
+        (try? JSONEncoder().encode(ExchangeRate(manual: false, automatic: true))) ?? Data()
 }

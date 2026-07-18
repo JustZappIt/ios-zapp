@@ -38,11 +38,6 @@ struct ResyncWalletView: View {
                 bdBadge()
                     .padding(.bottom, Design.Spacing._3xl)
 
-                ZashiButton(String(localizable: .generalConfirm)) {
-                    store.send(.startResyncTapped)
-                }
-                .padding(.bottom, 24)
-
                 shareView()
 
                 if let supportData = store.supportData {
@@ -65,7 +60,13 @@ struct ResyncWalletView: View {
         .screenHorizontalPadding()
         .applyScreenBackground()
         .navigationBarTitleDisplayMode(.inline)
-        .zashiBack()
+        .zashiBack(
+            primaryAction: {
+                ZashiButton(String(localizable: .generalConfirm)) {
+                    store.send(.startResyncTapped)
+                }
+            }
+        )
         .screenTitle(String(localizable: .resyncWalletTitle))
     }
     
