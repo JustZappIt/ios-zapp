@@ -43,12 +43,6 @@ struct RecoveryPhraseSecurityView: View {
                 .zFont(size: 12, style: Design.Utility.WarningYellow._700)
                 .padding(.bottom, 20)
                 .screenHorizontalPadding()
-
-                ZashiButton(String(localizable: .generalNext)) {
-                    store.send(.securityWarningNextTapped)
-                }
-                .padding(.bottom, 24)
-                .screenHorizontalPadding()
             }
             .applyScreenBackground()
         }

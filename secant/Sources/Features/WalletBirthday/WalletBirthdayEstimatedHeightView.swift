@@ -67,19 +67,20 @@ struct WalletBirthdayEstimatedHeightView: View {
                 .frame(maxWidth: .infinity)
 
                 Spacer()
-
-                ZashiButton(
-                    store.isKeystoneFlow
-                    ? String(localizable: .keystoneAddHWWalletConnect)
-                    : store.isResyncFlow
-                    ? String(localizable: .generalConfirm)
-                    : String(localizable: .importWalletButtonRestoreWallet)
-                ) {
-                    store.send(.restoreTapped)
-                }
-                .padding(.bottom, 24)
             }
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    ZashiButton(
+                        store.isKeystoneFlow
+                        ? String(localizable: .keystoneAddHWWalletConnect)
+                        : store.isResyncFlow
+                        ? String(localizable: .generalConfirm)
+                        : String(localizable: .importWalletButtonRestoreWallet)
+                    ) {
+                        store.send(.restoreTapped)
+                    }
+                }
+            )
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 trailing:

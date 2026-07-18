@@ -94,4 +94,22 @@ extension View {
             )
         )
     }
+
+    /// Back-left with an optional CTA-right: screens whose CTA exists only in some states pass
+    /// `hasPrimaryAction: false` for the rest and get a chrome-free back button, not an empty bar.
+    @ViewBuilder
+    func zashiBack<PrimaryAction: View>(
+        hasPrimaryAction: Bool,
+        _ disabled: Bool = false,
+        hidden: Bool = false,
+        invertedColors: Bool = false,
+        @ViewBuilder primaryAction: () -> PrimaryAction,
+        customDismiss: (() -> Void)? = nil
+    ) -> some View {
+        if hasPrimaryAction {
+            zashiBack(disabled, hidden: hidden, invertedColors: invertedColors, primaryAction: primaryAction, customDismiss: customDismiss)
+        } else {
+            zashiBack(disabled, hidden: hidden, invertedColors: invertedColors, customDismiss: customDismiss)
+        }
+    }
 }

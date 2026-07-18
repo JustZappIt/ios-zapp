@@ -6,9 +6,17 @@ directly impact users rather than highlighting other crucial architectural updat
 
 ## [Unreleased]
 
+### Added
+- [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
+
 ### Changed
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
 - [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and bold Swiss typography (bold headings and titles, a heavy-weight balance display) in both light and dark mode.
+- [ZAPP-1] Currency conversion is now on by default, so your total balance, activity, and amounts show in your selected local currency without having to turn it on first (you can still opt out in Settings). Tap your total balance on the Pay screen to switch between local currency and ZEC; amounts fall back to ZEC only when the rate provider is unavailable.
+
+### Fixed
+- [ZAPP-1] A flat 24-hour balance chart (no change over the period) now draws its line centered vertically instead of pinned to the bottom, where it looked like a zero balance.
+- [ZAPP-1] Standardized the back button across the app: it now sits at the bottom-left of a single action bar, on the same row as the screen's main button (Next / Confirm / Restore / "I wrote it down", and the transaction-details actions), instead of being stacked underneath it. Screens that previously showed a second, redundant "back-like" button (Skip / Remind me later / Keep it off) now use the one back control. Affected areas include recovery-phrase backup, restore birthday height, transaction details, delete/disconnect wallet, data export, feedback, and voting.
 
 ## 3.7.3 build 1 (2026-07-12)
 

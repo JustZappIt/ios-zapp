@@ -91,23 +91,22 @@ struct SendFeedbackView: View {
                             // so frame is set to 0 to not break SwiftUI's layout
                             .frame(width: 0, height: 0)
                         }
-                        
-                        Spacer()
-                        
+
+                        shareView()
+                    }
+                    .screenHorizontalPadding()
+                }
+                .padding(.vertical, 1)
+                .zashiBack(
+                    primaryAction: {
                         ZashiButton(
                             String(localizable: .generalShare)
                         ) {
                             store.send(.sendTapped)
                         }
                         .disabled(store.invalidForm)
-                        .padding(.bottom, keyboardVisible ? 48 : 24)
-                        
-                        shareView()
                     }
-                    .screenHorizontalPadding()
-                }
-                .padding(.vertical, 1)
-                .zashiBack()
+                )
                 .trackKeyboardVisibility($keyboardVisible)
                 .onAppear {
                     store.send(.onAppear)

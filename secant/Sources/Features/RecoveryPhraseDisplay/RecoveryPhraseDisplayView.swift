@@ -43,53 +43,13 @@ struct RecoveryPhraseDisplayView: View {
 
                 Spacer()
 
-                if store.isRecoveryPhraseHidden {
-                    if store.isSeedUnavailable {
-                        Text(localizable: .recoveryPhraseDisplayNoWords)
-                            .zFont(.medium, size: 14, style: Design.Text.primary)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity)
-                            .padding(.bottom, 24)
-                    } else {
-                        ZashiButton(
-                            String(localizable: .recoveryPhraseDisplayReveal),
-                            prefixView:
-                                Asset.Assets.eyeOn.image
-                                .zImage(size: 20, style: Design.Btns.Primary.fg)
-                        ) {
-                            store.send(.recoveryPhraseUnhideRequested, animation: .easeInOut)
-                        }
+                if store.isRecoveryPhraseHidden && store.isSeedUnavailable {
+                    Text(localizable: .recoveryPhraseDisplayNoWords)
+                        .zFont(.medium, size: 14, style: Design.Text.primary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
                         .padding(.bottom, 24)
-                    }
-                } else {
-                    if store.isWalletBackup {
-                        ZashiButton(
-                            String(localizable: .recoveryPhraseDisplayButtonRemindMeLater),
-                            type: .ghost
-                        ) {
-                            store.send(.remindMeLaterTapped)
-                        }
-                        .padding(.bottom, 8)
-
-                        ZashiButton(
-                            String(localizable: .recoveryPhraseDisplayButtonWroteItDown)
-                        ) {
-                            store.send(.seedSavedTapped)
-                        }
-                        .accessibilityIdentifier(AccessibilityID.RecoveryPhrase.confirmButton)
-                        .padding(.bottom, 24)
-                    } else {
-                        ZashiButton(
-                            String(localizable: .recoveryPhraseDisplayHide),
-                            prefixView:
-                                Asset.Assets.eyeOff.image
-                                .zImage(size: 20, style: Design.Btns.Primary.fg)
-                        ) {
-                            store.send(.hideEverything, animation: .easeInOut)
-                        }
-                        .padding(.bottom, 20)
-                    }
                 }
             }
             .onAppear { store.send(.onAppear) }
@@ -103,7 +63,11 @@ struct RecoveryPhraseDisplayView: View {
                 store.send(.hideEverything)
             }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .zashiBack()
+            .zashiBack(
+                hasPrimaryAction: !(store.isRecoveryPhraseHidden && store.isSeedUnavailable),
+                primaryAction: { recoveryPrimaryButton() },
+                customDismiss: recoveryBackAction
+            )
             .zashiSheet(isPresented: $store.isHelpSheetPresented) {
                 helpSheetContent()
             }
@@ -133,7 +97,44 @@ struct RecoveryPhraseDisplayView: View {
         .applyScreenBackground()
         .screenTitle(String(localizable: .recoveryPhraseDisplayScreenTitle).uppercased())
     }
-    
+
+    @ViewBuilder func recoveryPrimaryButton() -> some View {
+        if store.isRecoveryPhraseHidden {
+            if !store.isSeedUnavailable {
+                ZashiButton(
+                    String(localizable: .recoveryPhraseDisplayReveal),
+                    prefixView:
+                        Asset.Assets.eyeOn.image
+                        .zImage(size: 20, style: Design.Btns.Primary.fg)
+                ) {
+                    store.send(.recoveryPhraseUnhideRequested, animation: .easeInOut)
+                }
+            }
+        } else if store.isWalletBackup {
+            ZashiButton(
+                String(localizable: .recoveryPhraseDisplayButtonWroteItDown)
+            ) {
+                store.send(.seedSavedTapped)
+            }
+            .accessibilityIdentifier(AccessibilityID.RecoveryPhrase.confirmButton)
+        } else {
+            ZashiButton(
+                String(localizable: .recoveryPhraseDisplayHide),
+                prefixView:
+                    Asset.Assets.eyeOff.image
+                    .zImage(size: 20, style: Design.Btns.Primary.fg)
+            ) {
+                store.send(.hideEverything, animation: .easeInOut)
+            }
+        }
+    }
+
+    // In backup mode, leaving the screen is "remind me later" — there is no separate back-like button.
+    private var recoveryBackAction: (() -> Void)? {
+        guard store.isWalletBackup else { return nil }
+        return { store.send(.remindMeLaterTapped) }
+    }
+
     /// The word shown at the given seed position. Real seed words exist in the view
     /// hierarchy only after local authentication populated `store.phrase`; before
     /// that (and after every hide) only placeholders are rendered.

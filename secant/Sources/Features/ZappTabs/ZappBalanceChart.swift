@@ -90,12 +90,16 @@ struct ZappBalanceChart: View {
             let minimum = values.min() ?? 0
             let maximum = values.max() ?? 0
             let dateRange = max(lastDate - firstDate, 1)
-            let valueRange = max(Double(maximum - minimum), 1)
+            let valueRange = Double(maximum - minimum)
+            let lineWidth = 2.0
+            let plotHeight = max(size.height - lineWidth * 2, 1)
 
             let coordinates = points.map { point in
-                CGPoint(
+                // Center a flat (zero-range) window instead of pinning it to the baseline.
+                let fraction = valueRange > 0 ? Double(point.balance - minimum) / valueRange : 0.5
+                return CGPoint(
                     x: (point.date.timeIntervalSince1970 - firstDate) / dateRange * size.width,
-                    y: size.height - (Double(point.balance - minimum) / valueRange * size.height)
+                    y: lineWidth + (1 - fraction) * plotHeight
                 )
             }
             guard let first = coordinates.first else { return }
@@ -118,7 +122,7 @@ struct ZappBalanceChart: View {
                     endPoint: CGPoint(x: 0, y: size.height)
                 )
             )
-            context.stroke(line, with: .color(accent), lineWidth: 2)
+            context.stroke(line, with: .color(accent), lineWidth: lineWidth)
         }
         .accessibilityHidden(true)
     }

@@ -87,11 +87,13 @@ struct TorSetupView: View {
                 .padding(.vertical, 1)
 
             Spacer()
-            learnMoreFooter()
         }
         .navigationBarTitleDisplayMode(.inline)
         .applyScreenBackground()
-        .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
+        .zashiBack(
+            primaryAction: { learnMoreFooter() },
+            customDismiss: { store.send(.backToHomeTapped) }
+        )
     }
 
     private func toggleTorSelection() {
@@ -115,20 +117,9 @@ struct TorSetupView: View {
     }
  
     private func learnMoreFooter() -> some View {
-        VStack {
-            ZashiButton(
-                String(localizable: .torSetupLearnBtnOut),
-                type: .ghost
-            ) {
-                store.send(.disableTapped)
-            }
-            
-            ZashiButton(String(localizable: .torSetupLearnBtnIn)) {
-                store.send(.enableTapped)
-            }
-            .padding(.bottom, 24)
+        ZashiButton(String(localizable: .torSetupLearnBtnIn)) {
+            store.send(.enableTapped)
         }
-        .screenHorizontalPadding()
     }
 }
 

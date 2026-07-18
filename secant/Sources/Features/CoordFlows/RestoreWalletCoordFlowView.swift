@@ -994,18 +994,6 @@ struct RecoverySeedPhraseEntryView: View {
                     .screenHorizontalPadding()
                 }
                 .padding(.vertical, 1)
-                
-                VStack {
-                    Spacer()
-                    
-                    ZashiButton(String(localizable: .generalNext)) {
-                        store.send(.nextTapped)
-                    }
-                    .disabled(!store.isValidSeed)
-                    .padding(.bottom, 24)
-                    .screenHorizontalPadding()
-                }
-                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
             .frame(maxWidth: .infinity)
             .trackKeyboardVisibility($keyboardVisible)
@@ -1043,7 +1031,14 @@ struct RecoverySeedPhraseEntryView: View {
                             .padding(Design.Spacing.navBarButtonPadding)
                     }
             )
-            .zashiBack()
+            .zashiBack(
+                primaryAction: {
+                    ZashiButton(String(localizable: .generalNext)) {
+                        store.send(.nextTapped)
+                    }
+                    .disabled(!store.isValidSeed)
+                }
+            )
             .screenTitle(String(localizable: .importWalletButtonRestoreWallet))
             .overlay(
                 VStack(spacing: 0) {

@@ -292,6 +292,12 @@ extension SmartBannerView {
 
                 ZatoshiText(store.transparentBalance, .expanded, store.tokenName)
                     .zFont(.semiBold, size: 20, style: Design.Text.primary)
+
+                if let shieldingFiat {
+                    Text(shieldingFiat)
+                        .zFont(size: 16, style: Design.Text.tertiary)
+                        .padding(.top, 2)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)

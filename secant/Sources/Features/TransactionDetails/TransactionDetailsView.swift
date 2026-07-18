@@ -44,6 +44,7 @@ struct TransactionDetailsView: View {
     let tokenName: String
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
+    @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
 
     init(store: StoreOf<TransactionDetails>, tokenName: String) {
         self.store = store
@@ -123,7 +124,7 @@ struct TransactionDetailsView: View {
                     }
                 }
 
-                footer()
+                footerInfo()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
@@ -141,10 +142,12 @@ struct TransactionDetailsView: View {
                     annotationContent(store.isEditMode)
                 }
             }
-        }
-        .navigationBarHidden(true)
-        .zashiBack() {
-            store.send(.closeDetailTapped)
+            .navigationBarHidden(true)
+            .zashiBack(
+                hasPrimaryAction: hasInlineFooterActions,
+                primaryAction: { footerActions() },
+                customDismiss: { store.send(.closeDetailTapped) }
+            )
         }
     }
 
@@ -154,7 +157,8 @@ struct TransactionDetailsView: View {
         : String(localizable: .transactionHistoryDetails)
     }
 
-    @ViewBuilder func footer() -> some View {
+    // Info-only footer content; button actions move into the bottom bar via `footerActions`.
+    @ViewBuilder func footerInfo() -> some View {
         if store.footerState == .providerFailure {
             if let retryFailure = store.swapAssetFailedWithRetry {
                 VStack(spacing: 8) {
@@ -188,19 +192,6 @@ struct TransactionDetailsView: View {
                 .padding(.horizontal, Constants.horizontalPadding)
                 .padding(.bottom, 16)
             }
-        } else if store.footerState == .contactSupport {
-            if store.isSwap {
-                if store.swapStatus == .refunded || store.swapStatus == .expired || store.swapStatus == .failed || store.swapStatus == .processing {
-                    ZappButton(
-                        title: String(localizable: .reportSwapContact),
-                        variant: .secondary
-                    ) {
-                        store.send(.contactSupportTapped)
-                    }
-                    .padding(.horizontal, Constants.horizontalPadding)
-                    .padding(.bottom, 16)
-                }
-            }
         } else if store.footerState == .depositInfo {
             HStack(alignment: .top, spacing: 12) {
                 Asset.Assets.infoOutline.image
@@ -213,6 +204,33 @@ struct TransactionDetailsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Constants.horizontalPadding)
             .padding(.bottom, 16)
+        }
+
+        if let supportData = store.supportData {
+            UIMailDialogView(
+                supportData: supportData,
+                completion: {
+                    store.send(.sendSupportMailFinished)
+                }
+            )
+            // UIMailDialogView only wraps MFMailComposeViewController presentation
+            // so frame is set to 0 to not break SwiftUI's layout
+            .frame(width: 0, height: 0)
+        }
+
+        shareView()
+    }
+
+    // Buttons that share the bottom bar's row with the back button.
+    @ViewBuilder func footerActions() -> some View {
+        if store.footerState == .contactSupport {
+            // footerState resolves to .contactSupport only for the failed/expired/refunded/stuck states.
+            ZappButton(
+                title: String(localizable: .reportSwapContact),
+                variant: .secondary
+            ) {
+                store.send(.contactSupportTapped)
+            }
         } else if store.footerState == .addNote {
             HStack(spacing: 12) {
                 ZappButton(
@@ -236,23 +254,11 @@ struct TransactionDetailsView: View {
                     }
                 }
             }
-            .padding(.horizontal, Constants.horizontalPadding)
-            .padding(.bottom, 16)
         }
+    }
 
-        if let supportData = store.supportData {
-            UIMailDialogView(
-                supportData: supportData,
-                completion: {
-                    store.send(.sendSupportMailFinished)
-                }
-            )
-            // UIMailDialogView only wraps MFMailComposeViewController presentation
-            // so frame is set to 0 to not break SwiftUI's layout
-            .frame(width: 0, height: 0)
-        }
-
-        shareView()
+    var hasInlineFooterActions: Bool {
+        store.footerState == .addNote || store.footerState == .contactSupport
     }
 }
 
@@ -388,24 +394,39 @@ extension TransactionDetailsView {
     }
 
     @ViewBuilder func amountView() -> some View {
-        Group {
-            if store.isSensitiveContentHidden {
-                Text(localizable: .generalHideBalancesMost)
-                    .zappFont(.display, style: amountStyle)
-            } else if store.transaction.isSwapToZec {
-                if let amount = store.swapAmountOut {
-                    Text("\(amount) \(tokenName)")
+        VStack(spacing: 4) {
+            Group {
+                if store.isSensitiveContentHidden {
+                    Text(localizable: .generalHideBalancesMost)
                         .zappFont(.display, style: amountStyle)
+                } else if store.transaction.isSwapToZec {
+                    if let amount = store.swapAmountOut {
+                        Text("\(amount) \(tokenName)")
+                            .zappFont(.display, style: amountStyle)
+                    } else {
+                        unknownAmount()
+                    }
                 } else {
-                    unknownAmount()
+                    Text("\(store.transaction.netValue) \(tokenName)")
+                        .zappFont(.display, style: amountStyle)
                 }
-            } else {
-                Text("\(store.transaction.netValue) \(tokenName)")
-                    .zappFont(.display, style: amountStyle)
+            }
+            .minimumScaleFactor(0.1)
+            .lineLimit(1)
+
+            if let amountFiat {
+                Text(amountFiat)
+                    .zappFont(.body, style: ZappColors.textMuted)
             }
         }
-        .minimumScaleFactor(0.1)
-        .lineLimit(1)
+    }
+
+    // The transaction amount in the selected fiat, shown under the ZEC value (nil when there is no rate).
+    private var amountFiat: String? {
+        guard !store.isSensitiveContentHidden, !store.transaction.isSwapToZec else { return nil }
+        guard let currencyConversion else { return nil }
+
+        return currencyConversion.convert(store.transaction.zecAmount)
     }
 
     var amountStyle: ZappColors {

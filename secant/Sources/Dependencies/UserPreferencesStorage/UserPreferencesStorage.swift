@@ -73,7 +73,7 @@ struct UserPreferencesStorage {
         setValue(enabled, forKey: Constants.ups_automaticServerSelection.rawValue)
     }
 
-    /// Exchange rate API in the SDK uses TOR and eventually fetches the data from rate providers. This has to be opted in by a user, by default it's off.
+    /// Currency conversion is on by default (see `defaultExchangeRateOn`); users can opt out in settings.
     var exchangeRate: ExchangeRate? {
         /// Removal of `legacy` key, see the comment of `Constants.ups_exchangeRate`
         if userDefaults.objectForKey(Constants.ups_exchangeRate.rawValue) != nil {
