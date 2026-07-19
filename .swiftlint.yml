@@ -139,6 +139,11 @@ identifier_name:
     - nf
     - tx
     - as
+    - xs
+    - sm
+    - md
+    - lg
+    - xl
 
 indentation_width:
   indentation_width: 4

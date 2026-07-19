@@ -468,6 +468,23 @@ public enum Asset {
       public static let warningYellow900 = ColorAsset(name: "WarningYellow900")
       public static let warningYellow950 = ColorAsset(name: "WarningYellow950")
     }
+    public enum Zapp {
+      public static let accent = ColorAsset(name: "Zapp/accent")
+      public static let background = ColorAsset(name: "Zapp/background")
+      public static let border = ColorAsset(name: "Zapp/border")
+      public static let cardShadow = ColorAsset(name: "Zapp/cardShadow")
+      public static let error = ColorAsset(name: "Zapp/error")
+      public static let fabShadow = ColorAsset(name: "Zapp/fabShadow")
+      public static let onPrimary = ColorAsset(name: "Zapp/onPrimary")
+      public static let primary = ColorAsset(name: "Zapp/primary")
+      public static let secondaryBackground = ColorAsset(name: "Zapp/secondaryBackground")
+      public static let success = ColorAsset(name: "Zapp/success")
+      public static let tertiaryBackground = ColorAsset(name: "Zapp/tertiaryBackground")
+      public static let textPrimary = ColorAsset(name: "Zapp/textPrimary")
+      public static let textSecondary = ColorAsset(name: "Zapp/textSecondary")
+      public static let textTertiary = ColorAsset(name: "Zapp/textTertiary")
+      public static let warning = ColorAsset(name: "Zapp/warning")
+    }
     public static let background = ColorAsset(name: "background")
     public static let btnDarkShade = ColorAsset(name: "btnDarkShade")
     public static let btnLabelShade = ColorAsset(name: "btnLabelShade")
