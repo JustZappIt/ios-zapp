@@ -15,6 +15,8 @@ import SwiftUI
 
 struct ZappTransactionRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Dependency(\.date) private var date
+    @Dependency(\.userStoredPreferences) private var userStoredPreferences
 
     private enum Constants {
         static let iconBox: CGFloat = 40
@@ -27,7 +29,7 @@ struct ZappTransactionRow: View {
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
     @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
-    @Shared(.inMemory(.swapAssetsCatalog)) var swapAssets: IdentifiedArrayOf<SwapAsset> = []
+    @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
 
     let transaction: TransactionState
     var tokenName = "ZEC"
@@ -97,8 +99,6 @@ struct ZappTransactionRow: View {
             : transaction.title()
     }
 
-    /// ZEC and fiat swap primary/secondary together with the balance card — one flag
-    /// drives both, exactly as on Android.
     private var amounts: some View {
         VStack(alignment: .trailing, spacing: 2) {
             Text(primaryAmount)
@@ -119,16 +119,17 @@ struct ZappTransactionRow: View {
             : "\(transaction.isSpending ? "-" : "+")\(transaction.zecAmount.decimalString()) \(tokenName)"
     }
 
-    /// nil when neither the exchange rate nor the swap catalogue can price ZEC — the row then shows
-    /// ZEC only, rather than a fabricated fiat figure.
     private var fiatText: String? {
-        guard let conversion = ZappFiatRate.resolve(conversion: currencyConversion, swapAssets: swapAssets) else {
+        guard let conversion = ZappFiatRate.resolve(
+            preference: userStoredPreferences.exchangeRate(),
+            conversion: currencyConversion,
+            fallback: zappFiatQuote,
+            at: date.now()
+        ) else {
             return nil
         }
         guard !isSensitiveContentHidden else { return String(localizable: .generalHideBalancesMost) }
 
-        // Signed to match the ZEC line; an unsigned fiat figure next to a signed one reads as a
-        // different amount rather than the same one in another currency.
         let converted: String = conversion.convert(transaction.zecAmount)
 
         return "\(transaction.isSpending ? "-" : "+")\(converted)"

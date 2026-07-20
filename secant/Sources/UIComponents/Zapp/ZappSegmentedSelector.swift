@@ -5,7 +5,6 @@
 
 import SwiftUI
 
-/// Selector used for the balance-card period switcher (1D / 1W / 1M …).
 struct ZappSegmentedSelector: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -13,8 +12,6 @@ struct ZappSegmentedSelector: View {
         static let inset: CGFloat = 3
         static let spacing: CGFloat = 2
         static let cellMinHeight: CGFloat = 20
-        /// The cell reads at 20pt but still has to offer a 44pt target. The slop is padded on for
-        /// the hit shape and padded straight back off so it costs nothing in layout.
         static let hitSlop: CGFloat = 12
     }
 

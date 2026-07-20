@@ -59,8 +59,7 @@ struct CurrencyConversionSetupView: View {
                     }
                 }
                 .padding(.vertical, Design.Spacing._lg)
-                // Currencies stay reachable while opted out so the choice can be made up front and
-                // saved together with the opt-in.
+                // Currency remains selectable before conversion is enabled.
                 .opacity(store.currentSettingsOption == .optIn ? 1 : 0.5)
             }
         }
