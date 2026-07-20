@@ -50,6 +50,10 @@ struct ContentHeightKey: PreferenceKey {
     }
 }
 
+private enum ZashiSheetConstants {
+    static let bottomSpace26: CGFloat = 24
+}
+
 struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
     @Binding var isPresented: Bool
     let horizontalPadding: CGFloat
@@ -117,6 +121,11 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
             sheetContent
         }
         .padding(.horizontal, horizontalPadding)
+        // `Design.Spacing.sheetBottomSpace` is 0 on iOS 26, where sheets normally inherit a bottom
+        // inset from the system. A detent pinned to the measured content height leaves no slack for
+        // that, so the last control ends up flush against the sheet edge and clipped by its corner
+        // radius. Restore the pre-26 spacing here, before the height is measured.
+        .padding(.bottom, ZashiSheetConstants.bottomSpace26)
         .readHeight { height in
             if abs(height - sheetHeight) > 1 {
                 sheetHeight = height

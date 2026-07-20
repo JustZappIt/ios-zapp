@@ -13,6 +13,9 @@ struct ZappSegmentedSelector: View {
         static let inset: CGFloat = 3
         static let spacing: CGFloat = 2
         static let cellMinHeight: CGFloat = 20
+        /// The cell reads at 20pt but still has to offer a 44pt target. The slop is padded on for
+        /// the hit shape and padded straight back off so it costs nothing in layout.
+        static let hitSlop: CGFloat = 12
     }
 
     let options: [String]
@@ -45,7 +48,9 @@ struct ZappSegmentedSelector: View {
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: Constants.cellMinHeight)
                 .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
+                .padding(.vertical, Constants.hitSlop)
                 .contentShape(Rectangle())
+                .padding(.vertical, -Constants.hitSlop)
         }
         .buttonStyle(.zappPress)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
