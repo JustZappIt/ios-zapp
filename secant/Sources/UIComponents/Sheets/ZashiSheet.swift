@@ -65,7 +65,6 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
                     mainBody26()
                         .presentationDetents([.height(sheetHeight)])
                         .presentationDragIndicator(dragIndicatorVisibility)
-                        .padding(.horizontal, horizontalPadding)
                         .applySheetBackground()
                 } else if #available(iOS 16.4, *) {
                     mainBody()
@@ -73,18 +72,15 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
                         .presentationDetents([.height(sheetHeight)])
                         .presentationDragIndicator(dragIndicatorVisibility)
                         .presentationCornerRadius(Design.Radius._4xl)
-                        .padding(.horizontal, horizontalPadding)
                         .applySheetBackground()
                 } else if #available(iOS 16.0, *) {
                     mainBody()
                         .id(sheetHeight)
                         .presentationDetents([.height(sheetHeight)])
                         .presentationDragIndicator(dragIndicatorVisibility)
-                        .padding(.horizontal, horizontalPadding)
                         .applySheetBackground()
                 } else {
                     mainBody(stickToBottom: true)
-                        .padding(.horizontal, horizontalPadding)
                         .applySheetBackground()
                 }
             }
@@ -98,6 +94,10 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
 
             sheetContent
         }
+        // Measured inside the horizontal padding. The detent comes from this height, and text wraps
+        // to more lines at the padded width than at full width — measuring before the padding
+        // under-reports the height, so the content overflows and the trailing button is clipped.
+        .padding(.horizontal, horizontalPadding)
         .background {
             GeometryReader { proxy in
                 Color.clear
@@ -116,6 +116,7 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
 
             sheetContent
         }
+        .padding(.horizontal, horizontalPadding)
         .readHeight { height in
             if abs(height - sheetHeight) > 1 {
                 sheetHeight = height

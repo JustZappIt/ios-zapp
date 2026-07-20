@@ -23,6 +23,7 @@ struct Home {
         var smartBannerState = SmartBanner.State.initial
         var walletConfig: WalletConfig
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
+        @Shared(.inMemory(.swapAssetsCatalog)) var swapAssetsCatalog: IdentifiedArrayOf<SwapAsset> = []
         var transactionListState: TransactionList.State
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletBalancesState: WalletBalances.State
@@ -93,6 +94,7 @@ struct Home {
         case settingsTapped
         case showSynchronizerErrorAlert(ZcashError)
         case smartBanner(SmartBanner.Action)
+        case swapAssetsCatalogLoaded(IdentifiedArrayOf<SwapAsset>)
         case swapWithNearTapped
         case synchronizerStateChanged(RedactableSynchronizerState)
         case syncFailed(ZcashError)
@@ -153,8 +155,19 @@ struct Home {
                     .cancellable(id: state.CancelEventId, cancelInFlight: true),
                     .send(.smartBanner(.onAppear)),
                     .send(.transactionList(.onAppear)),
-                    .send(.walletBalances(.onAppear))
+                    .send(.walletBalances(.onAppear)),
+                    // The catalogue carries the ZEC price the fiat line falls back to when the
+                    // CoinMarketCap opt-in is off, so it has to be loaded here rather than lazily
+                    // by the swap flows. Android does the same via `ensureSwapAssetsLoaded()`.
+                    .run { [isLoaded = !state.swapAssetsCatalog.isEmpty] send in
+                        guard !isLoaded, let catalog = try? await swapAndPay.swapAssetsCatalog() else { return }
+                        await send(.swapAssetsCatalogLoaded(catalog))
+                    }
                 )
+
+            case .swapAssetsCatalogLoaded(let catalog):
+                state.$swapAssetsCatalog.withLock { $0 = catalog }
+                return .none
                 
             case .onDisappear:
                 // __LD2 TESTED

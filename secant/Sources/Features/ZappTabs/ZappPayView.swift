@@ -26,8 +26,9 @@ struct ZappPayView: View {
     let tokenName: String
 
     /// Shared by the hero and every activity row so both present fiat- or ZEC-first together;
-    /// tapping the balance flips both. Android holds the same single flag.
-    @State private var showZecAsPrimary = false
+    /// tapping the balance flips both. Android holds the same single flag, but starts fiat-first —
+    /// here ZEC leads and fiat sits underneath until the user taps.
+    @State private var showZecAsPrimary = true
 
     var body: some View {
         WithPerceptionTracking {

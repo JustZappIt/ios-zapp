@@ -32,7 +32,18 @@ struct CurrencyConversionSetupView: View {
             ZappScreenHeader(title: String(localizable: .currencyConversionSelectCurrencyTitle))
 
             ScrollView {
-                VStack(spacing: 0) {
+                bordered {
+                    ZappToggleRow(
+                        title: String(localizable: .currencyConversionTitle),
+                        subtitle: String(localizable: .currencyConversionSettingsDesc),
+                        isOn: store.currentSettingsOption == .optIn
+                    ) {
+                        store.send(.settingsOptionTapped(store.currentSettingsOption == .optIn ? .optOut : .optIn))
+                    }
+                }
+                .padding(.top, Design.Spacing._lg)
+
+                bordered {
                     ForEach(Array(CurrencyISO4217.allCases.enumerated()), id: \.element) { index, currency in
                         ZappSelectionRow(
                             title: currency.code,
@@ -47,13 +58,10 @@ struct CurrencyConversionSetupView: View {
                         }
                     }
                 }
-                .background(ZappColors.surface.color(colorScheme))
-                .overlay(
-                    Rectangle()
-                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-                )
-                .padding(.horizontal, 14)
                 .padding(.vertical, Design.Spacing._lg)
+                // Currencies stay reachable while opted out so the choice can be made up front and
+                // saved together with the opt-in.
+                .opacity(store.currentSettingsOption == .optIn ? 1 : 0.5)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -273,6 +281,18 @@ struct CurrencyConversionSetupView: View {
 // MARK: - UI components
 
 extension CurrencyConversionSetupView {
+    private func bordered<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(spacing: 0) {
+            content()
+        }
+        .background(ZappColors.surface.color(colorScheme))
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+        .padding(.horizontal, 14)
+    }
+
     private func primaryButton(
         _ title: String,
         disabled: Bool = false,

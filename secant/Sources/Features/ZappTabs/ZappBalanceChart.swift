@@ -47,7 +47,7 @@ struct ZappBalanceChart: View {
             VStack(alignment: .leading, spacing: 14) {
                 delta(points)
                 sparkline(points)
-                    .frame(height: 88)
+                    .frame(height: 140)
                 ZappSegmentedSelector(
                     options: Period.allCases.map(\.label),
                     selectedIndex: period.rawValue,
