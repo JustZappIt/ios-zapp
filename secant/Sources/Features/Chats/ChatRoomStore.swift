@@ -24,7 +24,11 @@ struct ChatRoom {
         var draft = ""
         var isLoading = true
         var sendDidFail = false
+        var sendFailureMessage: String?
         var messagingState = ZappMessagingState()
+        var showsNetworkDetails = false
+        var isLoadingNetworkDetails = false
+        var connectionDetails: ZMConnectionDetails?
 
         var replyingTo: ZMMessage?
 
@@ -86,13 +90,9 @@ struct ChatRoom {
             return senderName(for: message) ?? String(localizable: .generalUnknown)
         }
 
-        /// OUR connectivity, not the peer's — `isOnline` is this node's swarm
-        /// state, the same field the list's connection chip reads. There is no
-        /// per-peer presence on the client yet (the SDK emits
-        /// `connection.peer_status`, but nothing surfaces it), so claiming
-        /// "Online" under someone's name would be a fabrication: it would read as
-        /// present whenever *we* have a network, even if they have been dark for
-        /// weeks. Say nothing while healthy, and only own up when we are offline.
+        /// The header pill owns peer presence and transport detail. Keep the
+        /// subtitle quiet while our node is connected; when it is offline there
+        /// cannot be a reachable peer, so saying so here is still useful.
         var subtitle: String? {
             messagingState.isOnline ? nil : String(localizable: .chatRoomPeerOffline)
         }
@@ -128,6 +128,15 @@ struct ChatRoom {
                 earlyStatuses.removeValue(forKey: oldest)
             }
         }
+
+        mutating func reconcile(clientId: String, with persisted: ZMMessage) {
+            if let index = messages.firstIndex(where: { $0.id == clientId }) {
+                messages[index] = persisted
+                applyEarlyStatus(at: index)
+            } else {
+                insert(persisted)
+            }
+        }
     }
 
     enum Action: Equatable {
@@ -137,10 +146,15 @@ struct ChatRoom {
         case titleTapped
         case draftChanged(String)
         case sendTapped
+        case sendSucceeded(clientId: String, message: ZMMessage)
         case messagesLoaded([ZMMessage])
         case messageReceived(ZMMessage)
         case messagingStateChanged(ZappMessagingState)
-        case sendFailed(String)
+        case networkChipTapped
+        case networkDetailsDismissed
+        case networkDetailsLoaded(ZMConnectionDetails)
+        case networkDetailsFailed
+        case sendFailed(clientId: String, content: String, reason: String)
         case replyTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
@@ -163,7 +177,9 @@ struct ChatRoom {
 
                 return .merge(
                     .run { _ in
-                        try? await zappMessaging.markRead(conversationId)
+                        try await zappMessaging.markRead(conversationId)
+                    } catch: { error, _ in
+                        LoggerProxy.error("Chat room mark-read failed: \(error)")
                     },
                     .run { send in
                         let messages = try await zappMessaging.messages(conversationId, messagePageSize)
@@ -223,6 +239,7 @@ struct ChatRoom {
             case .draftChanged(let draft):
                 state.draft = draft
                 state.sendDidFail = false
+                state.sendFailureMessage = nil
                 return .none
 
             case .sendTapped:
@@ -240,17 +257,47 @@ struct ChatRoom {
 
                 state.draft = ""
                 state.sendDidFail = false
+                state.sendFailureMessage = nil
                 state.replyingTo = nil
                 state.pendingReply = replyTo
                 let conversationId = state.conversationId
+                let clientId = "local_\(UUID().uuidString)"
+
+                state.insert(
+                    ZMMessage(
+                        id: clientId,
+                        conversationId: conversationId,
+                        senderId: state.messagingState.identity?.publicKey ?? "",
+                        senderName: state.messagingState.identity?.displayName,
+                        content: content,
+                        contentType: "text/plain",
+                        timestamp: Date(),
+                        isFromMe: true,
+                        status: "sending",
+                        replyToId: reply?.id,
+                        replyToSenderName: reply?.senderName,
+                        replyToContent: reply?.content
+                    )
+                )
 
                 return .run { send in
                     let message = try await zappMessaging.sendMessage(conversationId, content, reply)
-                    await send(.messageReceived(message))
+                    await send(.sendSucceeded(clientId: clientId, message: message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send message: \(error)")
-                    await send(.sendFailed(content))
+                    await send(
+                        .sendFailed(
+                            clientId: clientId,
+                            content: content,
+                            reason: error.localizedDescription
+                        )
+                    )
                 }
+
+            case .sendSucceeded(let clientId, let message):
+                state.pendingReply = nil
+                state.reconcile(clientId: clientId, with: message)
+                return .none
 
             case .messagesLoaded(let messages):
                 state.isLoading = false
@@ -276,11 +323,33 @@ struct ChatRoom {
                 state.messagingState = messagingState
                 return .none
 
+            case .networkChipTapped:
+                state.showsNetworkDetails = true
+                state.isLoadingNetworkDetails = true
+                return loadNetworkDetails()
+
+            case .networkDetailsDismissed:
+                state.showsNetworkDetails = false
+                return .none
+
+            case .networkDetailsLoaded(let details):
+                state.connectionDetails = details
+                state.isLoadingNetworkDetails = false
+                return .none
+
+            case .networkDetailsFailed:
+                state.connectionDetails = nil
+                state.isLoadingNetworkDetails = false
+                return .none
+
             // Give the text back. The draft is cleared optimistically on send, so
             // without this a failed send destroys what the user typed, with no
             // bubble and no error — the message simply evaporates. The quote goes
             // back with it, or the retry silently drops the reply.
-            case .sendFailed(let content):
+            case .sendFailed(let clientId, let content, let reason):
+                if let index = state.messages.firstIndex(where: { $0.id == clientId }) {
+                    state.messages[index] = state.messages[index].withStatus("failed")
+                }
                 if state.draft.isEmpty {
                     state.draft = content
                 }
@@ -289,6 +358,7 @@ struct ChatRoom {
                 }
                 state.pendingReply = nil
                 state.sendDidFail = true
+                state.sendFailureMessage = reason
                 return .none
 
             case .replyTapped(let message):
@@ -329,6 +399,7 @@ struct ChatRoom {
 
             case .mediaSendFailed:
                 state.sendDidFail = true
+                state.sendFailureMessage = nil
                 return .none
 
             case .messageStatusChanged(let messageId, let status):
@@ -368,6 +439,16 @@ struct ChatRoom {
 
                 return .none
             }
+        }
+    }
+
+    private func loadNetworkDetails() -> Effect<Action> {
+        .run { send in
+            let details = try await zappMessaging.connectionDetails()
+            await send(.networkDetailsLoaded(details))
+        } catch: { error, send in
+            LoggerProxy.error("Chat room failed to load network details: \(error)")
+            await send(.networkDetailsFailed)
         }
     }
 }

@@ -51,6 +51,10 @@ struct ZappMessagingState: Equatable, Sendable {
 
     var totalUnreadCount = 0
 
+    /// Latest operational failure, kept until a later successful operation clears it.
+    /// Transport errors must remain inspectable instead of disappearing behind `try?`.
+    var lastFailure: ZappMessagingFailure?
+
     /// Per-conversation unread. Counted app-side: the core never sends an
     /// `unreadCount` and `ZMConversation` carries no such field.
     var unreadCounts: [String: Int] = [:]
@@ -74,6 +78,24 @@ struct ZappMessagingState: Equatable, Sendable {
 
     func isPeerOnline(in conversationId: String) -> Bool {
         onlineConversationIds.contains(conversationId)
+    }
+}
+
+struct ZappMessagingFailure: Equatable, Sendable {
+    let operation: String
+    let code: String
+    let message: String
+    let occurredAt: Date
+}
+
+enum ZappMessagingAppError: LocalizedError {
+    case ownPublicKey
+
+    var errorDescription: String? {
+        switch self {
+        case .ownPublicKey:
+            return "A direct chat cannot use your own messaging key."
+        }
     }
 }
 
@@ -118,6 +140,9 @@ struct ZappMessagingClient {
         Empty().eraseToAnyPublisher()
     }
     var refreshConversations: @Sendable () async throws -> Void
+
+    /// Full live transport diagnostics used by the network status sheet.
+    var connectionDetails: @Sendable () async throws -> ZMConnectionDetails
 
     /// Start (or re-open) a direct conversation with a peer's Ed25519 public key.
     /// Returns the existing conversation if one already exists for that peer.
