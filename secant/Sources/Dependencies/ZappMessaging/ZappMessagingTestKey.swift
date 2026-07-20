@@ -23,6 +23,28 @@ extension ZappMessagingClient: TestDependencyKey {
         latestState: { ZappMessagingState() },
         conversationsStream: { Empty().eraseToAnyPublisher() },
         refreshConversations: { },
+        connectionDetails: {
+            ZMConnectionDetails(
+                online: false,
+                peerCount: 0,
+                globalConnections: 0,
+                pendingQueues: 0,
+                pendingMessageCount: 0,
+                pendingInvites: 0,
+                dhtHealth: "unknown",
+                dhtLastCheck: nil,
+                consecutiveFailures: 0,
+                directConversations: 0,
+                groupConversations: 0,
+                dhtBootstrapped: false,
+                dhtFirewalled: nil,
+                dhtRandomized: nil,
+                rtNodes: 0,
+                relayEnabled: false,
+                relaysConnected: 0,
+                relaysTotal: 0
+            )
+        },
         createDirectConversation: { publicKey, displayName in
             ZMConversation(
                 id: publicKey,

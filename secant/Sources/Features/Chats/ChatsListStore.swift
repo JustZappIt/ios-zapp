@@ -18,6 +18,9 @@ struct ChatsList {
 
         /// Distinguishes "no conversations yet" from "the first snapshot has not arrived".
         var isLoaded = false
+        var showsNetworkDetails = false
+        var isLoadingNetworkDetails = false
+        var connectionDetails: ZMConnectionDetails?
 
         var conversationsCancelId = UUID()
         var stateCancelId = UUID()
@@ -47,7 +50,12 @@ struct ChatsList {
         case onAppear
         case onDisappear
         case conversationsUpdated([ZMConversation])
+        case conversationsRefreshFailed
         case messagingStateChanged(ZappMessagingState)
+        case networkChipTapped
+        case networkDetailsDismissed
+        case networkDetailsLoaded(ZMConnectionDetails)
+        case networkDetailsFailed
 
         // Root routes these; the tab stays navigation-agnostic.
         case conversationTapped(String)
@@ -77,7 +85,12 @@ struct ChatsList {
                             .map(ChatsList.Action.messagingStateChanged)
                     }
                     .cancellable(id: state.stateCancelId, cancelInFlight: true),
-                    .run { _ in try? await zappMessaging.refreshConversations() }
+                    .run { _ in
+                        try await zappMessaging.refreshConversations()
+                    } catch: { error, send in
+                        LoggerProxy.error("Chat list refresh failed: \(error)")
+                        await send(.conversationsRefreshFailed)
+                    }
                 )
 
             case .onDisappear:
@@ -91,13 +104,48 @@ struct ChatsList {
                 state.isLoaded = true
                 return .none
 
+            case .conversationsRefreshFailed:
+                // Leave the last known list intact. The structured SDK failure is
+                // visible from the network sheet instead of becoming an empty state.
+                state.isLoaded = true
+                return .none
+
             case .messagingStateChanged(let messagingState):
                 state.messagingState = messagingState
+                return .none
+
+            case .networkChipTapped:
+                state.showsNetworkDetails = true
+                state.isLoadingNetworkDetails = true
+                return loadNetworkDetails()
+
+            case .networkDetailsDismissed:
+                state.showsNetworkDetails = false
+                return .none
+
+            case .networkDetailsLoaded(let details):
+                state.connectionDetails = details
+                state.isLoadingNetworkDetails = false
+                return .none
+
+            case .networkDetailsFailed:
+                state.connectionDetails = nil
+                state.isLoadingNetworkDetails = false
                 return .none
 
             case .conversationTapped, .newConversationTapped:
                 return .none
             }
+        }
+    }
+
+    private func loadNetworkDetails() -> Effect<Action> {
+        .run { send in
+            let details = try await zappMessaging.connectionDetails()
+            await send(.networkDetailsLoaded(details))
+        } catch: { error, send in
+            LoggerProxy.error("Chat list failed to load network details: \(error)")
+            await send(.networkDetailsFailed)
         }
     }
 }

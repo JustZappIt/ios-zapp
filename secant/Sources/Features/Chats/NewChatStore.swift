@@ -42,6 +42,9 @@ struct NewChat {
 
         var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
         var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
+        var isOwnKey: Bool {
+            isValidKey && detectedKey == PublicKeyRules.sanitize(myPublicKey)
+        }
 
         /// A pasted key we already have a name for.
         var detectedContact: ChatContact? {
@@ -52,7 +55,9 @@ struct NewChat {
 
         /// Blocked contacts are excluded: starting a chat with one silently drops their replies.
         var visibleContacts: [ChatContact] {
-            chatContacts.saved.filter { !$0.isBlocked }
+            chatContacts.saved.filter {
+                !$0.isBlocked && PublicKeyRules.sanitize($0.publicKey) != PublicKeyRules.sanitize(myPublicKey)
+            }
         }
 
         var filteredContacts: [ChatContact] {
@@ -70,7 +75,7 @@ struct NewChat {
         /// A group takes keys alone, so the field has no job there.
         var showsNameField: Bool { !isGroupMode && isValidKey && detectedContact == nil }
 
-        var canStart: Bool { isValidKey && !isCreating }
+        var canStart: Bool { isValidKey && !isOwnKey && !isCreating }
 
         var isDetectedKeySelected: Bool {
             isValidKey && selectedContacts.contains { $0.publicKey == detectedKey }
@@ -132,7 +137,7 @@ struct NewChat {
 
             case .peerKeyChanged(let value):
                 state.searchInput = value
-                state.errorCode = nil
+                state.errorCode = state.isOwnKey ? "OWN_PUBLIC_KEY" : nil
                 return .none
 
             case .displayNameChanged(let value):
@@ -177,7 +182,10 @@ struct NewChat {
                 return .none
 
             case .startTapped:
-                guard state.isValidKey else { return .none }
+                guard state.isValidKey, !state.isOwnKey else {
+                    if state.isOwnKey { state.errorCode = "OWN_PUBLIC_KEY" }
+                    return .none
+                }
 
                 let typed = state.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
                 let name = state.detectedContact?.name ?? (typed.isEmpty ? nil : typed)
@@ -207,7 +215,10 @@ struct NewChat {
             // A pasted key can join a group without ever becoming a saved contact, so the chip
             // is an unsaved stand-in. It is local to this screen and never reaches @Shared.
             case .detectedKeyAdded:
-                guard state.isGroupMode, state.isValidKey, !state.isCreating else { return .none }
+                guard state.isGroupMode, state.isValidKey, !state.isOwnKey, !state.isCreating else {
+                    if state.isOwnKey { state.errorCode = "OWN_PUBLIC_KEY" }
+                    return .none
+                }
 
                 let key = state.detectedKey
                 state.searchInput = ""

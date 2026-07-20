@@ -28,8 +28,13 @@ struct NewChatView: View {
                             selectedParticipants
                         }
 
-                        if store.isValidKey {
+                        if store.isValidKey && !store.isOwnKey {
                             keyDetectedBanner
+                        }
+
+                        if store.isOwnKey {
+                            Text(String(localizable: .newChatOwnKey))
+                                .zappFont(.caption, style: ZappColors.danger)
                         }
 
                         if store.showsNameField {
@@ -200,7 +205,7 @@ struct NewChatView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            if store.errorCode != nil {
+            if store.errorCode != nil && store.errorCode != "OWN_PUBLIC_KEY" {
                 Text(String(localizable: .newChatFailed))
                     .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
             }

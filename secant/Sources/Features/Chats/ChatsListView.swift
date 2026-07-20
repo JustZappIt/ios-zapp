@@ -21,7 +21,9 @@ struct ChatsListView: View {
             ZStack(alignment: .bottomTrailing) {
                 VStack(spacing: 0) {
                     ZappScreenHeader(title: String(localizable: .chatListTitle)) {
-                        ChatsConnectionChip(messagingState: store.messagingState)
+                        ChatNetworkStatusChip(state: store.messagingState, context: .list) {
+                            store.send(.networkChipTapped)
+                        }
                     }
 
                     if !store.isLoaded {
@@ -43,6 +45,19 @@ struct ChatsListView: View {
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
+            .sheet(
+                isPresented: Binding(
+                    get: { store.showsNetworkDetails },
+                    set: { if !$0 { store.send(.networkDetailsDismissed) } }
+                )
+            ) {
+                ChatNetworkDetailsView(
+                    state: store.messagingState,
+                    details: store.connectionDetails,
+                    isLoading: store.isLoadingNetworkDetails,
+                    onRefresh: { store.send(.networkChipTapped) }
+                )
+            }
         }
     }
 
@@ -87,35 +102,6 @@ struct ChatsListView: View {
         ProgressView()
             .tint(ZappColors.accent.color(colorScheme))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Silent while the network is healthy: the chip exists to report trouble, not to reassure.
-private struct ChatsConnectionChip: View {
-    let messagingState: ZappMessagingState
-
-    var body: some View {
-        if let status {
-            ZappStatusChip(text: status.text, variant: status.variant)
-        }
-    }
-}
-
-private extension ChatsConnectionChip {
-    var status: (text: String, variant: ZappChipVariant)? {
-        if messagingState.phase == .initializing {
-            return (String(localizable: .chatListConnecting), .accent)
-        }
-
-        if !messagingState.isOnline {
-            return (String(localizable: .chatListOffline), .danger)
-        }
-
-        if messagingState.dhtHealth == "degraded" || messagingState.dhtHealth == "critical" {
-            return (String(localizable: .chatListDegraded), .accent)
-        }
-
-        return nil
     }
 }
 

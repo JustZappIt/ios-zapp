@@ -2049,13 +2049,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't send. Tap to retry."
+            "value": "Couldn't send. Your message is still in the composer."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo enviar. Toca para reintentar."
+            "value": "No se pudo enviar. Tu mensaje sigue en el editor."
           }
         }
       }
@@ -11003,6 +11003,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "No hay contactos guardados"
+          }
+        }
+      }
+    },
+    "newChat.ownKey": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That is your own messaging key. Paste the other person's key to start a chat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esa es tu propia clave de mensajería. Pega la clave de la otra persona para iniciar un chat."
           }
         }
       }

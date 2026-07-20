@@ -27,7 +27,13 @@ struct ChatRoomView: View {
                         store.send(.backToHomeTapped)
                     }
                 } right: {
-                    EmptyView()
+                    ChatNetworkStatusChip(
+                        state: store.messagingState,
+                        context: .room,
+                        conversationId: store.conversationId
+                    ) {
+                        store.send(.networkChipTapped)
+                    }
                 }
 
                 messages
@@ -37,7 +43,7 @@ struct ChatRoomView: View {
                     .frame(height: 1)
 
                 if store.sendDidFail {
-                    Text(String(localizable: .chatRoomSendFailed))
+                    Text(store.sendFailureMessage ?? String(localizable: .chatRoomSendFailed))
                         .zappFont(.caption, style: ZappColors.danger)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, Design.Spacing._xl)
@@ -65,6 +71,19 @@ struct ChatRoomView: View {
             .animation(ZappMotion.content, value: store.replyingTo)
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
+            .sheet(
+                isPresented: Binding(
+                    get: { store.showsNetworkDetails },
+                    set: { if !$0 { store.send(.networkDetailsDismissed) } }
+                )
+            ) {
+                ChatNetworkDetailsView(
+                    state: store.messagingState,
+                    details: store.connectionDetails,
+                    isLoading: store.isLoadingNetworkDetails,
+                    onRefresh: { store.send(.networkChipTapped) }
+                )
+            }
         }
     }
 
