@@ -50,10 +50,6 @@ struct ContentHeightKey: PreferenceKey {
     }
 }
 
-private enum ZashiSheetConstants {
-    static let bottomSpace26: CGFloat = 24
-}
-
 struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
     @Binding var isPresented: Bool
     let horizontalPadding: CGFloat
@@ -98,9 +94,7 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
 
             sheetContent
         }
-        // Measured inside the horizontal padding. The detent comes from this height, and text wraps
-        // to more lines at the padded width than at full width — measuring before the padding
-        // under-reports the height, so the content overflows and the trailing button is clipped.
+        // Measure at the same width used to lay out wrapping content.
         .padding(.horizontal, horizontalPadding)
         .background {
             GeometryReader { proxy in
@@ -121,11 +115,8 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
             sheetContent
         }
         .padding(.horizontal, horizontalPadding)
-        // `Design.Spacing.sheetBottomSpace` is 0 on iOS 26, where sheets normally inherit a bottom
-        // inset from the system. A detent pinned to the measured content height leaves no slack for
-        // that, so the last control ends up flush against the sheet edge and clipped by its corner
-        // radius. Restore the pre-26 spacing here, before the height is measured.
-        .padding(.bottom, ZashiSheetConstants.bottomSpace26)
+        // Fixed-height iOS 26 detents need explicit room below the final control.
+        .padding(.bottom, Design.Spacing._3xl)
         .readHeight { height in
             if abs(height - sheetHeight) > 1 {
                 sheetHeight = height

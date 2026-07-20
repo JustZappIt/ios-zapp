@@ -15,6 +15,7 @@ struct Home {
         var canRequestReview = false
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var isInAppBrowserKeystoneOn = false
+        var isFiatFallbackLoading = false
         var isRateEducationEnabled = false
         var isRateTooltipEnabled = false
         var migratingDatabase = true
@@ -23,7 +24,7 @@ struct Home {
         var smartBannerState = SmartBanner.State.initial
         var walletConfig: WalletConfig
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
-        @Shared(.inMemory(.swapAssetsCatalog)) var swapAssetsCatalog: IdentifiedArrayOf<SwapAsset> = []
+        @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
         var transactionListState: TransactionList.State
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletBalancesState: WalletBalances.State
@@ -73,6 +74,7 @@ struct Home {
         case buyTapped
         case currencyConversionCloseTapped
         case currencyConversionSetupTapped
+        case fiatFallbackResponse(ZappFiatQuote?)
         case foundTransactions
         case keystoneBannerTapped
         case moreTapped
@@ -94,7 +96,6 @@ struct Home {
         case settingsTapped
         case showSynchronizerErrorAlert(ZcashError)
         case smartBanner(SmartBanner.Action)
-        case swapAssetsCatalogLoaded(IdentifiedArrayOf<SwapAsset>)
         case swapWithNearTapped
         case synchronizerStateChanged(RedactableSynchronizerState)
         case syncFailed(ZcashError)
@@ -109,6 +110,7 @@ struct Home {
         case flexaTapped
     }
     
+    @Dependency(\.date) var date
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.reviewRequest) var reviewRequest
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
@@ -141,6 +143,26 @@ struct Home {
                 state.walletBalancesState.migratingDatabase = state.migratingDatabase
                 state.migratingDatabase = false
                 state.isRateEducationEnabled = userStoredPreferences.exchangeRate() == nil
+                let preference = userStoredPreferences.exchangeRate()
+                let shouldLoadFiatFallback = ZappFiatRate.shouldRefreshFallback(
+                    preference: preference,
+                    fallback: state.zappFiatQuote,
+                    isLoading: state.isFiatFallbackLoading,
+                    at: date.now()
+                )
+
+                let fiatFallbackEffect: Effect<Action>
+                if shouldLoadFiatFallback {
+                    state.isFiatFallbackLoading = true
+                    fiatFallbackEffect = .run { [date, swapAndPay] send in
+                        let catalog = try? await swapAndPay.swapAssetsCatalog()
+                        let quote = catalog.flatMap { ZappFiatQuote(swapAssets: $0, fetchedAt: date.now()) }
+                        await send(.fiatFallbackResponse(quote))
+                    }
+                } else {
+                    fiatFallbackEffect = .none
+                }
+
                 return .merge(
                     .publisher {
                         sdkSynchronizer.eventStream()
@@ -156,17 +178,14 @@ struct Home {
                     .send(.smartBanner(.onAppear)),
                     .send(.transactionList(.onAppear)),
                     .send(.walletBalances(.onAppear)),
-                    // The catalogue carries the ZEC price the fiat line falls back to when the
-                    // CoinMarketCap opt-in is off, so it has to be loaded here rather than lazily
-                    // by the swap flows. Android does the same via `ensureSwapAssetsLoaded()`.
-                    .run { [isLoaded = !state.swapAssetsCatalog.isEmpty] send in
-                        guard !isLoaded, let catalog = try? await swapAndPay.swapAssetsCatalog() else { return }
-                        await send(.swapAssetsCatalogLoaded(catalog))
-                    }
+                    fiatFallbackEffect
                 )
 
-            case .swapAssetsCatalogLoaded(let catalog):
-                state.$swapAssetsCatalog.withLock { $0 = catalog }
+            case .fiatFallbackResponse(let quote):
+                state.isFiatFallbackLoading = false
+                if let quote {
+                    state.$zappFiatQuote.withLock { $0 = quote }
+                }
                 return .none
                 
             case .onDisappear:

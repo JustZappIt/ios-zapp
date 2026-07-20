@@ -247,8 +247,6 @@ struct OfframpView: View {
                     .zappFont(.caption, style: ZappColors.textMuted)
             }
 
-            // Baseline-aligned: the flag previously sat in a 20pt-tall box at a 25pt glyph size,
-            // which clipped it and left it floating against the 32pt amount.
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 if let corridor = store.selectedCorridor {
                     Text(corridor.flag)

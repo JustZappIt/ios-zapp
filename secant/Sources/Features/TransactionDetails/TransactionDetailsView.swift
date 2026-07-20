@@ -37,6 +37,8 @@ struct TransactionDetailsView: View {
     }
 
     @Environment(\.colorScheme) var colorScheme
+    @Dependency(\.date) private var date
+    @Dependency(\.userStoredPreferences) private var userStoredPreferences
 
     @FocusState var isAnnotationFocused
 
@@ -45,7 +47,7 @@ struct TransactionDetailsView: View {
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
     @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
-    @Shared(.inMemory(.swapAssetsCatalog)) var swapAssets: IdentifiedArrayOf<SwapAsset> = []
+    @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
 
     init(store: StoreOf<TransactionDetails>, tokenName: String) {
         self.store = store
@@ -422,11 +424,14 @@ extension TransactionDetailsView {
         }
     }
 
-    // The transaction amount in the selected fiat, shown under the ZEC value (nil when neither the
-    // exchange rate nor the swap catalogue can price ZEC).
     private var amountFiat: String? {
         guard !store.isSensitiveContentHidden, !store.transaction.isSwapToZec else { return nil }
-        guard let conversion = ZappFiatRate.resolve(conversion: currencyConversion, swapAssets: swapAssets) else {
+        guard let conversion = ZappFiatRate.resolve(
+            preference: userStoredPreferences.exchangeRate(),
+            conversion: currencyConversion,
+            fallback: zappFiatQuote,
+            at: date.now()
+        ) else {
             return nil
         }
 

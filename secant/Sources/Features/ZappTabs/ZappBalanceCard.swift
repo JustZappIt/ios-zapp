@@ -11,6 +11,8 @@ import SwiftUI
 
 struct ZappBalanceCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Dependency(\.date) private var date
+    @Dependency(\.userStoredPreferences) private var userStoredPreferences
 
     private enum Constants {
         static let horizontalPadding: CGFloat = 20
@@ -25,7 +27,7 @@ struct ZappBalanceCard: View {
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
     @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
-    @Shared(.inMemory(.swapAssetsCatalog)) var swapAssets: IdentifiedArrayOf<SwapAsset> = []
+    @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
 
     let totalBalance: Zatoshi
     let shieldedBalance: Zatoshi
@@ -150,10 +152,13 @@ struct ZappBalanceCard: View {
         hidable(totalBalance.decimalString())
     }
 
-    /// nil when neither the exchange rate nor the swap catalogue can price ZEC — the hero then stays
-    /// ZEC-only and the tap-to-flip is disabled, rather than showing a fabricated fiat figure.
     private var fiat: (whole: String, fraction: String)? {
-        guard let conversion = ZappFiatRate.resolve(conversion: currencyConversion, swapAssets: swapAssets) else {
+        guard let conversion = ZappFiatRate.resolve(
+            preference: userStoredPreferences.exchangeRate(),
+            conversion: currencyConversion,
+            fallback: zappFiatQuote,
+            at: date.now()
+        ) else {
             return nil
         }
 
