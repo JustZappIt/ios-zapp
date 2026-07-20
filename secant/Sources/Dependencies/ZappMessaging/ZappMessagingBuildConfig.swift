@@ -26,6 +26,10 @@ enum ZappMessagingBuildConfig {
     /// DHT seed node. Without it the swarm has nothing to join through.
     static let bootstrapNodes = "140.245.193.100:49737"
 
+    /// Stable public address for an immediate blind-peer connection attempt.
+    /// HyperDHT retains normal DHT lookup as the fallback path.
+    static let blindPeerAddress = "140.245.193.100:49737"
+
     /// Must stay nil/`info` in anything shipped: `debug` dumps keypairs and
     /// verbose stream lifecycle into the log.
     static let logLevel: String? = {
@@ -45,6 +49,7 @@ enum ZappMessagingBuildConfig {
             dataDir: try ZappMessagingConfig.defaultDataDir(),
             blindPeerKeys: blindPeerKeys,
             bootstrapNodes: bootstrapNodes,
+            blindPeerAddress: blindPeerAddress,
             logLevel: logLevel
         )
     }
