@@ -205,7 +205,7 @@ struct NewChatView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            if store.errorCode != nil && store.errorCode != "OWN_PUBLIC_KEY" {
+            if store.errorCode != nil && store.errorCode != .ownPublicKey {
                 Text(String(localizable: .newChatFailed))
                     .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
             }

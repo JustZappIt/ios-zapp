@@ -8,6 +8,7 @@ directly impact users rather than highlighting other crucial architectural updat
 
 ### Added
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
+- [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
@@ -18,6 +19,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] The currency picker in Settings now has an on/off switch for currency conversion, so you can turn it off without leaving the screen.
 
 ### Fixed
+- [ZAPP-1] Chat now rejects conversations that use your own messaging key, keeps failed messages available for an explicit retry, and reconciles outgoing messages without duplicate bubbles.
 - [ZAPP-1] Dollar amounts no longer vanish from the balance, activity list, and transaction details when the rate provider can't be reached — the price from the swap catalogue is used instead. This only applies when currency conversion is on and your currency is USD; turning conversion off now hides fiat everywhere, and a non-USD currency waits for the real rate rather than showing a dollar figure under the wrong symbol.
 - [ZAPP-1] On "Pay a merchant", the country flag next to the amount was clipped and sat out of line with the figure you type; flag, currency symbol, and amount now share a baseline.
 - [ZAPP-1] Bottom sheets no longer cut off their last button. On iOS 26 sheet content had no space reserved beneath it, so the button sat flush against the sheet edge and its corners were clipped — the OK button in the "How this works" sheets for paying a merchant and adding funds to Base, and the Add/Save button on the transaction note sheet.
@@ -1029,4 +1031,3 @@ issue for more details.
 --------
 - Added SwiftGen templates for generating asset helper files.
 - Added Code Review Guides, Changelog, pull request and issue templates, SwiftLint Rules
-

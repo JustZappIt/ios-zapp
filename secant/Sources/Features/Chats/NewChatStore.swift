@@ -24,7 +24,7 @@ struct NewChat {
         var searchInput = ""
         var displayName = ""
         var isCreating = false
-        var errorCode: String?
+        var errorCode: ZappMessagingFailureCode?
         var didCopy = false
 
         /// Our own key, so the user can hand it to the person they want to talk
@@ -106,7 +106,7 @@ struct NewChat {
         case contactTapped(ChatContact)
         case startTapped
         case created(ZMConversation)
-        case createFailed(String)
+        case createFailed(ZappMessagingFailureCode)
 
         case newGroupTapped
         case detectedKeyAdded
@@ -137,7 +137,7 @@ struct NewChat {
 
             case .peerKeyChanged(let value):
                 state.searchInput = value
-                state.errorCode = state.isOwnKey ? "OWN_PUBLIC_KEY" : nil
+                state.errorCode = state.isOwnKey ? .ownPublicKey : nil
                 return .none
 
             case .displayNameChanged(let value):
@@ -183,7 +183,7 @@ struct NewChat {
 
             case .startTapped:
                 guard state.isValidKey, !state.isOwnKey else {
-                    if state.isOwnKey { state.errorCode = "OWN_PUBLIC_KEY" }
+                    if state.isOwnKey { state.errorCode = .ownPublicKey }
                     return .none
                 }
 
@@ -216,7 +216,7 @@ struct NewChat {
             // is an unsaved stand-in. It is local to this screen and never reaches @Shared.
             case .detectedKeyAdded:
                 guard state.isGroupMode, state.isValidKey, !state.isOwnKey, !state.isCreating else {
-                    if state.isOwnKey { state.errorCode = "OWN_PUBLIC_KEY" }
+                    if state.isOwnKey { state.errorCode = .ownPublicKey }
                     return .none
                 }
 
@@ -270,7 +270,7 @@ struct NewChat {
                         await send(.created(conversation))
                     } catch {
                         LoggerProxy.event("NewChat: createGroup failed: \(error)")
-                        await send(.createFailed((error as NSError).domain))
+                        await send(.createFailed(ZappMessagingFailureCode(error: error)))
                     }
                 }
 
@@ -313,7 +313,7 @@ struct NewChat {
                 await send(.created(conversation))
             } catch {
                 LoggerProxy.event("NewChat: createDirectConversation failed: \(error)")
-                await send(.createFailed((error as NSError).domain))
+                await send(.createFailed(ZappMessagingFailureCode(error: error)))
             }
         }
     }

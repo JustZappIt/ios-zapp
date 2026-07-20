@@ -130,9 +130,15 @@ struct ChatRoom {
         }
 
         mutating func reconcile(clientId: String, with persisted: ZMMessage) {
-            if let index = messages.firstIndex(where: { $0.id == clientId }) {
-                messages[index] = persisted
-                applyEarlyStatus(at: index)
+            let echoedStatus = messages.first(where: { $0.id == persisted.id })?.status
+            messages.removeAll { $0.id == clientId || $0.id == persisted.id }
+
+            if let echoedStatus {
+                insert(
+                    persisted.withStatus(
+                        ChatMessageStatusOrder.advance(from: persisted.status, to: echoedStatus)
+                    )
+                )
             } else {
                 insert(persisted)
             }
@@ -154,7 +160,8 @@ struct ChatRoom {
         case networkDetailsDismissed
         case networkDetailsLoaded(ZMConnectionDetails)
         case networkDetailsFailed
-        case sendFailed(clientId: String, content: String, reason: String)
+        case sendFailed(clientId: String, code: ZappMessagingFailureCode)
+        case retrySendTapped(ZMMessage)
         case replyTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
@@ -288,14 +295,15 @@ struct ChatRoom {
                     await send(
                         .sendFailed(
                             clientId: clientId,
-                            content: content,
-                            reason: error.localizedDescription
+                            code: ZappMessagingFailureCode(error: error)
                         )
                     )
                 }
 
             case .sendSucceeded(let clientId, let message):
                 state.pendingReply = nil
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
                 state.reconcile(clientId: clientId, with: message)
                 return .none
 
@@ -342,24 +350,50 @@ struct ChatRoom {
                 state.isLoadingNetworkDetails = false
                 return .none
 
-            // Give the text back. The draft is cleared optimistically on send, so
-            // without this a failed send destroys what the user typed, with no
-            // bubble and no error — the message simply evaporates. The quote goes
-            // back with it, or the retry silently drops the reply.
-            case .sendFailed(let clientId, let content, let reason):
+            case .sendFailed(let clientId, let code):
                 if let index = state.messages.firstIndex(where: { $0.id == clientId }) {
                     state.messages[index] = state.messages[index].withStatus("failed")
                 }
-                if state.draft.isEmpty {
-                    state.draft = content
-                }
-                if state.replyingTo == nil {
-                    state.replyingTo = state.pendingReply
-                }
                 state.pendingReply = nil
                 state.sendDidFail = true
-                state.sendFailureMessage = reason
+                state.sendFailureMessage = code == .ownPublicKey || code == .ipc(.ownPublicKey)
+                    ? String(localizable: .chatRoomOwnKeySendFailed)
+                    : String(localizable: .chatRoomSendFailed)
                 return .none
+
+            case .retrySendTapped(let failedMessage):
+                guard failedMessage.isFromMe,
+                      failedMessage.status == "failed",
+                      let index = state.messages.firstIndex(where: { $0.id == failedMessage.id })
+                else { return .none }
+
+                let reply = failedMessage.replyToId.map {
+                    ZMReplyContext(
+                        id: $0,
+                        senderName: failedMessage.replyToSenderName ?? String(localizable: .generalUnknown),
+                        content: failedMessage.replyToContent ?? ""
+                    )
+                }
+                state.messages[index] = failedMessage.withStatus("sending")
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
+
+                return .run { send in
+                    let message = try await zappMessaging.sendMessage(
+                        failedMessage.conversationId,
+                        failedMessage.content,
+                        reply
+                    )
+                    await send(.sendSucceeded(clientId: failedMessage.id, message: message))
+                } catch: { error, send in
+                    LoggerProxy.error("Chat room failed to retry message: \(error)")
+                    await send(
+                        .sendFailed(
+                            clientId: failedMessage.id,
+                            code: ZappMessagingFailureCode(error: error)
+                        )
+                    )
+                }
 
             case .replyTapped(let message):
                 state.replyingTo = message

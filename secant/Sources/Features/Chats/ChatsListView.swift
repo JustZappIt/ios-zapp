@@ -73,6 +73,13 @@ struct ChatsListView: View {
                     ) {
                         store.send(.conversationTapped(conversation.id))
                     }
+                    .contextMenu {
+                        if conversation.type == .direct {
+                            Button(String(localizable: .generalDelete), role: .destructive) {
+                                store.send(.removeConversationTapped(conversation.id))
+                            }
+                        }
+                    }
 
                     if conversation.id != store.sortedConversations.last?.id {
                         ZappRowDivider(inset: true)
