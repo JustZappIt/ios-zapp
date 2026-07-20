@@ -27,6 +27,7 @@ struct ZappTransactionRow: View {
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
     @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
+    @Shared(.inMemory(.swapAssetsCatalog)) var swapAssets: IdentifiedArrayOf<SwapAsset> = []
 
     let transaction: TransactionState
     var tokenName = "ZEC"
@@ -118,13 +119,19 @@ struct ZappTransactionRow: View {
             : "\(transaction.isSpending ? "-" : "+")\(transaction.zecAmount.decimalString()) \(tokenName)"
     }
 
-    /// nil when there is no exchange rate — the row then shows ZEC only, rather than
-    /// a fabricated fiat figure.
+    /// nil when neither the exchange rate nor the swap catalogue can price ZEC — the row then shows
+    /// ZEC only, rather than a fabricated fiat figure.
     private var fiatText: String? {
-        guard let currencyConversion else { return nil }
+        guard let conversion = ZappFiatRate.resolve(conversion: currencyConversion, swapAssets: swapAssets) else {
+            return nil
+        }
         guard !isSensitiveContentHidden else { return String(localizable: .generalHideBalancesMost) }
 
-        return currencyConversion.convert(transaction.zecAmount)
+        // Signed to match the ZEC line; an unsigned fiat figure next to a signed one reads as a
+        // different amount rather than the same one in another currency.
+        let converted: String = conversion.convert(transaction.zecAmount)
+
+        return "\(transaction.isSpending ? "-" : "+")\(converted)"
     }
 
     private var primaryAmount: String {

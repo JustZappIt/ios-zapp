@@ -25,6 +25,7 @@ struct ZappBalanceCard: View {
 
     @Shared(.appStorage(.sensitiveContent)) var isSensitiveContentHidden = false
     @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
+    @Shared(.inMemory(.swapAssetsCatalog)) var swapAssets: IdentifiedArrayOf<SwapAsset> = []
 
     let totalBalance: Zatoshi
     let shieldedBalance: Zatoshi
@@ -149,12 +150,14 @@ struct ZappBalanceCard: View {
         hidable(totalBalance.decimalString())
     }
 
-    /// nil when no exchange rate has been fetched — the hero then stays ZEC-only and the tap-to-flip
-    /// is disabled, rather than showing a fabricated fiat figure.
+    /// nil when neither the exchange rate nor the swap catalogue can price ZEC — the hero then stays
+    /// ZEC-only and the tap-to-flip is disabled, rather than showing a fabricated fiat figure.
     private var fiat: (whole: String, fraction: String)? {
-        guard let currencyConversion else { return nil }
+        guard let conversion = ZappFiatRate.resolve(conversion: currencyConversion, swapAssets: swapAssets) else {
+            return nil
+        }
 
-        let formatted: String = currencyConversion.convert(totalBalance)
+        let formatted: String = conversion.convert(totalBalance)
         guard !formatted.isEmpty else { return nil }
 
         let separator = Locale.current.decimalSeparator ?? "."

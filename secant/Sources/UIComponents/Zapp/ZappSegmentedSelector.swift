@@ -12,7 +12,7 @@ struct ZappSegmentedSelector: View {
     private enum Constants {
         static let inset: CGFloat = 3
         static let spacing: CGFloat = 2
-        static let cellMinHeight: CGFloat = 48
+        static let cellMinHeight: CGFloat = 20
     }
 
     let options: [String]

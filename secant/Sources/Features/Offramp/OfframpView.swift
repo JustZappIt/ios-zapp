@@ -247,11 +247,12 @@ struct OfframpView: View {
                     .zappFont(.caption, style: ZappColors.textMuted)
             }
 
-            HStack(spacing: 8) {
+            // Baseline-aligned: the flag previously sat in a 20pt-tall box at a 25pt glyph size,
+            // which clipped it and left it floating against the 32pt amount.
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 if let corridor = store.selectedCorridor {
                     Text(corridor.flag)
-                        .font(.system(size: 25))
-                        .frame(width: 30, height: 20)
+                        .font(.system(size: 28))
                     Text(corridor.symbol)
                         .zappFont(amountStyle, style: ZappColors.text)
                 }
@@ -670,17 +671,21 @@ struct OfframpView: View {
                 "Enter the amount first. Zapp connects you to a merchant, then asks you to scan the merchant QR so the encrypted payment details can be sent."
             ))
             .zappFont(.body, style: ZappColors.textMuted)
+            .fixedSize(horizontal: false, vertical: true)
             Text(text(
                 "offramp.info.android.privacy",
                 "No KYC is required, and your funds leave from your shielded balance, so the merchant only sees the Base account that pays them, not your Zcash address."
             ))
             .zappFont(.body, style: ZappColors.textMuted)
+            .fixedSize(horizontal: false, vertical: true)
             Text(text(
                 "offramp.info.android.estimate",
                 "Estimated. Final amount locks in when the merchant accepts."
             ))
-            .zappFont(.body, style: ZappColors.textMuted)
+            .zappFont(.caption, style: ZappColors.textSubtle)
+            .fixedSize(horizontal: false, vertical: true)
             ZappButton(title: text("general.ok", "OK")) { isPaymentInfoPresented = false }
+                .padding(.top, 12)
         }
         .padding(.top, 24)
         .padding(.bottom, Design.Spacing.sheetBottomSpace)
@@ -698,6 +703,7 @@ struct OfframpView: View {
             .fixedSize(horizontal: false, vertical: true)
             if let account = store.account { accountAddressCard(account) }
             ZappButton(title: text("general.ok", "OK")) { isTopUpInfoPresented = false }
+                .padding(.top, 12)
         }
         .padding(.top, 24)
         .padding(.bottom, Design.Spacing.sheetBottomSpace)
