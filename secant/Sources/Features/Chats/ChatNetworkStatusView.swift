@@ -29,27 +29,28 @@ struct ChatNetworkStatusChip: View {
     private var model: (text: String, variant: ZappChipVariant, dotColor: ZappColors) {
         switch state.phase {
         case .initializing, .deriving, .idle, .needsIdentity:
-            return (chatString("chat.network.connecting", "Connecting…"), .accent, .accent)
+            return (String(localizable: .chatListConnecting), .accent, .accent)
         case .failed:
-            return (chatString("chat.network.error", "Error"), .danger, .danger)
+            return (String(localizable: .chatNetworkError), .danger, .danger)
         case .ready:
             break
         }
 
         guard state.isOnline else {
-            return (chatString("chat.network.offline", "Offline"), .danger, .danger)
+            return (String(localizable: .chatListOffline), .danger, .danger)
         }
 
-        if context == .room {
-            if let conversationId, state.isPeerOnline(in: conversationId) {
-                return (chatString("chat.network.online", "Online"), .success, .success)
-            }
-            if state.dhtHealth == "critical" {
-                return (chatString("chat.network.dht", "DHT"), .danger, .danger)
-            }
-            if state.peerCount == 0 {
-                return (chatString("chat.network.connecting", "Connecting…"), .accent, .accent)
-            }
+        if context == .room, let conversationId, state.isPeerOnline(in: conversationId) {
+            return (String(localizable: .chatRoomPeerOnline), .success, .success)
+        }
+        if state.dhtHealth == "critical" {
+            return (String(localizable: .chatNetworkDht), .danger, .danger)
+        }
+        if state.dhtHealth == "degraded" {
+            return (String(localizable: .chatListDegraded), .accent, .accent)
+        }
+        if state.peerCount == 0 {
+            return (String(localizable: .chatListConnecting), .accent, .accent)
         }
 
         return (String(state.peerCount), .success, .success)
@@ -70,30 +71,33 @@ struct ChatNetworkDetailsView: View {
             VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 header
 
-                section(chatString("chat.network.section.connection", "Connection")) {
-                    row("wifi", chatString("chat.network.status", "Status"), connectionValue, connectionColor)
-                    row("router", chatString("chat.network.reachability", "Reachability"), reachabilityValue, reachabilityColor)
-                    row("externaldrive.connected.to.line.below", chatString("chat.network.backup", "Backup delivery"), backupValue, backupColor)
+                section(String(localizable: .chatNetworkSectionConnection)) {
+                    row(String(localizable: .chatNetworkStatus), connectionValue, connectionColor)
+                    row(String(localizable: .chatNetworkReachability), reachabilityValue, reachabilityColor)
+                    row(String(localizable: .chatNetworkBackup), backupValue, backupColor)
                 }
 
-                section(chatString("chat.network.section.peers", "Peers")) {
-                    row("person.2", chatString("chat.network.peers", "P2P peers"), String(details?.peerCount ?? state.peerCount), peerColor)
-                    row("cable.connector", chatString("chat.network.connections", "TCP connections"), String(details?.globalConnections ?? 0), .text)
-                    row("point.3.connected.trianglepath.dotted", "DHT", dhtValue, dhtColor)
-                    row("network", chatString("chat.network.nodes", "DHT nodes"), String(details?.rtNodes ?? 0), nodeColor)
+                section(String(localizable: .chatNetworkSectionPeers)) {
+                    row(String(localizable: .chatNetworkPeers), String(details?.peerCount ?? state.peerCount), peerColor)
+                    row(String(localizable: .chatNetworkConnections), String(details?.globalConnections ?? 0), .text)
+                    row(String(localizable: .chatNetworkDht), dhtValue, dhtColor)
+                    row(String(localizable: .chatNetworkNodes), String(details?.rtNodes ?? 0), nodeColor)
                 }
 
-                section(chatString("chat.network.section.messages", "Messages")) {
-                    row("clock", chatString("chat.network.pending", "Pending"), pendingValue, pendingColor)
-                    row("bubble.left.and.bubble.right", chatString("chat.network.conversations", "Conversations"), conversationValue, .text)
-                    row("person.badge.plus", chatString("chat.network.invites", "Invites"), String(details?.pendingInvites ?? 0), inviteColor)
+                section(String(localizable: .chatNetworkSectionMessages)) {
+                    row(String(localizable: .chatNetworkPending), pendingValue, pendingColor)
+                    row(String(localizable: .chatNetworkConversations), conversationValue, .text)
+                    row(String(localizable: .chatNetworkInvites), String(details?.pendingInvites ?? 0), inviteColor)
                 }
 
                 if let failure = state.lastFailure {
-                    section(chatString("chat.network.section.lastError", "Last error")) {
+                    section(String(localizable: .chatNetworkSectionLastError)) {
                         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-                            Text("\(failure.operation) · \(failure.code)")
-                                .zappFont(.rowTitle, style: ZappColors.danger)
+                            Text("\(failure.operation.identifier) · \(failure.code.identifier)")
+                                .zappFont(
+                                    .rowTitle,
+                                    style: failure.severity == .error ? ZappColors.danger : ZappColors.accentText
+                                )
                             Text(failure.message)
                                 .zappFont(.caption, style: ZappColors.text)
                                 .textSelection(.enabled)
@@ -112,7 +116,7 @@ struct ChatNetworkDetailsView: View {
 
     private var header: some View {
         HStack {
-            Text(chatString("chat.network.title", "Network"))
+            Text(String(localizable: .chatNetworkTitle))
                 .zappFont(.sectionTitle, style: ZappColors.text)
 
             Spacer()
@@ -120,17 +124,17 @@ struct ChatNetworkDetailsView: View {
             if isLoading {
                 ProgressView().tint(ZappColors.accent.color(colorScheme))
             } else {
-                Button(chatString("chat.network.refresh", "Refresh"), action: onRefresh)
+                Button(String(localizable: .chatNetworkRefresh), action: onRefresh)
                     .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
             }
 
             Button(action: { dismiss() }) {
-                Image(systemName: "xmark")
+                Asset.Assets.Icons.xClose.image
                     .zImage(width: 14, height: 14, style: ZappColors.text)
                     .frame(width: 36, height: 36)
             }
             .buttonStyle(.zappPress)
-            .accessibilityLabel(chatString("general.close", "Close"))
+            .accessibilityLabel(String(localizable: .generalClose))
         }
         .padding(.top, Design.Spacing._lg)
     }
@@ -144,12 +148,8 @@ struct ChatNetworkDetailsView: View {
         .background(ZappColors.surface.color(colorScheme))
     }
 
-    private func row(_ icon: String, _ label: String, _ value: String, _ valueColor: ZappColors) -> some View {
+    private func row(_ label: String, _ value: String, _ valueColor: ZappColors) -> some View {
         HStack(spacing: Design.Spacing._sm) {
-            Image(systemName: icon)
-                .zImage(width: 17, height: 17, style: ZappColors.textMuted)
-                .frame(width: 22)
-
             Text(label)
                 .zappFont(.body, style: ZappColors.textMuted)
 
@@ -162,18 +162,18 @@ struct ChatNetworkDetailsView: View {
     }
 
     private var connectionValue: String {
-        if state.phase == .initializing { return chatString("chat.network.connecting", "Connecting…") }
-        return state.isOnline ? chatString("chat.network.connected", "Connected") : chatString("chat.network.offline", "Offline")
+        if state.phase == .initializing { return String(localizable: .chatListConnecting) }
+        return state.isOnline ? String(localizable: .chatNetworkConnected) : String(localizable: .chatListOffline)
     }
 
     private var connectionColor: ZappColors { state.isOnline ? .success : .danger }
 
     private var reachabilityValue: String {
-        guard let details else { return chatString("chat.network.unknown", "Unknown") }
-        if details.dhtFirewalled == false { return chatString("chat.network.direct", "Direct") }
-        if details.dhtRandomized == true { return chatString("chat.network.strictNat", "Strict NAT") }
-        if details.dhtFirewalled == true { return "NAT" }
-        return chatString("chat.network.unknown", "Unknown")
+        guard let details else { return String(localizable: .generalUnknown) }
+        if details.dhtFirewalled == false { return String(localizable: .chatNetworkDirect) }
+        if details.dhtRandomized == true { return String(localizable: .chatNetworkStrictNat) }
+        if details.dhtFirewalled == true { return String(localizable: .chatNetworkNat) }
+        return String(localizable: .generalUnknown)
     }
 
     private var reachabilityColor: ZappColors {
@@ -181,10 +181,10 @@ struct ChatNetworkDetailsView: View {
     }
 
     private var backupValue: String {
-        guard let details else { return chatString("chat.network.unknown", "Unknown") }
-        if !details.relayEnabled { return chatString("chat.network.off", "Off") }
-        if details.relaysConnected > 0 { return chatString("chat.network.connected", "Connected") }
-        return chatString("chat.network.unavailable", "Unavailable")
+        guard let details else { return String(localizable: .generalUnknown) }
+        if !details.relayEnabled { return String(localizable: .chatNetworkOff) }
+        if details.relaysConnected > 0 { return String(localizable: .chatNetworkConnected) }
+        return String(localizable: .chatNetworkUnavailable)
     }
 
     private var backupColor: ZappColors {
@@ -197,8 +197,12 @@ struct ChatNetworkDetailsView: View {
     private var nodeColor: ZappColors { (details?.rtNodes ?? 0) > 0 ? .success : .textMuted }
 
     private var dhtValue: String {
-        let health = details?.dhtHealth ?? state.dhtHealth
-        return chatString("chat.network.dht.\(health)", health.capitalized)
+        switch details?.dhtHealth ?? state.dhtHealth {
+        case "healthy": return String(localizable: .chatNetworkDhtHealthy)
+        case "degraded": return String(localizable: .chatNetworkDhtDegraded)
+        case "critical": return String(localizable: .chatNetworkDhtCritical)
+        default: return String(localizable: .generalUnknown)
+        }
     }
 
     private var dhtColor: ZappColors {
@@ -210,8 +214,8 @@ struct ChatNetworkDetailsView: View {
     }
 
     private var pendingValue: String {
-        guard let details else { return chatString("chat.network.unknown", "Unknown") }
-        guard details.pendingMessageCount > 0 else { return chatString("chat.network.none", "None") }
+        guard let details else { return String(localizable: .generalUnknown) }
+        guard details.pendingMessageCount > 0 else { return String(localizable: .chatNetworkNone) }
         return "\(details.pendingMessageCount) / \(details.pendingQueues)"
     }
 
@@ -219,11 +223,12 @@ struct ChatNetworkDetailsView: View {
     private var inviteColor: ZappColors { (details?.pendingInvites ?? 0) > 0 ? .accentText : .textMuted }
 
     private var conversationValue: String {
-        guard let details else { return chatString("chat.network.unknown", "Unknown") }
-        return "\(details.directConversations) direct · \(details.groupConversations) group"
+        guard let details else { return String(localizable: .generalUnknown) }
+        return String(
+            localizable: .chatNetworkConversationCount(
+                String(details.directConversations),
+                String(details.groupConversations)
+            )
+        )
     }
-}
-
-private func chatString(_ key: String, _ defaultValue: String) -> String {
-    NSLocalizedString(key, tableName: nil, bundle: .main, value: defaultValue, comment: "")
 }

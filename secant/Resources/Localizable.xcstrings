@@ -1601,6 +1601,202 @@
         }
       }
     },
+    "chatNetwork.backup": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Backup delivery" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Entrega de respaldo" } }
+      }
+    },
+    "chatNetwork.connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Connected" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Conectado" } }
+      }
+    },
+    "chatNetwork.connections": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "TCP connections" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Conexiones TCP" } }
+      }
+    },
+    "chatNetwork.conversationCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "%1$@ direct · %2$@ group" } },
+        "es": { "stringUnit": { "state": "translated", "value": "%1$@ directos · %2$@ grupos" } }
+      }
+    },
+    "chatNetwork.conversations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Conversations" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Conversaciones" } }
+      }
+    },
+    "chatNetwork.dht": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "DHT" } },
+        "es": { "stringUnit": { "state": "translated", "value": "DHT" } }
+      }
+    },
+    "chatNetwork.dhtCritical": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Critical" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Crítico" } }
+      }
+    },
+    "chatNetwork.dhtDegraded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Degraded" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Degradado" } }
+      }
+    },
+    "chatNetwork.dhtHealthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Healthy" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Saludable" } }
+      }
+    },
+    "chatNetwork.direct": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Direct" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Directa" } }
+      }
+    },
+    "chatNetwork.error": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Error" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Error" } }
+      }
+    },
+    "chatNetwork.invites": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Invites" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Invitaciones" } }
+      }
+    },
+    "chatNetwork.nat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "NAT" } },
+        "es": { "stringUnit": { "state": "translated", "value": "NAT" } }
+      }
+    },
+    "chatNetwork.nodes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "DHT nodes" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Nodos DHT" } }
+      }
+    },
+    "chatNetwork.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "None" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Ninguno" } }
+      }
+    },
+    "chatNetwork.off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Off" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Desactivada" } }
+      }
+    },
+    "chatNetwork.peers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "P2P peers" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Pares P2P" } }
+      }
+    },
+    "chatNetwork.pending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Pending" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Pendientes" } }
+      }
+    },
+    "chatNetwork.reachability": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Reachability" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Alcance" } }
+      }
+    },
+    "chatNetwork.refresh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Refresh" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Actualizar" } }
+      }
+    },
+    "chatNetwork.sectionConnection": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Connection" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Conexión" } }
+      }
+    },
+    "chatNetwork.sectionLastError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Latest issue" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Incidencia más reciente" } }
+      }
+    },
+    "chatNetwork.sectionMessages": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Messages" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Mensajes" } }
+      }
+    },
+    "chatNetwork.sectionPeers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Peers" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Pares" } }
+      }
+    },
+    "chatNetwork.status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Status" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Estado" } }
+      }
+    },
+    "chatNetwork.strictNat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Strict NAT" } },
+        "es": { "stringUnit": { "state": "translated", "value": "NAT estricta" } }
+      }
+    },
+    "chatNetwork.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Network" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Red" } }
+      }
+    },
+    "chatNetwork.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Unavailable" } },
+        "es": { "stringUnit": { "state": "translated", "value": "No disponible" } }
+      }
+    },
     "chatProfile.displayName": {
       "extractionState": "manual",
       "localizations": {
@@ -1992,6 +2188,23 @@
         }
       }
     },
+    "chatRoom.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar"
+          }
+        }
+      }
+    },
     "chatRoom.replyingTo": {
       "extractionState": "manual",
       "localizations": {
@@ -2049,13 +2262,30 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't send. Your message is still in the composer."
+            "value": "Couldn't send. Tap the failed message to retry."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo enviar. Tu mensaje sigue en el editor."
+            "value": "No se pudo enviar. Toca el mensaje fallido para reintentarlo."
+          }
+        }
+      }
+    },
+    "chatRoom.ownKeySendFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This conversation uses your own messaging key. Remove it and start a chat with the other person's key."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta conversación usa tu propia clave de mensajería. Elimínala e inicia un chat con la clave de la otra persona."
           }
         }
       }

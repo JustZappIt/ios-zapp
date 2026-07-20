@@ -82,19 +82,132 @@ struct ZappMessagingState: Equatable, Sendable {
 }
 
 struct ZappMessagingFailure: Equatable, Sendable {
-    let operation: String
-    let code: String
+    enum Severity: Equatable, Sendable {
+        case advisory
+        case error
+    }
+
+    let operation: ZappMessagingOperation
+    let code: ZappMessagingFailureCode
     let message: String
+    let severity: Severity
     let occurredAt: Date
 }
 
-enum ZappMessagingAppError: LocalizedError {
+enum ZappMessagingOperation: Equatable, Sendable {
+    enum Local: String, Equatable, Sendable {
+        case connectionDetails = "connection.details"
+        case conversationRefresh = "conversation.refresh"
+        case conversationCreate = "conversation.create"
+        case conversationConnect = "conversation.connect"
+        case messageList = "message.list"
+        case messageSend = "message.send"
+        case messageMarkRead = "message.mark_read"
+        case mediaSend = "media.send"
+        case setReadReceipts = "message.set_read_receipts"
+        case setPresenceVisible = "message.set_presence_visible"
+    }
+
+    enum RecoveryArea: Equatable, Sendable {
+        case connection
+        case conversations
+        case messages
+        case privacy
+    }
+
+    case local(Local)
+    case sdk(ZMOperationalFailure.Operation)
+
+    var identifier: String {
+        switch self {
+        case .local(let operation): return operation.rawValue
+        case .sdk(let operation): return operation.identifier
+        }
+    }
+
+    var recoveryArea: RecoveryArea {
+        switch self {
+        case .local(.connectionDetails): return .connection
+        case .local(.conversationRefresh), .local(.conversationCreate), .local(.conversationConnect): return .conversations
+        case .local(.messageList), .local(.messageSend), .local(.messageMarkRead), .local(.mediaSend): return .messages
+        case .local(.setReadReceipts), .local(.setPresenceVisible): return .privacy
+        case .sdk(.connectionResume), .sdk(.pushNotification), .sdk(.ipcEvent): return .connection
+        case .sdk(.conversationConnect), .sdk(.conversationRefresh): return .conversations
+        case .sdk(.messagePersist): return .messages
+        }
+    }
+
+    func recovers(_ failedOperation: ZappMessagingOperation) -> Bool {
+        if self == failedOperation { return true }
+
+        switch self {
+        case .local(.connectionDetails), .local(.conversationRefresh), .local(.messageList):
+            return recoveryArea == failedOperation.recoveryArea
+        case .local(.setReadReceipts), .local(.setPresenceVisible):
+            return failedOperation.recoveryArea == .privacy
+        default:
+            return false
+        }
+    }
+}
+
+enum ZappMessagingFailureCode: Equatable, Sendable {
+    case ownPublicKey
+    case sdkNotReady
+    case ipcTimeout
+    case ipc(ZMErrorCode)
+    case workletError
+    case badResponse
+    case invalidSeed
+    case noIdentity
+    case operational(ZMOperationalFailure.Code)
+    case unknown(String)
+
+    init(error: Error) {
+        if error is ZappMessagingAppError {
+            self = .ownPublicKey
+            return
+        }
+        guard let zmError = error as? ZMError else {
+            self = .unknown((error as NSError).domain)
+            return
+        }
+
+        switch zmError {
+        case .notInitialized: self = .sdkNotReady
+        case .ipcTimeout: self = .ipcTimeout
+        case .ipcError(let code, _): self = .ipc(code)
+        case .workletError: self = .workletError
+        case .invalidData: self = .badResponse
+        case .invalidSeedPhrase: self = .invalidSeed
+        case .identityNotFound: self = .noIdentity
+        default: self = .unknown("UNKNOWN")
+        }
+    }
+
+    var identifier: String {
+        switch self {
+        case .ownPublicKey: return "OWN_PUBLIC_KEY"
+        case .sdkNotReady: return "SDK_NOT_READY"
+        case .ipcTimeout: return "IPC_TIMEOUT"
+        case .ipc(let code): return code.rawValue
+        case .workletError: return "WORKLET_ERROR"
+        case .badResponse: return "BAD_RESPONSE"
+        case .invalidSeed: return "INVALID_SEED"
+        case .noIdentity: return "NO_IDENTITY"
+        case .operational(let code): return code.identifier
+        case .unknown(let value): return value
+        }
+    }
+}
+
+enum ZappMessagingAppError: LocalizedError, Equatable, Sendable {
     case ownPublicKey
 
     var errorDescription: String? {
         switch self {
         case .ownPublicKey:
-            return "A direct chat cannot use your own messaging key."
+            return String(localizable: .chatRoomOwnKeySendFailed)
         }
     }
 }

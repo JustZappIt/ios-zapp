@@ -141,7 +141,18 @@ struct ChatRoomView: View {
                 )
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if message.isFromMe && message.status == "failed" {
+                store.send(.retrySendTapped(message))
+            }
+        }
         .contextMenu {
+            if message.isFromMe && message.status == "failed" {
+                Button(String(localizable: .chatRoomRetry)) {
+                    store.send(.retrySendTapped(message))
+                }
+            }
             Button(String(localizable: .chatRoomReply)) {
                 store.send(.replyTapped(message))
             }

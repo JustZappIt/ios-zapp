@@ -259,9 +259,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await sdk.refreshConversations()
             conversationsSubject.send(await sdk.conversations)
-            clearFailure(for: "conversation.refresh")
+            clearFailure(for: .local(.conversationRefresh))
         } catch {
-            recordFailure("conversation.refresh", error)
+            recordFailure(.local(.conversationRefresh), error)
             throw error
         }
     }
@@ -270,10 +270,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard let sdk else { throw ZMError.notInitialized }
         do {
             let details = try await sdk.getConnectionDetails()
-            clearFailure(for: "connection.details")
+            clearFailure(for: .local(.connectionDetails))
             return details
         } catch {
-            recordFailure("connection.details", error)
+            recordFailure(.local(.connectionDetails), error)
             throw error
         }
     }
@@ -285,7 +285,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         let normalizedKey = PublicKeyRules.sanitize(publicKey)
         guard normalizedKey != PublicKeyRules.sanitize(sdk.identity?.publicKey ?? "") else {
             let error = ZappMessagingAppError.ownPublicKey
-            recordFailure("conversation.create", error)
+            recordFailure(.local(.conversationCreate), error)
             throw error
         }
 
@@ -299,10 +299,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         }) {
             do {
                 try await sdk.ensureConversationConnected(existing.id)
-                clearFailure(for: "conversation.connect")
+                clearFailure(for: .local(.conversationConnect))
                 return existing
             } catch {
-                recordFailure("conversation.connect", error)
+                recordFailure(.local(.conversationConnect), error)
                 throw error
             }
         }
@@ -313,14 +313,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 participants: [normalizedKey],
                 displayName: displayName
             )
-            // Keep this explicit at the app boundary too: a room must never open
-            // after a failed topic join, even if an older SDK is linked locally.
-            try await sdk.ensureConversationConnected(conversation.id)
             conversationsSubject.send(sdk.conversations)
-            clearFailure(for: "conversation.create")
+            clearFailure(for: .local(.conversationCreate))
             return conversation
         } catch {
-            recordFailure("conversation.create", error)
+            recordFailure(.local(.conversationCreate), error)
             throw error
         }
     }
@@ -329,10 +326,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard let sdk else { throw ZMError.notInitialized }
         do {
             let messages = try await sdk.getMessages(conversationId: conversationId, limit: limit)
-            clearFailure(for: "message.list")
+            clearFailure(for: .local(.messageList))
             return messages
         } catch {
-            recordFailure("message.list", error)
+            recordFailure(.local(.messageList), error)
             throw error
         }
     }
@@ -342,10 +339,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
             let message = try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
-            clearFailure(for: "message.send")
+            clearFailure(for: .local(.messageSend))
             return message
         } catch {
-            recordFailure("message.send", error)
+            recordFailure(.local(.messageSend), error)
             throw error
         }
     }
@@ -355,9 +352,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await sdk.markRead(conversationId: conversationId)
             clearUnread(for: conversationId)
-            clearFailure(for: "message.mark_read")
+            clearFailure(for: .local(.messageMarkRead))
         } catch {
-            recordFailure("message.mark_read", error)
+            recordFailure(.local(.messageMarkRead), error)
             throw error
         }
     }
@@ -439,10 +436,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 caption: caption,
                 thumbnailData: thumbnailData
             )
-            clearFailure(for: "media.send")
+            clearFailure(for: .local(.mediaSend))
             return message
         } catch {
-            recordFailure("media.send", error)
+            recordFailure(.local(.mediaSend), error)
             throw error
         }
     }
@@ -455,9 +452,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             try await sdk.setReadReceiptsEnabled(enabled)
             userDefaults.setValue(enabled, PrefKey.readReceipts)
             mutate { $0.readReceiptsEnabled = enabled }
-            clearFailure(for: "message.set_read_receipts")
+            clearFailure(for: .local(.setReadReceipts))
         } catch {
-            recordFailure("message.set_read_receipts", error)
+            recordFailure(.local(.setReadReceipts), error)
             throw error
         }
     }
@@ -468,9 +465,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             try await sdk.setPresenceVisible(visible)
             userDefaults.setValue(visible, PrefKey.presence)
             mutate { $0.presenceVisible = visible }
-            clearFailure(for: "message.set_presence_visible")
+            clearFailure(for: .local(.setPresenceVisible))
         } catch {
-            recordFailure("message.set_presence_visible", error)
+            recordFailure(.local(.setPresenceVisible), error)
             throw error
         }
     }
@@ -487,12 +484,12 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await sdk.setReadReceiptsEnabled(receipts)
         } catch {
-            recordFailure("message.set_read_receipts", error)
+            recordFailure(.local(.setReadReceipts), error)
         }
         do {
             try await sdk.setPresenceVisible(presence)
         } catch {
-            recordFailure("message.set_presence_visible", error)
+            recordFailure(.local(.setPresenceVisible), error)
         }
 
         mutate {
@@ -544,7 +541,12 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         sdk.operationalFailure
             .receive(on: mainQueue)
             .sink { [weak self] failure in
-                self?.recordFailure(failure.operation, code: failure.code, message: failure.message)
+                self?.recordFailure(
+                    .sdk(failure.operation),
+                    code: .operational(failure.code),
+                    message: failure.message,
+                    severity: failure.operation == .pushNotification ? .advisory : .error
+                )
             }
             .store(in: &cancellables)
 
@@ -626,26 +628,34 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         guard hasRemoteParticipant else { throw ZappMessagingAppError.ownPublicKey }
     }
 
-    private func recordFailure(_ operation: String, _ error: Error) {
+    private func recordFailure(_ operation: ZappMessagingOperation, _ error: Error) {
         let nsError = error as NSError
-        recordFailure(operation, code: Self.errorCode(error), message: nsError.localizedDescription)
+        recordFailure(operation, code: ZappMessagingFailureCode(error: error), message: nsError.localizedDescription)
     }
 
-    private func recordFailure(_ operation: String, code: String, message: String) {
+    private func recordFailure(
+        _ operation: ZappMessagingOperation,
+        code: ZappMessagingFailureCode,
+        message: String,
+        severity: ZappMessagingFailure.Severity = .error
+    ) {
         mutate {
+            if $0.lastFailure?.severity == .error && severity == .advisory { return }
             $0.lastFailure = ZappMessagingFailure(
                 operation: operation,
                 code: code,
                 message: message,
+                severity: severity,
                 occurredAt: Date()
             )
         }
-        LoggerProxy.error("ZappMessaging \(operation) failed [\(code)]: \(message)")
+        LoggerProxy.error("ZappMessaging \(operation.identifier) failed [\(code.identifier)]: \(message)")
     }
 
-    private func clearFailure(for operation: String) {
+    private func clearFailure(for operation: ZappMessagingOperation) {
         mutate {
-            if $0.lastFailure?.operation == operation {
+            if let failedOperation = $0.lastFailure?.operation,
+               operation.recovers(failedOperation) {
                 $0.lastFailure = nil
             }
         }
@@ -654,26 +664,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     /// Stable codes for the setup screen's error line, mirroring Android's
     /// SetupErrorCode. Never contains the seed, the key or the name.
     private static func errorCode(_ error: Error) -> String {
-        if let appError = error as? ZappMessagingAppError {
-            switch appError {
-            case .ownPublicKey:
-                return "OWN_PUBLIC_KEY"
-            }
-        }
-        guard let zmError = error as? ZMError else {
-            return (error as NSError).domain
-        }
-
-        switch zmError {
-        case .notInitialized:       return "SDK_NOT_READY"
-        case .ipcTimeout:           return "IPC_TIMEOUT"
-        case .ipcError:             return "IPC_ERROR"
-        case .workletError:         return "WORKLET_ERROR"
-        case .invalidData:          return "BAD_RESPONSE"
-        case .invalidSeedPhrase:    return "INVALID_SEED"
-        case .identityNotFound:     return "NO_IDENTITY"
-        default:                    return "UNKNOWN"
-        }
+        ZappMessagingFailureCode(error: error).identifier
     }
 }
 

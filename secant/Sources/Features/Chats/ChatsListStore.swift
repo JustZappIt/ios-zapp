@@ -59,6 +59,8 @@ struct ChatsList {
 
         // Root routes these; the tab stays navigation-agnostic.
         case conversationTapped(String)
+        case removeConversationTapped(String)
+        case removeConversationFailed
         case newConversationTapped
     }
 
@@ -131,6 +133,17 @@ struct ChatsList {
             case .networkDetailsFailed:
                 state.connectionDetails = nil
                 state.isLoadingNetworkDetails = false
+                return .none
+
+            case .removeConversationTapped(let conversationId):
+                return .run { _ in
+                    try await zappMessaging.removeConversation(conversationId)
+                } catch: { error, send in
+                    LoggerProxy.error("Chat list failed to remove conversation: \(error)")
+                    await send(.removeConversationFailed)
+                }
+
+            case .removeConversationFailed:
                 return .none
 
             case .conversationTapped, .newConversationTapped:
