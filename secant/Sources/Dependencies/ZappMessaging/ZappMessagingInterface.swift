@@ -276,6 +276,11 @@ struct ZappMessagingClient {
     var leaveConversation: @Sendable (_ conversationId: String) async throws -> Void
     var removeConversation: @Sendable (_ conversationId: String) async throws -> Void
 
+    /// Whether the deterministic direct conversation with this peer was explicitly removed on
+    /// this device, so a rejoin can confirm before recreating a tombstoned DM. Defaults to false
+    /// so previews and un-customized mocks skip the prompt.
+    var hasLeftDirectConversation: @Sendable (_ publicKey: String) async throws -> Bool = { _ in false }
+
     // MARK: Messages
 
     var messages: @Sendable (_ conversationId: String, _ limit: Int) async throws -> [ZMMessage] = { _, _ in [] }

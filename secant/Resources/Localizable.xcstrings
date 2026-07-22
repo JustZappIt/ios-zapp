@@ -11305,6 +11305,57 @@
         }
       }
     },
+    "newChat.rejoinConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejoin"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver"
+          }
+        }
+      }
+    },
+    "newChat.rejoinMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You left \"%@\" before. Rejoining will make this conversation visible in Chats again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya saliste de \"%@\". Si vuelves, esta conversación aparecerá de nuevo en Chats."
+          }
+        }
+      }
+    },
+    "newChat.rejoinTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejoin conversation?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Volver a la conversación?"
+          }
+        }
+      }
+    },
     "newChat.searchPlaceholder": {
       "extractionState": "manual",
       "localizations": {

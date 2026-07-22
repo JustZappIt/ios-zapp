@@ -58,6 +58,7 @@ struct NewChatView: View {
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
+            .alert($store.scope(state: \.alert, action: \.alert))
         }
     }
 
