@@ -60,6 +60,7 @@ extension ZappMessagingClient: TestDependencyKey {
         addMember: { _, _, _ in },
         leaveConversation: { _ in },
         removeConversation: { _ in },
+        hasLeftDirectConversation: { _ in false },
         messages: { _, _ in [] },
         sendMessage: { conversationId, content, _ in
             ZMMessage(
