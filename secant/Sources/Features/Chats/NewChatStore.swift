@@ -40,6 +40,9 @@ struct NewChat {
         /// reads "Create group" both before and after it appears.
         var isNamingGroup = false
 
+        /// Non-nil while the "rejoin?" prompt is open, before an explicitly-left DM is recreated.
+        @Presents var alert: AlertState<Action>?
+
         var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
         var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
         var isOwnKey: Bool {
@@ -107,6 +110,9 @@ struct NewChat {
         case startTapped
         case created(ZMConversation)
         case createFailed(ZappMessagingFailureCode)
+        case rejoinRequired(publicKey: String, displayName: String?)
+        case rejoinConfirmed(publicKey: String, displayName: String?)
+        case alert(PresentationAction<Action>)
 
         case newGroupTapped
         case detectedKeyAdded
@@ -206,6 +212,25 @@ struct NewChat {
                 state.errorCode = code
                 return .none
 
+            case let .rejoinRequired(publicKey, displayName):
+                state.isCreating = false
+                let name = displayName ?? String(publicKey.prefix(Constants.keyPreviewLength))
+                state.alert = .rejoinDirect(name: name, publicKey: publicKey, displayName: displayName)
+                return .none
+
+            case let .rejoinConfirmed(publicKey, displayName):
+                return start(&state, publicKey: publicKey, displayName: displayName, confirmRejoin: false)
+
+            case .alert(.presented(let action)):
+                return .send(action)
+
+            case .alert(.dismiss):
+                state.alert = nil
+                return .none
+
+            case .alert:
+                return .none
+
             case .newGroupTapped:
                 guard !state.isCreating, !state.isGroupMode else { return .none }
                 state.isGroupMode = true
@@ -301,7 +326,8 @@ struct NewChat {
     private func start(
         _ state: inout State,
         publicKey: String,
-        displayName: String?
+        displayName: String?,
+        confirmRejoin: Bool = true
     ) -> Effect<Action> {
         guard !state.isCreating else { return .none }
         state.isCreating = true
@@ -309,6 +335,13 @@ struct NewChat {
 
         return .run { send in
             do {
+                // A DM the user explicitly removed is recreated silently once the core clears its
+                // tombstone; prompt first so the reappearing thread isn't a surprise. A failed
+                // status check falls through to a normal create, matching Android.
+                if confirmRejoin, (try? await zappMessaging.hasLeftDirectConversation(publicKey)) == true {
+                    await send(.rejoinRequired(publicKey: publicKey, displayName: displayName))
+                    return
+                }
                 let conversation = try await zappMessaging.createDirectConversation(publicKey, displayName)
                 await send(.created(conversation))
             } catch {
@@ -321,6 +354,26 @@ struct NewChat {
 
 extension NewChat.State {
     static var initial: NewChat.State { .init() }
+}
+
+// MARK: Alerts
+
+extension AlertState where Action == NewChat.Action {
+    static func rejoinDirect(name: String, publicKey: String, displayName: String?) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .newChatRejoinTitle))
+        } actions: {
+            ButtonState(action: .rejoinConfirmed(publicKey: publicKey, displayName: displayName)) {
+                TextState(String(localizable: .newChatRejoinConfirm))
+            }
+
+            ButtonState(role: .cancel) {
+                TextState(String(localizable: .generalCancel))
+            }
+        } message: {
+            TextState(String(localizable: .newChatRejoinMessage(name)))
+        }
+    }
 }
 
 /// An Ed25519 public key as the chat core spells it on the wire: 64 lowercase

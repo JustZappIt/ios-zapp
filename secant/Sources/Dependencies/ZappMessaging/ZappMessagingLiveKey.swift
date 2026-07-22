@@ -43,6 +43,7 @@ extension ZappMessagingClient: DependencyKey {
             addMember: { try await impl.addMember(conversationId: $0, publicKey: $1, displayName: $2) },
             leaveConversation: { try await impl.leaveConversation($0) },
             removeConversation: { try await impl.removeConversation($0) },
+            hasLeftDirectConversation: { try await impl.hasLeftDirectConversation(publicKey: $0) },
             messages: { try await impl.messages(conversationId: $0, limit: $1) },
             sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1, replyTo: $2) },
             sendMedia: { try await impl.sendMedia(conversationId: $0, mediaPath: $1, contentType: $2, caption: $3, thumbnailData: $4) },
@@ -414,6 +415,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         try await sdk.removeConversation(conversationId)
         conversationsSubject.send(await sdk.conversations)
         clearUnread(for: conversationId)
+    }
+
+    func hasLeftDirectConversation(publicKey: String) async throws -> Bool {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.hasLeftDirectConversation(publicKey: publicKey)
     }
 
     // MARK: - Media
