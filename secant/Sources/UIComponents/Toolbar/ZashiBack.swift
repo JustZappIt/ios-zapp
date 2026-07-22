@@ -35,24 +35,136 @@ struct ZashiBackModifier<PrimaryAction: View>: ViewModifier {
                 .navigationBarBackButtonHidden(true)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     ZappBottomActionBar(
-                        onBack: {
-                            if let customDismiss {
-                                customDismiss()
-                            } else {
-                                dismiss()
-                            }
-                        },
+                        onBack: navigateBack,
                         backTint: invertedColors ? .bg : .text,
                         isBackEnabled: !disabled
                     ) {
                         primaryAction
                     }
                 }
+                .zappSwipeBack(isEnabled: !disabled, action: navigateBack)
+        }
+    }
+
+    private func navigateBack() {
+        if let customDismiss {
+            customDismiss()
+        } else {
+            dismiss()
+        }
+    }
+}
+
+private struct ZappInteractiveBackModifier: ViewModifier {
+    private enum Constants {
+        static let activationWidth: CGFloat = 24
+        static let completionProgress: CGFloat = 0.5
+        static let minimumFlickProgress: CGFloat = 0.08
+        static let settleDuration: TimeInterval = 0.2
+    }
+
+    @State private var horizontalOffset: CGFloat = 0
+    @State private var isTracking = false
+    @State private var isCompleting = false
+    @State private var completionTask: Task<Void, Never>?
+
+    let isEnabled: Bool
+    let action: () -> Void
+
+    func body(content: Content) -> some View {
+        GeometryReader { proxy in
+            content
+                .offset(x: horizontalOffset)
+                .contentShape(Rectangle())
+                .simultaneousGesture(edgeSwipeGesture(containerWidth: proxy.size.width))
+        }
+        .onDisappear {
+            completionTask?.cancel()
+        }
+    }
+
+    private func edgeSwipeGesture(containerWidth: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 5)
+            .onChanged { value in
+                guard !isCompleting else { return }
+
+                if !isTracking {
+                    guard beginsBackSwipe(value) else { return }
+                    isTracking = true
+                }
+
+                horizontalOffset = max(0, value.translation.width)
+            }
+            .onEnded { value in
+                guard isTracking else { return }
+                isTracking = false
+
+                if shouldComplete(value, containerWidth: containerWidth) {
+                    completeSwipe(containerWidth: containerWidth)
+                } else {
+                    cancelSwipe()
+                }
+            }
+    }
+
+    private func beginsBackSwipe(_ value: DragGesture.Value) -> Bool {
+        isEnabled
+            && value.startLocation.x <= Constants.activationWidth
+            && value.translation.width > 0
+            && abs(value.translation.width) > abs(value.translation.height)
+    }
+
+    private func shouldComplete(
+        _ value: DragGesture.Value,
+        containerWidth: CGFloat
+    ) -> Bool {
+        guard containerWidth > 0 else { return false }
+
+        let progress = horizontalOffset / containerWidth
+        let predictedProgress = max(0, value.predictedEndTranslation.width) / containerWidth
+
+        return progress >= Constants.completionProgress
+            || (progress >= Constants.minimumFlickProgress
+                && predictedProgress >= Constants.completionProgress)
+    }
+
+    private func cancelSwipe() {
+        withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.9)) {
+            horizontalOffset = 0
+        }
+    }
+
+    private func completeSwipe(containerWidth: CGFloat) {
+        isCompleting = true
+
+        withAnimation(.easeOut(duration: Constants.settleDuration)) {
+            horizontalOffset = containerWidth
+        }
+
+        completionTask?.cancel()
+        completionTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(Constants.settleDuration * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+
+            var transaction = Transaction(animation: nil)
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                action()
+                horizontalOffset = 0
+            }
+            isCompleting = false
         }
     }
 }
 
 extension View {
+    func zappSwipeBack(
+        isEnabled: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
+        modifier(ZappInteractiveBackModifier(isEnabled: isEnabled, action: action))
+    }
+
     func zashiBack(
         _ disabled: Bool = false,
         hidden: Bool = false,

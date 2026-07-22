@@ -25,6 +25,7 @@ struct OfframpView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack { store.send(.backTapped) }
             .onAppear { store.send(.onAppear) }
             .zashiSheet(isPresented: $isPaymentInfoPresented) { paymentMethodInfo }
             .zashiSheet(isPresented: $isTopUpInfoPresented) { topUpInfo }

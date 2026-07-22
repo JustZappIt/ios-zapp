@@ -12,6 +12,7 @@ import ZappMessaging
 /// `ZappBottomActionBar`: the composer owns the bottom edge. `ChatRoomView.kt` does the same.
 struct ChatRoomView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isComposerFocused: Bool
 
     @Perception.Bindable var store: StoreOf<ChatRoom>
 
@@ -24,7 +25,7 @@ struct ChatRoomView: View {
                     onTitleTap: store.isGroup ? { store.send(.titleTapped) } : nil
                 ) {
                     ZappBackButton {
-                        store.send(.backToHomeTapped)
+                        navigateBack()
                     }
                 } right: {
                     ChatNetworkStatusChip(
@@ -62,12 +63,14 @@ struct ChatRoomView: View {
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
                     pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
+                    isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
                     onSend: { store.send(.sendTapped) }
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack(action: navigateBack)
             .animation(ZappMotion.content, value: store.replyingTo)
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
@@ -85,6 +88,11 @@ struct ChatRoomView: View {
                 )
             }
         }
+    }
+
+    private func navigateBack() {
+        isComposerFocused = false
+        store.send(.backToHomeTapped, animation: ZappMotion.content)
     }
 
     private var items: [ChatRoomItem] {
@@ -114,6 +122,10 @@ struct ChatRoomView: View {
                 }
                 .padding(.horizontal, Design.Spacing._xl)
                 .padding(.bottom, Design.Spacing._md)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .onTapGesture {
+                isComposerFocused = false
             }
             .onChange(of: items.count) { _ in
                 guard let last = items.last else { return }
@@ -211,6 +223,7 @@ private struct ChatRoomInputRow: View {
 
     @Binding var draft: String
     @Binding var pickedItem: PhotosPickerItem?
+    let isFocused: FocusState<Bool>.Binding
     let isSendEnabled: Bool
     let onSend: () -> Void
 
@@ -226,6 +239,7 @@ private struct ChatRoomInputRow: View {
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
             TextField(String(localizable: .chatRoomInputPlaceholder), text: $draft, axis: .vertical)
+                .focused(isFocused)
                 .zappFont(.body, style: ZappColors.text)
                 .lineLimit(Constants.lineLimit)
                 .padding(.horizontal, Constants.inputHorizontalPadding)
@@ -246,10 +260,15 @@ private struct ChatRoomInputRow: View {
             .buttonStyle(.zappPress)
             .disabled(!isSendEnabled)
         }
-        .padding(.horizontal, Design.Spacing._xl)
-        .padding(.vertical, Design.Spacing._lg)
-        .background(ZappColors.surface.color(colorScheme))
-        .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+        .padding(.horizontal, Design.Spacing._lg)
+        .padding(.top, Design.Spacing._md)
+        .padding(.bottom, Design.Spacing._xs)
+        .background {
+            // Keep the composer visually attached to the bottom edge while its controls remain
+            // above the home indicator. The keyboard replaces that system inset automatically.
+            ZappColors.surface.color(colorScheme)
+                .ignoresSafeArea(.container, edges: .bottom)
+        }
     }
 }
 

@@ -39,6 +39,7 @@ struct ChatContactsListView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .sheet(item: $store.scope(state: \.form, action: \.form)) { formStore in
                 // A sheet's content closure escapes: reads inside it only register with TCA's

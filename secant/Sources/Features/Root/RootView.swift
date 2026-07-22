@@ -124,7 +124,8 @@ private extension RootView {
                                 tokenName: tokenName
                             )
                         }
-                        .offset(x: store.path == nil ? 0 : -200)
+                        // Keep the home screen beneath a pushed screen stationary. The foreground
+                        // screen owns the transition, so dismissing it never has to re-center home.
                         .onChange(of: store.path) { value in
                             if value == nil {
                                 store.send(.home(.onAppear))
