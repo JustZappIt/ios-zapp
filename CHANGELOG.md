@@ -25,6 +25,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Bottom sheets no longer cut off their last button. On iOS 26 sheet content had no space reserved beneath it, so the button sat flush against the sheet edge and its corners were clipped — the OK button in the "How this works" sheets for paying a merchant and adding funds to Base, and the Add/Save button on the transaction note sheet.
 - [ZAPP-1] A flat 24-hour balance chart (no change over the period) now draws its line centered vertically instead of pinned to the bottom, where it looked like a zero balance.
 - [ZAPP-1] Standardized the back button across the app: it now sits at the bottom-left of a single action bar, on the same row as the screen's main button (Next / Confirm / Restore / "I wrote it down", and the transaction-details actions), instead of being stacked underneath it. Screens that previously showed a second, redundant "back-like" button (Skip / Remind me later / Keep it off) now use the one back control. Affected areas include recovery-phrase backup, restore birthday height, transaction details, delete/disconnect wallet, data export, feedback, and voting.
+- [ZAPP-1] The Zapp onboarding screens (welcome, wallet intro, wallet choice, and the loading screen) now adapt to smaller phones: their large headings scale down to fit the width and the content scrolls when it's too tall, so nothing is clipped or pushed off-screen on shorter devices.
 
 ## 3.7.3 build 1 (2026-07-12)
 
