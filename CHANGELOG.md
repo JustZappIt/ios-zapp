@@ -17,6 +17,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] The Pay screen now leads with your ZEC balance and shows the local-currency value underneath; tapping swaps them so local currency takes the headline with ZEC beneath. The activity list follows whichever you pick.
 - [ZAPP-1] The balance chart is taller and the 24H/1W/1M/ALL selector is half its previous height, so the chart carries the screen instead of the period buttons.
 - [ZAPP-1] The currency picker in Settings now has an on/off switch for currency conversion, so you can turn it off without leaving the screen.
+- [ZAPP-1] You can now swipe from the left edge of a screen to go back, and the screen follows your finger the way it does everywhere else in iOS: drag partway to peek at the screen behind and let go to stay put, or swipe far enough (or flick) to go back. The screen behind slides in as you drag.
+- [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
 ### Fixed
 - [ZAPP-1] Chat now rejects conversations that use your own messaging key, keeps failed messages available for an explicit retry, and reconciles outgoing messages without duplicate bubbles.

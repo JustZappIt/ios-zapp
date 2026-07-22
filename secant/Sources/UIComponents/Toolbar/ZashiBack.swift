@@ -55,14 +55,46 @@ struct ZashiBackModifier<PrimaryAction: View>: ViewModifier {
     }
 }
 
-private struct ZappInteractiveBackModifier: ViewModifier {
-    private enum Constants {
-        static let activationWidth: CGFloat = 24
-        static let completionProgress: CGFloat = 0.5
-        static let minimumFlickProgress: CGFloat = 0.08
-        static let settleDuration: TimeInterval = 0.2
+/// Live back-swipe progress (0...1), reported up to `RootView` so it can parallax the screen behind.
+struct SwipeBackProgressKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+/// Routes the progress preference through `animatableData` so it interpolates on release rather than
+/// jumping to the target `withAnimation` has already committed.
+private struct SwipeBackProgressReporter: ViewModifier, Animatable {
+    var progress: CGFloat
+
+    nonisolated var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
     }
 
+    func body(content: Content) -> some View {
+        content.preference(key: SwipeBackProgressKey.self, value: min(1, max(0, progress)))
+    }
+}
+
+/// Interactive edge-back: the screen tracks the finger from the left edge, then goes back past the
+/// halfway point or on a flick, otherwise snaps back.
+private struct ZappInteractiveBackModifier: ViewModifier {
+    private enum Constants {
+        static let edgeWidth: CGFloat = 30
+        static let minimumDistance: CGFloat = 8
+        static let completionProgress: CGFloat = 0.5
+        static let minimumFlickProgress: CGFloat = 0.1
+        static let settleDuration: TimeInterval = 0.2
+        static let shadowMaxOpacity: CGFloat = 0.18
+        static let shadowRadius: CGFloat = 10
+    }
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var containerWidth: CGFloat = 0
     @State private var horizontalOffset: CGFloat = 0
     @State private var isTracking = false
     @State private var isCompleting = false
@@ -71,20 +103,43 @@ private struct ZappInteractiveBackModifier: ViewModifier {
     let isEnabled: Bool
     let action: () -> Void
 
+    private var progress: CGFloat {
+        containerWidth > 0 ? min(1, max(0, horizontalOffset / containerWidth)) : 0
+    }
+
     func body(content: Content) -> some View {
+        content
+            .offset(x: horizontalOffset)
+            .shadow(
+                color: ZappColors.shadow.color(colorScheme).opacity(Constants.shadowMaxOpacity * shadowStrength),
+                radius: Constants.shadowRadius,
+                x: -Constants.shadowRadius / 2
+            )
+            .background(widthReader)
+            .contentShape(Rectangle())
+            .simultaneousGesture(edgeSwipeGesture)
+            .modifier(SwipeBackProgressReporter(progress: progress))
+            .onDisappear {
+                completionTask?.cancel()
+            }
+    }
+
+    // No shadow at rest; fades in over the first few points as the screen lifts off the edge.
+    private var shadowStrength: CGFloat {
+        horizontalOffset <= 0 ? 0 : min(1, horizontalOffset / Constants.edgeWidth)
+    }
+
+    private var widthReader: some View {
         GeometryReader { proxy in
-            content
-                .offset(x: horizontalOffset)
-                .contentShape(Rectangle())
-                .simultaneousGesture(edgeSwipeGesture(containerWidth: proxy.size.width))
-        }
-        .onDisappear {
-            completionTask?.cancel()
+            Color.clear
+                .onAppear { containerWidth = proxy.size.width }
+                .onChange(of: proxy.size.width) { newWidth in containerWidth = newWidth }
         }
     }
 
-    private func edgeSwipeGesture(containerWidth: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 5)
+    private var edgeSwipeGesture: some Gesture {
+        // `.global` space, not `.local`: local space moves with the view we offset, halving tracking.
+        DragGesture(minimumDistance: Constants.minimumDistance, coordinateSpace: .global)
             .onChanged { value in
                 guard !isCompleting else { return }
 
@@ -99,8 +154,8 @@ private struct ZappInteractiveBackModifier: ViewModifier {
                 guard isTracking else { return }
                 isTracking = false
 
-                if shouldComplete(value, containerWidth: containerWidth) {
-                    completeSwipe(containerWidth: containerWidth)
+                if shouldComplete(value) {
+                    completeSwipe()
                 } else {
                     cancelSwipe()
                 }
@@ -109,18 +164,14 @@ private struct ZappInteractiveBackModifier: ViewModifier {
 
     private func beginsBackSwipe(_ value: DragGesture.Value) -> Bool {
         isEnabled
-            && value.startLocation.x <= Constants.activationWidth
+            && value.startLocation.x <= Constants.edgeWidth
             && value.translation.width > 0
             && abs(value.translation.width) > abs(value.translation.height)
     }
 
-    private func shouldComplete(
-        _ value: DragGesture.Value,
-        containerWidth: CGFloat
-    ) -> Bool {
+    private func shouldComplete(_ value: DragGesture.Value) -> Bool {
         guard containerWidth > 0 else { return false }
 
-        let progress = horizontalOffset / containerWidth
         let predictedProgress = max(0, value.predictedEndTranslation.width) / containerWidth
 
         return progress >= Constants.completionProgress
@@ -129,15 +180,15 @@ private struct ZappInteractiveBackModifier: ViewModifier {
     }
 
     private func cancelSwipe() {
-        withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.9)) {
+        withAnimation(ZappMotion.content) {
             horizontalOffset = 0
         }
     }
 
-    private func completeSwipe(containerWidth: CGFloat) {
+    private func completeSwipe() {
         isCompleting = true
 
-        withAnimation(.easeOut(duration: Constants.settleDuration)) {
+        withAnimation(ZappMotion.content) {
             horizontalOffset = containerWidth
         }
 
@@ -146,12 +197,9 @@ private struct ZappInteractiveBackModifier: ViewModifier {
             try? await Task.sleep(nanoseconds: UInt64(Constants.settleDuration * 1_000_000_000))
             guard !Task.isCancelled else { return }
 
-            var transaction = Transaction(animation: nil)
-            transaction.disablesAnimations = true
-            withTransaction(transaction) {
-                action()
-                horizontalOffset = 0
-            }
+            // Leave the offset at full width: `action()` unmounts the screen, so its removal plays
+            // off-screen. Resetting to 0 would drop it back to center and flash it on the way out.
+            action()
             isCompleting = false
         }
     }
