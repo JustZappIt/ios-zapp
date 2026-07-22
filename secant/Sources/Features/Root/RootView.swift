@@ -6,7 +6,11 @@ struct RootView: View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.colorScheme) var colorScheme
     @State var covered = false
-    
+
+    // Home-screen parallax while a pushed screen is swiped back, fed by `SwipeBackProgressKey`.
+    @State private var swipeBackProgress: CGFloat = 0
+    @State private var homeWidth: CGFloat = 0
+
     @Perception.Bindable var store: StoreOf<Root>
     let tokenName: String
     let networkType: NetworkType
@@ -50,6 +54,15 @@ private struct FeatureFlagWrapper: Identifiable, Equatable, Comparable {
 }
 
 private extension RootView {
+    // Publishes the full screen width so the home parallax can be expressed as a fraction of it.
+    var homeWidthReader: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .onAppear { homeWidth = proxy.size.width }
+                .onChange(of: proxy.size.width) { newWidth in homeWidth = newWidth }
+        }
+    }
+
     @ViewBuilder func switchOverDestination() -> some View {
         WithPerceptionTracking {
             Group {
@@ -124,8 +137,9 @@ private extension RootView {
                                 tokenName: tokenName
                             )
                         }
-                        // Keep the home screen beneath a pushed screen stationary. The foreground
-                        // screen owns the transition, so dismissing it never has to re-center home.
+                        // Sits ~30% left while covered and slides to center as the front screen leaves
+                        // — `swipeBackProgress` drives it on a swipe, `.animation(value:)` on a tap.
+                        .offset(x: store.path != nil ? -homeWidth * 0.3 * (1 - swipeBackProgress) : 0)
                         .onChange(of: store.path) { value in
                             if value == nil {
                                 store.send(.home(.onAppear))
@@ -359,6 +373,8 @@ private extension RootView {
                         )
                     }
                     .animation(.easeInOut(duration: 0.3), value: store.path)
+                    .background(homeWidthReader)
+                    .onPreferenceChange(SwipeBackProgressKey.self) { swipeBackProgress = $0 }
                     .overlayedWithSplash(store.splashAppeared) {
                         store.send(.splashRemovalRequested)
                     }
