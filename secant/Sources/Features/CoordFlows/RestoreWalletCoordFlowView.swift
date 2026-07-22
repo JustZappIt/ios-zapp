@@ -352,6 +352,7 @@ private struct ZappWalletIntroView: View {
             }
         }
         .background(ZappColors.bg.color(colorScheme))
+        .zappSwipeBack(action: onBack)
         .navigationBarBackButtonHidden(true)
     }
 }
@@ -417,6 +418,7 @@ private struct ZappWalletChoiceView: View {
             ZappBottomActionBar(onBack: onBack)
         }
         .background(ZappColors.bg.color(colorScheme))
+        .zappSwipeBack(action: onBack)
         .navigationBarBackButtonHidden(true)
     }
 }

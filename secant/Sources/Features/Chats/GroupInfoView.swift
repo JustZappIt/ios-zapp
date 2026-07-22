@@ -40,6 +40,7 @@ struct GroupInfoView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .sheet(isPresented: addMemberBinding) {

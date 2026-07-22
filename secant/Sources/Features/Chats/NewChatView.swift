@@ -56,6 +56,7 @@ struct NewChatView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .alert($store.scope(state: \.alert, action: \.alert))
