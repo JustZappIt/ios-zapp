@@ -228,45 +228,53 @@ private struct ZappWelcomeGateView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-                Spacer(minLength: 24)
+            GeometryReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Spacer(minLength: 24)
 
-                HStack(spacing: 12) {
-                    Text("Z")
-                        .zappFont(.displaySecondary, style: ZappColors.onAccent)
-                        .frame(width: 40, height: 40)
-                        .background(ZappColors.accent.color(colorScheme))
+                        HStack(spacing: 12) {
+                            Text("Z")
+                                .zappFont(.displaySecondary, style: ZappColors.onAccent)
+                                .frame(width: 40, height: 40)
+                                .background(ZappColors.accent.color(colorScheme))
 
-                    Text("Zapp")
-                        .zappFont(.screenTitle, style: ZappColors.text)
+                            Text("Zapp")
+                                .zappFont(.screenTitle, style: ZappColors.text)
+                        }
+
+                        Spacer().frame(height: 40)
+
+                        Text(localizable: .onboardingWelcomeHeroLine1)
+                            .zappFont(.onboardingWelcomeHero, style: ZappColors.text)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.6)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(localizable: .onboardingWelcomeHeroLine2)
+                            .zappFont(.onboardingWelcomeHero, style: ZappColors.accent)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .padding(.top, 6)
+
+                        Rectangle()
+                            .fill(ZappColors.text.color(colorScheme))
+                            .frame(width: 36, height: 3)
+                            .padding(.top, 24)
+
+                        Text(localizable: .onboardingWelcomeBody)
+                            .zappFont(.body, style: ZappColors.textMuted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: 300, alignment: .leading)
+                            .padding(.top, 20)
+
+                        Spacer(minLength: 24)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 28)
+                    .frame(minHeight: proxy.size.height)
                 }
-
-                Spacer().frame(height: 40)
-
-                Text(localizable: .onboardingWelcomeHeroLine1)
-                    .zappFont(.onboardingWelcomeHero, style: ZappColors.text)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(localizable: .onboardingWelcomeHeroLine2)
-                    .zappFont(.onboardingWelcomeHero, style: ZappColors.accent)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 6)
-
-                Rectangle()
-                    .fill(ZappColors.text.color(colorScheme))
-                    .frame(width: 36, height: 3)
-                    .padding(.top, 24)
-
-                Text(localizable: .onboardingWelcomeBody)
-                    .zappFont(.body, style: ZappColors.textMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: 300, alignment: .leading)
-                    .padding(.top, 20)
-
-                Spacer(minLength: 24)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 28)
 
             VStack(spacing: 8) {
                 ZappButton(title: String(localizable: .onboardingWelcomeGetStarted)) {
@@ -322,6 +330,8 @@ private struct ZappWalletIntroView: View {
 
                         Text(localizable: .onboardingWalletIntroTitle)
                             .zappFont(.onboardingHero, style: ZappColors.text)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.7)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 14)
 
@@ -372,50 +382,57 @@ private struct ZappWalletChoiceView: View {
                 .padding(.horizontal, 28)
                 .padding(.top, 20)
 
-            ZStack(alignment: .topTrailing) {
-                ZappOnboardingGhostNumber(number: 1)
+            GeometryReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    ZStack(alignment: .topTrailing) {
+                        ZappOnboardingGhostNumber(number: 1)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    ZappOnboardingEyebrow(text: String(localizable: .onboardingWalletChoiceBadge))
+                        VStack(alignment: .leading, spacing: 0) {
+                            ZappOnboardingEyebrow(text: String(localizable: .onboardingWalletChoiceBadge))
 
-                    Text(localizable: .onboardingWalletChoiceTitle)
-                        .zappFont(.onboardingHero, style: ZappColors.text)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 14)
+                            Text(localizable: .onboardingWalletChoiceTitle)
+                                .zappFont(.onboardingHero, style: ZappColors.text)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.7)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 14)
 
-                    Text(localizable: .onboardingWalletChoiceSubtitle)
-                        .zappFont(.onboardingSub, style: ZappColors.textMuted)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 14)
+                            Text(localizable: .onboardingWalletChoiceSubtitle)
+                                .zappFont(.onboardingSub, style: ZappColors.textMuted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 14)
 
-                    Spacer(minLength: 24)
+                            Spacer(minLength: 24)
 
-                    VStack(spacing: 0) {
-                        ZappOnboardingAction(
-                            glyph: "✦",
-                            title: String(localizable: .onboardingWalletChoiceCreate),
-                            subtitle: String(localizable: .onboardingWalletChoiceCreateSubtitle),
-                            isHighlighted: true,
-                            action: onCreate
-                        )
-                        ZappOnboardingAction(
-                            glyph: "⚿",
-                            title: String(localizable: .onboardingWalletChoiceRestore),
-                            subtitle: String(localizable: .onboardingWalletChoiceRestoreSubtitle),
-                            isHighlighted: false,
-                            action: onRestore
-                        )
+                            VStack(spacing: 0) {
+                                ZappOnboardingAction(
+                                    glyph: "✦",
+                                    title: String(localizable: .onboardingWalletChoiceCreate),
+                                    subtitle: String(localizable: .onboardingWalletChoiceCreateSubtitle),
+                                    isHighlighted: true,
+                                    action: onCreate
+                                )
+                                ZappOnboardingAction(
+                                    glyph: "⚿",
+                                    title: String(localizable: .onboardingWalletChoiceRestore),
+                                    subtitle: String(localizable: .onboardingWalletChoiceRestoreSubtitle),
+                                    isHighlighted: false,
+                                    action: onRestore
+                                )
+                            }
+                            .overlay {
+                                Rectangle()
+                                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                            }
+                            .padding(.bottom, 16)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                     }
-                    .overlay {
-                        Rectangle()
-                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-                    }
-                    .padding(.bottom, 16)
+                    .padding(.horizontal, 28)
+                    .padding(.top, 24)
+                    .frame(minHeight: proxy.size.height, alignment: .top)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 28)
-            .padding(.top, 24)
 
             ZappBottomActionBar(onBack: onBack)
         }
@@ -445,6 +462,8 @@ private struct ZappOnboardingLoadingView: View {
             VStack(spacing: 0) {
                 Text(localizable: .onboardingLoadingGreeting)
                     .zappFont(.onboardingGreeting, color: .white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                 Rectangle()
                     .fill(ZappColors.text.color(colorScheme))
@@ -587,6 +606,8 @@ private struct ZappOnboardingSeedBackupView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(localizable: .onboardingSeedTitle)
                             .zappFont(.onboardingSeedTitle, style: ZappColors.text)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.7)
                             .fixedSize(horizontal: false, vertical: true)
 
                         Text(localizable: .onboardingSeedSubtitle)
