@@ -46,3 +46,4 @@ if [ ! -f "$SIBLING/ios/Resources/worklet.bundle" ]; then
 fi
 
 echo "==> Ready: $COUNT addons + worklet.bundle ($(wc -c < "$SIBLING/ios/Resources/worklet.bundle" | tr -d ' ') bytes)"
+"$APP_DIR/Scripts/validate-zappmessaging-artifacts.sh"

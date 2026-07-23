@@ -16,6 +16,7 @@
 @preconcurrency import Combine
 import ComposableArchitecture
 import Foundation
+import UIKit
 import ZappMessaging
 
 extension ZappMessagingClient: DependencyKey {
@@ -94,6 +95,8 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     private var activeConversationId: String?
     private var unreadCounts: [String: Int] = [:]
     private var blockedKeys: Set<String> = []
+    private var lifecycleRequestSequence: UInt64 = 0
+    private let lifecycle = MessagingLifecycleOwner()
 
     // MARK: - Lifecycle
 
@@ -115,6 +118,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 self.observe(sdk)
 
                 try await sdk.initialize()
+                await self.lifecycle.install(
+                    suspend: { await sdk.suspend() },
+                    resume: { await sdk.resume() }
+                )
 
                 if let identity = sdk.identity {
                     self.mutate {
@@ -143,13 +150,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     }
 
     func suspend() {
-        guard let sdk else { return }
-        Task { @MainActor in await sdk.suspend() }
+        requestLifecycleState(.background)
     }
 
     func resume() {
-        guard let sdk else { return }
-        Task { @MainActor in await sdk.resume() }
+        requestLifecycleState(.foreground)
     }
 
     /// Stop the worklet, then delete its store. In that order — a running worklet
@@ -158,6 +163,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         if let sdk {
             await sdk.shutdown()
         }
+        await lifecycle.uninstall()
 
         self.sdk = nil
         cancellables.removeAll()
@@ -337,12 +343,15 @@ private final class ZappMessagingImpl: @unchecked Sendable {
 
     func sendMessage(conversationId: String, content: String, replyTo: ZMReplyContext?) async throws -> ZMMessage {
         guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat message")
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
             let message = try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
+            await finishProtectedSend(protection)
             clearFailure(for: .local(.messageSend))
             return message
         } catch {
+            await finishProtectedSend(protection)
             recordFailure(.local(.messageSend), error)
             throw error
         }
@@ -432,6 +441,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         thumbnailData: String?
     ) async throws -> ZMMessage {
         guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat media message")
 
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
@@ -442,9 +452,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 caption: caption,
                 thumbnailData: thumbnailData
             )
+            await finishProtectedSend(protection)
             clearFailure(for: .local(.mediaSend))
             return message
         } catch {
+            await finishProtectedSend(protection)
             recordFailure(.local(.mediaSend), error)
             throw error
         }
@@ -671,6 +683,51 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     /// SetupErrorCode. Never contains the seed, the key or the name.
     private static func errorCode(_ error: Error) -> String {
         ZappMessagingFailureCode(error: error).identifier
+    }
+
+    private func requestLifecycleState(_ state: MessagingLifecycleOwner.State) {
+        let sequence = lock.withLock {
+            lifecycleRequestSequence &+= 1
+            return lifecycleRequestSequence
+        }
+        Task { await lifecycle.setApplicationState(state, sequence: sequence) }
+    }
+
+    private func beginProtectedSend(named name: String) async -> (UUID, MessagingBackgroundTask) {
+        let sendID = await lifecycle.beginSend()
+        let task = await MainActor.run {
+            MessagingBackgroundTask(name: name) { [weak self] in
+                LoggerProxy.warn("ZappMessaging: bounded send flush expired")
+                Task { await self?.lifecycle.backgroundTimeExpired() }
+            }
+        }
+        return (sendID, task)
+    }
+
+    private func finishProtectedSend(_ protection: (UUID, MessagingBackgroundTask)) async {
+        await lifecycle.finishSend(protection.0)
+        await protection.1.end()
+    }
+}
+
+@MainActor
+private final class MessagingBackgroundTask: @unchecked Sendable {
+    private var identifier: UIBackgroundTaskIdentifier = .invalid
+    private let expiration: @MainActor () -> Void
+
+    init(name: String, expiration: @escaping @MainActor () -> Void) {
+        self.expiration = expiration
+        identifier = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
+            guard let self else { return }
+            self.expiration()
+            self.end()
+        }
+    }
+
+    func end() {
+        guard identifier != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(identifier)
+        identifier = .invalid
     }
 }
 

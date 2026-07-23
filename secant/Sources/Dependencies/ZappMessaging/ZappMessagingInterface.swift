@@ -131,7 +131,8 @@ enum ZappMessagingOperation: Equatable, Sendable {
         case .local(.conversationRefresh), .local(.conversationCreate), .local(.conversationConnect): return .conversations
         case .local(.messageList), .local(.messageSend), .local(.messageMarkRead), .local(.mediaSend): return .messages
         case .local(.setReadReceipts), .local(.setPresenceVisible): return .privacy
-        case .sdk(.connectionResume), .sdk(.pushNotification), .sdk(.ipcEvent): return .connection
+        case .sdk(.connectionResume), .sdk(.pushNotification), .sdk(.ipcEvent), .sdk(.workletRecovery):
+            return .connection
         case .sdk(.conversationConnect), .sdk(.conversationRefresh): return .conversations
         case .sdk(.messagePersist): return .messages
         }

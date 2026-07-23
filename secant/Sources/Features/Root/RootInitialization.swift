@@ -57,6 +57,9 @@ extension Root {
                     .cancellable(id: state.DidFinishLaunchingId, cancelInFlight: true)
 
             case .initialization(.appDelegate(.willEnterForeground)):
+                // Messaging lifecycle is independent of wallet preparation,
+                // disk-space checks, and background synchronizer branches.
+                zappMessaging.resume()
                 if state.featureFlags.appLaunchBiometric {
                     let now = Date()
                     let before = Date.init(timeIntervalSince1970: TimeInterval(state.lastAuthenticationTimestamp))
@@ -190,8 +193,6 @@ extension Root {
                     state.destinationState.internalDestination = preNotEnoughFreeSpaceDestination
                     state.destinationState.preNotEnoughFreeSpaceDestination = nil
                 }
-                zappMessaging.resume()
-
                 // Try the start only if the synchronizer has been already prepared
                 guard sdkSynchronizer.latestState().syncStatus.isPrepared else {
                     return .none

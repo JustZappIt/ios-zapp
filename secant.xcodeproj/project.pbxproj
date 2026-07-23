@@ -286,6 +286,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9E41FFB72CB2814500783CFD /* Build configuration list for PBXNativeTarget "zodl-testnet" */;
 			buildPhases = (
+				5A99EE100000000000000001 /* Validate zappMessaging artifacts */,
 				3463CACE2FD8549600A2AE50 /* Validate PartnerKeys.plist */,
 				9E41FFA32CB2814500783CFD /* Swiftgen */,
 				9E41FFA42CB2814500783CFD /* SwiftLint */,
@@ -328,6 +329,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9E4AB2B42BA1BEE900F5D6DB /* Build configuration list for PBXNativeTarget "zodl-production" */;
 			buildPhases = (
+				5A99EE100000000000000002 /* Validate zappMessaging artifacts */,
 				3463CACD2FD8548500A2AE50 /* Validate PartnerKeys.plist */,
 				9E4AB29F2BA1BEE900F5D6DB /* Swiftgen */,
 				9E4AB2A02BA1BEE900F5D6DB /* SwiftLint */,
@@ -369,6 +371,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9E5AB47E2C94777800065483 /* Build configuration list for PBXNativeTarget "zodl-internal" */;
 			buildPhases = (
+				5A99EE100000000000000003 /* Validate zappMessaging artifacts */,
 				3463CACC2FD8544800A2AE50 /* Validate PartnerKeys.plist */,
 				9E5AB46A2C94777800065483 /* Swiftgen */,
 				9E5AB46B2C94777800065483 /* SwiftLint */,
@@ -493,6 +496,63 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5A99EE100000000000000001 /* Validate zappMessaging artifacts */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Validate zappMessaging artifacts";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/validate-zappmessaging-artifacts.sh\"\n";
+		};
+		5A99EE100000000000000002 /* Validate zappMessaging artifacts */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Validate zappMessaging artifacts";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/validate-zappmessaging-artifacts.sh\"\n";
+		};
+		5A99EE100000000000000003 /* Validate zappMessaging artifacts */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Validate zappMessaging artifacts";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/validate-zappmessaging-artifacts.sh\"\n";
+		};
 		3463CACC2FD8544800A2AE50 /* Validate PartnerKeys.plist */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
