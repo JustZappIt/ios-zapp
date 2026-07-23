@@ -12,9 +12,9 @@ That bundle was 2,266,612 bytes and did not contain the current persisted
 `processed cursor` implementation.
 
 The corrected build pins SDK commit
-`c8a2e228d602def5b437f3d9857d4ba6728873c5`. Its generated manifest records:
+`f8f922a533f9b46b889abbf76b50e7b8f09770b9`. Its generated manifest records:
 
-- source tree: `5b7c6f671b84cdb7fccf8e91bc16bcad231f1ef4`
+- source tree: `67b25d804ace0c7ec638ce59f39840b880cbac07`
 - source dirty: `false`
 - package-lock SHA-256: `0f7c174e52042b93ee1f78b1005a8df7f808cbdbc5a085b35d1f9566b3f34ed4`
 - bundle SHA-256: `ebd0e597899fb9f2f7d851e476b7bb560cdab3e5b0157f2dce98bb3b6b271d95`
