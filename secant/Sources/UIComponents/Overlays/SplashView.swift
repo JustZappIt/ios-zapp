@@ -92,7 +92,7 @@ final class SplashManager: ObservableObject {
         lockScreen = .none
 
         Task {
-            if await !localAuthentication.authenticate() {
+            if await !localAuthentication.authenticateAppLock() {
                 self.authenticationFailed()
             } else {
                 self.spinTheWheel()
@@ -106,40 +106,33 @@ final class SplashManager: ObservableObject {
 }
 
 extension SplashManager {
-    func pinKeyTapped(_ key: Character) {
+    func pinKeyTapped(_ key: PINKey) {
         guard !isProcessing, lockoutSeconds == 0 else {
             return
         }
         errorMessage = nil
-        if key == "⌫" {
-            if !pin.isEmpty {
-                pin.removeLast()
-            }
-            return
-        }
-        guard key.isNumber, pin.count < 6 else {
-            return
-        }
-        pin.append(key)
-        guard pin.count == 6 else {
-            return
-        }
+        PINInput.apply(key, to: &pin)
 
         switch lockScreen {
         case .verifyPIN:
+            guard PINInput.isComplete(pin) else {
+                return
+            }
             verifyPIN()
-        case .migrateCreatePIN:
-            firstPIN = pin
-            pin = ""
-            lockScreen = .migrateConfirmPIN
-        case .migrateConfirmPIN:
-            if pin == firstPIN {
-                configureMigrationPIN()
-            } else {
+        case .migrateCreatePIN, .migrateConfirmPIN:
+            let submission = PINInput.submit(pin: pin, firstPIN: firstPIN)
+            pin = submission.pin
+            firstPIN = submission.firstPIN
+            switch submission.result {
+            case .incomplete:
+                break
+            case .confirmationRequired:
+                lockScreen = .migrateConfirmPIN
+            case .mismatch:
                 errorMessage = String(localizable: .onboardingPINMismatch)
-                firstPIN = ""
-                pin = ""
                 lockScreen = .migrateCreatePIN
+            case .confirmed:
+                configureMigrationPIN()
             }
         default:
             break

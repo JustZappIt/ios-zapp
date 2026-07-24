@@ -39,13 +39,13 @@ struct ZappPINPad: View {
     private var colorScheme
 
     let isEnabled: Bool
-    let onKey: (Character) -> Void
+    let onKey: (PINKey) -> Void
 
-    private let rows: [[Character?]] = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        [nil, "0", "⌫"]
+    private let rows: [[PINKey?]] = [
+        [.digit(1), .digit(2), .digit(3)],
+        [.digit(4), .digit(5), .digit(6)],
+        [.digit(7), .digit(8), .digit(9)],
+        [nil, .digit(0), .delete]
     ]
 
     var body: some View {
@@ -57,7 +57,7 @@ struct ZappPINPad: View {
                             Button {
                                 onKey(key)
                             } label: {
-                                Text(String(key))
+                                Text(key.label)
                                     .zappFont(.sectionTitle, style: ZappColors.text)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 60)
@@ -70,11 +70,7 @@ struct ZappPINPad: View {
                                     .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
                             }
                             .disabled(!isEnabled)
-                            .accessibilityLabel(
-                                key == "⌫"
-                                    ? String(localizable: .appLockPINDelete)
-                                    : String(key)
-                            )
+                            .accessibilityLabel(key.accessibilityLabel)
                         } else {
                             Color.clear
                                 .frame(maxWidth: .infinity)
@@ -85,5 +81,25 @@ struct ZappPINPad: View {
             }
         }
         .opacity(isEnabled ? 1 : 0.45)
+    }
+}
+
+private extension PINKey {
+    var label: String {
+        switch self {
+        case .delete:
+            return "⌫"
+        case let .digit(digit):
+            return String(digit)
+        }
+    }
+
+    var accessibilityLabel: String {
+        switch self {
+        case .delete:
+            return String(localizable: .appLockPINDelete)
+        case .digit:
+            return label
+        }
     }
 }

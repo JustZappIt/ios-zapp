@@ -49,7 +49,7 @@ struct SecuritySettings {
         case lockoutTick
         case onAppear
         case pinConfigurationFinished(PINIntent, Bool)
-        case pinKeyTapped(Character)
+        case pinKeyTapped(PINKey)
         case pinVerificationFinished(PINIntent, PINVerificationResult)
         case saveTapped
         case selectedMethodChanged(AppAuthenticationMethod)
@@ -171,27 +171,18 @@ private extension SecuritySettings {
         }
     }
 
-    func handlePINKey(_ key: Character, state: inout State) -> Effect<Action> {
+    func handlePINKey(_ key: PINKey, state: inout State) -> Effect<Action> {
         guard !state.isProcessing, state.lockoutSeconds == 0 else {
             return .none
         }
         state.errorMessage = nil
-        if key == "⌫" {
-            if !state.pin.isEmpty {
-                state.pin.removeLast()
-            }
-            return .none
-        }
-        guard key.isNumber, state.pin.count < 6 else {
-            return .none
-        }
-        state.pin.append(key)
-        guard state.pin.count == 6 else {
-            return .none
-        }
+        PINInput.apply(key, to: &state.pin)
 
         switch state.screen {
         case let .verifyPIN(intent):
+            guard PINInput.isComplete(state.pin) else {
+                return .none
+            }
             return verifyPIN(intent: intent, state: &state)
         case let .createPIN(intent):
             return createPIN(intent: intent, state: &state)
@@ -212,29 +203,29 @@ private extension SecuritySettings {
     }
 
     func createPIN(intent: PINIntent, state: inout State) -> Effect<Action> {
-        if state.firstPIN.isEmpty {
-            state.firstPIN = state.pin
-            state.pin = ""
+        let submission = PINInput.submit(pin: state.pin, firstPIN: state.firstPIN)
+        state.pin = submission.pin
+        state.firstPIN = submission.firstPIN
+        switch submission.result {
+        case .incomplete:
             return .none
-        }
-        guard state.pin == state.firstPIN else {
+        case .confirmationRequired:
+            return .none
+        case .mismatch:
             state.errorMessage = String(localizable: .onboardingPINMismatch)
-            state.firstPIN = ""
-            state.pin = ""
             return .none
-        }
-
-        state.isProcessing = true
-        let pin = state.pin
-        return .run { send in
-            let succeeded: Bool
-            do {
-                try await appSecurity.configurePIN(pin)
-                succeeded = true
-            } catch {
-                succeeded = false
+        case let .confirmed(pin):
+            state.isProcessing = true
+            return .run { send in
+                let succeeded: Bool
+                do {
+                    try await appSecurity.configurePIN(pin)
+                    succeeded = true
+                } catch {
+                    succeeded = false
+                }
+                await send(.pinConfigurationFinished(intent, succeeded))
             }
-            await send(.pinConfigurationFinished(intent, succeeded))
         }
     }
 
@@ -331,7 +322,7 @@ private extension SecuritySettings {
         state.isProcessing = true
         state.errorMessage = nil
         return .run { send in
-            await send(.biometricAuthenticationFinished(intent, await localAuthentication.authenticate()))
+            await send(.biometricAuthenticationFinished(intent, await localAuthentication.authenticateAppLock()))
         }
     }
 
@@ -343,9 +334,6 @@ private extension SecuritySettings {
         state.isProcessing = false
         guard succeeded else {
             state.errorMessage = String(localizable: .onboardingBiometricFailed)
-            if state.screen == .menu {
-                state.screen = .menu
-            }
             return .none
         }
 

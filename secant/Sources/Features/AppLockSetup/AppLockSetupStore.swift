@@ -34,7 +34,7 @@ struct AppLockSetup {
         case enableBiometricTapped
         case onAppear
         case pinConfigurationFinished(Bool)
-        case pinKeyTapped(Character)
+        case pinKeyTapped(PINKey)
         case pinTapped
         case setupFinished
     }
@@ -78,46 +78,32 @@ struct AppLockSetup {
                     return .none
                 }
                 state.errorMessage = nil
-                if key == "⌫" {
-                    if !state.pin.isEmpty {
-                        state.pin.removeLast()
-                    }
+                PINInput.apply(key, to: &state.pin)
+                let submission = PINInput.submit(pin: state.pin, firstPIN: state.firstPIN)
+                state.pin = submission.pin
+                state.firstPIN = submission.firstPIN
+                switch submission.result {
+                case .incomplete:
                     return .none
-                }
-                guard key.isNumber, state.pin.count < 6 else {
-                    return .none
-                }
-                state.pin.append(key)
-                guard state.pin.count == 6 else {
-                    return .none
-                }
-
-                if state.step == .createPIN {
-                    state.firstPIN = state.pin
-                    state.pin = ""
+                case .confirmationRequired:
                     state.step = .confirmPIN
                     return .none
-                }
-
-                guard state.pin == state.firstPIN else {
+                case .mismatch:
                     state.errorMessage = String(localizable: .onboardingPINMismatch)
-                    state.firstPIN = ""
-                    state.pin = ""
                     state.step = .createPIN
                     return .none
-                }
-
-                state.isProcessing = true
-                let pin = state.pin
-                return .run { send in
-                    let succeeded: Bool
-                    do {
-                        try await appSecurity.configurePIN(pin)
-                        succeeded = true
-                    } catch {
-                        succeeded = false
+                case let .confirmed(pin):
+                    state.isProcessing = true
+                    return .run { send in
+                        let succeeded: Bool
+                        do {
+                            try await appSecurity.configurePIN(pin)
+                            succeeded = true
+                        } catch {
+                            succeeded = false
+                        }
+                        await send(.pinConfigurationFinished(succeeded))
                     }
-                    await send(.pinConfigurationFinished(succeeded))
                 }
 
             case .enableBiometricTapped:
@@ -128,7 +114,7 @@ struct AppLockSetup {
                 state.isProcessing = true
                 state.errorMessage = nil
                 return .run { send in
-                    await send(.biometricAuthenticationFinished(await localAuthentication.authenticate()))
+                    await send(.biometricAuthenticationFinished(await localAuthentication.authenticateAppLock()))
                 }
 
             case let .biometricAuthenticationFinished(succeeded):

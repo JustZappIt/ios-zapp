@@ -8,11 +8,13 @@
 extension LocalAuthenticationClient {
     static let mockAuthenticationSucceeded = Self(
         authenticate: { true },
+        authenticateAppLock: { true },
         method: { .none }
     )
     
     static let mockAuthenticationFailed = Self(
         authenticate: { false },
+        authenticateAppLock: { false },
         method: { .none }
     )
 }

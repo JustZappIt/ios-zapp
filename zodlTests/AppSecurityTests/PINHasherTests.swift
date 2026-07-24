@@ -8,7 +8,7 @@ import Testing
 @testable import zodl_internal
 
 @Suite struct PINHasherTests {
-    @Test func hashMatchesAndroidFormatAndParameters() throws {
+    @Test func hashMatchesPBKDF2GoldenVector() throws {
         let salt = Data((0 ..< 16).map(UInt8.init))
 
         let hash = try PINHasher.hash("123456", salt: salt)
