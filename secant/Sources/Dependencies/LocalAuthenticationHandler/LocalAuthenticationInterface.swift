@@ -24,5 +24,6 @@ struct LocalAuthenticationClient {
     }
     
     var authenticate: @Sendable () async -> Bool = { false }
+    var authenticateAppLock: @Sendable () async -> Bool = { false }
     var method: @Sendable () -> Method = { .none }
 }

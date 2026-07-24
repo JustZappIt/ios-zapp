@@ -26,17 +26,24 @@ extension LocalAuthenticationClient: DependencyKey {
                 let reason = String(localizable: .localAuthenticationReason)
 
                 do {
-                    guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-                        return false
+                    /// Biometrics validation
+                    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+                        return try await context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason)
+                    } else {
+                        /// Biometrics not supported by the device, fallback to passcode
+                        if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
+                            return try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
+                        } else {
+                            /// No local authentication available, user's device is not protected, fallback to allow access to sensitive content
+                            return true
+                        }
                     }
-                    return try await context.evaluatePolicy(
-                        .deviceOwnerAuthentication,
-                        localizedReason: reason
-                    )
                 } catch {
+                    /// Some interruption occurred during the authentication, access to the sensitive content is therefore forbidden
                     return false
                 }
             },
+            authenticateAppLock: authenticateAppLock,
             method: {
                 let context = LAContext()
                 var error: NSError?
@@ -61,5 +68,25 @@ extension LocalAuthenticationClient: DependencyKey {
                 }
             }
         )
+    }
+
+    private static func authenticateAppLock() async -> Bool {
+#if targetEnvironment(simulator)
+        if !UserDefaults.standard.bool(forKey: "zodlE2EBiometric") {
+            return true
+        }
+#endif
+        let context = LAContext()
+        var error: NSError?
+        let reason = String(localizable: .localAuthenticationReason)
+
+        do {
+            guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+                return false
+            }
+            return try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
+        } catch {
+            return false
+        }
     }
 }

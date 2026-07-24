@@ -16,7 +16,7 @@ struct AppPINEntryView: View {
     var isInputEnabled = true
     var showsOnboardingProgress = false
     var onBack: (() -> Void)?
-    let onKey: (Character) -> Void
+    let onKey: (PINKey) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
