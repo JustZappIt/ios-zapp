@@ -25,6 +25,7 @@ struct Settings {
         case resyncWallet(ResyncWallet)
         case resyncWalletBirthday(WalletBirthday)
         case scan(Scan)
+        case securitySettings(SecuritySettings)
         case sendUsFeedback(SendFeedback)
         case torSetup(TorSetup)
         case whatsNew(WhatsNew)
@@ -74,6 +75,7 @@ struct Settings {
         case addressBookAccessCheck
         case addressBookTapped
         case advancedSettingsTapped
+        case appLockTapped
         case backToHomeTapped
         case binding(BindingAction<Settings.State>)
         case checkFundsForAddress(String)
@@ -154,6 +156,9 @@ struct Settings {
                 return .none
 
             case .advancedSettingsTapped:
+                return .none
+
+            case .appLockTapped:
                 return .none
 
             case .sendUsFeedbackTapped:

@@ -70,6 +70,17 @@ struct SettingsView: View {
                             ZappRowDivider(inset: true)
 
                             ZappRow(
+                                title: String(localizable: .appLockTitle),
+                                icon: Asset.Assets.Icons.authKey.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.appLockTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
                                 title: String(localizable: .settingsWhatsNew),
                                 icon: Asset.Assets.Icons.magicWand.image,
                                 iconTint: .accentText,
@@ -158,6 +169,8 @@ struct SettingsView: View {
                     DeleteWalletView(store: store)
                 case let .scan(store):
                     ScanView(store: store)
+                case let .securitySettings(store):
+                    SecuritySettingsView(store: store)
                 case let .sendUsFeedback(store):
                     SendFeedbackView(store: store)
                 case let .torSetup(store):

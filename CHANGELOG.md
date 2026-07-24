@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] Onboarding now requires an app-lock method: a 6-digit PIN or device authentication. PIN unlock includes a persisted five-attempt, 30-second lockout, and App Lock settings let you change the PIN or switch authentication methods.
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 

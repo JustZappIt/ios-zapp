@@ -533,6 +533,9 @@ extension Root {
                 userDefaults.remove(Constants.udLeavesScreenOpen)
                 userDefaults.remove(.hasSeenHowToVote)
                 userDefaults.remove(.hasSeenHowToVoteKeystone)
+                userDefaults.remove(.appAuthenticationMethod)
+                userDefaults.remove(.failedPINAttempts)
+                userDefaults.remove(.pinLockoutEndTimestamp)
                 // Drop the user-supplied voting chain override and the saved
                 // custom-chain list. Without this wipe, the next wallet on
                 // this device would silently resolve voting through whatever

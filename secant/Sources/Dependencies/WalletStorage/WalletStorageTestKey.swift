@@ -32,6 +32,9 @@ extension WalletStorageClient {
         exportShieldingAcknowledged: { false },
         importTorSetupFlag: { _ in },
         exportTorSetupFlag: { false },
+        importPINHash: { _ in },
+        exportPINHash: { nil },
+        removePINHash: { },
         importVotingHotkey: { _, _ in },
         exportVotingHotkey: { _ in .init(seedPhrase: .init(""), version: 0) }
     )

@@ -27,6 +27,7 @@ struct RestoreWalletCoordFlow {
 
     @Reducer
     enum Path {
+        case appLockSetup(AppLockSetup)
         case chatUsername(ChatUsernameEntry)
         case estimateBirthdaysDate(WalletBirthday)
         case estimatedBirthday(WalletBirthday)

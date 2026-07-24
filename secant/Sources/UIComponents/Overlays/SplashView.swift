@@ -10,6 +10,14 @@ import ComposableArchitecture
 
 @MainActor
 final class SplashManager: ObservableObject {
+    enum LockScreen: Equatable {
+        case biometricRetry
+        case migrateConfirmPIN
+        case migrateCreatePIN
+        case none
+        case verifyPIN
+    }
+
     struct SplashShape: Shape {
         var points: [CGPoint]
         
@@ -31,8 +39,13 @@ final class SplashManager: ObservableObject {
     var task: Task<(), Never>?
     var currentMaxHeight: CGFloat = 0.0
     var step: CGFloat = 0.0
-    @Published var authenticationDidntSucceed = false
+    @Published var errorMessage: String?
     @Published var isOn = true
+    @Published var isProcessing = false
+    @Published var lockScreen = LockScreen.none
+    @Published var lockoutSeconds = 0
+    @Published var pin = ""
+    var firstPIN = ""
     let completion: () -> Void
     var timer: Timer?
 
@@ -44,7 +57,7 @@ final class SplashManager: ObservableObject {
         if !isHidden {
             preparePoints()
             if featureFlags.appLaunchBiometric {
-                authenticate()
+                beginAuthentication()
             } else {
                 Task {
                     self.spinTheWheel()
@@ -53,10 +66,30 @@ final class SplashManager: ObservableObject {
         }
     }
 
+    func beginAuthentication() {
+        @Dependency(\.appSecurity) var appSecurity
+        @Dependency(\.localAuthentication) var localAuthentication
+
+        switch appSecurity.authenticationMethod() {
+        case .none:
+            spinTheWheel()
+        case .pin:
+            lockScreen = .verifyPIN
+            refreshLockout()
+        case .biometric:
+            if localAuthentication.method() == .none {
+                lockScreen = .migrateCreatePIN
+            } else {
+                authenticate()
+            }
+        }
+    }
+
     func authenticate() {
         @Dependency(\.localAuthentication) var localAuthentication
 
-        authenticationDidntSucceed = false
+        errorMessage = nil
+        lockScreen = .none
 
         Task {
             if await !localAuthentication.authenticate() {
@@ -68,9 +101,137 @@ final class SplashManager: ObservableObject {
     }
     
     @MainActor func authenticationFailed() {
-        authenticationDidntSucceed = true
+        lockScreen = .biometricRetry
     }
-    
+}
+
+extension SplashManager {
+    func pinKeyTapped(_ key: Character) {
+        guard !isProcessing, lockoutSeconds == 0 else {
+            return
+        }
+        errorMessage = nil
+        if key == "⌫" {
+            if !pin.isEmpty {
+                pin.removeLast()
+            }
+            return
+        }
+        guard key.isNumber, pin.count < 6 else {
+            return
+        }
+        pin.append(key)
+        guard pin.count == 6 else {
+            return
+        }
+
+        switch lockScreen {
+        case .verifyPIN:
+            verifyPIN()
+        case .migrateCreatePIN:
+            firstPIN = pin
+            pin = ""
+            lockScreen = .migrateConfirmPIN
+        case .migrateConfirmPIN:
+            if pin == firstPIN {
+                configureMigrationPIN()
+            } else {
+                errorMessage = String(localizable: .onboardingPINMismatch)
+                firstPIN = ""
+                pin = ""
+                lockScreen = .migrateCreatePIN
+            }
+        default:
+            break
+        }
+    }
+
+    private func verifyPIN() {
+        @Dependency(\.appSecurity) var appSecurity
+        @Dependency(\.date) var date
+
+        let submittedPIN = pin
+        pin = ""
+        isProcessing = true
+        task = Task {
+            let result = await appSecurity.verifyPIN(submittedPIN, date.now())
+            isProcessing = false
+
+            switch result {
+            case .success:
+                lockScreen = .none
+                spinTheWheel()
+            case .incorrect:
+                errorMessage = String(localizable: .appLockPINIncorrect)
+            case let .locked(secondsRemaining):
+                lockoutSeconds = secondsRemaining
+                errorMessage = String(localizable: .appLockPINLocked(String(secondsRemaining)))
+                startLockoutTimer()
+            }
+        }
+    }
+
+    private func configureMigrationPIN() {
+        @Dependency(\.appSecurity) var appSecurity
+
+        let submittedPIN = pin
+        isProcessing = true
+        task = Task {
+            let succeeded: Bool
+            do {
+                try await appSecurity.configurePIN(submittedPIN)
+                succeeded = true
+            } catch {
+                succeeded = false
+            }
+
+            isProcessing = false
+            if succeeded {
+                pin = ""
+                firstPIN = ""
+                lockScreen = .none
+                spinTheWheel()
+            } else {
+                errorMessage = String(localizable: .appLockStorageError)
+                pin = ""
+                firstPIN = ""
+                lockScreen = .migrateCreatePIN
+            }
+        }
+    }
+
+    private func refreshLockout() {
+        @Dependency(\.appSecurity) var appSecurity
+        @Dependency(\.date) var date
+
+        lockoutSeconds = appSecurity.lockoutRemaining(date.now())
+        if lockoutSeconds > 0 {
+            errorMessage = String(localizable: .appLockPINLocked(String(lockoutSeconds)))
+            startLockoutTimer()
+        }
+    }
+
+    private func startLockoutTimer() {
+        @Dependency(\.appSecurity) var appSecurity
+        @Dependency(\.continuousClock) var continuousClock
+        @Dependency(\.date) var date
+
+        task?.cancel()
+        task = Task {
+            while !Task.isCancelled {
+                try? await continuousClock.sleep(for: .seconds(1))
+                lockoutSeconds = appSecurity.lockoutRemaining(date.now())
+                if lockoutSeconds == 0 {
+                    errorMessage = nil
+                    break
+                }
+                errorMessage = String(localizable: .appLockPINLocked(String(lockoutSeconds)))
+            }
+        }
+    }
+}
+
+extension SplashManager {
     @MainActor func spinTheWheel() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { timer in
@@ -147,6 +308,7 @@ final class SplashManager: ObservableObject {
     }
     
     @MainActor func finished() {
+        task?.cancel()
         self.isOn.toggle()
         completion()
     }
@@ -178,7 +340,7 @@ struct SplashView: View {
     }
     
     var hiIconYOffset: CGFloat {
-        splashManager.authenticationDidntSucceed
+        splashManager.lockScreen == .biometricRetry
         ? 100.0
         : 0.0
     }
@@ -203,7 +365,7 @@ struct SplashView: View {
         if splashManager.isOn && !isHidden {
             ZStack {
                 hiIcon()
-                lockedIcons()
+                lockContent()
             }
             .ignoresSafeArea(.keyboard)
         }
@@ -230,8 +392,9 @@ struct SplashView: View {
         }
     }
     
-    @ViewBuilder func lockedIcons() -> some View {
-        if splashManager.authenticationDidntSucceed {
+    @ViewBuilder func lockContent() -> some View {
+        switch splashManager.lockScreen {
+        case .biometricRetry:
             VStack(spacing: 0) {
                 Spacer()
                 
@@ -259,6 +422,32 @@ struct SplashView: View {
             }
             .padding(.bottom, 160)
             .screenHorizontalPadding()
+        case .verifyPIN:
+            AppPINEntryView(
+                title: String(localizable: .appLockPINVerifyTitle),
+                subtitle: String(localizable: .appLockPINVerifySubtitle),
+                errorMessage: splashManager.errorMessage,
+                digitCount: splashManager.pin.count,
+                isInputEnabled: !splashManager.isProcessing && splashManager.lockoutSeconds == 0,
+                onKey: splashManager.pinKeyTapped
+            )
+            .ignoresSafeArea()
+        case .migrateCreatePIN, .migrateConfirmPIN:
+            AppPINEntryView(
+                title: splashManager.lockScreen == .migrateCreatePIN
+                    ? String(localizable: .onboardingPINCreateTitle)
+                    : String(localizable: .onboardingPINConfirmTitle),
+                subtitle: splashManager.lockScreen == .migrateCreatePIN
+                    ? String(localizable: .appLockMigrationPINSubtitle)
+                    : String(localizable: .onboardingPINConfirmSubtitle),
+                errorMessage: splashManager.errorMessage,
+                digitCount: splashManager.pin.count,
+                isInputEnabled: !splashManager.isProcessing,
+                onKey: splashManager.pinKeyTapped
+            )
+            .ignoresSafeArea()
+        case .none:
+            EmptyView()
         }
     }
 }

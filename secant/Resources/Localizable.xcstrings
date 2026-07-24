@@ -579,6 +579,182 @@
         }
       }
     },
+    "appLock.actions": {
+      "comment": "MARK: - App Lock",
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Actions" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Acciones" } }
+      }
+    },
+    "appLock.biometric.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Face ID, Touch ID, or your device passcode unlocks the app." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Face ID, Touch ID o el código del dispositivo desbloquean la app." } }
+      }
+    },
+    "appLock.biometric.option": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Biometrics" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Biometría" } }
+      }
+    },
+    "appLock.biometric.updated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Biometrics enrolled successfully." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Biometría registrada correctamente." } }
+      }
+    },
+    "appLock.changePIN": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Change PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cambiar PIN" } }
+      }
+    },
+    "appLock.changePIN.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Update your 6-digit unlock code" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Actualiza tu código de desbloqueo de 6 dígitos" } }
+      }
+    },
+    "appLock.migrationPINSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Your device has no screen lock. Create a 6-digit PIN to protect Zapp." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Tu dispositivo no tiene bloqueo de pantalla. Crea un PIN de 6 dígitos para proteger Zapp." } }
+      }
+    },
+    "appLock.PIN.changed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "PIN changed successfully." } },
+        "es": { "stringUnit": { "state": "translated", "value": "PIN cambiado correctamente." } }
+      }
+    },
+    "appLock.PIN.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Delete digit" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Borrar dígito" } }
+      }
+    },
+    "appLock.PIN.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Your 6-digit PIN is required when Zapp locks." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Tu PIN de 6 dígitos es necesario cuando Zapp se bloquea." } }
+      }
+    },
+    "appLock.PIN.incorrect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Incorrect PIN. Please try again." } },
+        "es": { "stringUnit": { "state": "translated", "value": "PIN incorrecto. Inténtalo de nuevo." } }
+      }
+    },
+    "appLock.PIN.locked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Too many attempts. Try again in %@s." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Demasiados intentos. Inténtalo de nuevo en %@ s." } }
+      }
+    },
+    "appLock.PIN.newConfirmSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Re-enter your new PIN to confirm." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Vuelve a ingresar tu nuevo PIN para confirmar." } }
+      }
+    },
+    "appLock.PIN.newSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enter a new 6-digit PIN." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Ingresa un nuevo PIN de 6 dígitos." } }
+      }
+    },
+    "appLock.PIN.newTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Change\nyour PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cambia\ntu PIN" } }
+      }
+    },
+    "appLock.PIN.option": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "6-digit PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "PIN de 6 dígitos" } }
+      }
+    },
+    "appLock.PIN.progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "%@ of 6 digits entered" } },
+        "es": { "stringUnit": { "state": "translated", "value": "%@ de 6 dígitos ingresados" } }
+      }
+    },
+    "appLock.PIN.switched": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Switched to PIN successfully." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cambiaste a PIN correctamente." } }
+      }
+    },
+    "appLock.PIN.verifySubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enter your 6-digit PIN to continue." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Ingresa tu PIN de 6 dígitos para continuar." } }
+      }
+    },
+    "appLock.PIN.verifyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enter\nyour PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Ingresa\ntu PIN" } }
+      }
+    },
+    "appLock.reenrollBiometric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Re-enroll biometrics" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Volver a registrar biometría" } }
+      }
+    },
+    "appLock.reenrollBiometric.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Use your device's authentication settings" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Usa los ajustes de autenticación de tu dispositivo" } }
+      }
+    },
+    "appLock.saveChanges": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Save Changes" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Guardar cambios" } }
+      }
+    },
+    "appLock.storageError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zapp couldn't save your app lock. Please try again." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Zapp no pudo guardar el bloqueo de la app. Inténtalo de nuevo." } }
+      }
+    },
+    "appLock.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "App Lock" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Bloqueo de la app" } }
+      }
+    },
     "addressDetails.copyAddress": {
       "extractionState": "manual",
       "localizations": {
@@ -11579,6 +11755,49 @@
         }
       }
     },
+    "onboarding.biometric.enable": {
+      "comment": "MARK: - Onboarding App Lock",
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enable Biometrics" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Activar biometría" } }
+      }
+    },
+    "onboarding.biometric.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Authentication failed. Tap to try again." } },
+        "es": { "stringUnit": { "state": "translated", "value": "La autenticación falló. Toca para volver a intentarlo." } }
+      }
+    },
+    "onboarding.biometric.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zapp will use your device authentication to lock and unlock the app." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Zapp usará la autenticación de tu dispositivo para bloquear y desbloquear la app." } }
+      }
+    },
+    "onboarding.biometric.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Biometric unlock" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Desbloqueo biométrico" } }
+      }
+    },
+    "onboarding.biometric.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Set up Face ID, Touch ID, or a device passcode in Settings, or use a PIN." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Configura Face ID, Touch ID o un código del dispositivo en Ajustes, o usa un PIN." } }
+      }
+    },
+    "onboarding.biometric.verifying": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Verifying…" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Verificando…" } }
+      }
+    },
     "onboarding.creatingWallet.failed": {
       "comment": "MARK: - Zapp Onboarding",
       "extractionState": "manual",
@@ -11700,6 +11919,41 @@
         }
       }
     },
+    "onboarding.PIN.confirmSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Re-enter your 6-digit PIN to confirm." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Vuelve a ingresar tu PIN de 6 dígitos para confirmar." } }
+      }
+    },
+    "onboarding.PIN.confirmTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Confirm\nyour PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Confirma\ntu PIN" } }
+      }
+    },
+    "onboarding.PIN.createSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Choose a 6-digit code you'll remember." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Elige un código de 6 dígitos que recuerdes." } }
+      }
+    },
+    "onboarding.PIN.createTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Create\nyour PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Crea\ntu PIN" } }
+      }
+    },
+    "onboarding.PIN.mismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "PINs don't match. Please try again." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Los PIN no coinciden. Inténtalo de nuevo." } }
+      }
+    },
     "onboarding.progressAccessibility": {
       "extractionState": "manual",
       "localizations": {
@@ -11715,6 +11969,55 @@
             "value": "Progreso de configuración: parte 1 de 3"
           }
         }
+      }
+    },
+    "onboarding.security.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "PART 3 OF 3 · SECURE ZAPP" } },
+        "es": { "stringUnit": { "state": "translated", "value": "PARTE 3 DE 3 · PROTEGE ZAPP" } }
+      }
+    },
+    "onboarding.security.biometric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Biometric" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Biometría" } }
+      }
+    },
+    "onboarding.security.biometricSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Face ID or Touch ID — fastest" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Face ID o Touch ID — lo más rápido" } }
+      }
+    },
+    "onboarding.security.PIN": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "6-digit PIN" } },
+        "es": { "stringUnit": { "state": "translated", "value": "PIN de 6 dígitos" } }
+      }
+    },
+    "onboarding.security.PINSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "A passcode you remember" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Un código que tú recuerdas" } }
+      }
+    },
+    "onboarding.security.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Choose how you unlock Zapp." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Elige cómo desbloqueas Zapp." } }
+      }
+    },
+    "onboarding.security.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Secure\nyour app" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Protege\ntu app" } }
       }
     },
     "onboarding.seed.confirmation": {

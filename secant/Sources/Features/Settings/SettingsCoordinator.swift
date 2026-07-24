@@ -234,6 +234,14 @@ extension Settings {
                 state.path.append(.advancedSettings(AdvancedSettings.State.initial))
                 return .none
 
+            case .appLockTapped:
+                state.path.append(.securitySettings(.initial))
+                return .none
+
+            case .path(.element(id: _, action: .securitySettings(.closeRequested))):
+                _ = state.path.popLast()
+                return .none
+
             case .coinholderPollingTapped:
                 guard let account = state.selectedWalletAccount else { return .none }
                 var votingState = VotingCoordFlow.State()
