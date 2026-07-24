@@ -27,6 +27,7 @@ struct WalletStorage {
         static let zcashStoredWalletBackupAcknowledged = "zcashStoredWalletBackupAcknowledged"
         static let zcashStoredShieldingAcknowledged = "zcashStoredShieldingAcknowledged"
         static let zcashStoredTorSetupFlag = "zcashStoredTorSetupFlag"
+        static let zcashStoredPINHash = "zcashStoredPINHash"
         static let zcashStoredVotingHotkey = "zcashStoredVotingHotkey"
         static let zcashStoredZodlAnnouncementFlag = "zcashStoredZodlAnnouncementFlag"
 
@@ -189,6 +190,7 @@ struct WalletStorage {
         try? deleteData(forKey: Constants.zcashStoredWalletBackupAcknowledged)
         try? deleteData(forKey: Constants.zcashStoredShieldingAcknowledged)
         try? deleteData(forKey: Constants.zcashStoredTorSetupFlag)
+        try? deleteData(forKey: Constants.zcashStoredPINHash)
         try? deleteData(forKey: Constants.zcashStoredZodlAnnouncementFlag)
         // Voting hotkeys are stored per-account under
         // "<zcashStoredVotingHotkey>_<accountUUIDHex>". Enumerate every such
@@ -434,6 +436,41 @@ struct WalletStorage {
         }
         
         return try? decode(json: reqData, as: Bool.self)
+    }
+
+    // MARK: - App lock PIN
+
+    func importPINHash(_ hash: String) throws {
+        guard let data = hash.data(using: .utf8) else {
+            throw KeychainError.encoding
+        }
+
+        do {
+            try setData(data, forKey: Constants.zcashStoredPINHash)
+        } catch KeychainError.duplicate {
+            try updateData(data, forKey: Constants.zcashStoredPINHash)
+        } catch {
+            throw WalletStorageError.storageError(error)
+        }
+    }
+
+    func exportPINHash() throws -> String? {
+        do {
+            guard let data = try data(forKey: Constants.zcashStoredPINHash) else {
+                return nil
+            }
+            return String(data: data, encoding: .utf8)
+        } catch KeychainError.noDataFound {
+            return nil
+        }
+    }
+
+    func removePINHash() throws {
+        do {
+            try deleteData(forKey: Constants.zcashStoredPINHash)
+        } catch KeychainError.noDataFound {
+            return
+        }
     }
 
     // MARK: - Voting Hotkey

@@ -104,6 +104,11 @@ struct WalletStorageClient {
     var importTorSetupFlag: @Sendable (Bool) throws -> Void
     var exportTorSetupFlag: @Sendable () -> Bool? = { nil }
 
+    /// App lock PIN verifier
+    var importPINHash: @Sendable (String) throws -> Void
+    var exportPINHash: @Sendable () throws -> String?
+    var removePINHash: @Sendable () throws -> Void
+
     /// Per-account voting hotkey. Scoped by `AccountUUID` so two accounts on
     /// the same device get distinct hotkeys (and therefore distinct on-chain
     /// voter identities), instead of being linkable via a shared hotkey.

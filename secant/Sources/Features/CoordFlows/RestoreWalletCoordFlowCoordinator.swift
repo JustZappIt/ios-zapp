@@ -117,6 +117,10 @@ extension RestoreWalletCoordFlow {
                 return .send(.walletProvisioned(.created))
 
             case .path(.element(id: _, action: .identityDerivation(.identityReady))):
+                state.path.append(.appLockSetup(.initial))
+                return .none
+
+            case .path(.element(id: _, action: .appLockSetup(.setupFinished))):
                 if state.isImportingWallet {
                     state.path.append(.restoreInfo(RestoreInfo.State.initial))
                     return .send(.successfullyRecovered)
