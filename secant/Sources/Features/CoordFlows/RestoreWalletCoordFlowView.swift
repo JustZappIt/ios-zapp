@@ -330,7 +330,7 @@ private struct ZappWalletIntroView: View {
 
                         Text(localizable: .onboardingWalletIntroTitle)
                             .zappFont(.onboardingHero, style: ZappColors.text)
-                            .lineLimit(2)
+                            .lineLimit(3)
                             .minimumScaleFactor(0.7)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 14)
