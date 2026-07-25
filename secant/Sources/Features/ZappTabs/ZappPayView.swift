@@ -155,7 +155,7 @@ struct ZappPayView: View {
             store.send(.seeAllTransactionsTapped)
         } label: {
             Text(localizable: .zappPaySeeAll)
-                .zappFont(.body, style: ZappColors.accent)
+                .zappFont(.body, style: ZappColors.accentText)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.horizontal, 18)
                 .padding(.vertical, 14)

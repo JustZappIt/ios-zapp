@@ -67,6 +67,10 @@ struct RestoreWalletCoordFlowView: View {
                 }
                 .id(store.landingStep)
                 .transition(.zappLandingSlide(forward: store.landingForward))
+                // Not every landing-step change comes from a button (`creatingWallet` is
+                // entered by an effect), so drive the transition off the step itself rather
+                // than relying on each send site passing an animation.
+                .animation(ZappMotion.content, value: store.landingStep)
                 .background(ZappColors.bg.color(colorScheme))
                 .zashiSheet(isPresented: $store.isHelpSheetPresented) {
                     helpSheetContent()

@@ -62,24 +62,29 @@ struct ZappBalanceChart: View {
         let last = points.last?.balance ?? 0
         let change = last - first
         let isPositive = change >= 0
+        // Android's `computeDelta()` returns null when the window opens on a zero balance,
+        // because there is no baseline to take a percentage against. It then renders the
+        // period label alone rather than a change with no percentage beside it.
         let percent = first > 0 ? Double(abs(change)) / Double(first) * 100 : nil
 
         return HStack(spacing: 8) {
-            Text("\(isPositive ? "▲" : "▼") \(Zatoshi(abs(change)).decimalString()) \(tokenName)")
-                .zappFont(.caption, style: isPositive ? ZappColors.success : ZappColors.danger)
-            Rectangle()
-                .fill(ZappColors.textSubtle.color(colorScheme))
-                .frame(width: 3, height: 3)
             if let percent {
+                Text("\(isPositive ? "▲" : "▼") \(Zatoshi(abs(change)).decimalString()) \(tokenName)")
+                    .zappFont(.caption, style: isPositive ? ZappColors.success : ZappColors.danger)
+                separatorDot
                 Text("\(isPositive ? "+" : "-")\(String(format: "%.2f%%", percent))")
                     .zappFont(.caption, style: isPositive ? ZappColors.success : ZappColors.danger)
-                Rectangle()
-                    .fill(ZappColors.textSubtle.color(colorScheme))
-                    .frame(width: 3, height: 3)
+                separatorDot
             }
             Text(period.label)
                 .zappFont(.caption, style: ZappColors.textMuted)
         }
+    }
+
+    private var separatorDot: some View {
+        Rectangle()
+            .fill(ZappColors.textSubtle.color(colorScheme))
+            .frame(width: 3, height: 3)
     }
 
     private func sparkline(_ points: [Point]) -> some View {
