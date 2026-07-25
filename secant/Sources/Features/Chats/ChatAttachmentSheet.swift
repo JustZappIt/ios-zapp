@@ -28,6 +28,7 @@ struct ChatAttachmentSheet: View {
     let isGroup: Bool
     let onShareAddress: () -> Void
     let onSendZec: () -> Void
+    let onSplitBill: () -> Void
     let onAttachMedia: () -> Void
 
     static var detentHeight: CGFloat { Constants.height }
@@ -50,15 +51,14 @@ struct ChatAttachmentSheet: View {
 
             divider
 
-            // Phase 6 owns split bill / payment requests. The row keeps Android's slot (and its
-            // group-vs-direct label) so the sheet does not visibly change shape when it lands.
+            // Android labels this row by conversation type: a group splits a bill, a 1:1 just
+            // requests a payment. Both open the same sheet.
             row(
                 icon: Asset.Assets.Icons.currencyDollar.image,
                 label: isGroup
                     ? String(localizable: .chatRoomAttachmentSplitBill)
                     : String(localizable: .chatRoomAttachmentRequestPayment),
-                action: { },
-                isEnabled: false
+                action: onSplitBill
             )
 
             divider
@@ -190,6 +190,7 @@ struct ChatMediaAttachmentSheet: View {
         isGroup: false,
         onShareAddress: { },
         onSendZec: { },
+        onSplitBill: { },
         onAttachMedia: { }
     )
 }

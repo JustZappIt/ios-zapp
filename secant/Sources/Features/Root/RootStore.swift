@@ -37,6 +37,14 @@ struct Root {
             case walletBackup
         }
 
+        /// Android's `ChatSendContextProvider.ChatSendContext`. `requestId` is set only when the
+        /// send was started by paying a payment request — it is what the posted receipt quotes so
+        /// the requester's bubble can flip to Paid.
+        struct ChatSendContext: Equatable {
+            let conversationId: String
+            var requestId: String?
+        }
+
         struct PendingServerCandidate {
             let endpoint: LightWalletEndpoint
             let benchmarkedAt: Date
@@ -134,6 +142,11 @@ struct Root {
         /// tabs. `Root.path` holds one destination at a time, so the way back has to be
         /// remembered explicitly.
         var returnsToChatRoomAfterWalletFlow = false
+        /// The conversation a send was started from, and the payment request it settles (if any).
+        /// Mirrors Android's `ChatSendContextProvider`: set when a wallet flow is opened from a
+        /// room, consumed exactly once when that send resolves. Holding it here rather than in
+        /// the room's state is what lets the receipt survive the whole send flow.
+        var chatSendContext: ChatSendContext?
         var settingsState = Settings.State.initial
         var signWithKeystoneCoordFlowState = SignWithKeystoneCoordFlow.State.initial
         var swapAndPayCoordFlowState = SwapAndPayCoordFlow.State.initial

@@ -22,6 +22,10 @@ struct ChatRoom {
         /// `getZashiAccount().unified.address.address` — never a hardware-wallet account.
         @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount?
 
+        /// Drives the fiat side of payment-request bubbles and the split sheet, the way
+        /// Android feeds its `ZecFiatRate` in from `exchangeRateRepository`.
+        @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion?
+
         var conversationId: String
         var conversation: ZMConversation?
         var messages: [ZMMessage] = []
@@ -49,6 +53,12 @@ struct ChatRoom {
         var showsPhotosPicker = false
         var showsFileImporter = false
         var showsCamera = false
+
+        /// Split bill / request payment. See `ChatSplitBillStore.swift`.
+        var splitBill: SplitBillState?
+
+        /// The media message opened fullscreen, if any. See `ChatImageViewer.swift`.
+        var imageViewerMessage: ZMMessage?
 
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
@@ -83,6 +93,18 @@ struct ChatRoom {
 
         var visibleMessages: [ZMMessage] {
             messages.filter { !chatContacts.isBlocked($0.senderId) }
+        }
+
+        /// Requests settled by a `zec-transaction` receipt somewhere in this room. Android
+        /// recomputes the same set per render (`paidRequestIds`); the settlement is derived from
+        /// the message log rather than stored, so it survives a cold reload on both platforms.
+        var paidRequestIds: Set<String> {
+            ChatPaymentSettlement.paidRequestIds(in: messages)
+        }
+
+        /// Decides whether a payment request naming a debtor is ours to pay.
+        var localPublicKey: String? {
+            messagingState.identity?.publicKey
         }
 
         func senderName(for message: ZMMessage) -> String? {
@@ -204,15 +226,43 @@ struct ChatRoom {
         case sendZecTapped
         /// Routed by Root into `ScanCoordFlow`.
         case scanWalletAddressTapped
+
+        // MARK: Split bill — reduced in `ChatSplitBillStore.swift`
+
+        case splitBillTapped
+        case splitSheetDismissed
+        case splitTotalChanged(String)
+        case splitMemoChanged(String)
+        case splitShareChanged(publicKey: String, text: String)
+        case splitCurrencyToggled
+        case splitSendTapped
+        case splitSendFailed
+
+        // MARK: Rich bubbles
+
+        /// A payment request the user chose to pay. Routed by Root into `SendCoordFlow`,
+        /// prefilled with the requester's address and amount.
+        case payRequestTapped(ZMMessage)
+        /// Routed by Root into the transaction detail — only when the tx is in this wallet.
+        case viewTransactionTapped(String)
+        /// A shared wallet-address bubble tapped into a send. Routed by Root.
+        case sendToAddressTapped(String)
+        case copyAddressTapped(String)
+        /// The peer's tx id is not in this wallet yet, so there is no detail to open.
+        case transactionUnavailable
+        case imageTapped(ZMMessage)
+        case imageViewerDismissed
     }
 
     @Dependency(\.cameraCapture) var cameraCapture
+    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
 
     var body: some Reducer<State, Action> {
         attachmentReduce()
+        splitBillReduce()
 
         Reduce { state, action in
             switch action {
@@ -511,12 +561,42 @@ struct ChatRoom {
 
                 return .none
 
+            case .imageTapped(let message):
+                state.imageViewerMessage = message
+                return .none
+
+            case .imageViewerDismissed:
+                state.imageViewerMessage = nil
+                return .none
+
+            case .copyAddressTapped(let address):
+                pasteboard.setString(RedactableString(address))
+                return .none
+
+            // Android toasts; the room's inline strip is iOS's equivalent transient surface, and
+            // it is already where every other chat failure is reported.
+            case .transactionUnavailable:
+                state.sendDidFail = true
+                state.sendFailureMessage = String(localizable: .chatRoomTransactionNotSynced)
+                return .none
+
+            // Routed by Root — the room only clears its own transient state.
+            case .payRequestTapped, .sendToAddressTapped, .viewTransactionTapped:
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
+                return .none
+
             // Owned by `attachmentReduce()`, which runs first.
             case .attachTapped, .attachmentSheetDismissed, .attachmentSheetClosed, .attachMediaTapped,
                 .chooseMediaTapped, .attachFileTapped, .takePhotoTapped, .photosPickerDismissed,
                 .fileImporterDismissed, .fileImported, .cameraAuthorizationResolved, .cameraUnavailable,
                 .cameraDismissed, .cameraCaptured, .shareAddressTapped, .shareAddressFailed,
                 .sendZecTapped, .scanWalletAddressTapped:
+                return .none
+
+            // Owned by `splitBillReduce()`, which runs first.
+            case .splitBillTapped, .splitSheetDismissed, .splitTotalChanged, .splitMemoChanged,
+                .splitShareChanged, .splitCurrencyToggled, .splitSendTapped, .splitSendFailed:
                 return .none
             }
         }

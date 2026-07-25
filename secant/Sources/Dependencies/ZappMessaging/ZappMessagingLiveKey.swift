@@ -49,6 +49,8 @@ extension ZappMessagingClient: DependencyKey {
             sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1, replyTo: $2) },
             sendMedia: { try await impl.sendMedia(conversationId: $0, mediaPath: $1, contentType: $2, caption: $3, thumbnailData: $4) },
             sendWalletAddress: { try await impl.sendWalletAddress(conversationId: $0, address: $1) },
+            sendPaymentRequest: { try await impl.sendPaymentRequest(conversationId: $0, payload: $1) },
+            sendTransactionReceipt: { try await impl.sendTransactionReceipt(conversationId: $0, payload: $1) },
             markRead: { try await impl.markRead(conversationId: $0) },
             messageStatusStream: { impl.messageStatusSubject.eraseToAnyPublisher() },
             mediaProgressStream: { impl.mediaProgressSubject.eraseToAnyPublisher() },
@@ -376,6 +378,69 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                     "contentType": ChatContentType.walletAddress
                 ],
                 type: .walletAddress
+            )
+            await finishProtectedSend(protection)
+            clearFailure(for: .local(.messageSend))
+            return message
+        } catch {
+            await finishProtectedSend(protection)
+            recordFailure(.local(.messageSend), error)
+            throw error
+        }
+    }
+
+    /// Wire format, mirrored from Android's `ChatRoomVM.sendSplitRequests()` and the Request
+    /// wizard's "Send in chat": `{ content: <buildPaymentRequestJson body>,
+    /// contentType: "application/payment-request" }`.
+    ///
+    /// Android reaches the core through `message.send` with that content type; this reaches
+    /// `message.send_payment_request`, and the JS handler
+    /// (`ipc-handler.js: case 'send_payment_request'`) spreads the same `message` dict into the
+    /// same `chatStore.addMessage`. The stored — and therefore broadcast — message is identical.
+    func sendPaymentRequest(conversationId: String, payload: String) async throws -> ZMMessage {
+        guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat payment request")
+        do {
+            try await validateRecipient(conversationId: conversationId, sdk: sdk)
+            let message = try await sdk.sendPaymentMessage(
+                conversationId: conversationId,
+                message: [
+                    "content": payload,
+                    "contentType": ChatContentType.paymentRequest
+                ],
+                type: .paymentRequest
+            )
+            await finishProtectedSend(protection)
+            clearFailure(for: .local(.messageSend))
+            return message
+        } catch {
+            await finishProtectedSend(protection)
+            recordFailure(.local(.messageSend), error)
+            throw error
+        }
+    }
+
+    /// Wire format, mirrored from `SubmitProposalUseCase.notifyChatPeer()`:
+    /// `{ content: <amount/token/requestId/txId JSON>, contentType: "application/zec-transaction" }`,
+    /// posted only after a fully successful send. Routed through
+    /// `message.send_transaction`, which shares the structured handler above.
+    ///
+    /// Deliberately not factored together with `sendPaymentRequest` above: `PaymentMessageType`
+    /// is not `Sendable`, so a shared helper taking it as a parameter cannot hand it across the
+    /// SDK's isolation boundary. Created inline, each literal is its own disconnected region and
+    /// sends cleanly.
+    func sendTransactionReceipt(conversationId: String, payload: String) async throws -> ZMMessage {
+        guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat transaction receipt")
+        do {
+            try await validateRecipient(conversationId: conversationId, sdk: sdk)
+            let message = try await sdk.sendPaymentMessage(
+                conversationId: conversationId,
+                message: [
+                    "content": payload,
+                    "contentType": ChatContentType.zecTransaction
+                ],
+                type: .transaction
             )
             await finishProtectedSend(protection)
             clearFailure(for: .local(.messageSend))

@@ -311,6 +311,23 @@ struct ZappMessagingClient {
         _ address: String
     ) async throws -> ZMMessage
 
+    /// Post an `application/payment-request` message. `payload` is the JSON body built by
+    /// `ChatPaymentRequest.json(...)`, which mirrors Android's `buildPaymentRequestJson`
+    /// field-for-field — never assemble that body at a call site.
+    var sendPaymentRequest: @Sendable (
+        _ conversationId: String,
+        _ payload: String
+    ) async throws -> ZMMessage
+
+    /// Post an `application/zec-transaction` receipt after a chat-initiated send succeeded.
+    /// `payload` comes from `ChatTransactionReceipt.json(...)`, mirroring Android's
+    /// `SubmitProposalUseCase.notifyChatPeer`. Quoting the settled request's id in `requestId`
+    /// is what flips the requester's bubble to Paid — on either platform.
+    var sendTransactionReceipt: @Sendable (
+        _ conversationId: String,
+        _ payload: String
+    ) async throws -> ZMMessage
+
     var markRead: @Sendable (_ conversationId: String) async throws -> Void
 
     /// Delivery-state changes for messages already on screen (queued -> sent -> read).

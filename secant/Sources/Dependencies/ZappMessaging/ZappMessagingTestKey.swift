@@ -91,6 +91,26 @@ extension ZappMessagingClient: TestDependencyKey {
                 isFromMe: true
             )
         },
+        sendPaymentRequest: { conversationId, payload in
+            ZMMessage(
+                id: UUID().uuidString,
+                conversationId: conversationId,
+                senderId: "test",
+                content: payload,
+                contentType: ChatContentType.paymentRequest,
+                isFromMe: true
+            )
+        },
+        sendTransactionReceipt: { conversationId, payload in
+            ZMMessage(
+                id: UUID().uuidString,
+                conversationId: conversationId,
+                senderId: "test",
+                content: payload,
+                contentType: ChatContentType.zecTransaction,
+                isFromMe: true
+            )
+        },
         markRead: { _ in },
         messageStatusStream: { Empty().eraseToAnyPublisher() },
         mediaProgressStream: { Empty().eraseToAnyPublisher() },

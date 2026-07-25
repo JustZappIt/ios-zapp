@@ -17,12 +17,18 @@ enum ChatContentType {
     static let imageJPEG = "image/jpeg"
     static let gif = "image/gif"
 
-    /// Body is the sender's unified address, verbatim. Android's `WalletAddressBubble`
-    /// renders it; iOS renders the fallback bubble until Phase 6 lands.
+    /// Body is the sender's unified address, verbatim — NOT JSON. Rendered by
+    /// `ChatWalletAddressBubble`, Android's `WalletAddressBubble`.
     static let walletAddress = "application/wallet-address"
 
-    /// Phase 6 consumes these; listed so the wire vocabulary lives in one place.
+    /// Body is a JSON payload. The schemas — and the evidence they match Android's — live in
+    /// `ChatMessagePayloads.swift`; build them only through `ChatPaymentRequest.json(...)` /
+    /// `ChatTransactionReceipt.json(...)`, never by hand at a call site.
     static let paymentRequest = "application/payment-request"
     static let zecTransaction = "application/zec-transaction"
+
+    /// Out of scope per Decision 3: incoming location messages keep the plain-text fallback
+    /// bubble. Listed so the wire vocabulary lives in one place and so `ChatMessageKind` can
+    /// name what it is deliberately not rendering.
     static let location = "application/location"
 }

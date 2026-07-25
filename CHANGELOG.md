@@ -7,7 +7,14 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
-- [ZAPP-1] The "+" button in a chat now opens an attachment menu instead of jumping straight to your photo library: Share Address, Send ZEC, Request Payment / Split Bill (coming soon), and Attach Media.
+- [ZAPP-1] Payment requests now appear in chat as their own card, showing the amount (in your local currency with the ZEC value underneath, when a rate is available), an optional note, and who owes what. If the request is yours to pay, tapping it — or its Pay button — opens the send screen already filled in with the requester's address, amount and note. Once you've paid, the request is marked "Paid" for everyone in the conversation.
+- [ZAPP-1] Split Bill is now available from the chat "+" menu. Enter a total in your local currency or in ZEC, and Zapp splits it evenly between everyone in the group including you — adjust any individual's share by hand, add a note, and each person receives their own payment request. In a one-to-one chat the same option becomes Request Payment for the whole amount.
+- [ZAPP-1] After you send ZEC from a chat, a receipt now appears in the conversation for both of you, showing the amount sent. Tapping it opens the transaction's details; if the transaction hasn't synced to this wallet yet, Zapp says so instead of opening a screen that never loads.
+- [ZAPP-1] A wallet address shared into a chat now appears as a card with a scannable QR code, the address in full, a copy button, and a "Send to this address" button that opens the send screen ready to go.
+- [ZAPP-1] Files sent in a chat now appear as file cards with their name and size, and show transfer progress while they're being received, instead of appearing as a broken photo.
+- [ZAPP-1] Tapping a photo in a chat now opens it full screen, where you can pinch or double-tap to zoom, pan around, and swipe down to dismiss.
+- [ZAPP-1] Long-pressing a message now offers Copy alongside Reply for text messages and shared wallet addresses, and choosing Reply gives a light haptic tap.
+- [ZAPP-1] The "+" button in a chat now opens an attachment menu instead of jumping straight to your photo library: Share Address, Send ZEC, Request Payment / Split Bill, and Attach Media.
 - [ZAPP-1] Share Address posts your wallet address into the conversation, so the person you're chatting with can pay you without you having to copy and paste it.
 - [ZAPP-1] Send ZEC opens the send screen already filled in with the address your chat partner shared — or the one saved on their contact card. If neither exists, the QR scanner opens instead so you can scan an address. Closing either the send screen or the scanner brings you back to the conversation you started from, rather than dropping you on the Pay tab.
 - [ZAPP-1] Attach Media now offers Media, File, and Camera. Camera takes a photo and sends it straight into the chat (asking for camera access the first time), and File lets you send any document from Files, keeping its name and type so it arrives as a file rather than a photo.

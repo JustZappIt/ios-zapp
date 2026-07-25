@@ -6,6 +6,7 @@
 import ComposableArchitecture
 import PhotosUI
 import SwiftUI
+import UIKit
 import ZappMessaging
 
 /// The chat room is the one screen that keeps its back button in the header rather than in a
@@ -140,6 +141,20 @@ struct ChatRoomView: View {
                     onRefresh: { store.send(.networkChipTapped) }
                 )
             }
+            // Fullscreen rather than a sheet: a photo should own the screen, and the viewer
+            // supplies its own dismiss (close button + drag-down).
+            .fullScreenCover(
+                isPresented: Binding(
+                    get: { store.imageViewerMessage != nil },
+                    set: { if !$0 { store.send(.imageViewerDismissed) } }
+                )
+            ) {
+                if let message = store.imageViewerMessage {
+                    ChatImageViewer(message: message) {
+                        store.send(.imageViewerDismissed)
+                    }
+                }
+            }
         }
     }
 
@@ -152,6 +167,7 @@ struct ChatRoomView: View {
                     isGroup: store.isGroup,
                     onShareAddress: { store.send(.shareAddressTapped) },
                     onSendZec: { store.send(.sendZecTapped) },
+                    onSplitBill: { store.send(.splitBillTapped) },
                     onAttachMedia: { store.send(.attachMediaTapped, animation: ZappMotion.content) }
                 )
 
@@ -202,7 +218,7 @@ struct ChatRoomView: View {
                     ForEach(items) { item in
                         switch item {
                         case .message(let message):
-                            bubble(for: message)
+                            ChatRoomBubbleRow(store: store, message: message)
 
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)
@@ -216,46 +232,26 @@ struct ChatRoomView: View {
             .onTapGesture {
                 isComposerFocused = false
             }
+            // Mounted here because the composer's `.sheet` slot is taken by the attachment menu
+            // and the screen's by the network details.
+            .sheet(
+                isPresented: Binding(
+                    get: { store.splitBill != nil },
+                    set: { if !$0 { store.send(.splitSheetDismissed) } }
+                )
+            ) {
+                if let split = store.splitBill {
+                    ChatSplitBillSheet(store: store, split: split)
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                }
+            }
             .onChange(of: items.count) { _ in
                 guard let last = items.last else { return }
 
                 withAnimation(ZappMotion.content) {
                     proxy.scrollTo(last.id, anchor: .bottom)
                 }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func bubble(for message: ZMMessage) -> some View {
-        Group {
-            if let mediaId = message.mediaId {
-                ChatMediaBubble(
-                    message: message,
-                    senderName: store.state.senderName(for: message),
-                    progress: store.mediaProgress[mediaId]
-                )
-            } else {
-                ChatMessageBubble(
-                    message: message,
-                    senderName: store.state.senderName(for: message)
-                )
-            }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if message.isFromMe && message.status == "failed" {
-                store.send(.retrySendTapped(message))
-            }
-        }
-        .contextMenu {
-            if message.isFromMe && message.status == "failed" {
-                Button(String(localizable: .chatRoomRetry)) {
-                    store.send(.retrySendTapped(message))
-                }
-            }
-            Button(String(localizable: .chatRoomReply)) {
-                store.send(.replyTapped(message))
             }
         }
     }
