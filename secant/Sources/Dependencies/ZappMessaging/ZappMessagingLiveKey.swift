@@ -48,6 +48,7 @@ extension ZappMessagingClient: DependencyKey {
             messages: { try await impl.messages(conversationId: $0, limit: $1) },
             sendMessage: { try await impl.sendMessage(conversationId: $0, content: $1, replyTo: $2) },
             sendMedia: { try await impl.sendMedia(conversationId: $0, mediaPath: $1, contentType: $2, caption: $3, thumbnailData: $4) },
+            sendWalletAddress: { try await impl.sendWalletAddress(conversationId: $0, address: $1) },
             markRead: { try await impl.markRead(conversationId: $0) },
             messageStatusStream: { impl.messageStatusSubject.eraseToAnyPublisher() },
             mediaProgressStream: { impl.mediaProgressSubject.eraseToAnyPublisher() },
@@ -347,6 +348,35 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
             let message = try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
+            await finishProtectedSend(protection)
+            clearFailure(for: .local(.messageSend))
+            return message
+        } catch {
+            await finishProtectedSend(protection)
+            recordFailure(.local(.messageSend), error)
+            throw error
+        }
+    }
+
+    /// Wire format, mirrored from Android's `ChatRoomVM.shareWalletAddress()`:
+    /// `{ content: <unified address>, contentType: "application/wallet-address" }`.
+    /// Android reaches the core through `message.send` with that content type; the SDK's
+    /// `sendPaymentMessage(.walletAddress)` reaches the same `chat-store.addMessage` with the
+    /// same fields via `message.send_wallet_address`, so the stored — and therefore the
+    /// broadcast — message is identical. No new IPC type, no new payload shape.
+    func sendWalletAddress(conversationId: String, address: String) async throws -> ZMMessage {
+        guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat wallet address")
+        do {
+            try await validateRecipient(conversationId: conversationId, sdk: sdk)
+            let message = try await sdk.sendPaymentMessage(
+                conversationId: conversationId,
+                message: [
+                    "content": address,
+                    "contentType": ChatContentType.walletAddress
+                ],
+                type: .walletAddress
+            )
             await finishProtectedSend(protection)
             clearFailure(for: .local(.messageSend))
             return message

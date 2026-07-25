@@ -300,6 +300,17 @@ struct ZappMessagingClient {
         _ thumbnailData: String?
     ) async throws -> ZMMessage
 
+    /// Post the user's own unified address into the conversation as a
+    /// `ChatContentType.walletAddress` message.
+    ///
+    /// The body is the address verbatim — NOT JSON — because that is exactly what
+    /// Android's `ChatRoomVM.shareWalletAddress()` puts on the wire and what its
+    /// `WalletAddressBubble` reads back out of `message.content`.
+    var sendWalletAddress: @Sendable (
+        _ conversationId: String,
+        _ address: String
+    ) async throws -> ZMMessage
+
     var markRead: @Sendable (_ conversationId: String) async throws -> Void
 
     /// Delivery-state changes for messages already on screen (queued -> sent -> read).

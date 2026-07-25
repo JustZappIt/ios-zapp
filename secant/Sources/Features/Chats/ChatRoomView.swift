@@ -62,11 +62,64 @@ struct ChatRoomView: View {
 
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
-                    pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
                     isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
+                    onAttach: {
+                        isComposerFocused = false
+                        store.send(.attachTapped)
+                    },
                     onSend: { store.send(.sendTapped) }
                 )
+                // Mounted on the composer, not on the screen: SwiftUI honours one `.sheet` per
+                // view, and the network-details sheet already owns the screen's slot.
+                .sheet(
+                    isPresented: Binding(
+                        get: { store.showsAttachmentSheet },
+                        set: { if !$0 { store.send(.attachmentSheetDismissed) } }
+                    ),
+                    // Only fires once the sheet is fully gone, which is the earliest a picker
+                    // can be presented without iOS dropping it.
+                    onDismiss: { store.send(.attachmentSheetClosed) }
+                ) {
+                    attachmentSheet
+                }
+                .photosPicker(
+                    isPresented: Binding(
+                        get: { store.showsPhotosPicker },
+                        set: { if !$0 { store.send(.photosPickerDismissed) } }
+                    ),
+                    selection: $store.pickedItem.sending(\.pickedItemChanged),
+                    matching: .images
+                )
+                .fileImporter(
+                    isPresented: Binding(
+                        get: { store.showsFileImporter },
+                        set: { if !$0 { store.send(.fileImporterDismissed) } }
+                    ),
+                    // Android's document picker filters on `*/*`; `.item` is the same "anything".
+                    allowedContentTypes: [.item]
+                ) { result in
+                    switch result {
+                    case .success(let url):
+                        store.send(.fileImported(url))
+
+                    case .failure(let error):
+                        LoggerProxy.error("Chat room file import failed: \(error)")
+                        store.send(.mediaSendFailed)
+                    }
+                }
+                .fullScreenCover(
+                    isPresented: Binding(
+                        get: { store.showsCamera },
+                        set: { if !$0 { store.send(.cameraDismissed) } }
+                    )
+                ) {
+                    ChatCameraPicker(
+                        onCapture: { store.send(.cameraCaptured($0)) },
+                        onCancel: { store.send(.cameraDismissed) }
+                    )
+                    .ignoresSafeArea()
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
@@ -87,6 +140,42 @@ struct ChatRoomView: View {
                     onRefresh: { store.send(.networkChipTapped) }
                 )
             }
+        }
+    }
+
+    @ViewBuilder
+    private var attachmentSheet: some View {
+        Group {
+            switch store.attachmentPage {
+            case .actions:
+                ChatAttachmentSheet(
+                    isGroup: store.isGroup,
+                    onShareAddress: { store.send(.shareAddressTapped) },
+                    onSendZec: { store.send(.sendZecTapped) },
+                    onAttachMedia: { store.send(.attachMediaTapped, animation: ZappMotion.content) }
+                )
+
+            case .media:
+                ChatMediaAttachmentSheet(
+                    onChooseMedia: { store.send(.chooseMediaTapped) },
+                    onAttachFile: { store.send(.attachFileTapped) },
+                    onTakePhoto: { store.send(.takePhotoTapped) }
+                )
+            }
+        }
+        .padding(.horizontal, Design.Spacing._3xl)
+        .padding(.bottom, Design.Spacing._3xl)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, Design.Spacing._xl)
+        .background(ZappColors.surface.color(colorScheme))
+        .presentationDetents([.height(attachmentSheetHeight)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private var attachmentSheetHeight: CGFloat {
+        switch store.attachmentPage {
+        case .actions: return ChatAttachmentSheet.detentHeight
+        case .media: return ChatMediaAttachmentSheet.detentHeight
         }
     }
 
@@ -222,17 +311,16 @@ private struct ChatRoomInputRow: View {
     }
 
     @Binding var draft: String
-    @Binding var pickedItem: PhotosPickerItem?
     let isFocused: FocusState<Bool>.Binding
     let isSendEnabled: Bool
+    let onAttach: () -> Void
     let onSend: () -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Design.Spacing._md) {
-            // PhotosPicker's label closure is @Sendable, and the Zapp font modifiers are
-            // MainActor-isolated — so the label has to be its own view rather than built
-            // inline.
-            PhotosPicker(selection: $pickedItem, matching: .images) {
+            // "+" used to mount a `PhotosPicker` directly; it now opens the attachment sheet,
+            // where the gallery is one of several options (Android's `onAttachClick`).
+            Button(action: onAttach) {
                 ChatAttachGlyph()
             }
             .buttonStyle(.zappPress)

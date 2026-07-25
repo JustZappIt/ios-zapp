@@ -7,6 +7,10 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] The "+" button in a chat now opens an attachment menu instead of jumping straight to your photo library: Share Address, Send ZEC, Request Payment / Split Bill (coming soon), and Attach Media.
+- [ZAPP-1] Share Address posts your wallet address into the conversation, so the person you're chatting with can pay you without you having to copy and paste it.
+- [ZAPP-1] Send ZEC opens the send screen already filled in with the address your chat partner shared — or the one saved on their contact card. If neither exists, the QR scanner opens instead so you can scan an address. Closing either the send screen or the scanner brings you back to the conversation you started from, rather than dropping you on the Pay tab.
+- [ZAPP-1] Attach Media now offers Media, File, and Camera. Camera takes a photo and sends it straight into the chat (asking for camera access the first time), and File lets you send any document from Files, keeping its name and type so it arrives as a file rather than a photo.
 - [ZAPP-1] You can now swipe a conversation to the left in the Chats list to leave it — direct chats and groups alike — with a confirmation naming the conversation before anything is removed, and a tap of haptic feedback when the swipe reaches the point where letting go will leave. Long-pressing a row offers the same Leave action.
 - [ZAPP-1] The first time you open the Chats tab, Zapp now asks you to read and accept the messaging terms and community guidelines. Accepting is remembered; declining takes you back to the tab you came from.
 - [ZAPP-1] Creating a wallet now includes a "messaging account" intro screen before you pick your username, explaining that your username is backed by your recovery phrase, and finishes on a confirmation screen ("You're all set") that reflects how you secured the app and hands you into Zapp with a success tap.
@@ -34,6 +38,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
 ### Fixed
+- [ZAPP-1] An animated GIF sent from your photo library now arrives animated on the other side, instead of as a single frozen frame.
 - [ZAPP-1] The "See all" row under recent activity now uses the readable accent tone instead of the bright button orange, so it stays legible against the light background.
 - [ZAPP-1] When your balance history starts a period at zero there is no percentage to report, so the Pay screen now shows just the period (24H/1W/1M/ALL) instead of a change figure with a dangling separator dot.
 - [ZAPP-1] Tapping "Create a new wallet" now slides into the creating-wallet screen like the rest of onboarding, instead of cutting to it.

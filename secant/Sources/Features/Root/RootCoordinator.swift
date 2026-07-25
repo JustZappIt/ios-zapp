@@ -28,8 +28,7 @@ extension Root {
                 .torSetup(.backToHomeTapped),
                 .currencyConversionSetup(.backToHomeTapped),
                 .backToHomeFromChatPrivacyTapped,
-                .backToHomeFromServerSwitchTapped,
-                .sendCoordFlow(.sendForm(.dismissRequired)):
+                .backToHomeFromServerSwitchTapped:
                 state.path = nil
                 return .none
                 
@@ -197,12 +196,14 @@ extension Root {
 
             case .home(.sendTapped):
                 state.sendCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = false
                 state.path = .sendCoordFlow
                 exchangeRate.refreshExchangeRateUSD()
                 return .none
 
             case .home(.scanTapped):
                 state.scanCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = false
                 state.path = .scanCoordFlow
                 return .none
 
@@ -278,6 +279,33 @@ extension Root {
                 state.groupInfoState = .initial
                 state.groupInfoState.conversation = conversation
                 state.path = .groupInfo
+                return .none
+
+                // Send ZEC from the composer's attachment sheet. The address is whatever the peer
+                // shared in this chat, else their saved contact row — Android's
+                // `onSendZecClick`. With neither, the room asks for the scanner instead and this
+                // case never fires.
+            case .chatRoom(.sendZecTapped):
+                guard let address = state.chatRoomState.resolvedPeerWalletAddress else {
+                    return .none
+                }
+                state.sendCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = true
+                state.path = .sendCoordFlow
+                exchangeRate.refreshExchangeRateUSD()
+                // Phase 6 extension point: Android posts an `application/zec-transaction` receipt
+                // into the conversation after a successful chat-initiated send
+                // (`SubmitProposalUseCase.notifyChatPeer`, keyed on its `ChatSendContext`). That
+                // receipt is what feeds Phase 6's `TransactionBubble`, so it lands with the bubble
+                // that renders it — this flag is where the conversation id has to be remembered.
+                return .send(.sendCoordFlow(.sendForm(.addressUpdated(address.redacted))))
+
+                // Falls out of Send ZEC when no peer address is known. The scanner ends in the
+                // same send form, so it returns to the room on the way out too.
+            case .chatRoom(.scanWalletAddressTapped):
+                state.scanCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = true
+                state.path = .scanCoordFlow
                 return .none
 
                 // Leaving drops you out of the group entirely, so go back to the list
@@ -440,28 +468,30 @@ extension Root {
 
                 // MARK: - Scan Coord Flow
                 
-            case .scanCoordFlow(.scan(.cancelTapped)):
-                state.path = nil
-                return .none
-                
-            case .scanCoordFlow(.path(.element(id: _, action: .sendForm(.dismissRequired)))):
-                state.path = nil
+                // A scan started from a chat room unwinds back onto that room, the same way the
+                // send flow it feeds does. Every other entry point still unwinds to the tabs.
+            case .scanCoordFlow(.scan(.cancelTapped)), .scanCoordFlow(.path(.element(id: _, action: .sendForm(.dismissRequired)))):
+                state.path = state.returnsToChatRoomAfterWalletFlow ? .chatRoom : nil
+                state.returnsToChatRoomAfterWalletFlow = false
                 return .none
 
             case .scanCoordFlow(.path(.element(id: _, action: .transactionDetails(.closeDetailTapped)))):
                 state.path = nil
+                state.returnsToChatRoomAfterWalletFlow = false
                 return .none
 
             case .scanCoordFlow(.path(.element(id: _, action: .sendResultSuccess(.closeTapped)))),
                     .scanCoordFlow(.path(.element(id: _, action: .sendResultFailure(.closeTapped)))),
                     .scanCoordFlow(.path(.element(id: _, action: .sendResultPending(.closeTapped)))):
-                state.path = nil
+                state.path = state.returnsToChatRoomAfterWalletFlow ? .chatRoom : nil
+                state.returnsToChatRoomAfterWalletFlow = false
                 return .send(.fetchTransactionsForTheSelectedAccount)
 
                 // MARK: - Self
 
             case .sendAgainRequested(let transactionState):
                 state.sendCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = false
                 state.path = .sendCoordFlow
                 state.sendCoordFlowState.sendFormState.memoState.text = state.transactionMemos[transactionState.id]?.first ?? ""
                 return .merge(
@@ -478,15 +508,25 @@ extension Root {
                 )
 
                 // MARK: - Send Coord Flow
-                
+
+                // A send started from a chat returns to that chat, the way Android's send screen
+                // pops back onto the room it was pushed from. Every other entry point still
+                // unwinds to the tabs.
+            case .sendCoordFlow(.sendForm(.dismissRequired)):
+                state.path = state.returnsToChatRoomAfterWalletFlow ? .chatRoom : nil
+                state.returnsToChatRoomAfterWalletFlow = false
+                return .none
+
             case .sendCoordFlow(.path(.element(id: _, action: .sendResultSuccess(.closeTapped)))),
                     .sendCoordFlow(.path(.element(id: _, action: .sendResultFailure(.closeTapped)))),
                     .sendCoordFlow(.path(.element(id: _, action: .sendResultPending(.closeTapped)))):
-                state.path = nil
+                state.path = state.returnsToChatRoomAfterWalletFlow ? .chatRoom : nil
+                state.returnsToChatRoomAfterWalletFlow = false
                 return .send(.fetchTransactionsForTheSelectedAccount)
 
             case .sendCoordFlow(.path(.element(id: _, action: .transactionDetails(.closeDetailTapped)))):
                 state.path = nil
+                state.returnsToChatRoomAfterWalletFlow = false
                 return .none
 
                 // MARK: - Sign with Keystone Coord Flow

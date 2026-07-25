@@ -129,6 +129,11 @@ struct Root {
         var scanCoordFlowState = ScanCoordFlow.State.initial
         var securitySettingsState = SecuritySettings.State.initial
         var sendCoordFlowState = SendCoordFlow.State.initial
+        /// A wallet flow was opened from a chat room (attachment sheet → Send ZEC, or the scanner
+        /// it falls back to), so closing it puts the user back in that room rather than on the
+        /// tabs. `Root.path` holds one destination at a time, so the way back has to be
+        /// remembered explicitly.
+        var returnsToChatRoomAfterWalletFlow = false
         var settingsState = Settings.State.initial
         var signWithKeystoneCoordFlowState = SignWithKeystoneCoordFlow.State.initial
         var swapAndPayCoordFlowState = SwapAndPayCoordFlow.State.initial

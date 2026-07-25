@@ -18,6 +18,10 @@ struct ChatRoom {
     struct State: Equatable {
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
 
+        /// Share-address posts THIS account's unified address, matching Android's
+        /// `getZashiAccount().unified.address.address` — never a hardware-wallet account.
+        @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount?
+
         var conversationId: String
         var conversation: ZMConversation?
         var messages: [ZMMessage] = []
@@ -37,6 +41,14 @@ struct ChatRoom {
 
         /// Bound to the composer's `PhotosPicker`. Consumed and cleared the moment it lands.
         var pickedItem: PhotosPickerItem?
+
+        // Composer attachment menu. See `ChatRoomAttachments.swift`.
+        var showsAttachmentSheet = false
+        var attachmentPage: ChatRoom.AttachmentPage = .actions
+        var pendingAttachment: ChatRoom.PendingAttachment?
+        var showsPhotosPicker = false
+        var showsFileImporter = false
+        var showsCamera = false
 
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
@@ -169,13 +181,39 @@ struct ChatRoom {
         case messageStatusChanged(messageId: String, status: String)
         case mediaProgressChanged(mediaId: String, progress: Double)
         case mediaCompleted(mediaId: String, filePath: String)
+
+        // MARK: Attachment menu — reduced in `ChatRoomAttachments.swift`
+
+        case attachTapped
+        case attachmentSheetDismissed
+        case attachmentSheetClosed
+        case attachMediaTapped
+        case chooseMediaTapped
+        case attachFileTapped
+        case takePhotoTapped
+        case photosPickerDismissed
+        case fileImporterDismissed
+        case fileImported(URL)
+        case cameraAuthorizationResolved(Bool)
+        case cameraUnavailable
+        case cameraDismissed
+        case cameraCaptured(Data)
+        case shareAddressTapped
+        case shareAddressFailed
+        /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address.
+        case sendZecTapped
+        /// Routed by Root into `ScanCoordFlow`.
+        case scanWalletAddressTapped
     }
 
+    @Dependency(\.cameraCapture) var cameraCapture
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
 
     var body: some Reducer<State, Action> {
+        attachmentReduce()
+
         Reduce { state, action in
             switch action {
             case .onAppear:
@@ -277,7 +315,7 @@ struct ChatRoom {
                         senderId: state.messagingState.identity?.publicKey ?? "",
                         senderName: state.messagingState.identity?.displayName,
                         content: content,
-                        contentType: "text/plain",
+                        contentType: ChatContentType.text,
                         timestamp: Date(),
                         isFromMe: true,
                         status: "sending",
@@ -472,6 +510,14 @@ struct ChatRoom {
                 }
 
                 return .none
+
+            // Owned by `attachmentReduce()`, which runs first.
+            case .attachTapped, .attachmentSheetDismissed, .attachmentSheetClosed, .attachMediaTapped,
+                .chooseMediaTapped, .attachFileTapped, .takePhotoTapped, .photosPickerDismissed,
+                .fileImporterDismissed, .fileImported, .cameraAuthorizationResolved, .cameraUnavailable,
+                .cameraDismissed, .cameraCaptured, .shareAddressTapped, .shareAddressFailed,
+                .sendZecTapped, .scanWalletAddressTapped:
+                return .none
             }
         }
     }
@@ -562,6 +608,16 @@ enum ChatMediaEncoder {
             .jpegData(compressionQuality: thumbnailQuality)?
             .base64EncodedString()
 
+        // Forwarded untouched, like Android's `sendMediaFromUri` GIF branch: re-encoding a GIF
+        // flattens it to a single still, so the peer would receive a frozen animation.
+        if supportedTypes.contains(where: { $0.conforms(to: .gif) }) {
+            return Encoded(
+                path: try write(data, pathExtension: "gif"),
+                contentType: ChatContentType.gif,
+                thumbnail: thumbnail
+            )
+        }
+
         if supportedTypes.contains(where: { $0.conforms(to: .png) }) {
             return Encoded(
                 path: try write(data, pathExtension: "png"),
@@ -581,7 +637,7 @@ enum ChatMediaEncoder {
 
         return Encoded(
             path: try write(jpeg, pathExtension: "jpg"),
-            contentType: "image/jpeg",
+            contentType: ChatContentType.imageJPEG,
             thumbnail: thumbnail
         )
     }
