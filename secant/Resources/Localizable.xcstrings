@@ -12020,6 +12020,84 @@
         "es": { "stringUnit": { "state": "translated", "value": "Protege\ntu app" } }
       }
     },
+    "onboarding.done.enterCta": {
+      "comment": "MARK: - Zapp Onboarding Phase 2",
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Enter Zapp →" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Entrar a Zapp →" } }
+      }
+    },
+    "onboarding.done.subtitleBio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Identity created, wallet ready, secured with biometrics." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Identidad creada, billetera lista, protegida con biometría." } }
+      }
+    },
+    "onboarding.done.subtitlePin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Identity created, wallet ready, secured with a PIN." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Identidad creada, billetera lista, protegida con un PIN." } }
+      }
+    },
+    "onboarding.done.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "You’re\nall set." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Todo\nlisto." } }
+      }
+    },
+    "onboarding.msgIntro.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Part 2 of 3 · Messaging account" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Parte 2 de 3 · Cuenta de mensajería" } }
+      }
+    },
+    "onboarding.msgIntro.phraseSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Your wallet’s 24-word phrase also restores your messaging identity." } },
+        "es": { "stringUnit": { "state": "translated", "value": "La frase de 24 palabras de tu billetera también restaura tu identidad de mensajería." } }
+      }
+    },
+    "onboarding.msgIntro.phraseTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "One recovery phrase" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Una sola frase de recuperación" } }
+      }
+    },
+    "onboarding.msgIntro.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Your identity is a username backed by your wallet’s recovery phrase — one phrase restores your wallet and messaging identity on any device. Message history is stored locally and is not recoverable." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Tu identidad es un nombre de usuario respaldado por la frase de recuperación de tu billetera — una sola frase restaura tu billetera y tu identidad de mensajería en cualquier dispositivo. El historial de mensajes se guarda localmente y no es recuperable." } }
+      }
+    },
+    "onboarding.msgIntro.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Create your\nmessaging\nidentity" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Crea tu\nidentidad de\nmensajería" } }
+      }
+    },
+    "onboarding.msgIntro.usernameSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "How friends find and message you" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Así te encuentran y te escriben tus amigos" } }
+      }
+    },
+    "onboarding.msgIntro.usernameTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Pick a username" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Elige un nombre de usuario" } }
+      }
+    },
     "onboarding.seed.confirmation": {
       "extractionState": "manual",
       "localizations": {
@@ -17972,6 +18050,13 @@
             "value": "Tu cuenta Zapp está protegida."
           }
         }
+      }
+    },
+    "splash.authSupport": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Contact Support" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Contactar Soporte" } }
       }
     },
     "splash.authTouchID": {

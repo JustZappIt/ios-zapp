@@ -7,12 +7,15 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] Creating a wallet now includes a "messaging account" intro screen before you pick your username, explaining that your username is backed by your recovery phrase, and finishes on a confirmation screen ("You're all set") that reflects how you secured the app and hands you into Zapp with a success tap.
+- [ZAPP-1] If unlocking the app fails, the lock screen now offers a "Contact Support" option alongside the retry, so you're never stranded on a failed sign-in.
 - [ZAPP-1] The You tab's Security section now has an App lock row that opens app-lock settings directly (change your PIN or switch authentication method) without going through All settings.
 - [ZAPP-1] Onboarding now requires an app-lock method: a 6-digit PIN or device authentication. PIN unlock includes a persisted five-attempt, 30-second lockout, and App Lock settings let you change the PIN or switch authentication methods.
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] Onboarding steps now slide in directionally (forward from the right, back from the left) with a fade, and a failed biometric enrollment now gives an error haptic.
 - [ZAPP-1] The Chats tab now shows the number of unread conversations as a count badge (capped at "99+") that scales and fades in and out, instead of a plain dot.
 - [ZAPP-1] Switching tabs on the bottom navigation bar now gives a subtle haptic tap.
 - [ZAPP-1] Reorganized the You tab to match Android: P2P payment method and P2P transactions now live in their own "P2P" group instead of under Privacy.

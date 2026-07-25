@@ -29,9 +29,11 @@ struct RestoreWalletCoordFlow {
     enum Path {
         case appLockSetup(AppLockSetup)
         case chatUsername(ChatUsernameEntry)
+        case done(OnboardingDone)
         case estimateBirthdaysDate(WalletBirthday)
         case estimatedBirthday(WalletBirthday)
         case identityDerivation(OnboardingIdentityDerivation)
+        case messagingIntro(OnboardingMessagingIntro)
         case recoverySeedPhraseEntry(RestoreWalletCoordFlow)
         case restoreInfo(RestoreInfo)
         case seedBackup(OnboardingSeedBackup)
@@ -47,6 +49,7 @@ struct RestoreWalletCoordFlow {
         var isValidSeed = false
         var isTorOn = false
         var isTorSheetPresented = false
+        var landingForward = true
         var landingStep = LandingStep.welcome
         var walletCreationError: String?
         var nextIndex: Int?
@@ -106,6 +109,7 @@ struct RestoreWalletCoordFlow {
         case newWalletSuccessfullyCreated
     }
 
+    @Dependency(\.appSecurity) var appSecurity
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.continuousClock) var continuousClock
     @Dependency(\.pasteboard) var pasteboard
@@ -376,6 +380,57 @@ struct OnboardingSeedBackup {
                 state.words = words
                 state.isLoading = false
                 state.isRevealed = true
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct OnboardingMessagingIntro {
+    @ObservableState
+    struct State: Equatable {
+        static let initial = State()
+    }
+
+    enum Action: Equatable {
+        case continueTapped
+    }
+
+    var body: some Reducer<State, Action> {
+        Reduce { _, action in
+            switch action {
+            case .continueTapped:
+                return .none
+            }
+        }
+    }
+}
+
+@Reducer
+struct OnboardingDone {
+    enum Mode: Equatable {
+        case biometric
+        case pin
+    }
+
+    @ObservableState
+    struct State: Equatable {
+        var mode: Mode
+
+        init(mode: Mode) {
+            self.mode = mode
+        }
+    }
+
+    enum Action: Equatable {
+        case enterTapped
+    }
+
+    var body: some Reducer<State, Action> {
+        Reduce { _, action in
+            switch action {
+            case .enterTapped:
                 return .none
             }
         }

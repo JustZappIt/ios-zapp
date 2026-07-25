@@ -20,14 +20,17 @@ extension RestoreWalletCoordFlow {
                 return .none
 
             case .landingGetStartedTapped:
+                state.landingForward = true
                 state.landingStep = .walletIntro
                 return .none
 
             case .landingContinueTapped:
+                state.landingForward = true
                 state.landingStep = .walletChoice
                 return .none
 
             case .landingBackTapped:
+                state.landingForward = false
                 switch state.landingStep {
                 case .welcome:
                     return .none
@@ -45,6 +48,7 @@ extension RestoreWalletCoordFlow {
                 return .none
 
             case .createNewWalletRequested:
+                state.landingForward = true
                 state.landingStep = .creatingWallet
                 state.walletCreationError = nil
                 return createWalletEffect()
@@ -113,8 +117,14 @@ extension RestoreWalletCoordFlow {
                     state.alert = .cantMarkPhraseBackedUp(error.toZcashError())
                     return .none
                 }
-                state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                // Part 2 intro (Android's MessagingPhaseIntro) sits between seed backup and
+                // username entry on the create path; the wallet is already committed here.
+                state.path.append(.messagingIntro(.initial))
                 return .send(.walletProvisioned(.created))
+
+            case .path(.element(id: _, action: .messagingIntro(.continueTapped))):
+                state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                return .none
 
             case .path(.element(id: _, action: .identityDerivation(.identityReady))):
                 state.path.append(.appLockSetup(.initial))
@@ -125,6 +135,13 @@ extension RestoreWalletCoordFlow {
                     state.path.append(.restoreInfo(RestoreInfo.State.initial))
                     return .send(.successfullyRecovered)
                 }
+                // Create path ends on the mode-aware Done screen (Android's OnboardingDoneScreen);
+                // entering the app is deferred to its CTA.
+                let mode: OnboardingDone.Mode = appSecurity.authenticationMethod() == .pin ? .pin : .biometric
+                state.path.append(.done(OnboardingDone.State(mode: mode)))
+                return .none
+
+            case .path(.element(id: _, action: .done(.enterTapped))):
                 return .send(.newWalletSuccessfullyCreated)
 
             case .path(.element(id: _, action: .recoverySeedPhraseEntry(.nextTapped))):

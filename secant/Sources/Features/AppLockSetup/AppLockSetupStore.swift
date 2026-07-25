@@ -5,6 +5,7 @@
 
 import ComposableArchitecture
 import Foundation
+import UIKit
 
 @Reducer
 struct AppLockSetup {
@@ -121,7 +122,13 @@ struct AppLockSetup {
                 guard succeeded else {
                     state.isProcessing = false
                     state.errorMessage = String(localizable: .onboardingBiometricFailed)
-                    return .none
+                    // Reject/error haptic on failed biometric enrollment (Android's
+                    // BioState.Error LaunchedEffect fires HapticFeedbackType.Reject).
+                    return .run { _ in
+                        await MainActor.run {
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                    }
                 }
                 do {
                     try appSecurity.configureBiometric()

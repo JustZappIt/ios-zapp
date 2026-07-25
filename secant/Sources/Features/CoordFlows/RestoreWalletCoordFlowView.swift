@@ -66,7 +66,7 @@ struct RestoreWalletCoordFlowView: View {
                     }
                 }
                 .id(store.landingStep)
-                .transition(.opacity.combined(with: .move(edge: .trailing)))
+                .transition(.zappLandingSlide(forward: store.landingForward))
                 .background(ZappColors.bg.color(colorScheme))
                 .zashiSheet(isPresented: $store.isHelpSheetPresented) {
                     helpSheetContent()
@@ -81,12 +81,16 @@ struct RestoreWalletCoordFlowView: View {
                     AppLockSetupView(store: store)
                 case let .chatUsername(store):
                     ChatUsernameEntryView(store: store)
+                case let .done(store):
+                    ZappOnboardingDoneView(store: store)
                 case let .estimateBirthdaysDate(store):
                     WalletBirthdayEstimateDateView(store: store)
                 case let .estimatedBirthday(store):
                     WalletBirthdayEstimatedHeightView(store: store)
                 case let .identityDerivation(store):
                     ZappIdentityDerivationView(store: store)
+                case let .messagingIntro(store):
+                    ZappMessagingIntroView(store: store)
                 case let .recoverySeedPhraseEntry(store):
                     RecoverySeedPhraseEntryView(store: store)
                 case let .restoreInfo(store):
@@ -218,6 +222,42 @@ private extension ZappTextStyle {
         lineHeight: 104,
         tracking: -5
     )
+    static let onboardingDoneCheck = ZappTextStyle(
+        weight: .bold,
+        size: 88,
+        lineHeight: 92,
+        tracking: -4
+    )
+}
+
+// Directional ⅕-width slide + fade for onboarding landing-step changes, mirroring
+// Android's `ZappOnboardingFlow` AnimatedContent transitionSpec (forward slides in from
+// the right, back-navigation from the left).
+private struct ZappLandingSlideModifier: ViewModifier {
+    let offset: CGFloat
+
+    func body(content: Content) -> some View {
+        content.offset(x: offset)
+    }
+}
+
+extension AnyTransition {
+    // Built during main-actor View `body` evaluation, so reading `UIScreen.main` here is safe.
+    @MainActor static func zappLandingSlide(forward: Bool) -> AnyTransition {
+        let travel = UIScreen.main.bounds.width / 5
+        return .asymmetric(
+            insertion: .modifier(
+                active: ZappLandingSlideModifier(offset: forward ? travel : -travel),
+                identity: ZappLandingSlideModifier(offset: 0)
+            )
+            .combined(with: .opacity),
+            removal: .modifier(
+                active: ZappLandingSlideModifier(offset: forward ? -travel : travel),
+                identity: ZappLandingSlideModifier(offset: 0)
+            )
+            .combined(with: .opacity)
+        )
+    }
 }
 
 private struct ZappWelcomeGateView: View {
@@ -439,6 +479,125 @@ private struct ZappWalletChoiceView: View {
         .background(ZappColors.bg.color(colorScheme))
         .zappSwipeBack(action: onBack)
         .navigationBarBackButtonHidden(true)
+    }
+}
+
+private struct ZappMessagingIntroView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    @Perception.Bindable var store: StoreOf<OnboardingMessagingIntro>
+
+    var body: some View {
+        WithPerceptionTracking {
+            VStack(spacing: 0) {
+                ZappOnboardingProgress(step: 2)
+                    .padding(.horizontal, 28)
+                    .padding(.top, 20)
+
+                ScrollView {
+                    ZStack(alignment: .topTrailing) {
+                        ZappOnboardingGhostNumber(number: 2)
+
+                        VStack(alignment: .leading, spacing: 0) {
+                            ZappOnboardingEyebrow(text: String(localizable: .onboardingMsgIntroBadge))
+
+                            Text(localizable: .onboardingMsgIntroTitle)
+                                .zappFont(.onboardingHero, style: ZappColors.text)
+                                .lineLimit(3)
+                                .minimumScaleFactor(0.7)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 14)
+
+                            Text(localizable: .onboardingMsgIntroSubtitle)
+                                .zappFont(.onboardingSub, style: ZappColors.textMuted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 16)
+
+                            VStack(spacing: 0) {
+                                ZappOnboardingBullet(
+                                    title: String(localizable: .onboardingMsgIntroUsernameTitle),
+                                    subtitle: String(localizable: .onboardingMsgIntroUsernameSubtitle)
+                                )
+                                ZappOnboardingBullet(
+                                    title: String(localizable: .onboardingMsgIntroPhraseTitle),
+                                    subtitle: String(localizable: .onboardingMsgIntroPhraseSubtitle)
+                                )
+                            }
+                            .padding(.top, 28)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal, 28)
+                    .padding(.top, 24)
+                    .padding(.bottom, 16)
+                }
+
+                // No back button: the wallet is already committed at this point (Android's
+                // MessagingPhaseIntro renders with showBack = false).
+                ZappOnboardingPrimaryDock {
+                    ZappButton(title: String(localizable: .onboardingContinue)) {
+                        store.send(.continueTapped)
+                    }
+                }
+            }
+            .background(ZappColors.bg.color(colorScheme))
+            .navigationBarBackButtonHidden(true)
+        }
+    }
+}
+
+private struct ZappOnboardingDoneView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    @Perception.Bindable var store: StoreOf<OnboardingDone>
+
+    var body: some View {
+        WithPerceptionTracking {
+            VStack(spacing: 0) {
+                VStack(spacing: 0) {
+                    Spacer()
+
+                    Text("✓")
+                        .zappFont(.onboardingDoneCheck, style: ZappColors.accent)
+
+                    Text(localizable: .onboardingDoneTitle)
+                        .zappFont(.onboardingHero, style: ZappColors.text)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 18)
+
+                    Rectangle()
+                        .fill(ZappColors.text.color(colorScheme))
+                        .frame(width: 36, height: 3)
+                        .padding(.top, 20)
+
+                    Text(
+                        store.mode == .pin
+                            ? String(localizable: .onboardingDoneSubtitlePin)
+                            : String(localizable: .onboardingDoneSubtitleBio)
+                    )
+                    .zappFont(.onboardingSub, style: ZappColors.textMuted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 20)
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 28)
+
+                ZappOnboardingPrimaryDock {
+                    ZappButton(title: String(localizable: .onboardingDoneEnterCta)) {
+                        store.send(.enterTapped)
+                    }
+                }
+            }
+            .background(ZappColors.bg.color(colorScheme))
+            .navigationBarBackButtonHidden(true)
+            .onAppear {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+            }
+        }
     }
 }
 

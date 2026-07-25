@@ -103,6 +103,22 @@ final class SplashManager: ObservableObject {
     @MainActor func authenticationFailed() {
         lockScreen = .biometricRetry
     }
+
+    // Support escape hatch on repeated unlock failure (mirrors Android's
+    // AuthenticationErrorDialog "Contact Support" action). iOS-native mail handoff.
+    @MainActor func contactSupport() {
+        let supportData = SupportDataGenerator.generate()
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = supportData.toAddress
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: supportData.subject),
+            URLQueryItem(name: "body", value: supportData.message)
+        ]
+        if let url = components.url {
+            UIApplication.shared.open(url)
+        }
+    }
 }
 
 extension SplashManager {
@@ -412,6 +428,18 @@ struct SplashView: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.top, 8)
+
+                Button {
+                    splashManager.contactSupport()
+                } label: {
+                    Text(localizable: .splashAuthSupport)
+                        .font(.custom(FontFamily.Inter.semiBold.name, size: 14))
+                        .foregroundColor(.white)
+                        .underline()
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 24)
+                }
+                .padding(.top, 20)
             }
             .padding(.bottom, 160)
             .screenHorizontalPadding()
