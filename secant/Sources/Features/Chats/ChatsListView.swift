@@ -9,8 +9,8 @@ import ZappMessaging
 
 /// The Chats tab root, mirroring `ChatListView.kt`.
 ///
-/// Android also pins a "Zapp Support" row and swipes a row away to leave the conversation. Both
-/// need surface iOS does not have yet.
+/// Android also pins an aggregate "Zapp Support" row above the list; that arrives with the support
+/// subsystem in Phase 7, alongside the sorting extension point marked in `ChatsListStore`.
 struct ChatsListView: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -58,6 +58,19 @@ struct ChatsListView: View {
                     onRefresh: { store.send(.networkChipTapped) }
                 )
             }
+            // Swiping the sheet away is the analogue of Android's `onDismissRequest`, which declines.
+            .sheet(
+                isPresented: Binding(
+                    get: { store.showsTermsDialog },
+                    set: { if !$0 { store.send(.termsDeclined) } }
+                )
+            ) {
+                ChatTermsView(
+                    onAccept: { store.send(.termsAccepted) },
+                    onDecline: { store.send(.termsDeclined) }
+                )
+            }
+            .alert($store.scope(state: \.alert, action: \.alert))
         }
     }
 
@@ -65,18 +78,23 @@ struct ChatsListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(store.sortedConversations) { conversation in
-                    ChatConversationRow(
+                    // Android swipes both direct and group rows away to leave; the context menu
+                    // stays as the discoverable, accessible route to the same action.
+                    ChatSwipeToLeaveRow(
                         conversation: conversation,
-                        displayName: store.state.displayName(for: conversation),
-                        isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
-                        unreadCount: store.state.messagingState.unreadCount(for: conversation.id)
-                    ) {
-                        store.send(.conversationTapped(conversation.id))
-                    }
-                    .contextMenu {
-                        if conversation.type == .direct {
-                            Button(String(localizable: .generalDelete), role: .destructive) {
-                                store.send(.removeConversationTapped(conversation.id))
+                        onLeave: { store.send(.leaveConversationRequested(conversation.id)) },
+                        onTap: { store.send(.conversationTapped(conversation.id)) }
+                    ) { tap in
+                        ChatConversationRow(
+                            conversation: conversation,
+                            displayName: store.state.displayName(for: conversation),
+                            isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
+                            unreadCount: store.state.messagingState.unreadCount(for: conversation.id),
+                            action: tap
+                        )
+                        .contextMenu {
+                            Button(String(localizable: .chatListLeaveAction), role: .destructive) {
+                                store.send(.leaveConversationRequested(conversation.id))
                             }
                         }
                     }

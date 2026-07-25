@@ -27,6 +27,9 @@ struct ZappTabs {
     @ObservableState
     struct State: Equatable {
         var selectedTab: Tab = .chats
+        /// Where a tab that refuses to open — currently only Chats, when its terms are
+        /// declined — sends the user back to. Chats is the launch tab, so Pay is the fallback.
+        var previousTab: Tab = .pay
         var chatUnreadCount = 0
 
         /// Fed from Root's ZappMessagingState. The Chats tab shows the identity
@@ -66,6 +69,9 @@ struct ZappTabs {
         Reduce { state, action in
             switch action {
             case .tabSelected(let tab):
+                guard tab != state.selectedTab else { return .none }
+
+                state.previousTab = state.selectedTab
                 state.selectedTab = tab
                 return .none
 

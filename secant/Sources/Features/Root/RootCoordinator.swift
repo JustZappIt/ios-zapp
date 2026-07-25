@@ -296,6 +296,12 @@ extension Root {
             case .chatContactsList(.contactsChanged(let contacts)):
                 return .send(.chatContactsLoaded(contacts))
 
+                // Declining the messaging terms must not leave the user sitting in Chats behind a
+                // dismissed gate, so the tab bounces back to wherever they came from.
+            case .chatsList(.termsDeclined):
+                state.zappTabsState.selectedTab = state.zappTabsState.previousTab
+                return .none
+
             case .chatsList(.newConversationTapped):
                 state.newChatState = .initial
                 state.path = .newChat

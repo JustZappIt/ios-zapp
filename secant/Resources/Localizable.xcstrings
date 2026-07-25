@@ -1658,19 +1658,138 @@
         }
       }
     },
+    "chatList.filePlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivo"
+          }
+        }
+      }
+    },
+    "chatList.gifPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        }
+      }
+    },
+    "chatList.leaveAction": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salir"
+          }
+        }
+      }
+    },
+    "chatList.leaveDialog.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salir"
+          }
+        }
+      }
+    },
+    "chatList.leaveDialog.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You’ll leave “%1$@” and stop receiving its messages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saldrás de “%1$@” y dejarás de recibir sus mensajes."
+          }
+        }
+      }
+    },
+    "chatList.leaveDialog.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave conversation?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Salir de la conversación?"
+          }
+        }
+      }
+    },
+    "chatList.locationPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ubicación"
+          }
+        }
+      }
+    },
     "chatList.mediaPlaceholder": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Photo"
+            "value": "Media"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Foto"
+            "value": "Multimedia"
           }
         }
       }
@@ -1743,6 +1862,40 @@
         }
       }
     },
+    "chatList.paymentRequestPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payment request"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitud de pago"
+          }
+        }
+      }
+    },
+    "chatList.photoPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        }
+      }
+    },
     "chatList.time.now": {
       "extractionState": "manual",
       "localizations": {
@@ -1773,6 +1926,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chats"
+          }
+        }
+      }
+    },
+    "chatList.videoPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
           }
         }
       }
@@ -2564,6 +2734,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chat"
+          }
+        }
+      }
+    },
+    "chatTerms.accept": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I Accept"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acepto"
+          }
+        }
+      }
+    },
+    "chatTerms.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By using Zapp messaging, you agree to:\n\n1. Not send spam, unsolicited messages, or engage in harassment.\n\n2. Not share illegal content, including but not limited to child exploitation material, illegal substances, or stolen financial information.\n\n3. Not impersonate others or use the messaging feature for scams or fraud.\n\n4. Not use the messaging feature to facilitate illegal activities.\n\n5. Respect other users’ privacy and not share their information without consent.\n\nUsers who violate these guidelines may be blocked by other users. You can block or report any user from the conversation settings menu.\n\nMessages are sent peer-to-peer and are end-to-end encrypted. Zapp does not store or have access to your message content."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al usar la mensajería de Zapp, aceptas:\n\n1. No enviar spam, mensajes no solicitados ni acosar a otras personas.\n\n2. No compartir contenido ilegal, incluyendo, entre otros, material de explotación infantil, sustancias ilegales o información financiera robada.\n\n3. No hacerte pasar por otras personas ni usar la función de mensajería para estafas o fraudes.\n\n4. No usar la función de mensajería para facilitar actividades ilegales.\n\n5. Respetar la privacidad de otros usuarios y no compartir su información sin su consentimiento.\n\nLos usuarios que infrinjan estas normas podrán ser bloqueados por otros usuarios. Puedes bloquear o reportar a cualquier usuario desde el menú de ajustes de la conversación.\n\nLos mensajes se envían de par a par y están cifrados de extremo a extremo. Zapp no almacena ni tiene acceso al contenido de tus mensajes."
+          }
+        }
+      }
+    },
+    "chatTerms.decline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decline"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechazar"
+          }
+        }
+      }
+    },
+    "chatTerms.guidelinesHeading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Community Guidelines"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normas de la comunidad"
+          }
+        }
+      }
+    },
+    "chatTerms.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before using Zapp messaging, please review and accept our community guidelines:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antes de usar la mensajería de Zapp, revisa y acepta nuestras normas de la comunidad:"
+          }
+        }
+      }
+    },
+    "chatTerms.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messaging Terms"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Términos de mensajería"
           }
         }
       }

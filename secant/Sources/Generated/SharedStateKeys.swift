@@ -14,6 +14,7 @@ public extension String {
     static let flexaAccountId = "sharedStateKey_flexaAccountId"
     static let addressBookContacts = "sharedStateKey_addressBookContacts"
     static let chatContacts = "sharedStateKey_chatContacts"
+    static let chatTermsAccepted = "sharedStateKey_chatTermsAccepted"
     static let toast = "sharedStateKey_toast"
     static let featureFlags = "sharedStateKey_featureFlags"
     static let lastAuthenticationTimestamp = "sharedStateKey_lastAuthenticationTimestamp"

@@ -12,6 +12,10 @@ struct ChatsList {
     @ObservableState
     struct State: Equatable {
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+        /// Android persists the same flag as `IS_CHAT_TOS_ACCEPTED`.
+        @Shared(.appStorage(.chatTermsAccepted)) var chatTermsAccepted = false
+
+        @Presents var alert: AlertState<Action.Alert>?
 
         var conversations: [ZMConversation] = []
         var messagingState = ZappMessagingState()
@@ -20,6 +24,7 @@ struct ChatsList {
         var isLoaded = false
         var showsNetworkDetails = false
         var isLoadingNetworkDetails = false
+        var showsTermsDialog = false
         var connectionDetails: ZMConnectionDetails?
 
         var conversationsCancelId = UUID()
@@ -27,6 +32,11 @@ struct ChatsList {
 
         /// Blocked DMs are hidden outright. A group is not hidden because one member
         /// is blocked — their messages are filtered inside the room instead.
+        ///
+        /// Phase 7 extension point: Android also splits the support conversations out of this list
+        /// (`SupportChatConstants.isSupportConversation`) and pins one aggregate "Zapp Support" row
+        /// above the timestamp-sorted remainder. Until the support subsystem lands, every
+        /// conversation stays in the ordinary list.
         var sortedConversations: [ZMConversation] {
             conversations
                 .filter { conversation in
@@ -47,6 +57,11 @@ struct ChatsList {
     }
 
     enum Action: Equatable {
+        enum Alert: Equatable {
+            case leaveConfirmed(String)
+        }
+
+        case alert(PresentationAction<Alert>)
         case onAppear
         case onDisappear
         case conversationsUpdated([ZMConversation])
@@ -56,6 +71,9 @@ struct ChatsList {
         case networkDetailsDismissed
         case networkDetailsLoaded(ZMConnectionDetails)
         case networkDetailsFailed
+        case leaveConversationRequested(String)
+        case termsAccepted
+        case termsDeclined
 
         // Root routes these; the tab stays navigation-agnostic.
         case conversationTapped(String)
@@ -74,6 +92,9 @@ struct ChatsList {
             switch action {
             case .onAppear:
                 state.messagingState = zappMessaging.latestState()
+                // Android's `checkTosAccepted`: the gate re-presents on every entry to
+                // the tab until the terms are accepted.
+                state.showsTermsDialog = !state.chatTermsAccepted
 
                 return .merge(
                     .publisher {
@@ -135,6 +156,26 @@ struct ChatsList {
                 state.isLoadingNetworkDetails = false
                 return .none
 
+                // Android's `onLeaveRequest`: swipe and context menu both confirm before leaving.
+            case .leaveConversationRequested(let conversationId):
+                guard let conversation = state.conversations.first(where: { $0.id == conversationId }) else {
+                    return .none
+                }
+
+                state.alert = AlertState.leaveConversation(
+                    id: conversationId,
+                    name: state.displayName(for: conversation)
+                )
+                return .none
+
+            case .alert(.presented(.leaveConfirmed(let conversationId))):
+                return .send(.removeConversationTapped(conversationId))
+
+            case .alert:
+                return .none
+
+                // Both conversation types leave through `removeConversation`, matching Android's
+                // `ChatConversationsRepository.leaveConversation`, which is the same SDK call.
             case .removeConversationTapped(let conversationId):
                 return .run { _ in
                     try await zappMessaging.removeConversation(conversationId)
@@ -146,10 +187,22 @@ struct ChatsList {
             case .removeConversationFailed:
                 return .none
 
+            case .termsAccepted:
+                state.$chatTermsAccepted.withLock { $0 = true }
+                state.showsTermsDialog = false
+                return .none
+
+                // Declining leaves the tab: Root routes this back to the previously selected tab,
+                // so the gate keeps its meaning instead of silently dropping the user into chat.
+            case .termsDeclined:
+                state.showsTermsDialog = false
+                return .none
+
             case .conversationTapped, .newConversationTapped:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 
     private func loadNetworkDetails() -> Effect<Action> {
@@ -159,6 +212,27 @@ struct ChatsList {
         } catch: { error, send in
             LoggerProxy.error("Chat list failed to load network details: \(error)")
             await send(.networkDetailsFailed)
+        }
+    }
+}
+
+// MARK: Alerts
+
+extension AlertState where Action == ChatsList.Action.Alert {
+    /// Mirrors `ChatListLeaveDialog.kt`.
+    static func leaveConversation(id: String, name: String) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .chatListLeaveDialogTitle))
+        } actions: {
+            ButtonState(role: .destructive, action: .leaveConfirmed(id)) {
+                TextState(String(localizable: .chatListLeaveDialogConfirm))
+            }
+
+            ButtonState(role: .cancel) {
+                TextState(String(localizable: .generalCancel))
+            }
+        } message: {
+            TextState(String(localizable: .chatListLeaveDialogMessage(name)))
         }
     }
 }

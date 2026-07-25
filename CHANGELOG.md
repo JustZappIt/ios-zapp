@@ -7,6 +7,8 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] You can now swipe a conversation to the left in the Chats list to leave it — direct chats and groups alike — with a confirmation naming the conversation before anything is removed, and a tap of haptic feedback when the swipe reaches the point where letting go will leave. Long-pressing a row offers the same Leave action.
+- [ZAPP-1] The first time you open the Chats tab, Zapp now asks you to read and accept the messaging terms and community guidelines. Accepting is remembered; declining takes you back to the tab you came from.
 - [ZAPP-1] Creating a wallet now includes a "messaging account" intro screen before you pick your username, explaining that your username is backed by your recovery phrase, and finishes on a confirmation screen ("You're all set") that reflects how you secured the app and hands you into Zapp with a success tap.
 - [ZAPP-1] If unlocking the app fails, the lock screen now offers a "Contact Support" option alongside the retry, so you're never stranded on a failed sign-in.
 - [ZAPP-1] The You tab's Security section now has an App lock row that opens app-lock settings directly (change your PIN or switch authentication method) without going through All settings.
@@ -15,6 +17,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] The Chats list now previews each kind of attachment by name — Photo, Video, GIF, File, Location, Payment, Payment request — instead of labelling everything "Photo" or "Payment".
 - [ZAPP-1] Onboarding steps now slide in directionally (forward from the right, back from the left) with a fade, and a failed biometric enrollment now gives an error haptic.
 - [ZAPP-1] The Chats tab now shows the number of unread conversations as a count badge (capped at "99+") that scales and fades in and out, instead of a plain dot.
 - [ZAPP-1] Switching tabs on the bottom navigation bar now gives a subtle haptic tap.

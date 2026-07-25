@@ -80,16 +80,7 @@ struct ChatConversationRow: View {
     private var avatar: some View {
         ZStack(alignment: .bottomTrailing) {
             ZStack {
-                if let iconName = avatarIconName {
-                    Image(systemName: iconName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Constants.avatarIconSize, height: Constants.avatarIconSize)
-                        .zForegroundColor(ZappColors.onAccent)
-                } else {
-                    Text(initials)
-                        .zappFont(.rowTitle, style: ZappColors.onAccent)
-                }
+                avatarContent
             }
             .frame(width: Constants.avatarSize, height: Constants.avatarSize)
             .background(ZappColors.accent.color(colorScheme))
@@ -110,12 +101,24 @@ struct ChatConversationRow: View {
         displayName.zappInitials
     }
 
-    private var avatarIconName: String? {
+    @ViewBuilder
+    private var avatarContent: some View {
         if conversation.type == .group {
-            return "person.2.fill"
+            // Design-system gap: `Assets.xcassets/Icons` ships `user` but no group glyph, so the
+            // group avatar still falls back to a system symbol. Adding a `users` asset is a
+            // deliberate design-system extension rather than something to improvise here.
+            Image(systemName: "person.2.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: Constants.avatarIconSize, height: Constants.avatarIconSize)
+                .zForegroundColor(ZappColors.onAccent)
+        } else if initials.trimmingCharacters(in: .whitespaces).isEmpty {
+            Asset.Assets.Icons.user.image
+                .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)
+        } else {
+            Text(initials)
+                .zappFont(.rowTitle, style: ZappColors.onAccent)
         }
-
-        return initials.trimmingCharacters(in: .whitespaces).isEmpty ? "person.fill" : nil
     }
 
     private var timeLabel: String? {
@@ -127,23 +130,49 @@ struct ChatConversationRow: View {
             return String(localizable: .chatListNoMessages)
         }
 
-        if ChatPreviewSentinel.media.contains(lastMessage) {
-            return String(localizable: .chatListMediaPlaceholder)
-        }
-
-        if ChatPreviewSentinel.payment.contains(lastMessage) || lastMessage.hasPrefix("{") {
-            return String(localizable: .chatListPaymentPlaceholder)
-        }
-
-        return lastMessage
+        return ChatPreviewSentinel.label(for: lastMessage)
+            ?? ChatPreviewSentinel.jsonLabel(for: lastMessage)
+            ?? lastMessage
     }
 }
 
-/// Previews written by the JS core. A cold load hands back the raw JSON body of a structured
-/// message, which must never reach the user as JSON.
-private enum ChatPreviewSentinel {
-    static let media: Set<String> = ["[Media]", "[Photo]", "[Video]", "[File]", "[Location]", "[GIF]"]
-    static let payment: Set<String> = ["[Payment]", "[PaymentRequest]"]
+/// Previews written by the JS core, mirroring `ChatListVM.lastMessageText` /
+/// `ChatConversationsRepository`'s sentinels one-for-one: every content type gets its own label
+/// rather than collapsing into a single "Photo".
+enum ChatPreviewSentinel {
+    static func label(for lastMessage: String) -> String? {
+        switch lastMessage {
+        case "[Media]": return String(localizable: .chatListMediaPlaceholder)
+        case "[Photo]": return String(localizable: .chatListPhotoPlaceholder)
+        case "[GIF]": return String(localizable: .chatListGifPlaceholder)
+        case "[Video]": return String(localizable: .chatListVideoPlaceholder)
+        case "[File]": return String(localizable: .chatListFilePlaceholder)
+        case "[Location]": return String(localizable: .chatListLocationPlaceholder)
+        case "[Payment]": return String(localizable: .chatListPaymentPlaceholder)
+        case "[PaymentRequest]": return String(localizable: .chatListPaymentRequestPlaceholder)
+        default: return nil
+        }
+    }
+
+    /// A cold load hands back the raw JSON body of a structured message (the live path already maps
+    /// by content type). Mirrors Android's `jsonPreview`, which matches a marker inside the
+    /// ~100-character truncation to tell a request from a receipt.
+    ///
+    /// One deliberate divergence: Android lets an unrecognised JSON body fall through and renders it
+    /// verbatim. iOS keeps its existing guarantee that raw JSON never reaches the user and labels it
+    /// with the generic payment placeholder instead.
+    static func jsonLabel(for lastMessage: String) -> String? {
+        guard lastMessage.hasPrefix("{") else { return nil }
+
+        if lastMessage.hasPrefix(paymentRequestPrefix) || lastMessage.contains(paymentRequestAddressMarker) {
+            return String(localizable: .chatListPaymentRequestPlaceholder)
+        }
+
+        return String(localizable: .chatListPaymentPlaceholder)
+    }
+
+    private static let paymentRequestPrefix = "{\"id\":"
+    private static let paymentRequestAddressMarker = "\"requesterAddress\""
 }
 
 #Preview {
