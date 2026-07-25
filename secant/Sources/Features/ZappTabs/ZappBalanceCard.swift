@@ -19,6 +19,7 @@ struct ZappBalanceCard: View {
         static let verticalPadding: CGFloat = 18
         static let dotSize: CGFloat = 8
         static let heroMinimumScale: CGFloat = 22 / 52
+        static let heroTickerDuration: TimeInterval = 0.24
 
         static let hero = ZappTextStyle(weight: .black, size: 52, lineHeight: 52, tracking: -3)
         static let heroFraction = ZappTextStyle(weight: .bold, size: 26, lineHeight: 32, tracking: -1)
@@ -71,12 +72,15 @@ struct ZappBalanceCard: View {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text(fiat.whole)
                             .zappFont(Constants.hero, style: ZappColors.text)
+                            .contentTransition(.numericText())
 
                         Text(fiat.fraction)
                             .zappFont(Constants.heroFraction, style: ZappColors.textMuted)
+                            .contentTransition(.numericText())
                     }
                     .lineLimit(1)
                     .minimumScaleFactor(Constants.heroMinimumScale)
+                    .animation(.easeOut(duration: Constants.heroTickerDuration), value: fiat.whole)
 
                     Text("\(zecText) \(tokenName)")
                         .zappFont(.caption, style: ZappColors.textMuted)
@@ -86,6 +90,8 @@ struct ZappBalanceCard: View {
                             .zappFont(Constants.hero, style: ZappColors.text)
                             .lineLimit(1)
                             .minimumScaleFactor(Constants.heroMinimumScale)
+                            .contentTransition(.numericText())
+                            .animation(.easeOut(duration: Constants.heroTickerDuration), value: zecText)
 
                         Text(tokenName)
                             .zappFont(Constants.ticker, style: ZappColors.textMuted)

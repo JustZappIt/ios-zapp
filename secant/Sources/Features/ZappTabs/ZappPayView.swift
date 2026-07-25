@@ -26,7 +26,8 @@ struct ZappPayView: View {
     let tokenName: String
 
     /// Keeps the balance and activity rows on the same primary currency.
-    @State private var showZecAsPrimary = true
+    /// Fiat leads by default (matches Android's `showZecAsPrimary = false`) when a rate exists.
+    @State private var showZecAsPrimary = false
 
     var body: some View {
         WithPerceptionTracking {
@@ -153,18 +154,12 @@ struct ZappPayView: View {
         Button {
             store.send(.seeAllTransactionsTapped)
         } label: {
-            HStack(spacing: 8) {
-                Text(localizable: .zappPaySeeAll)
-                    .zappFont(.rowTitle, style: ZappColors.accent)
-
-                Spacer()
-
-                Asset.Assets.chevronRight.image
-                    .zImage(width: 16, height: 16, style: ZappColors.accent)
-            }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 14)
-            .contentShape(Rectangle())
+            Text(localizable: .zappPaySeeAll)
+                .zappFont(.body, style: ZappColors.accent)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

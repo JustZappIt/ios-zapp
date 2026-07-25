@@ -71,7 +71,7 @@ struct ZappBalanceChart: View {
                 .fill(ZappColors.textSubtle.color(colorScheme))
                 .frame(width: 3, height: 3)
             if let percent {
-                Text(String(format: "%.1f%%", percent))
+                Text("\(isPositive ? "+" : "-")\(String(format: "%.2f%%", percent))")
                     .zappFont(.caption, style: isPositive ? ZappColors.success : ZappColors.danger)
                 Rectangle()
                     .fill(ZappColors.textSubtle.color(colorScheme))
