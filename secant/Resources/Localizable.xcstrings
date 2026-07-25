@@ -16386,6 +16386,40 @@
         }
       }
     },
+    "settingsYou.appLockSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change PIN or switch auth method"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia el PIN o el método de autenticación"
+          }
+        }
+      }
+    },
+    "settingsYou.appLockTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App lock"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloqueo de la app"
+          }
+        }
+      }
+    },
     "settingsYou.chatProfile.subtitle": {
       "extractionState": "manual",
       "localizations": {
@@ -16488,6 +16522,23 @@
         }
       }
     },
+    "settingsYou.groupP2p": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P"
+          }
+        }
+      }
+    },
     "settingsYou.groupPeople": {
       "extractionState": "manual",
       "localizations": {
@@ -16586,6 +16637,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Moneda local"
+          }
+        }
+      }
+    },
+    "settingsYou.p2pPaymentMethodSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your country and local payment rail"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige tu país y método de pago local"
+          }
+        }
+      }
+    },
+    "settingsYou.p2pPaymentMethodTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P payment method"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Método de pago P2P"
+          }
+        }
+      }
+    },
+    "settingsYou.p2pTransactionsSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View payments and recover cancelled orders"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consulta pagos y recupera pedidos cancelados"
+          }
+        }
+      }
+    },
+    "settingsYou.p2pTransactionsTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P transactions"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transacciones P2P"
           }
         }
       }
@@ -22331,6 +22450,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pagar"
+          }
+        }
+      }
+    },
+    "zappTabs.unreadBadgeCap": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "99+"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "99+"
           }
         }
       }

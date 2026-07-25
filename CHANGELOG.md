@@ -7,11 +7,15 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] The You tab's Security section now has an App lock row that opens app-lock settings directly (change your PIN or switch authentication method) without going through All settings.
 - [ZAPP-1] Onboarding now requires an app-lock method: a 6-digit PIN or device authentication. PIN unlock includes a persisted five-attempt, 30-second lockout, and App Lock settings let you change the PIN or switch authentication methods.
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] The Chats tab now shows the number of unread conversations as a count badge (capped at "99+") that scales and fades in and out, instead of a plain dot.
+- [ZAPP-1] Switching tabs on the bottom navigation bar now gives a subtle haptic tap.
+- [ZAPP-1] Reorganized the You tab to match Android: P2P payment method and P2P transactions now live in their own "P2P" group instead of under Privacy.
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
 - [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and bold Swiss typography (bold headings and titles, a heavy-weight balance display) in both light and dark mode.
 - [ZAPP-1] Currency conversion is now on by default, so your total balance, activity, and amounts show in your selected local currency without having to turn it on first (you can still opt out in Settings). Tap your total balance on the Pay screen to switch between local currency and ZEC; amounts fall back to ZEC only when the rate provider is unavailable.

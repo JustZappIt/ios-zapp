@@ -27,6 +27,7 @@ struct Root {
             case receive
             case requestZecCoordFlow
             case scanCoordFlow
+            case securitySettings
             case sendCoordFlow
             case serverSwitch
             case settings
@@ -126,6 +127,7 @@ struct Root {
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
+        var securitySettingsState = SecuritySettings.State.initial
         var sendCoordFlowState = SendCoordFlow.State.initial
         var settingsState = Settings.State.initial
         var signWithKeystoneCoordFlowState = SignWithKeystoneCoordFlow.State.initial
@@ -164,7 +166,7 @@ struct Root {
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .groupInfo,
                  .newChat, .currencyConversionSetup, .receive,
-                 .requestZecCoordFlow, .serverSwitch, .torSetup, .walletBackup:
+                 .requestZecCoordFlow, .securitySettings, .serverSwitch, .torSetup, .walletBackup:
                 return false
             }
         }
@@ -256,6 +258,7 @@ struct Root {
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
+        case securitySettings(SecuritySettings.Action)
         case sendAgainRequested(TransactionState)
         case sendCoordFlow(SendCoordFlow.Action)
         case settings(Settings.Action)
@@ -468,6 +471,10 @@ struct Root {
 
         Scope(state: \.torSetupState, action: \.torSetup) {
             TorSetup()
+        }
+
+        Scope(state: \.securitySettingsState, action: \.securitySettings) {
+            SecuritySettings()
         }
 
         Scope(state: \.swapAndPayCoordFlowState, action: \.swapAndPayCoordFlow) {

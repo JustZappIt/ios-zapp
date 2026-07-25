@@ -327,6 +327,16 @@ extension Root {
                 state.path = .settings
                 return .none
 
+            case .zappTabs(.appLockTapped):
+                state.securitySettingsState = .initial
+                state.path = .securitySettings
+                return .none
+
+                // Leaving the App lock screen (via its menu back button) returns to the You tab.
+            case .securitySettings(.closeRequested):
+                state.path = nil
+                return .none
+
             case .zappTabs(.chooseServerTapped):
                 state.serverSetupState = .initial
                 state.path = .serverSwitch

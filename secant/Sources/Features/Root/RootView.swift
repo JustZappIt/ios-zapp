@@ -350,6 +350,17 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .securitySettings {
+                                NavigationStack {
+                                    SecuritySettingsView(
+                                        store: store.scope(
+                                            state: \.securitySettingsState,
+                                            action: \.securitySettings
+                                        )
+                                    )
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .groupInfo {
                                 GroupInfoView(
                                     store: store.scope(

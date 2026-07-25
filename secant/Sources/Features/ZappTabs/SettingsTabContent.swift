@@ -8,9 +8,11 @@ import SwiftUI
 
 /// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
-/// Android's App lock and Background delivery rows are deliberately absent because those
-/// subsystems are not available on iOS yet. Read receipts and online status open staged detail
-/// screens, matching Android without duplicating them in Profile.
+/// App lock routes into the existing `SecuritySettings` feature (verify current PIN/bio, then
+/// change PIN / switch auth method), matching Android's Security group. Android's Background
+/// delivery row is deliberately absent because push/background delivery is not available on iOS
+/// yet. Read receipts and online status open staged detail screens, matching Android without
+/// duplicating them in Profile.
 ///
 /// `allSettings` is iOS's route to the address book, advanced settings, about,
 /// feedback and voting. Keeping it here preserves those working surfaces without
@@ -57,6 +59,18 @@ struct SettingsTabContent: View {
                             ) {
                                 store.send(.chatProfileTapped)
                             }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsYouAppLockTitle),
+                                subtitle: String(localizable: .settingsYouAppLockSubtitle),
+                                icon: Asset.Assets.Icons.lockLocked.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.appLockTapped)
+                            }
                         }
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
@@ -68,36 +82,6 @@ struct SettingsTabContent: View {
                                 iconBackground: .accentSoft
                             ) {
                                 store.send(.torTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localized: "offramp.paymentMethod", defaultValue: "P2P payment method"),
-                                subtitle: String(
-                                    localized: "offramp.paymentMethod.subtitle",
-                                    defaultValue: "Choose your country and local payment rail"
-                                ),
-                                icon: Asset.Assets.Icons.pay.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.p2pPaymentMethodTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localized: "offramp.history.title", defaultValue: "P2P transactions"),
-                                subtitle: String(
-                                    localized: "offramp.history.subtitle",
-                                    defaultValue: "View payments and recover cancelled orders"
-                                ),
-                                icon: Asset.Assets.Icons.noTransactions.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.p2pTransactionsTapped)
                             }
 
                             ZappRowDivider(inset: true)
@@ -119,6 +103,32 @@ struct SettingsTabContent: View {
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft
                             ) { store.send(.onlineStatusTapped) }
+                        }
+
+                        // iOS keeps the "P2P transactions" history row (Appendix B, iOS-only)
+                        // alongside Android's payment-method row in this group.
+                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupP2p)) {
+                            ZappRow(
+                                title: String(localizable: .settingsYouP2pPaymentMethodTitle),
+                                subtitle: String(localizable: .settingsYouP2pPaymentMethodSubtitle),
+                                icon: Asset.Assets.Icons.pay.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.p2pPaymentMethodTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
+                                title: String(localizable: .settingsYouP2pTransactionsTitle),
+                                subtitle: String(localizable: .settingsYouP2pTransactionsSubtitle),
+                                icon: Asset.Assets.Icons.noTransactions.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.p2pTransactionsTapped)
+                            }
                         }
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
