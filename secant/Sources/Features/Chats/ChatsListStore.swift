@@ -30,16 +30,33 @@ struct ChatsList {
         var conversationsCancelId = UUID()
         var stateCancelId = UUID()
 
+        /// Decides which side of `isSupportConversation` this device is on. Absent until the
+        /// chat identity lands, which is exactly Android's `chatConversationsRepository.localPublicKey`.
+        var localPublicKey: String? {
+            messagingState.identity?.publicKey
+        }
+
+        /// Support tickets, hidden from the ordinary list and aggregated into the pinned row.
+        var supportConversations: [ZMConversation] {
+            conversations.filter {
+                SupportChatConstants.isSupportConversation($0, localPublicKey: localPublicKey)
+            }
+        }
+
         /// Blocked DMs are hidden outright. A group is not hidden because one member
         /// is blocked — their messages are filtered inside the room instead.
         ///
-        /// Phase 7 extension point: Android also splits the support conversations out of this list
-        /// (`SupportChatConstants.isSupportConversation`) and pins one aggregate "Zapp Support" row
-        /// above the timestamp-sorted remainder. Until the support subsystem lands, every
-        /// conversation stays in the ordinary list.
+        /// Support conversations are split out here and pinned above the list as one aggregate
+        /// "Zapp Support" row (`ChatListVM.createState`), so a ticket never appears as an ordinary
+        /// chat with a hex-key name.
         var sortedConversations: [ZMConversation] {
             conversations
                 .filter { conversation in
+                    guard !SupportChatConstants.isSupportConversation(
+                        conversation,
+                        localPublicKey: localPublicKey
+                    ) else { return false }
+
                     guard conversation.type == .direct else { return true }
 
                     return !conversation.participantIds.contains { chatContacts.isBlocked($0) }
@@ -47,6 +64,30 @@ struct ChatsList {
                 .sorted {
                     ($0.lastMessageTimestamp ?? .distantPast) > ($1.lastMessageTimestamp ?? .distantPast)
                 }
+        }
+
+        /// Android's `buildSupportRow`: the subtitle is the latest support message with the
+        /// `[Zapp]:` prefix stripped. Note it reads the NEWEST support conversation's last
+        /// message — if that ticket has none yet, the row falls back to the open-ticket count
+        /// rather than reaching into an older ticket.
+        var supportRowSubtitle: String {
+            let latest = supportConversations
+                .max { ($0.lastMessageTimestamp ?? .distantPast) < ($1.lastMessageTimestamp ?? .distantPast) }
+                .flatMap(\.lastMessage)
+
+            if let latest {
+                return SupportPreview.subtitle(for: latest)
+            }
+
+            if !supportConversations.isEmpty {
+                return String(localizable: .chatListSupportTickets(String(supportConversations.count)))
+            }
+
+            return String(localizable: .chatListSupportSubtitleDefault)
+        }
+
+        var supportUnreadCount: Int {
+            supportConversations.reduce(0) { $0 + messagingState.unreadCount(for: $1.id) }
         }
 
         func displayName(for conversation: ZMConversation) -> String {
@@ -80,6 +121,8 @@ struct ChatsList {
         case removeConversationTapped(String)
         case removeConversationFailed
         case newConversationTapped
+        /// The pinned "Zapp Support" row — routed to the ticket list, not to a chat room.
+        case supportRowTapped
     }
 
     @Dependency(\.mainQueue) var mainQueue
@@ -198,7 +241,7 @@ struct ChatsList {
                 state.showsTermsDialog = false
                 return .none
 
-            case .conversationTapped, .newConversationTapped:
+            case .conversationTapped, .newConversationTapped, .supportRowTapped:
                 return .none
             }
         }

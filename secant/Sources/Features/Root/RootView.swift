@@ -306,6 +306,24 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .supportTicketList {
+                                SupportTicketListView(
+                                    store: store.scope(
+                                        state: \.supportTicketListState,
+                                        action: \.supportTicketList
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .supportChat {
+                                SupportChatView(
+                                    store: store.scope(
+                                        state: \.supportChatState,
+                                        action: \.supportChat
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .chatContacts {
                                 ChatContactsListView(
                                     store: store.scope(

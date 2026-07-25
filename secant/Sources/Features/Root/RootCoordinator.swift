@@ -458,6 +458,35 @@ extension Root {
                 state.path = .chatRoom
                 return .none
 
+                // MARK: - Zapp Support
+
+                // The pinned support row opens the TICKET LIST, never a chat room: a user may have
+                // several open tickets and the row aggregates them (Android's `onSupportClick`).
+            case .chatsList(.supportRowTapped):
+                state.supportTicketListState = .initial
+                state.path = .supportTicketList
+                return .none
+
+            case .supportTicketList(.backTapped):
+                state.path = nil
+                return .none
+
+            case .supportTicketList(.newTicketTapped):
+                state.supportChatState = .init()
+                state.path = .supportChat
+                return .none
+
+            case .supportTicketList(.ticketTapped(let conversationId)):
+                state.supportChatState = .init(conversationId: conversationId)
+                state.path = .supportChat
+                return .none
+
+                // Both leaving and closing a ticket land back on the ticket list, which is where
+                // Android's `navigationRouter.back()` returns from the support chat.
+            case .supportChat(.backTapped), .supportChat(.leaveFinished):
+                state.path = .supportTicketList
+                return .none
+
             case .chatsList(.conversationTapped(let conversationId)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversationId

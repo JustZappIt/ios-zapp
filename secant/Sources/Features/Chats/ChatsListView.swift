@@ -9,8 +9,9 @@ import ZappMessaging
 
 /// The Chats tab root, mirroring `ChatListView.kt`.
 ///
-/// Android also pins an aggregate "Zapp Support" row above the list; that arrives with the support
-/// subsystem in Phase 7, alongside the sorting extension point marked in `ChatsListStore`.
+/// The aggregate "Zapp Support" row is pinned above the conversations, and stays pinned when there
+/// are none — support must be reachable from an empty inbox, which is why the empty state renders
+/// beneath the row rather than instead of the whole list.
 struct ChatsListView: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -28,7 +29,9 @@ struct ChatsListView: View {
 
                     if !store.isLoaded {
                         loading
-                    } else if store.conversations.isEmpty {
+                    } else if store.sortedConversations.isEmpty {
+                        supportRow
+                        ZappRowDivider(inset: true)
                         emptyState
                     } else {
                         conversations
@@ -74,9 +77,22 @@ struct ChatsListView: View {
         }
     }
 
+    /// Pinned above the timestamp-sorted list, exactly as Android's `item(key = "support_row")`.
+    private var supportRow: some View {
+        SupportContactRow(
+            subtitle: store.state.supportRowSubtitle,
+            unreadCount: store.state.supportUnreadCount
+        ) {
+            store.send(.supportRowTapped)
+        }
+    }
+
     private var conversations: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
+                supportRow
+                ZappRowDivider(inset: true)
+
                 ForEach(store.sortedConversations) { conversation in
                     // Android swipes both direct and group rows away to leave; the context menu
                     // stays as the discoverable, accessible route to the same action.

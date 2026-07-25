@@ -31,6 +31,8 @@ struct Root {
             case sendCoordFlow
             case serverSwitch
             case settings
+            case supportChat
+            case supportTicketList
             case swapAndPayCoordFlow
             case torSetup
             case transactionsCoordFlow
@@ -148,6 +150,8 @@ struct Root {
         /// the room's state is what lets the receipt survive the whole send flow.
         var chatSendContext: ChatSendContext?
         var settingsState = Settings.State.initial
+        var supportChatState = SupportChat.State.initial
+        var supportTicketListState = SupportTicketList.State.initial
         var signWithKeystoneCoordFlowState = SignWithKeystoneCoordFlow.State.initial
         var swapAndPayCoordFlowState = SwapAndPayCoordFlow.State.initial
         var transactionsCoordFlowState = TransactionsCoordFlow.State.initial
@@ -184,7 +188,8 @@ struct Root {
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .groupInfo,
                  .newChat, .currencyConversionSetup, .receive,
-                 .requestZecCoordFlow, .securitySettings, .serverSwitch, .torSetup, .walletBackup:
+                 .requestZecCoordFlow, .securitySettings, .serverSwitch,
+                 .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
             }
         }
@@ -282,6 +287,8 @@ struct Root {
         case settings(Settings.Action)
         case signWithKeystoneCoordFlow(SignWithKeystoneCoordFlow.Action)
         case signWithKeystoneRequested
+        case supportChat(SupportChat.Action)
+        case supportTicketList(SupportTicketList.Action)
         case swapAndPayCoordFlow(SwapAndPayCoordFlow.Action)
         case transactionsCoordFlow(TransactionsCoordFlow.Action)
         case walletBackupCoordFlow(WalletBackupCoordFlow.Action)
@@ -437,6 +444,14 @@ struct Root {
 
         Scope(state: \.groupInfoState, action: \.groupInfo) {
             GroupInfo()
+        }
+
+        Scope(state: \.supportTicketListState, action: \.supportTicketList) {
+            SupportTicketList()
+        }
+
+        Scope(state: \.supportChatState, action: \.supportChat) {
+            SupportChat()
         }
 
         Scope(state: \.newChatState, action: \.newChat) {

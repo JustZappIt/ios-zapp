@@ -7,6 +7,9 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] Zapp Support now has its own home in Chats. A "Zapp Support" row is pinned above your conversations, showing the most recent thing the support team said, and a badge when there's something new. Tapping it opens your support tickets.
+- [ZAPP-1] You can open as many support tickets as you need. Tapping + on the ticket list asks you to pick a topic — Problem, Feedback or Other — and starts a conversation with the Zapp team, greeting you with a reply about what to tell them. Each ticket shows its topic, the latest message and when it arrived, and you can send text, photos, files or a camera shot just like any other chat.
+- [ZAPP-1] Finished with a ticket? Close it from the ticket's menu, or by swiping the row on the ticket list, and Zapp lets the support team know the conversation has ended.
 - [ZAPP-1] Payment requests now appear in chat as their own card, showing the amount (in your local currency with the ZEC value underneath, when a rate is available), an optional note, and who owes what. If the request is yours to pay, tapping it — or its Pay button — opens the send screen already filled in with the requester's address, amount and note. Once you've paid, the request is marked "Paid" for everyone in the conversation.
 - [ZAPP-1] Split Bill is now available from the chat "+" menu. Enter a total in your local currency or in ZEC, and Zapp splits it evenly between everyone in the group including you — adjust any individual's share by hand, add a note, and each person receives their own payment request. In a one-to-one chat the same option becomes Request Payment for the whole amount.
 - [ZAPP-1] After you send ZEC from a chat, a receipt now appears in the conversation for both of you, showing the amount sent. Tapping it opens the transaction's details; if the transaction hasn't synced to this wallet yet, Zapp says so instead of opening a screen that never loads.
@@ -28,6 +31,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] Support conversations no longer appear as ordinary chats with a cryptic name — they're collected under the pinned Zapp Support row instead.
 - [ZAPP-1] The Chats list now previews each kind of attachment by name — Photo, Video, GIF, File, Location, Payment, Payment request — instead of labelling everything "Photo" or "Payment".
 - [ZAPP-1] Onboarding steps now slide in directionally (forward from the right, back from the left) with a fade, and a failed biometric enrollment now gives an error haptic.
 - [ZAPP-1] The Chats tab now shows the number of unread conversations as a count badge (capped at "99+") that scales and fades in and out, instead of a plain dot.
