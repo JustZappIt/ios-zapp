@@ -324,26 +324,6 @@ struct SwapAndPayForm: View {
             .padding(.top, keyboardVisible ? Design.Spacing._5xl : 0)
         }
     }
-
-    func slippageWarnBcgColor(_ colorScheme: ColorScheme) -> Color {
-        if store.slippageInSheet <= 2.0 {
-            return ZappColors.surfaceAlt.color(colorScheme)
-        } else if store.slippageInSheet > 2.0 && store.slippageInSheet <= 3.0 {
-            return ZappColors.accentSoft.color(colorScheme)
-        } else {
-            return ZappColors.dangerSoft.color(colorScheme)
-        }
-    }
-
-    func slippageWarnTextStyle() -> Colorable {
-        if store.slippageInSheet <= 2.0 {
-            return ZappColors.textMuted
-        } else if store.slippageInSheet > 2.0 && store.slippageInSheet <= 3.0 {
-            return ZappColors.accentText
-        } else {
-            return ZappColors.danger
-        }
-    }
 }
 
 extension View {

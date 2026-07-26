@@ -194,6 +194,8 @@ extension Root {
                 state.path = .receive
                 return .none
 
+                // Android's `HomeVM.onSendButtonClick` → `UnifiedSendArgs()`: the unified form with
+                // ZEC selected.
             case .home(.sendTapped):
                 state.sendCoordFlowState = .initial
                 state.returnsToChatRoomAfterWalletFlow = false
@@ -217,13 +219,19 @@ extension Root {
                 state.path = .addKeystoneHWWalletCoordFlow
                 return .none
                 
+                // The Pay tab's Swap action lands on the *same* unified form as Send, already in
+                // swap mode — Android's unified screen with a non-ZEC asset picked. `SwapAndPay`
+                // pre-selects the last-used asset (else BTC) once the asset list loads.
             case .home(.swapWithNearTapped):
-                state.swapAndPayCoordFlowState = .initial
-                state.swapAndPayCoordFlowState.isSwapExperience = true
-                state.swapAndPayCoordFlowState.swapAndPayState.isSwapExperienceEnabled = true
-                state.path = .swapAndPayCoordFlow
-                // whether to start on SwapToZEC or fromZEC
-                return .send(.swapAndPayCoordFlow(.swapAndPay(.enableSwapToZecExperience)))
+                state.sendCoordFlowState = .initial
+                state.sendCoordFlowState.mode = .swap
+                state.sendCoordFlowState.swapState.isSwapExperienceEnabled = true
+                state.sendCoordFlowState.swapState.isSwapToZecExperienceEnabled = false
+                state.returnsToChatRoomAfterWalletFlow = false
+                state.chatSendContext = nil
+                state.path = .sendCoordFlow
+                exchangeRate.refreshExchangeRateUSD()
+                return .none
 
             case .home(.payWithNearTapped):
                 state.offrampState = .initial(page: .amount, corridorContext: .payment)
@@ -407,6 +415,14 @@ extension Root {
                 state.chatSendContext = nil
 
                 guard result == .success else { return .none }
+
+                // Since the send form and the swap form became one screen, a send started from a
+                // chat room can be switched to swap mode and resolve through this very case. That
+                // ZEC went to the swap provider's deposit address, not to the peer: a receipt would
+                // tell them they were paid when they were not, and would flip a quoted payment
+                // request to Paid while it is still owed. Only a plain ZEC send notifies the peer.
+                // The context is consumed above either way, so it cannot attach to a later send.
+                guard confirmationState.type == .regular else { return .none }
 
                 // Multi-transaction proposals (TEX two-step, shield-then-spend) submit several
                 // txs; naming one would link the receipt to the wrong transaction, so the id is
@@ -619,7 +635,21 @@ extension Root {
                 )
 
                 // MARK: - Scan Coord Flow
-                
+
+                // Android's `OnAddressScannedUseCase` HOMEPAGE branch: a scanned address *replaces*
+                // the scanner with the unified send form rather than opening a send form of the
+                // scanner's own. The chat context (if the scanner was opened from a room) rides
+                // along untouched so the receipt still posts and the flow still returns to the room.
+            case .scanCoordFlow(.sendRequested(let address)):
+                let returnsToChatRoom = state.returnsToChatRoomAfterWalletFlow
+                let chatSendContext = state.chatSendContext
+                state.sendCoordFlowState = .initial
+                state.returnsToChatRoomAfterWalletFlow = returnsToChatRoom
+                state.chatSendContext = chatSendContext
+                state.path = .sendCoordFlow
+                exchangeRate.refreshExchangeRateUSD()
+                return .send(.sendCoordFlow(.sendForm(.addressUpdated(address))))
+
                 // A scan started from a chat room unwinds back onto that room, the same way the
                 // send flow it feeds does. Every other entry point still unwinds to the tabs.
             case .scanCoordFlow(.scan(.cancelTapped)), .scanCoordFlow(.path(.element(id: _, action: .sendForm(.dismissRequired)))):
@@ -644,8 +674,12 @@ extension Root {
 
                 // MARK: - Self
 
+                // Android's `SendTransactionAgainUseCase`:
+                // `UnifiedSendArgs(isScanZip321Enabled = false)` + a prefill of the original
+                // address/amount/memo.
             case .sendAgainRequested(let transactionState):
                 state.sendCoordFlowState = .initial
+                state.sendCoordFlowState.isScanZip321Enabled = false
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 state.path = .sendCoordFlow
@@ -687,6 +721,30 @@ extension Root {
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 return .none
+
+                // Android's `PrimaryButtonState.TopUp` → `TopUpArgs`. On iOS the bridge-funds
+                // corridor lives in Offramp; `addFundsTapped` is the action that opens its Top-Up
+                // page and loads the account behind it.
+            case .sendCoordFlow(.topUpRequested):
+                state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.returnsToChatRoomAfterWalletFlow = false
+                state.chatSendContext = nil
+                state.path = .offramp
+                return .send(.offramp(.addFundsTapped))
+
+                // Swap-to-ZEC (deposit an external asset, receive ZEC) is not part of Android's
+                // unified screen. It keeps its own flow, entered from the unified form's deposit
+                // affordance so the corridor is not orphaned by the merge — this is the routing the
+                // Pay tab's Swap action used before the two forms converged.
+            case .sendCoordFlow(.swapToZecRequested):
+                state.swapAndPayCoordFlowState = .initial
+                state.swapAndPayCoordFlowState.isSwapExperience = true
+                state.swapAndPayCoordFlowState.swapAndPayState.isSwapExperienceEnabled = true
+                state.returnsToChatRoomAfterWalletFlow = false
+                state.chatSendContext = nil
+                state.path = .swapAndPayCoordFlow
+                // whether to start on SwapToZEC or fromZEC
+                return .send(.swapAndPayCoordFlow(.swapAndPay(.enableSwapToZecExperience)))
 
                 // MARK: - Sign with Keystone Coord Flow
 

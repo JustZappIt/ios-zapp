@@ -22,14 +22,7 @@ struct SendCoordFlowView: View {
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                SendFormView(
-                    store:
-                        store.scope(
-                            state: \.sendFormState,
-                            action: \.sendForm
-                        ),
-                    tokenName: tokenName
-                )
+                ZappUnifiedSendView(store: store, tokenName: tokenName)
             } destination: { store in
                 switch store.case {
                 case let .addressBook(store):

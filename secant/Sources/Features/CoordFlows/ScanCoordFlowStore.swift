@@ -58,6 +58,11 @@ struct ScanCoordFlow {
         case requestZecFailedNoSendForm
         case resolveSendResult(SendConfirmation.State.Result?, SendConfirmation.State)
         case scan(Scan.Action)
+        /// Delegate to Root: a plain address scanned from the Pay tab's scanner opens the unified
+        /// send form prefilled with it, mirroring Android's `OnAddressScannedUseCase` HOMEPAGE
+        /// branch (`replace(UnifiedSendArgs(recipientAddress:))`) rather than pushing a second send
+        /// form of this flow's own.
+        case sendRequested(RedactableString)
         case viewTransactionRequested(SendConfirmation.State)
     }
 

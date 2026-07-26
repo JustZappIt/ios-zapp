@@ -217,10 +217,9 @@ extension ScanCoordFlow {
                 
             case .scan(.foundAddress(let address)):
                 audioServices.systemSoundVibrate()
-                state.path.append(.sendForm(SendForm.State.initial))
-                if let first = state.path.ids.first {
-                    return .send(.path(.element(id: first, action: .sendForm(.addressUpdated(address)))))
-                }
+                return .send(.sendRequested(address))
+
+            case .sendRequested:
                 return .none
 
             case .scan(.foundRequestZec(let requestPayment)):

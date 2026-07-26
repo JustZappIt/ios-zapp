@@ -227,6 +227,44 @@ import ZappMessaging
         #expect(store.chatSendContext == nil)
     }
 
+    /// Phase 12 regression: the send form and the swap form are now one screen, so a send opened
+    /// from a chat room can be switched to swap mode and resolve through the very same case. That
+    /// ZEC went to the swap provider's deposit address, not to the peer — posting a receipt would
+    /// claim they were paid, and would flip a quoted request to Paid while it is still owed.
+    @Test func aSwapResolvedFromAChatSendPostsNoReceipt() async throws {
+        let receipts = LockIsolated<[(conversationId: String, payload: String)]>([])
+        let store = rootStore(sentReceipts: receipts)
+
+        store.send(.chatRoom(.payRequestTapped(requestMessage(id: "req-1", amount: "0.5"))))
+
+        var swapConfirmation = confirmationState(amount: Zatoshi(50_000_000), txId: "abc123")
+        swapConfirmation.type = .swap
+
+        store.send(.sendCoordFlow(.resolveSendResult(.success, swapConfirmation)))
+
+        // The consumed context proves the receipt case ran and declined, rather than not having run.
+        try await waitUntil { store.chatSendContext == nil }
+
+        #expect(receipts.value.isEmpty)
+    }
+
+    /// The cross-pay corridor spends ZEC to a provider too, so it is refused for the same reason.
+    @Test func aCrossPayResolvedFromAChatSendPostsNoReceipt() async throws {
+        let receipts = LockIsolated<[(conversationId: String, payload: String)]>([])
+        let store = rootStore(sentReceipts: receipts)
+
+        store.send(.chatRoom(.payRequestTapped(requestMessage(id: "req-1", amount: "0.5"))))
+
+        var payConfirmation = confirmationState(amount: Zatoshi(50_000_000), txId: "abc123")
+        payConfirmation.type = .pay
+
+        store.send(.sendCoordFlow(.resolveSendResult(.success, payConfirmation)))
+
+        try await waitUntil { store.chatSendContext == nil }
+
+        #expect(receipts.value.isEmpty)
+    }
+
     /// A send that never started from a chat posts nothing at all.
     @Test func aSendStartedOutsideAChatPostsNoReceipt() async throws {
         let receipts = LockIsolated<[(conversationId: String, payload: String)]>([])
