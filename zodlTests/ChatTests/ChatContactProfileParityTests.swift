@@ -243,6 +243,25 @@ import Testing
         )
     }
 
+    /// A one-shot suspension point, so a dependency can be held mid-flight while the test
+    /// sends the action that used to cancel it.
+    private final class Gate: @unchecked Sendable {
+        private let stream: AsyncStream<Void>
+        private let continuation: AsyncStream<Void>.Continuation
+
+        init() {
+            (stream, continuation) = AsyncStream<Void>.makeStream()
+        }
+
+        func wait() async {
+            for await _ in stream { break }
+        }
+
+        func open() {
+            continuation.finish()
+        }
+    }
+
     /// Records whether the keychain was touched at all, so "the gate held" can be asserted
     /// directly rather than inferred from empty state.
     private final class ExportSpy: @unchecked Sendable {
@@ -323,6 +342,74 @@ import Testing
         await store.receive(\.seedLoaded)
 
         #expect(store.state.seedWords.count == 24)
+    }
+
+    /// iOS puts the Face ID / Touch ID sheet up in another process, so the app resigns active
+    /// while it is showing — the same notification that hides secrets. The gate has to survive
+    /// its own prompt, or every biometric user taps Reveal, authenticates, and sees nothing.
+    @MainActor @Test func theBiometricSheetResigningTheAppDoesNotCancelItsOwnReveal() async {
+        // Holds the prompt open so the resign-active notification lands while it is genuinely
+        // in flight, which is the whole point of the test.
+        let prompt = Gate()
+
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .biometric }
+            $0.localAuthentication.authenticateAppLock = {
+                await prompt.wait()
+                return true
+            }
+            $0.walletStorage.exportWallet = { self.storedWallet() }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.seedPhraseTapped)
+        #expect(store.state.isAwaitingBiometric)
+
+        // What `willResignActive` fires while the system sheet is up.
+        await store.send(.hideSensitiveContent)
+        #expect(store.state.pendingSecret == .seedPhrase)
+
+        prompt.open()
+
+        await store.receive(\.biometricFinished)
+        await store.receive(\.secretUnlocked)
+        await store.receive(\.seedLoaded)
+
+        #expect(store.state.seedWords.count == 24)
+        #expect(!store.state.isAwaitingBiometric)
+    }
+
+    /// The reprieve above lasts exactly as long as the prompt. Once it resolves, a real
+    /// backgrounding clears the gate again.
+    @MainActor @Test func onceTheBiometricPromptResolvesBackgroundingClearsTheGateAgain() async {
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .biometric }
+            $0.localAuthentication.authenticateAppLock = { false }
+            $0.walletStorage.exportWallet = { self.storedWallet() }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.seedPhraseTapped)
+        await store.receive(\.biometricFinished)
+
+        #expect(!store.state.isAwaitingBiometric)
+        #expect(store.state.pendingSecret == nil)
+
+        var pinned = store.state
+        pinned.pendingSecret = .seedPhrase
+        pinned.pinEntry = ChatProfile.State.PINEntry(pin: "12")
+
+        let second = TestStore(initialState: pinned) { ChatProfile() }
+        second.exhaustivity = .off
+
+        await second.send(.hideSensitiveContent)
+
+        #expect(second.state.pendingSecret == nil)
+        #expect(second.state.pinEntry == nil)
     }
 
     // MARK: PIN gate

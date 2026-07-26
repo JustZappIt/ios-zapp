@@ -47,6 +47,8 @@ extension ChatProfile {
                 // A dismissed or failed prompt is silent, exactly like Android's empty catch
                 // blocks for BiometricsCancelledException / BiometricsFailureException.
             case let .biometricFinished(target, succeeded):
+                state.isAwaitingBiometric = false
+
                 guard state.pendingSecret == target else { return .none }
                 guard succeeded else {
                     state.pendingSecret = nil
@@ -239,6 +241,7 @@ extension ChatProfile {
         switch appSecurity.authenticationMethod() {
         case .biometric:
             state.pendingSecret = target
+            state.isAwaitingBiometric = true
             return .run { send in
                 await send(.biometricFinished(target, await localAuthentication.authenticateAppLock()))
             }
@@ -257,11 +260,19 @@ extension ChatProfile {
     private func clearSecrets(_ state: inout State) -> Effect<Action> {
         state.seedWords.removeAll(keepingCapacity: false)
         state.p2pKey = nil
-        state.pendingSecret = nil
-        state.pinEntry = nil
         state.didCopyP2PAddress = false
         state.didCopyP2PKey = false
         state.secretFailed = false
+
+        // The gate itself survives its own biometric sheet — that sheet resigns the app active,
+        // and cancelling here would strand a successful Face ID with nothing left to unlock.
+        // Nothing sensitive is held: no secret has been read yet, the prompt always resolves
+        // (a real backgrounding makes the system cancel it, which fails the gate), and
+        // `biometricFinished` clears the flag either way.
+        if !state.isAwaitingBiometric {
+            state.pendingSecret = nil
+            state.pinEntry = nil
+        }
 
         return .merge(
             .cancel(id: CancelID.pinLockout),

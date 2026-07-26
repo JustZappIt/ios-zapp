@@ -44,24 +44,23 @@ private struct ChatProfileSecretOverlays: ViewModifier {
                         )
                     }
                 }
-                .fullScreenCover(
-                    isPresented: Binding(
-                        get: { store.pinEntry != nil },
-                        set: { if !$0 { store.send(.pinCancelled) } }
-                    )
-                ) {
-                    WithPerceptionTracking {
-                        if let entry = store.pinEntry {
-                            AppPINEntryView(
-                                title: String(localizable: .appLockPINVerifyTitle),
-                                subtitle: String(localizable: .appLockPINVerifySubtitle),
-                                errorMessage: entry.errorMessage,
-                                digitCount: entry.pin.count,
-                                isInputEnabled: !entry.isVerifying && entry.lockoutSeconds == 0,
-                                onBack: { store.send(.pinCancelled) },
-                                onKey: { store.send(.pinKeyTapped($0)) }
-                            )
-                        }
+                // An overlay, not a `fullScreenCover`: Android composes its `PinVerifyOverlay`
+                // into the profile itself, and on iOS a modal presentation can take the
+                // presenting view's `onDisappear` with it — which here means
+                // `hideSensitiveContent`, tearing down the PIN pad the moment it appears.
+                // Staying in one view tree keeps the hide handlers below authoritative.
+                .overlay {
+                    if let entry = store.pinEntry {
+                        AppPINEntryView(
+                            title: String(localizable: .appLockPINVerifyTitle),
+                            subtitle: String(localizable: .appLockPINVerifySubtitle),
+                            errorMessage: entry.errorMessage,
+                            digitCount: entry.pin.count,
+                            isInputEnabled: !entry.isVerifying && entry.lockoutSeconds == 0,
+                            onBack: { store.send(.pinCancelled) },
+                            onKey: { store.send(.pinKeyTapped($0)) }
+                        )
+                        .ignoresSafeArea()
                     }
                 }
                 .privacySensitive(store.isShowingSecret)

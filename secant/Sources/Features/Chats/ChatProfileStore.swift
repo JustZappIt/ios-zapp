@@ -72,6 +72,12 @@ struct ChatProfile {
         /// The secret whose authentication is in flight. Cleared as soon as it is shown or aborted.
         var pendingSecret: SecretTarget?
 
+        /// True only between the system biometric sheet going up and its result coming back.
+        /// That sheet makes the app resign active, which is one of the `hideSensitiveContent`
+        /// triggers — without this flag the app would cancel the very authentication it is
+        /// waiting on, and a successful Face ID would reveal nothing at all.
+        var isAwaitingBiometric = false
+
         /// Non-nil while the PIN gate is on screen.
         var pinEntry: PINEntry?
 
