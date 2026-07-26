@@ -91,12 +91,12 @@ struct AboutView: View {
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .sheet(isPresented: $store.isInAppBrowserPolicyOn) {
-                if let url = URL(string: "https://zodl.com/privacy-policy/#policy") {
+                if let url = URL(string: "https://www.justzappit.xyz/privacy") {
                     InAppBrowserView(url: url)
                 }
             }
             .sheet(isPresented: $store.isInAppBrowserTermsOn) {
-                if let url = URL(string: "https://zodl.com/privacy-policy/") {
+                if let url = URL(string: "https://www.justzappit.xyz/legal/terms") {
                     InAppBrowserView(url: url)
                 }
             }
