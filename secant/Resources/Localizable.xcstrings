@@ -1148,6 +1148,108 @@
         }
       }
     },
+    "chatBlock.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloquear"
+          }
+        }
+      }
+    },
+    "chatBlock.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block %@? You'll stop receiving their messages, and they won't be told they've been blocked."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Bloquear a %@? Dejarás de recibir sus mensajes y no se le avisará de que le has bloqueado."
+          }
+        }
+      }
+    },
+    "chatBlock.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block user"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloquear usuario"
+          }
+        }
+      }
+    },
+    "chatBlock.unblockConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unblock"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloquear"
+          }
+        }
+      }
+    },
+    "chatBlock.unblockMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unblock %@? You'll be able to receive their messages again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Desbloquear a %@? Volverás a recibir sus mensajes."
+          }
+        }
+      }
+    },
+    "chatBlock.unblockTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unblock user"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloquear usuario"
+          }
+        }
+      }
+    },
     "chatBubble.paymentRequest.owe": {
       "extractionState": "manual",
       "localizations": {
@@ -1382,6 +1484,125 @@
           "stringUnit": {
             "state": "translated",
             "value": "Añadir contacto"
+          }
+        }
+      }
+    },
+    "chatContacts.additionalAddresses": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Additional addresses"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direcciones adicionales"
+          }
+        }
+      }
+    },
+    "chatContacts.addrEvm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EVM address (ETH, Polygon, etc.)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección EVM (ETH, Polygon, etc.)"
+          }
+        }
+      }
+    },
+    "chatContacts.addrEvmHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter 0x address…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce la dirección 0x…"
+          }
+        }
+      }
+    },
+    "chatContacts.addrSolana": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solana address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección de Solana"
+          }
+        }
+      }
+    },
+    "chatContacts.addrSolanaHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter Solana address…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce la dirección de Solana…"
+          }
+        }
+      }
+    },
+    "chatContacts.addrTransparent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transparent address (Zcash)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección transparente (Zcash)"
+          }
+        }
+      }
+    },
+    "chatContacts.addrTransparentHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter transparent address…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce la dirección transparente…"
           }
         }
       }
@@ -1637,6 +1858,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Guardar"
+          }
+        }
+      }
+    },
+    "chatContacts.scanAddress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan wallet address QR"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear el QR de la dirección"
+          }
+        }
+      }
+    },
+    "chatContacts.scanKey": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan messaging key QR"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear el QR de la clave de mensajería"
           }
         }
       }
@@ -2168,6 +2423,23 @@
         }
       }
     },
+    "chatModeration.fallbackUser": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "this user"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "este usuario"
+          }
+        }
+      }
+    },
     "chatNetwork.backup": {
       "extractionState": "manual",
       "localizations": {
@@ -2364,6 +2636,176 @@
         "es": { "stringUnit": { "state": "translated", "value": "No disponible" } }
       }
     },
+    "chatProfile.addressShieldedCaption": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shielded address — private by default"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección blindada: privada por defecto"
+          }
+        }
+      }
+    },
+    "chatProfile.addressShieldedLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shielded address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección blindada"
+          }
+        }
+      }
+    },
+    "chatProfile.addressTransparentCaption": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transparent address — visible on chain"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección transparente: visible en la cadena"
+          }
+        }
+      }
+    },
+    "chatProfile.addressTransparentLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transparent address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección transparente"
+          }
+        }
+      }
+    },
+    "chatProfile.addressUnavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your wallet addresses aren't available yet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus direcciones de billetera aún no están disponibles."
+          }
+        }
+      }
+    },
+    "chatProfile.copyAddress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar dirección"
+          }
+        }
+      }
+    },
+    "chatProfile.deleteButton": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete identity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar identidad"
+          }
+        }
+      }
+    },
+    "chatProfile.deleteConfirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar"
+          }
+        }
+      }
+    },
+    "chatProfile.deleteMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This removes your messaging identity and all chat history from this device. Your funds are unaffected and can be recovered at any time with your seed phrase."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esto elimina tu identidad de mensajería y todo el historial de chats de este dispositivo. Tus fondos no se ven afectados y puedes recuperarlos en cualquier momento con tu frase semilla."
+          }
+        }
+      }
+    },
+    "chatProfile.deleteTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete identity?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar identidad?"
+          }
+        }
+      }
+    },
     "chatProfile.displayName": {
       "extractionState": "manual",
       "localizations": {
@@ -2394,6 +2836,125 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cómo apareces ante todos con quienes chateas."
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyAddressLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owner address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección del propietario"
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyCopy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar"
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyDialogMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derived from your seed phrase. This key controls your P2P cash-out account — anyone with it can spend those funds."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derivada de tu frase semilla. Esta clave controla tu cuenta de retiro P2P: cualquiera que la tenga puede gastar esos fondos."
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyDialogTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P wallet key"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave de billetera P2P"
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyPrivateLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Private key"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave privada"
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeySubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Key for your P2P cash-out account, derived from your seed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave de tu cuenta de retiro P2P, derivada de tu semilla"
+          }
+        }
+      }
+    },
+    "chatProfile.p2pKeyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P wallet key"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clave de billetera P2P"
           }
         }
       }
@@ -2547,6 +3108,159 @@
           "stringUnit": {
             "state": "translated",
             "value": "No se pudo guardar. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatProfile.secretFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That couldn't be unlocked. Try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo desbloquear. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatProfile.seedPhraseDialogMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep this safe. Anyone with these words can access your wallet and your messages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guárdala en un lugar seguro. Cualquiera que tenga estas palabras puede acceder a tu billetera y a tus mensajes."
+          }
+        }
+      }
+    },
+    "chatProfile.seedPhraseDialogTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seed phrase"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase semilla"
+          }
+        }
+      }
+    },
+    "chatProfile.seedPhraseSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backs up both your messaging and wallet identities"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respalda tus identidades de mensajería y de billetera"
+          }
+        }
+      }
+    },
+    "chatProfile.seedPhraseTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seed phrase"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frase semilla"
+          }
+        }
+      }
+    },
+    "chatProfile.subtabShielded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shielded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blindada"
+          }
+        }
+      }
+    },
+    "chatProfile.subtabTransparent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transparent"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transparente"
+          }
+        }
+      }
+    },
+    "chatProfile.tabMessagingId": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messaging ID"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID de mensajería"
+          }
+        }
+      }
+    },
+    "chatProfile.tabWalletAddress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wallet address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección de billetera"
           }
         }
       }

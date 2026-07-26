@@ -124,6 +124,19 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
     }
 }
 
+/// Zapp: a chat identity QR carries a bare Ed25519 public key — 64 hex characters, optionally
+/// `0x`-prefixed, exactly what `PublicKeyRules` accepts on paste. Returning `nil` for anything
+/// else keeps the camera looking instead of dropping a wallet address into the key field.
+struct PublicKeyScanChecker: ScanChecker, Equatable {
+    let id = 6
+
+    func checkQRCode(_ qrCode: String) -> Scan.Action? {
+        let sanitized = PublicKeyRules.sanitize(qrCode)
+
+        return PublicKeyRules.isValid(sanitized) ? .foundString(sanitized) : nil
+    }
+}
+
 struct ScanCheckerWrapper: Equatable, Sendable {
     let checker: any ScanChecker
 
@@ -133,6 +146,7 @@ struct ScanCheckerWrapper: Equatable, Sendable {
     static let keystonePCZTScanChecker = ScanCheckerWrapper(KeystonePcztScanChecker())
     static let swapStringScanChecker = ScanCheckerWrapper(SwapStringScanChecker())
     static let keystoneVotingDelegationPCZTScanChecker = ScanCheckerWrapper(KeystoneVotingDelegationPcztScanChecker())
+    static let publicKeyScanChecker = ScanCheckerWrapper(PublicKeyScanChecker())
 
     static func == (lhs: ScanCheckerWrapper, rhs: ScanCheckerWrapper) -> Bool {
         return lhs.checker.id == rhs.checker.id

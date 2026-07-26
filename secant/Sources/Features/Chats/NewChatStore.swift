@@ -43,6 +43,9 @@ struct NewChat {
         /// Non-nil while the "rejoin?" prompt is open, before an explicitly-left DM is recreated.
         @Presents var alert: AlertState<Action>?
 
+        /// Android's `ChatScanPublicKeyScreen`: the camera route into the same field paste uses.
+        @Presents var scan: Scan.State?
+
         var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
         var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
         var isOwnKey: Bool {
@@ -104,6 +107,8 @@ struct NewChat {
         case peerKeyChanged(String)
         case displayNameChanged(String)
         case pasteTapped
+        case scanTapped
+        case scan(PresentationAction<Scan.Action>)
         case copyMyKeyTapped
         case copyIndicatorExpired
         case contactTapped(ChatContact)
@@ -154,6 +159,25 @@ struct NewChat {
                 guard let pasted = pasteboard.getString() else { return .none }
 
                 return .send(.peerKeyChanged(pasted.data))
+
+                // The checker only accepts a well-formed identity key, so a scanned code either
+                // fills the field with something the "start chat" path can use or is ignored.
+            case .scanTapped:
+                var scanState = Scan.State.initial
+                scanState.checkers = [.publicKeyScanChecker]
+                state.scan = scanState
+                return .none
+
+            case .scan(.presented(.foundString(let key))):
+                state.scan = nil
+                return .send(.peerKeyChanged(key))
+
+            case .scan(.presented(.cancelTapped)), .scan(.dismiss):
+                state.scan = nil
+                return .none
+
+            case .scan:
+                return .none
 
             case .copyMyKeyTapped:
                 guard !state.myPublicKey.isEmpty else { return .none }
@@ -316,6 +340,9 @@ struct NewChat {
             case .backToHomeTapped:
                 return .none
             }
+        }
+        .ifLet(\.$scan, action: \.scan) {
+            Scan()
         }
     }
 

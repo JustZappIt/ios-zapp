@@ -276,6 +276,14 @@ extension Root {
                 state.path = .chatProfile
                 return .none
 
+                // Android's `DeleteChatIdentityUseCase` shuts the messaging SDK down and then
+                // deletes the wallet data and preferences behind it. On iOS that whole sequence
+                // already exists as the reset the Settings path runs — including
+                // `zappMessaging.wipe()` — so Delete identity reuses it rather than
+                // half-deleting an identity the wallet seed would immediately re-derive.
+            case .chatProfile(.deleteIdentityConfirmed):
+                return .send(.initialization(.resetZashiRequest(false)))
+
                 // Only a group has anything behind its title.
             case .chatRoom(.titleTapped):
                 guard let conversation = state.chatRoomState.conversation,
@@ -435,7 +443,8 @@ extension Root {
 
                 // The feature owns no shared state; Root does. A mutation comes back
                 // up here so every screen reading @Shared sees it at once.
-            case .chatContactsList(.contactsChanged(let contacts)):
+            case .chatContactsList(.contactsChanged(let contacts)),
+                .chatRoom(.contactsChanged(let contacts)):
                 return .send(.chatContactsLoaded(contacts))
 
                 // Declining the messaging terms must not leave the user sitting in Chats behind a

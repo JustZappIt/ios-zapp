@@ -121,6 +121,10 @@ struct OfframpClient {
     var accountSummary: @Sendable () async throws -> OfframpAccountModel
     var transactionURL: @Sendable (_ txHash: String) async throws -> URL?
     var invalidateSession: @Sendable () async -> Void
+
+    /// The owner key behind the P2P cash-out account, for the profile's reveal surface.
+    /// See `OfframpWalletKey.swift` — the secret never leaves a `RedactableString`.
+    var exportWalletKey: @Sendable () async throws -> OfframpWalletKey
 }
 
 extension OfframpClient: DependencyKey {
@@ -235,6 +239,9 @@ extension OfframpClient: DependencyKey {
                 await paymentDetails.reset()
                 quoteAuthorization.reset()
                 await OfframpSession.shared.invalidate()
+            },
+            exportWalletKey: {
+                try OfframpWalletKey.derive()
             }
         )
     }

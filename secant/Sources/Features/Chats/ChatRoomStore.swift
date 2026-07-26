@@ -60,6 +60,9 @@ struct ChatRoom {
         /// The media message opened fullscreen, if any. See `ChatImageViewer.swift`.
         var imageViewerMessage: ZMMessage?
 
+        /// Add / edit / block the peer, opened from the DM's title. Android's `openEditSheet`.
+        @Presents var contactForm: ChatContactForm.State?
+
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
         var completedMediaIds: Set<String> = []
@@ -252,6 +255,10 @@ struct ChatRoom {
         case transactionUnavailable
         case imageTapped(ZMMessage)
         case imageViewerDismissed
+        case contactForm(PresentationAction<ChatContactForm.Action>)
+
+        /// Handed up to Root, which owns the shared contacts projection.
+        case contactsChanged(ChatContacts)
     }
 
     @Dependency(\.cameraCapture) var cameraCapture
@@ -326,9 +333,33 @@ struct ChatRoom {
             case .backToHomeTapped:
                 return .none
 
-            // Routed by Root into group info. Only a group has anything behind its
-            // title; a DM's title is just the peer's name.
+            // A group's title is routed by Root into group info. A DM's title opens the peer's
+            // contact record instead — add when they are unknown, edit when they are saved —
+            // which is also where Block/Unblock lives. Mirrors Android's `onTitleClick`.
             case .titleTapped:
+                guard !state.isGroup, let publicKey = state.peerPublicKey else { return .none }
+
+                let existing = state.chatContacts.contact(for: publicKey)
+                state.contactForm = ChatContactForm.State(
+                    existing: existing?.isSaved == true ? existing : nil,
+                    prefill: existing ?? ChatContact(
+                        publicKey: publicKey,
+                        name: state.conversation?.resolvedDisplayName(state.chatContacts) ?? "",
+                        address: state.resolvedPeerWalletAddress ?? "",
+                        isSaved: false
+                    )
+                )
+                return .none
+
+            case .contactForm(.presented(.delegate(.contactsChanged(let contacts)))):
+                state.contactForm = nil
+                return .send(.contactsChanged(contacts))
+
+            case .contactForm(.presented(.closeTapped)):
+                state.contactForm = nil
+                return .none
+
+            case .contactForm, .contactsChanged:
                 return .none
 
             case .draftChanged(let draft):
@@ -599,6 +630,9 @@ struct ChatRoom {
                 .splitShareChanged, .splitCurrencyToggled, .splitSendTapped, .splitSendFailed:
                 return .none
             }
+        }
+        .ifLet(\.$contactForm, action: \.contactForm) {
+            ChatContactForm()
         }
     }
 

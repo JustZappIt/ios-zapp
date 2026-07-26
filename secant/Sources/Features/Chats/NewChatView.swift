@@ -60,6 +60,11 @@ struct NewChatView: View {
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .alert($store.scope(state: \.alert, action: \.alert))
+            .fullScreenCover(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
+                WithPerceptionTracking {
+                    ScanView(store: scanStore)
+                }
+            }
         }
     }
 
@@ -109,8 +114,19 @@ struct NewChatView: View {
                 Text(String(localizable: .newChatPaste))
                     .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
             }
+
+            Button {
+                store.send(.scanTapped)
+            } label: {
+                Asset.Assets.Icons.scan.image
+                    .zImage(width: Constants.scanIconSize, height: Constants.scanIconSize, style: ZappColors.accent)
+                    .frame(width: Constants.scanTouchTarget, height: Constants.scanTouchTarget)
+            }
+            .buttonStyle(.zappPress)
+            .accessibilityLabel(String(localizable: .chatContactsScanKey))
         }
-        .padding(Design.Spacing._md)
+        .padding(.leading, Design.Spacing._md)
+        .padding(.vertical, Design.Spacing._md)
         .background(ZappColors.surfaceInput.color(colorScheme))
     }
 
@@ -213,8 +229,12 @@ struct NewChatView: View {
             }
         }
     }
+}
 
-    @ViewBuilder private var contacts: some View {
+// MARK: - Contact list & own key
+
+private extension NewChatView {
+    @ViewBuilder var contacts: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             ZappSectionLabel(
                 text: store.isGroupMode
@@ -245,7 +265,7 @@ struct NewChatView: View {
         }
     }
 
-    private var rowDivider: some View {
+    var rowDivider: some View {
         Rectangle()
             .fill(ZappColors.border.color(colorScheme))
             .frame(height: 1)
@@ -254,7 +274,7 @@ struct NewChatView: View {
 
     /// Chat is symmetric: the peer needs our key just as much as we need theirs.
     /// Without this the screen only works for whoever was handed a key first.
-    private var myKeyCard: some View {
+    var myKeyCard: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             ZappSectionLabel(text: String(localizable: .newChatYourKey))
 
@@ -288,6 +308,8 @@ struct NewChatView: View {
 
     private enum Constants {
         static let bannerIconSize: CGFloat = 16
+        static let scanIconSize: CGFloat = 20
+        static let scanTouchTarget: CGFloat = 44
     }
 }
 

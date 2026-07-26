@@ -253,6 +253,19 @@ extension ChatRoom.State {
     var resolvedPeerWalletAddress: String? {
         peerSharedWalletAddress ?? savedContactWalletAddress
     }
+
+    /// The other side of a DM. A conversation can list OUR key among its participants, so it is
+    /// excluded before picking — the same trap `resolvedDisplayName` documents.
+    var peerPublicKey: String? {
+        guard let conversation, conversation.type == .direct else { return nil }
+
+        let ownKey = messagingState.identity.map { PublicKeyRules.sanitize($0.publicKey) }
+
+        return conversation.participantIds
+            .lazy
+            .map { PublicKeyRules.sanitize($0) }
+            .first { !$0.isEmpty && $0 != ownKey }
+    }
 }
 
 // MARK: - File encoding

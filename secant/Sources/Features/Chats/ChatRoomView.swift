@@ -23,7 +23,9 @@ struct ChatRoomView: View {
                 ZappScreenHeader(
                     title: store.title,
                     subtitle: store.subtitle,
-                    onTitleTap: store.isGroup ? { store.send(.titleTapped) } : nil
+                    // A group's title opens group info; a DM's opens the peer's contact record
+                    // (add / edit / block), so both are tappable now.
+                    onTitleTap: { store.send(.titleTapped) }
                 ) {
                     ZappBackButton {
                         navigateBack()
@@ -153,6 +155,11 @@ struct ChatRoomView: View {
                     ChatImageViewer(message: message) {
                         store.send(.imageViewerDismissed)
                     }
+                }
+            }
+            .sheet(item: $store.scope(state: \.contactForm, action: \.contactForm)) { formStore in
+                WithPerceptionTracking {
+                    ChatContactFormView(store: formStore)
                 }
             }
         }

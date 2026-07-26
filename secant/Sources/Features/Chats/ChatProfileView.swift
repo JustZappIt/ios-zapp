@@ -23,18 +23,22 @@ struct ChatProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 0) {
-                        identityHero
+                        tabSelector
+                            .padding(.horizontal, Constants.screenInset)
                             .padding(.bottom, Design.Spacing._lg)
 
-                        if store.hasPublicKey {
-                            qrCard
-                                .padding(.bottom, Design.Spacing._lg)
-
-                            publicKeyCard
-                                .padding(.bottom, Design.Spacing._lg)
+                        switch store.activeTab {
+                        case .messagingID:
+                            messagingIDTab
+                        case .walletAddress:
+                            walletAddressTab
                         }
 
-                        displayNameGroup
+                        keyExportRows
+                            .padding(.top, Design.Spacing._lg)
+
+                        deleteIdentity
+                            .padding(.top, Design.Spacing._lg)
                     }
                     .padding(.top, Design.Spacing._lg)
                     .padding(.bottom, Design.Spacing._md)
@@ -45,8 +49,95 @@ struct ChatProfileView: View {
             .zashiBack(customDismiss: { store.send(.backToHomeTapped) })
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .chatProfileSecretOverlays(store: store)
         }
     }
+
+    // MARK: Tabs
+
+    private var tabSelector: some View {
+        VStack(spacing: Design.Spacing._sm) {
+            ZappSegmentedSelector(
+                options: [
+                    String(localizable: .chatProfileTabMessagingId),
+                    String(localizable: .chatProfileTabWalletAddress)
+                ],
+                selectedIndex: store.activeTab.rawValue
+            ) { index in
+                store.send(.tabSelected(index == 0 ? .messagingID : .walletAddress))
+            }
+
+            if store.showsWalletSubTabs {
+                ZappSegmentedSelector(
+                    options: [
+                        String(localizable: .chatProfileSubtabShielded),
+                        String(localizable: .chatProfileSubtabTransparent)
+                    ],
+                    selectedIndex: store.walletSubTab.rawValue
+                ) { index in
+                    store.send(.walletSubTabSelected(index == 0 ? .shielded : .transparent))
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var messagingIDTab: some View {
+        identityHero
+            .padding(.bottom, Design.Spacing._lg)
+
+        if store.hasPublicKey {
+            qrCard(payload: store.publicKey, caption: String(localizable: .chatProfileQrCaption))
+                .padding(.bottom, Design.Spacing._lg)
+
+            valueCard(
+                label: String(localizable: .chatProfilePublicKey),
+                value: store.publicKey,
+                didCopy: store.didCopy,
+                copyLabel: String(localizable: .newChatCopy)
+            ) {
+                store.send(.copyPublicKeyTapped)
+            }
+            .padding(.bottom, Design.Spacing._lg)
+        }
+
+        displayNameGroup
+    }
+
+    @ViewBuilder private var walletAddressTab: some View {
+        if let address = store.selectedWalletAddress, !address.isEmpty {
+            qrCard(payload: address, caption: addressCaption)
+                .padding(.bottom, Design.Spacing._lg)
+
+            valueCard(
+                label: addressLabel,
+                value: address,
+                didCopy: store.didCopyAddress,
+                copyLabel: String(localizable: .chatProfileCopyAddress)
+            ) {
+                store.send(.copyAddressTapped)
+            }
+        } else {
+            Text(String(localizable: .chatProfileAddressUnavailable))
+                .zappFont(.caption, style: ZappColors.textMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, Constants.screenInset)
+        }
+    }
+
+    private var addressLabel: String {
+        store.walletSubTab == .shielded
+            ? String(localizable: .chatProfileAddressShieldedLabel)
+            : String(localizable: .chatProfileAddressTransparentLabel)
+    }
+
+    private var addressCaption: String {
+        store.walletSubTab == .shielded
+            ? String(localizable: .chatProfileAddressShieldedCaption)
+            : String(localizable: .chatProfileAddressTransparentCaption)
+    }
+
+    // MARK: Cards
 
     private var identityHero: some View {
         VStack(spacing: Design.Spacing._sm) {
@@ -64,11 +155,11 @@ struct ChatProfileView: View {
         .padding(.horizontal, Constants.screenInset)
     }
 
-    private var qrCard: some View {
+    private func qrCard(payload: String, caption: String) -> some View {
         VStack(spacing: Design.Spacing._sm) {
-            ChatIdentityQRCode(publicKey: store.publicKey)
+            ChatProfileQRCode(payload: payload)
 
-            Text(String(localizable: .chatProfileQrCaption))
+            Text(caption)
                 .zappFont(.caption, style: ZappColors.textSubtle)
                 .multilineTextAlignment(.center)
         }
@@ -82,36 +173,36 @@ struct ChatProfileView: View {
         .padding(.horizontal, Constants.screenInset)
     }
 
-    private var publicKeyCard: some View {
+    private func valueCard(
+        label: String,
+        value: String,
+        didCopy: Bool,
+        copyLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
         HStack(spacing: Design.Spacing._sm) {
             VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-                Text(String(localizable: .chatProfilePublicKey))
+                Text(label)
                     .zappFont(.caption, style: ZappColors.textMuted)
 
-                Text(store.publicKey)
+                Text(value)
                     .zappFont(.mono, style: ZappColors.text)
-                    .lineLimit(Constants.publicKeyLineLimit)
+                    .lineLimit(Constants.valueLineLimit)
                     .textSelection(.enabled)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Button {
-                store.send(.copyPublicKeyTapped)
-            } label: {
-                (store.didCopy ? Asset.Assets.Icons.checkSolid.image : Asset.Assets.copy.image)
+            Button(action: action) {
+                (didCopy ? Asset.Assets.Icons.checkSolid.image : Asset.Assets.copy.image)
                     .zImage(
                         width: Constants.copyIconSize,
                         height: Constants.copyIconSize,
-                        style: store.didCopy ? ZappColors.success : ZappColors.textMuted
+                        style: didCopy ? ZappColors.success : ZappColors.textMuted
                     )
                     .frame(width: Constants.touchTarget, height: Constants.touchTarget)
             }
             .buttonStyle(.zappPress)
-            .accessibilityLabel(
-                store.didCopy
-                    ? String(localizable: .newChatCopied)
-                    : String(localizable: .newChatCopy)
-            )
+            .accessibilityLabel(didCopy ? String(localizable: .newChatCopied) : copyLabel)
         }
         .padding(Design.Spacing._lg)
         .background(ZappColors.surfaceAlt.color(colorScheme))
@@ -121,8 +212,61 @@ struct ChatProfileView: View {
         )
         .padding(.horizontal, Constants.screenInset)
     }
+}
 
-    private var displayNameGroup: some View {
+// MARK: - Secrets, delete & display name
+
+private extension ChatProfileView {
+    /// Android's `KeyExportRows`: the seed backs up both identities so it is always offered; the
+    /// P2P key belongs to the wallet, so it only appears on the wallet tab.
+    var keyExportRows: some View {
+        VStack(spacing: 0) {
+            ZappRow(
+                title: String(localizable: .chatProfileSeedPhraseTitle),
+                subtitle: String(localizable: .chatProfileSeedPhraseSubtitle),
+                icon: Asset.Assets.Icons.key.image,
+                iconTint: .accent
+            ) {
+                store.send(.seedPhraseTapped)
+            }
+
+            if store.showsP2PKeyRow {
+                ZappRowDivider(inset: true)
+
+                ZappRow(
+                    title: String(localizable: .chatProfileP2pKeyTitle),
+                    subtitle: String(localizable: .chatProfileP2pKeySubtitle),
+                    icon: Asset.Assets.Icons.connectWallet.image,
+                    iconTint: .accent
+                ) {
+                    store.send(.p2pKeyTapped)
+                }
+            }
+
+            if store.secretFailed {
+                Text(String(localizable: .chatProfileSecretFailed))
+                    .zappFont(.caption, style: ZappColors.danger)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(Design.Spacing._md)
+            }
+        }
+        .background(ZappColors.surface.color(colorScheme))
+        .overlay(
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+        )
+        .padding(.horizontal, Constants.screenInset)
+    }
+
+    var deleteIdentity: some View {
+        ZappButton(title: String(localizable: .chatProfileDeleteButton), variant: .danger) {
+            store.send(.deleteIdentityTapped)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, Constants.screenInset)
+    }
+
+    var displayNameGroup: some View {
         ZappSettingsGroup(title: String(localizable: .chatProfileDisplayName)) {
             VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 TextField(
@@ -158,7 +302,6 @@ struct ChatProfileView: View {
             .padding(Constants.contentPadding)
         }
     }
-
 }
 
 private extension ChatProfileView {
@@ -166,19 +309,19 @@ private extension ChatProfileView {
         static let avatarSize: CGFloat = 72
         static let copyIconSize: CGFloat = 20
         static let nameMinimumScale: CGFloat = 0.75
-        static let publicKeyLineLimit = 3
+        static let valueLineLimit = 3
         static let screenInset: CGFloat = 18
         static let touchTarget: CGFloat = 48
         static let contentPadding: CGFloat = 18
     }
 }
 
-private struct ChatIdentityQRCode: View {
+struct ChatProfileQRCode: View {
     private enum Constants {
         static let size: CGFloat = 176
     }
 
-    let publicKey: String
+    let payload: String
     @State private var image: CGImage?
 
     var body: some View {
@@ -195,14 +338,14 @@ private struct ChatIdentityQRCode: View {
         }
         .frame(width: Constants.size, height: Constants.size)
         .background(Color.white)
-        .task(id: publicKey) {
-            guard !publicKey.isEmpty else {
+        .task(id: payload) {
+            guard !payload.isEmpty else {
                 image = nil
                 return
             }
 
             image = await QRCodeGenerator.generate(
-                from: publicKey,
+                from: payload,
                 maxPrivacy: false,
                 color: .black,
                 overlayedWithZcashLogo: false
