@@ -58,15 +58,4 @@ struct ZappTabsView: View {
             )
         }
     }
-
-    private func placeholder(_ tab: ZappTabs.Tab) -> some View {
-        VStack {
-            Spacer()
-            Text(tab.title)
-                .zFont(.semiBold, size: 24, style: Design.Text.tertiary)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .applyScreenBackground()
-    }
 }

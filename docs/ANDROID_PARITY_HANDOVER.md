@@ -406,6 +406,58 @@ Produce `docs/ANDROID_PARITY_VERIFICATION.md` — a table of every screen with �
 fix small residual gaps directly, and file the big ones back into this document as new phases.
 Commit: `[ZAPP-1] Phase 11: parity verification pass`.
 
+**Outcome (2026-07-26):** `docs/ANDROID_PARITY_VERIFICATION.md` — 77 rows, 71 ✅ / 6 ⚠️ / 0 ❌. One
+dead-code fix; one new phase filed (Phase 12 below); two additions to the decisions doc. Two
+open questions were *retired* by proving the Android side is equally dead code: `HomeArgs`
+(smart-banner tree — closes decisions §5) and `ChatSettingsArgs` (chat-settings hub).
+
+---
+
+### Phase 12 — Unified send form  *(large — needs a go/no-go before any work starts)*
+
+**Android refs:** `A:screen/unifiedsend/` (`UnifiedSendScreen.kt`, `UnifiedSendVM.kt`,
+`UnifiedSendState.kt`, `UnifiedSendView.kt`), `A:screen/home/HomeVM.kt:285`
+(`onSendButtonClick → UnifiedSendArgs`), `A:screen/chat/room/ChatRoomVM.kt:950/1051/1078`,
+`A:common/usecase/{NavigateToNearPay,OnZip321Scanned,OnAddressScanned,SendTransactionAgain,CancelProposalFlow}UseCase.kt`
+**iOS files:** `I:Features/SendForm/*`, `I:Features/SwapAndPayForm/*`,
+`I:Features/CoordFlows/SendCoordFlow*.swift`, `I:Features/CoordFlows/SwapAndPayCoordFlow*.swift`,
+`I:Features/ZappTabs/ZappPayView.swift` (speed dial), `I:Features/Chats/ChatRoomStore.swift`
+
+**Context — read before deciding.** On Android, *every* send entry point converges on one screen:
+the Pay tab's Send action, the chat room's Send-ZEC and send-to-address paths, ZIP-321 scans,
+address scans, and "send again" all `forward(UnifiedSendArgs(...))`. `UnifiedSendScreen` then lets
+the user pick the asset inline, and switches itself between a ZEC send and a swap
+(`UnifiedSendVM.kt:390`: `isSwap = selectedAsset?.let { it !is ZecSwapAsset } ?: false`), with
+`SwapMode.EXACT_INPUT` and a Top-Up affordance when the ZEC balance is zero. iOS instead keeps two
+screens — `SendFormView` (ZEC only) and `SwapAndPayForm` — and makes the user choose *before*
+entering, via separate Send and Swap actions on the Pay speed dial.
+
+**Capability parity already exists**: both platforms expose Send and Swap from the Pay tab's
+speed dial, and iOS's `SendFormView` already handles TEX gating, ZIP-321 and address prefill. This
+phase is therefore about **form shape**, not a missing feature — which is why it is filed for a
+decision rather than queued as work. It touches a money-moving flow with a live transaction guard
+(see `CLAUDE.md` on `TransactionGuard` non-reentrancy), so the regression surface is real.
+
+1. **Decide scope first.** Either (a) adopt Android's unified form wholesale, (b) add an in-form
+   asset selector to `SendFormView` that can hand off to the swap path while leaving the two
+   coordinators intact, or (c) decline and record iOS's two-screen split as an accepted divergence
+   in `ANDROID_PARITY_DECISIONS.md`. Option (c) is a legitimate outcome.
+2. If (a) or (b): converge the entry points. `ZappPayView`'s `.sendTapped` / `.swapWithNearTapped`,
+   `ChatRoomStore`'s send-ZEC and send-to-address handoffs, and the scan/ZIP-321 paths must all land
+   on the same form with the same prefill semantics Android uses (`recipientAddress`,
+   `recipientAddressType`, `isScanZip321Enabled`).
+3. Preserve the existing guard discipline — broadcasts stay wrapped inside dependency LiveKeys,
+   never at call sites, never nested.
+4. Keep `SwapAndPayForm`'s cross-pay/offramp corridor reachable; it is not part of Android's unified
+   screen and must not be orphaned by the merge.
+5. Tests: extend the existing `SendForm` / swap suites (Swift Testing) to cover mode switching and
+   each converged entry point's prefill.
+
+**Acceptance:** every send entry point reaches one form whose asset selector switches ZEC-send vs
+swap exactly as Android's does; cross-pay/offramp still reachable; no new lint; `zodlTests` green;
+changelog entry. **Or**: a recorded decision that iOS keeps two screens, and this phase is closed
+unbuilt.
+
 ---
 
 ## 3. Decision log
