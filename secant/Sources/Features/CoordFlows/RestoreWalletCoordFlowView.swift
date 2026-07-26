@@ -599,7 +599,7 @@ private struct ZappOnboardingDoneView: View {
             .background(ZappColors.bg.color(colorScheme))
             .navigationBarBackButtonHidden(true)
             .onAppear {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                ZappHaptics.success()
             }
         }
     }

@@ -58,7 +58,7 @@ struct ZappPillNavBar: View {
         Button {
             if tab != selectedTab {
                 // Match Android's SegmentTick on every tab change.
-                UISelectionFeedbackGenerator().selectionChanged()
+                ZappHaptics.selection()
                 onTabSelected(tab)
             }
         } label: {

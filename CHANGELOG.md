@@ -35,6 +35,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Onboarding now requires an app-lock method: a 6-digit PIN or device authentication. PIN unlock includes a persisted five-attempt, 30-second lockout, and App Lock settings let you change the PIN or switch authentication methods.
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
+- [ZAPP-1] When syncing runs into trouble, the sync status on the Pay screen is now tappable and opens a troubleshooting sheet offering Try again, Switch server, Disable Tor protection, and Contact Support — instead of only displaying the error text with nothing you can do about it. The sheet also raises itself the first time a sync error occurs in a session.
 
 ### Changed
 - [ZAPP-1] The Read receipts and Online status screens now explain what they do before you change them: an illustrated intro plus short "When this is on", "When this is off", and reciprocity notes, so it's clear that read ticks and online dots only work when both people allow them. The toggle itself now sits under a "Control" heading with its own description, and the rows that open these screens describe the setting rather than restate it.
@@ -43,6 +44,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Onboarding steps now slide in directionally (forward from the right, back from the left) with a fade, and a failed biometric enrollment now gives an error haptic.
 - [ZAPP-1] The Chats tab now shows the number of unread conversations as a count badge (capped at "99+") that scales and fades in and out, instead of a plain dot.
 - [ZAPP-1] Switching tabs on the bottom navigation bar now gives a subtle haptic tap.
+- [ZAPP-1] Sending a message in a chat now gives a light haptic tap, so a send registers in your hand without having to watch the screen.
 - [ZAPP-1] Reorganized the You tab to match Android: P2P payment method and P2P transactions now live in their own "P2P" group instead of under Privacy.
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
 - [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and bold Swiss typography (bold headings and titles, a heavy-weight balance display) in both light and dark mode.
@@ -56,6 +58,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
 ### Fixed
+- [ZAPP-1] Your screen no longer stays awake long after a wallet restore or resync has finished, or after you delete a wallet part-way through one. The screen timeout is handed back the moment the restore ends, instead of staying disabled until the phone was next plugged in or unplugged.
+- [ZAPP-1] "Contact Support" from a sync error now actually opens a support email (or the share sheet if no mail account is set up) instead of doing nothing.
 - [ZAPP-1] An animated GIF sent from your photo library now arrives animated on the other side, instead of as a single frozen frame.
 - [ZAPP-1] The "See all" row under recent activity now uses the readable accent tone instead of the bright button orange, so it stays legible against the light background.
 - [ZAPP-1] When your balance history starts a period at zero there is no percentage to report, so the Pay screen now shows just the period (24H/1W/1M/ALL) instead of a change figure with a dangling separator dot.

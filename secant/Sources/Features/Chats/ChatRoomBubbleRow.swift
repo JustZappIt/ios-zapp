@@ -91,7 +91,7 @@ struct ChatRoomBubbleRow: View {
         }
 
         Button(String(localizable: .chatRoomReply)) {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            ZappHaptics.impact()
             store.send(.replyTapped(message))
         }
 

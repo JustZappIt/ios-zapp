@@ -338,7 +338,12 @@ private struct ChatRoomInputRow: View {
                 .frame(minHeight: Constants.minHeight)
                 .background(ZappColors.surfaceInput.color(colorScheme))
 
-            Button(action: onSend) {
+            // Android pulses on the send CLICK, not on delivery — the tap is what the user is
+            // acknowledging, and a message that fails still surfaces its own failure row.
+            Button {
+                ZappHaptics.sendConfirm()
+                onSend()
+            } label: {
                 Text(String(localizable: .chatRoomSend))
                     .zappFont(.buttonSmall, style: ZappColors.onAccent)
                     .padding(.horizontal, Constants.sendHorizontalPadding)

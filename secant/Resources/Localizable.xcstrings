@@ -18702,6 +18702,23 @@
         }
       }
     },
+    "sheet.syncTimeout.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intentar de nuevo"
+          }
+        }
+      }
+    },
     "sheet.syncTimeout.server": {
       "extractionState": "manual",
       "localizations": {

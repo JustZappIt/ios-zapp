@@ -126,7 +126,7 @@ struct AppLockSetup {
                     // BioState.Error LaunchedEffect fires HapticFeedbackType.Reject).
                     return .run { _ in
                         await MainActor.run {
-                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            ZappHaptics.error()
                         }
                     }
                 }

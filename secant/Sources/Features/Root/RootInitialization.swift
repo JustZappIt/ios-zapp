@@ -167,7 +167,11 @@ extension Root {
                     state.bgTask = nil
                     return .merge(
                         .cancel(id: state.CancelStateId),
-                        .cancel(id: state.CancelTransactionsStateId)
+                        .cancel(id: state.CancelTransactionsStateId),
+                        // Same reason as `checkRestoreWalletFlag` below: a background sync that
+                        // finishes a restore clears `walletStatus`, and the idle timer has to be
+                        // handed back or the screen never sleeps once the user reopens the app.
+                        .send(.batteryStateChanged)
                     )
                 }
 
@@ -179,6 +183,14 @@ extension Root {
                     userDefaults.remove(Constants.udIsRestoringWallet)
                     userDefaults.remove(Constants.udIsResyncingWallet)
                     state.$walletStatus.withLock { $0 = .none }
+                    // Restore just finished, so the screen may sleep again. `walletStatus` is one
+                    // of the two inputs to the autolock decision but nothing recomputes it on its
+                    // own — without this the idle timer stays disabled until the next battery-state
+                    // notification, which on a plugged-in phone may not arrive for hours. Android
+                    // gets this for free: its `IsScreenTimeoutDisabledDuringRestoreUseCase` combines
+                    // the restoring state as a flow, so leaving RESTORING/SYNCING re-enables the
+                    // timeout immediately.
+                    return .send(.batteryStateChanged)
                 }
                 return .none
 
@@ -603,10 +615,19 @@ extension Root {
                 // is never exempted by `areMetadataPreserved`: the identity is
                 // derived from the wallet seed, so it belongs to the wallet being
                 // deleted, not to the user's portable metadata.
-                return .run { send in
-                    await zappMessaging.wipe()
-                    await send(.resetZashiKeychainRequest)
-                }
+                return .merge(
+                    // The third exit from a keep-awake state, alongside the two in
+                    // `checkRestoreWalletFlag` and the BGTask finish above: deleting the wallet
+                    // mid-restore. Both inputs to the autolock decision were just cleared
+                    // (`udLeavesScreenOpen` removed, `walletStatus` back to `.none`), so the idle
+                    // timer has to be handed back here too — otherwise the screen stays awake all
+                    // the way through onboarding the next wallet.
+                    .send(.batteryStateChanged),
+                    .run { send in
+                        await zappMessaging.wipe()
+                        await send(.resetZashiKeychainRequest)
+                    }
+                )
 
             case .resetZashiKeychainRequest:
                 return .run { send in

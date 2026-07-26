@@ -122,7 +122,7 @@ struct ChatSwipeToRevealRow<Content: View>: View {
         isArmed = armed
 
         if armed {
-            UISelectionFeedbackGenerator().selectionChanged()
+            ZappHaptics.selection()
         }
     }
 }
