@@ -417,4 +417,19 @@ enum PublicKeyRules {
     static func isValid(_ key: String) -> Bool {
         key.count == hexLength && key.allSatisfy(\.isHexDigit)
     }
+
+    /// Android's scan validator (`ChatScanPublicKeyVM.onScanned`): trim, drop an optional `0x`,
+    /// and require what is left to be exactly 64 hex characters — nothing is filtered out.
+    ///
+    /// `sanitize` must not be used here. Dropping stray characters is a kindness while someone
+    /// types or pastes, but applied to a scan it strips a wallet address down to whatever hex
+    /// digits it happens to contain: a real 141-character unified address carries 72 of them,
+    /// so it would truncate to a 64-character string that passes `isValid` and land in the key
+    /// field as a plausible-looking identity that belongs to nobody.
+    static func scanned(_ raw: String) -> String? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let unprefixed = trimmed.hasPrefix("0x") ? String(trimmed.dropFirst(2)) : trimmed
+
+        return isValid(unprefixed) ? unprefixed : nil
+    }
 }

@@ -125,15 +125,14 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
 }
 
 /// Zapp: a chat identity QR carries a bare Ed25519 public key — 64 hex characters, optionally
-/// `0x`-prefixed, exactly what `PublicKeyRules` accepts on paste. Returning `nil` for anything
-/// else keeps the camera looking instead of dropping a wallet address into the key field.
+/// `0x`-prefixed. `PublicKeyRules.scanned` applies Android's strict rule rather than the lenient
+/// paste sanitizer, so anything else — a wallet address above all — is rejected outright and the
+/// camera keeps looking instead of dropping a plausible-looking non-key into the field.
 struct PublicKeyScanChecker: ScanChecker, Equatable {
     let id = 6
 
     func checkQRCode(_ qrCode: String) -> Scan.Action? {
-        let sanitized = PublicKeyRules.sanitize(qrCode)
-
-        return PublicKeyRules.isValid(sanitized) ? .foundString(sanitized) : nil
+        PublicKeyRules.scanned(qrCode).map { .foundString($0) }
     }
 }
 

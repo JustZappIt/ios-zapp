@@ -177,6 +177,21 @@ import Testing
         #expect(checker.checkQRCode(peerKey) == .foundString(peerKey))
         #expect(checker.checkQRCode("0x\(peerKey.uppercased())") == .foundString(peerKey))
     }
+
+    /// The case a short stand-in address cannot catch. A real unified address is long enough
+    /// that its own hex characters — 72 of the 141 below — would satisfy a 64-character key
+    /// check if the scanner filtered rather than rejected. Android rejects it on length; so
+    /// must this, or scanning a Receive QR starts a chat with an identity that does not exist.
+    @Test func aRealWalletAddressIsRejectedRatherThanFilteredIntoAKey() {
+        let unifiedAddress = """
+            u1l8xunezsvhq8fgzfl7404m450nwnd76zshscn6nfys7vyz2ywyh4cc5daaq0c7q2su5lqfh23sp7\
+            fkf3kt27ve5948mzpfdvckzaect2jtte308mkwlycj2u0eac077wu70vqcetkxf
+            """
+
+        #expect(unifiedAddress.filter(\.isHexDigit).count > PublicKeyRules.hexLength)
+        #expect(PublicKeyScanChecker().checkQRCode(unifiedAddress) == nil)
+        #expect(PublicKeyRules.scanned(unifiedAddress) == nil)
+    }
 }
 
 // MARK: - Profile: wallet-address surface
