@@ -37,6 +37,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] The Read receipts and Online status screens now explain what they do before you change them: an illustrated intro plus short "When this is on", "When this is off", and reciprocity notes, so it's clear that read ticks and online dots only work when both people allow them. The toggle itself now sits under a "Control" heading with its own description, and the rows that open these screens describe the setting rather than restate it.
 - [ZAPP-1] Support conversations no longer appear as ordinary chats with a cryptic name — they're collected under the pinned Zapp Support row instead.
 - [ZAPP-1] The Chats list now previews each kind of attachment by name — Photo, Video, GIF, File, Location, Payment, Payment request — instead of labelling everything "Photo" or "Payment".
 - [ZAPP-1] Onboarding steps now slide in directionally (forward from the right, back from the left) with a fade, and a failed biometric enrollment now gives an error haptic.

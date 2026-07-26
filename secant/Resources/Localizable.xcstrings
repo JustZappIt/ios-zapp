@@ -2636,6 +2636,139 @@
         "es": { "stringUnit": { "state": "translated", "value": "No disponible" } }
       }
     },
+    "chatPrivacy.onlineStatusIntro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Your online status lets the people you chat with see when you're connected. It's optional, and it works both ways." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Tu estado en línea permite que las personas con las que chateas vean cuándo estás conectado. Es opcional y funciona en ambos sentidos." } }
+      }
+    },
+    "chatPrivacy.onlineStatusOffBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "People stop seeing when you're online, and Zapp also stops showing you when they're online. Your messages still send and arrive as usual." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Las personas dejan de ver cuándo estás en línea, y Zapp también deja de mostrarte cuándo ellas lo están. Tus mensajes se siguen enviando y recibiendo con normalidad." } }
+      }
+    },
+    "chatPrivacy.onlineStatusOffTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "When this is off" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando está desactivado" } }
+      }
+    },
+    "chatPrivacy.onlineStatusOnBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "People you have a direct chat with can see a small dot when you're connected, and you can see the same for them." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Las personas con las que tienes un chat directo pueden ver un punto cuando estás conectado, y tú puedes ver lo mismo de ellas." } }
+      }
+    },
+    "chatPrivacy.onlineStatusOnTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "When this is on" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado" } }
+      }
+    },
+    "chatPrivacy.onlineStatusReciprocalBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Hiding your online status also hides everyone else's from you. Turn it back on to see and be seen again." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Ocultar tu estado en línea también te oculta el de los demás. Vuelve a activarlo para ver y que te vean." } }
+      }
+    },
+    "chatPrivacy.onlineStatusReciprocalTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "It works both ways" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Funciona en ambos sentidos" } }
+      }
+    },
+    "chatPrivacy.onlineStatusToggleSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Let people you chat with see when you're connected" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Permite que las personas con las que chateas vean cuándo estás conectado" } }
+      }
+    },
+    "chatPrivacy.onlineStatusToggleTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Show my online status" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Mostrar mi estado en línea" } }
+      }
+    },
+    "chatPrivacy.readReceiptsBothSidesBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Double ticks require both sides to allow read receipts. If either person turns them off, that chat behaves like sent-only status." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Las dobles marcas requieren que ambas partes permitan las confirmaciones de lectura. Si cualquiera las desactiva, ese chat funciona solo con estado enviado." } }
+      }
+    },
+    "chatPrivacy.readReceiptsBothSidesTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "If the other person has it off" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Si la otra persona lo tiene desactivado" } }
+      }
+    },
+    "chatPrivacy.readReceiptsIntro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Read receipts let a chat show when a message has been opened. They are optional and only show read status when both sides allow them." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Las confirmaciones de lectura permiten que un chat muestre cuándo se abrió un mensaje. Son opcionales y solo muestran el estado leído cuando ambas partes las permiten." } }
+      }
+    },
+    "chatPrivacy.readReceiptsOffBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zapp will not send read signals when you open messages, and it will not show read status from other people. Messages stay at sent instead of read." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Zapp no enviará señales de lectura cuando abras mensajes y no mostrará el estado leído de otras personas. Los mensajes permanecen como enviados en lugar de leídos." } }
+      }
+    },
+    "chatPrivacy.readReceiptsOffTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "When this is off" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando está desactivado" } }
+      }
+    },
+    "chatPrivacy.readReceiptsOnBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "When you open a conversation, Zapp can send a small read signal for messages you received. Your outgoing messages can also show a close double tick after the other app confirms they were read." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando abres una conversación, Zapp puede enviar una pequeña señal de lectura para los mensajes que recibiste. Tus mensajes enviados también pueden mostrar una doble marca cercana después de que la otra app confirme que fueron leídos." } }
+      }
+    },
+    "chatPrivacy.readReceiptsOnTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "When this is on" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado" } }
+      }
+    },
+    "chatPrivacy.readReceiptsToggleSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Send and show read status when both sides allow it" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Enviar y mostrar el estado leído cuando ambas partes lo permitan" } }
+      }
+    },
+    "chatPrivacy.readReceiptsToggleTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Allow read receipts" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Permitir confirmaciones de lectura" } }
+      }
+    },
+    "chatPrivacy.sectionControl": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Control" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Control" } }
+      }
+    },
     "chatProfile.addressShieldedCaption": {
       "extractionState": "manual",
       "localizations": {
@@ -2979,18 +3112,8 @@
     "chatProfile.presenceHint": {
       "extractionState": "manual",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Let people see when you're online."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Permite que vean cuándo estás en línea."
-          }
-        }
+        "en": { "stringUnit": { "state": "translated", "value": "Choose whether people see when you're online" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Elige si las personas ven cuándo estás en línea" } }
       }
     },
     "chatProfile.privacy": {
@@ -3064,18 +3187,8 @@
     "chatProfile.readReceiptsHint": {
       "extractionState": "manual",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Let people see when you've read their messages."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Permite que vean cuándo has leído sus mensajes."
-          }
-        }
+        "en": { "stringUnit": { "state": "translated", "value": "Control sent and read indicators for chats" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Controla los indicadores de enviado y leído en los chats" } }
       }
     },
     "chatProfile.save": {

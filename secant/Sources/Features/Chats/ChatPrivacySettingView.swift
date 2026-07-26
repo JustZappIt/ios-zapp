@@ -6,6 +6,14 @@
 import ComposableArchitecture
 import SwiftUI
 
+/// One titled explanation paragraph, mirroring the `InfoBlock` composable that both
+/// `ReadReceiptsSettingsView.kt` and `OnlineStatusSettingsView.kt` declare.
+struct ChatPrivacyInfoBlock: Identifiable {
+    let id: Int
+    let title: String
+    let body: String
+}
+
 enum ChatPrivacySetting {
     case readReceipts
     case onlineStatus
@@ -17,10 +25,68 @@ enum ChatPrivacySetting {
         }
     }
 
-    var subtitle: String {
+    /// The paragraph under the hero icon, above the explanation blocks.
+    var intro: String {
         switch self {
-        case .readReceipts: String(localizable: .chatProfileReadReceiptsHint)
-        case .onlineStatus: String(localizable: .chatProfilePresenceHint)
+        case .readReceipts: String(localizable: .chatPrivacyReadReceiptsIntro)
+        case .onlineStatus: String(localizable: .chatPrivacyOnlineStatusIntro)
+        }
+    }
+
+    var toggleTitle: String {
+        switch self {
+        case .readReceipts: String(localizable: .chatPrivacyReadReceiptsToggleTitle)
+        case .onlineStatus: String(localizable: .chatPrivacyOnlineStatusToggleTitle)
+        }
+    }
+
+    var toggleSubtitle: String {
+        switch self {
+        case .readReceipts: String(localizable: .chatPrivacyReadReceiptsToggleSubtitle)
+        case .onlineStatus: String(localizable: .chatPrivacyOnlineStatusToggleSubtitle)
+        }
+    }
+
+    /// Android shows all three blocks unconditionally — the "on"/"off" titles describe what the
+    /// setting does in each position, they are not a rendering of the current value.
+    var infoBlocks: [ChatPrivacyInfoBlock] {
+        switch self {
+        case .readReceipts:
+            [
+                ChatPrivacyInfoBlock(
+                    id: 0,
+                    title: String(localizable: .chatPrivacyReadReceiptsOnTitle),
+                    body: String(localizable: .chatPrivacyReadReceiptsOnBody)
+                ),
+                ChatPrivacyInfoBlock(
+                    id: 1,
+                    title: String(localizable: .chatPrivacyReadReceiptsOffTitle),
+                    body: String(localizable: .chatPrivacyReadReceiptsOffBody)
+                ),
+                ChatPrivacyInfoBlock(
+                    id: 2,
+                    title: String(localizable: .chatPrivacyReadReceiptsBothSidesTitle),
+                    body: String(localizable: .chatPrivacyReadReceiptsBothSidesBody)
+                )
+            ]
+        case .onlineStatus:
+            [
+                ChatPrivacyInfoBlock(
+                    id: 0,
+                    title: String(localizable: .chatPrivacyOnlineStatusOnTitle),
+                    body: String(localizable: .chatPrivacyOnlineStatusOnBody)
+                ),
+                ChatPrivacyInfoBlock(
+                    id: 1,
+                    title: String(localizable: .chatPrivacyOnlineStatusOffTitle),
+                    body: String(localizable: .chatPrivacyOnlineStatusOffBody)
+                ),
+                ChatPrivacyInfoBlock(
+                    id: 2,
+                    title: String(localizable: .chatPrivacyOnlineStatusReciprocalTitle),
+                    body: String(localizable: .chatPrivacyOnlineStatusReciprocalBody)
+                )
+            ]
         }
     }
 
@@ -34,6 +100,8 @@ enum ChatPrivacySetting {
 
 /// Android-style staged privacy setting: Back discards the draft and Save applies it.
 struct ChatPrivacySettingView: View {
+    private typealias Constants = ChatPrivacySettingConstants
+
     @Environment(\.colorScheme) private var colorScheme
 
     @Perception.Bindable var store: StoreOf<ChatProfile>
@@ -60,19 +128,23 @@ struct ChatPrivacySettingView: View {
                 ZappScreenHeader(title: setting.title)
 
                 ScrollView {
-                    ZappSettingsGroup(title: String(localizable: .chatProfilePrivacy)) {
-                        ZappToggleRow(
-                            title: setting.title,
-                            subtitle: setting.subtitle,
-                            icon: setting.icon,
-                            iconTint: .accentText,
-                            iconBackground: .accentSoft,
-                            isOn: draftValue
-                        ) {
-                            draftValue.toggle()
+                    VStack(spacing: 0) {
+                        explanation
+
+                        ZappSettingsGroup(title: String(localizable: .chatPrivacySectionControl)) {
+                            ZappToggleRow(
+                                title: setting.toggleTitle,
+                                subtitle: setting.toggleSubtitle,
+                                icon: setting.icon,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft,
+                                isOn: draftValue
+                            ) {
+                                draftValue.toggle()
+                            }
                         }
                     }
-                    .padding(.top, Design.Spacing._lg)
+                    .padding(.bottom, Design.Spacing._xl)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -89,6 +161,41 @@ struct ChatPrivacySettingView: View {
                 customDismiss: onBack
             )
         }
+    }
+
+    private var explanation: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            setting.icon
+                .zImage(width: Constants.heroIconSize, height: Constants.heroIconSize, style: ZappColors.accentText)
+                .frame(width: Constants.heroBoxSize, height: Constants.heroBoxSize)
+                .background(ZappColors.accentSoft.color(colorScheme))
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            Spacer().frame(height: Design.Spacing._xl)
+
+            Text(setting.intro)
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer().frame(height: Design.Spacing._3xl)
+
+            ForEach(setting.infoBlocks) { block in
+                Text(block.title)
+                    .zappFont(.sectionTitle, style: ZappColors.text)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer().frame(height: Design.Spacing._sm)
+
+                Text(block.body)
+                    .zappFont(.body, style: ZappColors.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer().frame(height: Constants.infoBlockSpacing)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, Constants.horizontalPadding)
+        .padding(.top, Design.Spacing._xl)
     }
 
     private var currentValue: Bool {
@@ -117,4 +224,11 @@ struct ChatPrivacySettingView: View {
 
         onBack()
     }
+}
+
+private enum ChatPrivacySettingConstants {
+    static let horizontalPadding: CGFloat = 18
+    static let infoBlockSpacing: CGFloat = 18
+    static let heroBoxSize: CGFloat = 64
+    static let heroIconSize: CGFloat = 32
 }
