@@ -38,6 +38,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         guard !_XCTIsTesting else { return true }
         walletLogger = OSLogger(logLevel: .debug, category: LoggerConstants.walletLogs)
 #endif
+        ChatPushNotifications.shared.configure(application: application)
         handleBackgroundTask()
 
         // set the default behavior for the NSDecimalNumber
@@ -46,6 +47,20 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         rootStore.send(.initialization(.appDelegate(.didFinishLaunching)))
 
         return true
+    }
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        ChatPushNotifications.shared.didRegisterForRemoteNotifications(deviceToken: deviceToken)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        ChatPushNotifications.shared.didFailToRegisterForRemoteNotifications(error)
     }
 
     func application(

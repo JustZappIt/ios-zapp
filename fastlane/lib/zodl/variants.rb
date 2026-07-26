@@ -10,17 +10,17 @@ module Zodl
       "internal" => {
         scheme: "zodl-internal", target: "zodl-internal",
         configuration: "Release-Testflight",
-        app_identifier: "co.electriccoin.secant-testnet", channel: :testflight
+        app_identifier: "xyz.justzappit.zapp.internal", channel: :testflight
       },
       "testnet" => {
         scheme: "zodl-testnet", target: "zodl-testnet",
         configuration: "Release-Testflight",
-        app_identifier: "co.ecc.zashi-testnet", channel: :testflight
+        app_identifier: "xyz.justzappit.zapp.testnet", channel: :testflight
       },
       "appstore" => {
         scheme: "zodl-AppStore", target: "zodl-production",
         configuration: "Release-AppStore",
-        app_identifier: "co.electriccoin.secant-mainnet", channel: :appstore
+        app_identifier: "xyz.justzappit.zapp", channel: :appstore
       }
     }.freeze
 

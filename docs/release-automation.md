@@ -86,7 +86,7 @@ tests; you do not need it to build or ship.
    `p2pPimlicoApiKey`. `p2pRpcBaseMainnet`, `p2pSubgraphMainnet`, and
    `p2pSponsorshipPolicyId` are optional deployment overrides.
 3. **Signing.** You must already be able to Archive and upload the app from Xcode
-   by hand (Apple Distribution certificate, automatic signing, team `RLPRR8CPQG`).
+   by hand (Apple Distribution certificate, automatic signing, team `63UVRFCV97`).
    The tooling reuses that identity; it does not manage certificates.
 
 ### C. Quick check
@@ -103,9 +103,9 @@ independent — a build number only has to beat that variant's own history.
 
 | `--variant` | Scheme | App Store Connect app | Goes to |
 |---|---|---|---|
-| `internal` | `zodl-internal` | `co.electriccoin.secant-testnet` | TestFlight |
-| `testnet` | `zodl-testnet` | `co.ecc.zashi-testnet` | TestFlight |
-| `appstore` | `zodl-AppStore` | `co.electriccoin.secant-mainnet` | App Store |
+| `internal` | `zodl-internal` | `xyz.justzappit.zapp.internal` | TestFlight |
+| `testnet` | `zodl-testnet` | `xyz.justzappit.zapp.testnet` | TestFlight |
+| `appstore` | `zodl-AppStore` | `xyz.justzappit.zapp` | App Store |
 | `internal-testnet` | — | both of the above | builds `internal` then `testnet`, running tests once |
 
 ## Everyday use — the release flow

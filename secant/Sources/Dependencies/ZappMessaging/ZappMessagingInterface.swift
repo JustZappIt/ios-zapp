@@ -254,6 +254,7 @@ struct ZappMessagingClient {
         Empty().eraseToAnyPublisher()
     }
     var refreshConversations: @Sendable () async throws -> Void
+    var syncPushNotifications: @Sendable () async -> Void
 
     /// Full live transport diagnostics used by the network status sheet.
     var connectionDetails: @Sendable () async throws -> ZMConnectionDetails
