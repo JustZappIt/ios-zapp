@@ -15,6 +15,12 @@
 		5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B1 /* ZappMessaging */; };
 		5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B2 /* ZappMessaging */; };
 		5A99EE0000000000000000C3 /* ZappMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5A99EE0000000000000000B3 /* ZappMessaging */; };
+		5AFB0000000000000000D0 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000B0 /* FirebaseCore */; };
+		5AFB0000000000000000D1 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000B1 /* FirebaseCore */; };
+		5AFB0000000000000000D2 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000B2 /* FirebaseCore */; };
+		5AFB0000000000000000E0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000C0 /* FirebaseMessaging */; };
+		5AFB0000000000000000E1 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000C1 /* FirebaseMessaging */; };
+		5AFB0000000000000000E2 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5AFB0000000000000000C2 /* FirebaseMessaging */; };
 		348ECAA02FD5D95200BF9FE4 /* ZcashLightClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 348ECA9F2FD5D95200BF9FE4 /* ZcashLightClientKit */; };
 		34AA77182F857DB300D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77172F857DB300D244E2 /* ComposableArchitecture */; };
 		34AA771A2F857DB800D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77192F857DB800D244E2 /* ComposableArchitecture */; };
@@ -149,6 +155,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFB0000000000000000D2 /* FirebaseCore in Frameworks */,
+				5AFB0000000000000000E2 /* FirebaseMessaging in Frameworks */,
 				5AFFAA0000000000000000C1 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C1 /* ZappMessaging in Frameworks */,
 				34AA77832F8582F100D244E2 /* ZcashPaymentURI in Frameworks */,
@@ -172,6 +180,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFB0000000000000000D0 /* FirebaseCore in Frameworks */,
+				5AFB0000000000000000E0 /* FirebaseMessaging in Frameworks */,
 				5AFFAA0000000000000000C2 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C2 /* ZappMessaging in Frameworks */,
 				34AA777F2F8582E600D244E2 /* ZcashPaymentURI in Frameworks */,
@@ -195,6 +205,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AFB0000000000000000D1 /* FirebaseCore in Frameworks */,
+				5AFB0000000000000000E1 /* FirebaseMessaging in Frameworks */,
 				5AFFAA0000000000000000C3 /* ZappOfframp.xcframework in Frameworks */,
 				5A99EE0000000000000000C3 /* ZappMessaging in Frameworks */,
 				9E4841532F869F5F00D0649B /* ZcashLightClientKit in Frameworks */,
@@ -288,6 +300,7 @@
 			buildPhases = (
 				5A99EE100000000000000001 /* Validate zappMessaging artifacts */,
 				3463CACE2FD8549600A2AE50 /* Validate PartnerKeys.plist */,
+				5AFB100000000000000001 /* Embed Firebase config */,
 				9E41FFA32CB2814500783CFD /* Swiftgen */,
 				9E41FFA42CB2814500783CFD /* SwiftLint */,
 				9E41FFA52CB2814500783CFD /* Sources */,
@@ -304,6 +317,8 @@
 			);
 			name = "zodl-testnet";
 			packageProductDependencies = (
+				5AFB0000000000000000B2 /* FirebaseCore */,
+				5AFB0000000000000000C2 /* FirebaseMessaging */,
 				5A99EE0000000000000000B1 /* ZappMessaging */,
 				5A99EE0000000000000000B0 /* ZappMessaging */,
 				34AA771B2F857DBB00D244E2 /* ComposableArchitecture */,
@@ -331,6 +346,7 @@
 			buildPhases = (
 				5A99EE100000000000000002 /* Validate zappMessaging artifacts */,
 				3463CACD2FD8548500A2AE50 /* Validate PartnerKeys.plist */,
+				5AFB100000000000000002 /* Embed Firebase config */,
 				9E4AB29F2BA1BEE900F5D6DB /* Swiftgen */,
 				9E4AB2A02BA1BEE900F5D6DB /* SwiftLint */,
 				9E4AB2A12BA1BEE900F5D6DB /* Sources */,
@@ -347,6 +363,8 @@
 			);
 			name = "zodl-production";
 			packageProductDependencies = (
+				5AFB0000000000000000B0 /* FirebaseCore */,
+				5AFB0000000000000000C0 /* FirebaseMessaging */,
 				5A99EE0000000000000000B2 /* ZappMessaging */,
 				34AA77172F857DB300D244E2 /* ComposableArchitecture */,
 				34AA77262F857E2F00D244E2 /* XCTestDynamicOverlay */,
@@ -373,6 +391,7 @@
 			buildPhases = (
 				5A99EE100000000000000003 /* Validate zappMessaging artifacts */,
 				3463CACC2FD8544800A2AE50 /* Validate PartnerKeys.plist */,
+				5AFB100000000000000003 /* Embed Firebase config */,
 				9E5AB46A2C94777800065483 /* Swiftgen */,
 				9E5AB46B2C94777800065483 /* SwiftLint */,
 				9E5AB46C2C94777800065483 /* Sources */,
@@ -389,6 +408,8 @@
 			);
 			name = "zodl-internal";
 			packageProductDependencies = (
+				5AFB0000000000000000B1 /* FirebaseCore */,
+				5AFB0000000000000000C1 /* FirebaseMessaging */,
 				5A99EE0000000000000000B3 /* ZappMessaging */,
 				34AA77192F857DB800D244E2 /* ComposableArchitecture */,
 				34AA77282F857E3400D244E2 /* XCTestDynamicOverlay */,
@@ -437,6 +458,7 @@
 			mainGroup = 0D4E79FC26B364170058B01E;
 			packageReferences = (
 				5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */,
+				5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */,
 				34AA772C2F8580B800D244E2 /* XCRemoteSwiftPackageReference "swift-case-paths" */,
@@ -609,6 +631,63 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Scripts/validate-partner-keys.sh\"\n";
+		};
+		5AFB100000000000000001 /* Embed Firebase config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Firebase config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/embed-firebase-config.sh\"\n";
+		};
+		5AFB100000000000000002 /* Embed Firebase config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Firebase config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/embed-firebase-config.sh\"\n";
+		};
+		5AFB100000000000000003 /* Embed Firebase config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Firebase config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/Scripts/embed-firebase-config.sh\"\n";
 		};
 		9E41FFA32CB2814500783CFD /* Swiftgen */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -907,7 +986,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -933,7 +1012,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = zodlTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -959,7 +1038,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -988,7 +1067,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1017,7 +1096,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1047,7 +1126,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1086,7 +1165,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1180,7 +1259,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = zodlTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1205,7 +1284,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1245,7 +1324,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1274,7 +1353,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1303,7 +1382,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"secant/Preview Content\"";
-				DEVELOPMENT_TEAM = RLPRR8CPQG;
+				DEVELOPMENT_TEAM = 63UVRFCV97;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -1386,6 +1465,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
 		34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -1522,6 +1609,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */;
 			productName = ZappMessaging;
+		};
+		5AFB0000000000000000B0 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		5AFB0000000000000000B1 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		5AFB0000000000000000B2 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		5AFB0000000000000000C0 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		5AFB0000000000000000C1 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		5AFB0000000000000000C2 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		348ECA9F2FD5D95200BF9FE4 /* ZcashLightClientKit */ = {
 			isa = XCSwiftPackageProductDependency;

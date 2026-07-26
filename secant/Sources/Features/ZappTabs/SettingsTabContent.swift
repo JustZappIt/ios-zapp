@@ -60,6 +60,26 @@ struct SettingsTabContent: View {
                         }
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
+                            ZappToggleRow(
+                                title: String(
+                                    localized: "chat.notifications.background.title",
+                                    defaultValue: "Background chat alerts"
+                                ),
+                                subtitle: String(
+                                    localized: "chat.notifications.background.subtitle",
+                                    defaultValue: "Get a private alert when a direct message arrives"
+                                ),
+                                icon: Asset.Assets.Icons.messageChat.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft,
+                                isOn: chatProfileStore.backgroundNotificationsEnabled,
+                                isEnabled: !chatProfileStore.isBackgroundNotificationsBusy
+                            ) {
+                                chatProfileStore.send(.backgroundNotificationsToggled)
+                            }
+
+                            ZappRowDivider(inset: true)
+
                             ZappRow(
                                 title: String(localizable: .settingsYouTorTitle),
                                 subtitle: String(localizable: .settingsYouTorSubtitle),

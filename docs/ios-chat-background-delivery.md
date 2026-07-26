@@ -1,115 +1,64 @@
-# iOS chat background-delivery design
+# iOS chat notification delivery
 
-## Status and parity target
+## Implemented alert-doorbell path
 
-Foreground/cold-open delivery and sender durability can be implemented entirely
-in the app and `zappMessaging`. True background delivery cannot: APNs has no
-client-side equivalent of Firebase topic subscription, so an authenticated
-provider must map device tokens to opaque Hypercore topics and send the APNs
-doorbell. No production provider URL, authentication scheme, APNs key, bundle
-environment, retention policy, or user opt-in decision exists in this checkout.
-
-Until those choices are supplied, iOS parity is:
-
-- the same authoritative encrypted Hypercore data as Android;
-- local Hypercore append before a send reports success;
-- deterministic resume and pull when the app becomes active;
-- no claim of background notification parity.
-
-This deliberately stops short of registering for remote notifications: doing so
-without a working reconciliation backend creates a misleading permission prompt
-and a token that cannot receive a chat doorbell.
-
-## Proposed routing model
-
-The SDK remains the only component that derives inbound topics. After identity
-and conversations hydrate, the app reads the complete `getPushTopicSnapshot()`
-and reconciles it with a Zapp-operated registration service:
+The existing blind-push gateway already sends one proof-backed Firebase message
+to an opaque topic with both Android and APNs alert payloads. Firebase Cloud
+Messaging maps each Apple installation to APNs and supports the same client-side
+topic subscriptions used by Android. A separate token-registration provider is
+therefore not required for the first iOS alert-doorbell release.
 
 ```text
-iOS app -- device token + opaque topic set --> registration service
-blind peer -- proof-backed topic doorbell --> registration service --> APNs
-iOS app <-- contentless, signed/versioned topic hint -------------------
+zappMessaging derives opaque inbound topics
+        |
+iOS Firebase installation subscribes to the complete hydrated topic set
+        |
+blind peer -> blind-push gateway -> FCM -> APNs -> generic visible alert
+        |
+user opens Zapp -> authoritative encrypted Hypercore replication
 ```
 
-The provider stores an installation-scoped token and opaque topic membership,
-not identity keys, contact names, conversation IDs, message content, or media.
-Registration requests must be authenticated with a per-install key and protected
-against replay. The blind peer/provider boundary must accept a doorbell only
-after verifying the proof for the appended block, matching the current SDK
-`sendNotification(core,index)` boundary.
+The app:
 
-APNs payloads contain only a schema version, an opaque topic digest, a random
-doorbell ID, and `content-available: 1`. They never contain message text,
-participant identity, conversation ID, or a block. A topic is an untrusted hint;
-the app ignores topics absent from its latest local snapshot and never constructs
-a chat message from notification data.
+- configures Firebase only when a matching `GoogleService-Info.plist` is embedded;
+- asks for notification permission only after explicit user opt-in;
+- passes the APNs device token to Firebase Messaging;
+- subscribes only to `ready` conversations from a complete hydrated push-topic
+  snapshot;
+- reconciles on topic changes and FCM token rotation;
+- removes subscriptions when notifications are disabled or wallet data is
+  cleared; and
+- displays only the gateway's generic alert. Notification data is never treated
+  as a chat message.
 
-## Device behavior
+Full topics, device tokens, identity keys, contact names, conversation IDs, and
+message content must not be logged. Local routing is removed before a remote
+unsubscribe so a delayed stale doorbell is not considered current.
 
-For an allowed silent wake, the app starts or resumes messaging, waits within a
-strict background budget for authoritative encrypted replication, persists new
-rows, and posts one generic local notification such as “New chat activity.” It
-then suspends only if the application is still backgrounded. If the pull cannot
-finish before expiration, it records a retryable diagnostic and may post the
-same generic notification so opening the app completes the pull. Foreground
-doorbells trigger reconciliation but no duplicate local notification.
+## What the first release does not claim
 
-Doorbell IDs and the newest observed per-topic cursor are retained in a bounded,
-expiring store to suppress duplicate notifications. APNs collapse IDs may reduce
-wakes but are not correctness state. All execution is bounded; no keepalive,
-background socket, or iOS analogue of Android FOSS `ChatWakeService` is proposed.
+The current gateway payload is an APNs `alert`, not a silent
+`content-available` wake. It tells the user there may be new private activity;
+opening or foregrounding Zapp performs the authoritative pull. It does not
+guarantee that encrypted message data is downloaded before the alert appears.
 
-## Reconciliation and privacy rules
+True silent background ingestion remains a separate future feature. It requires
+a background payload and bounded iOS wake handler, has opportunistic execution
+and throttling limits, and cannot run after a user force-quits the app. A
+doorbell is never message transport or proof of message delivery.
 
-- Reconcile only a complete snapshot with `hydrated == true`. An incomplete
-  snapshot may add nothing and must never remove server subscriptions.
-- Atomically publish the new local routing set before remote additions, and
-  remove local routing before remote unsubscribe. A delayed stale hint is then
-  ignored.
-- Reconcile on token rotation, identity restore, reinstall, conversation add or
-  removal, explicit leave/block, push-topic change, and notification opt-in
-  change. Deleting a wallet removes the installation and every topic.
-- Blocked-sender filtering occurs against authoritative local conversation data
-  after pull. Payloads and logs never expose full topics, tokens, keys, content,
-  or identities; diagnostics use short non-reversible hashes.
-- User notification authorization and background delivery are explicit product
-  choices. Disabling either removes provider subscriptions and the local routing
-  map.
+## Required external configuration
 
-## Platform limits
+1. Enable Push Notifications for the Apple App ID matching each bundle.
+2. Create an APNs authentication key and keep the downloaded `.p8` outside the
+   repository.
+3. Upload that key in Firebase Cloud Messaging with its Apple Key ID and Team ID.
+4. Use a provisioning profile containing the Push Notifications entitlement.
+5. Deploy the blind-push gateway with the same Firebase project and the matching
+   production `apnsTopic`.
+6. Verify end to end on a physical iPhone; a simulator build is not an APNs
+   delivery test.
 
-- A user force-quit prevents silent-push launch until they manually reopen the
-  app. Delivery then occurs through the normal persisted-cursor catch-up path.
-- `AfterFirstUnlockThisDeviceOnly` data is available while locked after the first
-  unlock. Before the first unlock following reboot, the wake records no secret,
-  performs no pull, and falls back to delivery after unlock/open. Key protection
-  must not be weakened to avoid this limit.
-- APNs background execution is opportunistic and can be throttled. A doorbell is
-  neither message transport nor proof of delivery.
-
-## Required tests
-
-Provider contract tests cover token rotation, complete-set reconciliation,
-removal, replay, forged topics, and retention. iOS tests cover disabled
-notifications, blocked sender, duplicate doorbell, foreground suppression,
-expiration, pre-first-unlock, force-quit documentation, and wallet deletion.
-Device verification must include a backgrounded receiver, an offline sender,
-authoritative pull, a generic notification, and opening directly to the already
-persisted message.
-
-## External decisions required to implement
-
-1. Production/staging registration-service URLs and ownership.
-2. Installation authentication and abuse/rate-limit policy.
-3. APNs team/key IDs, signing-key custody, bundle/environment mapping, and CI
-   secret provisioning.
-4. Topic/token retention and deletion SLA.
-5. Whether notification permission and background delivery are opt-in, plus the
-   exact generic fallback copy.
-6. Whether the existing blind-push gateway will route both FCM topics and APNs
-   installations, or a separate provider will consume proof-backed doorbells.
-
-Implementation of APNs registration and wake handling is blocked until these are
-resolved; inventing defaults would not create a deployable or testable parity
-path.
+Production currently uses `xyz.justzappit.zapp`. Internal and testnet require
+their own Firebase config files and matching gateway APNs topics before their
+notifications are enabled.
