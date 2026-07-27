@@ -108,21 +108,34 @@ struct ChatsListView: View {
                             unreadCount: store.state.messagingState.unreadCount(for: conversation.id),
                             action: tap
                         )
+                        // Long-press peeks the conversation before committing to open it
+                        // (Appendix C.1). The peek is built from list data only — no room is
+                        // opened and no message stream is subscribed to.
                         .contextMenu {
                             Button(String(localizable: .chatListLeaveAction), role: .destructive) {
                                 store.send(.leaveConversationRequested(conversation.id))
                             }
+                        } preview: {
+                            ChatConversationPreviewCard(
+                                conversation: conversation,
+                                displayName: store.state.displayName(for: conversation),
+                                isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
+                                unreadCount: store.state.messagingState.unreadCount(for: conversation.id)
+                            )
                         }
                     }
 
-                    if conversation.id != store.sortedConversations.last?.id {
-                        ZappRowDivider(inset: true)
-                    }
+                    // Emitted after EVERY row, including the last — Android's list does the same
+                    // (`ZappRowDivider(inset = true)` inside its `items` block), leaving a hairline
+                    // above the bottom clearance rather than ending the list on a bare row.
+                    ZappRowDivider(inset: true)
                 }
             }
             .padding(.top, Design.Spacing._xs)
             .padding(.bottom, ZappNavBar.clearance)
+            .zappScrollShadowSource()
         }
+        .zappScrollEdges()
     }
 
     private var emptyState: some View {

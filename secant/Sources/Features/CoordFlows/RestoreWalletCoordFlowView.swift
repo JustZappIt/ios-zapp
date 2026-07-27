@@ -781,6 +781,14 @@ private struct ZappOnboardingSeedBackupView: View {
                         seedGrid
                             .padding(.top, 20)
 
+                        if store.isBlockedByScreenCapture {
+                            Text(localizable: .onboardingSeedScreenRecording)
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, 12)
+                        }
+
                         confirmation
                             .padding(.top, 16)
                     }

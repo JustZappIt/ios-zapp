@@ -560,6 +560,76 @@ import Testing
         #expect(store.state.secretFailed)
     }
 
+    // MARK: Screen recording already in progress
+
+    /// `capturedDidChange` only fires on a TRANSITION, so a recording that was already running
+    /// when the profile opened never produced one. The reveal has to refuse outright, BEFORE the
+    /// app-lock gate — authenticating into a secret that is being filmed is the whole bug.
+    @MainActor @Test func anAlreadyRunningRecordingRefusesTheSeedRevealWithoutAuthenticating() async {
+        let spy = ExportSpy()
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .none }
+            $0.screenCapture.isCaptured = { true }
+            $0.walletStorage.exportWallet = {
+                spy.record()
+                return self.storedWallet()
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.seedPhraseTapped)
+
+        #expect(spy.invocations == 0)
+        #expect(store.state.seedWords.isEmpty)
+        #expect(!store.state.showsSeedDialog)
+        #expect(store.state.pendingSecret == nil)
+        #expect(store.state.secretBlockedByCapture)
+    }
+
+    /// The P2P key goes through the same `beginReveal`, so it must refuse identically.
+    @MainActor @Test func anAlreadyRunningRecordingRefusesTheP2pKeyReveal() async {
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .biometric }
+            $0.screenCapture.isCaptured = { true }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.p2pKeyTapped)
+
+        #expect(store.state.p2pKey == nil)
+        #expect(!store.state.isAwaitingBiometric)
+        #expect(store.state.secretBlockedByCapture)
+    }
+
+    /// The refusal is not sticky: stopping the recording and asking again must go through.
+    @MainActor @Test func theRefusalClearsOnceTheRecordingStops() async {
+        let isRecording = LockIsolated(true)
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .none }
+            $0.screenCapture.isCaptured = { isRecording.value }
+            $0.walletStorage.exportWallet = { self.storedWallet() }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.seedPhraseTapped)
+        #expect(store.state.secretBlockedByCapture)
+
+        isRecording.setValue(false)
+
+        await store.send(.seedPhraseTapped)
+        await store.receive(\.secretUnlocked)
+        await store.receive(\.seedLoaded)
+
+        #expect(!store.state.secretBlockedByCapture)
+        #expect(store.state.seedWords.count == 24)
+    }
+
     // MARK: Hide on backgrounding
 
     /// `hideSensitiveContent` is what `willResignActive`, `didEnterBackground`, a screen

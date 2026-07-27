@@ -91,6 +91,10 @@ struct ChatProfile {
         var didCopyP2PKey = false
         var secretFailed = false
 
+        /// The reveal was refused because the screen was ALREADY being recorded when it was asked
+        /// for. Distinct from `secretFailed`, which means the secret could not be read.
+        var secretBlockedByCapture = false
+
         @Presents var alert: AlertState<Action>?
 
         struct PINEntry: Equatable {
@@ -183,6 +187,7 @@ struct ChatProfile {
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.offramp) var offramp
     @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.screenCapture) var screenCapture
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.zappMessaging) var zappMessaging
 

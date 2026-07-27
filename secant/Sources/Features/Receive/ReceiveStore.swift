@@ -15,11 +15,8 @@ struct Receive {
     @Reducer
     enum Path {
         case addressDetails(AddressDetails)
-        case requestZec(RequestZec)
-        case requestZecSummary(RequestZec)
-        case zecKeyboard(ZecKeyboard)
     }
-    
+
     @ObservableState
     struct State {
         enum AddressType {
@@ -36,8 +33,9 @@ struct Receive {
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         @Shared(.inMemory(.toast)) var toast: Toast.Edge? = nil
 
-        var requestZecState = RequestZec.State.initial
-        
+        /// The Request chain, presented as a slide-up rather than pushed. See `ReceiveRequestFlow`.
+        @Presents var requestFlow: ReceiveRequestFlow.State?
+
         var unifiedAddress: String {
             selectedWalletAccount?.privateUnifiedAddress ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
         }
@@ -59,6 +57,7 @@ struct Receive {
         case copyToPastboard(RedactableString)
         case infoTapped(Bool)
         case path(StackActionOf<Path>)
+        case requestFlow(PresentationAction<ReceiveRequestFlow.Action>)
         case requestTapped(RedactableString, Bool)
         case updateCurrentFocus(State.AddressType)
     }
@@ -85,7 +84,10 @@ struct Receive {
 
             case .requestTapped:
                 return .none
-                
+
+            case .requestFlow:
+                return .none
+
             case .updateCurrentFocus(let newFocus):
                 state.currentFocus = newFocus
                 return .none
@@ -100,5 +102,8 @@ struct Receive {
             }
         }
         .forEach(\.path, action: \.path)
+        .ifLet(\.$requestFlow, action: \.requestFlow) {
+            ReceiveRequestFlow()
+        }
     }
 }

@@ -145,6 +145,7 @@ extension ChatProfile {
             case .secretUnlocked(let target):
                 state.pendingSecret = nil
                 state.secretFailed = false
+                state.secretBlockedByCapture = false
 
                 switch target {
                 case .seedPhrase:
@@ -237,6 +238,15 @@ extension ChatProfile {
         guard state.pendingSecret == nil, !state.isShowingSecret else { return .none }
 
         state.secretFailed = false
+        state.secretBlockedByCapture = false
+
+        // `capturedDidChange` only fires on a TRANSITION, so a recording that was already
+        // running when the profile opened never produced one. Ask outright before the gate:
+        // there is no point authenticating into a secret that is being filmed.
+        guard !screenCapture.isCaptured() else {
+            state.secretBlockedByCapture = true
+            return .none
+        }
 
         switch appSecurity.authenticationMethod() {
         case .biometric:
@@ -263,6 +273,7 @@ extension ChatProfile {
         state.didCopyP2PAddress = false
         state.didCopyP2PKey = false
         state.secretFailed = false
+        state.secretBlockedByCapture = false
 
         // The gate itself survives its own biometric sheet — that sheet resigns the app active,
         // and cancelling here would strand a successful Face ID with nothing left to unlock.

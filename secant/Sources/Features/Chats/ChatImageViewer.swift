@@ -11,6 +11,7 @@
 //  thumbnail, else nothing.
 //
 
+import ComposableArchitecture
 import SwiftUI
 import UIKit
 import ZappMessaging
@@ -19,15 +20,26 @@ struct ChatImageViewer: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private enum Constants {
-        static let closeIcon: CGFloat = 20
-        static let closeTarget: CGFloat = 44
+        static let actionIcon: CGFloat = 20
+        static let actionTarget: CGFloat = 44
+        static let actionSpacing: CGFloat = 8
         /// Fullscreen wants far more pixels than the 280pt bubble; still bounded so a huge
         /// photo cannot pin an unbounded bitmap.
         static let decodeMaxPixel: CGFloat = 2400
         static let dismissDistance: CGFloat = 120
         static let dismissFadeDistance: CGFloat = 400
         static let minBackgroundOpacity: CGFloat = 0.4
+        static let confirmationSeconds: UInt64 = 2
     }
+
+    /// What the save button last did, driving both its glyph and the line under it.
+    private enum SaveOutcome: Equatable {
+        case saving
+        case saved
+        case failed
+    }
+
+    @Dependency(\.photoLibrary) private var photoLibrary
 
     let message: ZMMessage
     let onDismiss: () -> Void
@@ -36,6 +48,7 @@ struct ChatImageViewer: View {
     @State private var didFail = false
     @State private var dragOffset: CGSize = .zero
     @State private var zoomScale: CGFloat = 1
+    @State private var saveOutcome: SaveOutcome?
 
     var body: some View {
         ZStack {
@@ -46,7 +59,7 @@ struct ChatImageViewer: View {
             content
                 .offset(dragOffset)
 
-            closeButton
+            actionBar
         }
         // A drag only dismisses at rest: once zoomed in, the pan belongs to the image.
         .gesture(zoomScale <= 1 ? dismissDrag : nil)
@@ -69,27 +82,104 @@ struct ChatImageViewer: View {
         }
     }
 
-    private var closeButton: some View {
-        VStack {
-            HStack {
+    /// Save then close, top-trailing — the same order and the same 44pt targets as Android's
+    /// `Row(Alignment.TopEnd)`. Save is offered only when the real file is on disk; a
+    /// thumbnail-only message has nothing worth writing to the library, which is exactly the
+    /// `mediaLocalPath != null && exists()` condition Android gates its button on.
+    private var actionBar: some View {
+        VStack(alignment: .trailing, spacing: Design.Spacing._xs) {
+            HStack(spacing: Constants.actionSpacing) {
                 Spacer()
 
-                Button(action: onDismiss) {
-                    Asset.Assets.Icons.xClose.image
-                        .resizable()
-                        .renderingMode(.template)
-                        .scaledToFit()
-                        .frame(width: Constants.closeIcon, height: Constants.closeIcon)
-                        .foregroundColor(.white)
-                        .frame(width: Constants.closeTarget, height: Constants.closeTarget)
+                if savableFileURL != nil {
+                    actionButton(
+                        icon: saveOutcome == .saved
+                            ? Asset.Assets.Icons.checkSolid.image
+                            : Asset.Assets.Icons.save.image,
+                        tint: saveOutcome == .saved ? ZappColors.success.color(colorScheme) : .white,
+                        label: String(localizable: .chatRoomImageViewerSave),
+                        action: save
+                    )
+                    .disabled(saveOutcome == .saving)
                 }
-                .buttonStyle(.zappPress)
-                .accessibilityLabel(String(localizable: .generalClose))
+
+                actionButton(
+                    icon: Asset.Assets.Icons.xClose.image,
+                    tint: .white,
+                    label: String(localizable: .generalClose),
+                    action: onDismiss
+                )
+            }
+
+            if let confirmation {
+                Text(confirmation)
+                    .zappFont(.caption, style: ZappColors.onAccent)
+                    .padding(.horizontal, Design.Spacing._md)
+                    .padding(.vertical, Design.Spacing._xs)
+                    .background(ZappColors.overlay.color(colorScheme))
+                    .transition(.opacity)
             }
 
             Spacer()
         }
         .padding(Design.Spacing._lg)
+        .animation(ZappMotion.content, value: saveOutcome)
+    }
+
+    private func actionButton(
+        icon: Image,
+        tint: Color,
+        label: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            icon
+                .resizable()
+                .renderingMode(.template)
+                .scaledToFit()
+                .frame(width: Constants.actionIcon, height: Constants.actionIcon)
+                .foregroundColor(tint)
+                .frame(width: Constants.actionTarget, height: Constants.actionTarget)
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(label)
+    }
+
+    /// The line Android shows as a Toast. It cannot be a `Toast` here: the viewer is a
+    /// `fullScreenCover`, and the app's toast overlay lives on `RootView`, underneath it.
+    private var confirmation: String? {
+        switch saveOutcome {
+        case .saved: return String(localizable: .chatRoomImageViewerSaved)
+        case .failed: return String(localizable: .chatRoomImageViewerSaveFailed)
+        case .saving, .none: return nil
+        }
+    }
+
+    private var savableFileURL: URL? {
+        guard let path = message.mediaLocalPath, FileManager.default.fileExists(atPath: path) else {
+            return nil
+        }
+
+        return URL(fileURLWithPath: path)
+    }
+
+    private func save() {
+        guard let url = savableFileURL, saveOutcome != .saving else { return }
+
+        saveOutcome = .saving
+
+        Task {
+            do {
+                try await photoLibrary.saveImage(url)
+                saveOutcome = .saved
+            } catch {
+                LoggerProxy.error("ChatImageViewer: save to photo library failed")
+                saveOutcome = .failed
+            }
+
+            try? await Task.sleep(nanoseconds: Constants.confirmationSeconds * 1_000_000_000)
+            saveOutcome = nil
+        }
     }
 
     private var dismissDrag: some Gesture {

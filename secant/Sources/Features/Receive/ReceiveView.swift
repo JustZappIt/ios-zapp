@@ -50,15 +50,16 @@ struct ReceiveView: View {
                 switch store.case {
                 case let .addressDetails(store):
                     AddressDetailsView(store: store)
-                case let .requestZec(store):
-                    RequestZecView(store: store, tokenName: tokenName)
-                case let .requestZecSummary(store):
-                    RequestZecSummaryView(store: store, tokenName: tokenName)
-                case let .zecKeyboard(store):
-                    ZecKeyboardView(store: store, tokenName: tokenName)
                 }
             }
             .navigationBarHidden(true)
+            // Rises from the bottom and drops back down, matching Android's
+            // `sheetEnterTransition` for its `REQUEST` route. Receive itself stays a push.
+            .fullScreenCover(item: $store.scope(state: \.requestFlow, action: \.requestFlow)) { flowStore in
+                WithPerceptionTracking {
+                    ReceiveRequestFlowView(store: flowStore, tokenName: tokenName)
+                }
+            }
         }
     }
 

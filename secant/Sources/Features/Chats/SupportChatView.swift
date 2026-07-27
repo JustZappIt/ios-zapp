@@ -109,12 +109,7 @@ struct SupportChatView: View {
     @ViewBuilder
     private var failureBanner: some View {
         if store.sendDidFail {
-            Text(store.sendFailureMessage ?? String(localizable: .chatRoomSendFailed))
-                .zappFont(.caption, style: ZappColors.danger)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Design.Spacing._xl)
-                .padding(.top, Design.Spacing._md)
-                .background(ZappColors.surface.color(colorScheme))
+            ChatSendFailureBanner(message: store.sendFailureMessage)
         }
     }
 

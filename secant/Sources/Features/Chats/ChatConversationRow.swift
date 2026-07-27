@@ -120,13 +120,121 @@ struct ChatConversationRow: View {
     }
 
     private var preview: String {
-        guard let lastMessage = conversation.lastMessage else {
-            return String(localizable: .chatListNoMessages)
+        ChatPreviewSentinel.previewText(for: conversation)
+    }
+}
+
+/// The iOS "peek" shown while long-pressing a chat row — Appendix C.1, approved for this phase.
+///
+/// iOS-only: Android's list has no equivalent affordance, so there is nothing to match pixel for
+/// pixel. It is built from the data the list already holds (`ZMConversation`), never by loading the
+/// room — a peek must not open a conversation stream the user has not committed to.
+struct ChatConversationPreviewCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let width: CGFloat = 300
+        static let avatarSize: CGFloat = 40
+        static let avatarIconSize: CGFloat = 18
+        static let presenceSize: CGFloat = 8
+        static let presenceBorder: CGFloat = 2
+        static let accentBarWidth: CGFloat = 3
+        static let messageMinHeight: CGFloat = 64
+    }
+
+    let conversation: ZMConversation
+    let displayName: String
+    var isPeerOnline = false
+    var unreadCount = 0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            header
+
+            Rectangle()
+                .fill(ZappColors.border.color(colorScheme))
+                .frame(height: 1)
+
+            message
+        }
+        .frame(width: Constants.width, alignment: .leading)
+        .background(ZappColors.surface.color(colorScheme))
+    }
+
+    private var header: some View {
+        HStack(spacing: Design.Spacing._lg) {
+            ZStack(alignment: .bottomTrailing) {
+                ZStack { avatarContent }
+                    .frame(width: Constants.avatarSize, height: Constants.avatarSize)
+                    .background(ZappColors.accent.color(colorScheme))
+
+                if isPeerOnline && conversation.type == .direct {
+                    Rectangle()
+                        .fill(ZappColors.success.color(colorScheme))
+                        .frame(width: Constants.presenceSize, height: Constants.presenceSize)
+                        .padding(Constants.presenceBorder)
+                        .background(ZappColors.surface.color(colorScheme))
+                }
+            }
+
+            VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                Text(displayName)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .zappFont(.caption, style: ZappColors.textSubtle)
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(Design.Spacing._lg)
+    }
+
+    /// The accent rule on the leading edge is the same device the Receive warning and the
+    /// transaction rows use to mark quoted content — no bubble, no rounded corner.
+    private var message: some View {
+        HStack(alignment: .top, spacing: Design.Spacing._md) {
+            Rectangle()
+                .fill(ZappColors.accent.color(colorScheme))
+                .frame(width: Constants.accentBarWidth)
+
+            Text(ChatPreviewSentinel.previewText(for: conversation))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .lineLimit(4)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(Design.Spacing._lg)
+        .frame(minHeight: Constants.messageMinHeight, alignment: .top)
+    }
+
+    private var subtitle: String? {
+        if unreadCount > 0 {
+            return String(localizable: .chatListPreviewUnread(String(unreadCount)))
         }
 
-        return ChatPreviewSentinel.label(for: lastMessage)
-            ?? ChatPreviewSentinel.jsonLabel(for: lastMessage)
-            ?? lastMessage
+        return conversation.lastMessageTimestamp.map { ChatRelativeTime.label(for: $0) }
+    }
+
+    @ViewBuilder
+    private var avatarContent: some View {
+        let initials = displayName.zappInitials
+
+        if conversation.type == .group {
+            Asset.Assets.Icons.users.image
+                .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)
+        } else if initials.trimmingCharacters(in: .whitespaces).isEmpty {
+            Asset.Assets.Icons.user.image
+                .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)
+        } else {
+            Text(initials)
+                .zappFont(.rowTitle, style: ZappColors.onAccent)
+        }
     }
 }
 
@@ -134,6 +242,16 @@ struct ChatConversationRow: View {
 /// `ChatConversationsRepository`'s sentinels one-for-one: every content type gets its own label
 /// rather than collapsing into a single "Photo".
 enum ChatPreviewSentinel {
+    /// The one place a conversation turns into a human-readable last line, shared by the row and
+    /// its context-menu peek so the two can never disagree.
+    static func previewText(for conversation: ZMConversation) -> String {
+        guard let lastMessage = conversation.lastMessage else {
+            return String(localizable: .chatListNoMessages)
+        }
+
+        return label(for: lastMessage) ?? jsonLabel(for: lastMessage) ?? lastMessage
+    }
+
     static func label(for lastMessage: String) -> String? {
         switch lastMessage {
         case "[Media]": return String(localizable: .chatListMediaPlaceholder)

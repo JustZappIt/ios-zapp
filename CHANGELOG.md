@@ -7,6 +7,8 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-1] A photo opened full screen in a chat can now be saved to your photo library, from a save button next to the close button. Zapp asks for permission to add photos the first time, saves the original file rather than a re-compressed copy, and confirms with "Image saved" (or tells you if it couldn't). The button only appears once the photo has finished downloading.
+- [ZAPP-1] Long-pressing a conversation in the Chats list now peeks at it before you commit to opening it, showing the name, when it was last active or how many messages are unread, and the last thing that was said — alongside the existing Leave action.
 - [ZAPP-1] Send and Swap are now one screen. Whichever way you get there — the Pay tab's Send or Swap action, Send ZEC or a payment request in a chat, tapping a shared address, scanning a QR code, or "send again" from a transaction — you land on the same Send screen, with the recipient already filled in where Zapp knows it. An asset selector sits in the middle of the form: leave it on ZEC to send ZEC, or pick Bitcoin, Ethereum, USDC or any other supported token and the same screen becomes a swap, adding the estimated amount they'll receive and a slippage control. Switching asset clears the recipient (an address for one chain is meaningless on another) but keeps the amount you'd already typed. If you opened the screen from a chat and then switch it to a swap, the person you were chatting with is no longer told you paid them — that ZEC goes to the swap provider, not to them, and any payment request they sent stays unpaid.
 - [ZAPP-1] The Send screen now has a single amount field with an "≈" line underneath showing the same amount in your other currency, and a button to swap which one you type in — replacing the two side-by-side amount boxes.
 - [ZAPP-1] With an empty wallet, or when the amount is more than you can spend, the Send screen's button becomes "Top Up" and takes you to the bridge-funds screen, with a line explaining you can top up from an exchange or another wallet.
@@ -42,6 +44,10 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] When syncing runs into trouble, the sync status on the Pay screen is now tappable and opens a troubleshooting sheet offering Try again, Switch server, Disable Tor protection, and Contact Support — instead of only displaying the error text with nothing you can do about it. The sheet also raises itself the first time a sync error occurs in a session.
 
 ### Changed
+- [ZAPP-1] Requesting ZEC now rises up from the bottom of the screen instead of sliding in from the side, matching how the Request flow appears on Android. The Receive screen it starts from is unchanged.
+- [ZAPP-1] Scrollable content now fades out gently where it meets the top and bottom of the screen, and the floating tab bar picks up a soft shadow once content is scrolling underneath it, so it reads as sitting above the page rather than printed on it.
+- [ZAPP-1] The Chats list now draws a divider after the last conversation as well, matching Android.
+- [ZAPP-1] The chat attachment menu now stops exactly at the height of its contents on both of its pages, instead of leaving a band of empty space below the last row.
 - [ZAPP-1] The selected tab on the bottom navigation bar now shows a filled version of its icon rather than the same outline in a different colour, so the tab you're on reads at a glance.
 - [ZAPP-1] Group conversations without a photo now show a proper two-person avatar, the Camera tile in a chat's Attach Media menu shows a camera icon, and the pinned Zapp Support row now carries the Zapp brandmark instead of a generic help icon.
 - [ZAPP-1] The icons for adding a participant, removing one, confirming a selection and continuing on the New chat screen — plus the "+" on the Pay screen's quick-action button and the tick on bridge-progress steps — are now Zapp's own icons, so these screens are drawn in one consistent style instead of mixing in borrowed system symbols.
@@ -65,6 +71,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
 ### Fixed
+- [ZAPP-1] Your recovery phrase and P2P wallet key are now also protected when a screen recording is ALREADY running. Previously Zapp only reacted to a recording that started while the phrase was on screen, so a recording begun beforehand captured it; both the chat profile's reveals and the onboarding backup screen now refuse to reveal anything and say why until the recording stops.
+- [ZAPP-1] When camera access is turned off, a chat now offers an "Open settings" button that takes you straight there, instead of only telling you to go and find it yourself — the same button the QR scanner already showed.
 - [ZAPP-1] Your screen no longer stays awake long after a wallet restore or resync has finished, or after you delete a wallet part-way through one. The screen timeout is handed back the moment the restore ends, instead of staying disabled until the phone was next plugged in or unplugged.
 - [ZAPP-1] "Contact Support" from a sync error now actually opens a support email (or the share sheet if no mail account is set up) instead of doing nothing.
 - [ZAPP-1] An animated GIF sent from your photo library now arrives animated on the other side, instead of as a single frozen frame.

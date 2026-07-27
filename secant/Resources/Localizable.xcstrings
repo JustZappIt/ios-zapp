@@ -24674,7 +24674,13 @@
           }
         }
       }
-    }
+    },
+    "chatList.previewUnread": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"%1$@ unread"}},"es":{"stringUnit":{"state":"translated","value":"%1$@ sin leer"}}}},
+    "chatProfile.secretScreenRecording": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Screen recording is on. Stop it before revealing this."}},"es":{"stringUnit":{"state":"translated","value":"La grabación de pantalla está activa. Deténla antes de revelar esto."}}}},
+    "chatRoom.imageViewer.save": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Save image"}},"es":{"stringUnit":{"state":"translated","value":"Guardar imagen"}}}},
+    "chatRoom.imageViewer.saveFailed": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Could not save image"}},"es":{"stringUnit":{"state":"translated","value":"No se pudo guardar la imagen"}}}},
+    "chatRoom.imageViewer.saved": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Image saved"}},"es":{"stringUnit":{"state":"translated","value":"Imagen guardada"}}}},
+    "onboarding.seed.screenRecording": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Screen recording is on. Stop it before revealing your phrase."}},"es":{"stringUnit":{"state":"translated","value":"La grabación de pantalla está activa. Deténla antes de revelar tu frase."}}}}
   },
   "version": "1.1"
 }

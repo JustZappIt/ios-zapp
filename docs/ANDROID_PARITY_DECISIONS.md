@@ -1,10 +1,12 @@
 # Android Parity — Decisions Pending (Renee)
 
-**Companion to:** `docs/ANDROID_PARITY_HANDOVER.md` · `docs/ANDROID_PARITY_VERIFICATION.md` · **Branch:** `feature/ZAPP-1-android-parity` · **As of:** Phase 11 complete
+**Companion to:** `docs/ANDROID_PARITY_HANDOVER.md` · `docs/ANDROID_PARITY_VERIFICATION.md` · **Branch:** `feature/ZAPP-1-android-parity` · **As of:** Phase 14 complete
 
-Every item below was found during Phase 1–11 execution/audit, documented in its phase's commit body, and left unresolved because it's a product/design call rather than a parity bug. Nothing here is blocking — the branch builds, tests, and lints clean at every phase. Work through this at your own pace.
+Every item below was found during Phase 1–14 execution/audit, documented in its phase's commit body, and left unresolved because it's a product/design call rather than a parity bug. Nothing here is blocking — the branch builds, tests, and lints clean at every phase. Work through this at your own pace.
 
 **Phase 11 changed this list as follows:** §5 (stranded Smart Banner content) is **resolved as not a gap** — the equivalent Android route is equally dead code. §1 gained three rows (1.5–1.7, more missing assets behind SF-Symbol fallbacks). A new §7 records two cosmetic chat-list drifts. Phase 11 also filed one new **Phase 12** (unified send form) in the handover doc, which needs a go/no-go from you before any work starts.
+
+**Phase 14 changed this list as follows:** seven items you approved — §3.1, §3.2, §3.4, §4.1, §6.1, §6.5, and §7.1 — are now built and resolved (see each row for what shipped).
 
 ---
 
@@ -84,10 +86,10 @@ improvised.
 
 | # | Item | Detail | Phase |
 |---|---|---|---|
-| 3.1 | Camera-permission-denied messaging | Chat's camera tile now shows "enable it in Settings" as text; `ScanView` already has a real **Open Settings button** for the identical situation. Worth making the two consistent. | 5/10 |
-| 3.2 | Image viewer has no "Save to gallery" | Android's fullscreen image viewer offers it; iOS's doesn't. Needs a new `NSPhotoLibraryAddUsageDescription` permission string — a privacy-prompt addition, your call before it's added. | 6 |
+| 3.1 | Camera-permission-denied messaging — **RESOLVED by Phase 14** | Chat's send-failure strip now offers the same `ZappButton` → Settings deep link `ScanView` already used, replacing the "enable it in Settings" sentence. Shared via `ChatSendFailureBanner`, used by both the room and Support chat. | 5/10/14 |
+| 3.2 | Image viewer has no "Save to gallery" — **RESOLVED by Phase 14** | A save button next to the close button saves the original file (not a re-compressed copy) via a new `PhotoLibraryClient` dependency (add-only access), confirming with "Image saved" or a failure toast. Adds `NSPhotoLibraryAddUsageDescription`; button only appears once the photo has finished downloading. | 6/14 |
 | 3.3 | Delete-identity confirmation copy | Ported verbatim from Android: "Your funds are unaffected and can be recovered at any time with your seed phrase." True, but both platforms *also* wipe local wallet data and all preferences — the copy may understate what's actually happening. Same wording issue exists on Android today; could raise it upstream rather than diverge here. | 8 |
-| 3.4 | Screen-recording-already-in-progress isn't caught | The secret-reveal screen (and the pre-existing onboarding seed-backup screen it mirrors) only detects a recording that *starts* while the screen is open (`UIScreen.capturedDidChange`). If a recording is already running before the user taps Reveal, nothing blocks it. Inherited limitation from existing code, not introduced by this branch — but a real gap. A cheap hardening (refuse reveal when `UIScreen.main.isCaptured`) would need a new dependency and affects the onboarding screen too. | 8 |
+| 3.4 | Screen-recording-already-in-progress isn't caught — **RESOLVED by Phase 14** | A new `ScreenCaptureClient` dependency (`UIScreen.main.isCaptured`) is checked up front by both the chat profile's secret reveal and the onboarding seed-backup screen; a recording already running refuses the reveal outright, before authentication, with an explicit message — instead of only reacting to a recording that starts later. | 8/14 |
 
 ---
 
@@ -95,13 +97,11 @@ improvised.
 
 The handover doc said to convert Receive and Request to sheets. On investigation, **Android's Receive screen is a plain horizontal push, not a sheet** — converting iOS's Receive to `.sheet` would have been a regression (and would break the existing edge-swipe/parallax back system, which depends on preferences that don't cross a sheet boundary). This was **not done**, correctly, per Phase 10's audit.
 
-The one real gap that *is* still open:
+The one real gap that *was* still open, now closed:
 
 | # | Item | Detail |
 |---|---|---|
-| 4.1 | Request ZEC flow presentation | Android rises its Request flow as a slide-up transition; iOS pushes it horizontally through a 3-screen chain (`zecKeyboard → requestZec → requestZecSummary`) inside the Receive `NavigationStack`. |
-
-**Decision needed:** worth restyling Request's presentation to match Android's slide-up, or leave as an iOS-idiomatic push? (Small, self-contained change if you want it.)
+| 4.1 | Request ZEC flow presentation — **RESOLVED by Phase 14** | The `zecKeyboard → requestZec → requestZecSummary` chain was lifted out of Receive's own `NavigationStack` into a standalone `ReceiveRequestFlow`, presented as a `fullScreenCover` (the iOS equivalent of "a full destination that rises and drops back down") — matching Android's `slideIntoContainer(Up)` for its `REQUEST` route. Receive itself keeps its own `NavigationStack`, so its edge-swipe/parallax back system is unaffected. |
 
 ---
 
@@ -142,16 +142,16 @@ Per the handover doc, none of these ship without an explicit yes. Status of each
 
 | # | Touch | Status |
 |---|---|---|
-| 6.1 | Context-menu **previews** on chat rows (peek the conversation) | Not built — needs approval |
+| 6.1 | Context-menu **previews** on chat rows (peek the conversation) | **Built by Phase 14** — long-pressing a row shows `ChatConversationPreviewCard` (name, unread count or last-active time, last message), built entirely from list data already held (no room opened, no message stream subscribed), alongside the existing Leave action. |
 | 6.2 | `.contentTransition(.numericText())` hero balance ticker | **Already shipped** (Phase 3) |
 | 6.3 | Drag-down-to-dismiss + pinch-zoom in the image viewer | **Already shipped** (Phase 6, doc explicitly welcomed it there) |
 | 6.4 | Detented sheets (`.presentationDetents`) for attachment/media sheets and Receive QR | Attachment/media sheets: partially — Phase 5 used a two-page single sheet, not confirmed to use detents specifically. Receive QR: **not applicable** — Receive isn't a sheet at all (see §4). Needs a decision on whether the attachment sheet specifically should get detents. |
-| 6.5 | `ScrollView` edge effects + subtle nav-pill shadow on scroll | Not built — needs approval |
+| 6.5 | `ScrollView` edge effects + subtle nav-pill shadow on scroll | **Built by Phase 14** — `ZappScrollEdge` fades scrollable content out at the top/bottom edges (a ramp of the screen's own background colour, no material/blur, per the Swiss-design brief) and reports scroll travel so `ZappPillNavBar` deepens its shadow once content is passing beneath it. |
 | 6.6 | Haptic on send success | **Already shipped** (Phase 10, as part of the required haptic vocabulary, not gated on this list) |
 | 6.7 | Home-screen quick actions (long-press app icon → New chat / Scan / Receive) | Not built — needs approval |
 | 6.8 | Edge-back swipe with parallax | **Already shipped and kept** (predates this branch, per the doc) |
 
-**Decision needed:** approve/reject 6.1, 6.4 (attachment sheet detents specifically), 6.5, 6.7 individually — the rest are already resolved one way or another.
+**Decision needed:** approve/reject 6.4 (attachment sheet detents specifically) and 6.7 — the rest are now resolved one way or another.
 
 ---
 
@@ -163,10 +163,10 @@ choice rather than an oversight.
 
 | # | Item | Detail |
 |---|---|---|
-| 7.1 | Trailing row divider | Android emits `ZappRowDivider(inset = true)` after **every** conversation row, including the last, leaving a hairline above the bottom clearance. iOS suppresses it on the last row (`ChatsListView.swift:118`). "Android is the spec" argues for matching; visual taste argues for iOS's version. |
+| 7.1 | Trailing row divider — **RESOLVED by Phase 14: matched to Android** | iOS now emits `ZappRowDivider(inset: true)` after every row, including the last, matching Android's `ZappRowDivider(inset = true)` placement exactly. |
 | 7.2 | List reorder animation | Android animates rows moving as conversations re-sort by timestamp (`animateItem()`). iOS's `LazyVStack`/`ForEach` re-sorts without animation. SwiftUI's equivalent is fiddlier than Compose's and can read as jank if applied carelessly. |
 
-**Decision needed:** match Android on either/both, or accept iOS as-is. Neither affects function.
+**Decision needed:** match Android on 7.2, or accept iOS as-is. Doesn't affect function.
 
 ---
 
@@ -176,12 +176,17 @@ Phase 11 has landed, so the audit programme is complete: every Android screen ha
 side-by-side with iOS and the result is 71 ✅ / 6 ⚠️ / 0 ❌ (see
 `docs/ANDROID_PARITY_VERIFICATION.md`). There are no known parity defects left on the branch.
 
+**Phase 14 closed §3.1, §3.2, §3.4, §4.1, §6.1, §6.5, and §7.1** — all seven were approved and built
+in one pass (chat send-failure Settings button, save-photo-to-gallery, screen-recording-already-in-progress
+guard, Request ZEC as a rising `fullScreenCover`, chat-row long-press preview, scroll-edge fade +
+nav-pill scroll shadow, and the trailing chat-list divider).
+
 What's actually left for you, in the order it's cheapest to answer:
 
-1. **§1 assets (7 rows)** — one yes/no: commission the assets, or accept the SF-Symbol/text fallbacks as final.
-2. **§6 premium-iOS touches (6.1, 6.4, 6.5, 6.7)** — four independent yes/nos.
-3. **§7 chat-list cosmetics + §2.1 badge placement + §4.1 Request presentation** — three small taste calls.
-4. **§3 small UX inconsistencies (3.1–3.4)** — 3.2 and 3.4 involve new privacy prompts / a new dependency, so they're the ones worth real thought.
+1. **§1 assets** — already resolved (Phase 13), except row 1.8 (history/clock glyph), still an open one-off.
+2. **§6.4 / §6.7** — two independent yes/nos (attachment sheet detents specifically; home-screen quick actions).
+3. **§7.2 list reorder animation + §2.1 badge placement** — two small taste calls.
+4. **§3.3 delete-identity confirmation copy** — the one remaining §3 item, a wording call shared with Android.
 5. **Phase 12 (unified send form)** — the only large item, and a legitimate decline. Capability parity already exists; it's a form-shape question in a money-moving flow.
 
 §5 needs nothing from you — Phase 11 closed it.

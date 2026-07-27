@@ -318,6 +318,10 @@ struct OnboardingSeedBackup {
         var isRevealed = false
         var words: [RedactableString] = []
 
+        /// The reveal was refused because the screen was ALREADY being recorded when it was
+        /// asked for — the case `capturedDidChange` cannot see, since it only fires on a change.
+        var isBlockedByScreenCapture = false
+
         static let initial = State()
     }
 
@@ -330,6 +334,7 @@ struct OnboardingSeedBackup {
         case seedLoaded([RedactableString])
     }
 
+    @Dependency(\.screenCapture) var screenCapture
     @Dependency(\.walletStorage) var walletStorage
 
     var body: some Reducer<State, Action> {
@@ -356,6 +361,15 @@ struct OnboardingSeedBackup {
 
             case .revealTapped:
                 state.errorMessage = nil
+                state.isBlockedByScreenCapture = false
+
+                // A recording already in flight produces no `capturedDidChange`, so the phrase
+                // has to be refused here rather than hidden a moment after it is on screen.
+                guard !screenCapture.isCaptured() else {
+                    state.isBlockedByScreenCapture = true
+                    return .none
+                }
+
                 state.isLoading = true
                 return .run { send in
                     do {

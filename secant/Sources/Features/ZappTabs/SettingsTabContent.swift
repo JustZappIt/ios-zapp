@@ -168,7 +168,9 @@ struct SettingsTabContent: View {
                         }
                     }
                     .padding(.bottom, ZappNavBar.clearance)
+                    .zappScrollShadowSource()
                 }
+                .zappScrollEdges()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))

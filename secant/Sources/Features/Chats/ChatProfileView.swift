@@ -243,7 +243,13 @@ private extension ChatProfileView {
                 }
             }
 
-            if store.secretFailed {
+            if store.secretBlockedByCapture {
+                Text(String(localizable: .chatProfileSecretScreenRecording))
+                    .zappFont(.caption, style: ZappColors.danger)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(Design.Spacing._md)
+            } else if store.secretFailed {
                 Text(String(localizable: .chatProfileSecretFailed))
                     .zappFont(.caption, style: ZappColors.danger)
                     .frame(maxWidth: .infinity, alignment: .leading)
