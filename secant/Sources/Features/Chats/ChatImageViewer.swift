@@ -18,6 +18,7 @@ import ZappMessaging
 
 struct ChatImageViewer: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.openURL) private var openURL
 
     private enum Constants {
         static let actionIcon: CGFloat = 20
@@ -30,6 +31,9 @@ struct ChatImageViewer: View {
         static let dismissFadeDistance: CGFloat = 400
         static let minBackgroundOpacity: CGFloat = 0.4
         static let confirmationSeconds: UInt64 = 2
+        /// Keeps the permission notice a readable column rather than letting `ZappButton`'s
+        /// `maxWidth: .infinity` stretch it the full width of the photo.
+        static let noticeMaxWidth: CGFloat = 260
     }
 
     /// What the save button last did, driving both its glyph and the line under it.
@@ -37,6 +41,9 @@ struct ChatImageViewer: View {
         case saving
         case saved
         case failed
+        /// Refused access to the photo library. Kept apart from `failed` because it is not
+        /// retryable — see `permissionNotice`.
+        case notAuthorized
     }
 
     @Dependency(\.photoLibrary) private var photoLibrary
@@ -120,6 +127,10 @@ struct ChatImageViewer: View {
                     .transition(.opacity)
             }
 
+            if saveOutcome == .notAuthorized {
+                permissionNotice
+            }
+
             Spacer()
         }
         .padding(Design.Spacing._lg)
@@ -151,8 +162,31 @@ struct ChatImageViewer: View {
         switch saveOutcome {
         case .saved: return String(localizable: .chatRoomImageViewerSaved)
         case .failed: return String(localizable: .chatRoomImageViewerSaveFailed)
-        case .saving, .none: return nil
+        case .saving, .notAuthorized, .none: return nil
         }
+    }
+
+    /// Refusing photo-library access is permanent — iOS never puts the prompt up a second time —
+    /// so unlike the save confirmation this notice does not time out, and it offers the same
+    /// Settings deep link a denied camera does in `ChatSendFailureBanner` rather than dead-ending
+    /// on "Could not save image". Tapping Save again after granting access retries and clears it.
+    private var permissionNotice: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._md) {
+            Text(String(localizable: .chatRoomImageViewerSaveNoAccess))
+                .zappFont(.caption, style: ZappColors.onAccent)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            ZappButton(title: String(localizable: .scanOpenSettings)) {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(url)
+                }
+            }
+        }
+        .padding(Design.Spacing._md)
+        .frame(maxWidth: Constants.noticeMaxWidth, alignment: .leading)
+        .background(ZappColors.overlay.color(colorScheme))
+        .transition(.opacity)
     }
 
     private var savableFileURL: URL? {
@@ -172,6 +206,12 @@ struct ChatImageViewer: View {
             do {
                 try await photoLibrary.saveImage(url)
                 saveOutcome = .saved
+            } catch PhotoLibraryError.notAuthorized {
+                // Not a failed write: retrying cannot help, only Settings can. The notice stays
+                // up rather than clearing itself a couple of seconds later.
+                LoggerProxy.error("ChatImageViewer: photo library access refused")
+                saveOutcome = .notAuthorized
+                return
             } catch {
                 LoggerProxy.error("ChatImageViewer: save to photo library failed")
                 saveOutcome = .failed
