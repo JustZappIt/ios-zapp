@@ -90,11 +90,8 @@ struct ZappSpeedDialFab: View {
         Button {
             isExpanded.toggle()
         } label: {
-            Image(systemName: "plus")
-                .resizable()
-                .scaledToFit()
-                .frame(width: Constants.iconSize, height: Constants.iconSize)
-                .foregroundStyle(ZappColors.onAccent.color(colorScheme))
+            Asset.Assets.Icons.plus.image
+                .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.onAccent)
                 .rotationEffect(.degrees(isExpanded ? Constants.expandedRotation : 0))
                 .frame(width: Constants.toggleSize, height: Constants.toggleSize)
                 .background(ZappColors.accent.color(colorScheme))

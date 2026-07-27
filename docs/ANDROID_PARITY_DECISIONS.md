@@ -8,9 +8,22 @@ Every item below was found during Phase 1–11 execution/audit, documented in it
 
 ---
 
-## 1. Missing design-system assets
+## 1. Missing design-system assets — **RESOLVED by Phase 13**
 
-Each of these currently has a working fallback (documented in-code), not a broken feature.
+Renee approved commissioning all seven. Phase 13 closed every row below; no SF-Symbol fallback
+remains at any of these call sites. Two findings worth recording:
+
+- **Only five new assets were actually needed, not seven.** Rows 1.5–1.7 asked for add / arrow-right
+  / close / check / person glyphs, and the catalogue already shipped all five of them
+  (`Icons.plus`, `Icons.arrowRight`, `Icons.xClose`, top-level `check`, `Icons.user`). Those rows
+  were pure wiring — no new art. The genuinely missing glyphs were the three filled tab icons plus
+  a group glyph, a camera glyph and the Zapp brandmark.
+- The catalogue's icon family was reverse-engineered before anything was drawn: a 24×24 grid,
+  stroke-width 2, round caps and joins, ink `#282622`, exported as a 512×512 RGBA8 PNG whose
+  `Contents.json` carries no template-rendering key (tint comes from `.renderingMode(.template)`
+  inside `zImage`). Every new asset matches that convention exactly.
+
+Each of these previously had a working fallback (documented in-code), not a broken feature.
 
 | # | Asset needed | Where it's used | Current fallback | Phase |
 |---|---|---|---|---|
@@ -30,7 +43,30 @@ colors in any `Zapp*`/`Chat*` file, and the five fixed `Color.white`/`Color.blac
 image-viewer backdrop, toggle knob) are all verified-intentional matches to Android's own
 hardcoded values, so dark/light is correct.
 
-**Decision needed:** add these 7 assets to `Assets.xcassets` (I can generate/source and wire them once you approve), or accept the fallbacks as final.
+**How each new asset was produced** (Phase 13):
+
+| Asset | Source |
+|---|---|
+| `Icons.payFilled` | Solid disc at the outlined `pay`'s own outer radius with its arrow knocked out — the treatment the catalogue's existing `checkSolid` already uses. Same centre and footprint as the outline, so the tab doesn't shift on selection. |
+| `Icons.userFilled` | The outlined `user`'s measured geometry filled rather than stroked: head disc at its outer radius, shoulder arc closed into a solid body. Identical footprint to the outline. |
+| `Icons.messageChatFilled` | Derived from the outlined `messageChat` PNG itself — interiors flood-filled, then a separation band carved along the small bubble's real edge via a Euclidean distance transform. No geometry invented; both bubble tails and the exact silhouette are preserved. |
+| `Icons.users` | Drawn as a sibling of the outlined `user` (same circle-head + wide-arc-shoulder vocabulary, stroke weight, caps and footprint), with the back person smaller, raised, and separated from the foreground person by a clearance band so it reads as occluded. Android's `Icons.Default.Group` is a filled Material glyph and would have clashed with the outlined `user` shown directly beside it in the same avatar slot. **Redrawn during the Phase 13 audit**: the first cut placed both heads at the same size and height with crossing shoulder arcs, which read as a face rather than two people at the real 20pt call size. |
+| `Icons.camera` | Constructed on the family's 24×24 / stroke-2 grid. Android uses Compose's `Icons.Default.CameraAlt`, which ships no vector drawable in the repo to extract. |
+| `zappLogo` | Rendered from Android's own design source, `design/Zapp-designs/assets/zapp_logo.svg` — the same mark as its `img_zapp_logo` raster, but vector-sourced so it stays crisp. Full-colour, so it is drawn untinted (its `#FF9417` field is exactly the app's `accent`). |
+
+**Decision — resolved:** all seven rows are closed; the five pre-existing glyphs were reused and five new assets were added to `Assets.xcassets`.
+
+**One new row found by the Phase 13 audit, deliberately left open:**
+
+| # | Asset needed | Where it's used | Current fallback | Phase |
+|---|---|---|---|---|
+| 1.8 | History / clock glyph | `OfframpView`'s "Recent transactions" button | `clock.arrow.circlepath` SF Symbol | 13 |
+
+This is the last SF Symbol left in any `Zapp*`/`Chat*`/offramp shell file — the fifteen that remain
+project-wide are all in upstream Zashi screens (Voting, Splash), which this branch does not touch.
+Unlike rows 1.5–1.7 it cannot be closed by rewiring: the catalogue ships no clock or history glyph,
+so closing it means commissioning an eighth asset. Same call as before — flagged rather than
+improvised.
 
 ---
 

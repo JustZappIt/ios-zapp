@@ -113,9 +113,8 @@ private struct ZappOfframpStepRow: View {
                 .tint(ZappColors.accent.color(colorScheme))
                 .transition(.scale.combined(with: .opacity))
         case .completed:
-            Image(systemName: "checkmark")
-                .font(.system(size: 8, weight: .bold))
-                .foregroundStyle(ZappColors.onAccent.color(colorScheme))
+            Asset.Assets.check.image
+                .zImage(size: 10, style: ZappColors.onAccent)
                 .frame(width: 12, height: 12)
                 .background(ZappColors.accent.color(colorScheme))
                 .transition(.scale.combined(with: .opacity))

@@ -13,7 +13,6 @@ struct SupportContactRow: View {
 
     private enum Constants {
         static let avatarSize: CGFloat = 44
-        static let avatarIconSize: CGFloat = 22
         static let horizontalPadding: CGFloat = 14
         static let verticalPadding: CGFloat = 12
         static let spacing: CGFloat = 12
@@ -59,20 +58,13 @@ struct SupportContactRow: View {
         .contentShape(Rectangle())
     }
 
-    /// Design-system gap: Android draws this row with its `img_zapp_logo` brandmark, and the iOS
-    /// catalogue ships no Zapp logo asset (only the Zashi/ZODL brandmarks, which would be the
-    /// wrong mark here). The row keeps the list's own accent-square avatar with the help glyph
-    /// until a Zapp brandmark is added to `Assets.xcassets` — a deliberate design-system
-    /// extension rather than something to improvise.
+    /// The Zapp brandmark is a full-colour mark (it carries its own accent field), so it is drawn
+    /// untinted and edge-to-edge, exactly as Android's `ChatListView.SupportContactRow` draws
+    /// `img_zapp_logo` at 44dp.
     private var avatar: some View {
-        Asset.Assets.Icons.help.image
-            .zImage(
-                width: Constants.avatarIconSize,
-                height: Constants.avatarIconSize,
-                style: ZappColors.onAccent
-            )
+        Asset.Assets.zappLogo.image
+            .resizable()
             .frame(width: Constants.avatarSize, height: Constants.avatarSize)
-            .background(ZappColors.accent.color(colorScheme))
     }
 }
 

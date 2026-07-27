@@ -148,7 +148,7 @@ struct NewChatView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Image(systemName: store.isGroupMode ? "plus" : "arrow.right")
+                    (store.isGroupMode ? Asset.Assets.Icons.plus : Asset.Assets.Icons.arrowRight).image
                         .zImage(
                             width: Constants.bannerIconSize,
                             height: Constants.bannerIconSize,
@@ -333,7 +333,7 @@ private struct NewChatParticipantChip: View {
                     .zappFont(.chip, style: ZappColors.accentText)
                     .lineLimit(1)
 
-                Image(systemName: "xmark")
+                Asset.Assets.Icons.xClose.image
                     .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.accentText)
             }
             .padding(.horizontal, Constants.horizontalPadding)
@@ -401,7 +401,7 @@ private struct NewChatContactRow: View {
     private var selectionBox: some View {
         ZStack {
             if isSelected {
-                Image(systemName: "checkmark")
+                Asset.Assets.check.image
                     .zImage(width: Constants.checkIconSize, height: Constants.checkIconSize, style: ZappColors.onAccent)
             }
         }
@@ -416,11 +416,8 @@ private struct NewChatContactRow: View {
     private var avatar: some View {
         ZStack {
             if initials.isEmpty {
-                Image(systemName: "person.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.avatarIconSize, height: Constants.avatarIconSize)
-                    .zForegroundColor(ZappColors.onAccent)
+                Asset.Assets.Icons.user.image
+                    .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)
             } else {
                 Text(initials)
                     .zappFont(.rowTitle, style: ZappColors.onAccent)

@@ -104,14 +104,8 @@ struct ChatConversationRow: View {
     @ViewBuilder
     private var avatarContent: some View {
         if conversation.type == .group {
-            // Design-system gap: `Assets.xcassets/Icons` ships `user` but no group glyph, so the
-            // group avatar still falls back to a system symbol. Adding a `users` asset is a
-            // deliberate design-system extension rather than something to improvise here.
-            Image(systemName: "person.2.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: Constants.avatarIconSize, height: Constants.avatarIconSize)
-                .zForegroundColor(ZappColors.onAccent)
+            Asset.Assets.Icons.users.image
+                .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)
         } else if initials.trimmingCharacters(in: .whitespaces).isEmpty {
             Asset.Assets.Icons.user.image
                 .zImage(width: Constants.avatarIconSize, height: Constants.avatarIconSize, style: ZappColors.onAccent)

@@ -144,7 +144,7 @@ struct ChatMediaAttachmentSheet: View {
                 )
 
                 tile(
-                    icon: nil,
+                    icon: Asset.Assets.Icons.camera.image,
                     label: String(localizable: .chatRoomMediaCamera),
                     action: onTakePhoto
                 )
@@ -153,24 +153,11 @@ struct ChatMediaAttachmentSheet: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func tile(icon: Image?, label: String, action: @escaping () -> Void) -> some View {
+    private func tile(icon: Image, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: Design.Spacing._xs) {
-                if let icon {
-                    icon
-                        .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.accent)
-                } else {
-                    // Design-system gap: `Assets.xcassets/Icons` has no camera glyph (`scan` is the
-                    // QR viewfinder and would misread here), so the camera tile falls back to a
-                    // system symbol. Adding a `camera` asset is a deliberate design-system
-                    // extension, not something to improvise — same call as the group avatar in
-                    // `ChatConversationRow`.
-                    Image(systemName: "camera.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Constants.iconSize, height: Constants.iconSize)
-                        .zForegroundColor(ZappColors.accent)
-                }
+                icon
+                    .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.accent)
 
                 Text(label)
                     .zappFont(.chip, style: ZappColors.text)

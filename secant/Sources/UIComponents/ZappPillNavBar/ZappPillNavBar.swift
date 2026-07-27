@@ -63,7 +63,7 @@ struct ZappPillNavBar: View {
             }
         } label: {
             ZStack(alignment: .topTrailing) {
-                icon(tab)
+                icon(tab, selected: isSelected)
                     .zImage(
                         width: Constants.iconSize,
                         height: Constants.iconSize,
@@ -103,11 +103,16 @@ struct ZappPillNavBar: View {
             : String(max(chatUnreadCount, 1))
     }
 
-    private func icon(_ tab: ZappTabs.Tab) -> Image {
+    /// Mirrors Android's `iconFor(tab, selected)`, which swaps each tab's outlined
+    /// glyph for its filled counterpart on selection rather than only re-tinting it.
+    private func icon(_ tab: ZappTabs.Tab, selected: Bool) -> Image {
         switch tab {
-        case .pay: return Asset.Assets.Icons.pay.image
-        case .chats: return Asset.Assets.Icons.messageChat.image
-        case .you: return Asset.Assets.Icons.user.image
+        case .pay:
+            return selected ? Asset.Assets.Icons.payFilled.image : Asset.Assets.Icons.pay.image
+        case .chats:
+            return selected ? Asset.Assets.Icons.messageChatFilled.image : Asset.Assets.Icons.messageChat.image
+        case .you:
+            return selected ? Asset.Assets.Icons.userFilled.image : Asset.Assets.Icons.user.image
         }
     }
 }
