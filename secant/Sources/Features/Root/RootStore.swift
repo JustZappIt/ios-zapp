@@ -350,10 +350,25 @@ struct Root {
 
     init() { }
     
+    /// Split into chunks purely for stack budget: a single `@ReducerBuilder` holding all
+    /// 43 elements needs more than the 1 MB main thread stack to materialise, and `body`
+    /// is rebuilt on every action, so it overflowed during `didFinishLaunching`. The
+    /// chunks must stay in this order — reducer order is semantic.
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
+        coreBase
+
+        coreChat
+
+        coreFlows
+
+        coreLogic
+    }
+
+    @ReducerBuilder<State, Action>
+    private var coreBase: some Reducer<State, Action> {
         BindingReducer()
-        
+
         Scope(state: \.deeplinkWarningState, action: \.deeplinkWarning) {
             DeeplinkWarning()
         }
@@ -393,7 +408,10 @@ struct Root {
         Scope(state: \.osStatusErrorState, action: \.osStatusError) {
             OSStatusError()
         }
+    }
 
+    @ReducerBuilder<State, Action>
+    private var coreChat: some Reducer<State, Action> {
         Scope(state: \.chatsListState, action: \.chatsList) {
             ChatsList()
         }
@@ -425,7 +443,10 @@ struct Root {
         Scope(state: \.offrampState, action: \.offramp) {
             Offramp()
         }
+    }
 
+    @ReducerBuilder<State, Action>
+    private var coreFlows: some Reducer<State, Action> {
         Scope(state: \.settingsState, action: \.settings) {
             Settings()
         }
@@ -473,7 +494,10 @@ struct Root {
         Scope(state: \.swapAndPayCoordFlowState, action: \.swapAndPayCoordFlow) {
             SwapAndPayCoordFlow()
         }
+    }
 
+    @ReducerBuilder<State, Action>
+    private var coreLogic: some Reducer<State, Action> {
         initializationReduce()
 
         destinationReduce()
