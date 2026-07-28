@@ -21,6 +21,9 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] You can now swipe from the left edge of a screen to go back, and the screen follows your finger the way it does everywhere else in iOS: drag partway to peek at the screen behind and let go to stay put, or swipe far enough (or flick) to go back. The screen behind slides in as you drag.
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
+### Removed
+- [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
+
 ### Fixed
 - [ZAPP-1] The App Store / TestFlight build no longer crashes instantly on launch. It never reached the first screen, so the app was unusable for anyone installing it from TestFlight.
 - [ZAPP-1] The onboarding screens (welcome, wallet intro, wallet choice, seed backup, and the creating-wallet/identity loading screen) no longer clip their large headings or content on shorter phones: the landing screens now scroll when they don't fit and stay centered when they do, and the oversized headings scale down to fit the width.

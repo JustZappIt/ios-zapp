@@ -83,14 +83,14 @@ extension SecantApp {
         $featureFlags.withLock {
             $0 = FeatureFlags(
                 appLaunchBiometric: true,
-                flexa: true
+                flexa: false
             )
         }
 #else
         $featureFlags.withLock {
             $0 = FeatureFlags(
                 appLaunchBiometric: true,
-                flexa: true
+                flexa: false
             )
         }
 #endif
