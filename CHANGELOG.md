@@ -22,6 +22,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
 
 ### Fixed
+- [ZAPP-1] The App Store / TestFlight build no longer crashes instantly on launch. It never reached the first screen, so the app was unusable for anyone installing it from TestFlight.
 - [ZAPP-1] The onboarding screens (welcome, wallet intro, wallet choice, seed backup, and the creating-wallet/identity loading screen) no longer clip their large headings or content on shorter phones: the landing screens now scroll when they don't fit and stay centered when they do, and the oversized headings scale down to fit the width.
 - [ZAPP-1] Chat now rejects conversations that use your own messaging key, keeps failed messages available for an explicit retry, and reconciles outgoing messages without duplicate bubbles.
 - [ZAPP-1] Dollar amounts no longer vanish from the balance, activity list, and transaction details when the rate provider can't be reached — the price from the swap catalogue is used instead. This only applies when currency conversion is on and your currency is USD; turning conversion off now hides fiat everywhere, and a non-USD currency waits for the real rate rather than showing a dollar figure under the wrong symbol.
