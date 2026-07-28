@@ -92,3 +92,6 @@ PartnerKeys.plist
 
 # Release
 **/*.mobileprovision
+
+# local-only notes, never committed
+docs/local/
