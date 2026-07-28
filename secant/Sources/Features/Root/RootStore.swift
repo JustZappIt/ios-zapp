@@ -69,6 +69,7 @@ struct Root {
         /// otherwise starve transaction updates. The payload provenance guard remains the
         /// load-bearing protection against stale results.
         var CancelTransactionsFetchId = UUID()
+        var CancelPendingTxPollId = UUID()
         var CancelBatteryStateId = UUID()
         var SynchronizerCancelId = UUID()
         var WalletConfigCancelId = UUID()

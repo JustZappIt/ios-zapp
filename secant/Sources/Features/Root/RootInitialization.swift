@@ -97,9 +97,14 @@ extension Root {
                 state.bgTask = nil
                 state.appStartState = .didEnterBackground
                 state.isLockedInKeychainUnavailableState = false
+                // Tear down ALL synchronizer-driven subscriptions (plus the pending-transactions
+                // poller) over the now-stopped synchronizer; `.retryStart` on foreground rebuilds
+                // every one of them.
                 return .merge(
                     .cancel(id: state.CancelStateId),
-                    .cancel(id: state.CancelTransactionsStateId)
+                    .cancel(id: state.CancelTransactionsStateId),
+                    .cancel(id: state.CancelEventId),
+                    .cancel(id: state.CancelPendingTxPollId)
                 )
 
             case .initialization(.appDelegate(.backgroundTask(let task))):
@@ -186,6 +191,8 @@ extension Root {
                     return .merge(
                         .cancel(id: state.CancelStateId),
                         .cancel(id: state.CancelTransactionsStateId),
+                        .cancel(id: state.CancelEventId),
+                        .cancel(id: state.CancelPendingTxPollId),
                         // Same reason as `checkRestoreWalletFlag` below: a background sync that
                         // finishes a restore clears `walletStatus`, and the idle timer has to be
                         // handed back or the screen never sleeps once the user reopens the app.
@@ -234,6 +241,14 @@ extension Root {
                             LoggerProxy.event("BGTask synchronizer.start() PASSED")
                         }
                         await send(.initialization(.registerForSynchronizersUpdate))
+                        // Backgrounding cancels the transaction subscriptions (event stream and
+                        // `.upToDate` fetch trigger); without re-establishing them here, the first
+                        // background/foreground cycle would leave the transaction list refreshing
+                        // only via chance one-shot fetches for the rest of the process lifetime.
+                        // Re-dispatch is safe: the inner effects replace themselves via
+                        // `.cancellable(cancelInFlight: true)`, and the trailing fetch doubles as
+                        // the catch-up for anything mined while backgrounded.
+                        await send(.observeTransactions)
                         await send(.refreshAutomaticServer)
                     } catch {
                         if state.bgTask != nil {

@@ -17,8 +17,12 @@ extension Root {
             case .observeTransactions:
                 return .merge(
                     .publisher {
+                        // The transaction events must be filtered out of the stream BEFORE throttling.
+                        // Throttling the raw stream with `latest: true` lets an unrelated event
+                        // (`.connectionStateChanged`, `.storedUTXOs`) arriving in the same window
+                        // replace a `foundTransactions`/`minedTransaction` as "latest", silently
+                        // dropping the only signal that a pending transaction got mined.
                         sdkSynchronizer.eventStream()
-                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                             .compactMap {
                                 if case SynchronizerEvent.foundTransactions(let transactions, _) = $0 {
                                     return Root.Action.foundTransactions(transactions)
@@ -27,6 +31,7 @@ extension Root {
                                 }
                                 return nil
                             }
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                     }
                     .cancellable(id: state.CancelEventId, cancelInFlight: true),
                     .publisher {
@@ -60,8 +65,13 @@ extension Root {
                 // fetch. Do not add `cancelInFlight`: sync events can arrive every 0.2 seconds and
                 // would continually cancel slower reads before any could finish.
                 return .run { send in
-                    if let transactions = try? await sdkSynchronizer.getAllTransactions(accountUUID) {
+                    do {
+                        let transactions = try await sdkSynchronizer.getAllTransactions(accountUUID)
                         await send(.fetchedTransactions(accountUUID, transactions))
+                    } catch {
+                        // No user-facing alert: the pending-transactions poller and the next
+                        // synchronizer event both retry this fetch.
+                        LoggerProxy.error("getAllTransactions failed: \(error.toZcashError())")
                     }
                 }
                 .cancellable(id: state.CancelTransactionsFetchId)
@@ -120,21 +130,44 @@ extension Root {
                 
                 let identifiedArray = IdentifiedArrayOf<TransactionState>(uniqueElements: sortedTransactions)
 
+                // Reconciliation poller: while anything is pending, the list must not depend solely
+                // on push signals (a dropped event or a missed `.upToDate` tick would otherwise leave
+                // a mined transaction rendered as "Sending…" forever). Re-read the local database
+                // every 30 seconds until nothing is pending — a cheap SQLite read, no network.
+                // Managed on every completed fetch, including ones whose payload equals the current
+                // state, so an unchanged list keeps the poller alive.
+                let pendingTransactionsPoller: Effect<Root.Action>
+                if identifiedArray.contains(where: \.isPending) {
+                    pendingTransactionsPoller = .run { send in
+                        while !Task.isCancelled {
+                            try await mainQueue.sleep(for: .seconds(30))
+                            await send(.fetchTransactionsForTheSelectedAccount)
+                        }
+                    }
+                    .cancellable(id: state.CancelPendingTxPollId, cancelInFlight: true)
+                } else {
+                    pendingTransactionsPoller = .cancel(id: state.CancelPendingTxPollId)
+                }
+
                 // Update transactions
                 if state.transactions != identifiedArray {
                     state.$transactions.withLock {
                         $0 = identifiedArray
                     }
-                    return .send(.home(.smartBanner(.evaluatePriority6)))
+                    return .merge(
+                        pendingTransactionsPoller,
+                        .send(.home(.smartBanner(.evaluatePriority6)))
+                    )
                 }
                 // An identical result is still a completed refetch. Without a shared-state write,
                 // the transaction stores receive no publisher update and remain invalidated forever
                 // when switching between two empty accounts. Signal only stores actually waiting.
                 guard state.homeState.transactionListState.isInvalidated
                     || state.transactionsCoordFlowState.transactionsManagerState.isInvalidated else {
-                    return .none
+                    return pendingTransactionsPoller
                 }
                 return .merge(
+                    pendingTransactionsPoller,
                     .send(.home(.transactionList(.transactionsUpdated))),
                     .send(.transactionsCoordFlow(.transactionsManager(.transactionsUpdated)))
                 )
