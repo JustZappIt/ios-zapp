@@ -26,6 +26,10 @@ struct ChatContactForm {
         var publicKey = ""
         var address = ""
 
+        /// Non-nil while the public-key QR scanner is up. Only reachable in add mode — an
+        /// existing row's key is its identity and cannot be replaced.
+        @Presents var scan: Scan.State?
+
         /// Needs `derivationTool`, so the reducer computes it; an empty address is valid.
         var isValidAddress = true
 
@@ -66,6 +70,8 @@ struct ChatContactForm {
         case nameChanged(String)
         case publicKeyChanged(String)
         case addressChanged(String)
+        case scanTapped
+        case scan(PresentationAction<Scan.Action>)
         case saveTapped
         case blockTapped
         case deleteTapped
@@ -101,6 +107,25 @@ struct ChatContactForm {
             case .addressChanged(let value):
                 state.address = value
                 state.isValidAddress = isValidAddress(state.trimmedAddress)
+                return .none
+
+            case .scanTapped:
+                guard !state.isEditing else { return .none }
+                var scanState = Scan.State()
+                scanState.checkers = [.chatPublicKeyScanChecker]
+                scanState.instructions = String(localizable: .newChatScanInstructions)
+                state.scan = scanState
+                return .none
+
+            case .scan(.presented(.foundString(let key))):
+                state.scan = nil
+                return .send(.publicKeyChanged(key))
+
+            case .scan(.presented(.cancelTapped)), .scan(.dismiss):
+                state.scan = nil
+                return .none
+
+            case .scan:
                 return .none
 
             case .saveTapped:
@@ -155,6 +180,9 @@ struct ChatContactForm {
             case .delegate:
                 return .none
             }
+        }
+        .ifLet(\.$scan, action: \.scan) {
+            Scan()
         }
     }
 

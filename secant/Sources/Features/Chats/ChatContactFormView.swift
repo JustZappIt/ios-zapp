@@ -12,6 +12,7 @@ struct ChatContactFormView: View {
     private enum Constants {
         static let closeTouchTarget: CGFloat = 48
         static let closeIconSize: CGFloat = 20
+        static let scanIconSize: CGFloat = 16
     }
 
     @Perception.Bindable var store: StoreOf<ChatContactForm>
@@ -44,6 +45,9 @@ struct ChatContactFormView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
+            .sheet(store: store.scope(state: \.$scan, action: \.scan)) { scanStore in
+                ScanView(store: scanStore)
+            }
         }
     }
 
@@ -63,6 +67,21 @@ struct ChatContactFormView: View {
         }
         .buttonStyle(.zappPress)
         .accessibilityLabel(String(localizable: .generalClose))
+    }
+
+    private var scanButton: some View {
+        Button {
+            store.send(.scanTapped)
+        } label: {
+            HStack(spacing: Design.Spacing._xs) {
+                Asset.Assets.Icons.scan.image
+                    .zImage(width: Constants.scanIconSize, height: Constants.scanIconSize, style: ZappColors.accent)
+
+                Text(String(localizable: .newChatScan))
+                    .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
+            }
+        }
+        .buttonStyle(.zappPress)
     }
 
     private var nameField: some View {
@@ -85,7 +104,15 @@ struct ChatContactFormView: View {
 
     private var keyField: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .chatContactsKeyLabel))
+            HStack(spacing: Design.Spacing._sm) {
+                ZappSectionLabel(text: String(localizable: .chatContactsKeyLabel))
+
+                Spacer(minLength: 0)
+
+                if !store.isEditing {
+                    scanButton
+                }
+            }
 
             if store.isEditing {
                 Text(store.publicKey)

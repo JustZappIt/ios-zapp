@@ -10,6 +10,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Onboarding now requires an app-lock method: a 6-digit PIN or device authentication. PIN unlock includes a persisted five-attempt, 30-second lockout, and App Lock settings let you change the PIN or switch authentication methods.
 - [ZAPP-1] The amount you're shielding, and the amount on a transaction's details screen, now show their value in your selected local currency alongside ZEC — matching the activity list.
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
+- [ZAPP-1] You can now scan someone's QR code to start a chat with them, instead of having to get their public key across as text. The scanner is on the New chat screen and on the Add contact form, and it only accepts a ZODL public key, so pointing it at anything else tells you so rather than failing silently. Your own code is one tap away on the New chat screen for the other direction.
 
 ### Changed
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
@@ -20,6 +21,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] The currency picker in Settings now has an on/off switch for currency conversion, so you can turn it off without leaving the screen.
 - [ZAPP-1] You can now swipe from the left edge of a screen to go back, and the screen follows your finger the way it does everywhere else in iOS: drag partway to peek at the screen behind and let go to stay put, or swipe far enough (or flick) to go back. The screen behind slides in as you drag.
 - [ZAPP-1] In a chat, the keyboard now dismisses when you scroll or tap the conversation, and the message composer sits flush along the bottom edge above the home indicator.
+- [ZAPP-1] Reworked the New chat screen around starting a one-to-one chat. Back and the main button now share the standard bottom action bar, and that button offers to scan a QR code until there is someone to start with. Pasting a public key no longer prints the same 64 characters twice: the key becomes a single recipient card you can clear in one tap. With no contacts saved yet, the screen explains what to do instead of showing an empty list, searching with no matches says so, and your own key is a compact row that opens a scannable code rather than a wall of text. Group chats are unchanged and still start from "New group".
 
 ### Removed
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.

@@ -173,44 +173,6 @@ private extension ChatProfileView {
     }
 }
 
-private struct ChatIdentityQRCode: View {
-    private enum Constants {
-        static let size: CGFloat = 176
-    }
-
-    let publicKey: String
-    @State private var image: CGImage?
-
-    var body: some View {
-        Group {
-            if let image {
-                Image(uiImage: UIImage(cgImage: image))
-                    .resizable()
-                    .interpolation(.none)
-                    .scaledToFit()
-            } else {
-                Rectangle()
-                    .fill(Color.white)
-            }
-        }
-        .frame(width: Constants.size, height: Constants.size)
-        .background(Color.white)
-        .task(id: publicKey) {
-            guard !publicKey.isEmpty else {
-                image = nil
-                return
-            }
-
-            image = await QRCodeGenerator.generate(
-                from: publicKey,
-                maxPrivacy: false,
-                color: .black,
-                overlayedWithZcashLogo: false
-            )
-        }
-    }
-}
-
 #Preview {
     ChatProfileView(store: ChatProfile.initial)
 }
