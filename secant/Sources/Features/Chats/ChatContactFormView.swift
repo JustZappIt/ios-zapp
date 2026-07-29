@@ -45,7 +45,7 @@ struct ChatContactFormView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
-            .sheet(store: store.scope(state: \.$scan, action: \.scan)) { scanStore in
+            .sheet(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
                 ScanView(store: scanStore)
             }
         }
