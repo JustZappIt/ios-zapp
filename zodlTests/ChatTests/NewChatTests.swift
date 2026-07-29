@@ -188,15 +188,16 @@ import Testing
 
     // MARK: - Scanning
 
+    /// Asserted field by field rather than against a whole `Scan.State`: its `cancelId` is a
+    /// fresh `UUID()` per instance, so an equality check could never match.
     @MainActor @Test func scanningPresentsAScannerRestrictedToPublicKeys() async {
         let store = makeStore()
+        store.exhaustivity = .off
 
-        await store.send(.scanTapped) {
-            var scanState = Scan.State()
-            scanState.checkers = [.chatPublicKeyScanChecker]
-            scanState.instructions = String(localizable: .newChatScanInstructions)
-            $0.scan = scanState
-        }
+        await store.send(.scanTapped)
+
+        #expect(store.state.scan?.checkers == [.chatPublicKeyScanChecker])
+        #expect(store.state.scan?.instructions == String(localizable: .newChatScanInstructions))
     }
 
     @MainActor @Test func aScannedKeyDismissesTheScannerAndBecomesTheRecipient() async {
