@@ -75,7 +75,7 @@ struct NewChatView: View {
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .sheet(store: store.scope(state: \.$scan, action: \.scan)) { scanStore in
+            .sheet(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
                 ScanView(store: scanStore)
             }
             .sheet(
