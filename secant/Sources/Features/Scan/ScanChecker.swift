@@ -124,6 +124,19 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
     }
 }
 
+/// A chat peer's Ed25519 public key. Anything else is rejected outright rather than
+/// left to fall through, so a Zcash address QR reports "not a public key" instead of
+/// the generic no-code-found message.
+struct ChatPublicKeyScanChecker: ScanChecker, Equatable {
+    let id = 6
+
+    func checkQRCode(_ qrCode: String) -> Scan.Action? {
+        let key = PublicKeyRules.sanitize(qrCode)
+
+        return PublicKeyRules.isValid(key) ? .foundString(key) : .scanFailed(.invalidPublicKey)
+    }
+}
+
 struct ScanCheckerWrapper: Equatable, Sendable {
     let checker: any ScanChecker
 
@@ -133,6 +146,7 @@ struct ScanCheckerWrapper: Equatable, Sendable {
     static let keystonePCZTScanChecker = ScanCheckerWrapper(KeystonePcztScanChecker())
     static let swapStringScanChecker = ScanCheckerWrapper(SwapStringScanChecker())
     static let keystoneVotingDelegationPCZTScanChecker = ScanCheckerWrapper(KeystoneVotingDelegationPcztScanChecker())
+    static let chatPublicKeyScanChecker = ScanCheckerWrapper(ChatPublicKeyScanChecker())
 
     static func == (lhs: ScanCheckerWrapper, rhs: ScanCheckerWrapper) -> Bool {
         return lhs.checker.id == rhs.checker.id

@@ -2,11 +2,13 @@
 //  NewChatStore.swift
 //  Zapp
 //
-//  Start a conversation: search the saved contacts, or paste a peer's key. Tapping a
-//  contact opens a DM; "New group" flips the same list into multi-select.
+//  Start a conversation: search the saved contacts, scan a QR, or paste a peer's key.
+//  A one-to-one DM is the default — tapping a contact opens one straight away. Groups are
+//  an explicit opt-in: "New group" flips the same list into multi-select.
 //
-//  Mirrors Android's NewConversation screen, which infers "group" from having selected
-//  more than one participant. Here the mode is explicit, so a one-member group is possible.
+//  Android's NewConversation instead infers "group" from having selected more than one
+//  participant. Keeping the mode explicit here means the common case never has to pass
+//  through a selection step.
 //
 
 import ComposableArchitecture
@@ -17,6 +19,15 @@ import ZappMessaging
 struct NewChat {
     @ObservableState
     struct State: Equatable {
+        /// What the docked button does right now. With nothing entered there is nothing to
+        /// start, so the slot advertises the scanner instead of sitting there disabled.
+        enum PrimaryAction: Equatable {
+            case scan
+            case start
+            case createGroup
+            case confirmGroup
+        }
+
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
 
         /// Held raw, not sanitized: the one field both searches contacts and takes a
@@ -42,6 +53,12 @@ struct NewChat {
 
         /// Non-nil while the "rejoin?" prompt is open, before an explicitly-left DM is recreated.
         @Presents var alert: AlertState<Action>?
+
+        /// Non-nil while the QR scanner is up.
+        @Presents var scan: Scan.State?
+
+        /// Shows our own key as a QR the peer can scan — the other half of the exchange.
+        var isSharingMyKey = false
 
         var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
         var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
@@ -75,10 +92,38 @@ struct NewChat {
         }
 
         /// Only an unknown pasted key needs a name; a saved contact already has one.
-        /// A group takes keys alone, so the field has no job there.
-        var showsNameField: Bool { !isGroupMode && isValidKey && detectedContact == nil }
+        /// A group takes keys alone, so the field has no job there. Our own key is a dead
+        /// end, so naming it would be busywork.
+        var showsNameField: Bool { !isGroupMode && isValidKey && !isOwnKey && detectedContact == nil }
+
+        /// A complete key stops being text to edit and becomes the recipient, so the input
+        /// collapses into a single card. Showing both meant the same 64 characters twice.
+        var showsRecipientCard: Bool { isValidKey }
+
+        /// Nothing to search and nothing to search through: explain the screen instead of
+        /// rendering an empty list under an empty field.
+        var showsEmptyState: Bool {
+            !isGroupMode && searchInput.isEmpty && visibleContacts.isEmpty
+        }
 
         var canStart: Bool { isValidKey && !isOwnKey && !isCreating }
+
+        var primaryAction: PrimaryAction {
+            if isGroupMode {
+                return isNamingGroup ? .confirmGroup : .createGroup
+            }
+
+            return isValidKey ? .start : .scan
+        }
+
+        var isPrimaryEnabled: Bool {
+            switch primaryAction {
+            case .scan: return !isCreating
+            case .start: return canStart
+            case .createGroup: return canCreateGroup
+            case .confirmGroup: return canConfirmGroup
+            }
+        }
 
         var isDetectedKeySelected: Bool {
             isValidKey && selectedContacts.contains { $0.publicKey == detectedKey }
@@ -104,10 +149,16 @@ struct NewChat {
         case peerKeyChanged(String)
         case displayNameChanged(String)
         case pasteTapped
+        case searchCleared
         case copyMyKeyTapped
         case copyIndicatorExpired
         case contactTapped(ChatContact)
         case startTapped
+        case primaryTapped
+        case scanTapped
+        case scan(PresentationAction<Scan.Action>)
+        case shareMyKeyTapped
+        case shareMyKeyDismissed
         case created(ZMConversation)
         case createFailed(ZappMessagingFailureCode)
         case rejoinRequired(publicKey: String, displayName: String?)
@@ -142,7 +193,13 @@ struct NewChat {
                 return .cancel(id: CancelID.copyIndicator)
 
             case .peerKeyChanged(let value):
+                // A name typed for the previous key must not carry over onto a different
+                // one, or the peer gets saved under a stranger's label.
+                let previousKey = state.detectedKey
                 state.searchInput = value
+                if state.detectedKey != previousKey {
+                    state.displayName = ""
+                }
                 state.errorCode = state.isOwnKey ? .ownPublicKey : nil
                 return .none
 
@@ -154,6 +211,12 @@ struct NewChat {
                 guard let pasted = pasteboard.getString() else { return .none }
 
                 return .send(.peerKeyChanged(pasted.data))
+
+            case .searchCleared:
+                state.searchInput = ""
+                state.displayName = ""
+                state.errorCode = nil
+                return .none
 
             case .copyMyKeyTapped:
                 guard !state.myPublicKey.isEmpty else { return .none }
@@ -198,6 +261,44 @@ struct NewChat {
                 let key = state.detectedKey
 
                 return start(&state, publicKey: key, displayName: name)
+
+            case .primaryTapped:
+                switch state.primaryAction {
+                case .scan: return .send(.scanTapped)
+                case .start: return .send(.startTapped)
+                case .createGroup: return .send(.groupCreateTapped)
+                case .confirmGroup: return .send(.groupConfirmTapped)
+                }
+
+            case .scanTapped:
+                guard !state.isCreating else { return .none }
+                var scanState = Scan.State()
+                scanState.checkers = [.chatPublicKeyScanChecker]
+                scanState.instructions = String(localizable: .newChatScanInstructions)
+                state.scan = scanState
+                return .none
+
+                // The scanner only ever hands back a sanitized 64-hex key, so it lands in
+                // the same field a paste would and the detected-key card takes over.
+            case .scan(.presented(.foundString(let key))):
+                state.scan = nil
+                return .send(.peerKeyChanged(key))
+
+            case .scan(.presented(.cancelTapped)), .scan(.dismiss):
+                state.scan = nil
+                return .none
+
+            case .scan:
+                return .none
+
+            case .shareMyKeyTapped:
+                guard !state.myPublicKey.isEmpty else { return .none }
+                state.isSharingMyKey = true
+                return .none
+
+            case .shareMyKeyDismissed:
+                state.isSharingMyKey = false
+                return .none
 
             case .created:
                 state.isCreating = false
@@ -317,6 +418,9 @@ struct NewChat {
                 return .none
             }
         }
+        .ifLet(\.$scan, action: \.scan) {
+            Scan()
+        }
     }
 
     private enum Constants {
@@ -381,6 +485,9 @@ extension AlertState where Action == NewChat.Action {
 enum PublicKeyRules {
     static let hexLength = 64
 
+    private static let previewHead = 12
+    private static let previewTail = 6
+
     static func sanitize(_ raw: String) -> String {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let unprefixed = trimmed.hasPrefix("0x") ? String(trimmed.dropFirst(2)) : trimmed
@@ -389,5 +496,13 @@ enum PublicKeyRules {
 
     static func isValid(_ key: String) -> Bool {
         key.count == hexLength && key.allSatisfy(\.isHexDigit)
+    }
+
+    /// Head-and-tail form for display, as Android abbreviates it. Both ends are kept: the
+    /// tail is what someone reads back to confirm they pasted the right key.
+    static func abbreviated(_ key: String) -> String {
+        guard key.count > previewHead + previewTail else { return key }
+
+        return "\(key.prefix(previewHead))…\(key.suffix(previewTail))"
     }
 }

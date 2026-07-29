@@ -18,6 +18,7 @@ import ZcashPaymentURI
 struct Scan {
     enum ScanImageResult: Equatable {
         case invalidQRCode
+        case invalidPublicKey
         case noQRCodeFound
         case severalQRCodesFound
         case keystoneCheckOnly
@@ -191,6 +192,8 @@ struct Scan {
                 switch result {
                 case .invalidQRCode:
                     state.info = String(localizable: .scanInvalidQR)
+                case .invalidPublicKey:
+                    state.info = String(localizable: .scanInvalidPublicKey)
                 case .noQRCodeFound:
                     state.info = String(localizable: .scanInvalidImage)
                 case .severalQRCodesFound:
