@@ -76,7 +76,22 @@ struct ZappMessagingState: Equatable, Sendable {
         unreadCounts[conversationId] ?? 0
     }
 
+    /// Peer presence as the UI is allowed to show it. Reciprocity: while we hide
+    /// our own status we surface no peer dots either, which is what `ChatListVM.kt`
+    /// and `ChatRoomVM.kt` do with `showOnlineStatus`.
     func isPeerOnline(in conversationId: String) -> Bool {
+        presenceVisible && onlineConversationIds.contains(conversationId)
+    }
+
+    /// The same signal without the reciprocity gate: we have a live path to this
+    /// peer, which stays honest to show even while their presence is ours to hide.
+    ///
+    /// Still derived from presence, not from transport — the core folds socket
+    /// connect/close and the peer's `__presence` control message into one event,
+    /// so a peer with a live socket who hides reads as unreachable here. Android
+    /// carries the same limitation; separating them needs a distinct connectivity
+    /// event from the SDK.
+    func isPeerReachable(in conversationId: String) -> Bool {
         onlineConversationIds.contains(conversationId)
     }
 }

@@ -2030,13 +2030,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Let people see when you're online."
+            "value": "Let people see when you're online. It works both ways: hiding yours hides theirs from you."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Permite que vean cuándo estás en línea."
+            "value": "Permite que vean cuándo estás en línea. Funciona en ambos sentidos: si ocultas el tuyo, también dejas de ver el suyo."
           }
         }
       }
@@ -2292,6 +2292,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mensaje"
+          }
+        }
+      }
+    },
+    "chatRoom.peer.connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado"
           }
         }
       }
