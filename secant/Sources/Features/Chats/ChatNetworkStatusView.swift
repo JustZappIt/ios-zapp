@@ -40,27 +40,39 @@ struct ChatNetworkStatusChip: View {
             return (String(localizable: .chatListOffline), .danger, .danger)
         }
 
-        if context == .room, let conversationId, state.isPeerOnline(in: conversationId) {
-            return (String(localizable: .chatRoomPeerOnline), .success, .success)
+        // A room chip speaks for one conversation, so it answers about that peer
+        // first. Swarm-wide facts — the peer count, and DHT health — describe the
+        // network, not this chat, and a conversation with a live socket must not be
+        // labelled "Weak connection" because the swarm is unhappy elsewhere. They
+        // stay, but only as the explanation for why we cannot reach this peer.
+        if context == .room {
+            if let conversationId {
+                // Reachability ungated on purpose: hiding our own status must not
+                // strand a working conversation on "Connecting…".
+                if state.isPeerOnline(in: conversationId) {
+                    return (String(localizable: .chatRoomPeerOnline), .success, .success)
+                }
+                if state.isPeerReachable(in: conversationId) {
+                    return (String(localizable: .chatRoomPeerConnected), .success, .success)
+                }
+            }
+            // Nothing better to say about this peer, so fall back to why: the
+            // swarm-wide health is a real answer once they are out of reach.
+            if state.dhtHealth == "critical" {
+                return (String(localizable: .chatNetworkDht), .danger, .danger)
+            }
+            if state.dhtHealth == "degraded" {
+                return (String(localizable: .chatListDegraded), .accent, .accent)
+            }
+            return (String(localizable: .chatListConnecting), .accent, .accent)
         }
+
         if state.dhtHealth == "critical" {
             return (String(localizable: .chatNetworkDht), .danger, .danger)
         }
         if state.dhtHealth == "degraded" {
             return (String(localizable: .chatListDegraded), .accent, .accent)
         }
-
-        // A room chip speaks for one conversation, so the swarm-wide peer count
-        // never belongs here — it says nothing about whether THIS peer is
-        // reachable. Ungated on purpose: hiding our own status must not strand a
-        // working conversation on "Connecting…".
-        if context == .room {
-            guard let conversationId, state.isPeerReachable(in: conversationId) else {
-                return (String(localizable: .chatListConnecting), .accent, .accent)
-            }
-            return (String(localizable: .chatRoomPeerConnected), .success, .success)
-        }
-
         if state.peerCount == 0 {
             return (String(localizable: .chatListConnecting), .accent, .accent)
         }
