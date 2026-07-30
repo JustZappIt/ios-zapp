@@ -54,13 +54,22 @@ runs:
       working-directory: ../zappMessaging/ios
       run: |
         COUNT=$(ls -d Addons/*.xcframework 2>/dev/null | wc -l | tr -d ' ')
-        test "$COUNT" = "15" || { echo "::error::expected 15 addon xcframeworks, found $COUNT"; exit 1; }
+        test "$COUNT" = "18" || { echo "::error::expected 18 addon xcframeworks, found $COUNT"; exit 1; }
         test -f Resources/worklet.bundle || { echo "::error::worklet.bundle was not generated"; exit 1; }
 
         # Package.swift hardcodes the addon list; a dependency bump renames the
         # xcframeworks and silently staleness it. Fail loudly instead.
-        diff <(ls -d Addons/*.xcframework | sed 's|Addons/||; s|\.xcframework||' | sort) \
-             <(grep -oE '"[a-z-]+\.[0-9.]+"' Package.swift | tr -d '"' | sort) \
-          || { echo "::error::Package.swift's addon list has drifted from Addons/ — re-run npm run setup and update Package.swift"; exit 1; }
+        #
+        # Subset, not equality: bare-link walks the whole dependency tree, so
+        # Addons/ also holds addons the packed bundle never loads (bare-dns,
+        # bare-tcp and bare-tls today). Package.swift declares only what the
+        # bundle requires, so the check that matters is that every DECLARED
+        # addon still exists on disk under that exact versioned name.
+        MISSING=$(comm -23 <(grep -oE '"[a-z-]+\.[0-9.]+"' Package.swift | tr -d '"' | sort -u) \
+                           <(ls -d Addons/*.xcframework | sed 's|Addons/||; s|\.xcframework||' | sort -u))
+        if [ -n "$MISSING" ]; then
+          echo "::error::Package.swift declares addons that Addons/ does not contain: $(echo "$MISSING" | tr '\n' ' ')— re-run npm run setup and update Package.swift"
+          exit 1
+        fi
 
         echo "zappMessaging ready: $COUNT addons + worklet.bundle"
