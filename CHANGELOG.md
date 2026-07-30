@@ -12,6 +12,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Chat now includes a network-status control with detailed connection, peer, delivery, queue, and recent-error diagnostics.
 
 ### Changed
+- [ZAPP-1] Hiding your own online status in chat privacy settings now hides your contacts' status from you as well, in the chat list and in the chat header. Showing whether other people are online while withholding the same about yourself was one-sided; the header still tells you the conversation is connected, so turning the setting off no longer leaves a working chat looking like it is still connecting.
 - [ZAPP-1] Rebranded the app from ZODL to Zapp: new app name across all screens, new Zapp app icons for the production, testnet, and internal builds, new logo and wordmark art, and a new bundle-identifier namespace so Zapp installs side by side with ZODL.
 - [ZAPP-1] Restyled the whole app to the Zapp Swiss design system: warm neutral palette with a single orange accent for calls to action, sharp corners on every surface, and bold Swiss typography (bold headings and titles, a heavy-weight balance display) in both light and dark mode.
 - [ZAPP-1] Currency conversion is now on by default, so your total balance, activity, and amounts show in your selected local currency without having to turn it on first (you can still opt out in Settings). Tap your total balance on the Pay screen to switch between local currency and ZEC; amounts fall back to ZEC only when the rate provider is unavailable.
@@ -25,6 +26,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [ZAPP-1] Starting a chat now works on networks that block the peer-to-peer transport outright — strict mobile carriers, and workplace or campus Wi-Fi. The first invite and the key needed to open the conversation can now travel over ordinary HTTPS when the direct path can't be established, so an invite that used to sit unanswered forever now lands. Once the conversation is open, messages continue over the usual peer-to-peer path.
+- [ZAPP-1] A chat's header no longer shows the number of peers your app is connected to across the whole network as if it described that one conversation. A green "12" gave the impression the person you were talking to was reachable when they may not have been; the header now reports only what it actually knows about that conversation.
 - [ZAPP-1] The App Store / TestFlight build no longer crashes instantly on launch. It never reached the first screen, so the app was unusable for anyone installing it from TestFlight.
 - [ZAPP-1] The onboarding screens (welcome, wallet intro, wallet choice, seed backup, and the creating-wallet/identity loading screen) no longer clip their large headings or content on shorter phones: the landing screens now scroll when they don't fit and stay centered when they do, and the oversized headings scale down to fit the width.
 - [ZAPP-1] Chat now rejects conversations that use your own messaging key, keeps failed messages available for an explicit retry, and reconciles outgoing messages without duplicate bubbles.

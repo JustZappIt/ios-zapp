@@ -49,6 +49,18 @@ struct ChatNetworkStatusChip: View {
         if state.dhtHealth == "degraded" {
             return (String(localizable: .chatListDegraded), .accent, .accent)
         }
+
+        // A room chip speaks for one conversation, so the swarm-wide peer count
+        // never belongs here — it says nothing about whether THIS peer is
+        // reachable. Ungated on purpose: hiding our own status must not strand a
+        // working conversation on "Connecting…".
+        if context == .room {
+            guard let conversationId, state.isPeerReachable(in: conversationId) else {
+                return (String(localizable: .chatListConnecting), .accent, .accent)
+            }
+            return (String(localizable: .chatRoomPeerConnected), .success, .success)
+        }
+
         if state.peerCount == 0 {
             return (String(localizable: .chatListConnecting), .accent, .accent)
         }
