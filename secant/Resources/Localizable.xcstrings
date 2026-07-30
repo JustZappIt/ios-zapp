@@ -11640,13 +11640,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scan a ZODL public key QR code"
+            "value": "Scan a Zapp public key QR code"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Escanea un código QR de clave pública de ZODL"
+            "value": "Escanea un código QR de clave pública de Zapp"
           }
         }
       }
@@ -14755,13 +14755,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This QR code doesn't contain a valid ZODL public key."
+            "value": "This QR code doesn't contain a valid Zapp public key."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Este código QR no contiene una clave pública válida de ZODL."
+            "value": "Este código QR no contiene una clave pública válida de Zapp."
           }
         }
       }

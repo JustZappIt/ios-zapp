@@ -131,9 +131,11 @@ struct ChatPublicKeyScanChecker: ScanChecker, Equatable {
     let id = 6
 
     func checkQRCode(_ qrCode: String) -> Scan.Action? {
-        let key = PublicKeyRules.sanitize(qrCode)
+        guard let key = PublicKeyRules.parse(qrCode) else {
+            return .scanFailed(.invalidPublicKey)
+        }
 
-        return PublicKeyRules.isValid(key) ? .foundString(key) : .scanFailed(.invalidPublicKey)
+        return .foundString(key)
     }
 }
 
