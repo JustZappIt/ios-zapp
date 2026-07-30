@@ -36,8 +36,8 @@ echo "==> npm run setup (assembles the 15 addon xcframeworks + packs worklet.bun
 ( cd "$SIBLING" && npm ci && npm run setup )
 
 COUNT=$(ls -d "$SIBLING"/ios/Addons/*.xcframework 2>/dev/null | wc -l | tr -d ' ')
-if [ "$COUNT" != "15" ]; then
-  echo "!! expected 15 addon xcframeworks, found $COUNT" >&2
+if [ "$COUNT" != "18" ]; then
+  echo "!! expected 18 addon xcframeworks, found $COUNT" >&2
   exit 1
 fi
 if [ ! -f "$SIBLING/ios/Resources/worklet.bundle" ]; then
