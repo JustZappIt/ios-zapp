@@ -60,8 +60,10 @@ struct NewChat {
         /// Shows our own key as a QR the peer can scan — the other half of the exchange.
         var isSharingMyKey = false
 
-        var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
-        var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
+        /// Strict: a search string that merely contains 64 hex characters is a search string,
+        /// not a peer. See `PublicKeyRules.parse`.
+        var detectedKey: String { PublicKeyRules.parse(searchInput) ?? "" }
+        var isValidKey: Bool { PublicKeyRules.parse(searchInput) != nil }
         var isOwnKey: Bool {
             isValidKey && detectedKey == PublicKeyRules.sanitize(myPublicKey)
         }
@@ -496,6 +498,24 @@ enum PublicKeyRules {
 
     static func isValid(_ key: String) -> Bool {
         key.count == hexLength && key.allSatisfy(\.isHexDigit)
+    }
+
+    /// Strict counterpart to `sanitize`, for deciding whether some untrusted text *is* a key
+    /// rather than coercing it into one.
+    ///
+    /// `sanitize` drops every non-hex character and truncates to 64, which is right for
+    /// masking a field as it is typed but wrong for validation: a URL or a sentence with
+    /// enough incidental hex in it silently becomes a well-formed key for a peer who does not
+    /// exist. Here anything other than whitespace and an optional `0x` disqualifies the input.
+    ///
+    /// Whitespace is dropped anywhere, not just at the ends, because keys are routinely copied
+    /// out of a wrapped display. Matches Android, which also requires the cleaned string to be
+    /// the key in its entirety.
+    static func parse(_ raw: String) -> String? {
+        let compact = raw.filter { !$0.isWhitespace }.lowercased()
+        let unprefixed = compact.hasPrefix("0x") ? String(compact.dropFirst(2)) : compact
+
+        return isValid(unprefixed) ? unprefixed : nil
     }
 
     /// Head-and-tail form for display, as Android abbreviates it. Both ends are kept: the

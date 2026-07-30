@@ -13,7 +13,7 @@ import Testing
     private static let otherKey = String(repeating: "c", count: PublicKeyRules.hexLength)
     private static let ownKey = String(repeating: "a", count: PublicKeyRules.hexLength)
 
-    private func makeStore(
+    @MainActor private func makeStore(
         myPublicKey: String = "",
         contacts: [ChatContact] = [],
         isCreating: Bool = false
@@ -246,6 +246,48 @@ import Testing
         #expect(checker.checkQRCode("zcash:u1abcdef") == .scanFailed(.invalidPublicKey))
         #expect(checker.checkQRCode(String(repeating: "b", count: 63)) == .scanFailed(.invalidPublicKey))
         #expect(checker.checkQRCode("") == .scanFailed(.invalidPublicKey))
+    }
+
+    /// A key is recognised, never assembled. Dropping non-hex characters and truncating to 64
+    /// turns ordinary text into a well-formed key for a peer who does not exist, so the whole
+    /// payload has to be the key.
+    @Test func payloadsThatMerelyContainHexAreNotKeys() {
+        let checker = ChatPublicKeyScanChecker()
+        let fabrications = [
+            String(repeating: "g1", count: PublicKeyRules.hexLength),
+            "https://example.com/tx/\(String(repeating: "deadbeef", count: 9))?ref=zz",
+            "cafe babe deadbeef \(String(repeating: "feed", count: 20))",
+            "\(String(repeating: "b", count: PublicKeyRules.hexLength))trailing-junk",
+            "zcash:u1\(String(repeating: "a", count: PublicKeyRules.hexLength))"
+        ]
+
+        for payload in fabrications {
+            #expect(PublicKeyRules.parse(payload) == nil, "should not parse: \(payload)")
+            #expect(checker.checkQRCode(payload) == .scanFailed(.invalidPublicKey))
+        }
+    }
+
+    /// Keys get copied out of wrapped displays, so whitespace anywhere is still forgiven.
+    @Test func realKeysSurviveWrappingAndPrefixes() {
+        let key = String(repeating: "b", count: PublicKeyRules.hexLength)
+
+        #expect(PublicKeyRules.parse(key) == key)
+        #expect(PublicKeyRules.parse("  \(key)\n") == key)
+        #expect(PublicKeyRules.parse("0x\(key.uppercased())") == key)
+        #expect(PublicKeyRules.parse("\(key.prefix(32))\n\(key.suffix(32))") == key)
+    }
+
+    @MainActor @Test func aSearchStringContainingHexDoesNotBecomeARecipient() async {
+        let store = makeStore()
+        let payload = "cafe babe deadbeef \(String(repeating: "feed", count: 20))"
+
+        await store.send(.peerKeyChanged(payload)) {
+            $0.searchInput = payload
+        }
+
+        #expect(!store.state.isValidKey)
+        #expect(!store.state.showsRecipientCard)
+        #expect(store.state.primaryAction == .scan)
     }
 
     // MARK: - Sharing our own key
