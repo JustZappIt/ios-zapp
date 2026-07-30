@@ -6,13 +6,15 @@
 //  gradle.properties. iOS has no xcconfig and no BuildConfig analogue, so they
 //  live here.
 //
-//  Both peer values are PUBLIC by design — a blind peer's public key and its
-//  bootstrap address are advertised to anyone who wants to relay through it, and
-//  zodl-android commits them to gradle.properties for the same reason. Nothing
-//  here is a secret.
+//  Every value here is PUBLIC by design — a blind peer's public key, its
+//  bootstrap address and its mailbox endpoint are advertised to anyone who wants
+//  to relay through it, and zodl-android commits them to gradle.properties for
+//  the same reason. Nothing here is a secret.
 //
 //  Keep them in step with zodl-android's gradle.properties. If they drift, the
-//  failure is silent: no offline delivery, and a DHT with no seed nodes.
+//  failure is silent: no offline delivery, a DHT with no seed nodes, or — for the
+//  mailbox URL, which doubles as the allow-list for host-carried requests — every
+//  invite POST rejected before it leaves the device.
 //
 
 import Foundation
@@ -29,6 +31,13 @@ enum ZappMessagingBuildConfig {
     /// Stable public address for an immediate blind-peer connection attempt.
     /// HyperDHT retains normal DHT lookup as the fallback path.
     static let blindPeerAddress = "140.245.193.100:49737"
+
+    /// Bootstrap invite mailbox over HTTPS, for the networks that drop HyperDHT's
+    /// UDP altogether — the only path that reaches a firewalled peer there. The
+    /// worklet names the destination and the SDK checks it against this value
+    /// before POSTing, so it is also the allow-list: get it wrong and the feature
+    /// does not misbehave, it silently stops existing.
+    static let inviteMailboxURL = "https://ntfy.140.245.193.100.sslip.io/zapp-invite"
 
     /// Must stay nil/`info` in anything shipped: `debug` dumps keypairs and
     /// verbose stream lifecycle into the log.
@@ -50,6 +59,7 @@ enum ZappMessagingBuildConfig {
             blindPeerKeys: blindPeerKeys,
             bootstrapNodes: bootstrapNodes,
             blindPeerAddress: blindPeerAddress,
+            inviteMailboxURL: inviteMailboxURL,
             logLevel: logLevel
         )
     }
