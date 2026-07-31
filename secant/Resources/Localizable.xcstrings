@@ -3966,19 +3966,36 @@
         }
       }
     },
+    "chatRoom.status.delivered": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delivered"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entregado"
+          }
+        }
+      }
+    },
     "chatRoom.status.queued": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Queued"
+            "value": "Waiting for recipient to sync"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En cola"
+            "value": "Esperando que el destinatario sincronice"
           }
         }
       }
@@ -4023,13 +4040,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sent"
+            "value": "Sent, awaiting delivery"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enviado"
+            "value": "Enviado, pendiente de entrega"
           }
         }
       }

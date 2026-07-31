@@ -33,6 +33,9 @@ struct ChatMediaBubble: View {
     var senderName: String?
     /// `nil` unless a transfer is in flight. Supplied by the room — the bubble owns no streams.
     var progress: Double?
+    /// Read receipts are reciprocal. The stored status remains read, but the bubble only
+    /// highlights it while receipts are enabled.
+    var readReceiptsEnabled: Bool
 
     @State private var image: UIImage?
     @State private var isThumbnail = false
@@ -137,7 +140,8 @@ struct ChatMediaBubble: View {
 
             if isFromMe {
                 ChatMessageStatusIndicator(
-                    status: .init(wire: message.status),
+                    status: ChatMessageStatusIndicator.Status(wire: message.status)
+                        .visible(readReceiptsEnabled: readReceiptsEnabled),
                     mutedColor: metaColor,
                     readColor: ZappColors.onAccent.color(colorScheme)
                 )
@@ -286,7 +290,8 @@ private extension ZappTextStyle {
                 mediaWidth: 1200,
                 mediaHeight: 900
             ),
-            senderName: "satoshi"
+            senderName: "satoshi",
+            readReceiptsEnabled: true
         )
 
         ChatMediaBubble(
@@ -302,7 +307,8 @@ private extension ZappTextStyle {
                 mediaHeight: 1000,
                 status: "queued"
             ),
-            progress: 0.4
+            progress: 0.4,
+            readReceiptsEnabled: true
         )
     }
     .padding(16)

@@ -26,6 +26,7 @@ struct ChatTransactionBubble: View {
     let message: ZMMessage
     var senderName: String?
     var onViewTransaction: ((String) -> Void)?
+    var readReceiptsEnabled = true
 
     private var isFromMe: Bool { message.isFromMe }
 
@@ -82,7 +83,8 @@ struct ChatTransactionBubble: View {
 
                 if isFromMe {
                     ChatMessageStatusIndicator(
-                        status: .init(wire: message.status),
+                        status: ChatMessageStatusIndicator.Status(wire: message.status)
+                            .visible(readReceiptsEnabled: readReceiptsEnabled),
                         mutedColor: ZappColors.textMuted.color(colorScheme),
                         readColor: ZappColors.accent.color(colorScheme)
                     )

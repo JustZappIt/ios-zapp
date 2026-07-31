@@ -25,6 +25,7 @@ struct ChatFileBubble: View {
     var senderName: String?
     /// `nil` unless a transfer is in flight — supplied by the room, as with the media bubble.
     var progress: Double?
+    var readReceiptsEnabled = true
 
     private var isFromMe: Bool { message.isFromMe }
 
@@ -71,7 +72,8 @@ struct ChatFileBubble: View {
 
                 if isFromMe {
                     ChatMessageStatusIndicator(
-                        status: .init(wire: message.status),
+                        status: ChatMessageStatusIndicator.Status(wire: message.status)
+                            .visible(readReceiptsEnabled: readReceiptsEnabled),
                         mutedColor: metaColor,
                         readColor: ZappColors.onAccent.color(colorScheme)
                     )

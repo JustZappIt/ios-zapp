@@ -88,7 +88,10 @@ struct SupportChatView: View {
             ScrollView {
                 LazyVStack(spacing: Design.Spacing._md) {
                     ForEach(store.messages) { message in
-                        SupportMessageRow(message: message)
+                        SupportMessageRow(
+                            message: message,
+                            readReceiptsEnabled: store.messagingState.readReceiptsEnabled
+                        )
                     }
                 }
                 .padding(.horizontal, Design.Spacing._xl)
@@ -258,14 +261,15 @@ private struct SupportCategoryPicker: View {
 /// so the `[Zapp]:` greeting the user's own device posted still reads as a system message.
 private struct SupportMessageRow: View {
     let message: SupportMessage
+    let readReceiptsEnabled: Bool
 
     var body: some View {
         switch ChatMessageKind.of(message.message) {
         case .image, .video:
-            ChatMediaBubble(message: message.message)
+            ChatMediaBubble(message: message.message, readReceiptsEnabled: readReceiptsEnabled)
 
         case .file:
-            ChatFileBubble(message: message.message)
+            ChatFileBubble(message: message.message, readReceiptsEnabled: readReceiptsEnabled)
 
         default:
             SupportTextBubble(message: message)

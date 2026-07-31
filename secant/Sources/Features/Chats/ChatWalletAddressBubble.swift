@@ -36,6 +36,7 @@ struct ChatWalletAddressBubble: View {
     var senderName: String?
     var onCopy: ((String) -> Void)?
     var onSendToAddress: ((String) -> Void)?
+    var readReceiptsEnabled = true
 
     @State private var didCopy = false
 
@@ -127,7 +128,8 @@ struct ChatWalletAddressBubble: View {
 
                 if isFromMe {
                     ChatMessageStatusIndicator(
-                        status: .init(wire: message.status),
+                        status: ChatMessageStatusIndicator.Status(wire: message.status)
+                            .visible(readReceiptsEnabled: readReceiptsEnabled),
                         mutedColor: ZappColors.textMuted.color(colorScheme),
                         readColor: ZappColors.accent.color(colorScheme)
                     )

@@ -64,10 +64,9 @@ struct ZappMessagingState: Equatable, Sendable {
     /// to a public key and cannot identify who is online, only that someone is.
     var onlineConversationIds: Set<String> = []
 
-    /// The worklet defaults read receipts ON at identity create/restore, before the
-    /// app's preferences have loaded. The app re-asserts the user's real setting the
-    /// moment identity lands, or a receipts-off user leaks receipts on every cold start.
-    var readReceiptsEnabled = true
+    /// Privacy-safe cold start: reveal read state only after the persisted setting has
+    /// been re-asserted against the restored worklet identity.
+    var readReceiptsEnabled = false
     var presenceVisible = true
 
     var isReady: Bool { phase == .ready }

@@ -20,6 +20,10 @@ struct ChatRoomBubbleRow: View {
 
     let message: ZMMessage
 
+    /// Read receipts are reciprocal: with them off, a `read` status is shown as merely
+    /// `delivered`, on every bubble kind rather than only the text and media ones.
+    private var readReceiptsEnabled: Bool { store.messagingState.readReceiptsEnabled }
+
     var body: some View {
         WithPerceptionTracking {
             bubble
@@ -54,24 +58,40 @@ struct ChatRoomBubbleRow: View {
                 message: message,
                 senderName: senderName,
                 onCopy: { store.send(.copyAddressTapped($0)) },
-                onSendToAddress: { store.send(.sendToAddressTapped($0)) }
+                onSendToAddress: { store.send(.sendToAddressTapped($0)) },
+                readReceiptsEnabled: readReceiptsEnabled
             )
 
         case .zecTransaction:
             ChatTransactionBubble(
                 message: message,
                 senderName: senderName,
-                onViewTransaction: { store.send(.viewTransactionTapped($0)) }
+                onViewTransaction: { store.send(.viewTransactionTapped($0)) },
+                readReceiptsEnabled: readReceiptsEnabled
             )
 
         case .image, .video:
-            ChatMediaBubble(message: message, senderName: senderName, progress: progress)
+            ChatMediaBubble(
+                message: message,
+                senderName: senderName,
+                progress: progress,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
 
         case .file:
-            ChatFileBubble(message: message, senderName: senderName, progress: progress)
+            ChatFileBubble(
+                message: message,
+                senderName: senderName,
+                progress: progress,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
 
         case .text:
-            ChatMessageBubble(message: message, senderName: senderName)
+            ChatMessageBubble(
+                message: message,
+                senderName: senderName,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
         }
     }
 

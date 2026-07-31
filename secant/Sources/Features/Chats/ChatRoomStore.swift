@@ -428,7 +428,21 @@ struct ChatRoom {
 
             case .messagesLoaded(let messages):
                 state.isLoading = false
-                state.messages = messages.sorted { $0.timestamp < $1.timestamp }
+                let visibleStatuses = state.messages.reduce(into: [String: String]()) { result, message in
+                    guard let status = message.status else { return }
+                    result[message.id] = ChatMessageStatusOrder.advance(
+                        from: result[message.id],
+                        to: status
+                    )
+                }
+                state.messages = messages.map { message in
+                    guard let visibleStatus = visibleStatuses[message.id] else { return message }
+
+                    return message.withStatus(
+                        ChatMessageStatusOrder.advance(from: message.status, to: visibleStatus)
+                    )
+                }
+                .sorted { $0.timestamp < $1.timestamp }
 
                 for index in state.messages.indices {
                     state.applyEarlyStatus(at: index)
@@ -651,22 +665,27 @@ private let messagePageSize = 50
 private let replyPreviewMaxLength = 100
 private let maxEarlyStatuses = 64
 
-/// Delivery state only ever moves forward. Without this a late `sent` overwrites a `read`
-/// double-tick, and the mark walks backwards while the user watches.
+/// Delivery state only ever moves forward. Without this a late relay or persistence event can
+/// overwrite recipient delivery/read confirmation and make the mark walk backwards.
 enum ChatMessageStatusOrder {
     static func advance(from current: String?, to next: String) -> String {
-        switch current {
-        case "read": return "read"
-        case "failed": return "failed"
-        default: break
+        guard let nextStatus = ChatMessageStatusIndicator.Status.exact(wire: next) else {
+            return current ?? next
+        }
+        guard let currentStatus = ChatMessageStatusIndicator.Status.exact(wire: current) else {
+            return nextStatus.rawValue
         }
 
-        if next == "failed" || next == "read" { return next }
-        if current == "sent" { return "sent" }
-        if current == "queued", next == "sending" { return "queued" }
+        if currentStatus == .read || currentStatus == .failed { return currentStatus.rawValue }
+        if nextStatus == .failed || nextStatus == .read { return nextStatus.rawValue }
+        if currentStatus == .delivered || nextStatus == .delivered { return Status.delivered.rawValue }
+        if currentStatus == .sent || nextStatus == .sent { return Status.sent.rawValue }
+        if currentStatus == .queued && nextStatus == .sending { return Status.queued.rawValue }
 
-        return next
+        return nextStatus.rawValue
     }
+
+    private typealias Status = ChatMessageStatusIndicator.Status
 }
 
 extension ZMMessage {
