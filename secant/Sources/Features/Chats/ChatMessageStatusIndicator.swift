@@ -7,8 +7,9 @@ import SwiftUI
 
 /// Delivery state on an outgoing bubble, rendered as a typographic mark in the Swiss style (no SF
 /// Symbols): a clock while queued locally, a single tick once the blind relay accepts the encrypted
-/// block, a muted double tick once the recipient confirms delivery, and a highlighted double tick
-/// once the peer has read it.
+/// block, a muted double tick once the recipient confirms delivery, and a highlighted triple tick
+/// once the peer has read it. Tick count keeps delivered and read distinguishable without relying
+/// on colour.
 ///
 /// Colours are supplied by the caller because they depend on the bubble the mark sits in.
 struct ChatMessageStatusIndicator: View {
@@ -38,8 +39,12 @@ struct ChatMessageStatusIndicator: View {
             !readReceiptsEnabled && self == .read ? .delivered : self
         }
 
-        var isDoubleTick: Bool {
-            self == .delivered || self == .read
+        var tickCount: Int {
+            switch self {
+            case .delivered: return 2
+            case .read: return 3
+            case .sending, .queued, .sent, .failed: return 1
+            }
         }
 
         var usesHighlightedColor: Bool {
@@ -48,8 +53,8 @@ struct ChatMessageStatusIndicator: View {
     }
 
     private enum Constants {
-        static let readWidth: CGFloat = 11
-        static let readOffset: CGFloat = 4
+        static let markWidth: CGFloat = 15
+        static let tickOffset: CGFloat = 4
         static let size: CGFloat = 10
         static let sendingSize: CGFloat = 11
         static let lineHeight: CGFloat = 16
@@ -65,10 +70,10 @@ struct ChatMessageStatusIndicator: View {
                 .id(status)
                 .transition(.opacity)
         }
-        // One width for every state. The read mark is a double tick and is wider
+        // One width for every state. The read mark is a triple tick and is wider
         // than the others, so without this the time shifts sideways the moment a
         // message is read — the mark must turn in place, not nudge the row.
-        .frame(width: Constants.readWidth, alignment: .leading)
+        .frame(width: Constants.markWidth, alignment: .leading)
         .animation(ZappMotion.content, value: status)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
@@ -76,10 +81,13 @@ struct ChatMessageStatusIndicator: View {
 
     @ViewBuilder
     private var mark: some View {
-        if status.isDoubleTick {
+        if status.tickCount > 1 {
             ZStack(alignment: .topLeading) {
                 glyph
-                glyph.offset(x: Constants.readOffset)
+                glyph.offset(x: Constants.tickOffset)
+                if status.tickCount > 2 {
+                    glyph.offset(x: Constants.tickOffset * 2)
+                }
             }
         } else {
             glyph

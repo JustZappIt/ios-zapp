@@ -25,7 +25,7 @@ struct ChatMessageBubble: View {
     var senderName: String?
     /// Read receipts are reciprocal. The stored status remains read, but the bubble only
     /// highlights it while receipts are enabled.
-    var readReceiptsEnabled = true
+    var readReceiptsEnabled: Bool
 
     private var isFromMe: Bool { message.isFromMe }
     private var hasQuote: Bool { message.replyToId != nil }
@@ -154,7 +154,8 @@ private extension ZappTextStyle {
                 senderName: "satoshi",
                 content: "Sharp corners only.",
                 isFromMe: false
-            )
+            ),
+            readReceiptsEnabled: true
         )
 
         ChatMessageBubble(
@@ -162,10 +163,11 @@ private extension ZappTextStyle {
                 id: "2",
                 conversationId: "c",
                 senderId: "me",
-                content: "Read receipts land as a double tick.",
+                content: "Read receipts land as a triple tick.",
                 isFromMe: true,
                 status: "read"
-            )
+            ),
+            readReceiptsEnabled: true
         )
 
         ChatMessageBubble(
@@ -179,7 +181,8 @@ private extension ZappTextStyle {
                 replyToId: "1",
                 replyToSenderName: "satoshi",
                 replyToContent: "Sharp corners only."
-            )
+            ),
+            readReceiptsEnabled: true
         )
     }
     .padding(16)

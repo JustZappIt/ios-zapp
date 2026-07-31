@@ -35,7 +35,7 @@ struct ChatMediaBubble: View {
     var progress: Double?
     /// Read receipts are reciprocal. The stored status remains read, but the bubble only
     /// highlights it while receipts are enabled.
-    var readReceiptsEnabled = true
+    var readReceiptsEnabled: Bool
 
     @State private var image: UIImage?
     @State private var isThumbnail = false
@@ -290,7 +290,8 @@ private extension ZappTextStyle {
                 mediaWidth: 1200,
                 mediaHeight: 900
             ),
-            senderName: "satoshi"
+            senderName: "satoshi",
+            readReceiptsEnabled: true
         )
 
         ChatMediaBubble(
@@ -306,7 +307,8 @@ private extension ZappTextStyle {
                 mediaHeight: 1000,
                 status: "queued"
             ),
-            progress: 0.4
+            progress: 0.4,
+            readReceiptsEnabled: true
         )
     }
     .padding(16)
