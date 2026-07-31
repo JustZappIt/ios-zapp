@@ -6,35 +6,55 @@
 import SwiftUI
 
 /// Delivery state on an outgoing bubble, rendered as a typographic mark in the Swiss style (no SF
-/// Symbols): a single tick once the message has left the device, a double tick once the peer has
-/// read it.
+/// Symbols): a clock while queued locally, a single tick once the blind relay accepts the encrypted
+/// block, a muted double tick once the recipient confirms delivery, and a highlighted triple tick
+/// once the peer has read it. Tick count keeps delivered and read distinguishable without relying
+/// on colour.
 ///
 /// Colours are supplied by the caller because they depend on the bubble the mark sits in.
 struct ChatMessageStatusIndicator: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    enum Status: Equatable {
+    enum Status: String, Equatable {
         case sending
         case queued
         case sent
+        case delivered
         case read
         case failed
 
-        /// `nil` off the wire means the message left the device.
+        /// A missing or unrecognized persisted status predates delivery tracking and is treated as
+        /// sent. Live status ordering uses `exact(wire:)` so an unknown event cannot advance a row.
         init(wire: String?) {
-            switch wire {
-            case "sending": self = .sending
-            case "queued": self = .queued
-            case "read": self = .read
-            case "failed": self = .failed
-            default: self = .sent
+            self = Self.exact(wire: wire) ?? .sent
+        }
+
+        static func exact(wire: String?) -> Self? {
+            wire.flatMap(Self.init(rawValue:))
+        }
+
+        /// Reciprocity only changes what the user can see. Keep the underlying read state so
+        /// turning receipts back on can reveal it without waiting for another SDK event.
+        func visible(readReceiptsEnabled: Bool) -> Self {
+            !readReceiptsEnabled && self == .read ? .delivered : self
+        }
+
+        var tickCount: Int {
+            switch self {
+            case .delivered: return 2
+            case .read: return 3
+            case .sending, .queued, .sent, .failed: return 1
             }
+        }
+
+        var usesHighlightedColor: Bool {
+            self == .read
         }
     }
 
     private enum Constants {
-        static let readWidth: CGFloat = 11
-        static let readOffset: CGFloat = 4
+        static let markWidth: CGFloat = 15
+        static let tickOffset: CGFloat = 4
         static let size: CGFloat = 10
         static let sendingSize: CGFloat = 11
         static let lineHeight: CGFloat = 16
@@ -50,10 +70,10 @@ struct ChatMessageStatusIndicator: View {
                 .id(status)
                 .transition(.opacity)
         }
-        // One width for every state. The read mark is a double tick and is wider
+        // One width for every state. The read mark is a triple tick and is wider
         // than the others, so without this the time shifts sideways the moment a
         // message is read — the mark must turn in place, not nudge the row.
-        .frame(width: Constants.readWidth, alignment: .leading)
+        .frame(width: Constants.markWidth, alignment: .leading)
         .animation(ZappMotion.content, value: status)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
@@ -61,10 +81,13 @@ struct ChatMessageStatusIndicator: View {
 
     @ViewBuilder
     private var mark: some View {
-        if status == .read {
+        if status.tickCount > 1 {
             ZStack(alignment: .topLeading) {
                 glyph
-                glyph.offset(x: Constants.readOffset)
+                glyph.offset(x: Constants.tickOffset)
+                if status.tickCount > 2 {
+                    glyph.offset(x: Constants.tickOffset * 2)
+                }
             }
         } else {
             glyph
@@ -79,11 +102,11 @@ struct ChatMessageStatusIndicator: View {
             )
     }
 
-    private var text: String {
+    var text: String {
         switch status {
         case .sending: return "◌"
         case .queued: return "◷"
-        case .sent, .read: return "✓"
+        case .sent, .delivered, .read: return "✓"
         case .failed: return "!"
         }
     }
@@ -92,7 +115,7 @@ struct ChatMessageStatusIndicator: View {
         switch status {
         case .read: return readColor
         case .failed: return ZappColors.danger.color(colorScheme)
-        case .sending, .queued, .sent: return mutedColor
+        case .sending, .queued, .sent, .delivered: return mutedColor
         }
     }
 
@@ -100,11 +123,12 @@ struct ChatMessageStatusIndicator: View {
         status == .sending ? Constants.sendingSize : Constants.size
     }
 
-    private var accessibilityLabel: String {
+    var accessibilityLabel: String {
         switch status {
         case .sending: return String(localizable: .chatRoomStatusSending)
         case .queued: return String(localizable: .chatRoomStatusQueued)
         case .sent: return String(localizable: .chatRoomStatusSent)
+        case .delivered: return String(localizable: .chatRoomStatusDelivered)
         case .read: return String(localizable: .chatRoomStatusRead)
         case .failed: return String(localizable: .chatRoomStatusFailed)
         }
@@ -116,6 +140,7 @@ struct ChatMessageStatusIndicator: View {
         ChatMessageStatusIndicator(status: .sending, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .queued, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .sent, mutedColor: .gray, readColor: .black)
+        ChatMessageStatusIndicator(status: .delivered, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .read, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .failed, mutedColor: .gray, readColor: .black)
     }

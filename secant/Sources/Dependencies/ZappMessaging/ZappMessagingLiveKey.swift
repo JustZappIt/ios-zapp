@@ -125,11 +125,11 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 )
 
                 if let identity = sdk.identity {
+                    await self.reassertPrivacySettings(sdk)
                     self.mutate {
                         $0.identity = identity
                         $0.phase = .ready
                     }
-                    await self.reassertPrivacySettings(sdk)
                     do {
                         try await self.refreshConversations()
                     } catch {
@@ -239,13 +239,13 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 let identity = try await sdk.restoreFromSeedPhrase(seedPhrase, displayName: displayName)
 
                 self.lock.withLock { self.pendingDisplayName = nil }
+                await self.reassertPrivacySettings(sdk)
                 self.mutate {
                     $0.identity = identity
                     $0.identityErrorCode = nil
                     $0.phase = .ready
                 }
 
-                await self.reassertPrivacySettings(sdk)
                 do {
                     try await self.refreshConversations()
                 } catch {

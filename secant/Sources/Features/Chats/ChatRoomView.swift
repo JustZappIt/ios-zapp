@@ -144,12 +144,14 @@ struct ChatRoomView: View {
                 ChatMediaBubble(
                     message: message,
                     senderName: store.state.senderName(for: message),
-                    progress: store.mediaProgress[mediaId]
+                    progress: store.mediaProgress[mediaId],
+                    readReceiptsEnabled: store.messagingState.readReceiptsEnabled
                 )
             } else {
                 ChatMessageBubble(
                     message: message,
-                    senderName: store.state.senderName(for: message)
+                    senderName: store.state.senderName(for: message),
+                    readReceiptsEnabled: store.messagingState.readReceiptsEnabled
                 )
             }
         }
