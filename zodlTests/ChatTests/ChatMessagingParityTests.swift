@@ -5,6 +5,7 @@
 
 import ComposableArchitecture
 import Foundation
+import SwiftUI
 import Testing
 import ZappMessaging
 @testable import zodl_internal
@@ -120,6 +121,100 @@ import ZappMessaging
         state.reconcile(clientId: optimistic.id, with: persisted)
 
         #expect(state.messages.map(\.id) == [persisted.id, later.id])
+    }
+
+    @Test func deliveryStatusParsingMatchesTheSDKContract() {
+        typealias Status = ChatMessageStatusIndicator.Status
+
+        #expect(Status(wire: "sending") == .sending)
+        #expect(Status(wire: "queued") == .queued)
+        #expect(Status(wire: "sent") == .sent)
+        #expect(Status(wire: "delivered") == .delivered)
+        #expect(Status(wire: "read") == .read)
+        #expect(Status(wire: "failed") == .failed)
+        #expect(Status(wire: nil) == .sent)
+        #expect(Status(wire: "legacy") == .sent)
+        #expect(Status.exact(wire: "legacy") == nil)
+    }
+
+    @Test func deliveryStatusAdvancesMonotonically() {
+        #expect(ChatMessageStatusOrder.advance(from: "sending", to: "queued") == "queued")
+        #expect(ChatMessageStatusOrder.advance(from: "queued", to: "sent") == "sent")
+        #expect(ChatMessageStatusOrder.advance(from: "sent", to: "delivered") == "delivered")
+        #expect(ChatMessageStatusOrder.advance(from: "delivered", to: "read") == "read")
+
+        #expect(ChatMessageStatusOrder.advance(from: "sent", to: "queued") == "sent")
+        #expect(ChatMessageStatusOrder.advance(from: "delivered", to: "sent") == "delivered")
+        #expect(ChatMessageStatusOrder.advance(from: "read", to: "delivered") == "read")
+        #expect(ChatMessageStatusOrder.advance(from: "delivered", to: "unknown") == "delivered")
+    }
+
+    @MainActor @Test func deliveryIndicatorDistinguishesRelayDeliveryAndRead() {
+        let queued = ChatMessageStatusIndicator(status: .queued, mutedColor: .gray, readColor: .blue)
+        let sent = ChatMessageStatusIndicator(status: .sent, mutedColor: .gray, readColor: .blue)
+        let delivered = ChatMessageStatusIndicator(status: .delivered, mutedColor: .gray, readColor: .blue)
+        let read = ChatMessageStatusIndicator(status: .read, mutedColor: .gray, readColor: .blue)
+
+        #expect(queued.text == "◷")
+        #expect(!queued.status.isDoubleTick)
+        #expect(sent.text == "✓")
+        #expect(!sent.status.isDoubleTick)
+        #expect(delivered.text == "✓")
+        #expect(delivered.status.isDoubleTick)
+        #expect(!delivered.status.usesHighlightedColor)
+        #expect(read.status.isDoubleTick)
+        #expect(read.status.usesHighlightedColor)
+        #expect(delivered.accessibilityLabel == String(localizable: .chatRoomStatusDelivered))
+        #expect(sent.accessibilityLabel == String(localizable: .chatRoomStatusSent))
+    }
+
+    @Test func disablingReadReceiptsDowngradesVisibleReadToDelivered() {
+        let status = ChatMessageStatusIndicator.Status.read
+
+        #expect(status.visible(readReceiptsEnabled: true) == .read)
+        #expect(status.visible(readReceiptsEnabled: false) == .delivered)
+        #expect(ChatMessageStatusIndicator.Status.sent.visible(readReceiptsEnabled: false) == .sent)
+    }
+
+    @MainActor @Test func messageReloadDoesNotDowngradeANewerVisibleStatus() async {
+        let delivered = ZMMessage(
+            id: "message",
+            conversationId: "conversation",
+            senderId: "me",
+            content: "hello",
+            isFromMe: true,
+            status: "delivered"
+        )
+        let staleReload = delivered.withStatus("sent")
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.messages = [delivered]
+        let store = TestStore(initialState: state) {
+            ChatRoom()
+        }
+
+        await store.send(.messagesLoaded([staleReload])) {
+            $0.isLoading = false
+            $0.messages = [delivered]
+        }
+    }
+
+    @Test func earlyStatusesRemainMonotonicUntilTheMessageLoads() {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.rememberEarlyStatus("message", "delivered")
+        state.rememberEarlyStatus("message", "sent")
+        state.insert(
+            ZMMessage(
+                id: "message",
+                conversationId: "conversation",
+                senderId: "me",
+                content: "hello",
+                isFromMe: true,
+                status: "queued"
+            )
+        )
+
+        #expect(state.messages.first?.status == "delivered")
+        #expect(state.earlyStatuses.isEmpty)
     }
 
     @MainActor @Test func tappingFailedMessageRetriesAndReconcilesIt() async {

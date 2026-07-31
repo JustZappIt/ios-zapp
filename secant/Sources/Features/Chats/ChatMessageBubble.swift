@@ -23,6 +23,9 @@ struct ChatMessageBubble: View {
     /// Resolved by the store (local alias > wire name). Passed in so the bubble
     /// stays dumb and the resolution stays testable.
     var senderName: String?
+    /// Read receipts are reciprocal. The stored status remains read, but the bubble only
+    /// highlights it while receipts are enabled.
+    var readReceiptsEnabled = true
 
     private var isFromMe: Bool { message.isFromMe }
     private var hasQuote: Bool { message.replyToId != nil }
@@ -78,7 +81,8 @@ struct ChatMessageBubble: View {
 
             if isFromMe {
                 ChatMessageStatusIndicator(
-                    status: .init(wire: message.status),
+                    status: ChatMessageStatusIndicator.Status(wire: message.status)
+                        .visible(readReceiptsEnabled: readReceiptsEnabled),
                     mutedColor: metaColor,
                     readColor: ZappColors.onAccent.color(colorScheme)
                 )

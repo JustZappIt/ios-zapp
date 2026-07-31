@@ -6,29 +6,44 @@
 import SwiftUI
 
 /// Delivery state on an outgoing bubble, rendered as a typographic mark in the Swiss style (no SF
-/// Symbols): a single tick once the message has left the device, a double tick once the peer has
-/// read it.
+/// Symbols): a clock while queued locally, a single tick once the blind relay accepts the encrypted
+/// block, a muted double tick once the recipient confirms delivery, and a highlighted double tick
+/// once the peer has read it.
 ///
 /// Colours are supplied by the caller because they depend on the bubble the mark sits in.
 struct ChatMessageStatusIndicator: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    enum Status: Equatable {
+    enum Status: String, Equatable {
         case sending
         case queued
         case sent
+        case delivered
         case read
         case failed
 
-        /// `nil` off the wire means the message left the device.
+        /// A missing or unrecognized persisted status predates delivery tracking and is treated as
+        /// sent. Live status ordering uses `exact(wire:)` so an unknown event cannot advance a row.
         init(wire: String?) {
-            switch wire {
-            case "sending": self = .sending
-            case "queued": self = .queued
-            case "read": self = .read
-            case "failed": self = .failed
-            default: self = .sent
-            }
+            self = Self.exact(wire: wire) ?? .sent
+        }
+
+        static func exact(wire: String?) -> Self? {
+            wire.flatMap(Self.init(rawValue:))
+        }
+
+        /// Reciprocity only changes what the user can see. Keep the underlying read state so
+        /// turning receipts back on can reveal it without waiting for another SDK event.
+        func visible(readReceiptsEnabled: Bool) -> Self {
+            !readReceiptsEnabled && self == .read ? .delivered : self
+        }
+
+        var isDoubleTick: Bool {
+            self == .delivered || self == .read
+        }
+
+        var usesHighlightedColor: Bool {
+            self == .read
         }
     }
 
@@ -61,7 +76,7 @@ struct ChatMessageStatusIndicator: View {
 
     @ViewBuilder
     private var mark: some View {
-        if status == .read {
+        if status.isDoubleTick {
             ZStack(alignment: .topLeading) {
                 glyph
                 glyph.offset(x: Constants.readOffset)
@@ -79,11 +94,11 @@ struct ChatMessageStatusIndicator: View {
             )
     }
 
-    private var text: String {
+    var text: String {
         switch status {
         case .sending: return "◌"
         case .queued: return "◷"
-        case .sent, .read: return "✓"
+        case .sent, .delivered, .read: return "✓"
         case .failed: return "!"
         }
     }
@@ -92,7 +107,7 @@ struct ChatMessageStatusIndicator: View {
         switch status {
         case .read: return readColor
         case .failed: return ZappColors.danger.color(colorScheme)
-        case .sending, .queued, .sent: return mutedColor
+        case .sending, .queued, .sent, .delivered: return mutedColor
         }
     }
 
@@ -100,11 +115,12 @@ struct ChatMessageStatusIndicator: View {
         status == .sending ? Constants.sendingSize : Constants.size
     }
 
-    private var accessibilityLabel: String {
+    var accessibilityLabel: String {
         switch status {
         case .sending: return String(localizable: .chatRoomStatusSending)
         case .queued: return String(localizable: .chatRoomStatusQueued)
         case .sent: return String(localizable: .chatRoomStatusSent)
+        case .delivered: return String(localizable: .chatRoomStatusDelivered)
         case .read: return String(localizable: .chatRoomStatusRead)
         case .failed: return String(localizable: .chatRoomStatusFailed)
         }
@@ -116,6 +132,7 @@ struct ChatMessageStatusIndicator: View {
         ChatMessageStatusIndicator(status: .sending, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .queued, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .sent, mutedColor: .gray, readColor: .black)
+        ChatMessageStatusIndicator(status: .delivered, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .read, mutedColor: .gray, readColor: .black)
         ChatMessageStatusIndicator(status: .failed, mutedColor: .gray, readColor: .black)
     }
