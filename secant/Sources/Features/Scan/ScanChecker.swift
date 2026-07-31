@@ -124,15 +124,19 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
     }
 }
 
-/// Zapp: a chat identity QR carries a bare Ed25519 public key — 64 hex characters, optionally
-/// `0x`-prefixed. `PublicKeyRules.scanned` applies Android's strict rule rather than the lenient
-/// paste sanitizer, so anything else — a wallet address above all — is rejected outright and the
-/// camera keeps looking instead of dropping a plausible-looking non-key into the field.
-struct PublicKeyScanChecker: ScanChecker, Equatable {
+/// A chat peer's Ed25519 public key — 64 hex characters, optionally `0x`-prefixed. `parse`
+/// applies Android's strict rule rather than the lenient paste sanitizer, so anything else —
+/// a wallet address above all — is rejected outright rather than left to fall through, and a
+/// Zcash address QR reports "not a public key" instead of the generic no-code-found message.
+struct ChatPublicKeyScanChecker: ScanChecker, Equatable {
     let id = 6
 
     func checkQRCode(_ qrCode: String) -> Scan.Action? {
-        PublicKeyRules.scanned(qrCode).map { .foundString($0) }
+        guard let key = PublicKeyRules.parse(qrCode) else {
+            return .scanFailed(.invalidPublicKey)
+        }
+
+        return .foundString(key)
     }
 }
 
@@ -145,7 +149,7 @@ struct ScanCheckerWrapper: Equatable, Sendable {
     static let keystonePCZTScanChecker = ScanCheckerWrapper(KeystonePcztScanChecker())
     static let swapStringScanChecker = ScanCheckerWrapper(SwapStringScanChecker())
     static let keystoneVotingDelegationPCZTScanChecker = ScanCheckerWrapper(KeystoneVotingDelegationPcztScanChecker())
-    static let publicKeyScanChecker = ScanCheckerWrapper(PublicKeyScanChecker())
+    static let chatPublicKeyScanChecker = ScanCheckerWrapper(ChatPublicKeyScanChecker())
 
     static func == (lhs: ScanCheckerWrapper, rhs: ScanCheckerWrapper) -> Bool {
         return lhs.checker.id == rhs.checker.id

@@ -1,5 +1,5 @@
 # Fallback default only. Each lane passes the correct per-variant app identifier
 # explicitly (see fastlane/lib/zodl/variants.rb): internal = secant-testnet,
 # testnet = zashi-testnet, appstore = secant-mainnet. This value is rarely used.
-app_identifier "co.electriccoin.secant-mainnet"
-team_id "RLPRR8CPQG"
+app_identifier "xyz.justzappit.zapp"
+team_id "63UVRFCV97"

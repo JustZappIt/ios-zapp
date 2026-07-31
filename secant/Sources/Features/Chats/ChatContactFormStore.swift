@@ -205,6 +205,9 @@ struct ChatContactForm {
                 state.scanTarget = target
                 var scanState = Scan.State.initial
                 scanState.checkers = checkers(for: target)
+                if target == .publicKey {
+                    scanState.instructions = String(localizable: .newChatScanInstructions)
+                }
                 state.scan = scanState
                 return .none
 
@@ -304,7 +307,7 @@ struct ChatContactForm {
     /// whatever the QR carries, since only their own chain can validate them.
     private func checkers(for target: ScanTarget) -> [ScanCheckerWrapper] {
         switch target {
-        case .publicKey: return [.publicKeyScanChecker]
+        case .publicKey: return [.chatPublicKeyScanChecker]
         case .address: return [.zcashAddressScanChecker, .swapStringScanChecker]
         case .transparent, .evm, .solana: return [.swapStringScanChecker]
         }

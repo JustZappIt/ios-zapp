@@ -14,7 +14,7 @@ struct FeatureFlags: Equatable {
     init(
         addUAtoMemo: Bool = false,
         appLaunchBiometric: Bool = true,
-        flexa: Bool = true,
+        flexa: Bool = false,
         selectText: Bool = true
     ) {
         self.addUAtoMemo = addUAtoMemo

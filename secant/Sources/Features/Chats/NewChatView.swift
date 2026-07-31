@@ -15,26 +15,25 @@ struct NewChatView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZappScreenHeader(title: String(localizable: .newChatTitle)) {
-                    ZappBackButton { store.send(.backToHomeTapped) }
-                } right: {
                     groupModeToggle
                 }
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-                        searchField
-
-                        if !store.selectedContacts.isEmpty {
-                            selectedParticipants
-                        }
-
-                        if store.isValidKey && !store.isOwnKey {
-                            keyDetectedBanner
+                        if store.showsRecipientCard {
+                            recipientCard
+                        } else {
+                            searchField
                         }
 
                         if store.isOwnKey {
                             Text(String(localizable: .newChatOwnKey))
                                 .zappFont(.caption, style: ZappColors.danger)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        if !store.selectedContacts.isEmpty {
+                            selectedParticipants
                         }
 
                         if store.showsNameField {
@@ -45,13 +44,29 @@ struct NewChatView: View {
                             groupNameField
                         }
 
-                        primaryAction
-                        contacts
-                        myKeyCard
+                        if store.errorCode != nil && store.errorCode != .ownPublicKey {
+                            Text(String(localizable: .newChatFailed))
+                                .zappFont(.caption, style: ZappColors.danger)
+                        }
+
+                        if store.showsEmptyState {
+                            emptyState
+                        } else {
+                            contacts
+                        }
+
+                        shareMyKeyRow
                     }
                     .padding(.horizontal, Design.Spacing._lg)
                     .padding(.top, Design.Spacing._lg)
-                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+                    .padding(.bottom, Design.Spacing._lg)
+                }
+
+                ZappBottomActionBar(
+                    onBack: { store.send(.backToHomeTapped) },
+                    isBackEnabled: !store.isCreating
+                ) {
+                    primaryButton
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,14 +75,27 @@ struct NewChatView: View {
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .fullScreenCover(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
-                WithPerceptionTracking {
-                    ScanView(store: scanStore)
-                }
+            .sheet(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
+                ScanView(store: scanStore)
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { store.isSharingMyKey },
+                    set: { if !$0 { store.send(.shareMyKeyDismissed) } }
+                )
+            ) {
+                NewChatMyKeySheet(
+                    publicKey: store.myPublicKey,
+                    didCopy: store.didCopy,
+                    onCopy: { store.send(.copyMyKeyTapped) },
+                    onDone: { store.send(.shareMyKeyDismissed) }
+                )
             }
         }
     }
 
+    /// Groups are the exception, so they stay behind a deliberate tap rather than making
+    /// every DM pass through a multi-select step.
     private var groupModeToggle: some View {
         Button {
             store.send(store.isGroupMode ? .groupCancelTapped : .newGroupTapped)
@@ -82,6 +110,24 @@ struct NewChatView: View {
         .disabled(store.isCreating)
     }
 
+    private var primaryButton: some View {
+        ZappButton(
+            title: primaryTitle,
+            isEnabled: store.isPrimaryEnabled,
+            leadingIcon: store.primaryAction == .scan ? Asset.Assets.Icons.scan.image : nil
+        ) {
+            store.send(.primaryTapped)
+        }
+    }
+
+    private var primaryTitle: String {
+        switch store.primaryAction {
+        case .scan: return String(localizable: .newChatScan)
+        case .start: return String(localizable: .newChatStart)
+        case .createGroup, .confirmGroup: return String(localizable: .groupCreate)
+        }
+    }
+
     private var selectedParticipants: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: Design.Spacing._sm) {
@@ -94,9 +140,12 @@ struct NewChatView: View {
         }
     }
 
-    /// One field, two jobs: it filters the contacts below and detects a pasted key.
+    /// One field, two jobs: it filters the contacts below and takes a pasted key.
     private var searchField: some View {
         HStack(spacing: Design.Spacing._sm) {
+            Asset.Assets.Icons.search.image
+                .zImage(width: Constants.fieldIconSize, height: Constants.fieldIconSize, style: ZappColors.textSubtle)
+
             TextField(
                 String(localizable: .newChatSearchPlaceholder),
                 text: Binding(
@@ -108,59 +157,74 @@ struct NewChatView: View {
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
 
-            Button {
-                store.send(.pasteTapped)
-            } label: {
-                Text(String(localizable: .newChatPaste))
-                    .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
+            if store.searchInput.isEmpty {
+                Button {
+                    store.send(.pasteTapped)
+                } label: {
+                    Text(String(localizable: .newChatPaste))
+                        .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
+                }
+            } else {
+                clearButton
             }
-
-            Button {
-                store.send(.scanTapped)
-            } label: {
-                Asset.Assets.Icons.scan.image
-                    .zImage(width: Constants.scanIconSize, height: Constants.scanIconSize, style: ZappColors.accent)
-                    .frame(width: Constants.scanTouchTarget, height: Constants.scanTouchTarget)
-            }
-            .buttonStyle(.zappPress)
-            .accessibilityLabel(String(localizable: .chatContactsScanKey))
         }
-        .padding(.leading, Design.Spacing._md)
-        .padding(.vertical, Design.Spacing._md)
+        .padding(.horizontal, Design.Spacing._md)
+        .padding(.vertical, Design.Spacing._lg)
         .background(ZappColors.surfaceInput.color(colorScheme))
+        .overlay {
+            Rectangle()
+                .strokeBorder(
+                    (store.searchInput.isEmpty ? ZappColors.border : ZappColors.borderStrong).color(colorScheme),
+                    lineWidth: store.searchInput.isEmpty ? 1 : 2
+                )
+        }
     }
 
-    /// In group mode the same banner adds the pasted key as a participant instead of opening a DM.
-    @ViewBuilder private var keyDetectedBanner: some View {
-        if !store.isDetectedKeySelected {
-            Button {
-                store.send(store.isGroupMode ? .detectedKeyAdded : .startTapped)
-            } label: {
-                HStack(spacing: Design.Spacing._sm) {
-                    VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
-                        Text(String(localizable: .newChatKeyDetected))
-                            .zappFont(.rowTitle, style: ZappColors.text)
+    private var clearButton: some View {
+        Button {
+            store.send(.searchCleared)
+        } label: {
+            Asset.Assets.Icons.xClose.image
+                .zImage(width: Constants.fieldIconSize, height: Constants.fieldIconSize, style: ZappColors.textSubtle)
+        }
+        .accessibilityLabel(String(localizable: .newChatClear))
+    }
 
-                        Text(store.detectedContact?.name ?? store.detectedKey)
-                            .zappFont(.mono, style: ZappColors.textMuted)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    /// A complete key is a recipient, not text to keep editing — so it replaces the field
+    /// rather than being echoed underneath it.
+    private var recipientCard: some View {
+        HStack(spacing: Design.Spacing._lg) {
+            Asset.Assets.Icons.checkVerified.image
+                .zImage(width: Constants.cardIconSize, height: Constants.cardIconSize, style: ZappColors.accentText)
 
-                    (store.isGroupMode ? Asset.Assets.Icons.plus : Asset.Assets.Icons.arrowRight).image
-                        .zImage(
-                            width: Constants.bannerIconSize,
-                            height: Constants.bannerIconSize,
-                            style: ZappColors.accent
-                        )
-                }
-                .padding(Design.Spacing._md)
-                .frame(maxWidth: .infinity)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
-                .contentShape(Rectangle())
+            VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                Text(String(localizable: .newChatKeyDetected))
+                    .zappFont(.caption, style: ZappColors.accentText)
+
+                Text(store.detectedContact?.name ?? PublicKeyRules.abbreviated(store.detectedKey))
+                    .zappFont(.mono, style: ZappColors.accentText)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
             }
-            .buttonStyle(.zappPress)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if store.isGroupMode && !store.isDetectedKeySelected {
+                Button {
+                    store.send(.detectedKeyAdded)
+                } label: {
+                    Text(String(localizable: .newChatAdd))
+                        .zappFont(.buttonSmall, color: ZappColors.accentText.color(colorScheme))
+                }
+            }
+
+            clearButton
+        }
+        .padding(Design.Spacing._xl)
+        .frame(maxWidth: .infinity)
+        .background(ZappColors.accentSoft.color(colorScheme))
+        .overlay {
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         }
     }
 
@@ -201,40 +265,42 @@ struct NewChatView: View {
         }
     }
 
-    @ViewBuilder private var primaryAction: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            if store.isGroupMode {
-                if !store.selectedContacts.isEmpty {
-                    ZappButton(
-                        title: String(localizable: .groupCreate),
-                        isEnabled: store.isNamingGroup ? store.canConfirmGroup : store.canCreateGroup
-                    ) {
-                        store.send(store.isNamingGroup ? .groupConfirmTapped : .groupCreateTapped)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            } else {
-                ZappButton(
-                    title: String(localizable: .newChatStart),
-                    isEnabled: store.canStart
-                ) {
-                    store.send(.startTapped)
-                }
-                .frame(maxWidth: .infinity)
-            }
+    private var emptyState: some View {
+        VStack(spacing: Design.Spacing._lg) {
+            Asset.Assets.Icons.messageChat.image
+                .zImage(width: Constants.emptyIconSize, height: Constants.emptyIconSize, style: ZappColors.textSubtle)
+                .frame(width: Constants.emptyIconBox, height: Constants.emptyIconBox)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
 
-            if store.errorCode != nil && store.errorCode != .ownPublicKey {
-                Text(String(localizable: .newChatFailed))
-                    .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
+            Text(String(localizable: .newChatEmptyTitle))
+                .zappFont(.sectionTitle, style: ZappColors.text)
+                .multilineTextAlignment(.center)
+
+            Text(String(localizable: .newChatEmptyBody))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(alignment: .top, spacing: Design.Spacing._lg) {
+                Rectangle()
+                    .fill(ZappColors.accent.color(colorScheme))
+                    .frame(width: Constants.calloutMarkSize, height: Constants.calloutMarkSize)
+
+                Text(String(localizable: .newChatPrivacyCallout))
+                    .zappFont(.body, style: ZappColors.accentText)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 0)
             }
+            .padding(Design.Spacing._xl)
+            .frame(maxWidth: .infinity)
+            .background(ZappColors.accentSoft.color(colorScheme))
         }
+        .frame(maxWidth: .infinity)
+        .padding(.top, Design.Spacing._xl)
     }
-}
 
-// MARK: - Contact list & own key
-
-private extension NewChatView {
-    @ViewBuilder var contacts: some View {
+    @ViewBuilder private var contacts: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             ZappSectionLabel(
                 text: store.isGroupMode
@@ -242,9 +308,13 @@ private extension NewChatView {
                     : String(localizable: .newChatContactsLabel)
             )
 
-            if store.visibleContacts.isEmpty {
-                Text(String(localizable: .newChatNoContacts))
-                    .zappFont(.body, style: ZappColors.textMuted)
+            if store.filteredContacts.isEmpty {
+                Text(
+                    store.visibleContacts.isEmpty
+                        ? String(localizable: .newChatNoContacts)
+                        : String(localizable: .newChatNoMatches)
+                )
+                .zappFont(.body, style: ZappColors.textMuted)
             } else {
                 VStack(spacing: 0) {
                     ForEach(store.filteredContacts) { contact in
@@ -265,51 +335,110 @@ private extension NewChatView {
         }
     }
 
-    var rowDivider: some View {
+    private var rowDivider: some View {
         Rectangle()
             .fill(ZappColors.border.color(colorScheme))
             .frame(height: 1)
             .padding(.leading, NewChatContactRow.dividerInset)
     }
 
-    /// Chat is symmetric: the peer needs our key just as much as we need theirs.
-    /// Without this the screen only works for whoever was handed a key first.
-    var myKeyCard: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .newChatYourKey))
+    /// Chat is symmetric: the peer needs our key just as much as we need theirs. Kept to a
+    /// single row here — the scannable code lives in the sheet, not dumped on the screen.
+    private var shareMyKeyRow: some View {
+        Button {
+            store.send(.shareMyKeyTapped)
+        } label: {
+            HStack(spacing: Design.Spacing._lg) {
+                Asset.Assets.Icons.qr.image
+                    .zImage(width: Constants.cardIconSize, height: Constants.cardIconSize, style: ZappColors.text)
 
-            Text(store.myPublicKey)
-                .zappFont(.mono, color: ZappColors.text.color(colorScheme))
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(Design.Spacing._md)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
+                VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
+                    Text(String(localizable: .newChatYourKey))
+                        .zappFont(.rowTitle, style: ZappColors.text)
 
-            HStack {
-                Text(String(localizable: .newChatYourKeyHint))
-                    .zappFont(.caption, color: ZappColors.textMuted.color(colorScheme))
-
-                Spacer()
-
-                Button {
-                    store.send(.copyMyKeyTapped)
-                } label: {
-                    Text(
-                        store.didCopy
-                            ? String(localizable: .newChatCopied)
-                            : String(localizable: .newChatCopy)
-                    )
-                    .zappFont(.buttonSmall, color: ZappColors.accent.color(colorScheme))
+                    Text(String(localizable: .newChatYourKeyHint))
+                        .zappFont(.caption, style: ZappColors.textMuted)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Asset.Assets.Icons.arrowRight.image
+                    .zImage(width: Constants.fieldIconSize, height: Constants.fieldIconSize, style: ZappColors.textMuted)
             }
+            .padding(Design.Spacing._xl)
+            .frame(maxWidth: .infinity)
+            .background(ZappColors.surfaceAlt.color(colorScheme))
+            .overlay {
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            }
+            .contentShape(Rectangle())
         }
-        .padding(.top, Design.Spacing._lg)
+        .buttonStyle(.zappPress)
+        .padding(.top, Design.Spacing._md)
     }
 
     private enum Constants {
-        static let bannerIconSize: CGFloat = 16
-        static let scanIconSize: CGFloat = 20
-        static let scanTouchTarget: CGFloat = 44
+        static let fieldIconSize: CGFloat = 18
+        static let cardIconSize: CGFloat = 20
+        static let emptyIconSize: CGFloat = 40
+        static let emptyIconBox: CGFloat = 96
+        static let calloutMarkSize: CGFloat = 8
+    }
+}
+
+/// Our own key, big enough to scan, so the exchange works in whichever direction the two
+/// people happen to be standing.
+private struct NewChatMyKeySheet: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let qrSize: CGFloat = 220
+    }
+
+    let publicKey: String
+    let didCopy: Bool
+    let onCopy: () -> Void
+    let onDone: () -> Void
+
+    var body: some View {
+        VStack(spacing: Design.Spacing._xl) {
+            ZappScreenHeader(title: String(localizable: .newChatYourKey))
+
+            ChatIdentityQRCode(payload: publicKey, size: Constants.qrSize)
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surface.color(colorScheme))
+                .overlay {
+                    Rectangle()
+                        .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                }
+
+            Text(String(localizable: .chatProfileQrCaption))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+                .multilineTextAlignment(.center)
+
+            Text(publicKey)
+                .zappFont(.mono, style: ZappColors.text)
+                .textSelection(.enabled)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(Design.Spacing._lg)
+                .background(ZappColors.surfaceAlt.color(colorScheme))
+
+            Spacer(minLength: 0)
+
+            ZappButton(
+                title: didCopy ? String(localizable: .newChatCopied) : String(localizable: .newChatCopy),
+                variant: .secondary,
+                leadingIcon: didCopy ? Asset.Assets.Icons.checkSolid.image : Asset.Assets.copy.image,
+                action: onCopy
+            )
+
+            ZappButton(title: String(localizable: .generalClose), action: onDone)
+        }
+        .padding(.horizontal, Design.Spacing._lg)
+        .padding(.bottom, Design.Spacing._lg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(ZappColors.bg.color(colorScheme))
     }
 }
 
@@ -380,7 +509,7 @@ private struct NewChatContactRow: View {
                         .lineLimit(1)
                         .truncationMode(.tail)
 
-                    Text(contact.publicKey)
+                    Text(PublicKeyRules.abbreviated(contact.publicKey))
                         .zappFont(.mono, style: ZappColors.textMuted)
                         .lineLimit(1)
                         .truncationMode(.middle)
@@ -401,7 +530,7 @@ private struct NewChatContactRow: View {
     private var selectionBox: some View {
         ZStack {
             if isSelected {
-                Asset.Assets.check.image
+                Asset.Assets.Icons.checkSolid.image
                     .zImage(width: Constants.checkIconSize, height: Constants.checkIconSize, style: ZappColors.onAccent)
             }
         }

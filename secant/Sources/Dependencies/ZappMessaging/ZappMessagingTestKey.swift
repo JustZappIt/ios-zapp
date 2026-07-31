@@ -23,6 +23,7 @@ extension ZappMessagingClient: TestDependencyKey {
         latestState: { ZappMessagingState() },
         conversationsStream: { Empty().eraseToAnyPublisher() },
         refreshConversations: { },
+        syncPushNotifications: { },
         connectionDetails: {
             ZMConnectionDetails(
                 online: false,

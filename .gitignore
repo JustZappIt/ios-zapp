@@ -75,8 +75,8 @@ iOSInjectionProject/
 #ignore Pods directory for example project 
 Pods
 
-# do not commit Google Firebase config PLIST file
-GoogleService-info.plist
+# do not commit per-environment Google Firebase config PLIST files
+GoogleService-Info*.plist
 
 # do not commit PartnerKeys.plist
 PartnerKeys.plist
@@ -92,3 +92,6 @@ PartnerKeys.plist
 
 # Release
 **/*.mobileprovision
+
+# local-only notes, never committed
+docs/local/

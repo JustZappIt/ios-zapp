@@ -37,6 +37,7 @@ extension ZappMessagingClient: DependencyKey {
             latestState: { impl.stateSubject.value },
             conversationsStream: { impl.conversationsSubject.eraseToAnyPublisher() },
             refreshConversations: { try await impl.refreshConversations() },
+            syncPushNotifications: { await impl.syncPushNotifications() },
             connectionDetails: { try await impl.connectionDetails() },
             createDirectConversation: { try await impl.createDirectConversation(publicKey: $0, displayName: $1) },
             createGroup: { try await impl.createGroup(name: $0, participantKeys: $1) },
@@ -189,6 +190,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
 
         stateSubject.send(ZappMessagingState())
         conversationsSubject.send([])
+        await ChatPushNotifications.shared.clearTopics()
     }
 
     // MARK: - Identity
@@ -270,9 +272,20 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             try await sdk.refreshConversations()
             conversationsSubject.send(await sdk.conversations)
             clearFailure(for: .local(.conversationRefresh))
+            await syncPushNotifications()
         } catch {
             recordFailure(.local(.conversationRefresh), error)
             throw error
+        }
+    }
+
+    func syncPushNotifications() async {
+        guard let sdk else { return }
+        do {
+            let snapshot = try await sdk.getPushTopicSnapshot()
+            await ChatPushNotifications.shared.sync(snapshot)
+        } catch {
+            LoggerProxy.error("Chat push topic snapshot failed: \(error.localizedDescription)")
         }
     }
 
@@ -649,6 +662,15 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         sdk.messageStatus
             .receive(on: mainQueue)
             .sink { [weak self] status in self?.messageStatusSubject.send(status) }
+            .store(in: &cancellables)
+
+        sdk.pushTopicsChanged
+            .receive(on: mainQueue)
+            .sink { [weak self] in
+                Task {
+                    await self?.syncPushNotifications()
+                }
+            }
             .store(in: &cancellables)
 
         sdk.operationalFailure

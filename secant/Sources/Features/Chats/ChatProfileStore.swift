@@ -56,12 +56,14 @@ struct ChatProfile {
 
         var readReceiptsEnabled = true
         var presenceVisible = true
+        var backgroundNotificationsEnabled = false
 
         /// A privacy call is in flight. The stream still carries the OLD value until the worklet
         /// acknowledges, so an unrelated emission (a peer count tick) would otherwise snap the
         /// optimistic toggle back mid-flight.
         var isReadReceiptsBusy = false
         var isPresenceBusy = false
+        var isBackgroundNotificationsBusy = false
 
         var activeTab = Tab.messagingID
         var walletSubTab = WalletSubTab.shielded
@@ -150,6 +152,8 @@ struct ChatProfile {
         case readReceiptsFinished(Bool)
         case presenceToggled
         case presenceFinished(Bool)
+        case backgroundNotificationsToggled
+        case backgroundNotificationsFinished(Bool)
 
         case tabSelected(Tab)
         case walletSubTabSelected(WalletSubTab)
@@ -181,6 +185,7 @@ struct ChatProfile {
     }
 
     @Dependency(\.appSecurity) var appSecurity
+    @Dependency(\.chatPushNotifications) var chatPushNotifications
     @Dependency(\.continuousClock) var continuousClock
     @Dependency(\.date) var date
     @Dependency(\.localAuthentication) var localAuthentication
@@ -239,6 +244,7 @@ private extension ChatProfile {
             switch action {
             case .onAppear:
                 seed(&state, from: zappMessaging.latestState())
+                state.backgroundNotificationsEnabled = chatPushNotifications.isEnabled()
 
                 return .publisher {
                     zappMessaging.stateStream()
@@ -438,6 +444,25 @@ private extension ChatProfile {
             case .presenceFinished(let value):
                 state.presenceVisible = value
                 state.isPresenceBusy = false
+                return .none
+
+            case .backgroundNotificationsToggled:
+                guard !state.isBackgroundNotificationsBusy else { return .none }
+
+                let requested = !state.backgroundNotificationsEnabled
+                state.isBackgroundNotificationsBusy = true
+
+                return .run { send in
+                    let enabled = await chatPushNotifications.setEnabled(requested)
+                    if enabled {
+                        await zappMessaging.syncPushNotifications()
+                    }
+                    await send(.backgroundNotificationsFinished(enabled))
+                }
+
+            case .backgroundNotificationsFinished(let enabled):
+                state.backgroundNotificationsEnabled = enabled
+                state.isBackgroundNotificationsBusy = false
                 return .none
 
             default:

@@ -2,11 +2,13 @@
 //  NewChatStore.swift
 //  Zapp
 //
-//  Start a conversation: search the saved contacts, or paste a peer's key. Tapping a
-//  contact opens a DM; "New group" flips the same list into multi-select.
+//  Start a conversation: search the saved contacts, scan a QR, or paste a peer's key.
+//  A one-to-one DM is the default — tapping a contact opens one straight away. Groups are
+//  an explicit opt-in: "New group" flips the same list into multi-select.
 //
-//  Mirrors Android's NewConversation screen, which infers "group" from having selected
-//  more than one participant. Here the mode is explicit, so a one-member group is possible.
+//  Android's NewConversation instead infers "group" from having selected more than one
+//  participant. Keeping the mode explicit here means the common case never has to pass
+//  through a selection step.
 //
 
 import ComposableArchitecture
@@ -17,6 +19,15 @@ import ZappMessaging
 struct NewChat {
     @ObservableState
     struct State: Equatable {
+        /// What the docked button does right now. With nothing entered there is nothing to
+        /// start, so the slot advertises the scanner instead of sitting there disabled.
+        enum PrimaryAction: Equatable {
+            case scan
+            case start
+            case createGroup
+            case confirmGroup
+        }
+
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
 
         /// Held raw, not sanitized: the one field both searches contacts and takes a
@@ -43,11 +54,17 @@ struct NewChat {
         /// Non-nil while the "rejoin?" prompt is open, before an explicitly-left DM is recreated.
         @Presents var alert: AlertState<Action>?
 
-        /// Android's `ChatScanPublicKeyScreen`: the camera route into the same field paste uses.
+        /// Non-nil while the QR scanner is up — Android's `ChatScanPublicKeyScreen`, the
+        /// camera route into the same field paste uses.
         @Presents var scan: Scan.State?
 
-        var detectedKey: String { PublicKeyRules.sanitize(searchInput) }
-        var isValidKey: Bool { PublicKeyRules.isValid(detectedKey) }
+        /// Shows our own key as a QR the peer can scan — the other half of the exchange.
+        var isSharingMyKey = false
+
+        /// Strict: a search string that merely contains 64 hex characters is a search string,
+        /// not a peer. See `PublicKeyRules.parse`.
+        var detectedKey: String { PublicKeyRules.parse(searchInput) ?? "" }
+        var isValidKey: Bool { PublicKeyRules.parse(searchInput) != nil }
         var isOwnKey: Bool {
             isValidKey && detectedKey == PublicKeyRules.sanitize(myPublicKey)
         }
@@ -78,10 +95,38 @@ struct NewChat {
         }
 
         /// Only an unknown pasted key needs a name; a saved contact already has one.
-        /// A group takes keys alone, so the field has no job there.
-        var showsNameField: Bool { !isGroupMode && isValidKey && detectedContact == nil }
+        /// A group takes keys alone, so the field has no job there. Our own key is a dead
+        /// end, so naming it would be busywork.
+        var showsNameField: Bool { !isGroupMode && isValidKey && !isOwnKey && detectedContact == nil }
+
+        /// A complete key stops being text to edit and becomes the recipient, so the input
+        /// collapses into a single card. Showing both meant the same 64 characters twice.
+        var showsRecipientCard: Bool { isValidKey }
+
+        /// Nothing to search and nothing to search through: explain the screen instead of
+        /// rendering an empty list under an empty field.
+        var showsEmptyState: Bool {
+            !isGroupMode && searchInput.isEmpty && visibleContacts.isEmpty
+        }
 
         var canStart: Bool { isValidKey && !isOwnKey && !isCreating }
+
+        var primaryAction: PrimaryAction {
+            if isGroupMode {
+                return isNamingGroup ? .confirmGroup : .createGroup
+            }
+
+            return isValidKey ? .start : .scan
+        }
+
+        var isPrimaryEnabled: Bool {
+            switch primaryAction {
+            case .scan: return !isCreating
+            case .start: return canStart
+            case .createGroup: return canCreateGroup
+            case .confirmGroup: return canConfirmGroup
+            }
+        }
 
         var isDetectedKeySelected: Bool {
             isValidKey && selectedContacts.contains { $0.publicKey == detectedKey }
@@ -107,12 +152,16 @@ struct NewChat {
         case peerKeyChanged(String)
         case displayNameChanged(String)
         case pasteTapped
-        case scanTapped
-        case scan(PresentationAction<Scan.Action>)
+        case searchCleared
         case copyMyKeyTapped
         case copyIndicatorExpired
         case contactTapped(ChatContact)
         case startTapped
+        case primaryTapped
+        case scanTapped
+        case scan(PresentationAction<Scan.Action>)
+        case shareMyKeyTapped
+        case shareMyKeyDismissed
         case created(ZMConversation)
         case createFailed(ZappMessagingFailureCode)
         case rejoinRequired(publicKey: String, displayName: String?)
@@ -147,7 +196,13 @@ struct NewChat {
                 return .cancel(id: CancelID.copyIndicator)
 
             case .peerKeyChanged(let value):
+                // A name typed for the previous key must not carry over onto a different
+                // one, or the peer gets saved under a stranger's label.
+                let previousKey = state.detectedKey
                 state.searchInput = value
+                if state.detectedKey != previousKey {
+                    state.displayName = ""
+                }
                 state.errorCode = state.isOwnKey ? .ownPublicKey : nil
                 return .none
 
@@ -160,23 +215,10 @@ struct NewChat {
 
                 return .send(.peerKeyChanged(pasted.data))
 
-                // The checker only accepts a well-formed identity key, so a scanned code either
-                // fills the field with something the "start chat" path can use or is ignored.
-            case .scanTapped:
-                var scanState = Scan.State.initial
-                scanState.checkers = [.publicKeyScanChecker]
-                state.scan = scanState
-                return .none
-
-            case .scan(.presented(.foundString(let key))):
-                state.scan = nil
-                return .send(.peerKeyChanged(key))
-
-            case .scan(.presented(.cancelTapped)), .scan(.dismiss):
-                state.scan = nil
-                return .none
-
-            case .scan:
+            case .searchCleared:
+                state.searchInput = ""
+                state.displayName = ""
+                state.errorCode = nil
                 return .none
 
             case .copyMyKeyTapped:
@@ -222,6 +264,44 @@ struct NewChat {
                 let key = state.detectedKey
 
                 return start(&state, publicKey: key, displayName: name)
+
+            case .primaryTapped:
+                switch state.primaryAction {
+                case .scan: return .send(.scanTapped)
+                case .start: return .send(.startTapped)
+                case .createGroup: return .send(.groupCreateTapped)
+                case .confirmGroup: return .send(.groupConfirmTapped)
+                }
+
+            case .scanTapped:
+                guard !state.isCreating else { return .none }
+                var scanState = Scan.State()
+                scanState.checkers = [.chatPublicKeyScanChecker]
+                scanState.instructions = String(localizable: .newChatScanInstructions)
+                state.scan = scanState
+                return .none
+
+                // The scanner only ever hands back a sanitized 64-hex key, so it lands in
+                // the same field a paste would and the detected-key card takes over.
+            case .scan(.presented(.foundString(let key))):
+                state.scan = nil
+                return .send(.peerKeyChanged(key))
+
+            case .scan(.presented(.cancelTapped)), .scan(.dismiss):
+                state.scan = nil
+                return .none
+
+            case .scan:
+                return .none
+
+            case .shareMyKeyTapped:
+                guard !state.myPublicKey.isEmpty else { return .none }
+                state.isSharingMyKey = true
+                return .none
+
+            case .shareMyKeyDismissed:
+                state.isSharingMyKey = false
+                return .none
 
             case .created:
                 state.isCreating = false
@@ -408,6 +488,9 @@ extension AlertState where Action == NewChat.Action {
 enum PublicKeyRules {
     static let hexLength = 64
 
+    private static let previewHead = 12
+    private static let previewTail = 6
+
     static func sanitize(_ raw: String) -> String {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let unprefixed = trimmed.hasPrefix("0x") ? String(trimmed.dropFirst(2)) : trimmed
@@ -418,18 +501,33 @@ enum PublicKeyRules {
         key.count == hexLength && key.allSatisfy(\.isHexDigit)
     }
 
-    /// Android's scan validator (`ChatScanPublicKeyVM.onScanned`): trim, drop an optional `0x`,
-    /// and require what is left to be exactly 64 hex characters — nothing is filtered out.
+    /// Strict counterpart to `sanitize`, for deciding whether some untrusted text *is* a key
+    /// rather than coercing it into one. Android's scan validator
+    /// (`ChatScanPublicKeyVM.onScanned`) applies the same rule.
     ///
-    /// `sanitize` must not be used here. Dropping stray characters is a kindness while someone
-    /// types or pastes, but applied to a scan it strips a wallet address down to whatever hex
-    /// digits it happens to contain: a real 141-character unified address carries 72 of them,
-    /// so it would truncate to a 64-character string that passes `isValid` and land in the key
-    /// field as a plausible-looking identity that belongs to nobody.
-    static func scanned(_ raw: String) -> String? {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let unprefixed = trimmed.hasPrefix("0x") ? String(trimmed.dropFirst(2)) : trimmed
+    /// `sanitize` drops every non-hex character and truncates to 64, which is right for
+    /// masking a field as it is typed but wrong for validation: a URL or a sentence with
+    /// enough incidental hex in it silently becomes a well-formed key for a peer who does not
+    /// exist. A wallet address is the worst case — a real 141-character unified address carries
+    /// 72 hex digits, so `sanitize` would truncate it to a 64-character string that passes
+    /// `isValid` and land in the key field as a plausible-looking identity belonging to nobody.
+    /// Here anything other than whitespace and an optional `0x` disqualifies the input.
+    ///
+    /// Whitespace is dropped anywhere, not just at the ends, because keys are routinely copied
+    /// out of a wrapped display. Matches Android, which also requires the cleaned string to be
+    /// the key in its entirety.
+    static func parse(_ raw: String) -> String? {
+        let compact = raw.filter { !$0.isWhitespace }.lowercased()
+        let unprefixed = compact.hasPrefix("0x") ? String(compact.dropFirst(2)) : compact
 
         return isValid(unprefixed) ? unprefixed : nil
+    }
+
+    /// Head-and-tail form for display, as Android abbreviates it. Both ends are kept: the
+    /// tail is what someone reads back to confirm they pasted the right key.
+    static func abbreviated(_ key: String) -> String {
+        guard key.count > previewHead + previewTail else { return key }
+
+        return "\(key.prefix(previewHead))…\(key.suffix(previewTail))"
     }
 }

@@ -48,9 +48,8 @@ The bracket labels mirror Android's launcher labels ("Zapp [DFT]" / "Zapp [DFM]"
   URL scheme itself is a payment-protocol identifier and stays).
 - `NSUbiquitousContainerName` "Zashi Internal" / "Zashi Address Book" → "Zapp Internal" /
   "Zapp Address Book".
-- Kept: BG task ids, `applinks:secant.flexa.link` associated domain (Flexa feature,
-  out of scope), `DEVELOPMENT_TEAM = RLPRR8CPQG` (signing is out of scope; set the Zapp
-  team before device builds).
+- Kept: BG task ids and `applinks:secant.flexa.link` associated domain (Flexa feature,
+  out of scope). Signing now uses Zapp Apple Developer team `63UVRFCV97`.
 
 ### App name in strings
 

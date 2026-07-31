@@ -157,7 +157,7 @@ struct ChatProfileView: View {
 
     private func qrCard(payload: String, caption: String) -> some View {
         VStack(spacing: Design.Spacing._sm) {
-            ChatProfileQRCode(payload: payload)
+            ChatIdentityQRCode(payload: payload)
 
             Text(caption)
                 .zappFont(.caption, style: ZappColors.textSubtle)
@@ -319,44 +319,6 @@ private extension ChatProfileView {
         static let screenInset: CGFloat = 18
         static let touchTarget: CGFloat = 48
         static let contentPadding: CGFloat = 18
-    }
-}
-
-struct ChatProfileQRCode: View {
-    private enum Constants {
-        static let size: CGFloat = 176
-    }
-
-    let payload: String
-    @State private var image: CGImage?
-
-    var body: some View {
-        Group {
-            if let image {
-                Image(uiImage: UIImage(cgImage: image))
-                    .resizable()
-                    .interpolation(.none)
-                    .scaledToFit()
-            } else {
-                Rectangle()
-                    .fill(Color.white)
-            }
-        }
-        .frame(width: Constants.size, height: Constants.size)
-        .background(Color.white)
-        .task(id: payload) {
-            guard !payload.isEmpty else {
-                image = nil
-                return
-            }
-
-            image = await QRCodeGenerator.generate(
-                from: payload,
-                maxPrivacy: false,
-                color: .black,
-                overlayedWithZcashLogo: false
-            )
-        }
     }
 }
 

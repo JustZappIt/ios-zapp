@@ -24,7 +24,7 @@ TEST_SCHEME = "zodl-internal"        # only scheme wired to the zodlTests target
 TEST_DEVICE = "iPhone 17 Pro"
 PARTNER_KEYS_REL = "secant/Resources/PartnerKeys.plist"
 FASTLANE_DIR = __dir__
-TEAM_ID = "RLPRR8CPQG"               # Apple Developer team (matches DEVELOPMENT_TEAM in the project)
+TEAM_ID = "63UVRFCV97"               # Apple Developer team (matches DEVELOPMENT_TEAM in the project)
 
 # Swift macros (TCA, swift-dependencies, swift-perception, swift-case-paths) and
 # SPM build-tool plugins (SwiftGen, SwiftLint, XCStringsTool) must be trusted
@@ -115,6 +115,9 @@ lane :release do |options|
     UI.message("Creating a clean build worktree at #{sha[0, 8]}…")
     run("git -C #{repo_root.shellescape} worktree add --detach #{worktree.shellescape} #{sha}", must_succeed: true)
     FileUtils.cp(File.join(repo_root, PARTNER_KEYS_REL), File.join(worktree, PARTNER_KEYS_REL))
+    Dir.glob(File.join(repo_root, "GoogleService-Info*.plist")).each do |firebase_config|
+      FileUtils.cp(firebase_config, File.join(worktree, File.basename(firebase_config)))
+    end
 
     Dir.chdir(worktree) do
       # Absolute paths, anchored to the worktree: fastlane runs each action inside

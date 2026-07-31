@@ -3112,8 +3112,18 @@
     "chatProfile.presenceHint": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Choose whether people see when you're online" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Elige si las personas ven cuándo estás en línea" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose whether people see when you're online"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige si las personas ven cuándo estás en línea"
+          }
+        }
       }
     },
     "chatProfile.privacy": {
@@ -3714,6 +3724,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mensaje"
+          }
+        }
+      }
+    },
+    "chatRoom.peer.connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado"
           }
         }
       }
@@ -13005,6 +13032,40 @@
         }
       }
     },
+    "newChat.clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar"
+          }
+        }
+      }
+    },
+    "newChat.add": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agregar"
+          }
+        }
+      }
+    },
     "newChat.contactsLabel": {
       "extractionState": "manual",
       "localizations": {
@@ -13052,6 +13113,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copiar"
+          }
+        }
+      }
+    },
+    "newChat.emptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start a private conversation"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia una conversación privada"
+          }
+        }
+      }
+    },
+    "newChat.emptyBody": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan someone's QR code or paste their public key to send them a message."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanea el código QR de alguien o pega su clave pública para enviarle un mensaje."
           }
         }
       }
@@ -13158,6 +13253,23 @@
         }
       }
     },
+    "newChat.noMatches": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No contacts match your search"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún contacto coincide con tu búsqueda"
+          }
+        }
+      }
+    },
     "newChat.ownKey": {
       "extractionState": "manual",
       "localizations": {
@@ -13226,6 +13338,23 @@
         }
       }
     },
+    "newChat.privacyCallout": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messages are peer-to-peer encrypted and only readable by you and the recipient."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los mensajes están cifrados de par a par y solo tú y el destinatario pueden leerlos."
+          }
+        }
+      }
+    },
     "newChat.rejoinConfirm": {
       "extractionState": "manual",
       "localizations": {
@@ -13273,6 +13402,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "¿Volver a la conversación?"
+          }
+        }
+      }
+    },
+    "newChat.scanInstructions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan a Zapp public key QR code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanea un código QR de clave pública de Zapp"
+          }
+        }
+      }
+    },
+    "newChat.scan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan QR code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear código QR"
           }
         }
       }
@@ -16432,6 +16595,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Este código QR no contiene una dirección Zcash válida."
+          }
+        }
+      }
+    },
+    "scan.invalidPublicKey": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This QR code doesn't contain a valid Zapp public key."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este código QR no contiene una clave pública válida de Zapp."
           }
         }
       }

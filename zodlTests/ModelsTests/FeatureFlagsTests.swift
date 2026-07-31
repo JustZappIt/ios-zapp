@@ -13,7 +13,9 @@ import Testing
         let flags = FeatureFlags()
         #expect(!flags.addUAtoMemo)
         #expect(flags.appLaunchBiometric)
-        #expect(flags.flexa)
+        // Defaults to false: the shipping build exposed Flexa UI backed by an SDK that was
+        // never initialised, so the entry point is off unless a build turns it on explicitly.
+        #expect(!flags.flexa)
         #expect(flags.selectText)
     }
 

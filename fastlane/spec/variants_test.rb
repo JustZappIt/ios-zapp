@@ -28,14 +28,14 @@ class ZodlVariantsTest < Minitest::Test
     assert_equal "zodl-internal", cfg[:scheme]
     assert_equal "zodl-internal", cfg[:target]
     assert_equal "Release-Testflight", cfg[:configuration]
-    assert_equal "co.electriccoin.secant-testnet", cfg[:app_identifier]
+    assert_equal "xyz.justzappit.zapp.internal", cfg[:app_identifier]
   end
 
   def test_config_appstore_mapping
     cfg = Zodl::Variants.config("appstore")
     assert_equal "zodl-production", cfg[:target]
     assert_equal "Release-AppStore", cfg[:configuration]
-    assert_equal "co.electriccoin.secant-mainnet", cfg[:app_identifier]
+    assert_equal "xyz.justzappit.zapp", cfg[:app_identifier]
   end
 
   def test_config_rejects_combined

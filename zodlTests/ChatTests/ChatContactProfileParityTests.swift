@@ -157,7 +157,7 @@ import Testing
 
         await store.send(.scanTapped)
         #expect(store.state.scan != nil)
-        #expect(store.state.scan?.checkers == [.publicKeyScanChecker])
+        #expect(store.state.scan?.checkers == [.chatPublicKeyScanChecker])
 
         await store.send(.scan(.presented(.foundString(peerKey))))
         await store.receive(\.peerKeyChanged)
@@ -170,10 +170,10 @@ import Testing
     /// The checker is the guard: a wallet address scanned into the key field is rejected outright
     /// rather than pasted in and failing validation later.
     @Test func publicKeyCheckerAcceptsOnlyIdentityKeys() {
-        let checker = PublicKeyScanChecker()
+        let checker = ChatPublicKeyScanChecker()
 
-        #expect(checker.checkQRCode("u1someunifiedaddress") == nil)
-        #expect(checker.checkQRCode("") == nil)
+        #expect(checker.checkQRCode("u1someunifiedaddress") == .scanFailed(.invalidPublicKey))
+        #expect(checker.checkQRCode("") == .scanFailed(.invalidPublicKey))
         #expect(checker.checkQRCode(peerKey) == .foundString(peerKey))
         #expect(checker.checkQRCode("0x\(peerKey.uppercased())") == .foundString(peerKey))
     }
@@ -189,8 +189,8 @@ import Testing
             """
 
         #expect(unifiedAddress.filter(\.isHexDigit).count > PublicKeyRules.hexLength)
-        #expect(PublicKeyScanChecker().checkQRCode(unifiedAddress) == nil)
-        #expect(PublicKeyRules.scanned(unifiedAddress) == nil)
+        #expect(ChatPublicKeyScanChecker().checkQRCode(unifiedAddress) == .scanFailed(.invalidPublicKey))
+        #expect(PublicKeyRules.parse(unifiedAddress) == nil)
     }
 }
 

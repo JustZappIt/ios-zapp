@@ -48,10 +48,8 @@ struct ChatContactFormView: View {
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .fullScreenCover(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
-                WithPerceptionTracking {
-                    ScanView(store: scanStore)
-                }
+            .sheet(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
+                ScanView(store: scanStore)
             }
         }
     }
