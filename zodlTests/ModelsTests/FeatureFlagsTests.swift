@@ -13,7 +13,7 @@ import Testing
         let flags = FeatureFlags()
         #expect(!flags.addUAtoMemo)
         #expect(flags.appLaunchBiometric)
-        #expect(flags.flexa)
+        #expect(!flags.flexa)
         #expect(flags.selectText)
     }
 

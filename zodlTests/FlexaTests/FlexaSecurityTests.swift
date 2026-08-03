@@ -123,6 +123,9 @@ import ComposableArchitecture
                 $0.localAuthentication = .mockAuthenticationSucceeded
                 $0.mainQueue = .immediate
                 $0.mnemonic = .mock
+                // Switching accounts also sends `.offramp(.cancelAll)`, which invalidates the
+                // offramp session. Unrelated to what this test asserts, but it must be stubbed.
+                $0.offramp.invalidateSession = { }
                 $0.readTransactionsStorage.resetZashi = { }
                 $0.sdkSynchronizer = .noOp
                 $0.sdkSynchronizer.proposeTransfer = { _, _, _, _ in
