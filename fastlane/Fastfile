@@ -12,6 +12,7 @@ require_relative "lib/zodl/preflight"
 require_relative "lib/zodl/build_paths"
 require_relative "lib/zodl/local_packages"
 require_relative "lib/zodl/notify"
+require_relative "lib/zodl/project_version"
 
 # Refuse to run outside bundler so the pinned gem versions in Gemfile.lock are
 # always used. The Scripts/*.sh wrappers invoke `bundle exec fastlane`.
@@ -154,9 +155,18 @@ lane :bump do |options|
     UI.message("Setting marketing version to #{version}…")
     set_marketing_version(version)
     UI.message("Setting build number to #{build}…")
-    run("agvtool new-version -all #{build}", must_succeed: true)
+    set_build_number(build)
     UI.message("Committing the version bump…")
-    run("git add secant.xcodeproj/project.pbxproj", must_succeed: true)
+    # Both edits land in the project file, so nothing else should have changed.
+    # Fail loudly rather than leaving stray edits behind for the release preflight
+    # to trip over, or committing something this lane never meant to touch.
+    project = "secant.xcodeproj/project.pbxproj"
+    changed = run("git status --porcelain", must_succeed: true)
+              .lines.map { |line| line[3..].to_s.strip }.reject(&:empty?)
+    unexpected = changed - [project]
+    UI.user_error!("bump changed unexpected files:\n  #{unexpected.join("\n  ")}") unless unexpected.empty?
+
+    run("git add #{project}", must_succeed: true)
     run("git commit -m #{"Bump to #{version} (#{build})".shellescape}", must_succeed: true)
   end
 
@@ -277,10 +287,16 @@ end
 # Sets MARKETING_VERSION on all targets directly in the pbxproj. agvtool's
 # new-marketing-version does not update the build-setting form this project uses.
 def set_marketing_version(version)
-  path = "secant.xcodeproj/project.pbxproj"
-  content = File.read(path)
-  content.gsub!(/MARKETING_VERSION = [^;]+;/, "MARKETING_VERSION = #{version};")
-  File.write(path, content)
+  rewrite_project { |content| Zodl::ProjectVersion.set_marketing_version(content, version) }
+end
+
+def set_build_number(build)
+  rewrite_project { |content| Zodl::ProjectVersion.set_build_number(content, build) }
+end
+
+def rewrite_project
+  path = Zodl::BuildPaths::PROJECT_FILE
+  File.write(path, yield(File.read(path)))
 end
 
 # Resolves a branch/tag/commit to a commit SHA. Prefers origin/<ref> so a release
