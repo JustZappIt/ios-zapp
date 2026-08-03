@@ -78,9 +78,10 @@ struct ChatRoomView: View {
                     pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
                     isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
+                    isMediaEnabled: !store.isSendingMedia,
                     onSend: { store.send(.sendTapped) },
-                    onMediaPasted: { data, type in
-                        store.send(.mediaPasted(data: data, type: type))
+                    onMediaPasted: { fileURL, type in
+                        store.send(.mediaPasted(fileURL: fileURL, type: type))
                     }
                 )
             }
@@ -338,8 +339,9 @@ private struct ChatRoomInputRow: View {
     @Binding var pickedItem: PhotosPickerItem?
     let isFocused: FocusState<Bool>.Binding
     let isSendEnabled: Bool
+    let isMediaEnabled: Bool
     let onSend: () -> Void
-    let onMediaPasted: (Data, UTType) -> Void
+    let onMediaPasted: (URL, UTType) -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Design.Spacing._md) {
@@ -350,6 +352,8 @@ private struct ChatRoomInputRow: View {
                 ChatAttachGlyph()
             }
             .buttonStyle(.zappPress)
+            .disabled(!isMediaEnabled)
+            .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
             // UIKit rather than TextField: the keyboard's GIF key and a pasted image both

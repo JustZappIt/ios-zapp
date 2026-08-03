@@ -28,8 +28,10 @@ private actor ChatLinkPreviewLoader {
 
     private enum Constants {
         static let maxResponseBytes = 256 * 1024
-        static let maxImageBytes = 2 * 1024 * 1024
-        static let cacheSize = 128
+        static let maxImageBytes = 1024 * 1024
+        static let cachedImageMaxPixel: CGFloat = 156
+        static let maxCachedImageBytes = 256 * 1024
+        static let cacheSize = 64
         static let timeout: TimeInterval = 10
         static let userAgent = "Zapp/iOS LinkPreview"
         static let supportedContentTypes: Set<String> = ["text/html", "application/xhtml+xml"]
@@ -39,6 +41,9 @@ private actor ChatLinkPreviewLoader {
     /// every redraw of the row that mentions it.
     private var cache: [String: ChatLinkPreview?] = [:]
     private var order: [String] = []
+    /// Actor reentrancy means two rows can miss the cache while the first URLSession request is
+    /// suspended. Share that work instead of retaining duplicate response and image buffers.
+    private var inFlight: [String: Task<ChatLinkPreview?, Never>] = [:]
 
     private let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
@@ -47,6 +52,7 @@ private actor ChatLinkPreviewLoader {
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = Constants.timeout
+        configuration.httpMaximumConnectionsPerHost = 2
 
         return URLSession(configuration: configuration)
     }()
@@ -55,8 +61,13 @@ private actor ChatLinkPreviewLoader {
         guard let url = ChatLinkPreviewParser.safePreviewURL(rawURL) else { return nil }
 
         if let cached = cache[url] { return cached }
+        if let existing = inFlight[url] { return await existing.value }
 
-        let preview = await fetch(url)
+        let task = Task { await fetch(url) }
+        inFlight[url] = task
+
+        let preview = await task.value
+        inFlight[url] = nil
         store(preview, for: url)
 
         return preview
@@ -99,7 +110,13 @@ private actor ChatLinkPreviewLoader {
             }
 
             if let imageURL = preview.imageURL {
-                preview.imageData = try? await loadImage(imageURL)
+                let downloaded = try? await loadImage(imageURL)
+                let bounded = downloaded
+                    .flatMap { ChatMediaImage.downsampled(data: $0, maxPixel: Constants.cachedImageMaxPixel) }
+                    .flatMap { $0.jpegData(compressionQuality: 0.75) }
+                preview.imageData = bounded.flatMap {
+                    $0.count <= Constants.maxCachedImageBytes ? $0 : nil
+                }
             }
 
             return preview

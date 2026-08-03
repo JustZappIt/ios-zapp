@@ -5,6 +5,7 @@
 
 @preconcurrency import Combine
 import ComposableArchitecture
+import CoreTransferable
 import Foundation
 import PhotosUI
 import SwiftUI
@@ -59,6 +60,7 @@ struct ChatRoom {
 
         /// Bound to the composer's `PhotosPicker`. Consumed and cleared the moment it lands.
         var pickedItem: PhotosPickerItem?
+        var isSendingMedia = false
 
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
@@ -152,6 +154,18 @@ struct ChatRoom {
             messages.append(message)
             messages.sort { $0.timestamp < $1.timestamp }
 
+            if messages.count > maxLiveRoomMessages {
+                messages.removeFirst(messages.count - maxLiveRoomMessages)
+
+                let retainedIds = Set(messages.map(\.id))
+                let retainedMediaIds = Set(messages.compactMap(\.mediaId))
+                postEntryInboundMessageIds.formIntersection(retainedIds)
+                requestedLinkPreviewMessageIds.formIntersection(retainedIds)
+                messageLinkPreviews = messageLinkPreviews.filter { retainedIds.contains($0.key) }
+                completedMediaIds.formIntersection(retainedMediaIds)
+                mediaProgress = mediaProgress.filter { retainedMediaIds.contains($0.key) }
+            }
+
             guard let index = messages.firstIndex(where: { $0.id == message.id }) else { return }
 
             applyEarlyStatus(at: index)
@@ -214,7 +228,8 @@ struct ChatRoom {
         case copyMessageTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
-        case mediaPasted(data: Data, type: UTType)
+        case mediaPasted(fileURL: URL, type: UTType)
+        case mediaSendSucceeded(ZMMessage)
         case mediaSendFailed
         case mediaTooLarge
         case messageStatusChanged(messageId: String, status: String)
@@ -228,6 +243,7 @@ struct ChatRoom {
 
     @Dependency(\.chatLinkPreview) var chatLinkPreview
     @Dependency(\.continuousClock) var clock
+    @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
 
@@ -269,6 +285,7 @@ struct ChatRoom {
                     .cancellable(id: state.messageStatusCancelId, cancelInFlight: true),
                     .publisher {
                         zappMessaging.mediaProgressStream()
+                            .throttle(for: .milliseconds(100), scheduler: mainQueue, latest: true)
                             .map { Action.mediaProgressChanged(mediaId: $0.mediaId, progress: $0.progress) }
                     }
                     .cancellable(id: state.mediaProgressCancelId, cancelInFlight: true),
@@ -299,11 +316,11 @@ struct ChatRoom {
                 return .none
 
             case .draftChanged(let draft):
-                state.draft = draft
+                state.draft = String(draft.prefix(MediaPastingTextView.maxTextCharacters))
                 state.sendDidFail = false
                 state.sendFailureMessage = nil
 
-                let url = ChatLinkPreviewParser.firstWebURL(in: draft)
+                let url = ChatLinkPreviewParser.firstWebURL(in: state.draft)
 
                 guard url != state.draftLinkPreviewURL else { return .none }
 
@@ -552,18 +569,26 @@ struct ChatRoom {
             case .pickedItemChanged(let item):
                 state.pickedItem = nil
 
-                guard let item else { return .none }
+                guard let item, !state.isSendingMedia else { return .none }
 
                 state.sendDidFail = false
+                state.isSendingMedia = true
                 let conversationId = state.conversationId
+                let supportedTypes = item.supportedContentTypes
 
                 return .run { send in
-                    guard let data = try await item.loadTransferable(type: Data.self) else {
+                    guard let imported = try await item.loadTransferable(type: ChatPickedMedia.self) else {
                         await send(.mediaSendFailed)
                         return
                     }
+                    defer { ChatMediaTemporaryFiles.remove(imported.fileURL) }
 
-                    let encoded = try ChatMediaEncoder.encode(data, supportedTypes: item.supportedContentTypes)
+                    let encoded = try ChatMediaEncoder.encode(
+                        fileURL: imported.fileURL,
+                        supportedTypes: supportedTypes
+                    )
+                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
                     let message = try await zappMessaging.sendMedia(
                         conversationId,
                         encoded.path,
@@ -571,7 +596,7 @@ struct ChatRoom {
                         "",
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send media: \(error)")
 
@@ -584,12 +609,21 @@ struct ChatRoom {
 
             // The keyboard's GIF key and a pasted image arrive here rather than through the
             // picker, but ship down the same encoder — so a pasted GIF stays animated too.
-            case .mediaPasted(let data, let type):
+            case .mediaPasted(let fileURL, let type):
+                guard !state.isSendingMedia else {
+                    return .run { _ in ChatMediaTemporaryFiles.remove(fileURL) }
+                }
+
                 state.sendDidFail = false
+                state.isSendingMedia = true
                 let conversationId = state.conversationId
 
                 return .run { send in
-                    let encoded = try ChatMediaEncoder.encode(data, supportedTypes: [type])
+                    defer { ChatMediaTemporaryFiles.remove(fileURL) }
+
+                    let encoded = try ChatMediaEncoder.encode(fileURL: fileURL, supportedTypes: [type])
+                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
                     let message = try await zappMessaging.sendMedia(
                         conversationId,
                         encoded.path,
@@ -597,7 +631,7 @@ struct ChatRoom {
                         "",
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send pasted media: \(error)")
 
@@ -608,12 +642,21 @@ struct ChatRoom {
                     }
                 }
 
+            case .mediaSendSucceeded(let message):
+                state.isSendingMedia = false
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
+                state.insert(message)
+                return .none
+
             case .mediaSendFailed:
+                state.isSendingMedia = false
                 state.sendDidFail = true
                 state.sendFailureMessage = nil
                 return .none
 
             case .mediaTooLarge:
+                state.isSendingMedia = false
                 state.sendDidFail = true
                 state.sendFailureMessage = String(localizable: .chatRoomGifTooLarge)
                 return .none
@@ -633,6 +676,7 @@ struct ChatRoom {
             // A straggler <1.0 event after completion must not re-insert the id and strand a
             // permanent progress bar; a completed id is final.
             case .mediaProgressChanged(let mediaId, let progress):
+                guard state.messages.contains(where: { $0.mediaId == mediaId }) else { return .none }
                 guard !state.completedMediaIds.contains(mediaId) else { return .none }
 
                 if progress >= 1 {
@@ -645,6 +689,7 @@ struct ChatRoom {
                 return .none
 
             case .mediaCompleted(let mediaId, let filePath):
+                guard state.messages.contains(where: { $0.mediaId == mediaId }) else { return .none }
                 state.completedMediaIds.insert(mediaId)
                 state.mediaProgress.removeValue(forKey: mediaId)
 
@@ -670,6 +715,7 @@ struct ChatRoom {
 }
 
 private let messagePageSize = 50
+private let maxLiveRoomMessages = 500
 private let replyPreviewMaxLength = 100
 private let maxEarlyStatuses = 64
 
@@ -739,6 +785,8 @@ enum ChatMediaEncoder {
 
     private static let maxPixel: CGFloat = 1920
     private static let quality: CGFloat = 0.85
+    static let maxInputBytes = 32 * 1024 * 1024
+    private static let maxEncodedBytes = 12 * 1024 * 1024
 
     /// A GIF ships verbatim, so nothing downsizes it on the way out.
     static let maxGIFBytes = 8 * 1024 * 1024
@@ -747,40 +795,52 @@ enum ChatMediaEncoder {
     private static let thumbnailPixel: CGFloat = 64
     private static let thumbnailQuality: CGFloat = 0.5
 
-    static func encode(_ data: Data, supportedTypes: [UTType]) throws -> Encoded {
-        let thumbnail = ChatMediaImage
-            .downsampled(data: data, maxPixel: thumbnailPixel)?
+    static func encode(fileURL: URL, supportedTypes: [UTType]) throws -> Encoded {
+        guard
+            let byteCount = ChatMediaImage.fileByteCount(at: fileURL),
+            byteCount > 0,
+            byteCount <= maxInputBytes
+        else {
+            throw Failure.tooLarge
+        }
+
+        let isGIF = ChatMediaImage.isGIF(at: fileURL)
+
+        // Reject oversized GIFs before ImageIO sees a byte. They ship verbatim and therefore
+        // cannot become smaller later in this pipeline.
+        if isGIF, byteCount > maxGIFBytes {
+            throw Failure.tooLarge
+        }
+
+        guard let thumbnailImage = ChatMediaImage.downsampled(path: fileURL.path, maxPixel: thumbnailPixel) else {
+            throw Failure.undecodable
+        }
+
+        let thumbnail = thumbnailImage
             .jpegData(compressionQuality: thumbnailQuality)?
             .base64EncodedString()
 
         // Re-encoding a GIF collapses it to one frame. Sniffed from the bytes: PhotosUI
         // advertises a conforming still representation for an animated asset.
-        if ChatMediaImage.isGIF(data) {
-            guard data.count <= maxGIFBytes else { throw Failure.tooLarge }
-
+        if isGIF {
             return Encoded(
-                path: try write(data, pathExtension: "gif"),
+                path: try copy(fileURL, pathExtension: "gif"),
                 contentType: "image/gif",
                 thumbnail: thumbnail
             )
         }
 
-        if supportedTypes.contains(where: { $0.conforms(to: .png) }) {
-            return Encoded(
-                path: try write(data, pathExtension: "png"),
-                contentType: "image/png",
-                thumbnail: thumbnail
-            )
-        }
-
-        // Anything that is not PNG is re-encoded rather than forwarded: the library hands back
-        // HEIC as readily as JPEG, and a peer told "image/jpeg" cannot decode HEIC bytes.
+        // Match Android's strict image path: every non-GIF still is downsampled and re-encoded.
+        // Forwarding PNG verbatim allowed a highly-compressed source to bypass output bounds and
+        // reach the worklet as a multi-megabyte allocation.
+        _ = supportedTypes
         guard let jpeg = ChatMediaImage
-            .downsampled(data: data, maxPixel: maxPixel)?
+            .downsampled(path: fileURL.path, maxPixel: maxPixel)?
             .jpegData(compressionQuality: quality)
         else {
             throw Failure.undecodable
         }
+        guard jpeg.count <= maxEncodedBytes else { throw Failure.tooLarge }
 
         return Encoded(
             path: try write(jpeg, pathExtension: "jpg"),
@@ -790,12 +850,65 @@ enum ChatMediaEncoder {
     }
 
     private static func write(_ data: Data, pathExtension: String) throws -> String {
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("zapp-media-\(UUID().uuidString).\(pathExtension)")
+        let url = ChatMediaTemporaryFiles.makeURL(pathExtension: pathExtension)
 
         try data.write(to: url, options: .atomic)
 
         return url.path
+    }
+
+    private static func copy(_ sourceURL: URL, pathExtension: String) throws -> String {
+        let destinationURL = ChatMediaTemporaryFiles.makeURL(pathExtension: pathExtension)
+        try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+        return destinationURL.path
+    }
+}
+
+struct ChatPickedMedia: Transferable, Sendable {
+    let fileURL: URL
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .image) { received in
+            ChatPickedMedia(fileURL: try ChatMediaTemporaryFiles.importFile(at: received.file))
+        }
+    }
+}
+
+enum ChatMediaTemporaryFiles {
+    static func makeURL(pathExtension: String) -> URL {
+        let sanitizedExtension = pathExtension
+            .lowercased()
+            .filter { $0.isLetter || $0.isNumber }
+        let suffix = sanitizedExtension.isEmpty ? "bin" : sanitizedExtension
+
+        return FileManager.default.temporaryDirectory
+            .appendingPathComponent("zapp-media-\(UUID().uuidString).\(suffix)")
+    }
+
+    static func importFile(at sourceURL: URL) throws -> URL {
+        guard
+            let byteCount = ChatMediaImage.fileByteCount(at: sourceURL),
+            byteCount > 0,
+            byteCount <= ChatMediaEncoder.maxInputBytes
+        else {
+            throw ChatMediaEncoder.Failure.tooLarge
+        }
+
+        let destinationURL = makeURL(pathExtension: sourceURL.pathExtension)
+        try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+        return destinationURL
+    }
+
+    static func remove(_ url: URL) {
+        guard url.isFileURL else { return }
+
+        do {
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(at: url)
+            }
+        } catch {
+            LoggerProxy.warn("Chat media temporary-file cleanup failed: \(error.localizedDescription)")
+        }
     }
 }
 

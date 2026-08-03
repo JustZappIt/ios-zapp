@@ -60,7 +60,8 @@ enum ZappMessagingBuildConfig {
             bootstrapNodes: bootstrapNodes,
             blindPeerAddress: blindPeerAddress,
             inviteMailboxURL: inviteMailboxURL,
-            logLevel: logLevel
+            logLevel: logLevel,
+            mediaMaxBytes: 16 * 1024 * 1024
         )
     }
 }

@@ -19,7 +19,7 @@ struct ChatComposerTextView: UIViewRepresentable {
 
     let placeholder: String
     let maxLines: Int
-    let onMediaPasted: (Data, UTType) -> Void
+    let onMediaPasted: (URL, UTType) -> Void
 
     func makeUIView(context: Context) -> MediaPastingTextView {
         let view = MediaPastingTextView()
@@ -82,6 +82,17 @@ struct ChatComposerTextView: UIViewRepresentable {
             textView.invalidateIntrinsicContentSize()
         }
 
+        func textView(
+            _ textView: UITextView,
+            shouldChangeTextIn range: NSRange,
+            replacementText text: String
+        ) -> Bool {
+            let current = textView.text as NSString
+
+            return current.replacingCharacters(in: range, with: text).count
+                <= MediaPastingTextView.maxTextCharacters
+        }
+
         func textViewDidBeginEditing(_ textView: UITextView) {
             guard !isFocused.wrappedValue else { return }
             isFocused.wrappedValue = true
@@ -99,12 +110,14 @@ struct ChatComposerTextView: UIViewRepresentable {
 /// `pasteConfiguration` is what makes the keyboard's GIF key light up: the system asks the first
 /// responder whether it accepts the type before offering to insert it.
 final class MediaPastingTextView: UITextView {
+    nonisolated static let maxTextCharacters = 16_000
     /// Every still type the encoder can ship. GIF is listed first because it is the one that
     /// must survive as-is; the others are re-encoded downstream.
     static let acceptedTypes: [UTType] = [.gif, .png, .jpeg, .image]
 
-    var onMediaPasted: ((Data, UTType) -> Void)?
+    var onMediaPasted: ((URL, UTType) -> Void)?
     var maxHeight: CGFloat = .greatestFiniteMagnitude
+    private var isImportingMedia = false
 
     let placeholderLabel = UILabel()
 
@@ -149,6 +162,8 @@ final class MediaPastingTextView: UITextView {
     }
 
     override func paste(itemProviders: [NSItemProvider]) {
+        guard !isImportingMedia else { return }
+
         let media = itemProviders.filter { provider in
             Self.acceptedTypes.contains { provider.hasItemConformingToTypeIdentifier($0.identifier) }
         }
@@ -158,9 +173,13 @@ final class MediaPastingTextView: UITextView {
             return
         }
 
-        for provider in media {
-            load(provider)
-        }
+        // A paste can contain the same image in several representations. Importing every
+        // provider concurrently multiplies peak memory and sends duplicates, so one user
+        // gesture always produces at most one attachment.
+        guard let provider = media.first else { return }
+
+        isImportingMedia = true
+        load(provider)
     }
 
     /// The most specific type wins, so an animated GIF is never taken as a generic image and
@@ -172,14 +191,31 @@ final class MediaPastingTextView: UITextView {
             return
         }
 
-        provider.loadDataRepresentation(forTypeIdentifier: type.identifier) { [weak self] data, error in
-            guard let data, error == nil else {
+        provider.loadFileRepresentation(forTypeIdentifier: type.identifier) { [weak self] sourceURL, error in
+            guard let sourceURL, error == nil else {
                 LoggerProxy.error("Chat composer could not read pasted media: \(error?.localizedDescription ?? "no data")")
+                Task { @MainActor [weak self] in self?.isImportingMedia = false }
+                return
+            }
+
+            let importedURL: URL
+
+            do {
+                importedURL = try ChatMediaTemporaryFiles.importFile(at: sourceURL)
+            } catch {
+                LoggerProxy.error("Chat composer rejected pasted media: \(error.localizedDescription)")
+                Task { @MainActor [weak self] in self?.isImportingMedia = false }
                 return
             }
 
             Task { @MainActor [weak self] in
-                self?.onMediaPasted?(data, type)
+                guard let self else {
+                    ChatMediaTemporaryFiles.remove(importedURL)
+                    return
+                }
+
+                self.isImportingMedia = false
+                self.onMediaPasted?(importedURL, type)
             }
         }
     }

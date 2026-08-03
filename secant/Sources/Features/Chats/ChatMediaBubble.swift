@@ -12,6 +12,7 @@ import ZappMessaging
 /// bubble degrades: local file -> the wire thumbnail, blurred -> a neutral box.
 struct ChatMediaBubble: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     private enum Constants {
         static let width: CGFloat = 280
@@ -66,6 +67,14 @@ struct ChatMediaBubble: View {
         }
         .onDisappear {
             gifPlayer.stop()
+        }
+        .onChange(of: scenePhase) { phase in
+            guard phase == .active, isGIF, let path = message.mediaLocalPath else {
+                gifPlayer.stop()
+                return
+            }
+
+            gifPlayer.play(path: path)
         }
     }
 
@@ -213,13 +222,15 @@ struct ChatMediaBubble: View {
         }
         .value
 
+        guard !Task.isCancelled else { return }
+
         image = decoded?.0
         isThumbnail = decoded?.1 ?? false
 
         // Only a file we were told is on disk can "fail". No file yet is a transfer in flight.
         didFail = decoded == nil && path != nil
 
-        if isGIF, let path {
+        if scenePhase == .active, isGIF, let path {
             gifPlayer.play(path: path)
         } else {
             gifPlayer.stop()
@@ -227,72 +238,121 @@ struct ChatMediaBubble: View {
     }
 }
 
-/// Streams one GIF frame at a time from ImageIO. Materialising every frame as a bitmap would
-/// cost hundreds of MB per row in a scrolling list.
+/// Streams one downsampled GIF frame at a time. ImageIO's animation convenience API returns
+/// source-resolution frames on the main queue, so a compact 4K GIF can otherwise consume tens
+/// of megabytes per visible row. Decoding each requested frame to the bubble's pixel budget keeps
+/// playback memory constant and lets cancellation stop off-screen work immediately.
 @MainActor
 final class ChatGIFPlayer: ObservableObject {
     @Published private(set) var frame: CGImage?
 
-    private let playback = Playback()
+    private var playbackTask: Task<Void, Never>?
+    private var currentPath: String?
 
     func play(path: String) {
-        // Captured locally so the ImageIO callback reaches it without going through
-        // the weakly-held self it is meant to outlive.
-        let playback = playback
-        let token = playback.restart()
+        guard currentPath != path || playbackTask == nil else { return }
 
-        CGAnimateImageAtURLWithBlock(URL(fileURLWithPath: path) as CFURL, nil) { [weak self] _, image, stop in
-            guard playback.isCurrent(token) else {
-                stop.pointee = true
-                return
-            }
+        stop()
+        currentPath = path
 
-            Task { @MainActor in
-                // Re-checked on the main actor: the row can disappear between ImageIO
-                // handing over a frame and this hop, and a stale frame would then
-                // overwrite whatever the reused row is showing now.
-                guard playback.isCurrent(token) else { return }
-                self?.frame = image
+        playbackTask = Task { [weak self] in
+            guard let descriptor = await ChatGIFDecoder.descriptor(path: path) else { return }
+
+            var index = 0
+
+            while !Task.isCancelled {
+                guard let decoded = await ChatGIFDecoder.frame(path: path, index: index) else { return }
+                guard !Task.isCancelled, self?.currentPath == path else { return }
+
+                self?.frame = decoded.image
+
+                do {
+                    try await Task.sleep(for: .seconds(descriptor.delays[index]))
+                } catch {
+                    return
+                }
+
+                index = (index + 1) % descriptor.delays.count
             }
         }
     }
 
     func stop() {
-        playback.cancel()
-    }
-
-    deinit {
-        playback.cancel()
+        playbackTask?.cancel()
+        playbackTask = nil
+        currentPath = nil
+        frame = nil
     }
 }
 
-/// Playback state lives outside the main actor deliberately: `deinit` is nonisolated,
-/// so reaching main-actor state from it races ImageIO's callback queue. A token rather
-/// than a flag means a new `play` invalidates the previous loop immediately, instead of
-/// waiting for a callback that a stalled or single-frame GIF may never deliver.
-private final class Playback: @unchecked Sendable {
-    private let lock = NSLock()
-    private var token = 0
-    private var isActive = false
-
-    func restart() -> Int {
-        lock.lock()
-        defer { lock.unlock() }
-        token += 1
-        isActive = true
-        return token
+private enum ChatGIFDecoder {
+    struct Descriptor: Sendable {
+        let delays: [Double]
     }
 
-    func cancel() {
-        lock.lock()
-        defer { lock.unlock() }
-        isActive = false
+    struct Frame: @unchecked Sendable {
+        let image: CGImage
     }
 
-    func isCurrent(_ candidate: Int) -> Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        return isActive && token == candidate
+    private static let maxFileBytes = 16 * 1024 * 1024
+    private static let maxFrames = 300
+    private static let maxPixel: CGFloat = 560
+    private static let defaultDelay = 0.1
+    private static let minimumDelay = 0.05
+    private static let maximumDelay = 10.0
+
+    static func descriptor(path: String) async -> Descriptor? {
+        await Task.detached(priority: .userInitiated) {
+            autoreleasepool {
+                let url = URL(fileURLWithPath: path)
+
+                guard
+                    ChatMediaImage.fileByteCount(at: url).map({ $0 <= maxFileBytes }) == true,
+                    ChatMediaImage.isGIF(at: url),
+                    let source = CGImageSourceCreateWithURL(url as CFURL, ChatMediaImage.sourceOptions)
+                else {
+                    return nil
+                }
+
+                let count = CGImageSourceGetCount(source)
+                guard count > 1, count <= maxFrames else { return nil }
+
+                var delays: [Double] = []
+                delays.reserveCapacity(count)
+
+                for index in 0..<count {
+                    guard ChatMediaImage.sourceIsWithinPixelLimit(source, index: index) else { return nil }
+
+                    let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+                    let gif = properties?[kCGImagePropertyGIFDictionary] as? [CFString: Any]
+                    let rawDelay = (gif?[kCGImagePropertyGIFUnclampedDelayTime] as? NSNumber)?.doubleValue
+                        ?? (gif?[kCGImagePropertyGIFDelayTime] as? NSNumber)?.doubleValue
+                        ?? defaultDelay
+                    let finiteDelay = rawDelay.isFinite ? rawDelay : defaultDelay
+                    delays.append(min(max(finiteDelay, minimumDelay), maximumDelay))
+                }
+
+                return Descriptor(delays: delays)
+            }
+        }
+        .value
+    }
+
+    static func frame(path: String, index: Int) async -> Frame? {
+        await Task.detached(priority: .userInitiated) {
+            autoreleasepool {
+                guard let image = ChatMediaImage.downsampledCGImage(
+                    path: path,
+                    index: index,
+                    maxPixel: maxPixel
+                ) else {
+                    return nil
+                }
+
+                return Frame(image: image)
+            }
+        }
+        .value
     }
 }
 
@@ -304,6 +364,9 @@ enum ChatMediaImage {
     /// `ImageProcessor.decodePeerThumbnail` on Android.
     private static let maxThumbnailBase64Chars = 512 * 1024
     private static let thumbnailMaxPixel: CGFloat = 400
+    /// Mirrors Android's bounds-only guard. Downsampling controls the output allocation;
+    /// this limit rejects malformed inputs whose declared canvas is itself unreasonable.
+    private static let maxSourcePixels: Int64 = 100_000_000
 
     static func decodeThumbnail(_ base64: String?) -> UIImage? {
         guard
@@ -323,6 +386,23 @@ enum ChatMediaImage {
             || data.count >= 6 && data.prefix(6).elementsEqual(Array("GIF87a".utf8))
     }
 
+    static func isGIF(at url: URL) -> Bool {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? handle.close() }
+
+        guard let signature = try? handle.read(upToCount: 6) else { return false }
+
+        return isGIF(signature)
+    }
+
+    static func fileByteCount(at url: URL) -> Int? {
+        guard let values = try? url.resourceValues(forKeys: [.fileSizeKey]), let size = values.fileSize else {
+            return nil
+        }
+
+        return size
+    }
+
     static func downsampled(path: String, maxPixel: CGFloat) -> UIImage? {
         guard
             let source = CGImageSourceCreateWithURL(URL(fileURLWithPath: path) as CFURL, sourceOptions)
@@ -339,11 +419,49 @@ enum ChatMediaImage {
         return downsampled(source: source, maxPixel: maxPixel)
     }
 
-    private static var sourceOptions: CFDictionary {
+    static var sourceOptions: CFDictionary {
         [kCGImageSourceShouldCache: false] as CFDictionary
     }
 
+    static func sourceIsWithinPixelLimit(_ source: CGImageSource, index: Int) -> Bool {
+        guard
+            let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any],
+            let width = (properties[kCGImagePropertyPixelWidth] as? NSNumber)?.int64Value,
+            let height = (properties[kCGImagePropertyPixelHeight] as? NSNumber)?.int64Value,
+            width > 0,
+            height > 0,
+            width <= maxSourcePixels / height
+        else {
+            return false
+        }
+
+        return width * height <= maxSourcePixels
+    }
+
+    static func downsampledCGImage(path: String, index: Int, maxPixel: CGFloat) -> CGImage? {
+        guard
+            maxPixel.isFinite,
+            maxPixel > 0,
+            let source = CGImageSourceCreateWithURL(URL(fileURLWithPath: path) as CFURL, sourceOptions),
+            index >= 0,
+            index < CGImageSourceGetCount(source),
+            sourceIsWithinPixelLimit(source, index: index)
+        else {
+            return nil
+        }
+
+        return downsampledCGImage(source: source, index: index, maxPixel: maxPixel)
+    }
+
     private static func downsampled(source: CGImageSource, maxPixel: CGFloat) -> UIImage? {
+        guard sourceIsWithinPixelLimit(source, index: 0) else { return nil }
+
+        guard let image = downsampledCGImage(source: source, index: 0, maxPixel: maxPixel) else { return nil }
+
+        return UIImage(cgImage: image)
+    }
+
+    private static func downsampledCGImage(source: CGImageSource, index: Int, maxPixel: CGFloat) -> CGImage? {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
@@ -351,9 +469,7 @@ enum ChatMediaImage {
             kCGImageSourceThumbnailMaxPixelSize: maxPixel
         ]
 
-        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
-
-        return UIImage(cgImage: image)
+        return CGImageSourceCreateThumbnailAtIndex(source, index, options as CFDictionary)
     }
 }
 

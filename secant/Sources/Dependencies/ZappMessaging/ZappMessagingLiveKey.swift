@@ -542,14 +542,15 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 self.countUnread(message)
                 self.publishMessageActivity(message)
                 self.messageReceivedSubject.send(message)
-                Task {
-                    do {
-                        try await self.refreshConversations()
-                    } catch {
-                        // `refreshConversations` records the structured failure.
-                    }
-                }
             }
+            .store(in: &cancellables)
+
+        // The SDK already refreshes its published conversation snapshot after every message and
+        // mutation. Forward that authoritative value instead of starting a second unbounded IPC
+        // refresh task for the same event.
+        sdk.$conversations
+            .receive(on: mainQueue)
+            .sink { [weak self] conversations in self?.conversationsSubject.send(conversations) }
             .store(in: &cancellables)
 
         sdk.$isOnline
@@ -608,15 +609,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             }
             .store(in: &cancellables)
 
+        // The SDK currently mirrors the core's transfer event into both its transfer and
+        // download publishers. Subscribe once so every core update reaches the UI once.
         sdk.mediaTransferProgress
-            .receive(on: mainQueue)
-            .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
-            .store(in: &cancellables)
-
-        // Incoming media needs this as much as outgoing does: a GIF travels
-        // uncompressed, so without download progress the bubble sits on a blurred
-        // 64px thumbnail for the whole transfer and reads as broken rather than loading.
-        sdk.mediaDownloadProgress
             .receive(on: mainQueue)
             .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
             .store(in: &cancellables)
