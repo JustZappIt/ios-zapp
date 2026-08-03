@@ -9,155 +9,11 @@ import Foundation
 extension KlipyGIFClient: DependencyKey {
     static let liveValue = KlipyGIFClient(
         isConfigured: { KlipyGIFCatalog.apiKey != nil },
-        trending: { try await KlipyGIFService.shared.trending() },
-        search: { try await KlipyGIFService.shared.search($0) },
+        trending: { try await KlipyGIFService.shared.trending(page: $0) },
+        search: { try await KlipyGIFService.shared.search($0, page: $1) },
         preview: { try await KlipyGIFService.shared.preview($0) },
         download: { try await KlipyGIFService.shared.download($0) }
     )
-}
-
-extension KlipyGIFClient: TestDependencyKey {
-    static let testValue = KlipyGIFClient(
-        isConfigured: { false },
-        trending: { [] },
-        search: { _ in [] },
-        preview: { _ in Data() },
-        download: { _ in throw KlipyGIFError.notConfigured }
-    )
-}
-
-/// Request building and response parsing, kept off the actor so it is testable without network.
-enum KlipyGIFCatalog {
-    static let perPage = 30
-    static let previewByteLimit = 2 * 1024 * 1024
-    static let maxBlurPreviewChars = 8 * 1024
-
-    /// `md` before `hd`: Klipy ships both at the same pixel size and `hd` differs only in encoding
-    /// quality, so `hd` costs roughly double the bytes over a peer-to-peer transfer for a gain no
-    /// one sees in a chat bubble.
-    static let sendSizes = ["md", "hd", "sm", "xs"]
-    /// `sm` is 220px against a ~320px cell; `xs` is 90px and visibly mushy.
-    static let previewSizes = ["sm", "xs", "md", "hd"]
-
-    static var apiKey: String? {
-        PartnerKeys.klipyKey.flatMap { $0.isEmpty ? nil : $0 }
-    }
-
-    static func endpoint(path: String, query: String?, customerId: String) throws -> URL {
-        guard let apiKey else { throw KlipyGIFError.notConfigured }
-
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.klipy.com"
-        components.path = "/api/v1/\(apiKey)/gifs/\(path)"
-        components.queryItems = [
-            URLQueryItem(name: "page", value: "1"),
-            URLQueryItem(name: "per_page", value: String(perPage)),
-            URLQueryItem(name: "customer_id", value: customerId),
-            URLQueryItem(name: "content_filter", value: "high"),
-            // Each item otherwise carries mp4/webm/webp/jpg renditions at four sizes, none of
-            // which this picker can use.
-            URLQueryItem(name: "format_filter", value: "gif")
-        ]
-
-        if let query {
-            components.queryItems?.append(URLQueryItem(name: "q", value: query))
-        }
-
-        guard let url = components.url else { throw KlipyGIFError.badResponse }
-
-        return url
-    }
-
-    static func parse(_ data: Data, maxSendBytes: Int = ChatMediaEncoder.maxGIFBytes) throws -> [KlipyGIF] {
-        guard
-            let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
-            let page = root["data"] as? [String: Any],
-            let results = page["data"] as? [[String: Any]]
-        else {
-            throw KlipyGIFError.badResponse
-        }
-
-        return results.compactMap { result($0, maxSendBytes: maxSendBytes) }
-    }
-
-    /// An injected advertisement arrives in the same array as a `content` item carrying markup
-    /// instead of a `file` — dropping those is what keeps the grid to actual GIFs.
-    private static func result(_ raw: [String: Any], maxSendBytes: Int) -> KlipyGIF? {
-        guard
-            raw["content"] == nil,
-            let identifier = identifier(raw),
-            let sizes = raw["file"] as? [String: Any],
-            let send = rendition(in: sizes, order: sendSizes, maxBytes: maxSendBytes),
-            let preview = rendition(in: sizes, order: previewSizes, maxBytes: previewByteLimit)
-        else {
-            return nil
-        }
-
-        return KlipyGIF(
-            id: identifier,
-            title: (raw["title"] as? String) ?? "",
-            previewURL: preview.url,
-            sendURL: send.url,
-            width: preview.width,
-            height: preview.height,
-            blurPreview: blurPreview(raw["blur_preview"] as? String)
-        )
-    }
-
-    /// A `data:` URI rather than a link, so it is decoded rather than fetched. Bounded because it
-    /// arrives from a third party and lands in memory for every cell on screen.
-    static func blurPreview(_ raw: String?) -> Data? {
-        guard
-            let raw,
-            raw.count <= maxBlurPreviewChars,
-            let comma = raw.firstIndex(of: ","),
-            raw[raw.startIndex..<comma].hasPrefix("data:image/")
-        else {
-            return nil
-        }
-
-        return Data(base64Encoded: String(raw[raw.index(after: comma)...]), options: [.ignoreUnknownCharacters])
-    }
-
-    private static func identifier(_ raw: [String: Any]) -> String? {
-        if let slug = raw["slug"] as? String, !slug.isEmpty { return slug }
-
-        return (raw["id"] as? NSNumber).map { $0.stringValue }
-    }
-
-    private struct Rendition {
-        let url: String
-        let width: Int
-        let height: Int
-    }
-
-    private static func rendition(in sizes: [String: Any], order: [String], maxBytes: Int) -> Rendition? {
-        for name in order {
-            guard
-                let formats = sizes[name] as? [String: Any],
-                let gif = formats["gif"] as? [String: Any],
-                let rawURL = gif["url"] as? String,
-                let url = ChatLinkPreviewParser.safePreviewURL(rawURL)
-            else {
-                continue
-            }
-
-            // Klipy declares the byte count, so an oversized rendition is skipped before it is
-            // ever requested rather than downloaded and thrown away.
-            if let size = (gif["size"] as? NSNumber)?.intValue, size > maxBytes {
-                continue
-            }
-
-            return Rendition(
-                url: url,
-                width: (gif["width"] as? NSNumber)?.intValue ?? 0,
-                height: (gif["height"] as? NSNumber)?.intValue ?? 0
-            )
-        }
-
-        return nil
-    }
 }
 
 /// Klipy search for the composer's GIF picker.
@@ -172,13 +28,20 @@ private actor KlipyGIFService {
     private enum Constants {
         static let maxResponseBytes = 1024 * 1024
         static let timeout: TimeInterval = 15
-        static let previewCacheSize = 120
+        static let previewCacheBytes = 24 * 1024 * 1024
     }
 
     private let customerId = UUID().uuidString
 
-    private var previewCache: [String: Data] = [:]
-    private var previewOrder: [String] = []
+    /// `NSCache` rather than a hand-rolled LRU so a grid of previews is evicted under memory
+    /// pressure instead of being held for the lifetime of the process.
+    private let previewCache: NSCache<NSString, NSData> = {
+        let cache = NSCache<NSString, NSData>()
+        cache.totalCostLimit = Constants.previewCacheBytes
+
+        return cache
+    }()
+
     private var inFlightPreviews: [String: Task<Data, Error>] = [:]
 
     private let session: URLSession = {
@@ -193,62 +56,74 @@ private actor KlipyGIFService {
         return URLSession(configuration: configuration)
     }()
 
-    func trending() async throws -> [KlipyGIF] {
-        try await catalog(path: "trending", query: nil)
+    func trending(page: Int) async throws -> KlipyGIFPage {
+        try await catalog(path: "trending", query: nil, page: page)
     }
 
-    func search(_ query: String) async throws -> [KlipyGIF] {
+    func search(_ query: String, page: Int) async throws -> KlipyGIFPage {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard !trimmed.isEmpty else { return try await trending() }
+        guard !trimmed.isEmpty else { return try await trending(page: page) }
 
-        return try await catalog(path: "search", query: trimmed)
+        return try await catalog(path: "search", query: trimmed, page: page)
     }
 
     func preview(_ gif: KlipyGIF) async throws -> Data {
-        if let cached = previewCache[gif.previewURL] { return cached }
+        if let cached = previewCache.object(forKey: gif.previewURL as NSString) { return cached as Data }
         if let existing = inFlightPreviews[gif.previewURL] { return try await existing.value }
 
-        let task = Task { try await load(gif.previewURL, limit: KlipyGIFCatalog.previewByteLimit) }
+        let task = Task {
+            try await body(
+                for: try imageRequest(gif.previewURL),
+                limit: KlipyGIFCatalog.previewByteLimit,
+                pathExtension: "gif"
+            )
+        }
         inFlightPreviews[gif.previewURL] = task
 
         defer { inFlightPreviews[gif.previewURL] = nil }
 
         let data = try await task.value
-        store(data, for: gif.previewURL)
+        previewCache.setObject(data as NSData, forKey: gif.previewURL as NSString, cost: data.count)
 
         return data
     }
 
     func download(_ gif: KlipyGIF) async throws -> URL {
-        let data = try await load(gif.sendURL, limit: ChatMediaEncoder.maxGIFBytes)
+        let fileURL = try await fetch(
+            try imageRequest(gif.sendURL),
+            limit: ChatMediaEncoder.maxGIFBytes,
+            pathExtension: "gif"
+        )
 
-        guard ChatMediaImage.isGIF(data) else { throw KlipyGIFError.badResponse }
-
-        let url = ChatMediaTemporaryFiles.makeURL(pathExtension: "gif")
-        try data.write(to: url, options: .atomic)
-
-        return url
-    }
-
-    private func catalog(path: String, query: String?) async throws -> [KlipyGIF] {
-        let url = try KlipyGIFCatalog.endpoint(path: path, query: query, customerId: customerId)
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        let (bytes, response) = try await session.bytes(for: request)
-
-        guard
-            let httpResponse = response as? HTTPURLResponse,
-            httpResponse.statusCode == 200
-        else {
+        guard ChatMediaImage.isGIF(at: fileURL) else {
+            ChatMediaTemporaryFiles.remove(fileURL)
             throw KlipyGIFError.badResponse
         }
 
-        return try KlipyGIFCatalog.parse(try await read(bytes, limit: Constants.maxResponseBytes))
+        return fileURL
     }
 
-    private func load(_ url: String, limit: Int) async throws -> Data {
+    private func catalog(path: String, query: String?, page: Int) async throws -> KlipyGIFPage {
+        let url = try KlipyGIFCatalog.endpoint(
+            path: path,
+            query: query,
+            page: page,
+            customerId: customerId,
+            apiKey: KlipyGIFCatalog.apiKey
+        )
+
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        return try KlipyGIFCatalog.parse(
+            try await body(for: request, limit: Constants.maxResponseBytes, pathExtension: "json")
+        )
+    }
+
+    /// Klipy names its own CDN, but it is still a third party naming a host — so a rendition goes
+    /// through the same screening a link preview gets.
+    private func imageRequest(_ url: String) throws -> URLRequest {
         guard
             let safeURL = ChatLinkPreviewParser.safePreviewURL(url),
             let requestURL = URL(string: safeURL)
@@ -259,42 +134,46 @@ private actor KlipyGIFService {
         var request = URLRequest(url: requestURL)
         request.setValue("image/gif", forHTTPHeaderField: "Accept")
 
-        let (bytes, response) = try await session.bytes(for: request)
+        return request
+    }
+
+    private func body(for request: URLRequest, limit: Int, pathExtension: String) async throws -> Data {
+        let fileURL = try await fetch(request, limit: limit, pathExtension: pathExtension)
+
+        defer { ChatMediaTemporaryFiles.remove(fileURL) }
+
+        return try Data(contentsOf: fileURL)
+    }
+
+    /// Streamed to disk rather than accumulated in memory: `URLSession`'s in-memory conveniences
+    /// buffer the whole body, and policing that through `AsyncBytes` costs one `await` per byte —
+    /// seconds of CPU on a multi-megabyte GIF. The size is checked once the body has landed, so a
+    /// host that under-declares its length spends temporary disk rather than memory.
+    private func fetch(_ request: URLRequest, limit: Int, pathExtension: String) async throws -> URL {
+        let (downloadedURL, response) = try await session.download(for: request)
+        let fileURL = ChatMediaTemporaryFiles.makeURL(pathExtension: pathExtension)
+
+        do {
+            try FileManager.default.moveItem(at: downloadedURL, to: fileURL)
+        } catch {
+            ChatMediaTemporaryFiles.remove(downloadedURL)
+            throw KlipyGIFError.badResponse
+        }
 
         guard
             let httpResponse = response as? HTTPURLResponse,
             httpResponse.statusCode == 200,
-            httpResponse.expectedContentLength <= Int64(limit)
+            let byteCount = ChatMediaImage.fileByteCount(at: fileURL)
         else {
+            ChatMediaTemporaryFiles.remove(fileURL)
             throw KlipyGIFError.badResponse
         }
 
-        return try await read(bytes, limit: limit)
-    }
-
-    /// Streamed rather than trusting `Content-Length`, which a host can under-declare.
-    private func read(_ bytes: URLSession.AsyncBytes, limit: Int) async throws -> Data {
-        var data = Data()
-        data.reserveCapacity(min(limit, 64 * 1024))
-
-        for try await byte in bytes {
-            data.append(byte)
-
-            if data.count > limit { throw KlipyGIFError.tooLarge }
+        guard byteCount <= limit else {
+            ChatMediaTemporaryFiles.remove(fileURL)
+            throw KlipyGIFError.tooLarge
         }
 
-        return data
-    }
-
-    private func store(_ data: Data, for url: String) {
-        if previewCache[url] == nil {
-            previewOrder.append(url)
-        }
-
-        previewCache[url] = data
-
-        while previewOrder.count > Constants.previewCacheSize {
-            previewCache.removeValue(forKey: previewOrder.removeFirst())
-        }
+        return fileURL
     }
 }

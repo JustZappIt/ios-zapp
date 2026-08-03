@@ -2568,6 +2568,23 @@
         }
       }
     },
+    "chatRoom.sendingMedia": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviando…"
+          }
+        }
+      }
+    },
     "chatRoom.ownKeySendFailed": {
       "extractionState": "manual",
       "localizations": {

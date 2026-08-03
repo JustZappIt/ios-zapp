@@ -12,8 +12,9 @@ struct ChatGIFPickerView: View {
         static let columns = 2
         static let cellSpacing: CGFloat = 8
         static let cellHeight: CGFloat = 120
-        static let iconSize: CGFloat = 16
         static let closeSize: CGFloat = 36
+        /// How far from the end a cell has to appear before the next page is asked for.
+        static let prefetchDistance = 4
     }
 
     @Environment(\.colorScheme) private var colorScheme
@@ -56,40 +57,14 @@ struct ChatGIFPickerView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: Design.Spacing._sm) {
-            Asset.Assets.Icons.search.image
-                .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.textSubtle)
-
-            TextField(
-                String(localizable: .chatGifPickerSearchPlaceholder),
-                text: Binding(
-                    get: { store.query },
-                    set: { store.send(.queryChanged($0)) }
-                )
-            )
-            .zappFont(.body, style: ZappColors.text)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .submitLabel(.search)
-
-            if !store.query.isEmpty {
-                Button {
-                    store.send(.clearQueryTapped)
-                } label: {
-                    Asset.Assets.Icons.xClose.image
-                        .zImage(width: 12, height: 12, style: ZappColors.textSubtle)
-                }
-                .buttonStyle(.zappPress)
-                .accessibilityLabel(String(localizable: .generalClear))
-            }
-        }
-        .padding(.horizontal, Design.Spacing._md)
-        .padding(.vertical, Design.Spacing._lg)
-        .background(ZappColors.surfaceInput.color(colorScheme))
-        .overlay {
-            Rectangle()
-                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-        }
+        ZappSearchField(
+            placeholder: String(localizable: .chatGifPickerSearchPlaceholder),
+            text: Binding(
+                get: { store.query },
+                set: { store.send(.queryChanged($0)) }
+            ),
+            onClear: { store.send(.clearQueryTapped) }
+        )
     }
 
     /// Required by Klipy's API terms, alongside the "Search KLIPY" placeholder.
@@ -137,11 +112,28 @@ struct ChatGIFPickerView: View {
                     }
                     .buttonStyle(.zappPress)
                     .accessibilityLabel(gif.title)
+                    .onAppear {
+                        guard gif.id == prefetchTriggerId else { return }
+
+                        store.send(.reachedEnd)
+                    }
                 }
             }
-            .padding(.bottom, Design.Spacing._3xl)
+
+            if store.isLoadingMore {
+                ProgressView()
+                    .tint(ZappColors.accent.color(colorScheme))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Design.Spacing._lg)
+            }
+
+            Color.clear.frame(height: Design.Spacing._3xl)
         }
         .scrollDismissesKeyboard(.immediately)
+    }
+
+    private var prefetchTriggerId: KlipyGIF.ID? {
+        store.results.dropLast(Constants.prefetchDistance).last?.id ?? store.results.last?.id
     }
 
     private func placeholder<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -156,24 +148,25 @@ struct ChatGIFPickerView: View {
 }
 
 private struct ChatGIFPickerCell: View {
+    private static let blurPixel: CGFloat = 64
+
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
+
     @StateObject private var player = ChatDataGIFPlayer()
+    /// Decoded once rather than per redraw: the animated frame republishes ten times a second,
+    /// and a computed decode would run ImageIO that often on the main thread.
+    @State private var blur: CGImage?
 
     let gif: KlipyGIF
     let height: CGFloat
-
-    private var blur: UIImage? {
-        gif.blurPreview.flatMap { ChatMediaImage.downsampled(data: $0, maxPixel: Self.blurPixel) }
-    }
-
-    private static let blurPixel: CGFloat = 64
 
     var body: some View {
         ZStack {
             ZappColors.surfaceInput.color(colorScheme)
 
             if let blur {
-                Image(uiImage: blur)
+                Image(decorative: blur, scale: 1)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             }
@@ -187,7 +180,20 @@ private struct ChatGIFPickerCell: View {
         .frame(height: height)
         .clipped()
         .contentShape(Rectangle())
-        .task(id: gif.id) { await player.play(gif) }
+        .task(id: gif.id) {
+            if let data = gif.blurPreview {
+                blur = await ChatDataGIFDecoder.still(data, maxPixel: Self.blurPixel)?.image
+            }
+
+            await player.play(gif)
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                Task { await player.play(gif) }
+            } else {
+                player.stop()
+            }
+        }
         .onDisappear { player.stop() }
     }
 }
@@ -229,6 +235,8 @@ private final class ChatDataGIFPlayer: ObservableObject {
         }
     }
 
+    /// Unlike the bubble's player this keeps the last frame, so a cell scrolling back into view or
+    /// a return from the background resumes on the image rather than flashing the placeholder.
     func stop() {
         playbackTask?.cancel()
         playbackTask = nil
@@ -283,6 +291,14 @@ private enum ChatDataGIFDecoder {
     }
 
     static func frame(_ data: Data, index: Int) async -> Frame? {
+        await thumbnail(data, index: index, maxPixel: maxPixel)
+    }
+
+    static func still(_ data: Data, maxPixel: CGFloat) async -> Frame? {
+        await thumbnail(data, index: 0, maxPixel: maxPixel)
+    }
+
+    private static func thumbnail(_ data: Data, index: Int, maxPixel: CGFloat) async -> Frame? {
         await Task.detached(priority: .userInitiated) {
             autoreleasepool {
                 guard
