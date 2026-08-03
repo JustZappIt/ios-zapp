@@ -62,6 +62,12 @@ struct ChatRoom {
         var pickedItem: PhotosPickerItem?
         var isSendingMedia = false
 
+        @Presents var gifPicker: ChatGIFPicker.State?
+
+        /// False without a `klipyKey` in `PartnerKeys.plist`, which hides the composer's GIF
+        /// button rather than opening a search that cannot answer.
+        var isGIFSearchAvailable = false
+
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
         var completedMediaIds: Set<String> = []
@@ -229,6 +235,9 @@ struct ChatRoom {
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
         case mediaPasted(fileURL: URL, type: UTType)
+        case gifButtonTapped
+        case gifPicker(PresentationAction<ChatGIFPicker.Action>)
+        case gifDownloaded(fileURL: URL)
         case mediaSendSucceeded(ZMMessage)
         case mediaSendFailed
         case mediaTooLarge
@@ -245,6 +254,7 @@ struct ChatRoom {
     @Dependency(\.continuousClock) var clock
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.klipyGIF) var klipyGIF
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
@@ -254,6 +264,7 @@ struct ChatRoom {
             switch action {
             case .onAppear:
                 let conversationId = state.conversationId
+                state.isGIFSearchAvailable = klipyGIF.isConfigured()
                 zappMessaging.setActiveConversation(conversationId)
 
                 // Reading is deferred to `.messagesLoaded`: marking read on entry alone clears
@@ -607,8 +618,8 @@ struct ChatRoom {
                     }
                 }
 
-            // The keyboard's GIF key and a pasted image arrive here rather than through the
-            // picker, but ship down the same encoder — so a pasted GIF stays animated too.
+            // A pasted image arrives here rather than through the picker, but ships down the same
+            // encoder — so a pasted GIF stays animated too.
             case .mediaPasted(let fileURL, let type):
                 guard !state.isSendingMedia else {
                     return .run { _ in ChatMediaTemporaryFiles.remove(fileURL) }
@@ -616,31 +627,33 @@ struct ChatRoom {
 
                 state.sendDidFail = false
                 state.isSendingMedia = true
-                let conversationId = state.conversationId
+
+                return sendMedia(conversationId: state.conversationId, fileURL: fileURL, type: type)
+
+            case .gifButtonTapped:
+                state.gifPicker = ChatGIFPicker.State()
+                return .none
+
+            case .gifPicker(.presented(.delegate(.selected(let gif)))):
+                state.gifPicker = nil
+
+                guard !state.isSendingMedia else { return .none }
+
+                state.sendDidFail = false
+                state.isSendingMedia = true
 
                 return .run { send in
-                    defer { ChatMediaTemporaryFiles.remove(fileURL) }
-
-                    let encoded = try ChatMediaEncoder.encode(fileURL: fileURL, supportedTypes: [type])
-                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
-
-                    let message = try await zappMessaging.sendMedia(
-                        conversationId,
-                        encoded.path,
-                        encoded.contentType,
-                        "",
-                        encoded.thumbnail
-                    )
-                    await send(.mediaSendSucceeded(message))
+                    await send(.gifDownloaded(fileURL: try await klipyGIF.download(gif)))
                 } catch: { error, send in
-                    LoggerProxy.error("Chat room failed to send pasted media: \(error)")
-
-                    if error as? ChatMediaEncoder.Failure == .tooLarge {
-                        await send(.mediaTooLarge)
-                    } else {
-                        await send(.mediaSendFailed)
-                    }
+                    LoggerProxy.error("Chat room failed to download GIF: \(error)")
+                    await send(.mediaSendFailed)
                 }
+
+            case .gifPicker:
+                return .none
+
+            case .gifDownloaded(let fileURL):
+                return sendMedia(conversationId: state.conversationId, fileURL: fileURL, type: .gif)
 
             case .mediaSendSucceeded(let message):
                 state.isSendingMedia = false
@@ -699,6 +712,35 @@ struct ChatRoom {
                 }
 
                 return .none
+            }
+        }
+        .ifLet(\.$gifPicker, action: \.gifPicker) {
+            ChatGIFPicker()
+        }
+    }
+
+    private func sendMedia(conversationId: String, fileURL: URL, type: UTType) -> Effect<Action> {
+        .run { send in
+            defer { ChatMediaTemporaryFiles.remove(fileURL) }
+
+            let encoded = try ChatMediaEncoder.encode(fileURL: fileURL, supportedTypes: [type])
+            defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
+            let message = try await zappMessaging.sendMedia(
+                conversationId,
+                encoded.path,
+                encoded.contentType,
+                "",
+                encoded.thumbnail
+            )
+            await send(.mediaSendSucceeded(message))
+        } catch: { error, send in
+            LoggerProxy.error("Chat room failed to send media: \(error)")
+
+            if error as? ChatMediaEncoder.Failure == .tooLarge {
+                await send(.mediaTooLarge)
+            } else {
+                await send(.mediaSendFailed)
             }
         }
     }

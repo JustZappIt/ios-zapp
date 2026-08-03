@@ -1165,6 +1165,91 @@
         }
       }
     },
+    "chatGifPicker.attribution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Powered by KLIPY"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con tecnología de KLIPY"
+          }
+        }
+      }
+    },
+    "chatGifPicker.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIFs"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        }
+      }
+    },
+    "chatGifPicker.searchPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search KLIPY"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar en KLIPY"
+          }
+        }
+      }
+    },
+    "chatGifPicker.noResults": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No GIFs found."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encontraron GIF."
+          }
+        }
+      }
+    },
+    "chatGifPicker.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF search is unavailable right now."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La búsqueda de GIF no está disponible ahora mismo."
+          }
+        }
+      }
+    },
     "chatContacts.addressLabel": {
       "extractionState": "manual",
       "localizations": {
@@ -2445,6 +2530,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Enviar"
+          }
+        }
+      }
+    },
+    "chatRoom.sendGif": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a GIF"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar un GIF"
           }
         }
       }
@@ -9551,6 +9653,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cerrar"
+          }
+        }
+      }
+    },
+    "general.clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar"
           }
         }
       }

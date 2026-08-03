@@ -13,7 +13,9 @@ import ZappMessaging
 /// `ZappBottomActionBar`: the composer owns the bottom edge. `ChatRoomView.kt` does the same.
 struct ChatRoomView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @FocusState private var isComposerFocused: Bool
+    /// Not `@FocusState`: nothing in the SwiftUI hierarchy is focusable, so SwiftUI would keep
+    /// clearing it and the composer would resign the keyboard on the next keystroke.
+    @State private var isComposerFocused = false
     @State private var hasPositioned = false
     @State private var isAtBottom = true
 
@@ -79,7 +81,9 @@ struct ChatRoomView: View {
                     isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
                     isMediaEnabled: !store.isSendingMedia,
+                    showsGIFButton: store.isGIFSearchAvailable,
                     onSend: { store.send(.sendTapped) },
+                    onGIF: { store.send(.gifButtonTapped) },
                     onMediaPasted: { fileURL, type in
                         store.send(.mediaPasted(fileURL: fileURL, type: type))
                     }
@@ -103,6 +107,9 @@ struct ChatRoomView: View {
                     isLoading: store.isLoadingNetworkDetails,
                     onRefresh: { store.send(.networkChipTapped) }
                 )
+            }
+            .sheet(item: $store.scope(state: \.gifPicker, action: \.gifPicker)) { pickerStore in
+                ChatGIFPickerView(store: pickerStore)
             }
         }
     }
@@ -337,10 +344,12 @@ private struct ChatRoomInputRow: View {
 
     @Binding var draft: String
     @Binding var pickedItem: PhotosPickerItem?
-    let isFocused: FocusState<Bool>.Binding
+    @Binding var isFocused: Bool
     let isSendEnabled: Bool
     let isMediaEnabled: Bool
+    let showsGIFButton: Bool
     let onSend: () -> Void
+    let onGIF: () -> Void
     let onMediaPasted: (URL, UTType) -> Void
 
     var body: some View {
@@ -356,14 +365,21 @@ private struct ChatRoomInputRow: View {
             .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
-            // UIKit rather than TextField: the keyboard's GIF key and a pasted image both
-            // arrive through paste(itemProviders:), which SwiftUI's field cannot receive.
+            if showsGIFButton {
+                Button(action: onGIF) {
+                    ChatGIFGlyph()
+                }
+                .buttonStyle(.zappPress)
+                .disabled(!isMediaEnabled)
+                .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
+                .accessibilityLabel(String(localizable: .chatRoomSendGif))
+            }
+
+            // UIKit rather than TextField: a pasted image arrives through
+            // paste(itemProviders:), which SwiftUI's field cannot receive.
             ChatComposerTextView(
                 text: $draft,
-                isFocused: Binding(
-                    get: { isFocused.wrappedValue },
-                    set: { isFocused.wrappedValue = $0 }
-                ),
+                isFocused: $isFocused,
                 placeholder: String(localizable: .chatRoomInputPlaceholder),
                 maxLines: Constants.maxLines,
                 onMediaPasted: onMediaPasted
@@ -400,6 +416,20 @@ private struct ChatRoomInputRow: View {
 
 private extension ZappTextStyle {
     static let attachGlyph = ZappTextStyle(weight: .medium, size: 22, lineHeight: 24)
+    static let gifGlyph = ZappTextStyle(weight: .bold, size: 11, lineHeight: 14, tracking: 0.4)
+}
+
+/// A lettered glyph rather than an icon: the catalogue has no GIF mark, and the neighbouring
+/// attach control is already drawn the same way.
+private struct ChatGIFGlyph: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Text(String(localizable: .chatRoomGif))
+            .zappFont(.gifGlyph, style: ZappColors.text)
+            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
+            .background(ZappColors.surfaceInput.color(colorScheme))
+    }
 }
 
 #Preview {
