@@ -276,7 +276,7 @@ import ZappMessaging
         #expect(delivered.text == "✓")
         #expect(delivered.status.tickCount == 2)
         #expect(!delivered.status.usesHighlightedColor)
-        #expect(read.status.tickCount == 3)
+        #expect(read.status.tickCount == 2)
         #expect(read.status.usesHighlightedColor)
         #expect(delivered.accessibilityLabel == String(localizable: .chatRoomStatusDelivered))
         #expect(sent.accessibilityLabel == String(localizable: .chatRoomStatusSent))

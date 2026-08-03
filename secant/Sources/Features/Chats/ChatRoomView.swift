@@ -334,7 +334,8 @@ private struct ChatRoomInputRow: View {
 
     private enum Constants {
         static let inputHorizontalPadding: CGFloat = 12
-        static let inputVerticalPadding: CGFloat = 10
+        /// 8, not 10: 28pt of GIF button plus 16 keeps the box on the same 44 as before.
+        static let inputVerticalPadding: CGFloat = 8
         static let sendHorizontalPadding: CGFloat = 16
         static let sendVerticalPadding: CGFloat = 12
         static let minHeight: CGFloat = 44
@@ -365,29 +366,7 @@ private struct ChatRoomInputRow: View {
             .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
-            if showsGIFButton {
-                Button(action: onGIF) {
-                    ChatGIFGlyph()
-                }
-                .buttonStyle(.zappPress)
-                .disabled(!isMediaEnabled)
-                .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
-                .accessibilityLabel(String(localizable: .chatRoomSendGif))
-            }
-
-            // UIKit rather than TextField: a pasted image arrives through
-            // paste(itemProviders:), which SwiftUI's field cannot receive.
-            ChatComposerTextView(
-                text: $draft,
-                isFocused: $isFocused,
-                placeholder: String(localizable: .chatRoomInputPlaceholder),
-                maxLines: Constants.maxLines,
-                onMediaPasted: onMediaPasted
-            )
-            .padding(.horizontal, Constants.inputHorizontalPadding)
-            .padding(.vertical, Constants.inputVerticalPadding)
-            .frame(minHeight: Constants.minHeight)
-            .background(ZappColors.surfaceInput.color(colorScheme))
+            inputBox
 
             Button(action: onSend) {
                 Text(String(localizable: .chatRoomSend))
@@ -412,23 +391,57 @@ private struct ChatRoomInputRow: View {
                 .ignoresSafeArea(.container, edges: .bottom)
         }
     }
+
+    private var inputBox: some View {
+        HStack(alignment: .bottom, spacing: Design.Spacing._sm) {
+            // UIKit rather than TextField: a pasted image arrives through
+            // paste(itemProviders:), which SwiftUI's field cannot receive.
+            ChatComposerTextView(
+                text: $draft,
+                isFocused: $isFocused,
+                placeholder: String(localizable: .chatRoomInputPlaceholder),
+                maxLines: Constants.maxLines,
+                onMediaPasted: onMediaPasted
+            )
+
+            if showsGIFButton {
+                Button(action: onGIF) {
+                    ChatGIFGlyph()
+                }
+                .buttonStyle(.zappPress)
+                .disabled(!isMediaEnabled)
+                .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
+                .accessibilityLabel(String(localizable: .chatRoomSendGif))
+            }
+        }
+        .padding(.horizontal, Constants.inputHorizontalPadding)
+        .padding(.vertical, Constants.inputVerticalPadding)
+        .frame(minHeight: Constants.minHeight)
+        .background {
+            // A tap on the box's padding missed the field entirely and read as an ignored tap.
+            ZappColors.surfaceInput.color(colorScheme)
+                .contentShape(Rectangle())
+                .onTapGesture { isFocused = true }
+        }
+    }
 }
 
 private extension ZappTextStyle {
     static let attachGlyph = ZappTextStyle(weight: .medium, size: 22, lineHeight: 24)
-    static let gifGlyph = ZappTextStyle(weight: .bold, size: 11, lineHeight: 14, tracking: 0.4)
+    static let gifGlyph = ZappTextStyle(weight: .bold, size: 10, lineHeight: 12, tracking: 0.4)
 }
 
-/// A lettered glyph rather than an icon: the catalogue has no GIF mark, and the neighbouring
-/// attach control is already drawn the same way.
+/// Lettered rather than an icon — the catalogue has no GIF mark. It sits inside the field, so it
+/// carries no background of its own.
 private struct ChatGIFGlyph: View {
-    @Environment(\.colorScheme) private var colorScheme
+    static let width: CGFloat = 32
+    static let height: CGFloat = 28
 
     var body: some View {
         Text(String(localizable: .chatRoomGif))
-            .zappFont(.gifGlyph, style: ZappColors.text)
-            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
-            .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFont(.gifGlyph, style: ZappColors.textSubtle)
+            .frame(width: Self.width, height: Self.height)
+            .contentShape(Rectangle())
     }
 }
 

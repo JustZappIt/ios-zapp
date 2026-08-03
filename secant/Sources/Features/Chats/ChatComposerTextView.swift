@@ -49,7 +49,13 @@ struct ChatComposerTextView: UIViewRepresentable {
         view.placeholderLabel.isHidden = !text.isEmpty
         view.maxHeight = Self.font.lineHeight * CGFloat(maxLines)
 
-        applyFocus(to: view)
+        // Only a change SwiftUI made may drive the responder: a tap focuses the field before the
+        // binding catches up, and "correcting" that swallowed the tap.
+        if context.coordinator.lastSeenFocus != isFocused {
+            context.coordinator.lastSeenFocus = isFocused
+
+            applyFocus(to: view)
+        }
     }
 
     /// Measured against the proposed width; `bounds.width` is still zero on the first pass, which
@@ -90,6 +96,8 @@ struct ChatComposerTextView: UIViewRepresentable {
     }
 
     final class Coordinator: NSObject, UITextViewDelegate {
+        var lastSeenFocus: Bool?
+
         private let text: Binding<String>
         private let isFocused: Binding<Bool>
 
