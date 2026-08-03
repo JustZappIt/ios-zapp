@@ -16,7 +16,6 @@ struct ChatMediaBubble: View {
     private enum Constants {
         static let width: CGFloat = 280
         static let padding: CGFloat = 12
-        static let outgoingMetaOpacity: CGFloat = 0.7
         static let defaultAspect: CGFloat = 4.0 / 3.0
         static let minAspect: CGFloat = 0.6
         static let maxAspect: CGFloat = 2.0
@@ -153,7 +152,7 @@ struct ChatMediaBubble: View {
                     status: ChatMessageStatusIndicator.Status(wire: message.status)
                         .visible(readReceiptsEnabled: readReceiptsEnabled),
                     mutedColor: metaColor,
-                    readColor: ZappColors.onAccent.color(colorScheme)
+                    readColor: ZappColors.accent.color(colorScheme)
                 )
             }
         }
@@ -180,22 +179,18 @@ struct ChatMediaBubble: View {
         return Constants.width / min(max(aspect, Constants.minAspect), Constants.maxAspect)
     }
 
+    // A media bubble is neutral in both directions: the picture carries the row, and an accent
+    // panel around an outgoing photo fights it. Matches `MediaBubble.kt`.
     private var bubbleColor: Color {
-        isFromMe
-            ? ZappColors.accent.color(colorScheme)
-            : ZappColors.surfaceAlt.color(colorScheme)
+        ZappColors.surfaceAlt.color(colorScheme)
     }
 
     private var textColor: Color {
-        isFromMe
-            ? ZappColors.onAccent.color(colorScheme)
-            : ZappColors.text.color(colorScheme)
+        ZappColors.text.color(colorScheme)
     }
 
     private var metaColor: Color {
-        isFromMe
-            ? ZappColors.onAccent.color(colorScheme).opacity(Constants.outgoingMetaOpacity)
-            : ZappColors.textMuted.color(colorScheme)
+        ZappColors.textMuted.color(colorScheme)
     }
 
     /// Decoding runs off the main actor: a full-size JPEG decoded inline would hitch the scroll

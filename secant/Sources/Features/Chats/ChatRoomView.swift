@@ -13,7 +13,8 @@ import ZappMessaging
 struct ChatRoomView: View {
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var isComposerFocused: Bool
-    @State private var hasPositionedAtBottom = false
+    @State private var hasPositioned = false
+    @State private var isAtBottom = true
 
     /// Matches the media bubble, so a link card and a photo line up on the same edge.
     private let linkPreviewWidth: CGFloat = 280
@@ -109,8 +110,7 @@ struct ChatRoomView: View {
     private var items: [ChatRoomItem] {
         ChatRoomItem.build(
             from: store.visibleMessages,
-            unreadSeparatorMessageId: store.unreadSeparatorMessageId,
-            unreadCount: store.unreadMessageCountAtEntry
+            unreadSeparatorMessageId: store.unreadSeparatorMessageId
         )
     }
 
@@ -133,14 +133,16 @@ struct ChatRoomView: View {
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)
 
-                        case .unread(_, let count):
-                            ChatUnreadSeparator(count: count)
+                        case .unread:
+                            ChatDateSeparator(label: String(localizable: .chatRoomUnreadMessages))
                         }
                     }
 
                     Color.clear
                         .frame(height: 1)
                         .id(ChatRoomItem.bottomId)
+                        .onAppear { isAtBottom = true }
+                        .onDisappear { isAtBottom = false }
                 }
                 .padding(.horizontal, Design.Spacing._xl)
                 .padding(.bottom, Design.Spacing._md)
@@ -150,36 +152,71 @@ struct ChatRoomView: View {
                 isComposerFocused = false
             }
             .onAppear {
-                guard !items.isEmpty else { return }
-                positionAtBottom(proxy, animated: false)
+                positionOnEntry(proxy)
             }
             .onChange(of: items.last?.id) { _ in
-                guard !items.isEmpty else { return }
-                positionAtBottom(proxy, animated: hasPositionedAtBottom)
+                positionOnNewMessage(proxy)
             }
             .onChange(of: isComposerFocused) { isFocused in
                 guard isFocused, !items.isEmpty else { return }
-                positionAtBottom(proxy, animated: true)
+                scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
             }
         }
     }
 
-    private func positionAtBottom(_ proxy: ScrollViewProxy, animated: Bool) {
+    /// Entering lands on the first unread message when there is one — the marker is the point
+    /// of the divider, and dropping past it to the newest message hides what was missed.
+    private func positionOnEntry(_ proxy: ScrollViewProxy) {
+        guard !items.isEmpty, !hasPositioned else { return }
+
+        hasPositioned = true
+
+        guard let unreadAnchorId else {
+            scroll(proxy, to: ChatRoomItem.bottomId, animated: false)
+            return
+        }
+
+        // Anchored to the top so the unread run sits below the divider, not above it.
+        scroll(proxy, to: unreadAnchorId, anchor: .top, animated: false)
+    }
+
+    /// Following the newest message while the user is reading history yanks them out of it, so
+    /// only own sends and an already-pinned view scroll. Mirrors `shouldFollowLatest`.
+    private func positionOnNewMessage(_ proxy: ScrollViewProxy) {
+        guard !items.isEmpty else { return }
+
+        guard hasPositioned else {
+            positionOnEntry(proxy)
+            return
+        }
+
+        guard isAtBottom || store.visibleMessages.last?.isFromMe == true else { return }
+
+        scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+    }
+
+    private var unreadAnchorId: String? {
+        for item in items {
+            if case .unread(let id) = item { return id }
+        }
+
+        return nil
+    }
+
+    private func scroll(_ proxy: ScrollViewProxy, to id: String, anchor: UnitPoint = .bottom, animated: Bool) {
         Task { @MainActor in
-            // Let the lazy stack lay out its newly loaded rows before resolving the
-            // bottom anchor. Scrolling to the last message during the same update can
-            // otherwise leave the room several rows above the end.
+            // Let the lazy stack lay out its newly loaded rows before resolving the anchor.
+            // Scrolling during the same update can otherwise leave the room several rows short.
             await Task.yield()
 
-            if animated {
-                withAnimation(ZappMotion.content) {
-                    proxy.scrollTo(ChatRoomItem.bottomId, anchor: .bottom)
-                }
-            } else {
-                proxy.scrollTo(ChatRoomItem.bottomId, anchor: .bottom)
+            guard animated else {
+                proxy.scrollTo(id, anchor: anchor)
+                return
             }
 
-            hasPositionedAtBottom = true
+            withAnimation(ZappMotion.content) {
+                proxy.scrollTo(id, anchor: anchor)
+            }
         }
     }
 
@@ -235,7 +272,7 @@ struct ChatRoomView: View {
 private enum ChatRoomItem: Identifiable, Equatable {
     case message(ZMMessage)
     case separator(id: String, label: String)
-    case unread(id: String, count: Int)
+    case unread(id: String)
 
     static let bottomId = "chat_room_bottom"
 
@@ -243,7 +280,7 @@ private enum ChatRoomItem: Identifiable, Equatable {
         switch self {
         case .message(let message): return "msg_\(message.id)"
         case .separator(let id, _): return id
-        case .unread(let id, _): return id
+        case .unread(let id): return id
         }
     }
 
@@ -251,7 +288,6 @@ private enum ChatRoomItem: Identifiable, Equatable {
     static func build(
         from messages: [ZMMessage],
         unreadSeparatorMessageId: String?,
-        unreadCount: Int,
         calendar: Calendar = .current
     ) -> [ChatRoomItem] {
         var items: [ChatRoomItem] = []
@@ -271,41 +307,13 @@ private enum ChatRoomItem: Identifiable, Equatable {
             }
 
             if message.id == unreadSeparatorMessageId {
-                items.append(.unread(id: "unread_\(message.id)", count: unreadCount))
+                items.append(.unread(id: "unread_\(message.id)"))
             }
 
             items.append(.message(message))
         }
 
         return items
-    }
-}
-
-private struct ChatUnreadSeparator: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let count: Int
-
-    var body: some View {
-        HStack(spacing: Design.Spacing._md) {
-            rule
-
-            Text(String(localizable: .chatRoomUnreadCount(String(count))))
-                .zappFont(.caption, style: ZappColors.textSubtle)
-
-            rule
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Design.Spacing._xs)
-        .accessibilityElement(children: .combine)
-    }
-
-    private var rule: some View {
-        Rectangle()
-            .fill(ZappColors.border.color(colorScheme))
-            .frame(maxWidth: .infinity)
-            .frame(height: 1)
-            .opacity(0.65)
     }
 }
 

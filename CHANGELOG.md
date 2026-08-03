@@ -14,7 +14,9 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] You can now send GIFs in chat, and GIFs you receive play instead of sitting there as a frozen first frame. Picking a GIF sends the original animation rather than a flattened photo of it; very large GIFs are refused with a message saying so instead of failing quietly.
 - [ZAPP-1] Long-pressing a message now offers Copy, so you can lift text out of a conversation without retyping it.
 - [ZAPP-1] Links in chat now show a preview card with the page's title, description, and image. The card appears in the composer as soon as you finish typing a link — so you can see what you are about to send, and dismiss it if you would rather send the bare link — and stays attached under the message once sent. Previews are only fetched over HTTPS from public addresses, so a link cannot make the app reach into your local network.
-- [ZAPP-1] A chat you open with unread messages now marks where you left off, and the room opens at the newest message instead of part-way up the list.
+- [ZAPP-1] A chat you open with unread messages now marks where you left off, and opens at the first message you haven't read rather than dropping you past it. Scrolling back through history no longer gets interrupted: a new message only pulls the conversation down if you were already at the bottom, or if you sent it.
+- [ZAPP-1] Links in messages are now tappable and open in your browser.
+- [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
 - [ZAPP-1] Hiding your own online status in chat privacy settings now hides your contacts' status from you as well, in the chat list and in the chat header. Showing whether other people are online while withholding the same about yourself was one-sided; the header still tells you the conversation is connected, so turning the setting off no longer leaves a working chat looking like it is still connecting.

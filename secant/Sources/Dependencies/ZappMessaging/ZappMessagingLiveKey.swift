@@ -647,9 +647,24 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         let previousTimestamp = conversations[index].lastMessageTimestamp ?? .distantPast
         guard message.timestamp >= previousTimestamp else { return }
 
-        conversations[index].lastMessage = message.mediaId == nil ? message.content : "[Media]"
+        conversations[index].lastMessage = Self.preview(for: message)
         conversations[index].lastMessageTimestamp = message.timestamp
         conversationsSubject.send(conversations)
+    }
+
+    /// The same sentinels the JS core writes on a cold load, so an optimistic row and a
+    /// reloaded one read identically. Mirrors `lastMessagePreview` on Android.
+    private static func preview(for message: ZMMessage) -> String {
+        if !message.content.isEmpty {
+            return message.content
+        }
+
+        switch message.contentType {
+        case "image/gif": return "[GIF]"
+        case let type where type.hasPrefix("image/"): return "[Photo]"
+        case let type where type.hasPrefix("video/"): return "[Video]"
+        default: return message.mediaId == nil ? message.content : "[File]"
+        }
     }
 
     private func clearUnread(for conversationId: String) {

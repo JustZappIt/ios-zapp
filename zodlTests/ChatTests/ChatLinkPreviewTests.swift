@@ -36,10 +36,20 @@ struct ChatLinkPreviewTests {
     }
 
     @Test func detectsLinksWithoutSwallowingSentencePunctuation() {
-        let links = ChatLinkPreviewParser.detectWebURLs(in: "See https://example.com/page, then http://example.org/test.")
+        let text = "See https://example.com/page, then http://example.org/test."
+        let links = ChatLinkPreviewParser.detectWebURLs(in: text)
 
-        #expect(links == ["https://example.com/page", "http://example.org/test"])
+        #expect(links.map(\.url) == ["https://example.com/page", "http://example.org/test"])
         #expect(ChatLinkPreviewParser.firstWebURL(in: "See https://example.com/page.") == "https://example.com/page")
+    }
+
+    /// The bubble underlines exactly this span, so a range that includes the trailing comma
+    /// would make punctuation part of the tap target.
+    @Test func reportsTheRangeOfEachLinkWithoutItsTrailingPunctuation() throws {
+        let text = "See https://example.com/page, then stop."
+        let link = try #require(ChatLinkPreviewParser.detectWebURLs(in: text).first)
+
+        #expect(String(text[link.range]) == "https://example.com/page")
     }
 
     /// The screening that keeps a peer-controlled URL from pointing the device at the local

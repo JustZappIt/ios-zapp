@@ -49,6 +49,9 @@ struct ChatRoom {
         /// run that caused the user to open the room.
         var postEntryInboundMessageIds: Set<String> = []
 
+        /// One read per visit, and only once history is on screen. Mirrors `ChatRoomReadGate`.
+        var hasReadForVisit = false
+
         var replyingTo: ZMMessage?
 
         /// Held so a failed send can hand the quote back with the draft.
@@ -236,12 +239,9 @@ struct ChatRoom {
                 let conversationId = state.conversationId
                 zappMessaging.setActiveConversation(conversationId)
 
+                // Reading is deferred to `.messagesLoaded`: marking read on entry alone clears
+                // the badge and emits receipts for messages that never reached the screen.
                 return .merge(
-                    .run { _ in
-                        try await zappMessaging.markRead(conversationId)
-                    } catch: { error, _ in
-                        LoggerProxy.error("Chat room mark-read failed: \(error)")
-                    },
                     .run { send in
                         let messages = try await zappMessaging.messages(conversationId, messagePageSize)
                         await send(.messagesLoaded(messages))
@@ -436,7 +436,16 @@ struct ChatRoom {
                     state.applyEarlyStatus(at: index)
                 }
 
-                return .none
+                guard !state.hasReadForVisit else { return .none }
+
+                state.hasReadForVisit = true
+
+                let conversationId = state.conversationId
+                return .run { _ in
+                    try await zappMessaging.markRead(conversationId)
+                } catch: { error, _ in
+                    LoggerProxy.error("Chat room mark-read failed: \(error)")
+                }
 
             case .messageReceived(let message):
                 guard !state.chatContacts.isBlocked(message.senderId) else { return .none }
