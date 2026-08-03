@@ -613,6 +613,14 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
             .store(in: &cancellables)
 
+        // Incoming media needs this as much as outgoing does: a GIF travels
+        // uncompressed, so without download progress the bubble sits on a blurred
+        // 64px thumbnail for the whole transfer and reads as broken rather than loading.
+        sdk.mediaDownloadProgress
+            .receive(on: mainQueue)
+            .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
+            .store(in: &cancellables)
+
         sdk.mediaDownloadComplete
             .receive(on: mainQueue)
             .sink { [weak self] complete in self?.mediaCompleteSubject.send(complete) }

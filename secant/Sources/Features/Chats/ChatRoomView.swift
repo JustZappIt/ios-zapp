@@ -6,6 +6,7 @@
 import ComposableArchitecture
 import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 import ZappMessaging
 
 /// The chat room is the one screen that keeps its back button in the header rather than in a
@@ -77,7 +78,10 @@ struct ChatRoomView: View {
                     pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
                     isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
-                    onSend: { store.send(.sendTapped) }
+                    onSend: { store.send(.sendTapped) },
+                    onMediaPasted: { data, type in
+                        store.send(.mediaPasted(data: data, type: type))
+                    }
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -327,7 +331,7 @@ private struct ChatRoomInputRow: View {
         static let sendVerticalPadding: CGFloat = 12
         static let minHeight: CGFloat = 44
         static let disabledOpacity: CGFloat = 0.45
-        static let lineLimit = 1...5
+        static let maxLines = 5
     }
 
     @Binding var draft: String
@@ -335,6 +339,7 @@ private struct ChatRoomInputRow: View {
     let isFocused: FocusState<Bool>.Binding
     let isSendEnabled: Bool
     let onSend: () -> Void
+    let onMediaPasted: (Data, UTType) -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Design.Spacing._md) {
@@ -347,14 +352,22 @@ private struct ChatRoomInputRow: View {
             .buttonStyle(.zappPress)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
-            TextField(String(localizable: .chatRoomInputPlaceholder), text: $draft, axis: .vertical)
-                .focused(isFocused)
-                .zappFont(.body, style: ZappColors.text)
-                .lineLimit(Constants.lineLimit)
-                .padding(.horizontal, Constants.inputHorizontalPadding)
-                .padding(.vertical, Constants.inputVerticalPadding)
-                .frame(minHeight: Constants.minHeight)
-                .background(ZappColors.surfaceInput.color(colorScheme))
+            // UIKit rather than TextField: the keyboard's GIF key and a pasted image both
+            // arrive through paste(itemProviders:), which SwiftUI's field cannot receive.
+            ChatComposerTextView(
+                text: $draft,
+                isFocused: Binding(
+                    get: { isFocused.wrappedValue },
+                    set: { isFocused.wrappedValue = $0 }
+                ),
+                placeholder: String(localizable: .chatRoomInputPlaceholder),
+                maxLines: Constants.maxLines,
+                onMediaPasted: onMediaPasted
+            )
+            .padding(.horizontal, Constants.inputHorizontalPadding)
+            .padding(.vertical, Constants.inputVerticalPadding)
+            .frame(minHeight: Constants.minHeight)
+            .background(ZappColors.surfaceInput.color(colorScheme))
 
             Button(action: onSend) {
                 Text(String(localizable: .chatRoomSend))

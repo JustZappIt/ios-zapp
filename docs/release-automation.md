@@ -38,23 +38,27 @@ sudo xcodebuild -license accept
 # 2. Homebrew (https://brew.sh)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# 3. rbenv + ruby-build, and wire rbenv into your shell (zsh shown)
-brew install rbenv ruby-build
-echo 'eval "$(rbenv init - zsh)"' >> ~/.zshrc
-exec zsh                 # reload the shell so rbenv is active
+# 3. Ruby — install the PRECOMPILED Homebrew build, not a source build.
+#
+#    ruby-build (what rbenv/mise/asdf shell out to) cannot compile Ruby on
+#    macOS 26 with the Xcode 26 toolchain: linking miniruby dies with
+#    "error: nm: invalid argument --" because Apple's nm rejects an argument
+#    the generated Makefile passes. This is version-independent — 3.4.10,
+#    4.0.5, and 4.0.6 all fail the same way. Homebrew ships a binary, so it
+#    sidesteps the compile entirely.
+brew install ruby
+echo 'export PATH="$(brew --prefix ruby)/bin:$PATH"' >> ~/.zshrc
+exec zsh                 # reload the shell so this ruby is first on PATH
 
-# 4. Ruby — `rbenv install` with no argument reads .ruby-version and installs
-#    exactly that version (4.0.5). Then refresh shims.
+# 4. Bundler, pinned by Gemfile.lock's "BUNDLED WITH".
+gem install bundler -v 4.0.15
+
+# 5. Project gems.
 cd <path-to>/zodl-ios
-rbenv install            # installs the version pinned in .ruby-version
-rbenv rehash
-
-# 5. Project gems. Bundler ships with Ruby; `bundle install` automatically
-#    fetches the bundler version pinned in Gemfile.lock, then the gems.
 bundle install
 
-# 6. (optional) the test runner for the wrapper scripts
-brew install bats-core
+# 6. (optional) formatter the Fastfile pins, and the wrapper-script test runner
+brew install xcbeautify bats-core
 ```
 
 `bats-core` is "Bash Automated Testing System" — it provides the `bats` command

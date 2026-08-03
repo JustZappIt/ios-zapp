@@ -233,51 +233,66 @@ struct ChatMediaBubble: View {
 final class ChatGIFPlayer: ObservableObject {
     @Published private(set) var frame: CGImage?
 
-    private var current: StopFlag?
+    private let playback = Playback()
 
     func play(path: String) {
-        current?.stop()
-
-        let flag = StopFlag()
-        current = flag
+        // Captured locally so the ImageIO callback reaches it without going through
+        // the weakly-held self it is meant to outlive.
+        let playback = playback
+        let token = playback.restart()
 
         CGAnimateImageAtURLWithBlock(URL(fileURLWithPath: path) as CFURL, nil) { [weak self] _, image, stop in
-            guard !flag.isStopped else {
+            guard playback.isCurrent(token) else {
                 stop.pointee = true
                 return
             }
 
             Task { @MainActor in
+                // Re-checked on the main actor: the row can disappear between ImageIO
+                // handing over a frame and this hop, and a stale frame would then
+                // overwrite whatever the reused row is showing now.
+                guard playback.isCurrent(token) else { return }
                 self?.frame = image
             }
         }
     }
 
     func stop() {
-        current?.stop()
-        current = nil
+        playback.cancel()
     }
 
     deinit {
-        current?.stop()
+        playback.cancel()
     }
 }
 
-/// A fresh flag per playback, so stopping one loop cannot be undone by the next `play`.
-private final class StopFlag: @unchecked Sendable {
+/// Playback state lives outside the main actor deliberately: `deinit` is nonisolated,
+/// so reaching main-actor state from it races ImageIO's callback queue. A token rather
+/// than a flag means a new `play` invalidates the previous loop immediately, instead of
+/// waiting for a callback that a stalled or single-frame GIF may never deliver.
+private final class Playback: @unchecked Sendable {
     private let lock = NSLock()
-    private var value = false
+    private var token = 0
+    private var isActive = false
 
-    var isStopped: Bool {
+    func restart() -> Int {
         lock.lock()
         defer { lock.unlock() }
-        return value
+        token += 1
+        isActive = true
+        return token
     }
 
-    func stop() {
+    func cancel() {
         lock.lock()
-        value = true
-        lock.unlock()
+        defer { lock.unlock() }
+        isActive = false
+    }
+
+    func isCurrent(_ candidate: Int) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return isActive && token == candidate
     }
 }
 

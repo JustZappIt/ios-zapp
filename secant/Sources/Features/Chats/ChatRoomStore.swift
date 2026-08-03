@@ -214,6 +214,7 @@ struct ChatRoom {
         case copyMessageTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
+        case mediaPasted(data: Data, type: UTType)
         case mediaSendFailed
         case mediaTooLarge
         case messageStatusChanged(messageId: String, status: String)
@@ -573,6 +574,32 @@ struct ChatRoom {
                     await send(.messageReceived(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send media: \(error)")
+
+                    if error as? ChatMediaEncoder.Failure == .tooLarge {
+                        await send(.mediaTooLarge)
+                    } else {
+                        await send(.mediaSendFailed)
+                    }
+                }
+
+            // The keyboard's GIF key and a pasted image arrive here rather than through the
+            // picker, but ship down the same encoder — so a pasted GIF stays animated too.
+            case .mediaPasted(let data, let type):
+                state.sendDidFail = false
+                let conversationId = state.conversationId
+
+                return .run { send in
+                    let encoded = try ChatMediaEncoder.encode(data, supportedTypes: [type])
+                    let message = try await zappMessaging.sendMedia(
+                        conversationId,
+                        encoded.path,
+                        encoded.contentType,
+                        "",
+                        encoded.thumbnail
+                    )
+                    await send(.messageReceived(message))
+                } catch: { error, send in
+                    LoggerProxy.error("Chat room failed to send pasted media: \(error)")
 
                     if error as? ChatMediaEncoder.Failure == .tooLarge {
                         await send(.mediaTooLarge)
