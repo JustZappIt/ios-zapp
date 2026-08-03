@@ -142,6 +142,30 @@ import ZappMessaging
         #expect(store.state.sendFailureMessage == String(localizable: .chatRoomSendFailed))
     }
 
+    /// Reading on entry alone would emit receipts for messages that never reached the screen,
+    /// and re-reading on every reload would emit a second one for the same visit.
+    @MainActor @Test func historyIsMarkedReadOnceItIsOnScreenAndOnlyOncePerVisit() async {
+        let readCalls = LockIsolated<[String]>([])
+        let loaded = Self.message(id: "loaded", timestamp: 10, isFromMe: false)
+        let store = TestStore(initialState: ChatRoom.State(conversationId: "conversation")) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.markRead = { conversationId in
+                readCalls.withValue { $0.append(conversationId) }
+            }
+        }
+
+        await store.send(.messagesLoaded([loaded])) {
+            $0.isLoading = false
+            $0.messages = [loaded]
+            $0.hasReadForVisit = true
+        }
+
+        await store.send(.messagesLoaded([loaded]))
+
+        #expect(readCalls.value == ["conversation"])
+    }
+
     @MainActor @Test func incomingMessageInOpenRoomIsMarkedRead() async {
         let readCalls = LockIsolated<[String]>([])
         let incoming = Self.message(id: "incoming", timestamp: 10, isFromMe: false)
@@ -280,11 +304,14 @@ import ZappMessaging
         state.messages = [delivered]
         let store = TestStore(initialState: state) {
             ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.markRead = { _ in }
         }
 
         await store.send(.messagesLoaded([staleReload])) {
             $0.isLoading = false
             $0.messages = [delivered]
+            $0.hasReadForVisit = true
         }
     }
 

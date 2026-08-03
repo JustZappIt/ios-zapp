@@ -2602,19 +2602,36 @@
         }
       }
     },
-    "chatRoom.unreadCount": {
+    "settings.profileQRCode": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ unread"
+            "value": "Your chat QR code"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ sin leer"
+            "value": "Tu código QR de chat"
+          }
+        }
+      }
+    },
+    "chatRoom.unreadMessages": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread messages"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensajes no leídos"
           }
         }
       }

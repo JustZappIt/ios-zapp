@@ -28,11 +28,18 @@ enum ChatLinkPreviewParser {
     private static let webURLPattern = "https?://[^\\s<>]+"
     private static let trailingPunctuation = CharacterSet(charactersIn: ".,!?;:)]}")
 
-    static func firstWebURL(in text: String) -> String? {
-        detectWebURLs(in: text).lazy.compactMap(safePreviewURL).first
+    /// A detected link and where it sits in the text, so the bubble can make exactly that
+    /// span tappable without searching for the substring again.
+    struct DetectedWebURL: Equatable {
+        let url: String
+        let range: Range<String.Index>
     }
 
-    static func detectWebURLs(in text: String) -> [String] {
+    static func firstWebURL(in text: String) -> String? {
+        detectWebURLs(in: text).lazy.compactMap { safePreviewURL($0.url) }.first
+    }
+
+    static func detectWebURLs(in text: String) -> [DetectedWebURL] {
         guard let regex = try? NSRegularExpression(pattern: webURLPattern, options: [.caseInsensitive]) else {
             return []
         }
@@ -42,20 +49,21 @@ enum ChatLinkPreviewParser {
         return regex.matches(in: text, range: range).compactMap { match in
             guard let matchRange = Range(match.range, in: text) else { return nil }
 
-            let trimmed = String(text[matchRange])
-                .trimmingTrailingCharacters(in: trailingPunctuation)
+            // Sentence punctuation sits inside the match but outside the link.
+            let trimmed = String(text[matchRange]).trimmingTrailingCharacters(in: trailingPunctuation)
 
             guard
                 let components = URLComponents(string: trimmed),
                 let scheme = components.scheme?.lowercased(),
                 scheme == "http" || scheme == "https",
                 let host = components.host,
-                !host.isEmpty
+                !host.isEmpty,
+                let end = text.index(matchRange.lowerBound, offsetBy: trimmed.count, limitedBy: matchRange.upperBound)
             else {
                 return nil
             }
 
-            return trimmed
+            return DetectedWebURL(url: trimmed, range: matchRange.lowerBound..<end)
         }
     }
 

@@ -86,6 +86,11 @@ struct ChatsList {
             case .onAppear:
                 state.messagingState = zappMessaging.latestState()
 
+                // The list being on screen means no room is. Asserted rather than trusted to
+                // every room teardown path: a stale claim swallows unread bumps and leaks
+                // receipts for a conversation nobody is looking at.
+                zappMessaging.setActiveConversation(nil)
+
                 return .merge(
                     .publisher {
                         zappMessaging.conversationsStream()
