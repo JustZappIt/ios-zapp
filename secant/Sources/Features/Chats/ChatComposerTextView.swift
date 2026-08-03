@@ -9,10 +9,8 @@ import UniformTypeIdentifiers
 
 /// The composer's text field, as UIKit rather than SwiftUI.
 ///
-/// SwiftUI's `TextField` has no way to receive media: the GIF key on the system keyboard, and a
-/// pasted image, both arrive through `UIResponder.paste(itemProviders:)`, which only a UIKit
-/// responder can implement. That is the whole reason this bridge exists — Android reaches the
-/// same place through `contentReceiver`.
+/// A pasted image arrives through `UIResponder.paste(itemProviders:)`, which SwiftUI's `TextField`
+/// cannot implement. Android reaches the same place through `contentReceiver`.
 struct ChatComposerTextView: UIViewRepresentable {
     @Binding var text: String
     @Binding var isFocused: Bool
@@ -51,15 +49,39 @@ struct ChatComposerTextView: UIViewRepresentable {
         view.placeholderLabel.isHidden = !text.isEmpty
         view.maxHeight = Self.font.lineHeight * CGFloat(maxLines)
 
-        if isFocused, !view.isFirstResponder {
-            view.becomeFirstResponder()
-        } else if !isFocused, view.isFirstResponder {
-            view.resignFirstResponder()
-        }
+        applyFocus(to: view)
+    }
+
+    /// Measured against the proposed width; `bounds.width` is still zero on the first pass, which
+    /// wraps every character onto its own line and snaps the field to `maxLines`.
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: MediaPastingTextView, context: Context) -> CGSize? {
+        guard let width = proposal.width, width.isFinite, width > 0 else { return nil }
+
+        return CGSize(width: width, height: uiView.height(fitting: width))
     }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(text: $text, isFocused: $isFocused)
+    }
+
+    /// Settled after the update: `becomeFirstResponder` moves the keyboard synchronously, and the
+    /// binding write that provokes would re-enter the update placing this field.
+    private func applyFocus(to view: MediaPastingTextView) {
+        guard isFocused != view.isFirstResponder else { return }
+
+        let wanted = $isFocused
+
+        DispatchQueue.main.async { [weak view] in
+            guard let view, wanted.wrappedValue != view.isFirstResponder else { return }
+
+            if wanted.wrappedValue {
+                guard view.window != nil else { return }
+
+                view.becomeFirstResponder()
+            } else {
+                view.resignFirstResponder()
+            }
+        }
     }
 
     private static var font: UIFont {
@@ -94,21 +116,30 @@ struct ChatComposerTextView: UIViewRepresentable {
         }
 
         func textViewDidBeginEditing(_ textView: UITextView) {
-            guard !isFocused.wrappedValue else { return }
-            isFocused.wrappedValue = true
+            report(focus: true)
         }
 
         func textViewDidEndEditing(_ textView: UITextView) {
-            guard isFocused.wrappedValue else { return }
-            isFocused.wrappedValue = false
+            report(focus: false)
+        }
+
+        private func report(focus: Bool) {
+            guard isFocused.wrappedValue != focus else { return }
+
+            DispatchQueue.main.async { [isFocused] in
+                guard isFocused.wrappedValue != focus else { return }
+
+                isFocused.wrappedValue = focus
+            }
         }
     }
 }
 
 /// A text view that accepts images as well as text.
 ///
-/// `pasteConfiguration` is what makes the keyboard's GIF key light up: the system asks the first
-/// responder whether it accepts the type before offering to insert it.
+/// `pasteConfiguration` is what offers Paste for an image: the system asks the first responder
+/// whether it accepts the type first. The stock keyboard has no GIF key — Apple's `#images` is a
+/// Messages-only extension — so a GIF reaches the composer by paste or through the picker sheet.
 final class MediaPastingTextView: UITextView {
     nonisolated static let maxTextCharacters = 16_000
     /// Every still type the encoder can ship. GIF is listed first because it is the one that
@@ -146,13 +177,23 @@ final class MediaPastingTextView: UITextView {
 
     /// Grows with the text up to `maxLines`, then scrolls — the behaviour `lineLimit(1...5)`
     /// gave the SwiftUI field.
+    func height(fitting width: CGFloat) -> CGFloat {
+        min(sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude)).height, maxHeight)
+    }
+
     override var intrinsicContentSize: CGSize {
-        let fitted = sizeThatFits(CGSize(width: bounds.width, height: .greatestFiniteMagnitude))
-        let height = min(fitted.height, maxHeight)
+        CGSize(width: UIView.noIntrinsicMetric, height: height(fitting: bounds.width))
+    }
 
-        isScrollEnabled = fitted.height > maxHeight
+    override func layoutSubviews() {
+        super.layoutSubviews()
 
-        return CGSize(width: UIView.noIntrinsicMetric, height: height)
+        let fitted = sizeThatFits(CGSize(width: bounds.width, height: .greatestFiniteMagnitude)).height
+        let shouldScroll = fitted > maxHeight + 0.5
+
+        if isScrollEnabled != shouldScroll {
+            isScrollEnabled = shouldScroll
+        }
     }
 
     override func canPaste(_ itemProviders: [NSItemProvider]) -> Bool {

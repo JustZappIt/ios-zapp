@@ -21,6 +21,7 @@ struct PartnerKeys {
         static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
         static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
         static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
+        static let klipyKey = "klipyKey"
 #if DEBUG
         static let testSeed = "testSeed"
 #endif
@@ -65,7 +66,11 @@ struct PartnerKeys {
     static var p2pSponsorshipPolicyId: String? {
         PartnerKeys.value(for: Constants.p2pSponsorshipPolicyId)
     }
-    
+
+    static var klipyKey: String? {
+        PartnerKeys.value(for: Constants.klipyKey)
+    }
+
 #if DEBUG
     static var testSeed: String? {
         PartnerKeys.value(for: Constants.testSeed)
