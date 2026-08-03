@@ -7,9 +7,9 @@ import SwiftUI
 
 /// Delivery state on an outgoing bubble, rendered as a typographic mark in the Swiss style (no SF
 /// Symbols): a clock while queued locally, a single tick once the blind relay accepts the encrypted
-/// block, a muted double tick once the recipient confirms delivery, and a highlighted triple tick
-/// once the peer has read it. Tick count keeps delivered and read distinguishable without relying
-/// on colour.
+/// block, a muted double tick once the recipient confirms delivery, and a highlighted double tick
+/// once the peer has read it — matching `MessageStatusIndicator.kt` and the convention every other
+/// messenger uses.
 ///
 /// Colours are supplied by the caller because they depend on the bubble the mark sits in.
 struct ChatMessageStatusIndicator: View {
@@ -41,8 +41,7 @@ struct ChatMessageStatusIndicator: View {
 
         var tickCount: Int {
             switch self {
-            case .delivered: return 2
-            case .read: return 3
+            case .delivered, .read: return 2
             case .sending, .queued, .sent, .failed: return 1
             }
         }
@@ -70,9 +69,8 @@ struct ChatMessageStatusIndicator: View {
                 .id(status)
                 .transition(.opacity)
         }
-        // One width for every state. The read mark is a triple tick and is wider
-        // than the others, so without this the time shifts sideways the moment a
-        // message is read — the mark must turn in place, not nudge the row.
+        // One width for every state, so the time beside it never shifts sideways as delivery
+        // progresses — the mark turns in place.
         .frame(width: Constants.markWidth, alignment: .leading)
         .animation(ZappMotion.content, value: status)
         .accessibilityElement(children: .ignore)
@@ -85,9 +83,6 @@ struct ChatMessageStatusIndicator: View {
             ZStack(alignment: .topLeading) {
                 glyph
                 glyph.offset(x: Constants.tickOffset)
-                if status.tickCount > 2 {
-                    glyph.offset(x: Constants.tickOffset * 2)
-                }
             }
         } else {
             glyph
