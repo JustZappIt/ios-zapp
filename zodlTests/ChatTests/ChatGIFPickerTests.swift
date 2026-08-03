@@ -24,7 +24,7 @@ import ZappMessaging
     }
 
     private static func gifItem(_ sizes: [String: Any], slug: String = "a-cat") -> [String: Any] {
-        ["id": 1, "slug": slug, "title": "a cat", "type": "gif", "file": sizes]
+        ["id": 8_041_071_659_142_944, "slug": slug, "title": "a cat", "type": "gif", "file": sizes]
     }
 
     private static func size(_ url: String, bytes: Int, width: Int = 200, height: Int = 100) -> [String: Any] {
@@ -33,13 +33,15 @@ import ZappMessaging
 
     // MARK: Rendition selection
 
-    @Test func parsePicksTheLargestRenditionThatFitsTheSendCap() throws {
+    /// `md` and `hd` are the same pixel size and differ only in encoding, so the cheaper one wins
+    /// rather than the biggest that merely fits.
+    @Test func parsePrefersTheCheaperFullSizeRendition() throws {
         let data = Self.response([
             Self.gifItem([
-                "hd": Self.size("https://media.klipy.com/hd.gif", bytes: 9_000_000),
-                "md": Self.size("https://media.klipy.com/md.gif", bytes: 3_000_000),
-                "sm": Self.size("https://media.klipy.com/sm.gif", bytes: 800_000),
-                "xs": Self.size("https://media.klipy.com/xs.gif", bytes: 200_000, width: 220, height: 110)
+                "hd": Self.size("https://media.klipy.com/hd.gif", bytes: 4_001_918, width: 498, height: 498),
+                "md": Self.size("https://media.klipy.com/md.gif", bytes: 3_721_260, width: 498, height: 498),
+                "sm": Self.size("https://media.klipy.com/sm.gif", bytes: 314_884, width: 220, height: 220),
+                "xs": Self.size("https://media.klipy.com/xs.gif", bytes: 71_468, width: 90, height: 90)
             ])
         ])
 
@@ -48,9 +50,9 @@ import ZappMessaging
 
         #expect(gifs.count == 1)
         #expect(gif.sendURL == "https://media.klipy.com/md.gif")
-        #expect(gif.previewURL == "https://media.klipy.com/xs.gif")
+        #expect(gif.previewURL == "https://media.klipy.com/sm.gif")
         #expect(gif.width == 220)
-        #expect(gif.height == 110)
+        #expect(gif.height == 220)
         #expect(gif.id == "a-cat")
         #expect(gif.title == "a cat")
     }
@@ -67,6 +69,24 @@ import ZappMessaging
         let gif = try #require(try KlipyGIFCatalog.parse(data, maxSendBytes: 8 * 1024 * 1024).first)
 
         #expect(gif.sendURL == "https://media.klipy.com/xs.gif")
+    }
+
+    @Test func parseDecodesTheInlineBlurPreview() throws {
+        var item = Self.gifItem(["md": Self.size("https://media.klipy.com/md.gif", bytes: 100)])
+        item["blur_preview"] = "data:image/jpeg;base64,\(Self.tinyGIF.base64EncodedString())"
+
+        let gif = try #require(try KlipyGIFCatalog.parse(Self.response([item])).first)
+
+        #expect(gif.blurPreview == Self.tinyGIF)
+    }
+
+    /// The blur preview is third-party bytes held for every visible cell, so a link, an unbounded
+    /// payload, or anything that is not an inline image is refused rather than decoded.
+    @Test func parseRefusesAnUnreasonableBlurPreview() {
+        #expect(KlipyGIFCatalog.blurPreview(nil) == nil)
+        #expect(KlipyGIFCatalog.blurPreview("https://evil.example/pixel.jpg") == nil)
+        #expect(KlipyGIFCatalog.blurPreview("data:text/html;base64,PGI+") == nil)
+        #expect(KlipyGIFCatalog.blurPreview("data:image/jpeg;base64,\(String(repeating: "A", count: 9000))") == nil)
     }
 
     @Test func parseDropsResultsWhoseRenditionsAreAllOversized() throws {
@@ -129,6 +149,22 @@ import ZappMessaging
         }
     }
 
+    /// The safety filter is the one query parameter whose absence is invisible until something
+    /// unwanted is already on screen in a chat.
+    @Test func endpointAlwaysAsksForTheStrictestSafetyFilter() throws {
+        guard KlipyGIFCatalog.apiKey != nil else { return }
+
+        let url = try KlipyGIFCatalog.endpoint(path: "search", query: "cat", customerId: "anon")
+        let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+        let value: (String) -> String? = { name in items.first { $0.name == name }?.value }
+
+        #expect(url.path.hasSuffix("/gifs/search"))
+        #expect(value("content_filter") == "high")
+        #expect(value("format_filter") == "gif")
+        #expect(value("q") == "cat")
+        #expect(value("customer_id") == "anon")
+    }
+
     // MARK: Picker reducer
 
     @MainActor @Test func typingDebouncesIntoOneSearch() async {
@@ -140,7 +176,7 @@ import ZappMessaging
             $0.continuousClock = clock
             $0.klipyGIF.search = { query in
                 searches.withValue { $0.append(query) }
-                return [KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1)]
+                return [KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1, blurPreview: nil)]
             }
         }
         store.exhaustivity = .off
@@ -176,7 +212,7 @@ import ZappMessaging
     }
 
     @MainActor @Test func tappingAGifDelegatesTheSelection() async {
-        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1)
+        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1, blurPreview: nil)
         let store = TestStore(initialState: ChatGIFPicker.State()) {
             ChatGIFPicker()
         }
@@ -194,7 +230,7 @@ import ZappMessaging
         defer { ChatMediaTemporaryFiles.remove(url) }
 
         let sentContentType = LockIsolated<String?>(nil)
-        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1)
+        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1, blurPreview: nil)
         let sent = ZMMessage(
             id: "sent",
             conversationId: "conversation",
@@ -233,7 +269,7 @@ import ZappMessaging
     }
 
     @MainActor @Test func aFailedGifDownloadClearsTheSendingStateAndReportsFailure() async {
-        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1)
+        let gif = KlipyGIF(id: "1", title: "", previewURL: "p", sendURL: "s", width: 2, height: 1, blurPreview: nil)
         var state = ChatRoom.State(conversationId: "conversation")
         state.gifPicker = ChatGIFPicker.State()
 

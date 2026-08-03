@@ -30,11 +30,14 @@ extension KlipyGIFClient: TestDependencyKey {
 enum KlipyGIFCatalog {
     static let perPage = 30
     static let previewByteLimit = 2 * 1024 * 1024
+    static let maxBlurPreviewChars = 8 * 1024
 
-    /// Largest first: the biggest rendition that still fits `ChatMediaEncoder`'s verbatim GIF cap
-    /// is the one worth sending.
-    static let sendSizes = ["hd", "md", "sm", "xs"]
-    static let previewSizes = ["xs", "sm", "md", "hd"]
+    /// `md` before `hd`: Klipy ships both at the same pixel size and `hd` differs only in encoding
+    /// quality, so `hd` costs roughly double the bytes over a peer-to-peer transfer for a gain no
+    /// one sees in a chat bubble.
+    static let sendSizes = ["md", "hd", "sm", "xs"]
+    /// `sm` is 220px against a ~320px cell; `xs` is 90px and visibly mushy.
+    static let previewSizes = ["sm", "xs", "md", "hd"]
 
     static var apiKey: String? {
         PartnerKeys.klipyKey.flatMap { $0.isEmpty ? nil : $0 }
@@ -50,7 +53,11 @@ enum KlipyGIFCatalog {
         components.queryItems = [
             URLQueryItem(name: "page", value: "1"),
             URLQueryItem(name: "per_page", value: String(perPage)),
-            URLQueryItem(name: "customer_id", value: customerId)
+            URLQueryItem(name: "customer_id", value: customerId),
+            URLQueryItem(name: "content_filter", value: "high"),
+            // Each item otherwise carries mp4/webm/webp/jpg renditions at four sizes, none of
+            // which this picker can use.
+            URLQueryItem(name: "format_filter", value: "gif")
         ]
 
         if let query {
@@ -93,8 +100,24 @@ enum KlipyGIFCatalog {
             previewURL: preview.url,
             sendURL: send.url,
             width: preview.width,
-            height: preview.height
+            height: preview.height,
+            blurPreview: blurPreview(raw["blur_preview"] as? String)
         )
+    }
+
+    /// A `data:` URI rather than a link, so it is decoded rather than fetched. Bounded because it
+    /// arrives from a third party and lands in memory for every cell on screen.
+    static func blurPreview(_ raw: String?) -> Data? {
+        guard
+            let raw,
+            raw.count <= maxBlurPreviewChars,
+            let comma = raw.firstIndex(of: ","),
+            raw[raw.startIndex..<comma].hasPrefix("data:image/")
+        else {
+            return nil
+        }
+
+        return Data(base64Encoded: String(raw[raw.index(after: comma)...]), options: [.ignoreUnknownCharacters])
     }
 
     private static func identifier(_ raw: [String: Any]) -> String? {

@@ -33,6 +33,9 @@ struct KlipyGIF: Equatable, Identifiable, Sendable {
     let sendURL: String
     let width: Int
     let height: Int
+    /// A tiny inline JPEG that ships with the search result, so a cell has something to show
+    /// before its animated preview has been fetched.
+    let blurPreview: Data?
 
     var aspectRatio: Double {
         guard width > 0, height > 0 else { return 1 }

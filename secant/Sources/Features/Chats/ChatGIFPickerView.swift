@@ -162,9 +162,21 @@ private struct ChatGIFPickerCell: View {
     let gif: KlipyGIF
     let height: CGFloat
 
+    private var blur: UIImage? {
+        gif.blurPreview.flatMap { ChatMediaImage.downsampled(data: $0, maxPixel: Self.blurPixel) }
+    }
+
+    private static let blurPixel: CGFloat = 64
+
     var body: some View {
         ZStack {
             ZappColors.surfaceInput.color(colorScheme)
+
+            if let blur {
+                Image(uiImage: blur)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
 
             if let frame = player.frame {
                 Image(decorative: frame, scale: 1)
