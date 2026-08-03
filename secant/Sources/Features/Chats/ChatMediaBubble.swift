@@ -37,11 +37,13 @@ struct ChatMediaBubble: View {
     /// highlights it while receipts are enabled.
     var readReceiptsEnabled: Bool
 
+    @StateObject private var gifPlayer = ChatGIFPlayer()
     @State private var image: UIImage?
     @State private var isThumbnail = false
     @State private var didFail = false
 
     private var isFromMe: Bool { message.isFromMe }
+    private var isGIF: Bool { message.contentType == "image/gif" }
 
     var body: some View {
         VStack(alignment: isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
@@ -63,6 +65,9 @@ struct ChatMediaBubble: View {
         .task(id: message.mediaLocalPath) {
             await load()
         }
+        .onDisappear {
+            gifPlayer.stop()
+        }
     }
 
     private var media: some View {
@@ -79,12 +84,17 @@ struct ChatMediaBubble: View {
         .frame(width: Constants.width, height: height)
         .clipped()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localizable: .chatRoomPhoto))
+        .accessibilityLabel(String(localizable: isGIF ? .chatRoomGif : .chatRoomPhoto))
     }
 
     @ViewBuilder
     private var imageLayer: some View {
-        if let image {
+        if let frame = gifPlayer.frame {
+            Image(decorative: frame, scale: 1)
+                .resizable()
+                .scaledToFill()
+                .frame(width: Constants.width, height: height)
+        } else if let image {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
@@ -213,6 +223,66 @@ struct ChatMediaBubble: View {
 
         // Only a file we were told is on disk can "fail". No file yet is a transfer in flight.
         didFail = decoded == nil && path != nil
+
+        if isGIF, let path {
+            gifPlayer.play(path: path)
+        } else {
+            gifPlayer.stop()
+        }
+    }
+}
+
+/// Streams one GIF frame at a time from ImageIO. Materialising every frame as a bitmap would
+/// cost hundreds of MB per row in a scrolling list.
+@MainActor
+final class ChatGIFPlayer: ObservableObject {
+    @Published private(set) var frame: CGImage?
+
+    private var current: StopFlag?
+
+    func play(path: String) {
+        current?.stop()
+
+        let flag = StopFlag()
+        current = flag
+
+        CGAnimateImageAtURLWithBlock(URL(fileURLWithPath: path) as CFURL, nil) { [weak self] _, image, stop in
+            guard !flag.isStopped else {
+                stop.pointee = true
+                return
+            }
+
+            Task { @MainActor in
+                self?.frame = image
+            }
+        }
+    }
+
+    func stop() {
+        current?.stop()
+        current = nil
+    }
+
+    deinit {
+        current?.stop()
+    }
+}
+
+/// A fresh flag per playback, so stopping one loop cannot be undone by the next `play`.
+private final class StopFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    var isStopped: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+
+    func stop() {
+        lock.lock()
+        value = true
+        lock.unlock()
     }
 }
 
@@ -235,6 +305,12 @@ enum ChatMediaImage {
         }
 
         return downsampled(data: data, maxPixel: thumbnailMaxPixel)
+    }
+
+    /// GIF87a / GIF89a. The picker's declared types describe the asset, not these bytes.
+    static func isGIF(_ data: Data) -> Bool {
+        data.count >= 6 && data.prefix(6).elementsEqual(Array("GIF89a".utf8))
+            || data.count >= 6 && data.prefix(6).elementsEqual(Array("GIF87a".utf8))
     }
 
     static func downsampled(path: String, maxPixel: CGFloat) -> UIImage? {

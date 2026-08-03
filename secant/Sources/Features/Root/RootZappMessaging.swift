@@ -21,12 +21,36 @@ extension Root {
             case .observeZappMessaging:
                 zappMessaging.start()
 
-                return .publisher {
-                    zappMessaging.stateStream()
-                        .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
-                        .map(Root.Action.zappMessagingStateChanged)
+                return .merge(
+                    .publisher {
+                        zappMessaging.stateStream()
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
+                            .map(Root.Action.zappMessagingStateChanged)
+                    }
+                    .cancellable(id: state.zappMessagingCancelId, cancelInFlight: true),
+                    .publisher {
+                        chatPushNotifications.conversationTapStream()
+                            .receive(on: mainQueue)
+                            .map(Root.Action.chatNotificationTapped)
+                    }
+                    .cancellable(id: state.chatNotificationTapCancelId, cancelInFlight: true)
+                )
+
+            // Re-entering the room already on screen would stack a second copy of it, so the
+            // first back press would appear to do nothing.
+            case .chatNotificationTapped(let conversationId):
+                guard state.path != .chatRoom || state.chatRoomState.conversationId != conversationId else {
+                    return .none
                 }
-                .cancellable(id: state.zappMessagingCancelId, cancelInFlight: true)
+
+                state.chatRoomState = .initial
+                state.chatRoomState.conversationId = conversationId
+                state.chatRoomState.unreadMessageCountAtEntry =
+                    state.zappMessagingState.unreadCount(for: conversationId)
+                state.chatRoomState.conversation = state.chatsListState.conversations
+                    .first { $0.id == conversationId }
+                state.path = .chatRoom
+                return .none
 
             case .zappMessagingStateChanged(let messagingState):
                 state.zappMessagingState = messagingState

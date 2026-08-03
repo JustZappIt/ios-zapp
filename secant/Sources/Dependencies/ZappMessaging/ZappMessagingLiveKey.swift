@@ -360,6 +360,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
             let message = try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
+            publishMessageActivity(message)
             await finishProtectedSend(protection)
             clearFailure(for: .local(.messageSend))
             return message
@@ -465,6 +466,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 caption: caption,
                 thumbnailData: thumbnailData
             )
+            publishMessageActivity(message)
             await finishProtectedSend(protection)
             clearFailure(for: .local(.mediaSend))
             return message
@@ -537,8 +539,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             .receive(on: mainQueue)
             .sink { [weak self] _, message in
                 guard let self else { return }
-                self.messageReceivedSubject.send(message)
                 self.countUnread(message)
+                self.publishMessageActivity(message)
+                self.messageReceivedSubject.send(message)
                 Task {
                     do {
                         try await self.refreshConversations()
@@ -628,6 +631,25 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             return unreadCounts
         }
         publishUnread(counts)
+    }
+
+    /// Keep the list responsive to message activity without waiting for the core's
+    /// follow-up conversation refresh. The later refresh remains authoritative, but
+    /// this snapshot ensures a newly queued or received message moves its chat to the
+    /// top immediately.
+    private func publishMessageActivity(_ message: ZMMessage) {
+        var conversations = conversationsSubject.value
+
+        guard let index = conversations.firstIndex(where: { $0.id == message.conversationId }) else {
+            return
+        }
+
+        let previousTimestamp = conversations[index].lastMessageTimestamp ?? .distantPast
+        guard message.timestamp >= previousTimestamp else { return }
+
+        conversations[index].lastMessage = message.mediaId == nil ? message.content : "[Media]"
+        conversations[index].lastMessageTimestamp = message.timestamp
+        conversationsSubject.send(conversations)
     }
 
     private func clearUnread(for conversationId: String) {

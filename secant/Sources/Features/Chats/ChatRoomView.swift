@@ -13,6 +13,10 @@ import ZappMessaging
 struct ChatRoomView: View {
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var isComposerFocused: Bool
+    @State private var hasPositionedAtBottom = false
+
+    /// Matches the media bubble, so a link card and a photo line up on the same edge.
+    private let linkPreviewWidth: CGFloat = 280
 
     @Perception.Bindable var store: StoreOf<ChatRoom>
 
@@ -60,6 +64,13 @@ struct ChatRoomView: View {
                     )
                 }
 
+                if let preview = store.draftLinkPreview {
+                    ChatLinkPreviewCard(
+                        preview: preview,
+                        onCancel: { store.send(.dismissDraftLinkPreviewTapped) }
+                    )
+                }
+
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
                     pickedItem: $store.pickedItem.sending(\.pickedItemChanged),
@@ -96,7 +107,11 @@ struct ChatRoomView: View {
     }
 
     private var items: [ChatRoomItem] {
-        ChatRoomItem.build(from: store.visibleMessages)
+        ChatRoomItem.build(
+            from: store.visibleMessages,
+            unreadSeparatorMessageId: store.unreadSeparatorMessageId,
+            unreadCount: store.unreadMessageCountAtEntry
+        )
     }
 
     private var messages: some View {
@@ -117,8 +132,15 @@ struct ChatRoomView: View {
 
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)
+
+                        case .unread(_, let count):
+                            ChatUnreadSeparator(count: count)
                         }
                     }
+
+                    Color.clear
+                        .frame(height: 1)
+                        .id(ChatRoomItem.bottomId)
                 }
                 .padding(.horizontal, Design.Spacing._xl)
                 .padding(.bottom, Design.Spacing._md)
@@ -127,19 +149,43 @@ struct ChatRoomView: View {
             .onTapGesture {
                 isComposerFocused = false
             }
-            .onChange(of: items.count) { _ in
-                guard let last = items.last else { return }
-
-                withAnimation(ZappMotion.content) {
-                    proxy.scrollTo(last.id, anchor: .bottom)
-                }
+            .onAppear {
+                guard !items.isEmpty else { return }
+                positionAtBottom(proxy, animated: false)
             }
+            .onChange(of: items.last?.id) { _ in
+                guard !items.isEmpty else { return }
+                positionAtBottom(proxy, animated: hasPositionedAtBottom)
+            }
+            .onChange(of: isComposerFocused) { isFocused in
+                guard isFocused, !items.isEmpty else { return }
+                positionAtBottom(proxy, animated: true)
+            }
+        }
+    }
+
+    private func positionAtBottom(_ proxy: ScrollViewProxy, animated: Bool) {
+        Task { @MainActor in
+            // Let the lazy stack lay out its newly loaded rows before resolving the
+            // bottom anchor. Scrolling to the last message during the same update can
+            // otherwise leave the room several rows above the end.
+            await Task.yield()
+
+            if animated {
+                withAnimation(ZappMotion.content) {
+                    proxy.scrollTo(ChatRoomItem.bottomId, anchor: .bottom)
+                }
+            } else {
+                proxy.scrollTo(ChatRoomItem.bottomId, anchor: .bottom)
+            }
+
+            hasPositionedAtBottom = true
         }
     }
 
     @ViewBuilder
     private func bubble(for message: ZMMessage) -> some View {
-        Group {
+        VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
             if let mediaId = message.mediaId {
                 ChatMediaBubble(
                     message: message,
@@ -153,8 +199,15 @@ struct ChatRoomView: View {
                     senderName: store.state.senderName(for: message),
                     readReceiptsEnabled: store.messagingState.readReceiptsEnabled
                 )
+
+                if let preview = store.messageLinkPreviews[message.id] {
+                    ChatLinkPreviewCard(preview: preview)
+                        .frame(maxWidth: linkPreviewWidth)
+                }
             }
         }
+        .frame(maxWidth: .infinity, alignment: message.isFromMe ? .trailing : .leading)
+        .onAppear { store.send(.messageAppeared(message)) }
         .contentShape(Rectangle())
         .onTapGesture {
             if message.isFromMe && message.status == "failed" {
@@ -170,6 +223,11 @@ struct ChatRoomView: View {
             Button(String(localizable: .chatRoomReply)) {
                 store.send(.replyTapped(message))
             }
+            if !message.content.isEmpty {
+                Button(String(localizable: .chatRoomCopyMessage)) {
+                    store.send(.copyMessageTapped(message))
+                }
+            }
         }
     }
 }
@@ -177,16 +235,25 @@ struct ChatRoomView: View {
 private enum ChatRoomItem: Identifiable, Equatable {
     case message(ZMMessage)
     case separator(id: String, label: String)
+    case unread(id: String, count: Int)
+
+    static let bottomId = "chat_room_bottom"
 
     var id: String {
         switch self {
         case .message(let message): return "msg_\(message.id)"
         case .separator(let id, _): return id
+        case .unread(let id, _): return id
         }
     }
 
     /// The separator id carries the index: a duplicate day key must not collide and tear the list.
-    static func build(from messages: [ZMMessage], calendar: Calendar = .current) -> [ChatRoomItem] {
+    static func build(
+        from messages: [ZMMessage],
+        unreadSeparatorMessageId: String?,
+        unreadCount: Int,
+        calendar: Calendar = .current
+    ) -> [ChatRoomItem] {
         var items: [ChatRoomItem] = []
         var lastDay: Date?
 
@@ -203,10 +270,42 @@ private enum ChatRoomItem: Identifiable, Equatable {
                 lastDay = day
             }
 
+            if message.id == unreadSeparatorMessageId {
+                items.append(.unread(id: "unread_\(message.id)", count: unreadCount))
+            }
+
             items.append(.message(message))
         }
 
         return items
+    }
+}
+
+private struct ChatUnreadSeparator: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: Design.Spacing._md) {
+            rule
+
+            Text(String(localizable: .chatRoomUnreadCount(String(count))))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+
+            rule
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Design.Spacing._xs)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var rule: some View {
+        Rectangle()
+            .fill(ZappColors.border.color(colorScheme))
+            .frame(maxWidth: .infinity)
+            .frame(height: 1)
+            .opacity(0.65)
     }
 }
 

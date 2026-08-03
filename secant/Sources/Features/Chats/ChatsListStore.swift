@@ -35,7 +35,18 @@ struct ChatsList {
                     return !conversation.participantIds.contains { chatContacts.isBlocked($0) }
                 }
                 .sorted {
-                    ($0.lastMessageTimestamp ?? .distantPast) > ($1.lastMessageTimestamp ?? .distantPast)
+                    let lhsActivity = $0.lastMessageTimestamp ?? .distantPast
+                    let rhsActivity = $1.lastMessageTimestamp ?? .distantPast
+
+                    if lhsActivity == rhsActivity {
+                        if $0.createdAt == $1.createdAt {
+                            return $0.id < $1.id
+                        }
+
+                        return $0.createdAt > $1.createdAt
+                    }
+
+                    return lhsActivity > rhsActivity
                 }
         }
 
