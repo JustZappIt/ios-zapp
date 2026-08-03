@@ -51,7 +51,22 @@ struct ChatRoomView: View {
                     .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
 
-                if store.sendDidFail {
+                // A GIF can be several megabytes, so the composer says the send is under way
+                // rather than looking idle until it lands.
+                if store.isSendingMedia {
+                    HStack(spacing: Design.Spacing._sm) {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(ZappColors.textSubtle.color(colorScheme))
+
+                        Text(String(localizable: .chatRoomSendingMedia))
+                            .zappFont(.caption, style: ZappColors.textSubtle)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, Design.Spacing._xl)
+                    .padding(.top, Design.Spacing._md)
+                    .background(ZappColors.surface.color(colorScheme))
+                } else if store.sendDidFail {
                     Text(store.sendFailureMessage ?? String(localizable: .chatRoomSendFailed))
                         .zappFont(.caption, style: ZappColors.danger)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -336,8 +351,7 @@ private struct ChatRoomInputRow: View {
         static let inputHorizontalPadding: CGFloat = 12
         /// 8, not 10: 28pt of GIF button plus 16 keeps the box on the same 44 as before.
         static let inputVerticalPadding: CGFloat = 8
-        static let sendHorizontalPadding: CGFloat = 16
-        static let sendVerticalPadding: CGFloat = 12
+        static let sendIconSize: CGFloat = 24
         static let minHeight: CGFloat = 44
         static let disabledOpacity: CGFloat = 0.45
         static let maxLines = 5
@@ -368,18 +382,26 @@ private struct ChatRoomInputRow: View {
 
             inputBox
 
+            // An up arrow rather than the word "Send", and dimmed by colour rather than opacity —
+            // `ChatRoomInputRow.kt` draws the same square.
             Button(action: onSend) {
-                Text(String(localizable: .chatRoomSend))
-                    .zappFont(.buttonSmall, style: ZappColors.onAccent)
-                    .padding(.horizontal, Constants.sendHorizontalPadding)
-                    .padding(.vertical, Constants.sendVerticalPadding)
-                    .frame(minHeight: Constants.minHeight)
-                    .background(ZappColors.accent.color(colorScheme))
-                    .opacity(isSendEnabled ? 1 : Constants.disabledOpacity)
+                Asset.Assets.Icons.arrowUp.image
+                    .zImage(
+                        width: Constants.sendIconSize,
+                        height: Constants.sendIconSize,
+                        style: isSendEnabled ? ZappColors.onAccent : ZappColors.textSubtle
+                    )
+                    .frame(width: Constants.minHeight, height: Constants.minHeight)
+                    .background((isSendEnabled ? ZappColors.accent : ZappColors.surfaceAlt).color(colorScheme))
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                    }
                     .animation(ZappMotion.state, value: isSendEnabled)
             }
             .buttonStyle(.zappPress)
             .disabled(!isSendEnabled)
+            .accessibilityLabel(String(localizable: .chatRoomSend))
         }
         .padding(.horizontal, Design.Spacing._lg)
         .padding(.top, Design.Spacing._md)
@@ -431,6 +453,19 @@ private extension ZappTextStyle {
     static let gifGlyph = ZappTextStyle(weight: .bold, size: 10, lineHeight: 12, tracking: 0.4)
 }
 
+private struct ChatAttachGlyph: View {
+    static let size: CGFloat = 44
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Text(verbatim: "+")
+            .zappFont(.attachGlyph, style: ZappColors.text)
+            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
+            .background(ZappColors.surfaceInput.color(colorScheme))
+    }
+}
+
 /// Lettered rather than an icon — the catalogue has no GIF mark. It sits inside the field, so it
 /// carries no background of its own.
 private struct ChatGIFGlyph: View {
@@ -447,17 +482,4 @@ private struct ChatGIFGlyph: View {
 
 #Preview {
     ChatRoomView(store: ChatRoom.initial)
-}
-
-private struct ChatAttachGlyph: View {
-    static let size: CGFloat = 44
-
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        Text(verbatim: "+")
-            .zappFont(.attachGlyph, style: ZappColors.text)
-            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
-            .background(ZappColors.surfaceInput.color(colorScheme))
-    }
 }

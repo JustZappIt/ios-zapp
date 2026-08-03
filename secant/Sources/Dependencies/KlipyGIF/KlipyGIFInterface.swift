@@ -18,8 +18,8 @@ struct KlipyGIFClient {
     /// False when `PartnerKeys.plist` carries no `klipyKey`, which hides the composer's GIF button
     /// rather than offering a search that cannot answer.
     var isConfigured: @Sendable () -> Bool = { false }
-    var trending: @Sendable () async throws -> [KlipyGIF]
-    var search: @Sendable (_ query: String) async throws -> [KlipyGIF]
+    var trending: @Sendable (_ page: Int) async throws -> KlipyGIFPage
+    var search: @Sendable (_ query: String, _ page: Int) async throws -> KlipyGIFPage
     /// Grid-sized rendition, cached across redraws.
     var preview: @Sendable (_ gif: KlipyGIF) async throws -> Data
     /// The sendable rendition, written to a temporary file for `ChatMediaEncoder`.
@@ -42,6 +42,15 @@ struct KlipyGIF: Equatable, Identifiable, Sendable {
 
         return Double(width) / Double(height)
     }
+}
+
+/// `hasMore` counts the raw results, not the parsed ones — a page that is mostly adverts still
+/// means Klipy has more to give.
+struct KlipyGIFPage: Equatable, Sendable {
+    let gifs: [KlipyGIF]
+    let hasMore: Bool
+
+    static let empty = KlipyGIFPage(gifs: [], hasMore: false)
 }
 
 enum KlipyGIFError: Error, Equatable {
