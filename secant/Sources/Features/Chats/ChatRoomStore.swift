@@ -29,6 +29,25 @@ struct ChatRoom {
         var showsNetworkDetails = false
         var isLoadingNetworkDetails = false
         var connectionDetails: ZMConnectionDetails?
+        @Shared(.inMemory(.toast)) var toast: Toast.Edge? = nil
+
+        var draftLinkPreview: ChatLinkPreview?
+        var draftLinkPreviewURL: String?
+        /// Dismissing a preview must stick for that URL: re-resolving it as the user keeps
+        /// typing would put the card the user just closed straight back on screen.
+        var dismissedLinkPreviewURLs: Set<String> = []
+        var messageLinkPreviews: [String: ChatLinkPreview] = [:]
+        var requestedLinkPreviewMessageIds: Set<String> = []
+
+        /// Captured from the list before `setActiveConversation` clears the badge.
+        /// Root creates a fresh room state for every entry, so the marker is shown
+        /// once and naturally disappears after leaving and opening the room again.
+        var unreadMessageCountAtEntry = 0
+
+        /// Inbound events received after the room opened are already being read in
+        /// place. Excluding them keeps the one-time separator pinned to the unread
+        /// run that caused the user to open the room.
+        var postEntryInboundMessageIds: Set<String> = []
 
         var replyingTo: ZMMessage?
 
@@ -71,6 +90,28 @@ struct ChatRoom {
 
         var visibleMessages: [ZMMessage] {
             messages.filter { !chatContacts.isBlocked($0.senderId) }
+        }
+
+        /// The oldest of the most recent unread inbound messages currently loaded.
+        /// If the unread run is larger than the page, the marker sits above the
+        /// earliest loaded inbound message instead of disappearing.
+        var unreadSeparatorMessageId: String? {
+            guard unreadMessageCountAtEntry > 0 else { return nil }
+
+            var remaining = unreadMessageCountAtEntry
+            var boundaryId: String?
+
+            for message in visibleMessages.reversed()
+            where !message.isFromMe && !postEntryInboundMessageIds.contains(message.id) {
+                boundaryId = message.id
+                remaining -= 1
+
+                if remaining == 0 {
+                    break
+                }
+            }
+
+            return boundaryId
         }
 
         func senderName(for message: ZMMessage) -> String? {
@@ -151,6 +192,10 @@ struct ChatRoom {
         case backToHomeTapped
         case titleTapped
         case draftChanged(String)
+        case draftLinkPreviewLoaded(url: String, preview: ChatLinkPreview?)
+        case dismissDraftLinkPreviewTapped
+        case messageAppeared(ZMMessage)
+        case messageLinkPreviewLoaded(messageId: String, preview: ChatLinkPreview?)
         case sendTapped
         case sendSucceeded(clientId: String, message: ZMMessage)
         case messagesLoaded([ZMMessage])
@@ -163,14 +208,23 @@ struct ChatRoom {
         case sendFailed(clientId: String, code: ZappMessagingFailureCode)
         case retrySendTapped(ZMMessage)
         case replyTapped(ZMMessage)
+        case copyMessageTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
         case mediaSendFailed
+        case mediaTooLarge
         case messageStatusChanged(messageId: String, status: String)
         case mediaProgressChanged(mediaId: String, progress: Double)
         case mediaCompleted(mediaId: String, filePath: String)
     }
 
+    enum CancelID {
+        case draftLinkPreview
+    }
+
+    @Dependency(\.chatLinkPreview) var chatLinkPreview
+    @Dependency(\.continuousClock) var clock
+    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
@@ -247,6 +301,59 @@ struct ChatRoom {
                 state.draft = draft
                 state.sendDidFail = false
                 state.sendFailureMessage = nil
+
+                let url = ChatLinkPreviewParser.firstWebURL(in: draft)
+
+                guard url != state.draftLinkPreviewURL else { return .none }
+
+                state.draftLinkPreviewURL = url
+                state.draftLinkPreview = nil
+
+                guard let url, !state.dismissedLinkPreviewURLs.contains(url) else {
+                    return .cancel(id: CancelID.draftLinkPreview)
+                }
+
+                // Debounced: a URL is typed one character at a time, and every prefix of it is
+                // a syntactically valid host we would otherwise go and fetch.
+                return .run { send in
+                    try await clock.sleep(for: .milliseconds(600))
+                    await send(.draftLinkPreviewLoaded(url: url, preview: chatLinkPreview.load(url)))
+                }
+                .cancellable(id: CancelID.draftLinkPreview, cancelInFlight: true)
+
+            case .draftLinkPreviewLoaded(let url, let preview):
+                guard url == state.draftLinkPreviewURL else { return .none }
+
+                state.draftLinkPreview = preview
+                return .none
+
+            case .dismissDraftLinkPreviewTapped:
+                if let url = state.draftLinkPreviewURL {
+                    state.dismissedLinkPreviewURLs.insert(url)
+                }
+
+                state.draftLinkPreview = nil
+                return .cancel(id: CancelID.draftLinkPreview)
+
+            case .messageAppeared(let message):
+                guard
+                    !state.requestedLinkPreviewMessageIds.contains(message.id),
+                    let url = ChatLinkPreviewParser.firstWebURL(in: message.content)
+                else {
+                    return .none
+                }
+
+                state.requestedLinkPreviewMessageIds.insert(message.id)
+
+                let messageId = message.id
+                return .run { send in
+                    await send(.messageLinkPreviewLoaded(messageId: messageId, preview: chatLinkPreview.load(url)))
+                }
+
+            case .messageLinkPreviewLoaded(let messageId, let preview):
+                guard let preview else { return .none }
+
+                state.messageLinkPreviews[messageId] = preview
                 return .none
 
             case .sendTapped:
@@ -336,10 +443,20 @@ struct ChatRoom {
 
                 if message.isFromMe {
                     state.pendingReply = nil
+                } else {
+                    state.postEntryInboundMessageIds.insert(message.id)
                 }
 
                 state.insert(message)
-                return .none
+
+                guard !message.isFromMe else { return .none }
+
+                let conversationId = state.conversationId
+                return .run { _ in
+                    try await zappMessaging.markRead(conversationId)
+                } catch: { error, _ in
+                    LoggerProxy.error("Chat room mark-read for incoming message failed: \(error)")
+                }
 
             case .messagingStateChanged(let messagingState):
                 state.messagingState = messagingState
@@ -413,6 +530,11 @@ struct ChatRoom {
                 state.replyingTo = message
                 return .none
 
+            case .copyMessageTapped(let message):
+                pasteboard.setString(message.content.redacted)
+                state.$toast.withLock { $0 = .top(String(localizable: .generalCopiedToTheClipboard)) }
+                return .none
+
             case .cancelReplyTapped:
                 state.replyingTo = nil
                 return .none
@@ -442,12 +564,22 @@ struct ChatRoom {
                     await send(.messageReceived(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send media: \(error)")
-                    await send(.mediaSendFailed)
+
+                    if error as? ChatMediaEncoder.Failure == .tooLarge {
+                        await send(.mediaTooLarge)
+                    } else {
+                        await send(.mediaSendFailed)
+                    }
                 }
 
             case .mediaSendFailed:
                 state.sendDidFail = true
                 state.sendFailureMessage = nil
+                return .none
+
+            case .mediaTooLarge:
+                state.sendDidFail = true
+                state.sendFailureMessage = String(localizable: .chatRoomGifTooLarge)
                 return .none
 
             case .messageStatusChanged(let messageId, let status):
@@ -564,12 +696,16 @@ enum ChatMediaEncoder {
         let thumbnail: String?
     }
 
-    enum Failure: Error {
+    enum Failure: Error, Equatable {
         case undecodable
+        case tooLarge
     }
 
     private static let maxPixel: CGFloat = 1920
     private static let quality: CGFloat = 0.85
+
+    /// A GIF ships verbatim, so nothing downsizes it on the way out.
+    static let maxGIFBytes = 8 * 1024 * 1024
 
     /// The thumbnail travels ON THE WIRE inside the message, so it stays tiny.
     private static let thumbnailPixel: CGFloat = 64
@@ -580,6 +716,18 @@ enum ChatMediaEncoder {
             .downsampled(data: data, maxPixel: thumbnailPixel)?
             .jpegData(compressionQuality: thumbnailQuality)?
             .base64EncodedString()
+
+        // Re-encoding a GIF collapses it to one frame. Sniffed from the bytes: PhotosUI
+        // advertises a conforming still representation for an animated asset.
+        if ChatMediaImage.isGIF(data) {
+            guard data.count <= maxGIFBytes else { throw Failure.tooLarge }
+
+            return Encoded(
+                path: try write(data, pathExtension: "gif"),
+                contentType: "image/gif",
+                thumbnail: thumbnail
+            )
+        }
 
         if supportedTypes.contains(where: { $0.conforms(to: .png) }) {
             return Encoded(

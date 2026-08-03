@@ -3,6 +3,7 @@
 //  Zapp
 //
 
+import Combine
 import ComposableArchitecture
 import FirebaseCore
 @preconcurrency import FirebaseMessaging
@@ -17,6 +18,12 @@ struct ChatPushNotificationsClient {
     var setEnabled: @Sendable (_ enabled: Bool) async -> Bool = { _ in false }
     var sync: @Sendable (_ snapshot: ZMPushTopicSnapshot) async -> Void
     var clearTopics: @Sendable () async -> Void
+
+    /// Emits the conversation a tapped notification belongs to. Resolved on device from the
+    /// FCM topic, which the app already maps to a conversation to subscribe in the first place.
+    var conversationTapStream: @Sendable () -> AnyPublisher<String, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
 }
 
 extension DependencyValues {
@@ -33,7 +40,8 @@ extension ChatPushNotificationsClient: DependencyKey {
         },
         setEnabled: { await ChatPushNotifications.shared.setEnabled($0) },
         sync: { await ChatPushNotifications.shared.sync($0) },
-        clearTopics: { await ChatPushNotifications.shared.clearTopics() }
+        clearTopics: { await ChatPushNotifications.shared.clearTopics() },
+        conversationTapStream: { ChatNotificationTapRelay.shared.stream }
     )
 }
 
@@ -42,8 +50,24 @@ extension ChatPushNotificationsClient: TestDependencyKey {
         isEnabled: { false },
         setEnabled: { _ in false },
         sync: { _ in },
-        clearTopics: { }
+        clearTopics: { },
+        conversationTapStream: { Empty().eraseToAnyPublisher() }
     )
+}
+
+/// Sits outside the main actor so the dependency's synchronous stream accessor can reach it.
+final class ChatNotificationTapRelay: @unchecked Sendable {
+    static let shared = ChatNotificationTapRelay()
+
+    private let subject = PassthroughSubject<String, Never>()
+
+    var stream: AnyPublisher<String, Never> {
+        subject.eraseToAnyPublisher()
+    }
+
+    func send(_ conversationId: String) {
+        subject.send(conversationId)
+    }
 }
 
 @MainActor
@@ -58,6 +82,10 @@ final class ChatPushNotifications: NSObject {
     private let defaults = UserDefaults.standard
     private var configured = false
     private var desiredTopics = Set<String>()
+
+    /// Topic -> conversation, kept from the same snapshot that drives subscription. The relay
+    /// never learns which conversation a notification is for; the mapping only exists here.
+    private var topicConversations: [String: String] = [:]
 
     var isEnabled: Bool {
         defaults.bool(forKey: PreferenceKey.enabled)
@@ -121,18 +149,21 @@ final class ChatPushNotifications: NSObject {
     func sync(_ snapshot: ZMPushTopicSnapshot) async {
         guard configured, isEnabled, snapshot.hydrated else { return }
 
-        desiredTopics = Set(
-            snapshot.conversations
-                .filter { $0.lifecycle == "ready" }
-                .flatMap(\.inboundTopics)
-                .map(\.topic)
-        )
+        let ready = snapshot.conversations.filter { $0.lifecycle == "ready" }
+
+        desiredTopics = Set(ready.flatMap(\.inboundTopics).map(\.topic))
+        topicConversations = ready.reduce(into: [:]) { result, conversation in
+            for inbound in conversation.inboundTopics {
+                result[inbound.topic] = conversation.conversationId
+            }
+        }
 
         await reconcileTopics()
     }
 
     func clearTopics() async {
         desiredTopics.removeAll()
+        topicConversations.removeAll()
         let previous = subscribedTopics
 
         // Publish the empty routing set before remote removal. A delayed
@@ -214,7 +245,24 @@ extension ChatPushNotifications: @preconcurrency UNUserNotificationCenterDelegat
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
-        // The notification is a generic doorbell. Foreground/cold-open
-        // messaging reconciliation remains the authoritative message path.
+        // The notification stays a generic doorbell: reconciliation remains the authoritative
+        // message path. The topic is the only routing hint it carries, and it is resolved here.
+        guard
+            let topic = Self.topic(from: response.notification.request.content.userInfo),
+            let conversationId = topicConversations[topic]
+        else {
+            return
+        }
+
+        ChatNotificationTapRelay.shared.send(conversationId)
+    }
+
+    /// FCM delivers topic sends as `/topics/<topic>` in `from`.
+    static func topic(from userInfo: [AnyHashable: Any]) -> String? {
+        guard let from = userInfo["from"] as? String, from.hasPrefix("/topics/") else { return nil }
+
+        let topic = String(from.dropFirst("/topics/".count))
+
+        return topic.isEmpty ? nil : topic
     }
 }

@@ -313,6 +313,8 @@ extension Root {
             case .chatsList(.conversationTapped(let conversationId)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversationId
+                state.chatRoomState.unreadMessageCountAtEntry =
+                    state.chatsListState.messagingState.unreadCount(for: conversationId)
                 // Carry the conversation across, or the room has no name to show
                 // and falls back to "Chat".
                 state.chatRoomState.conversation = state.chatsListState.conversations

@@ -15,6 +15,62 @@ import ZappMessaging
         var errorDescription: String? { "Transport unavailable" }
     }
 
+    @Test func conversationsAreOrderedByLatestMessageActivity() {
+        var state = ChatsList.State()
+        state.conversations = [
+            ZMConversation(
+                id: "older",
+                type: .direct,
+                participantIds: ["older-peer"],
+                displayName: "Older",
+                lastMessage: "old",
+                lastMessageTimestamp: Date(timeIntervalSince1970: 10)
+            ),
+            ZMConversation(
+                id: "newest",
+                type: .direct,
+                participantIds: ["newest-peer"],
+                displayName: "Newest",
+                lastMessage: "queued",
+                lastMessageTimestamp: Date(timeIntervalSince1970: 30)
+            ),
+            ZMConversation(
+                id: "middle",
+                type: .direct,
+                participantIds: ["middle-peer"],
+                displayName: "Middle",
+                lastMessage: "received",
+                lastMessageTimestamp: Date(timeIntervalSince1970: 20)
+            )
+        ]
+
+        #expect(state.sortedConversations.map(\.id) == ["newest", "middle", "older"])
+    }
+
+    @Test func unreadSeparatorStartsAtOldestUnreadInboundMessage() {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.unreadMessageCountAtEntry = 2
+        state.messages = [
+            Self.message(id: "already-read", timestamp: 10, isFromMe: false),
+            Self.message(id: "my-reply", timestamp: 20, isFromMe: true),
+            Self.message(id: "first-unread", timestamp: 30, isFromMe: false),
+            Self.message(id: "second-unread", timestamp: 40, isFromMe: false)
+        ]
+
+        #expect(state.unreadSeparatorMessageId == "first-unread")
+    }
+
+    @Test func unreadSeparatorFallsBackToEarliestLoadedInboundMessage() {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.unreadMessageCountAtEntry = 5
+        state.messages = [
+            Self.message(id: "first-loaded", timestamp: 10, isFromMe: false),
+            Self.message(id: "second-loaded", timestamp: 20, isFromMe: false)
+        ]
+
+        #expect(state.unreadSeparatorMessageId == "first-loaded")
+    }
+
     @MainActor @Test func ownPublicKeyCannotStartDirectChat() async {
         let ownKey = String(repeating: "a", count: PublicKeyRules.hexLength)
         var state = NewChat.State()
@@ -84,6 +140,40 @@ import ZappMessaging
         #expect(store.state.draft.isEmpty)
         #expect(store.state.sendDidFail)
         #expect(store.state.sendFailureMessage == String(localizable: .chatRoomSendFailed))
+    }
+
+    @MainActor @Test func incomingMessageInOpenRoomIsMarkedRead() async {
+        let readCalls = LockIsolated<[String]>([])
+        let incoming = Self.message(id: "incoming", timestamp: 10, isFromMe: false)
+        let store = TestStore(initialState: ChatRoom.State(conversationId: "conversation")) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.markRead = { conversationId in
+                readCalls.withValue { $0.append(conversationId) }
+            }
+        }
+
+        await store.send(.messageReceived(incoming)) {
+            $0.messages = [incoming]
+            $0.postEntryInboundMessageIds = [incoming.id]
+        }
+
+        #expect(readCalls.value == ["conversation"])
+    }
+
+    @Test func newInboundMessageDoesNotMoveExistingUnreadSeparator() {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.unreadMessageCountAtEntry = 2
+        state.messages = [
+            Self.message(id: "first-unread", timestamp: 10, isFromMe: false),
+            Self.message(id: "second-unread", timestamp: 20, isFromMe: false)
+        ]
+        state.postEntryInboundMessageIds = ["arrived-while-open"]
+        state.messages.append(
+            Self.message(id: "arrived-while-open", timestamp: 30, isFromMe: false)
+        )
+
+        #expect(state.unreadSeparatorMessageId == "first-unread")
     }
 
     @Test func persistedEchoBeforeSendResponseDoesNotDuplicateOrMisorderMessages() {
@@ -262,5 +352,20 @@ import ZappMessaging
 
         #expect(refresh.recovers(postEventFailure))
         #expect(!create.recovers(postCreateConnectionFailure))
+    }
+
+    private static func message(
+        id: String,
+        timestamp: TimeInterval,
+        isFromMe: Bool
+    ) -> ZMMessage {
+        ZMMessage(
+            id: id,
+            conversationId: "conversation",
+            senderId: isFromMe ? "me" : "peer",
+            content: id,
+            timestamp: Date(timeIntervalSince1970: timestamp),
+            isFromMe: isFromMe
+        )
     }
 }
