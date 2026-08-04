@@ -298,14 +298,16 @@ import ZappMessaging
         #expect(try Data(contentsOf: URL(fileURLWithPath: encoded.path)) == gif)
     }
 
-    /// The still branches are unchanged: PNG passes through, everything else is normalised to
-    /// JPEG so a peer told `image/jpeg` never receives HEIC bytes.
-    @Test func nonGifStillsKeepTheirExistingPassthroughAndJpegBranches() throws {
+    /// Every non-GIF still is normalised to JPEG — so a peer told `image/jpeg` never receives
+    /// HEIC bytes, and so no source can skip the re-encode. The PNG passthrough this used to
+    /// assert was removed deliberately: forwarding PNG verbatim let a highly-compressed source
+    /// bypass the output bound and reach the worklet as a multi-megabyte allocation.
+    @Test func everyNonGifStillIsNormalisedToJpeg() throws {
         let png = try #require(UIImage(systemName: "circle")?.pngData())
 
         let asPNG = try ChatMediaEncoder.encode(png, supportedTypes: [UTType.png])
         defer { try? FileManager.default.removeItem(atPath: asPNG.path) }
-        #expect(asPNG.contentType == "image/png")
+        #expect(asPNG.contentType == "image/jpeg")
 
         let asJPEG = try ChatMediaEncoder.encode(png, supportedTypes: [UTType.heic])
         defer { try? FileManager.default.removeItem(atPath: asJPEG.path) }
