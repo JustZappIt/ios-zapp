@@ -68,6 +68,7 @@ struct Root {
         var CancelFlexaId = UUID()
         var shieldingProcessorCancelId = UUID()
         var zappMessagingCancelId = UUID()
+        var chatNotificationTapCancelId = UUID()
         var automaticServerRefreshCancelId = UUID()
 
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
@@ -235,6 +236,7 @@ struct Root {
         case batteryStateChanged
         case binding(BindingAction<Root.State>)
         case cancelAllRunningEffects
+        case chatNotificationTapped(String)
         case loadChatContacts
         case chatContactsLoaded(ChatContacts)
         case observeZappMessaging
@@ -347,6 +349,7 @@ struct Root {
     @Dependency(\.addressBook) var addressBook
     @Dependency(\.audioServices) var audioServices
     @Dependency(\.autolockHandler) var autolockHandler
+    @Dependency(\.chatPushNotifications) var chatPushNotifications
     @Dependency(\.databaseFiles) var databaseFiles
     @Dependency(\.deeplink) var deeplink
     @Dependency(\.date) var date

@@ -34,7 +34,10 @@ struct SettingsTabContent: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         if let displayName {
-                            ProfileCard(displayName: displayName)
+                            ProfileCard(
+                                displayName: displayName,
+                                publicKey: chatProfileStore.publicKey
+                            )
                         }
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
@@ -204,17 +207,24 @@ private struct ProfileCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private enum Constants {
-        static let avatarSize: CGFloat = 72
+        static let avatarSize: CGFloat = 80
     }
 
     let displayName: String
+    let publicKey: String
 
     var body: some View {
         VStack(spacing: Design.Spacing._md) {
-            Text(displayName.zappInitials)
-                .zappFont(.sectionTitle, style: ZappColors.onAccent)
-                .frame(width: Constants.avatarSize, height: Constants.avatarSize)
-                .background(ZappColors.accent.color(colorScheme))
+            // Initials until the identity resolves: an empty QR frame reads as a broken image.
+            if publicKey.isEmpty {
+                Text(displayName.zappInitials)
+                    .zappFont(.sectionTitle, style: ZappColors.onAccent)
+                    .frame(width: Constants.avatarSize, height: Constants.avatarSize)
+                    .background(ZappColors.accent.color(colorScheme))
+            } else {
+                ChatIdentityQRCode(payload: publicKey, size: Constants.avatarSize)
+                    .accessibilityLabel(String(localizable: .settingsProfileQRCode))
+            }
 
             Text("@\(displayName)")
                 .zappFont(.sectionTitle, style: ZappColors.text)

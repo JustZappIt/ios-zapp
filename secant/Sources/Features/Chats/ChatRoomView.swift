@@ -7,13 +7,18 @@ import ComposableArchitecture
 import PhotosUI
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 import ZappMessaging
 
 /// The chat room is the one screen that keeps its back button in the header rather than in a
 /// `ZappBottomActionBar`: the composer owns the bottom edge. `ChatRoomView.kt` does the same.
 struct ChatRoomView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @FocusState private var isComposerFocused: Bool
+    /// Not `@FocusState`: nothing in the SwiftUI hierarchy is focusable, so SwiftUI would keep
+    /// clearing it and the composer would resign the keyboard on the next keystroke.
+    @State private var isComposerFocused = false
+    @State private var hasPositioned = false
+    @State private var isAtBottom = true
 
     @Perception.Bindable var store: StoreOf<ChatRoom>
 
@@ -46,7 +51,25 @@ struct ChatRoomView: View {
                     .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
 
-                if store.sendDidFail {
+                // A GIF can be several megabytes, so the composer says the send is under way
+                // rather than looking idle until it lands.
+                if store.isSendingMedia {
+                    HStack(spacing: Design.Spacing._sm) {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(ZappColors.textSubtle.color(colorScheme))
+
+                        Text(String(localizable: .chatRoomSendingMedia))
+                            .zappFont(.caption, style: ZappColors.textSubtle)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, Design.Spacing._xl)
+                    .padding(.top, Design.Spacing._md)
+                    .background(ZappColors.surface.color(colorScheme))
+                } else if store.sendDidFail {
+                    // Strictly richer than the bare sentence this replaced: a denied camera
+                    // permission is recoverable only from Settings, so the banner offers the
+                    // same deep link `ScanView` does.
                     ChatSendFailureBanner(message: store.sendFailureMessage)
                 }
 
@@ -58,15 +81,28 @@ struct ChatRoomView: View {
                     )
                 }
 
+                if let preview = store.draftLinkPreview {
+                    ChatLinkPreviewCard(
+                        preview: preview,
+                        onCancel: { store.send(.dismissDraftLinkPreviewTapped) }
+                    )
+                }
+
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
                     isFocused: $isComposerFocused,
                     isSendEnabled: !store.trimmedDraft.isEmpty,
+                    isMediaEnabled: !store.isSendingMedia,
+                    showsGIFButton: store.isGIFSearchAvailable,
                     onAttach: {
                         isComposerFocused = false
                         store.send(.attachTapped)
                     },
-                    onSend: { store.send(.sendTapped) }
+                    onSend: { store.send(.sendTapped) },
+                    onGIF: { store.send(.gifButtonTapped) },
+                    onMediaPasted: { fileURL, type in
+                        store.send(.mediaPasted(fileURL: fileURL, type: type))
+                    }
                 )
                 // Mounted on the composer, not on the screen: SwiftUI honours one `.sheet` per
                 // view, and the network-details sheet already owns the screen's slot.
@@ -157,6 +193,9 @@ struct ChatRoomView: View {
                     ChatContactFormView(store: formStore)
                 }
             }
+            .sheet(item: $store.scope(state: \.gifPicker, action: \.gifPicker)) { pickerStore in
+                ChatGIFPickerView(store: pickerStore)
+            }
         }
     }
 
@@ -203,7 +242,10 @@ struct ChatRoomView: View {
     }
 
     private var items: [ChatRoomItem] {
-        ChatRoomItem.build(from: store.visibleMessages)
+        ChatRoomItem.build(
+            from: store.visibleMessages,
+            unreadSeparatorMessageId: store.unreadSeparatorMessageId
+        )
     }
 
     private var messages: some View {
@@ -224,8 +266,17 @@ struct ChatRoomView: View {
 
                         case .separator(_, let label):
                             ChatDateSeparator(label: label)
+
+                        case .unread:
+                            ChatDateSeparator(label: String(localizable: .chatRoomUnreadMessages))
                         }
                     }
+
+                    Color.clear
+                        .frame(height: 1)
+                        .id(ChatRoomItem.bottomId)
+                        .onAppear { isAtBottom = true }
+                        .onDisappear { isAtBottom = false }
                 }
                 .padding(.horizontal, Design.Spacing._xl)
                 .padding(.bottom, Design.Spacing._md)
@@ -248,12 +299,71 @@ struct ChatRoomView: View {
                         .presentationDragIndicator(.visible)
                 }
             }
-            .onChange(of: items.count) { _ in
-                guard let last = items.last else { return }
+            .onAppear {
+                positionOnEntry(proxy)
+            }
+            .onChange(of: items.last?.id) { _ in
+                positionOnNewMessage(proxy)
+            }
+            .onChange(of: isComposerFocused) { isFocused in
+                guard isFocused, !items.isEmpty else { return }
+                scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+            }
+        }
+    }
 
-                withAnimation(ZappMotion.content) {
-                    proxy.scrollTo(last.id, anchor: .bottom)
-                }
+    /// Entering lands on the first unread message when there is one — the marker is the point
+    /// of the divider, and dropping past it to the newest message hides what was missed.
+    private func positionOnEntry(_ proxy: ScrollViewProxy) {
+        guard !items.isEmpty, !hasPositioned else { return }
+
+        hasPositioned = true
+
+        guard let unreadAnchorId else {
+            scroll(proxy, to: ChatRoomItem.bottomId, animated: false)
+            return
+        }
+
+        // Anchored to the top so the unread run sits below the divider, not above it.
+        scroll(proxy, to: unreadAnchorId, anchor: .top, animated: false)
+    }
+
+    /// Following the newest message while the user is reading history yanks them out of it, so
+    /// only own sends and an already-pinned view scroll. Mirrors `shouldFollowLatest`.
+    private func positionOnNewMessage(_ proxy: ScrollViewProxy) {
+        guard !items.isEmpty else { return }
+
+        guard hasPositioned else {
+            positionOnEntry(proxy)
+            return
+        }
+
+        guard isAtBottom || store.visibleMessages.last?.isFromMe == true else { return }
+
+        scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+    }
+
+    private var unreadAnchorId: String? {
+        for item in items {
+            if case .unread(let id) = item { return id }
+        }
+
+        return nil
+    }
+
+    private func scroll(_ proxy: ScrollViewProxy, to id: String, anchor: UnitPoint = .bottom, animated: Bool) {
+        Task { @MainActor in
+            // Let the lazy stack lay out its newly loaded rows before resolving the anchor.
+            // Scrolling during the same update can otherwise leave the room several rows short.
+            await Task.yield()
+
+            guard animated else {
+                proxy.scrollTo(id, anchor: anchor)
+                return
+            }
+
+            withAnimation(ZappMotion.content) {
+                proxy.scrollTo(id, anchor: anchor)
             }
         }
     }
@@ -262,16 +372,24 @@ struct ChatRoomView: View {
 private enum ChatRoomItem: Identifiable, Equatable {
     case message(ZMMessage)
     case separator(id: String, label: String)
+    case unread(id: String)
+
+    static let bottomId = "chat_room_bottom"
 
     var id: String {
         switch self {
         case .message(let message): return "msg_\(message.id)"
         case .separator(let id, _): return id
+        case .unread(let id): return id
         }
     }
 
     /// The separator id carries the index: a duplicate day key must not collide and tear the list.
-    static func build(from messages: [ZMMessage], calendar: Calendar = .current) -> [ChatRoomItem] {
+    static func build(
+        from messages: [ZMMessage],
+        unreadSeparatorMessageId: String?,
+        calendar: Calendar = .current
+    ) -> [ChatRoomItem] {
         var items: [ChatRoomItem] = []
         var lastDay: Date?
 
@@ -288,6 +406,10 @@ private enum ChatRoomItem: Identifiable, Equatable {
                 lastDay = day
             }
 
+            if message.id == unreadSeparatorMessageId {
+                items.append(.unread(id: "unread_\(message.id)"))
+            }
+
             items.append(.message(message))
         }
 
@@ -300,19 +422,25 @@ private struct ChatRoomInputRow: View {
 
     private enum Constants {
         static let inputHorizontalPadding: CGFloat = 12
-        static let inputVerticalPadding: CGFloat = 10
-        static let sendHorizontalPadding: CGFloat = 16
-        static let sendVerticalPadding: CGFloat = 12
+        /// 8, not 10: 28pt of GIF button plus 16 keeps the box on the same 44 as before.
+        static let inputVerticalPadding: CGFloat = 8
+        static let sendIconSize: CGFloat = 24
         static let minHeight: CGFloat = 44
         static let disabledOpacity: CGFloat = 0.45
-        static let lineLimit = 1...5
+        static let maxLines = 5
     }
 
     @Binding var draft: String
-    let isFocused: FocusState<Bool>.Binding
+    @Binding var isFocused: Bool
     let isSendEnabled: Bool
+    let isMediaEnabled: Bool
+    let showsGIFButton: Bool
+    /// The "+" opens the attachment sheet rather than mounting a `PhotosPicker` of its own — the
+    /// gallery is one option among several there, and the sheet is presented from the store.
     let onAttach: () -> Void
     let onSend: () -> Void
+    let onGIF: () -> Void
+    let onMediaPasted: (URL, UTType) -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: Design.Spacing._md) {
@@ -322,34 +450,38 @@ private struct ChatRoomInputRow: View {
                 ChatAttachGlyph()
             }
             .buttonStyle(.zappPress)
+            .disabled(!isMediaEnabled)
+            .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
-            TextField(String(localizable: .chatRoomInputPlaceholder), text: $draft, axis: .vertical)
-                .focused(isFocused)
-                .zappFont(.body, style: ZappColors.text)
-                .lineLimit(Constants.lineLimit)
-                .padding(.horizontal, Constants.inputHorizontalPadding)
-                .padding(.vertical, Constants.inputVerticalPadding)
-                .frame(minHeight: Constants.minHeight)
-                .background(ZappColors.surfaceInput.color(colorScheme))
+            inputBox
 
+            // An up arrow rather than the word "Send", and dimmed by colour rather than opacity —
+            // `ChatRoomInputRow.kt` draws the same square.
+            //
             // Android pulses on the send CLICK, not on delivery — the tap is what the user is
             // acknowledging, and a message that fails still surfaces its own failure row.
             Button {
                 ZappHaptics.sendConfirm()
                 onSend()
             } label: {
-                Text(String(localizable: .chatRoomSend))
-                    .zappFont(.buttonSmall, style: ZappColors.onAccent)
-                    .padding(.horizontal, Constants.sendHorizontalPadding)
-                    .padding(.vertical, Constants.sendVerticalPadding)
-                    .frame(minHeight: Constants.minHeight)
-                    .background(ZappColors.accent.color(colorScheme))
-                    .opacity(isSendEnabled ? 1 : Constants.disabledOpacity)
+                Asset.Assets.Icons.arrowUp.image
+                    .zImage(
+                        width: Constants.sendIconSize,
+                        height: Constants.sendIconSize,
+                        style: isSendEnabled ? ZappColors.onAccent : ZappColors.textSubtle
+                    )
+                    .frame(width: Constants.minHeight, height: Constants.minHeight)
+                    .background((isSendEnabled ? ZappColors.accent : ZappColors.surfaceAlt).color(colorScheme))
+                    .overlay {
+                        Rectangle()
+                            .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                    }
                     .animation(ZappMotion.state, value: isSendEnabled)
             }
             .buttonStyle(.zappPress)
             .disabled(!isSendEnabled)
+            .accessibilityLabel(String(localizable: .chatRoomSend))
         }
         .padding(.horizontal, Design.Spacing._lg)
         .padding(.top, Design.Spacing._md)
@@ -361,14 +493,44 @@ private struct ChatRoomInputRow: View {
                 .ignoresSafeArea(.container, edges: .bottom)
         }
     }
+
+    private var inputBox: some View {
+        HStack(alignment: .bottom, spacing: Design.Spacing._sm) {
+            // UIKit rather than TextField: a pasted image arrives through
+            // paste(itemProviders:), which SwiftUI's field cannot receive.
+            ChatComposerTextView(
+                text: $draft,
+                isFocused: $isFocused,
+                placeholder: String(localizable: .chatRoomInputPlaceholder),
+                maxLines: Constants.maxLines,
+                onMediaPasted: onMediaPasted
+            )
+
+            if showsGIFButton {
+                Button(action: onGIF) {
+                    ChatGIFGlyph()
+                }
+                .buttonStyle(.zappPress)
+                .disabled(!isMediaEnabled)
+                .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
+                .accessibilityLabel(String(localizable: .chatRoomSendGif))
+            }
+        }
+        .padding(.horizontal, Constants.inputHorizontalPadding)
+        .padding(.vertical, Constants.inputVerticalPadding)
+        .frame(minHeight: Constants.minHeight)
+        .background {
+            // A tap on the box's padding missed the field entirely and read as an ignored tap.
+            ZappColors.surfaceInput.color(colorScheme)
+                .contentShape(Rectangle())
+                .onTapGesture { isFocused = true }
+        }
+    }
 }
 
 private extension ZappTextStyle {
     static let attachGlyph = ZappTextStyle(weight: .medium, size: 22, lineHeight: 24)
-}
-
-#Preview {
-    ChatRoomView(store: ChatRoom.initial)
+    static let gifGlyph = ZappTextStyle(weight: .bold, size: 10, lineHeight: 12, tracking: 0.4)
 }
 
 private struct ChatAttachGlyph: View {
@@ -382,4 +544,22 @@ private struct ChatAttachGlyph: View {
             .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
             .background(ZappColors.surfaceInput.color(colorScheme))
     }
+}
+
+/// Lettered rather than an icon — the catalogue has no GIF mark. It sits inside the field, so it
+/// carries no background of its own.
+private struct ChatGIFGlyph: View {
+    static let width: CGFloat = 32
+    static let height: CGFloat = 28
+
+    var body: some View {
+        Text(String(localizable: .chatRoomGif))
+            .zappFont(.gifGlyph, style: ZappColors.textSubtle)
+            .frame(width: Self.width, height: Self.height)
+            .contentShape(Rectangle())
+    }
+}
+
+#Preview {
+    ChatRoomView(store: ChatRoom.initial)
 }

@@ -363,6 +363,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         do {
             try await validateRecipient(conversationId: conversationId, sdk: sdk)
             let message = try await sdk.sendMessage(conversationId: conversationId, content: content, replyTo: replyTo)
+            publishMessageActivity(message)
             await finishProtectedSend(protection)
             clearFailure(for: .local(.messageSend))
             return message
@@ -560,6 +561,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 caption: caption,
                 thumbnailData: thumbnailData
             )
+            publishMessageActivity(message)
             await finishProtectedSend(protection)
             clearFailure(for: .local(.mediaSend))
             return message
@@ -632,16 +634,18 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             .receive(on: mainQueue)
             .sink { [weak self] _, message in
                 guard let self else { return }
-                self.messageReceivedSubject.send(message)
                 self.countUnread(message)
-                Task {
-                    do {
-                        try await self.refreshConversations()
-                    } catch {
-                        // `refreshConversations` records the structured failure.
-                    }
-                }
+                self.publishMessageActivity(message)
+                self.messageReceivedSubject.send(message)
             }
+            .store(in: &cancellables)
+
+        // The SDK already refreshes its published conversation snapshot after every message and
+        // mutation. Forward that authoritative value instead of starting a second unbounded IPC
+        // refresh task for the same event.
+        sdk.$conversations
+            .receive(on: mainQueue)
+            .sink { [weak self] conversations in self?.conversationsSubject.send(conversations) }
             .store(in: &cancellables)
 
         sdk.$isOnline
@@ -700,6 +704,8 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             }
             .store(in: &cancellables)
 
+        // The SDK currently mirrors the core's transfer event into both its transfer and
+        // download publishers. Subscribe once so every core update reaches the UI once.
         sdk.mediaTransferProgress
             .receive(on: mainQueue)
             .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
@@ -723,6 +729,40 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             return unreadCounts
         }
         publishUnread(counts)
+    }
+
+    /// Keep the list responsive to message activity without waiting for the core's
+    /// follow-up conversation refresh. The later refresh remains authoritative, but
+    /// this snapshot ensures a newly queued or received message moves its chat to the
+    /// top immediately.
+    private func publishMessageActivity(_ message: ZMMessage) {
+        var conversations = conversationsSubject.value
+
+        guard let index = conversations.firstIndex(where: { $0.id == message.conversationId }) else {
+            return
+        }
+
+        let previousTimestamp = conversations[index].lastMessageTimestamp ?? .distantPast
+        guard message.timestamp >= previousTimestamp else { return }
+
+        conversations[index].lastMessage = Self.preview(for: message)
+        conversations[index].lastMessageTimestamp = message.timestamp
+        conversationsSubject.send(conversations)
+    }
+
+    /// The same sentinels the JS core writes on a cold load, so an optimistic row and a
+    /// reloaded one read identically. Mirrors `lastMessagePreview` on Android.
+    private static func preview(for message: ZMMessage) -> String {
+        if !message.content.isEmpty {
+            return message.content
+        }
+
+        switch message.contentType {
+        case "image/gif": return "[GIF]"
+        case let type where type.hasPrefix("image/"): return "[Photo]"
+        case let type where type.hasPrefix("video/"): return "[Video]"
+        default: return message.mediaId == nil ? message.content : "[File]"
+        }
     }
 
     private func clearUnread(for conversationId: String) {

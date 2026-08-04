@@ -5,7 +5,10 @@ Xcode identity — no keys are stored in the repo or anywhere new.
 
 ## One-time setup
 
-1. Ruby is pinned by `.ruby-version` (4.0.5); install it with `rbenv install` if needed.
+1. Ruby is pinned by `.ruby-version` (3.3.0). Install the precompiled Homebrew
+   build (`brew install ruby`) — `ruby-build`, and so `rbenv`/`mise`/`asdf`,
+   cannot compile any Ruby against the Xcode 26 toolchain. See
+   `docs/release-automation.md` for why.
 2. `bundle install`
 3. `brew install xcbeautify` (formats xcodebuild output, including Swift Testing results)
 4. `brew install bats-core` (only needed to run the wrapper tests)

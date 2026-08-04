@@ -54,14 +54,39 @@ struct ChatMessageBubble: View {
     /// A quoted bubble fills the group's width so the quote block and the message share one edge.
     private var fillWidth: CGFloat? { hasQuote ? .infinity : nil }
 
+    /// Only the spans the detector recognised become links, so a bare `www.` or a scheme the
+    /// app will not open stays inert text rather than a tap that goes nowhere.
+    private var linkedContent: AttributedString {
+        var attributed = AttributedString(message.content)
+
+        for detected in ChatLinkPreviewParser.detectWebURLs(in: message.content) {
+            guard
+                let url = URL(string: detected.url),
+                let range = Range(detected.range, in: attributed)
+            else {
+                continue
+            }
+
+            attributed[range].link = url
+            attributed[range].underlineStyle = .single
+        }
+
+        return attributed
+    }
+
+    private var linkColor: Color {
+        isFromMe ? ZappColors.onAccent.color(colorScheme) : ZappColors.accentText.color(colorScheme)
+    }
+
     private var bubble: some View {
         // Baseline-aligned, not bottom-aligned: the meta is 10pt against 14pt body
         // text, so matching box edges leaves the time floating above the words.
         // Aligning on the LAST baseline sits it on the final line of the message,
         // which is where a reader expects it.
         HStack(alignment: .lastTextBaseline, spacing: Design.Spacing._md) {
-            Text(message.content)
+            Text(linkedContent)
                 .zappFont(.body, color: textColor)
+                .tint(linkColor)
                 .frame(maxWidth: fillWidth, alignment: .leading)
 
             meta

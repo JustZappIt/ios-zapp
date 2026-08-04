@@ -168,6 +168,8 @@ struct OfframpTests {
     @Test func topUpRequiresPreviewBeforeStartingBridge() async {
         var state = Offramp.State.initial(page: .topUp, corridorContext: .payment)
         state.topUpAmount = "2.5"
+        // `startTopUpTapped` only proceeds for an amount that has already been validated.
+        state.topUpValidatedMicros = "2500000"
         let preview = OfframpBridgePreview(
             sourceAmount: "0.1",
             sourceAsset: "ZEC",

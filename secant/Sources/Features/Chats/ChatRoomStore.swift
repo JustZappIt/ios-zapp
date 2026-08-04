@@ -5,6 +5,7 @@
 
 @preconcurrency import Combine
 import ComposableArchitecture
+import CoreTransferable
 import Foundation
 import PhotosUI
 import SwiftUI
@@ -37,6 +38,28 @@ struct ChatRoom {
         var showsNetworkDetails = false
         var isLoadingNetworkDetails = false
         var connectionDetails: ZMConnectionDetails?
+        @Shared(.inMemory(.toast)) var toast: Toast.Edge? = nil
+
+        var draftLinkPreview: ChatLinkPreview?
+        var draftLinkPreviewURL: String?
+        /// Dismissing a preview must stick for that URL: re-resolving it as the user keeps
+        /// typing would put the card the user just closed straight back on screen.
+        var dismissedLinkPreviewURLs: Set<String> = []
+        var messageLinkPreviews: [String: ChatLinkPreview] = [:]
+        var requestedLinkPreviewMessageIds: Set<String> = []
+
+        /// Captured from the list before `setActiveConversation` clears the badge.
+        /// Root creates a fresh room state for every entry, so the marker is shown
+        /// once and naturally disappears after leaving and opening the room again.
+        var unreadMessageCountAtEntry = 0
+
+        /// Inbound events received after the room opened are already being read in
+        /// place. Excluding them keeps the one-time separator pinned to the unread
+        /// run that caused the user to open the room.
+        var postEntryInboundMessageIds: Set<String> = []
+
+        /// One read per visit, and only once history is on screen. Mirrors `ChatRoomReadGate`.
+        var hasReadForVisit = false
 
         var replyingTo: ZMMessage?
 
@@ -45,6 +68,13 @@ struct ChatRoom {
 
         /// Bound to the composer's `PhotosPicker`. Consumed and cleared the moment it lands.
         var pickedItem: PhotosPickerItem?
+        var isSendingMedia = false
+
+        @Presents var gifPicker: ChatGIFPicker.State?
+
+        /// False without a `klipyKey` in `PartnerKeys.plist`, which hides the composer's GIF
+        /// button rather than opening a search that cannot answer.
+        var isGIFSearchAvailable = false
 
         // Composer attachment menu. See `ChatRoomAttachments.swift`.
         var showsAttachmentSheet = false
@@ -110,6 +140,28 @@ struct ChatRoom {
             messagingState.identity?.publicKey
         }
 
+        /// The oldest of the most recent unread inbound messages currently loaded.
+        /// If the unread run is larger than the page, the marker sits above the
+        /// earliest loaded inbound message instead of disappearing.
+        var unreadSeparatorMessageId: String? {
+            guard unreadMessageCountAtEntry > 0 else { return nil }
+
+            var remaining = unreadMessageCountAtEntry
+            var boundaryId: String?
+
+            for message in visibleMessages.reversed()
+            where !message.isFromMe && !postEntryInboundMessageIds.contains(message.id) {
+                boundaryId = message.id
+                remaining -= 1
+
+                if remaining == 0 {
+                    break
+                }
+            }
+
+            return boundaryId
+        }
+
         func senderName(for message: ZMMessage) -> String? {
             message.resolvedSenderName(chatContacts)
         }
@@ -144,6 +196,18 @@ struct ChatRoom {
 
             messages.append(message)
             messages.sort { $0.timestamp < $1.timestamp }
+
+            if messages.count > maxLiveRoomMessages {
+                messages.removeFirst(messages.count - maxLiveRoomMessages)
+
+                let retainedIds = Set(messages.map(\.id))
+                let retainedMediaIds = Set(messages.compactMap(\.mediaId))
+                postEntryInboundMessageIds.formIntersection(retainedIds)
+                requestedLinkPreviewMessageIds.formIntersection(retainedIds)
+                messageLinkPreviews = messageLinkPreviews.filter { retainedIds.contains($0.key) }
+                completedMediaIds.formIntersection(retainedMediaIds)
+                mediaProgress = mediaProgress.filter { retainedMediaIds.contains($0.key) }
+            }
 
             guard let index = messages.firstIndex(where: { $0.id == message.id }) else { return }
 
@@ -188,6 +252,10 @@ struct ChatRoom {
         case backToHomeTapped
         case titleTapped
         case draftChanged(String)
+        case draftLinkPreviewLoaded(url: String, preview: ChatLinkPreview?)
+        case dismissDraftLinkPreviewTapped
+        case messageAppeared(ZMMessage)
+        case messageLinkPreviewLoaded(messageId: String, preview: ChatLinkPreview?)
         case sendTapped
         case sendSucceeded(clientId: String, message: ZMMessage)
         case messagesLoaded([ZMMessage])
@@ -200,9 +268,16 @@ struct ChatRoom {
         case sendFailed(clientId: String, code: ZappMessagingFailureCode)
         case retrySendTapped(ZMMessage)
         case replyTapped(ZMMessage)
+        case copyMessageTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
+        case mediaPasted(fileURL: URL, type: UTType)
+        case gifButtonTapped
+        case gifPicker(PresentationAction<ChatGIFPicker.Action>)
+        case gifDownloaded(fileURL: URL)
+        case mediaSendSucceeded(ZMMessage)
         case mediaSendFailed
+        case mediaTooLarge
         case messageStatusChanged(messageId: String, status: String)
         case mediaProgressChanged(mediaId: String, progress: Double)
         case mediaCompleted(mediaId: String, filePath: String)
@@ -261,8 +336,16 @@ struct ChatRoom {
         case contactsChanged(ChatContacts)
     }
 
+    enum CancelID {
+        case draftLinkPreview
+    }
+
     @Dependency(\.cameraCapture) var cameraCapture
+    @Dependency(\.chatLinkPreview) var chatLinkPreview
+    @Dependency(\.continuousClock) var clock
+    @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.klipyGIF) var klipyGIF
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
@@ -275,14 +358,12 @@ struct ChatRoom {
             switch action {
             case .onAppear:
                 let conversationId = state.conversationId
+                state.isGIFSearchAvailable = klipyGIF.isConfigured()
                 zappMessaging.setActiveConversation(conversationId)
 
+                // Reading is deferred to `.messagesLoaded`: marking read on entry alone clears
+                // the badge and emits receipts for messages that never reached the screen.
                 return .merge(
-                    .run { _ in
-                        try await zappMessaging.markRead(conversationId)
-                    } catch: { error, _ in
-                        LoggerProxy.error("Chat room mark-read failed: \(error)")
-                    },
                     .run { send in
                         let messages = try await zappMessaging.messages(conversationId, messagePageSize)
                         await send(.messagesLoaded(messages))
@@ -309,6 +390,7 @@ struct ChatRoom {
                     .cancellable(id: state.messageStatusCancelId, cancelInFlight: true),
                     .publisher {
                         zappMessaging.mediaProgressStream()
+                            .throttle(for: .milliseconds(100), scheduler: mainQueue, latest: true)
                             .map { Action.mediaProgressChanged(mediaId: $0.mediaId, progress: $0.progress) }
                     }
                     .cancellable(id: state.mediaProgressCancelId, cancelInFlight: true),
@@ -363,9 +445,62 @@ struct ChatRoom {
                 return .none
 
             case .draftChanged(let draft):
-                state.draft = draft
+                state.draft = String(draft.prefix(MediaPastingTextView.maxTextCharacters))
                 state.sendDidFail = false
                 state.sendFailureMessage = nil
+
+                let url = ChatLinkPreviewParser.firstWebURL(in: state.draft)
+
+                guard url != state.draftLinkPreviewURL else { return .none }
+
+                state.draftLinkPreviewURL = url
+                state.draftLinkPreview = nil
+
+                guard let url, !state.dismissedLinkPreviewURLs.contains(url) else {
+                    return .cancel(id: CancelID.draftLinkPreview)
+                }
+
+                // Debounced: a URL is typed one character at a time, and every prefix of it is
+                // a syntactically valid host we would otherwise go and fetch.
+                return .run { send in
+                    try await clock.sleep(for: .milliseconds(600))
+                    await send(.draftLinkPreviewLoaded(url: url, preview: chatLinkPreview.load(url)))
+                }
+                .cancellable(id: CancelID.draftLinkPreview, cancelInFlight: true)
+
+            case .draftLinkPreviewLoaded(let url, let preview):
+                guard url == state.draftLinkPreviewURL else { return .none }
+
+                state.draftLinkPreview = preview
+                return .none
+
+            case .dismissDraftLinkPreviewTapped:
+                if let url = state.draftLinkPreviewURL {
+                    state.dismissedLinkPreviewURLs.insert(url)
+                }
+
+                state.draftLinkPreview = nil
+                return .cancel(id: CancelID.draftLinkPreview)
+
+            case .messageAppeared(let message):
+                guard
+                    !state.requestedLinkPreviewMessageIds.contains(message.id),
+                    let url = ChatLinkPreviewParser.firstWebURL(in: message.content)
+                else {
+                    return .none
+                }
+
+                state.requestedLinkPreviewMessageIds.insert(message.id)
+
+                let messageId = message.id
+                return .run { send in
+                    await send(.messageLinkPreviewLoaded(messageId: messageId, preview: chatLinkPreview.load(url)))
+                }
+
+            case .messageLinkPreviewLoaded(let messageId, let preview):
+                guard let preview else { return .none }
+
+                state.messageLinkPreviews[messageId] = preview
                 return .none
 
             case .sendTapped:
@@ -448,17 +583,36 @@ struct ChatRoom {
                     state.applyEarlyStatus(at: index)
                 }
 
-                return .none
+                guard !state.hasReadForVisit else { return .none }
+
+                state.hasReadForVisit = true
+
+                let conversationId = state.conversationId
+                return .run { _ in
+                    try await zappMessaging.markRead(conversationId)
+                } catch: { error, _ in
+                    LoggerProxy.error("Chat room mark-read failed: \(error)")
+                }
 
             case .messageReceived(let message):
                 guard !state.chatContacts.isBlocked(message.senderId) else { return .none }
 
                 if message.isFromMe {
                     state.pendingReply = nil
+                } else {
+                    state.postEntryInboundMessageIds.insert(message.id)
                 }
 
                 state.insert(message)
-                return .none
+
+                guard !message.isFromMe else { return .none }
+
+                let conversationId = state.conversationId
+                return .run { _ in
+                    try await zappMessaging.markRead(conversationId)
+                } catch: { error, _ in
+                    LoggerProxy.error("Chat room mark-read for incoming message failed: \(error)")
+                }
 
             case .messagingStateChanged(let messagingState):
                 state.messagingState = messagingState
@@ -532,6 +686,11 @@ struct ChatRoom {
                 state.replyingTo = message
                 return .none
 
+            case .copyMessageTapped(let message):
+                pasteboard.setString(message.content.redacted)
+                state.$toast.withLock { $0 = .top(String(localizable: .generalCopiedToTheClipboard)) }
+                return .none
+
             case .cancelReplyTapped:
                 state.replyingTo = nil
                 return .none
@@ -539,18 +698,26 @@ struct ChatRoom {
             case .pickedItemChanged(let item):
                 state.pickedItem = nil
 
-                guard let item else { return .none }
+                guard let item, !state.isSendingMedia else { return .none }
 
                 state.sendDidFail = false
+                state.isSendingMedia = true
                 let conversationId = state.conversationId
+                let supportedTypes = item.supportedContentTypes
 
                 return .run { send in
-                    guard let data = try await item.loadTransferable(type: Data.self) else {
+                    guard let imported = try await item.loadTransferable(type: ChatPickedMedia.self) else {
                         await send(.mediaSendFailed)
                         return
                     }
+                    defer { ChatMediaTemporaryFiles.remove(imported.fileURL) }
 
-                    let encoded = try ChatMediaEncoder.encode(data, supportedTypes: item.supportedContentTypes)
+                    let encoded = try ChatMediaEncoder.encode(
+                        fileURL: imported.fileURL,
+                        supportedTypes: supportedTypes
+                    )
+                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
                     let message = try await zappMessaging.sendMedia(
                         conversationId,
                         encoded.path,
@@ -558,15 +725,72 @@ struct ChatRoom {
                         "",
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Chat room failed to send media: \(error)")
+
+                    if error as? ChatMediaEncoder.Failure == .tooLarge {
+                        await send(.mediaTooLarge)
+                    } else {
+                        await send(.mediaSendFailed)
+                    }
+                }
+
+            // A pasted image arrives here rather than through the picker, but ships down the same
+            // encoder — so a pasted GIF stays animated too.
+            case .mediaPasted(let fileURL, let type):
+                guard !state.isSendingMedia else {
+                    return .run { _ in ChatMediaTemporaryFiles.remove(fileURL) }
+                }
+
+                state.sendDidFail = false
+                state.isSendingMedia = true
+
+                return sendMedia(conversationId: state.conversationId, fileURL: fileURL, type: type)
+
+            case .gifButtonTapped:
+                state.gifPicker = ChatGIFPicker.State()
+                return .none
+
+            case .gifPicker(.presented(.delegate(.selected(let gif)))):
+                state.gifPicker = nil
+
+                guard !state.isSendingMedia else { return .none }
+
+                state.sendDidFail = false
+                state.isSendingMedia = true
+
+                return .run { send in
+                    let fileURL = try await klipyGIF.download(gif)
+                    await send(.gifDownloaded(fileURL: fileURL))
+                } catch: { error, send in
+                    LoggerProxy.error("Chat room failed to download GIF: \(error)")
                     await send(.mediaSendFailed)
                 }
 
+            case .gifPicker:
+                return .none
+
+            case .gifDownloaded(let fileURL):
+                return sendMedia(conversationId: state.conversationId, fileURL: fileURL, type: .gif)
+
+            case .mediaSendSucceeded(let message):
+                state.isSendingMedia = false
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
+                state.insert(message)
+                return .none
+
             case .mediaSendFailed:
+                state.isSendingMedia = false
                 state.sendDidFail = true
                 state.sendFailureMessage = nil
+                return .none
+
+            case .mediaTooLarge:
+                state.isSendingMedia = false
+                state.sendDidFail = true
+                state.sendFailureMessage = String(localizable: .chatRoomGifTooLarge)
                 return .none
 
             case .messageStatusChanged(let messageId, let status):
@@ -584,6 +808,7 @@ struct ChatRoom {
             // A straggler <1.0 event after completion must not re-insert the id and strand a
             // permanent progress bar; a completed id is final.
             case .mediaProgressChanged(let mediaId, let progress):
+                guard state.messages.contains(where: { $0.mediaId == mediaId }) else { return .none }
                 guard !state.completedMediaIds.contains(mediaId) else { return .none }
 
                 if progress >= 1 {
@@ -596,6 +821,7 @@ struct ChatRoom {
                 return .none
 
             case .mediaCompleted(let mediaId, let filePath):
+                guard state.messages.contains(where: { $0.mediaId == mediaId }) else { return .none }
                 state.completedMediaIds.insert(mediaId)
                 state.mediaProgress.removeValue(forKey: mediaId)
 
@@ -648,6 +874,35 @@ struct ChatRoom {
         .ifLet(\.$contactForm, action: \.contactForm) {
             ChatContactForm()
         }
+        .ifLet(\.$gifPicker, action: \.gifPicker) {
+            ChatGIFPicker()
+        }
+    }
+
+    private func sendMedia(conversationId: String, fileURL: URL, type: UTType) -> Effect<Action> {
+        .run { send in
+            defer { ChatMediaTemporaryFiles.remove(fileURL) }
+
+            let encoded = try ChatMediaEncoder.encode(fileURL: fileURL, supportedTypes: [type])
+            defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
+            let message = try await zappMessaging.sendMedia(
+                conversationId,
+                encoded.path,
+                encoded.contentType,
+                "",
+                encoded.thumbnail
+            )
+            await send(.mediaSendSucceeded(message))
+        } catch: { error, send in
+            LoggerProxy.error("Chat room failed to send media: \(error)")
+
+            if error as? ChatMediaEncoder.Failure == .tooLarge {
+                await send(.mediaTooLarge)
+            } else {
+                await send(.mediaSendFailed)
+            }
+        }
     }
 
     private func loadNetworkDetails() -> Effect<Action> {
@@ -662,6 +917,7 @@ struct ChatRoom {
 }
 
 private let messagePageSize = 50
+private let maxLiveRoomMessages = 500
 private let replyPreviewMaxLength = 100
 private let maxEarlyStatuses = 64
 
@@ -712,76 +968,6 @@ extension ZMMessage {
             replyToSenderName: replyToSenderName,
             replyToContent: replyToContent
         )
-    }
-}
-
-/// Turns a picked photo into something the core can ship: a file on disk, a MIME type the peer
-/// can actually decode, and a wire thumbnail small enough to ride inside the message body.
-enum ChatMediaEncoder {
-    struct Encoded: Equatable {
-        let path: String
-        let contentType: String
-        let thumbnail: String?
-    }
-
-    enum Failure: Error {
-        case undecodable
-    }
-
-    private static let maxPixel: CGFloat = 1920
-    private static let quality: CGFloat = 0.85
-
-    /// The thumbnail travels ON THE WIRE inside the message, so it stays tiny.
-    private static let thumbnailPixel: CGFloat = 64
-    private static let thumbnailQuality: CGFloat = 0.5
-
-    static func encode(_ data: Data, supportedTypes: [UTType]) throws -> Encoded {
-        let thumbnail = ChatMediaImage
-            .downsampled(data: data, maxPixel: thumbnailPixel)?
-            .jpegData(compressionQuality: thumbnailQuality)?
-            .base64EncodedString()
-
-        // Forwarded untouched, like Android's `sendMediaFromUri` GIF branch: re-encoding a GIF
-        // flattens it to a single still, so the peer would receive a frozen animation.
-        if supportedTypes.contains(where: { $0.conforms(to: .gif) }) {
-            return Encoded(
-                path: try write(data, pathExtension: "gif"),
-                contentType: ChatContentType.gif,
-                thumbnail: thumbnail
-            )
-        }
-
-        if supportedTypes.contains(where: { $0.conforms(to: .png) }) {
-            return Encoded(
-                path: try write(data, pathExtension: "png"),
-                contentType: "image/png",
-                thumbnail: thumbnail
-            )
-        }
-
-        // Anything that is not PNG is re-encoded rather than forwarded: the library hands back
-        // HEIC as readily as JPEG, and a peer told "image/jpeg" cannot decode HEIC bytes.
-        guard let jpeg = ChatMediaImage
-            .downsampled(data: data, maxPixel: maxPixel)?
-            .jpegData(compressionQuality: quality)
-        else {
-            throw Failure.undecodable
-        }
-
-        return Encoded(
-            path: try write(jpeg, pathExtension: "jpg"),
-            contentType: ChatContentType.imageJPEG,
-            thumbnail: thumbnail
-        )
-    }
-
-    private static func write(_ data: Data, pathExtension: String) throws -> String {
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("zapp-media-\(UUID().uuidString).\(pathExtension)")
-
-        try data.write(to: url, options: .atomic)
-
-        return url.path
     }
 }
 

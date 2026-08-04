@@ -14,6 +14,9 @@ module Zodl
   # worktree root makes them independent of fastlane's cwd.
   module BuildPaths
     PROJECT = "secant.xcodeproj"
+    # The version build settings live here, and every Info.plist reaches the
+    # build number through $(CURRENT_PROJECT_VERSION) rather than a literal.
+    PROJECT_FILE = File.join(PROJECT, "project.pbxproj")
 
     module_function
 

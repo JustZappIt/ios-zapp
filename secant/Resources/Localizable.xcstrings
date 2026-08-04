@@ -579,182 +579,6 @@
         }
       }
     },
-    "appLock.actions": {
-      "comment": "MARK: - App Lock",
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Actions" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Acciones" } }
-      }
-    },
-    "appLock.biometric.description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Face ID, Touch ID, or your device passcode unlocks the app." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Face ID, Touch ID o el código del dispositivo desbloquean la app." } }
-      }
-    },
-    "appLock.biometric.option": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Biometrics" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Biometría" } }
-      }
-    },
-    "appLock.biometric.updated": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Biometrics enrolled successfully." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Biometría registrada correctamente." } }
-      }
-    },
-    "appLock.changePIN": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Change PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cambiar PIN" } }
-      }
-    },
-    "appLock.changePIN.subtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Update your 6-digit unlock code" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Actualiza tu código de desbloqueo de 6 dígitos" } }
-      }
-    },
-    "appLock.migrationPINSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Your device has no screen lock. Create a 6-digit PIN to protect Zapp." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Tu dispositivo no tiene bloqueo de pantalla. Crea un PIN de 6 dígitos para proteger Zapp." } }
-      }
-    },
-    "appLock.PIN.changed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "PIN changed successfully." } },
-        "es": { "stringUnit": { "state": "translated", "value": "PIN cambiado correctamente." } }
-      }
-    },
-    "appLock.PIN.delete": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Delete digit" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Borrar dígito" } }
-      }
-    },
-    "appLock.PIN.description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Your 6-digit PIN is required when Zapp locks." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Tu PIN de 6 dígitos es necesario cuando Zapp se bloquea." } }
-      }
-    },
-    "appLock.PIN.incorrect": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Incorrect PIN. Please try again." } },
-        "es": { "stringUnit": { "state": "translated", "value": "PIN incorrecto. Inténtalo de nuevo." } }
-      }
-    },
-    "appLock.PIN.locked": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Too many attempts. Try again in %@s." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Demasiados intentos. Inténtalo de nuevo en %@ s." } }
-      }
-    },
-    "appLock.PIN.newConfirmSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Re-enter your new PIN to confirm." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Vuelve a ingresar tu nuevo PIN para confirmar." } }
-      }
-    },
-    "appLock.PIN.newSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Enter a new 6-digit PIN." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Ingresa un nuevo PIN de 6 dígitos." } }
-      }
-    },
-    "appLock.PIN.newTitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Change\nyour PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cambia\ntu PIN" } }
-      }
-    },
-    "appLock.PIN.option": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "6-digit PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "PIN de 6 dígitos" } }
-      }
-    },
-    "appLock.PIN.progress": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "%@ of 6 digits entered" } },
-        "es": { "stringUnit": { "state": "translated", "value": "%@ de 6 dígitos ingresados" } }
-      }
-    },
-    "appLock.PIN.switched": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Switched to PIN successfully." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cambiaste a PIN correctamente." } }
-      }
-    },
-    "appLock.PIN.verifySubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Enter your 6-digit PIN to continue." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Ingresa tu PIN de 6 dígitos para continuar." } }
-      }
-    },
-    "appLock.PIN.verifyTitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Enter\nyour PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Ingresa\ntu PIN" } }
-      }
-    },
-    "appLock.reenrollBiometric": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Re-enroll biometrics" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Volver a registrar biometría" } }
-      }
-    },
-    "appLock.reenrollBiometric.subtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Use your device's authentication settings" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Usa los ajustes de autenticación de tu dispositivo" } }
-      }
-    },
-    "appLock.saveChanges": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Save Changes" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Guardar cambios" } }
-      }
-    },
-    "appLock.storageError": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zapp couldn't save your app lock. Please try again." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Zapp no pudo guardar el bloqueo de la app. Inténtalo de nuevo." } }
-      }
-    },
-    "appLock.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "App Lock" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Bloqueo de la app" } }
-      }
-    },
     "addressDetails.copyAddress": {
       "extractionState": "manual",
       "localizations": {
@@ -956,6 +780,432 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nota"
+          }
+        }
+      }
+    },
+    "appLock.PIN.changed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN changed successfully."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN cambiado correctamente."
+          }
+        }
+      }
+    },
+    "appLock.PIN.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete digit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar dígito"
+          }
+        }
+      }
+    },
+    "appLock.PIN.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your 6-digit PIN is required when Zapp locks."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu PIN de 6 dígitos es necesario cuando Zapp se bloquea."
+          }
+        }
+      }
+    },
+    "appLock.PIN.incorrect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect PIN. Please try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN incorrecto. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "appLock.PIN.locked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Try again in %@s."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demasiados intentos. Inténtalo de nuevo en %@ s."
+          }
+        }
+      }
+    },
+    "appLock.PIN.newConfirmSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-enter your new PIN to confirm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuelve a ingresar tu nuevo PIN para confirmar."
+          }
+        }
+      }
+    },
+    "appLock.PIN.newSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a new 6-digit PIN."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresa un nuevo PIN de 6 dígitos."
+          }
+        }
+      }
+    },
+    "appLock.PIN.newTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change\nyour PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia\ntu PIN"
+          }
+        }
+      }
+    },
+    "appLock.PIN.option": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6-digit PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN de 6 dígitos"
+          }
+        }
+      }
+    },
+    "appLock.PIN.progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ of 6 digits entered"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ de 6 dígitos ingresados"
+          }
+        }
+      }
+    },
+    "appLock.PIN.switched": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switched to PIN successfully."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiaste a PIN correctamente."
+          }
+        }
+      }
+    },
+    "appLock.PIN.verifySubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter your 6-digit PIN to continue."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresa tu PIN de 6 dígitos para continuar."
+          }
+        }
+      }
+    },
+    "appLock.PIN.verifyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter\nyour PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingresa\ntu PIN"
+          }
+        }
+      }
+    },
+    "appLock.actions": {
+      "comment": "MARK: - App Lock",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acciones"
+          }
+        }
+      }
+    },
+    "appLock.biometric.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID, Touch ID, or your device passcode unlocks the app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID, Touch ID o el código del dispositivo desbloquean la app."
+          }
+        }
+      }
+    },
+    "appLock.biometric.option": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometrics"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometría"
+          }
+        }
+      }
+    },
+    "appLock.biometric.updated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometrics enrolled successfully."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometría registrada correctamente."
+          }
+        }
+      }
+    },
+    "appLock.changePIN": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar PIN"
+          }
+        }
+      }
+    },
+    "appLock.changePIN.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update your 6-digit unlock code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualiza tu código de desbloqueo de 6 dígitos"
+          }
+        }
+      }
+    },
+    "appLock.migrationPINSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your device has no screen lock. Create a 6-digit PIN to protect Zapp."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu dispositivo no tiene bloqueo de pantalla. Crea un PIN de 6 dígitos para proteger Zapp."
+          }
+        }
+      }
+    },
+    "appLock.reenrollBiometric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-enroll biometrics"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver a registrar biometría"
+          }
+        }
+      }
+    },
+    "appLock.reenrollBiometric.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use your device's authentication settings"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa los ajustes de autenticación de tu dispositivo"
+          }
+        }
+      }
+    },
+    "appLock.saveChanges": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Changes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar cambios"
+          }
+        }
+      }
+    },
+    "appLock.storageError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp couldn't save your app lock. Please try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp no pudo guardar el bloqueo de la app. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "appLock.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Lock"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloqueo de la app"
           }
         }
       }
@@ -1930,6 +2180,91 @@
         }
       }
     },
+    "chatGifPicker.attribution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Powered by KLIPY"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con tecnología de KLIPY"
+          }
+        }
+      }
+    },
+    "chatGifPicker.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF search is unavailable right now."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La búsqueda de GIF no está disponible ahora mismo."
+          }
+        }
+      }
+    },
+    "chatGifPicker.noResults": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No GIFs found."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encontraron GIF."
+          }
+        }
+      }
+    },
+    "chatGifPicker.searchPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search KLIPY"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar en KLIPY"
+          }
+        }
+      }
+    },
+    "chatGifPicker.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIFs"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        }
+      }
+    },
     "chatIdentity.continue": {
       "extractionState": "manual",
       "localizations": {
@@ -2372,6 +2707,57 @@
         }
       }
     },
+    "chatList.previewUnread": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ unread"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ sin leer"
+          }
+        }
+      }
+    },
+    "chatList.support.subtitleDefault": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report issues, share feedback"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reporta problemas, comparte comentarios"
+          }
+        }
+      }
+    },
+    "chatList.support.tickets": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ open ticket(s)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ticket(s) abierto(s)"
+          }
+        }
+      }
+    },
     "chatList.time.now": {
       "extractionState": "manual",
       "localizations": {
@@ -2443,330 +2829,800 @@
     "chatNetwork.backup": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Backup delivery" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Entrega de respaldo" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backup delivery"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrega de respaldo"
+          }
+        }
       }
     },
     "chatNetwork.connected": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Connected" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Conectado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado"
+          }
+        }
       }
     },
     "chatNetwork.connections": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "TCP connections" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Conexiones TCP" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TCP connections"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conexiones TCP"
+          }
+        }
       }
     },
     "chatNetwork.conversationCount": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "%1$@ direct · %2$@ group" } },
-        "es": { "stringUnit": { "state": "translated", "value": "%1$@ directos · %2$@ grupos" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ direct · %2$@ group"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ directos · %2$@ grupos"
+          }
+        }
       }
     },
     "chatNetwork.conversations": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Conversations" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Conversaciones" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversations"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversaciones"
+          }
+        }
       }
     },
     "chatNetwork.dht": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "DHT" } },
-        "es": { "stringUnit": { "state": "translated", "value": "DHT" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DHT"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DHT"
+          }
+        }
       }
     },
     "chatNetwork.dhtCritical": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Critical" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Crítico" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crítico"
+          }
+        }
       }
     },
     "chatNetwork.dhtDegraded": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Degraded" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Degradado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Degraded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Degradado"
+          }
+        }
       }
     },
     "chatNetwork.dhtHealthy": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Healthy" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Saludable" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Healthy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saludable"
+          }
+        }
       }
     },
     "chatNetwork.direct": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Direct" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Directa" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direct"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Directa"
+          }
+        }
       }
     },
     "chatNetwork.error": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Error" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Error" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
+          }
+        }
       }
     },
     "chatNetwork.invites": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Invites" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Invitaciones" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invites"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invitaciones"
+          }
+        }
       }
     },
     "chatNetwork.nat": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "NAT" } },
-        "es": { "stringUnit": { "state": "translated", "value": "NAT" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NAT"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NAT"
+          }
+        }
       }
     },
     "chatNetwork.nodes": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "DHT nodes" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Nodos DHT" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DHT nodes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodos DHT"
+          }
+        }
       }
     },
     "chatNetwork.none": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "None" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Ninguno" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguno"
+          }
+        }
       }
     },
     "chatNetwork.off": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Off" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Desactivada" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivada"
+          }
+        }
       }
     },
     "chatNetwork.peers": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "P2P peers" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Pares P2P" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P peers"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pares P2P"
+          }
+        }
       }
     },
     "chatNetwork.pending": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Pending" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Pendientes" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pending"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendientes"
+          }
+        }
       }
     },
     "chatNetwork.reachability": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Reachability" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Alcance" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reachability"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcance"
+          }
+        }
       }
     },
     "chatNetwork.refresh": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Refresh" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Actualizar" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar"
+          }
+        }
       }
     },
     "chatNetwork.sectionConnection": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Connection" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Conexión" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conexión"
+          }
+        }
       }
     },
     "chatNetwork.sectionLastError": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Latest issue" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Incidencia más reciente" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest issue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incidencia más reciente"
+          }
+        }
       }
     },
     "chatNetwork.sectionMessages": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Messages" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Mensajes" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messages"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensajes"
+          }
+        }
       }
     },
     "chatNetwork.sectionPeers": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Peers" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Pares" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peers"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pares"
+          }
+        }
       }
     },
     "chatNetwork.status": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Status" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Estado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado"
+          }
+        }
       }
     },
     "chatNetwork.strictNat": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Strict NAT" } },
-        "es": { "stringUnit": { "state": "translated", "value": "NAT estricta" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strict NAT"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NAT estricta"
+          }
+        }
       }
     },
     "chatNetwork.title": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Network" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Red" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Red"
+          }
+        }
       }
     },
     "chatNetwork.unavailable": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Unavailable" } },
-        "es": { "stringUnit": { "state": "translated", "value": "No disponible" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible"
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusIntro": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Your online status lets the people you chat with see when you're connected. It's optional, and it works both ways." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Tu estado en línea permite que las personas con las que chateas vean cuándo estás conectado. Es opcional y funciona en ambos sentidos." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your online status lets the people you chat with see when you're connected. It's optional, and it works both ways."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu estado en línea permite que las personas con las que chateas vean cuándo estás conectado. Es opcional y funciona en ambos sentidos."
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusOffBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "People stop seeing when you're online, and Zapp also stops showing you when they're online. Your messages still send and arrive as usual." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Las personas dejan de ver cuándo estás en línea, y Zapp también deja de mostrarte cuándo ellas lo están. Tus mensajes se siguen enviando y recibiendo con normalidad." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "People stop seeing when you're online, and Zapp also stops showing you when they're online. Your messages still send and arrive as usual."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las personas dejan de ver cuándo estás en línea, y Zapp también deja de mostrarte cuándo ellas lo están. Tus mensajes se siguen enviando y recibiendo con normalidad."
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusOffTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "When this is off" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está desactivado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está desactivado"
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusOnBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "People you have a direct chat with can see a small dot when you're connected, and you can see the same for them." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Las personas con las que tienes un chat directo pueden ver un punto cuando estás conectado, y tú puedes ver lo mismo de ellas." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "People you have a direct chat with can see a small dot when you're connected, and you can see the same for them."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las personas con las que tienes un chat directo pueden ver un punto cuando estás conectado, y tú puedes ver lo mismo de ellas."
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusOnTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "When this is on" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is on"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está activado"
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusReciprocalBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Hiding your online status also hides everyone else's from you. Turn it back on to see and be seen again." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Ocultar tu estado en línea también te oculta el de los demás. Vuelve a activarlo para ver y que te vean." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiding your online status also hides everyone else's from you. Turn it back on to see and be seen again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar tu estado en línea también te oculta el de los demás. Vuelve a activarlo para ver y que te vean."
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusReciprocalTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "It works both ways" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Funciona en ambos sentidos" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It works both ways"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Funciona en ambos sentidos"
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusToggleSubtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Let people you chat with see when you're connected" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Permite que las personas con las que chateas vean cuándo estás conectado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let people you chat with see when you're connected"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite que las personas con las que chateas vean cuándo estás conectado"
+          }
+        }
       }
     },
     "chatPrivacy.onlineStatusToggleTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Show my online status" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Mostrar mi estado en línea" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show my online status"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar mi estado en línea"
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsBothSidesBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Double ticks require both sides to allow read receipts. If either person turns them off, that chat behaves like sent-only status." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Las dobles marcas requieren que ambas partes permitan las confirmaciones de lectura. Si cualquiera las desactiva, ese chat funciona solo con estado enviado." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double ticks require both sides to allow read receipts. If either person turns them off, that chat behaves like sent-only status."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las dobles marcas requieren que ambas partes permitan las confirmaciones de lectura. Si cualquiera las desactiva, ese chat funciona solo con estado enviado."
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsBothSidesTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "If the other person has it off" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Si la otra persona lo tiene desactivado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If the other person has it off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si la otra persona lo tiene desactivado"
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsIntro": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Read receipts let a chat show when a message has been opened. They are optional and only show read status when both sides allow them." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Las confirmaciones de lectura permiten que un chat muestre cuándo se abrió un mensaje. Son opcionales y solo muestran el estado leído cuando ambas partes las permiten." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read receipts let a chat show when a message has been opened. They are optional and only show read status when both sides allow them."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las confirmaciones de lectura permiten que un chat muestre cuándo se abrió un mensaje. Son opcionales y solo muestran el estado leído cuando ambas partes las permiten."
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsOffBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zapp will not send read signals when you open messages, and it will not show read status from other people. Messages stay at sent instead of read." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Zapp no enviará señales de lectura cuando abras mensajes y no mostrará el estado leído de otras personas. Los mensajes permanecen como enviados en lugar de leídos." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp will not send read signals when you open messages, and it will not show read status from other people. Messages stay at sent instead of read."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp no enviará señales de lectura cuando abras mensajes y no mostrará el estado leído de otras personas. Los mensajes permanecen como enviados en lugar de leídos."
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsOffTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "When this is off" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está desactivado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está desactivado"
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsOnBody": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "When you open a conversation, Zapp can send a small read signal for messages you received. Your outgoing messages can also show a close double tick after the other app confirms they were read." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando abres una conversación, Zapp puede enviar una pequeña señal de lectura para los mensajes que recibiste. Tus mensajes enviados también pueden mostrar una doble marca cercana después de que la otra app confirme que fueron leídos." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When you open a conversation, Zapp can send a small read signal for messages you received. Your outgoing messages can also show a close double tick after the other app confirms they were read."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando abres una conversación, Zapp puede enviar una pequeña señal de lectura para los mensajes que recibiste. Tus mensajes enviados también pueden mostrar una doble marca cercana después de que la otra app confirme que fueron leídos."
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsOnTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "When this is on" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Cuando está activado" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is on"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está activado"
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsToggleSubtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Send and show read status when both sides allow it" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Enviar y mostrar el estado leído cuando ambas partes lo permitan" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send and show read status when both sides allow it"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar y mostrar el estado leído cuando ambas partes lo permitan"
+          }
+        }
       }
     },
     "chatPrivacy.readReceiptsToggleTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Allow read receipts" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Permitir confirmaciones de lectura" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow read receipts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir confirmaciones de lectura"
+          }
+        }
       }
     },
     "chatPrivacy.sectionControl": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Control" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Control" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        }
       }
     },
     "chatProfile.addressShieldedCaption": {
@@ -3197,8 +4053,18 @@
     "chatProfile.readReceiptsHint": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Control sent and read indicators for chats" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Controla los indicadores de enviado y leído en los chats" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control sent and read indicators for chats"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controla los indicadores de enviado y leído en los chats"
+          }
+        }
       }
     },
     "chatProfile.save": {
@@ -3248,6 +4114,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "No se pudo desbloquear. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatProfile.secretScreenRecording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen recording is on. Stop it before revealing this."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La grabación de pantalla está activa. Deténla antes de revelar esto."
           }
         }
       }
@@ -3541,6 +4424,244 @@
         }
       }
     },
+    "chatRoom.cancelReply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel reply"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar respuesta"
+          }
+        }
+      }
+    },
+    "chatRoom.copyMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar"
+          }
+        }
+      }
+    },
+    "chatRoom.date.today": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoy"
+          }
+        }
+      }
+    },
+    "chatRoom.date.yesterday": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yesterday"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayer"
+          }
+        }
+      }
+    },
+    "chatRoom.editContact": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit contact"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar contacto"
+          }
+        }
+      }
+    },
+    "chatRoom.gif": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF"
+          }
+        }
+      }
+    },
+    "chatRoom.gifTooLarge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That GIF is too large to send."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese GIF es demasiado grande para enviarlo."
+          }
+        }
+      }
+    },
+    "chatRoom.imageFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image unavailable"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagen no disponible"
+          }
+        }
+      }
+    },
+    "chatRoom.imageViewer.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save image"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar imagen"
+          }
+        }
+      }
+    },
+    "chatRoom.imageViewer.saveFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not save image"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar la imagen"
+          }
+        }
+      }
+    },
+    "chatRoom.imageViewer.saveNoAccess": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp can't add to your photo library. Turn on photo access in Settings."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp no puede añadir a tu fototeca. Activa el acceso a fotos en Ajustes."
+          }
+        }
+      }
+    },
+    "chatRoom.imageViewer.saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image saved"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagen guardada"
+          }
+        }
+      }
+    },
+    "chatRoom.inputPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensaje"
+          }
+        }
+      }
+    },
+    "chatRoom.linkPreviewFrom": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link preview from %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vista previa del enlace de %@"
+          }
+        }
+      }
+    },
     "chatRoom.media.camera": {
       "extractionState": "manual",
       "localizations": {
@@ -3609,121 +4730,19 @@
         }
       }
     },
-    "chatRoom.shareAddressFailed": {
+    "chatRoom.ownKeySendFailed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't share your wallet address"
+            "value": "This conversation uses your own messaging key. Remove it and start a chat with the other person's key."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo compartir tu dirección de billetera"
-          }
-        }
-      }
-    },
-    "chatRoom.cancelReply": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel reply"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar respuesta"
-          }
-        }
-      }
-    },
-    "chatRoom.date.today": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hoy"
-          }
-        }
-      }
-    },
-    "chatRoom.date.yesterday": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yesterday"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayer"
-          }
-        }
-      }
-    },
-    "chatRoom.editContact": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Edit contact"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar contacto"
-          }
-        }
-      }
-    },
-    "chatRoom.imageFailed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Image unavailable"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Imagen no disponible"
-          }
-        }
-      }
-    },
-    "chatRoom.inputPlaceholder": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mensaje"
+            "value": "Esta conversación usa tu propia clave de mensajería. Elimínala e inicia un chat con la clave de la otra persona."
           }
         }
       }
@@ -3813,23 +4832,6 @@
         }
       }
     },
-    "chatRoom.retry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retry"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reintentar"
-          }
-        }
-      }
-    },
     "chatRoom.replyingTo": {
       "extractionState": "manual",
       "localizations": {
@@ -3843,6 +4845,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Respondiendo a"
+          }
+        }
+      }
+    },
+    "chatRoom.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar"
           }
         }
       }
@@ -3898,19 +4917,53 @@
         }
       }
     },
-    "chatRoom.ownKeySendFailed": {
+    "chatRoom.sendGif": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This conversation uses your own messaging key. Remove it and start a chat with the other person's key."
+            "value": "Send a GIF"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esta conversación usa tu propia clave de mensajería. Elimínala e inicia un chat con la clave de la otra persona."
+            "value": "Enviar un GIF"
+          }
+        }
+      }
+    },
+    "chatRoom.sendingMedia": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviando…"
+          }
+        }
+      }
+    },
+    "chatRoom.shareAddressFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't share your wallet address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo compartir tu dirección de billetera"
           }
         }
       }
@@ -3949,23 +5002,6 @@
         }
       }
     },
-    "chatRoom.status.failed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to send"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Error al enviar"
-          }
-        }
-      }
-    },
     "chatRoom.status.delivered": {
       "extractionState": "manual",
       "localizations": {
@@ -3979,6 +5015,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Entregado"
+          }
+        }
+      }
+    },
+    "chatRoom.status.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to send"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error al enviar"
           }
         }
       }
@@ -4081,6 +5134,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "La transacción aún no se ha sincronizado con esta billetera"
+          }
+        }
+      }
+    },
+    "chatRoom.unreadMessages": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread messages"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensajes no leídos"
           }
         }
       }
@@ -11191,6 +12261,23 @@
         }
       }
     },
+    "general.clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar"
+          }
+        }
+      }
+    },
     "general.close": {
       "extractionState": "manual",
       "localizations": {
@@ -13049,23 +14136,6 @@
         }
       }
     },
-    "newChat.clear": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Borrar"
-          }
-        }
-      }
-    },
     "newChat.add": {
       "extractionState": "manual",
       "localizations": {
@@ -13079,6 +14149,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Agregar"
+          }
+        }
+      }
+    },
+    "newChat.clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar"
           }
         }
       }
@@ -13134,23 +14221,6 @@
         }
       }
     },
-    "newChat.emptyTitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start a private conversation"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inicia una conversación privada"
-          }
-        }
-      }
-    },
     "newChat.emptyBody": {
       "extractionState": "manual",
       "localizations": {
@@ -13164,6 +14234,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Escanea el código QR de alguien o pega su clave pública para enviarle un mensaje."
+          }
+        }
+      }
+    },
+    "newChat.emptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start a private conversation"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia una conversación privada"
           }
         }
       }
@@ -13423,23 +14510,6 @@
         }
       }
     },
-    "newChat.scanInstructions": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scan a Zapp public key QR code"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escanea un código QR de clave pública de Zapp"
-          }
-        }
-      }
-    },
     "newChat.scan": {
       "extractionState": "manual",
       "localizations": {
@@ -13453,6 +14523,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Escanear código QR"
+          }
+        }
+      }
+    },
+    "newChat.scanInstructions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan a Zapp public key QR code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanea un código QR de clave pública de Zapp"
           }
         }
       }
@@ -13628,54 +14715,1209 @@
         }
       }
     },
-    "osStatusError.error": {
+    "offramp.account.copy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Error code: %@"
+            "value": "Copy Base account"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Código de error: %@"
+            "value": "Copiar cuenta de Base"
           }
         }
       }
     },
-    "osStatusError.message": {
+    "offramp.account.label": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your funds are safe but something happened while we were trying to retrieve the Keychain data. Close the Zapp app, and give it a fresh launch, we will try again."
+            "value": "Your Base account"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tus fondos están seguros, pero algo ocurrió mientras intentábamos recuperar los datos del llavero. Cierra la aplicación de Zapp y ábrela de nuevo; lo intentaremos otra vez."
+            "value": "Tu cuenta de Base"
           }
         }
       }
     },
-    "osStatusError.title": {
-      "comment": "MARK: OSStatusError",
+    "offramp.addFunds.base": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It’s not you, it’s us."
+            "value": "Add funds to Base"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No eres tú, somos nosotros."
+            "value": "Añadir fondos a Base"
+          }
+        }
+      }
+    },
+    "offramp.addFunds.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add funds"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir fondos"
+          }
+        }
+      }
+    },
+    "offramp.bridge.preview.fee": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network fee"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comisión de red"
+          }
+        }
+      }
+    },
+    "offramp.bridge.preview.time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated time"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiempo estimado"
+          }
+        }
+      }
+    },
+    "offramp.bridge.preview.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The bridge quote is unavailable. Review it again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La cotización del puente no está disponible. Revísala de nuevo."
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.discard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar"
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.discard.confirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discarding hides local recovery for this order. Verify it is terminal before continuing."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al descartarlo se oculta la recuperación local de esta orden. Verifica que haya terminado antes de continuar."
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.discard.confirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard saved payment?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Descartar el pago guardado?"
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A P2P payment is still in progress. Resume it before starting another payment, or discard it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay un pago P2P en curso. Reanúdalo antes de iniciar otro pago o descártalo."
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.resume": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar"
+          }
+        }
+      }
+    },
+    "offramp.checkpoint.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payment already in progress"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya hay un pago en curso"
+          }
+        }
+      }
+    },
+    "offramp.history.balance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BASE BALANCE"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SALDO EN BASE"
+          }
+        }
+      }
+    },
+    "offramp.history.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No P2P payments yet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no hay pagos P2P"
+          }
+        }
+      }
+    },
+    "offramp.history.emptyDetail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your completed and cancelled orders will appear here."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus órdenes completadas y canceladas aparecerán aquí."
+          }
+        }
+      }
+    },
+    "offramp.history.fee": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fee"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comisión"
+          }
+        }
+      }
+    },
+    "offramp.history.recent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent P2P payments"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagos P2P recientes"
+          }
+        }
+      }
+    },
+    "offramp.history.recover": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get funds back to ZEC"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recuperar fondos en ZEC"
+          }
+        }
+      }
+    },
+    "offramp.history.refund": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Return to ZEC"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devolver a ZEC"
+          }
+        }
+      }
+    },
+    "offramp.history.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P transactions"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transacciones P2P"
+          }
+        }
+      }
+    },
+    "offramp.pay.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pay"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagar"
+          }
+        }
+      }
+    },
+    "offramp.pay.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm payment"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmar pago"
+          }
+        }
+      }
+    },
+    "offramp.pay.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pay a merchant"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagar a un comercio"
+          }
+        }
+      }
+    },
+    "offramp.pay.updated.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The rate, fee, or required USDC changed. Review the updated quote before confirming."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La tasa, la comisión o los USDC necesarios cambiaron. Revisa la cotización actualizada antes de confirmar."
+          }
+        }
+      }
+    },
+    "offramp.pay.updated.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review updated payment quote"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar la cotización de pago actualizada"
+          }
+        }
+      }
+    },
+    "offramp.paymentMethod": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P payment method"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Método de pago P2P"
+          }
+        }
+      }
+    },
+    "offramp.paymentMethod.infoButton": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How P2P payments work"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo funcionan los pagos P2P"
+          }
+        }
+      }
+    },
+    "offramp.paymentMethod.infoFlow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ZEC can be bridged to your self-custodial Base account, then exchanged through the P2P contract. Review the amount and rate before approving."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puedes transferir ZEC a tu cuenta autocustodiada de Base y cambiarlo mediante el contrato P2P. Revisa el importe y la tasa antes de aprobar."
+          }
+        }
+      }
+    },
+    "offramp.paymentMethod.infoRails": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the country whose payment QR you want to scan. Zapp validates the matching UPI, PIX, QRIS, Mercado Pago, Pago Móvil, NIP, or Colombian transfer format on your device."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige el país cuyo QR de pago quieres escanear. Zapp valida en tu dispositivo el formato UPI, PIX, QRIS, Mercado Pago, Pago Móvil, NIP o transferencia colombiana correspondiente."
+          }
+        }
+      }
+    },
+    "offramp.paymentMethod.infoTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How P2P payments work"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cómo funcionan los pagos P2P"
+          }
+        }
+      }
+    },
+    "offramp.progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payment in progress"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pago en curso"
+          }
+        }
+      }
+    },
+    "offramp.progress.stopped": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payment stopped"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pago detenido"
+          }
+        }
+      }
+    },
+    "offramp.progress.success": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completado"
+          }
+        }
+      }
+    },
+    "offramp.quote.balance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available on Base"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disponible en Base"
+          }
+        }
+      }
+    },
+    "offramp.quote.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar"
+          }
+        }
+      }
+    },
+    "offramp.quote.fee": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fixed fee"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comisión fija"
+          }
+        }
+      }
+    },
+    "offramp.quote.loading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting quote…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obteniendo cotización…"
+          }
+        }
+      }
+    },
+    "offramp.quote.rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasa"
+          }
+        }
+      }
+    },
+    "offramp.quote.shortfall": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add first"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir primero"
+          }
+        }
+      }
+    },
+    "offramp.quote.youPay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P2P order"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orden P2P"
+          }
+        }
+      }
+    },
+    "offramp.recipient": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipient"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Destinatario"
+          }
+        }
+      }
+    },
+    "offramp.refund.confirm.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Return funds"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devolver fondos"
+          }
+        }
+      }
+    },
+    "offramp.refund.confirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your full Base USDC balance will be bridged back to this wallet as ZEC."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo tu saldo USDC de Base se transferirá de vuelta a esta cartera como ZEC."
+          }
+        }
+      }
+    },
+    "offramp.refund.confirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Return Base funds to ZEC?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Devolver los fondos de Base a ZEC?"
+          }
+        }
+      }
+    },
+    "offramp.scan.cameraError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is unavailable. Allow camera access in Settings or choose a photo."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El acceso a la cámara no está disponible. Permítelo en Ajustes o elige una foto."
+          }
+        }
+      }
+    },
+    "offramp.scan.library": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo library"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fototeca"
+          }
+        }
+      }
+    },
+    "offramp.scan.photoError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No QR code was found in that photo."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encontró ningún código QR en esa foto."
+          }
+        }
+      }
+    },
+    "offramp.scan.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan %@ QR"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear QR de %@"
+          }
+        }
+      }
+    },
+    "offramp.scan.titleFallback": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan payment QR"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escanear QR de pago"
+          }
+        }
+      }
+    },
+    "offramp.topup.amount": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amount to add"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importe que añadir"
+          }
+        }
+      }
+    },
+    "offramp.topup.confirm.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bridge funds"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transferir fondos"
+          }
+        }
+      }
+    },
+    "offramp.topup.confirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm ZEC bridge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirmar puente de ZEC"
+          }
+        }
+      }
+    },
+    "offramp.topup.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review bridge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar puente"
+          }
+        }
+      }
+    },
+    "offramp.topup.discard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard saved top-up"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar recarga guardada"
+          }
+        }
+      }
+    },
+    "offramp.topup.discard.confirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard only after verifying the previous bridge cannot settle. Starting again may send ZEC twice."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descártala solo después de verificar que el puente anterior no puede completarse. Empezar de nuevo puede enviar ZEC dos veces."
+          }
+        }
+      }
+    },
+    "offramp.topup.discard.confirm.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard saved top-up?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Descartar la recarga guardada?"
+          }
+        }
+      }
+    },
+    "offramp.topup.resume.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume top-up"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar recarga"
+          }
+        }
+      }
+    },
+    "offramp.topup.resume.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume the saved bridge to avoid sending ZEC twice, or discard it only if you have verified it will not settle."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanuda el puente guardado para evitar enviar ZEC dos veces, o descártalo solo si has verificado que no se liquidará."
+          }
+        }
+      }
+    },
+    "offramp.topup.resume.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Base top-up in progress"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recarga de Base en curso"
+          }
+        }
+      }
+    },
+    "offramp.topup.step1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approve the ZEC bridge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aprobar el puente de ZEC"
+          }
+        }
+      }
+    },
+    "offramp.topup.step2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wait for USDC on Base"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperar los USDC en Base"
+          }
+        }
+      }
+    },
+    "offramp.topup.step3": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Return and pay from your Base balance"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver y pagar con tu saldo de Base"
+          }
+        }
+      }
+    },
+    "offramp.topup.testnet.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic ZEC bridging is unavailable on testnet. Send testnet USDC to this Base account."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El puente automático de ZEC no está disponible en testnet. Envía USDC de prueba a esta cuenta de Base."
+          }
+        }
+      }
+    },
+    "offramp.topup.testnet.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fund your testnet Base account"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añade fondos a tu cuenta de Base en testnet"
+          }
+        }
+      }
+    },
+    "offramp.topup.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add funds to Base"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir fondos a Base"
+          }
+        }
+      }
+    },
+    "onboarding.PIN.confirmSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-enter your 6-digit PIN to confirm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuelve a ingresar tu PIN de 6 dígitos para confirmar."
+          }
+        }
+      }
+    },
+    "onboarding.PIN.confirmTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm\nyour PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirma\ntu PIN"
+          }
+        }
+      }
+    },
+    "onboarding.PIN.createSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a 6-digit code you'll remember."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un código de 6 dígitos que recuerdes."
+          }
+        }
+      }
+    },
+    "onboarding.PIN.createTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create\nyour PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crea\ntu PIN"
+          }
+        }
+      }
+    },
+    "onboarding.PIN.mismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PINs don't match. Please try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los PIN no coinciden. Inténtalo de nuevo."
           }
         }
       }
@@ -13684,43 +15926,121 @@
       "comment": "MARK: - Onboarding App Lock",
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Enable Biometrics" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Activar biometría" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Biometrics"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar biometría"
+          }
+        }
       }
     },
     "onboarding.biometric.failed": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Authentication failed. Tap to try again." } },
-        "es": { "stringUnit": { "state": "translated", "value": "La autenticación falló. Toca para volver a intentarlo." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authentication failed. Tap to try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La autenticación falló. Toca para volver a intentarlo."
+          }
+        }
       }
     },
     "onboarding.biometric.subtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zapp will use your device authentication to lock and unlock the app." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Zapp usará la autenticación de tu dispositivo para bloquear y desbloquear la app." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp will use your device authentication to lock and unlock the app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp usará la autenticación de tu dispositivo para bloquear y desbloquear la app."
+          }
+        }
       }
     },
     "onboarding.biometric.title": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Biometric unlock" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Desbloqueo biométrico" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometric unlock"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloqueo biométrico"
+          }
+        }
       }
     },
     "onboarding.biometric.unavailable": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Set up Face ID, Touch ID, or a device passcode in Settings, or use a PIN." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Configura Face ID, Touch ID o un código del dispositivo en Ajustes, o usa un PIN." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up Face ID, Touch ID, or a device passcode in Settings, or use a PIN."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura Face ID, Touch ID o un código del dispositivo en Ajustes, o usa un PIN."
+          }
+        }
       }
     },
     "onboarding.biometric.verifying": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Verifying…" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Verificando…" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifying…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verificando…"
+          }
+        }
+      }
+    },
+    "onboarding.continue": {
+      "comment": "MARK: - Zapp Onboarding",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuar"
+          }
+        }
       }
     },
     "onboarding.creatingWallet.failed": {
@@ -13758,20 +16078,71 @@
         }
       }
     },
-    "onboarding.continue": {
-      "comment": "MARK: - Zapp Onboarding",
+    "onboarding.done.enterCta": {
+      "comment": "MARK: - Zapp Onboarding Phase 2",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Continue"
+            "value": "Enter Zapp →"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Continuar"
+            "value": "Entrar a Zapp →"
+          }
+        }
+      }
+    },
+    "onboarding.done.subtitleBio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identity created, wallet ready, secured with biometrics."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identidad creada, billetera lista, protegida con biometría."
+          }
+        }
+      }
+    },
+    "onboarding.done.subtitlePin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identity created, wallet ready, secured with a PIN."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identidad creada, billetera lista, protegida con un PIN."
+          }
+        }
+      }
+    },
+    "onboarding.done.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You’re\nall set."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo\nlisto."
           }
         }
       }
@@ -13844,39 +16215,123 @@
         }
       }
     },
-    "onboarding.PIN.confirmSubtitle": {
+    "onboarding.msgIntro.badge": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Re-enter your 6-digit PIN to confirm." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Vuelve a ingresar tu PIN de 6 dígitos para confirmar." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Part 2 of 3 · Messaging account"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parte 2 de 3 · Cuenta de mensajería"
+          }
+        }
       }
     },
-    "onboarding.PIN.confirmTitle": {
+    "onboarding.msgIntro.phraseSubtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Confirm\nyour PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Confirma\ntu PIN" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your wallet’s 24-word phrase also restores your messaging identity."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La frase de 24 palabras de tu billetera también restaura tu identidad de mensajería."
+          }
+        }
       }
     },
-    "onboarding.PIN.createSubtitle": {
+    "onboarding.msgIntro.phraseTitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Choose a 6-digit code you'll remember." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Elige un código de 6 dígitos que recuerdes." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One recovery phrase"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una sola frase de recuperación"
+          }
+        }
       }
     },
-    "onboarding.PIN.createTitle": {
+    "onboarding.msgIntro.subtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Create\nyour PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Crea\ntu PIN" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your identity is a username backed by your wallet’s recovery phrase — one phrase restores your wallet and messaging identity on any device. Message history is stored locally and is not recoverable."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu identidad es un nombre de usuario respaldado por la frase de recuperación de tu billetera — una sola frase restaura tu billetera y tu identidad de mensajería en cualquier dispositivo. El historial de mensajes se guarda localmente y no es recuperable."
+          }
+        }
       }
     },
-    "onboarding.PIN.mismatch": {
+    "onboarding.msgIntro.title": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "PINs don't match. Please try again." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Los PIN no coinciden. Inténtalo de nuevo." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create your\nmessaging\nidentity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crea tu\nidentidad de\nmensajería"
+          }
+        }
+      }
+    },
+    "onboarding.msgIntro.usernameSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How friends find and message you"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Así te encuentran y te escriben tus amigos"
+          }
+        }
+      }
+    },
+    "onboarding.msgIntro.usernameTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a username"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un nombre de usuario"
+          }
+        }
       }
     },
     "onboarding.progressAccessibility": {
@@ -13896,131 +16351,123 @@
         }
       }
     },
-    "onboarding.security.badge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "PART 3 OF 3 · SECURE ZAPP" } },
-        "es": { "stringUnit": { "state": "translated", "value": "PARTE 3 DE 3 · PROTEGE ZAPP" } }
-      }
-    },
-    "onboarding.security.biometric": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Biometric" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Biometría" } }
-      }
-    },
-    "onboarding.security.biometricSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Face ID or Touch ID — fastest" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Face ID o Touch ID — lo más rápido" } }
-      }
-    },
     "onboarding.security.PIN": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "6-digit PIN" } },
-        "es": { "stringUnit": { "state": "translated", "value": "PIN de 6 dígitos" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6-digit PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN de 6 dígitos"
+          }
+        }
       }
     },
     "onboarding.security.PINSubtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "A passcode you remember" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Un código que tú recuerdas" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A passcode you remember"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un código que tú recuerdas"
+          }
+        }
+      }
+    },
+    "onboarding.security.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PART 3 OF 3 · SECURE ZAPP"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PARTE 3 DE 3 · PROTEGE ZAPP"
+          }
+        }
+      }
+    },
+    "onboarding.security.biometric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometric"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biometría"
+          }
+        }
+      }
+    },
+    "onboarding.security.biometricSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID or Touch ID — fastest"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID o Touch ID — lo más rápido"
+          }
+        }
       }
     },
     "onboarding.security.subtitle": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Choose how you unlock Zapp." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Elige cómo desbloqueas Zapp." } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose how you unlock Zapp."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige cómo desbloqueas Zapp."
+          }
+        }
       }
     },
     "onboarding.security.title": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Secure\nyour app" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Protege\ntu app" } }
-      }
-    },
-    "onboarding.done.enterCta": {
-      "comment": "MARK: - Zapp Onboarding Phase 2",
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Enter Zapp →" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Entrar a Zapp →" } }
-      }
-    },
-    "onboarding.done.subtitleBio": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Identity created, wallet ready, secured with biometrics." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Identidad creada, billetera lista, protegida con biometría." } }
-      }
-    },
-    "onboarding.done.subtitlePin": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Identity created, wallet ready, secured with a PIN." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Identidad creada, billetera lista, protegida con un PIN." } }
-      }
-    },
-    "onboarding.done.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "You’re\nall set." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Todo\nlisto." } }
-      }
-    },
-    "onboarding.msgIntro.badge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Part 2 of 3 · Messaging account" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Parte 2 de 3 · Cuenta de mensajería" } }
-      }
-    },
-    "onboarding.msgIntro.phraseSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Your wallet’s 24-word phrase also restores your messaging identity." } },
-        "es": { "stringUnit": { "state": "translated", "value": "La frase de 24 palabras de tu billetera también restaura tu identidad de mensajería." } }
-      }
-    },
-    "onboarding.msgIntro.phraseTitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "One recovery phrase" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Una sola frase de recuperación" } }
-      }
-    },
-    "onboarding.msgIntro.subtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Your identity is a username backed by your wallet’s recovery phrase — one phrase restores your wallet and messaging identity on any device. Message history is stored locally and is not recoverable." } },
-        "es": { "stringUnit": { "state": "translated", "value": "Tu identidad es un nombre de usuario respaldado por la frase de recuperación de tu billetera — una sola frase restaura tu billetera y tu identidad de mensajería en cualquier dispositivo. El historial de mensajes se guarda localmente y no es recuperable." } }
-      }
-    },
-    "onboarding.msgIntro.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Create your\nmessaging\nidentity" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Crea tu\nidentidad de\nmensajería" } }
-      }
-    },
-    "onboarding.msgIntro.usernameSubtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "How friends find and message you" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Así te encuentran y te escriben tus amigos" } }
-      }
-    },
-    "onboarding.msgIntro.usernameTitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Pick a username" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Elige un nombre de usuario" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secure\nyour app"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Protege\ntu app"
+          }
+        }
       }
     },
     "onboarding.seed.confirmation": {
@@ -14104,6 +16551,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ya la guardé"
+          }
+        }
+      }
+    },
+    "onboarding.seed.screenRecording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen recording is on. Stop it before revealing your phrase."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La grabación de pantalla está activa. Deténla antes de revelar tu frase."
           }
         }
       }
@@ -14495,6 +16959,58 @@
           "stringUnit": {
             "state": "translated",
             "value": "Al continuar aceptas nuestros términos y política de privacidad."
+          }
+        }
+      }
+    },
+    "osStatusError.error": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error code: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de error: %@"
+          }
+        }
+      }
+    },
+    "osStatusError.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your funds are safe but something happened while we were trying to retrieve the Keychain data. Close the Zapp app, and give it a fresh launch, we will try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus fondos están seguros, pero algo ocurrió mientras intentábamos recuperar los datos del llavero. Cierra la aplicación de Zapp y ábrela de nuevo; lo intentaremos otra vez."
+          }
+        }
+      }
+    },
+    "osStatusError.title": {
+      "comment": "MARK: OSStatusError",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It’s not you, it’s us."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No eres tú, somos nosotros."
           }
         }
       }
@@ -16598,6 +19114,23 @@
         }
       }
     },
+    "scan.invalidPublicKey": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This QR code doesn't contain a valid Zapp public key."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este código QR no contiene una clave pública válida de Zapp."
+          }
+        }
+      }
+    },
     "scan.invalidQR": {
       "comment": "MARK: - Scan",
       "extractionState": "manual",
@@ -16612,23 +19145,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Este código QR no contiene una dirección Zcash válida."
-          }
-        }
-      }
-    },
-    "scan.invalidPublicKey": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This QR code doesn't contain a valid Zapp public key."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este código QR no contiene una clave pública válida de Zapp."
           }
         }
       }
@@ -18299,6 +20815,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Protección Tor"
+          }
+        }
+      }
+    },
+    "settings.profileQRCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your chat QR code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu código QR de chat"
           }
         }
       }
@@ -19993,6 +22526,23 @@
         }
       }
     },
+    "splash.authSupport": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contact Support"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contactar Soporte"
+          }
+        }
+      }
+    },
     "splash.authTitle": {
       "comment": "MARK: - Splash Screen",
       "extractionState": "manual",
@@ -20011,13 +22561,6 @@
         }
       }
     },
-    "splash.authSupport": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Contact Support" } },
-        "es": { "stringUnit": { "state": "translated", "value": "Contactar Soporte" } }
-      }
-    },
     "splash.authTouchID": {
       "extractionState": "manual",
       "localizations": {
@@ -20031,6 +22574,278 @@
           "stringUnit": {
             "state": "translated",
             "value": "Toca el ícono de la huella para usar Touch ID y desbloquear."
+          }
+        }
+      }
+    },
+    "supportChat.category.feedback": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comentarios"
+          }
+        }
+      }
+    },
+    "supportChat.category.other": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otro"
+          }
+        }
+      }
+    },
+    "supportChat.category.problem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problem"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problema"
+          }
+        }
+      }
+    },
+    "supportChat.createFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t open a support ticket. Check your connection and try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo abrir un ticket de soporte. Revisa tu conexión e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "supportChat.greeting.feedback": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We’d love to hear your thoughts."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nos encantaría conocer tu opinión."
+          }
+        }
+      }
+    },
+    "supportChat.greeting.other": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How can we help?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cómo podemos ayudarte?"
+          }
+        }
+      }
+    },
+    "supportChat.greeting.problem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please describe the issue you’re experiencing."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe el problema que estás experimentando."
+          }
+        }
+      }
+    },
+    "supportChat.inputPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mensaje"
+          }
+        }
+      }
+    },
+    "supportChat.leaveDialog.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        }
+      }
+    },
+    "supportChat.leaveDialog.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will remove the support conversation from your inbox. The Zapp team will also see it as closed."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esto eliminará la conversación de soporte de tu bandeja de entrada. El equipo de Zapp también la verá como cerrada."
+          }
+        }
+      }
+    },
+    "supportChat.leaveDialog.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close support chat?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cerrar chat de soporte?"
+          }
+        }
+      }
+    },
+    "supportChat.leaveNotice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "User has left the chat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El usuario salió del chat."
+          }
+        }
+      }
+    },
+    "supportChat.overflow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More options"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más opciones"
+          }
+        }
+      }
+    },
+    "supportChat.overflow.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close Support Chat"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar chat de soporte"
+          }
+        }
+      }
+    },
+    "supportChat.pickTopic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a topic"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige un tema"
+          }
+        }
+      }
+    },
+    "supportChat.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapp Support"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soporte de Zapp"
           }
         }
       }
@@ -20253,6 +23068,125 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hora actual"
+          }
+        }
+      }
+    },
+    "supportTicket.closeDialog.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        }
+      }
+    },
+    "supportTicket.closeDialog.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will remove the ticket and its messages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esto eliminará el ticket y sus mensajes."
+          }
+        }
+      }
+    },
+    "supportTicket.closeDialog.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close this ticket?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cerrar este ticket?"
+          }
+        }
+      }
+    },
+    "supportTicket.defaultLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ticket"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ticket"
+          }
+        }
+      }
+    },
+    "supportTicket.list.emptySubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap + to create a new ticket"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca + para crear un nuevo ticket"
+          }
+        }
+      }
+    },
+    "supportTicket.list.emptyTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No support tickets"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay tickets de soporte"
+          }
+        }
+      }
+    },
+    "supportTicket.list.new": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New ticket"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuevo ticket"
           }
         }
       }
@@ -24037,23 +26971,6 @@
         }
       }
     },
-    "unifiedSend.sentence.illPay": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I'll pay"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pagaré"
-          }
-        }
-      }
-    },
     "unifiedSend.sentence.iWantToSend": {
       "extractionState": "manual",
       "localizations": {
@@ -24067,6 +26984,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quiero enviar"
+          }
+        }
+      }
+    },
+    "unifiedSend.sentence.illPay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I'll pay"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagaré"
           }
         }
       }
@@ -24239,57 +27173,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Versión de Zapp %@"
-          }
-        }
-      }
-    },
-    "zappWallet.asset": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asset"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activo"
-          }
-        }
-      }
-    },
-    "zappWallet.availableBalance": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available balance"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saldo disponible"
-          }
-        }
-      }
-    },
-    "zappWallet.toggleBalanceCurrency": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toggle primary balance currency"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alternar la moneda principal del saldo"
           }
         }
       }
@@ -24753,6 +27636,57 @@
         }
       }
     },
+    "zappWallet.asset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asset"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activo"
+          }
+        }
+      }
+    },
+    "zappWallet.availableBalance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available balance"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saldo disponible"
+          }
+        }
+      }
+    },
+    "zappWallet.toggleBalanceCurrency": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toggle primary balance currency"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternar la moneda principal del saldo"
+          }
+        }
+      }
+    },
     "zecKeyboard.invalid": {
       "comment": "MARK: - ZEC Keyboard",
       "extractionState": "manual",
@@ -24771,97 +27705,6 @@
         }
       }
     },
-"offramp.account.copy": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Copy Base account"}},"es":{"stringUnit":{"state":"translated","value":"Copiar cuenta de Base"}}}},
-    "offramp.account.label": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your Base account"}},"es":{"stringUnit":{"state":"translated","value":"Tu cuenta de Base"}}}},
-    "offramp.addFunds.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add funds"}},"es":{"stringUnit":{"state":"translated","value":"Añadir fondos"}}}},
-    "offramp.addFunds.base": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add funds to Base"}},"es":{"stringUnit":{"state":"translated","value":"Añadir fondos a Base"}}}},
-    "offramp.checkpoint.discard": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard"}},"es":{"stringUnit":{"state":"translated","value":"Descartar"}}}},
-    "offramp.checkpoint.discard.confirm.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discarding hides local recovery for this order. Verify it is terminal before continuing."}},"es":{"stringUnit":{"state":"translated","value":"Al descartarlo se oculta la recuperación local de esta orden. Verifica que haya terminado antes de continuar."}}}},
-    "offramp.checkpoint.discard.confirm.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard saved payment?"}},"es":{"stringUnit":{"state":"translated","value":"¿Descartar el pago guardado?"}}}},
-    "offramp.checkpoint.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"A P2P payment is still in progress. Resume it before starting another payment, or discard it."}},"es":{"stringUnit":{"state":"translated","value":"Hay un pago P2P en curso. Reanúdalo antes de iniciar otro pago o descártalo."}}}},
-    "offramp.checkpoint.resume": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resume"}},"es":{"stringUnit":{"state":"translated","value":"Reanudar"}}}},
-    "offramp.checkpoint.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment already in progress"}},"es":{"stringUnit":{"state":"translated","value":"Ya hay un pago en curso"}}}},
-    "offramp.bridge.preview.unavailable": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The bridge quote is unavailable. Review it again."}},"es":{"stringUnit":{"state":"translated","value":"La cotización del puente no está disponible. Revísala de nuevo."}}}},
-    "offramp.bridge.preview.fee": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Network fee"}},"es":{"stringUnit":{"state":"translated","value":"Comisión de red"}}}},
-    "offramp.bridge.preview.time": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Estimated time"}},"es":{"stringUnit":{"state":"translated","value":"Tiempo estimado"}}}},
-    "offramp.history.balance": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"BASE BALANCE"}},"es":{"stringUnit":{"state":"translated","value":"SALDO EN BASE"}}}},
-    "offramp.history.empty": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"No P2P payments yet"}},"es":{"stringUnit":{"state":"translated","value":"Aún no hay pagos P2P"}}}},
-    "offramp.history.emptyDetail": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your completed and cancelled orders will appear here."}},"es":{"stringUnit":{"state":"translated","value":"Tus órdenes completadas y canceladas aparecerán aquí."}}}},
-    "offramp.history.fee": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Fee"}},"es":{"stringUnit":{"state":"translated","value":"Comisión"}}}},
-    "offramp.history.recent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Recent P2P payments"}},"es":{"stringUnit":{"state":"translated","value":"Pagos P2P recientes"}}}},
-    "offramp.history.recover": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Get funds back to ZEC"}},"es":{"stringUnit":{"state":"translated","value":"Recuperar fondos en ZEC"}}}},
-    "offramp.history.refund": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Return to ZEC"}},"es":{"stringUnit":{"state":"translated","value":"Devolver a ZEC"}}}},
-    "offramp.history.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"P2P transactions"}},"es":{"stringUnit":{"state":"translated","value":"Transacciones P2P"}}}},
-    "offramp.pay.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay"}},"es":{"stringUnit":{"state":"translated","value":"Pagar"}}}},
-    "offramp.pay.confirm": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Confirm payment"}},"es":{"stringUnit":{"state":"translated","value":"Confirmar pago"}}}},
-    "offramp.pay.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay a merchant"}},"es":{"stringUnit":{"state":"translated","value":"Pagar a un comercio"}}}},
-    "offramp.pay.updated.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The rate, fee, or required USDC changed. Review the updated quote before confirming."}},"es":{"stringUnit":{"state":"translated","value":"La tasa, la comisión o los USDC necesarios cambiaron. Revisa la cotización actualizada antes de confirmar."}}}},
-    "offramp.pay.updated.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Review updated payment quote"}},"es":{"stringUnit":{"state":"translated","value":"Revisar la cotización de pago actualizada"}}}},
-    "offramp.paymentMethod": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"P2P payment method"}},"es":{"stringUnit":{"state":"translated","value":"Método de pago P2P"}}}},
-    "offramp.paymentMethod.infoButton": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"How P2P payments work"}},"es":{"stringUnit":{"state":"translated","value":"Cómo funcionan los pagos P2P"}}}},
-    "offramp.paymentMethod.infoFlow": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"ZEC can be bridged to your self-custodial Base account, then exchanged through the P2P contract. Review the amount and rate before approving."}},"es":{"stringUnit":{"state":"translated","value":"Puedes transferir ZEC a tu cuenta autocustodiada de Base y cambiarlo mediante el contrato P2P. Revisa el importe y la tasa antes de aprobar."}}}},
-    "offramp.paymentMethod.infoRails": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Choose the country whose payment QR you want to scan. Zapp validates the matching UPI, PIX, QRIS, Mercado Pago, Pago Móvil, NIP, or Colombian transfer format on your device."}},"es":{"stringUnit":{"state":"translated","value":"Elige el país cuyo QR de pago quieres escanear. Zapp valida en tu dispositivo el formato UPI, PIX, QRIS, Mercado Pago, Pago Móvil, NIP o transferencia colombiana correspondiente."}}}},
-    "offramp.paymentMethod.infoTitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"How P2P payments work"}},"es":{"stringUnit":{"state":"translated","value":"Cómo funcionan los pagos P2P"}}}},
-    "offramp.progress": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment in progress"}},"es":{"stringUnit":{"state":"translated","value":"Pago en curso"}}}},
-    "offramp.progress.stopped": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment stopped"}},"es":{"stringUnit":{"state":"translated","value":"Pago detenido"}}}},
-    "offramp.progress.success": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Complete"}},"es":{"stringUnit":{"state":"translated","value":"Completado"}}}},
-    "offramp.quote.balance": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Available on Base"}},"es":{"stringUnit":{"state":"translated","value":"Disponible en Base"}}}},
-    "offramp.quote.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Review"}},"es":{"stringUnit":{"state":"translated","value":"Revisar"}}}},
-    "offramp.quote.fee": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Fixed fee"}},"es":{"stringUnit":{"state":"translated","value":"Comisión fija"}}}},
-    "offramp.quote.loading": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Getting quote…"}},"es":{"stringUnit":{"state":"translated","value":"Obteniendo cotización…"}}}},
-    "offramp.quote.rate": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Rate"}},"es":{"stringUnit":{"state":"translated","value":"Tasa"}}}},
-    "offramp.quote.shortfall": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add first"}},"es":{"stringUnit":{"state":"translated","value":"Añadir primero"}}}},
-    "offramp.quote.youPay": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"P2P order"}},"es":{"stringUnit":{"state":"translated","value":"Orden P2P"}}}},
-    "offramp.recipient": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Recipient"}},"es":{"stringUnit":{"state":"translated","value":"Destinatario"}}}},
-    "offramp.refund.confirm.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Return funds"}},"es":{"stringUnit":{"state":"translated","value":"Devolver fondos"}}}},
-    "offramp.refund.confirm.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your full Base USDC balance will be bridged back to this wallet as ZEC."}},"es":{"stringUnit":{"state":"translated","value":"Todo tu saldo USDC de Base se transferirá de vuelta a esta cartera como ZEC."}}}},
-    "offramp.refund.confirm.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Return Base funds to ZEC?"}},"es":{"stringUnit":{"state":"translated","value":"¿Devolver los fondos de Base a ZEC?"}}}},
-    "offramp.scan.library": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Photo library"}},"es":{"stringUnit":{"state":"translated","value":"Fototeca"}}}},
-    "offramp.scan.cameraError": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Camera access is unavailable. Allow camera access in Settings or choose a photo."}},"es":{"stringUnit":{"state":"translated","value":"El acceso a la cámara no está disponible. Permítelo en Ajustes o elige una foto."}}}},
-    "offramp.scan.photoError": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"No QR code was found in that photo."}},"es":{"stringUnit":{"state":"translated","value":"No se encontró ningún código QR en esa foto."}}}},
-    "offramp.scan.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Scan %@ QR"}},"es":{"stringUnit":{"state":"translated","value":"Escanear QR de %@"}}}},
-    "offramp.scan.titleFallback": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Scan payment QR"}},"es":{"stringUnit":{"state":"translated","value":"Escanear QR de pago"}}}},
-    "offramp.topup.amount": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Amount to add"}},"es":{"stringUnit":{"state":"translated","value":"Importe que añadir"}}}},
-    "offramp.topup.continue": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Review bridge"}},"es":{"stringUnit":{"state":"translated","value":"Revisar puente"}}}},
-    "offramp.topup.confirm.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Bridge funds"}},"es":{"stringUnit":{"state":"translated","value":"Transferir fondos"}}}},
-    "offramp.topup.confirm.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Confirm ZEC bridge"}},"es":{"stringUnit":{"state":"translated","value":"Confirmar puente de ZEC"}}}},
-    "offramp.topup.discard": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard saved top-up"}},"es":{"stringUnit":{"state":"translated","value":"Descartar recarga guardada"}}}},
-    "offramp.topup.discard.confirm.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard only after verifying the previous bridge cannot settle. Starting again may send ZEC twice."}},"es":{"stringUnit":{"state":"translated","value":"Descártala solo después de verificar que el puente anterior no puede completarse. Empezar de nuevo puede enviar ZEC dos veces."}}}},
-    "offramp.topup.discard.confirm.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Discard saved top-up?"}},"es":{"stringUnit":{"state":"translated","value":"¿Descartar la recarga guardada?"}}}},
-    "offramp.topup.resume.button": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resume top-up"}},"es":{"stringUnit":{"state":"translated","value":"Reanudar recarga"}}}},
-    "offramp.topup.resume.detail": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resume the saved bridge to avoid sending ZEC twice, or discard it only if you have verified it will not settle."}},"es":{"stringUnit":{"state":"translated","value":"Reanuda el puente guardado para evitar enviar ZEC dos veces, o descártalo solo si has verificado que no se liquidará."}}}},
-    "offramp.topup.resume.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Base top-up in progress"}},"es":{"stringUnit":{"state":"translated","value":"Recarga de Base en curso"}}}},
-    "offramp.topup.step1": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Approve the ZEC bridge"}},"es":{"stringUnit":{"state":"translated","value":"Aprobar el puente de ZEC"}}}},
-    "offramp.topup.step2": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Wait for USDC on Base"}},"es":{"stringUnit":{"state":"translated","value":"Esperar los USDC en Base"}}}},
-    "offramp.topup.step3": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Return and pay from your Base balance"}},"es":{"stringUnit":{"state":"translated","value":"Volver y pagar con tu saldo de Base"}}}},
-    "offramp.topup.testnet.detail": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Automatic ZEC bridging is unavailable on testnet. Send testnet USDC to this Base account."}},"es":{"stringUnit":{"state":"translated","value":"El puente automático de ZEC no está disponible en testnet. Envía USDC de prueba a esta cuenta de Base."}}}},
-    "offramp.topup.testnet.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Fund your testnet Base account"}},"es":{"stringUnit":{"state":"translated","value":"Añade fondos a tu cuenta de Base en testnet"}}}},
-    "offramp.topup.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Add funds to Base"}},"es":{"stringUnit":{"state":"translated","value":"Añadir fondos a Base"}}}},
-    "chatList.support.subtitleDefault": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Report issues, share feedback"}},"es":{"stringUnit":{"state":"translated","value":"Reporta problemas, comparte comentarios"}}}},
-    "chatList.support.tickets": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"%1$@ open ticket(s)"}},"es":{"stringUnit":{"state":"translated","value":"%1$@ ticket(s) abierto(s)"}}}},
-    "supportChat.category.feedback": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Feedback"}},"es":{"stringUnit":{"state":"translated","value":"Comentarios"}}}},
-    "supportChat.category.other": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Other"}},"es":{"stringUnit":{"state":"translated","value":"Otro"}}}},
-    "supportChat.category.problem": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Problem"}},"es":{"stringUnit":{"state":"translated","value":"Problema"}}}},
-    "supportChat.createFailed": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn’t open a support ticket. Check your connection and try again."}},"es":{"stringUnit":{"state":"translated","value":"No se pudo abrir un ticket de soporte. Revisa tu conexión e inténtalo de nuevo."}}}},
-    "supportChat.greeting.feedback": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"We’d love to hear your thoughts."}},"es":{"stringUnit":{"state":"translated","value":"Nos encantaría conocer tu opinión."}}}},
-    "supportChat.greeting.other": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"How can we help?"}},"es":{"stringUnit":{"state":"translated","value":"¿Cómo podemos ayudarte?"}}}},
-    "supportChat.greeting.problem": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Please describe the issue you’re experiencing."}},"es":{"stringUnit":{"state":"translated","value":"Describe el problema que estás experimentando."}}}},
-    "supportChat.inputPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Message"}},"es":{"stringUnit":{"state":"translated","value":"Mensaje"}}}},
-    "supportChat.leaveDialog.confirm": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Close"}},"es":{"stringUnit":{"state":"translated","value":"Cerrar"}}}},
-    "supportChat.leaveDialog.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This will remove the support conversation from your inbox. The Zapp team will also see it as closed."}},"es":{"stringUnit":{"state":"translated","value":"Esto eliminará la conversación de soporte de tu bandeja de entrada. El equipo de Zapp también la verá como cerrada."}}}},
-    "supportChat.leaveDialog.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Close support chat?"}},"es":{"stringUnit":{"state":"translated","value":"¿Cerrar chat de soporte?"}}}},
-    "supportChat.leaveNotice": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"User has left the chat."}},"es":{"stringUnit":{"state":"translated","value":"El usuario salió del chat."}}}},
-    "supportChat.overflow": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"More options"}},"es":{"stringUnit":{"state":"translated","value":"Más opciones"}}}},
-    "supportChat.overflow.close": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Close Support Chat"}},"es":{"stringUnit":{"state":"translated","value":"Cerrar chat de soporte"}}}},
-    "supportChat.pickTopic": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pick a topic"}},"es":{"stringUnit":{"state":"translated","value":"Elige un tema"}}}},
-    "supportChat.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zapp Support"}},"es":{"stringUnit":{"state":"translated","value":"Soporte de Zapp"}}}},
-    "supportTicket.closeDialog.confirm": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Close"}},"es":{"stringUnit":{"state":"translated","value":"Cerrar"}}}},
-    "supportTicket.closeDialog.message": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This will remove the ticket and its messages."}},"es":{"stringUnit":{"state":"translated","value":"Esto eliminará el ticket y sus mensajes."}}}},
-    "supportTicket.closeDialog.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Close this ticket?"}},"es":{"stringUnit":{"state":"translated","value":"¿Cerrar este ticket?"}}}},
-    "supportTicket.defaultLabel": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Ticket"}},"es":{"stringUnit":{"state":"translated","value":"Ticket"}}}},
-    "supportTicket.list.emptySubtitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Tap + to create a new ticket"}},"es":{"stringUnit":{"state":"translated","value":"Toca + para crear un nuevo ticket"}}}},
-    "supportTicket.list.emptyTitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"No support tickets"}},"es":{"stringUnit":{"state":"translated","value":"No hay tickets de soporte"}}}},
-    "supportTicket.list.new": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"New ticket"}},"es":{"stringUnit":{"state":"translated","value":"Nuevo ticket"}}}},
     "~%@ %@": {
       "localizations": {
         "en": {
@@ -24871,14 +27714,7 @@
           }
         }
       }
-    },
-    "chatList.previewUnread": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"%1$@ unread"}},"es":{"stringUnit":{"state":"translated","value":"%1$@ sin leer"}}}},
-    "chatProfile.secretScreenRecording": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Screen recording is on. Stop it before revealing this."}},"es":{"stringUnit":{"state":"translated","value":"La grabación de pantalla está activa. Deténla antes de revelar esto."}}}},
-    "chatRoom.imageViewer.save": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Save image"}},"es":{"stringUnit":{"state":"translated","value":"Guardar imagen"}}}},
-    "chatRoom.imageViewer.saveFailed": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Could not save image"}},"es":{"stringUnit":{"state":"translated","value":"No se pudo guardar la imagen"}}}},
-    "chatRoom.imageViewer.saveNoAccess": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zapp can't add to your photo library. Turn on photo access in Settings."}},"es":{"stringUnit":{"state":"translated","value":"Zapp no puede añadir a tu fototeca. Activa el acceso a fotos en Ajustes."}}}},
-    "chatRoom.imageViewer.saved": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Image saved"}},"es":{"stringUnit":{"state":"translated","value":"Imagen guardada"}}}},
-    "onboarding.seed.screenRecording": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Screen recording is on. Stop it before revealing your phrase."}},"es":{"stringUnit":{"state":"translated","value":"La grabación de pantalla está activa. Deténla antes de revelar tu frase."}}}}
+    }
   },
   "version": "1.1"
 }
