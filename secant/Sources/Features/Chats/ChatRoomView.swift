@@ -51,21 +51,8 @@ struct ChatRoomView: View {
                     .fill(ZappColors.border.color(colorScheme))
                     .frame(height: 1)
 
-                // A GIF can be several megabytes, so the composer says the send is under way
-                // rather than looking idle until it lands.
                 if store.isSendingMedia {
-                    HStack(spacing: Design.Spacing._sm) {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(ZappColors.textSubtle.color(colorScheme))
-
-                        Text(String(localizable: .chatRoomSendingMedia))
-                            .zappFont(.caption, style: ZappColors.textSubtle)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, Design.Spacing._xl)
-                    .padding(.top, Design.Spacing._md)
-                    .background(ZappColors.surface.color(colorScheme))
+                    ChatSendingMediaBanner()
                 } else if store.sendDidFail {
                     // Strictly richer than the bare sentence this replaced: a denied camera
                     // permission is recoverable only from Settings, so the banner offers the

@@ -15,6 +15,7 @@
 import ComposableArchitecture
 import Foundation
 import Testing
+import UIKit
 import ZappMessaging
 @testable import zodl_internal
 
@@ -500,6 +501,87 @@ private let supportTestUserKey = String(repeating: "a", count: 64)
 
         #expect(store.state.draft == "hello")
         #expect(store.state.sendDidFail)
+    }
+}
+
+// MARK: - Attachments
+
+/// Support tickets take the same attachments the room does, so they take the same bounds. These
+/// pin the two the room already had and support originally did not: one send at a time, and a
+/// refusal on size that says so.
+@Suite @MainActor struct SupportChatAttachmentTests {
+    private static func jpeg() throws -> Data {
+        try #require(UIImage(systemName: "circle")?.pngData())
+    }
+
+    /// An attachment can be several megabytes. Without the guard a second tap during the upload
+    /// sends the same capture twice.
+    @Test func aSecondCaptureIsIgnoredWhileTheFirstIsStillSending() async throws {
+        let calls = LockIsolated(0)
+        // Holds the first send open so the second arrives while it is genuinely still in flight.
+        let gate = TestClock()
+
+        let store = TestStore(initialState: SupportChat.State(conversationId: "ticket")) {
+            SupportChat()
+        } withDependencies: {
+            $0.zappMessaging.sendMedia = { conversationId, _, _, _, _ in
+                calls.withValue { $0 += 1 }
+                try await gate.sleep(for: .seconds(1))
+
+                return ZMMessage(
+                    id: "media",
+                    conversationId: conversationId,
+                    senderId: supportTestUserKey,
+                    content: "",
+                    timestamp: Date(timeIntervalSince1970: 5),
+                    isFromMe: true
+                )
+            }
+        }
+        store.exhaustivity = .off
+
+        let capture = try Self.jpeg()
+
+        await store.send(.cameraCaptured(capture))
+        #expect(store.state.isSendingMedia)
+
+        await store.send(.cameraCaptured(capture))
+
+        await gate.advance(by: .seconds(1))
+        await store.receive(\.mediaSendSucceeded)
+        await store.finish()
+
+        #expect(calls.value == 1)
+        #expect(!store.state.isSendingMedia)
+    }
+
+    /// Size is the one failure the sender can act on, so it gets its own message rather than the
+    /// generic "couldn't send".
+    @Test func anOversizedCaptureIsRefusedWithTheTooLargeMessage() async {
+        let store = TestStore(initialState: SupportChat.State(conversationId: "ticket")) {
+            SupportChat()
+        } withDependencies: {
+            $0.zappMessaging.sendMedia = { _, _, _, _, _ in
+                Issue.record("an oversized capture must never reach the wire")
+                return ZMMessage(
+                    id: "media",
+                    conversationId: "ticket",
+                    senderId: supportTestUserKey,
+                    content: "",
+                    timestamp: Date(timeIntervalSince1970: 5),
+                    isFromMe: true
+                )
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.cameraCaptured(Data(count: ChatMediaEncoder.maxInputBytes + 1)))
+        await store.receive(\.mediaTooLarge)
+        await store.finish()
+
+        #expect(!store.state.isSendingMedia)
+        #expect(store.state.sendDidFail)
+        #expect(store.state.sendFailureMessage == String(localizable: .chatRoomGifTooLarge))
     }
 }
 

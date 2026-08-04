@@ -39,6 +39,28 @@ struct ChatSendFailureBanner: View {
     }
 }
 
+/// The same strip while an attachment is on its way. A GIF or a photo can be several megabytes,
+/// so without this the composer looks idle for the whole upload and a slow send is
+/// indistinguishable from a tap that never registered.
+struct ChatSendingMediaBanner: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        HStack(spacing: Design.Spacing._sm) {
+            ProgressView()
+                .controlSize(.small)
+                .tint(ZappColors.textSubtle.color(colorScheme))
+
+            Text(String(localizable: .chatRoomSendingMedia))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, Design.Spacing._xl)
+        .padding(.top, Design.Spacing._md)
+        .background(ZappColors.surface.color(colorScheme))
+    }
+}
+
 enum ChatSendFailure {
     /// Derived from the message rather than tracked as its own flag: every path that clears
     /// `sendDidFail` already clears the message with it, so the button cannot be stranded on a

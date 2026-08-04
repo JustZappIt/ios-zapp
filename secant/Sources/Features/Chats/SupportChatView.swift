@@ -111,7 +111,9 @@ struct SupportChatView: View {
 
     @ViewBuilder
     private var failureBanner: some View {
-        if store.sendDidFail {
+        if store.isSendingMedia {
+            ChatSendingMediaBanner()
+        } else if store.sendDidFail {
             ChatSendFailureBanner(message: store.sendFailureMessage)
         }
     }
@@ -123,6 +125,7 @@ struct SupportChatView: View {
             draft: $store.draft.sending(\.draftChanged),
             isFocused: $isComposerFocused,
             isSendEnabled: store.isSendEnabled,
+            isMediaEnabled: !store.isSendingMedia,
             onAttach: {
                 isComposerFocused = false
                 store.send(.attachTapped)
@@ -329,6 +332,7 @@ private struct SupportComposer: View {
     @Binding var draft: String
     let isFocused: FocusState<Bool>.Binding
     let isSendEnabled: Bool
+    let isMediaEnabled: Bool
     let onAttach: () -> Void
     let onSend: () -> Void
 
@@ -341,6 +345,8 @@ private struct SupportComposer: View {
                     .background(ZappColors.surfaceInput.color(colorScheme))
             }
             .buttonStyle(.zappPress)
+            .disabled(!isMediaEnabled)
+            .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
             .accessibilityLabel(String(localizable: .chatRoomAttach))
 
             TextField(String(localizable: .supportChatInputPlaceholder), text: $draft, axis: .vertical)

@@ -52,6 +52,11 @@ struct SupportChat {
         var showsFileImporter = false
         var showsCamera = false
 
+        /// Same guard the room carries: an attachment can be several megabytes, so a second tap
+        /// while one is in flight would send it twice, and an idle-looking composer reads as a
+        /// tap that never registered.
+        var isSendingMedia = false
+
         var messageReceivedCancelId = UUID()
         var messagingStateCancelId = UUID()
 
@@ -119,7 +124,9 @@ struct SupportChat {
         case cameraDismissed
         case cameraCaptured(Data)
         case pickedItemChanged(PhotosPickerItem?)
+        case mediaSendSucceeded(ZMMessage)
         case mediaSendFailed
+        case mediaTooLarge
     }
 
     @Dependency(\.cameraCapture) var cameraCapture
@@ -428,10 +435,14 @@ extension SupportChat {
                 state.showsCamera = false
                 state.sendDidFail = false
 
-                guard let conversationId = state.conversationId else { return .none }
+                guard let conversationId = state.conversationId, !state.isSendingMedia else { return .none }
+
+                state.isSendingMedia = true
 
                 return .run { send in
                     let encoded = try ChatMediaEncoder.encode(data, supportedTypes: [UTType.jpeg])
+                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
                     let message = try await zappMessaging.sendMedia(
                         conversationId,
                         encoded.path,
@@ -439,17 +450,19 @@ extension SupportChat {
                         "",
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Support chat failed to send camera capture: \(error)")
-                    await send(.mediaSendFailed)
+                    await send(sendFailure(for: error))
                 }
 
             case .fileImported(let url):
                 state.showsFileImporter = false
                 state.sendDidFail = false
 
-                guard let conversationId = state.conversationId else { return .none }
+                guard let conversationId = state.conversationId, !state.isSendingMedia else { return .none }
+
+                state.isSendingMedia = true
 
                 return .run { send in
                     let encoded = try ChatFileEncoder.encode(url)
@@ -460,26 +473,37 @@ extension SupportChat {
                         encoded.fileName,
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Support chat failed to send file: \(error)")
-                    await send(.mediaSendFailed)
+                    await send(sendFailure(for: error))
                 }
 
             case .pickedItemChanged(let item):
                 state.pickedItem = nil
 
-                guard let item, let conversationId = state.conversationId else { return .none }
+                guard let item, let conversationId = state.conversationId, !state.isSendingMedia else { return .none }
 
                 state.sendDidFail = false
+                state.isSendingMedia = true
+                let supportedTypes = item.supportedContentTypes
 
                 return .run { send in
-                    guard let data = try await item.loadTransferable(type: Data.self) else {
+                    // `ChatPickedMedia` rather than `Data`: the picked image is streamed to a
+                    // temporary file instead of being materialised whole, which is what keeps a
+                    // large attachment from having to fit in memory. Same path the room takes.
+                    guard let imported = try await item.loadTransferable(type: ChatPickedMedia.self) else {
                         await send(.mediaSendFailed)
                         return
                     }
+                    defer { ChatMediaTemporaryFiles.remove(imported.fileURL) }
 
-                    let encoded = try ChatMediaEncoder.encode(data, supportedTypes: item.supportedContentTypes)
+                    let encoded = try ChatMediaEncoder.encode(
+                        fileURL: imported.fileURL,
+                        supportedTypes: supportedTypes
+                    )
+                    defer { ChatMediaTemporaryFiles.remove(URL(fileURLWithPath: encoded.path)) }
+
                     let message = try await zappMessaging.sendMedia(
                         conversationId,
                         encoded.path,
@@ -487,13 +511,27 @@ extension SupportChat {
                         "",
                         encoded.thumbnail
                     )
-                    await send(.messageReceived(message))
+                    await send(.mediaSendSucceeded(message))
                 } catch: { error, send in
                     LoggerProxy.error("Support chat failed to send media: \(error)")
-                    await send(.mediaSendFailed)
+                    await send(sendFailure(for: error))
                 }
 
+            case .mediaSendSucceeded(let message):
+                state.isSendingMedia = false
+                state.sendDidFail = false
+                state.sendFailureMessage = nil
+                state.insert(message)
+                return .none
+
+            case .mediaTooLarge:
+                state.isSendingMedia = false
+                state.sendDidFail = true
+                state.sendFailureMessage = String(localizable: .chatRoomGifTooLarge)
+                return .none
+
             case .mediaSendFailed:
+                state.isSendingMedia = false
                 state.sendDidFail = true
                 state.sendFailureMessage = nil
                 return .none
@@ -502,6 +540,12 @@ extension SupportChat {
                 return .none
             }
         }
+    }
+
+    /// A refusal on size is reportable ("that file is too big"); anything else is not something
+    /// the sender can act on, so it stays the generic failure.
+    private func sendFailure(for error: Error) -> Action {
+        (error as? ChatMediaEncoder.Failure) == .tooLarge ? .mediaTooLarge : .mediaSendFailed
     }
 }
 
