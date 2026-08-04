@@ -39,9 +39,8 @@ struct ChatSendFailureBanner: View {
     }
 }
 
-/// The same strip while an attachment is on its way. A GIF or a photo can be several megabytes,
-/// so without this the composer looks idle for the whole upload and a slow send is
-/// indistinguishable from a tap that never registered.
+/// The same strip while an attachment is on its way — a multi-megabyte GIF would otherwise leave
+/// the composer looking idle for the whole upload.
 struct ChatSendingMediaBanner: View {
     @Environment(\.colorScheme) private var colorScheme
 

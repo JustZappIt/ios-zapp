@@ -52,9 +52,7 @@ struct SupportChat {
         var showsFileImporter = false
         var showsCamera = false
 
-        /// Same guard the room carries: an attachment can be several megabytes, so a second tap
-        /// while one is in flight would send it twice, and an idle-looking composer reads as a
-        /// tap that never registered.
+        /// Same guard the room carries: blocks a second send while one is in flight.
         var isSendingMedia = false
 
         var messageReceivedCancelId = UUID()
@@ -489,9 +487,8 @@ extension SupportChat {
                 let supportedTypes = item.supportedContentTypes
 
                 return .run { send in
-                    // `ChatPickedMedia` rather than `Data`: the picked image is streamed to a
-                    // temporary file instead of being materialised whole, which is what keeps a
-                    // large attachment from having to fit in memory. Same path the room takes.
+                    // `ChatPickedMedia` rather than `Data` so a large attachment never has to fit
+                    // in memory. Same path the room takes.
                     guard let imported = try await item.loadTransferable(type: ChatPickedMedia.self) else {
                         await send(.mediaSendFailed)
                         return
@@ -542,8 +539,7 @@ extension SupportChat {
         }
     }
 
-    /// A refusal on size is reportable ("that file is too big"); anything else is not something
-    /// the sender can act on, so it stays the generic failure.
+    /// Size is the one failure the sender can act on, so it gets its own message.
     private func sendFailure(for error: Error) -> Action {
         (error as? ChatMediaEncoder.Failure) == .tooLarge ? .mediaTooLarge : .mediaSendFailed
     }

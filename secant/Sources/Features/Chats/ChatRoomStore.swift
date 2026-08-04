@@ -268,7 +268,6 @@ struct ChatRoom {
         case sendFailed(clientId: String, code: ZappMessagingFailureCode)
         case retrySendTapped(ZMMessage)
         case replyTapped(ZMMessage)
-        case copyMessageTapped(ZMMessage)
         case cancelReplyTapped
         case pickedItemChanged(PhotosPickerItem?)
         case mediaPasted(fileURL: URL, type: UTType)
@@ -686,11 +685,6 @@ struct ChatRoom {
                 state.replyingTo = message
                 return .none
 
-            case .copyMessageTapped(let message):
-                pasteboard.setString(message.content.redacted)
-                state.$toast.withLock { $0 = .top(String(localizable: .generalCopiedToTheClipboard)) }
-                return .none
-
             case .cancelReplyTapped:
                 state.replyingTo = nil
                 return .none
@@ -842,6 +836,7 @@ struct ChatRoom {
 
             case .copyAddressTapped(let address):
                 pasteboard.setString(RedactableString(address))
+                state.$toast.withLock { $0 = .top(String(localizable: .generalCopiedToTheClipboard)) }
                 return .none
 
             // Android toasts; the room's inline strip is iOS's equivalent transient surface, and

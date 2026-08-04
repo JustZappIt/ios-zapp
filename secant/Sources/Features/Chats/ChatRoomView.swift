@@ -54,9 +54,6 @@ struct ChatRoomView: View {
                 if store.isSendingMedia {
                     ChatSendingMediaBanner()
                 } else if store.sendDidFail {
-                    // Strictly richer than the bare sentence this replaced: a denied camera
-                    // permission is recoverable only from Settings, so the banner offers the
-                    // same deep link `ScanView` does.
                     ChatSendFailureBanner(message: store.sendFailureMessage)
                 }
 
@@ -422,8 +419,6 @@ private struct ChatRoomInputRow: View {
     let isSendEnabled: Bool
     let isMediaEnabled: Bool
     let showsGIFButton: Bool
-    /// The "+" opens the attachment sheet rather than mounting a `PhotosPicker` of its own — the
-    /// gallery is one option among several there, and the sheet is presented from the store.
     let onAttach: () -> Void
     let onSend: () -> Void
     let onGIF: () -> Void

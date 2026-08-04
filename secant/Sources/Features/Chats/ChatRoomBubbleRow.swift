@@ -33,6 +33,8 @@ struct ChatRoomBubbleRow: View {
         WithPerceptionTracking {
             bubble
                 .contentShape(Rectangle())
+                // Drives the link-preview fetch for this message.
+                .onAppear { store.send(.messageAppeared(message)) }
                 .onTapGesture {
                     handleTap()
                 }
@@ -92,8 +94,6 @@ struct ChatRoomBubbleRow: View {
             )
 
         case .text:
-            // The link card hangs under the bubble it belongs to, on the same edge, so a preview
-            // and the message that carries the link read as one unit.
             VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
                 ChatMessageBubble(
                     message: message,

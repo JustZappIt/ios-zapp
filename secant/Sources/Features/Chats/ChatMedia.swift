@@ -89,8 +89,8 @@ enum ChatMediaEncoder {
         )
     }
 
-    /// A camera capture already exists in memory. It is staged to a temporary file so it takes the
-    /// same bounded path as a picked one, rather than getting a second encoder of its own.
+    /// A camera capture already exists in memory; staged to a file so it takes the same bounded
+    /// path as a picked one rather than getting a second encoder.
     static func encode(_ data: Data, supportedTypes: [UTType]) throws -> Encoded {
         guard !data.isEmpty, data.count <= maxInputBytes else { throw Failure.tooLarge }
 
