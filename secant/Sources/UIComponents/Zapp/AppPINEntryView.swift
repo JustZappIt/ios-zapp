@@ -1,6 +1,6 @@
 //
 //  AppPINEntryView.swift
-//  Zashi
+//  Zapp
 //
 
 import SwiftUI

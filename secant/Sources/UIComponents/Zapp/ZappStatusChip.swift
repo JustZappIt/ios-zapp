@@ -21,6 +21,10 @@ struct ZappStatusChip: View {
         static let spacing: CGFloat = 6
         static let dotSize: CGFloat = 6
         static let iconSize: CGFloat = 12
+        /// A chip is ~22pt tall. When it is tappable that is under the 44pt HIG minimum, so the
+        /// tap area is padded out and given back — growing the target without growing the chip,
+        /// which would otherwise push out the headers it sits in.
+        static let tapHitSlop: CGFloat = 11
     }
 
     let text: String
@@ -31,9 +35,14 @@ struct ZappStatusChip: View {
 
     var body: some View {
         if let action {
-            Button(action: action) { chip }
-                .buttonStyle(.zappPress)
-                .accessibilityLabel(text)
+            Button(action: action) {
+                chip
+                    .padding(.vertical, Constants.tapHitSlop)
+                    .contentShape(Rectangle())
+                    .padding(.vertical, -Constants.tapHitSlop)
+            }
+            .buttonStyle(.zappPress)
+            .accessibilityLabel(text)
         } else {
             chip
         }
