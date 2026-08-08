@@ -51,13 +51,13 @@ struct ZappPillNavBar: View {
                 }
             }
             .padding(Constants.inset)
-            .background(Design.Surfaces.bgSecondary.color(colorScheme))
+            .background(ZappColors.navPill.color(colorScheme))
             .overlay(
                 Rectangle()
-                    .strokeBorder(Design.Surfaces.strokePrimary.color(colorScheme), lineWidth: 1)
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
             )
             .shadow(
-                color: Design.Text.primary.color(colorScheme).opacity(shadowOpacity),
+                color: ZappColors.shadow.color(colorScheme).opacity(shadowOpacity),
                 radius: Constants.shadowRestRadius + Constants.shadowLiftRadius * liftProgress,
                 y: Constants.shadowRestOffsetY + Constants.shadowLiftOffsetY * liftProgress
             )
@@ -91,20 +91,20 @@ struct ZappPillNavBar: View {
                     .zImage(
                         width: Constants.iconSize,
                         height: Constants.iconSize,
-                        style: isSelected ? Design.Btns.Primary.fg : Design.Text.tertiary
+                        style: isSelected ? ZappColors.onAccent : ZappColors.textMuted
                     )
 
                 if tab == .chats && chatUnreadCount > 0 {
                     unreadBadge
                 }
             }
-            .animation(.easeInOut(duration: 0.2), value: chatUnreadCount)
+            .animation(ZappMotion.content, value: chatUnreadCount)
             .frame(maxWidth: .infinity)
             .frame(height: Constants.cellHeight)
-            .background(isSelected ? Design.Surfaces.brandPrimary.color(colorScheme) : .clear)
+            .background(isSelected ? ZappColors.accent.color(colorScheme) : .clear)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.zappPress)
         .accessibilityLabel(tab.title)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }

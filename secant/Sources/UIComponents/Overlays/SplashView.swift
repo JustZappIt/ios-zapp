@@ -416,6 +416,7 @@ struct SplashView: View {
                         .frame(width: 64, height: 64)
                         .foregroundColor(.white)
                 }
+                .accessibilityLabel(String(localizable: .splashAuthTitle))
 
                 Text(localizable: .splashAuthTitle)
                     .font(.custom(FontFamily.Inter.semiBold.name, size: 20))

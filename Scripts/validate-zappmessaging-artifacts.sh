@@ -44,7 +44,7 @@ while addon="$(plutil -extract "addons.$index" raw -o - "$MANIFEST" 2>/dev/null)
   [ -d "$SDK_DIR/ios/Addons/$addon" ] || fail "addon $addon is missing"
   index=$((index + 1))
 done
-[ "$index" -eq 18 ] || fail "manifest contains $index addons; expected 18"
+[ "$index" -eq 15 ] || fail "manifest contains $index addons; expected 15"
 actual_addons="$(find "$SDK_DIR/ios/Addons" -maxdepth 1 -name '*.xcframework' -type d | wc -l | tr -d ' ')"
 [ "$actual_addons" -eq "$index" ] || fail "found $actual_addons addons; manifest contains $index"
 

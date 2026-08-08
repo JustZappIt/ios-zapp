@@ -10,6 +10,9 @@ struct ZappSearchField: View {
     private enum Constants {
         static let iconSize: CGFloat = 16
         static let clearSize: CGFloat = 12
+        /// Lifts the 12pt glyph to a 44pt tap target without growing the field: padding out,
+        /// claim the shape, pad back in — the same trick `ZappSegmentedSelector` uses.
+        static let clearHitSlop: CGFloat = 16
     }
 
     @Environment(\.colorScheme) private var colorScheme
@@ -35,6 +38,9 @@ struct ZappSearchField: View {
                 Button(action: onClear) {
                     Asset.Assets.Icons.xClose.image
                         .zImage(width: Constants.clearSize, height: Constants.clearSize, style: ZappColors.textSubtle)
+                        .padding(Constants.clearHitSlop)
+                        .contentShape(Rectangle())
+                        .padding(-Constants.clearHitSlop)
                 }
                 .buttonStyle(.zappPress)
                 .accessibilityLabel(String(localizable: .generalClear))

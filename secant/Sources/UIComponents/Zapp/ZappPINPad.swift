@@ -1,6 +1,6 @@
 //
 //  ZappPINPad.swift
-//  Zashi
+//  Zapp
 //
 
 import SwiftUI

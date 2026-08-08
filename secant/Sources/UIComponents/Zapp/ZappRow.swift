@@ -91,6 +91,9 @@ private enum ZappRowConstants {
     static let iconBoxSize: CGFloat = 36
     static let iconSize: CGFloat = 18
     static let trailingIconSize: CGFloat = 18
+    static let dividerHeight: CGFloat = 1
+    /// Clears the icon box and the gap after it, so an inset divider starts under the title.
+    static let dividerInsetLeading: CGFloat = 68
 }
 
 /// A chevron implies a tap target, so `action` is required — and, being non-optional, it is what a
@@ -203,9 +206,12 @@ struct ZappRowDivider: View {
     var body: some View {
         Rectangle()
             .fill(ZappColors.border.color(colorScheme))
-            .frame(height: 1)
-            .padding(.leading, inset ? 68 : 18)
-            .padding(.trailing, 18)
+            .frame(height: ZappRowConstants.dividerHeight)
+            .padding(
+                .leading,
+                inset ? ZappRowConstants.dividerInsetLeading : ZappRowConstants.horizontalPadding
+            )
+            .padding(.trailing, ZappRowConstants.horizontalPadding)
     }
 }
 

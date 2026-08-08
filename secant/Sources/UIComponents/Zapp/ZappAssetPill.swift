@@ -30,9 +30,8 @@ struct ZappAssetPill: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 9)
         .background(ZappColors.surface.color(colorScheme))
-        .clipShape(Capsule())
         .overlay {
-            Capsule()
+            Rectangle()
                 .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         }
         .accessibilityElement(children: .combine)

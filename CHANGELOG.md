@@ -85,6 +85,11 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [ZAPP-1] The floating tab bar now uses the correct colours in dark mode. Its shadow was being drawn in the theme's primary text colour, which is near-white in dark mode, so the bar sat in a pale glow instead of a shadow; the bar, its border and the selected tab now read from the Zapp palette like the rest of the app.
+- [ZAPP-1] The sync progress ring on the Pay screen now follows dark mode instead of always drawing its light-mode colours.
+- [ZAPP-1] Several small controls were too small to reliably hit: the clear button in search fields, and status chips that can be tapped, now meet the 44-point minimum touch target without changing how they look.
+- [ZAPP-1] The retry button on the Face ID / Touch ID lock screen is now announced properly by VoiceOver instead of being an unlabelled button.
+- [ZAPP-1] The asset selector on the Send screen is now square, matching every other surface in the app rather than being the one rounded pill.
 - [ZAPP-1] Sending a photo or file in a Zapp Support ticket now behaves like it does in a chat: the composer says the send is under way instead of looking idle, tapping "+" again mid-send no longer sends the same attachment twice, and a file that is too big says so rather than failing silently. Large photos are also no longer loaded into memory whole on their way out.
 - [ZAPP-1] The selected Chats tab icon now reads as two speech bubbles rather than a single dark shape. The filled version's two bubbles were separated by a gap too fine to survive being drawn at tab-bar size, so they merged together.
 - [ZAPP-1] Your recovery phrase and P2P wallet key are now also protected when a screen recording is ALREADY running. Previously Zapp only reacted to a recording that started while the phrase was on screen, so a recording begun beforehand captured it; both the chat profile's reveals and the onboarding backup screen now refuse to reveal anything and say why until the recording stops.

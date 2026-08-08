@@ -17,6 +17,8 @@ struct ZappTypeSpecimen: View {
     private static let tokens: [(String, ZappTextStyle)] = [
         ("display", .display),
         ("displaySecondary", .displaySecondary),
+        ("balanceDisplay", .balanceDisplay),
+        ("balanceFraction", .balanceFraction),
         ("screenTitle", .screenTitle),
         ("sectionTitle", .sectionTitle),
         ("eyebrow", .eyebrow),
