@@ -22578,6 +22578,60 @@
         }
       }
     },
+    "splash.authUnlockFaceID": {
+      "comment": "MARK: - Splash Screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock with Face ID"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloquear con Face ID"
+          }
+        }
+      }
+    },
+    "splash.authUnlockPasscode": {
+      "comment": "MARK: - Splash Screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock with passcode"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloquear con código"
+          }
+        }
+      }
+    },
+    "splash.authUnlockTouchID": {
+      "comment": "MARK: - Splash Screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock with Touch ID"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desbloquear con Touch ID"
+          }
+        }
+      }
+    },
     "supportChat.category.feedback": {
       "extractionState": "manual",
       "localizations": {

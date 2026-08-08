@@ -347,6 +347,17 @@ struct SplashView: View {
         default: return ""
         }
     }
+
+    /// The title and description are read as their own elements, so the button must name the action.
+    var authenticationLabel: String {
+        @Dependency(\.localAuthentication) var localAuthentication
+
+        switch localAuthentication.method() {
+        case .faceID: return String(localizable: .splashAuthUnlockFaceID)
+        case .touchID: return String(localizable: .splashAuthUnlockTouchID)
+        default: return String(localizable: .splashAuthUnlockPasscode)
+        }
+    }
     
     var hiIconYOffset: CGFloat {
         splashManager.lockScreen == .biometricRetry
@@ -416,7 +427,7 @@ struct SplashView: View {
                         .frame(width: 64, height: 64)
                         .foregroundColor(.white)
                 }
-                .accessibilityLabel(String(localizable: .splashAuthTitle))
+                .accessibilityLabel(authenticationLabel)
 
                 Text(localizable: .splashAuthTitle)
                     .font(.custom(FontFamily.Inter.semiBold.name, size: 20))
