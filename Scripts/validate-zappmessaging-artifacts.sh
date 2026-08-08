@@ -39,13 +39,28 @@ manifest_lock_hash="$(plutil -extract packageLockSHA256 raw -o - "$MANIFEST")"
 actual_lock_hash="$(shasum -a 256 "$SDK_DIR/package-lock.json" | awk '{print $1}')"
 [ "$manifest_lock_hash" = "$actual_lock_hash" ] || fail "package-lock.json does not match the generated artifacts"
 
+# Expected set is the SDK's own SPM link list, so a repin needs no edit here. bare-link never prunes
+# ios/Addons and the manifest is just a listing of it, so only Package.swift catches a stale framework.
+expected_addons="$(
+  sed -n '/^let addons = \[/,/^]/p' "$SDK_DIR/ios/Package.swift" 2>/dev/null |
+    grep -oE '"[^"]+"' | tr -d '"' | sed 's/$/.xcframework/' | sort || true
+)"
+[ -n "$expected_addons" ] || fail "could not read the addon list from ios/Package.swift"
+expected_count="$(printf '%s\n' "$expected_addons" | wc -l | tr -d ' ')"
+
+manifest_addons=""
 index=0
 while addon="$(plutil -extract "addons.$index" raw -o - "$MANIFEST" 2>/dev/null)"; do
   [ -d "$SDK_DIR/ios/Addons/$addon" ] || fail "addon $addon is missing"
+  manifest_addons="${manifest_addons}${addon}
+"
   index=$((index + 1))
 done
-[ "$index" -eq 15 ] || fail "manifest contains $index addons; expected 15"
-actual_addons="$(find "$SDK_DIR/ios/Addons" -maxdepth 1 -name '*.xcframework' -type d | wc -l | tr -d ' ')"
-[ "$actual_addons" -eq "$index" ] || fail "found $actual_addons addons; manifest contains $index"
+[ "$(printf '%s' "$manifest_addons" | sort)" = "$expected_addons" ] ||
+  fail "manifest lists $index addons, ios/Package.swift links $expected_count, and they differ"
+
+disk_addons="$(find "$SDK_DIR/ios/Addons" -maxdepth 1 -name '*.xcframework' -type d -exec basename {} \; | sort)"
+[ "$disk_addons" = "$expected_addons" ] ||
+  fail "ios/Addons does not match ios/Package.swift; it has stale or missing frameworks"
 
 echo "zappMessaging artifacts verified: source=$PINNED_REF bundle=$actual_bundle_hash addons=$index"

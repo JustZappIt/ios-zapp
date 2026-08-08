@@ -10,8 +10,7 @@ struct ZappSearchField: View {
     private enum Constants {
         static let iconSize: CGFloat = 16
         static let clearSize: CGFloat = 12
-        /// Lifts the 12pt glyph to a 44pt tap target without growing the field: padding out,
-        /// claim the shape, pad back in — the same trick `ZappSegmentedSelector` uses.
+        /// Lifts the 12pt glyph to a 44pt target without growing the field, as `ZappSegmentedSelector` does.
         static let clearHitSlop: CGFloat = 16
     }
 
