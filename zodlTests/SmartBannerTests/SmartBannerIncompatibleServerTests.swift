@@ -108,6 +108,23 @@ import Testing
         }
     }
 
+    @Test func recurringIncompatibleServerErrorRearmsTheFlag() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let store = makeStore()
+
+            await store.send(.synchronizerStateChanged(Self.syncState(.error(Self.incompatibleServerError))))
+            #expect(store.state.lastKnownErrorIsIncompatibleServer)
+
+            await store.send(.synchronizerStateChanged(Self.syncState(.upToDate)))
+            #expect(store.state.lastKnownErrorIsIncompatibleServer == false)
+
+            await store.send(.synchronizerStateChanged(Self.syncState(.error(Self.incompatibleServerError))))
+            #expect(store.state.lastKnownErrorIsIncompatibleServer)
+        }
+    }
+
     @Test func supportReportCarriesTheServerAndBranchIds() async {
         await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
