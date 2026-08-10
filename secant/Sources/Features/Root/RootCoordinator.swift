@@ -39,19 +39,16 @@ extension Root {
                     return .none
                 }
                 state.$selectedWalletAccount.withLock { $0 = walletAccount }
-                state.homeState.transactionListState.isInvalidated = true
-                state.autoUpdateSwapCandidates.removeAll()
+                let switchedEffect = accountSwitchedEffect(state: &state)
                 return .merge(
                     .send(.offramp(.cancelAll)),
-                    .send(.home(.smartBanner(.walletAccountChanged))),
-                    .send(.home(.walletBalances(.updateBalances))),
+                    switchedEffect,
                     .send(.loadContacts),
                     .send(.loadChatContacts),
                     .concatenate(
                         .send(.resolveMetadataEncryptionKeys),
                         .send(.loadUserMetadata)
                     ),
-                    .send(.fetchTransactionsForTheSelectedAccount),
                     // SECURITY (MOB-1352): end any open Flexa session bound to the previous account so a
                     // pending Flexa transaction request can't bind to the newly-selected account.
                     .cancel(id: state.CancelFlexaId)
@@ -75,17 +72,43 @@ extension Root {
                 state.path = nil
                 return .none
 
-            case .addKeystoneHWWalletCoordFlow(.path(.element(id: _, action: .accountHWWalletSelection(.accountImportSucceeded)))):
-                state.path = nil
-                state.autoUpdateSwapCandidates.removeAll()
+            case .addKeystoneHWWalletCoordFlow(.path(.element(id: _, action: .keystoneDeviceReady(.accountImportSucceeded)))):
+                // `AddHWWalletStore`'s `.loadedWalletAccounts` handler, fired immediately before
+                // this action within the same `.run` effect as `.accountImported`, writes
+                // `selectedWalletAccount` directly with no Root-visible switch action of its own.
+                // This is the earliest point Root can react, so transaction and balance refreshes
+                // happen now rather than waiting for `.keystoneConnected(.closeTapped)`. That close
+                // handler still refetches; the duplication is harmless because fetched payloads now
+                // carry account provenance. Navigation remains owned by the Keystone coordinator,
+                // so this arm leaves `state.path` untouched.
+                //
+                // Metadata must reload here too: transaction decoration reads the single in-memory
+                // `userMetadataProvider` state, which may still belong to the previous account. A
+                // newly imported account also has no metadata encryption keys yet, so resolving keys
+                // provisions every account just repopulated by `.loadedWalletAccounts` before
+                // `.loadUserMetadata` selects the imported account's metadata.
+                let switchedEffect = accountSwitchedEffect(state: &state)
                 return .merge(
+                    switchedEffect,
                     .send(.loadContacts),
                     .send(.loadChatContacts),
                     .concatenate(
                         .send(.resolveMetadataEncryptionKeys),
                         .send(.loadUserMetadata)
-                    ),
-                    .send(.fetchTransactionsForTheSelectedAccount)
+                    )
+                )
+
+            case .addKeystoneHWWalletCoordFlow(.path(.element(id: _, action: .accountHWWalletSelection(.accountImportSucceeded)))):
+                state.path = nil
+                let switchedEffect = accountSwitchedEffect(state: &state)
+                return .merge(
+                    switchedEffect,
+                    .send(.loadContacts),
+                    .send(.loadChatContacts),
+                    .concatenate(
+                        .send(.resolveMetadataEncryptionKeys),
+                        .send(.loadUserMetadata)
+                    )
                 )
 
             case .addKeystoneHWWalletCoordFlow(.path(.element(id: _, action: .keystoneConnected(.closeTapped)))):
@@ -109,15 +132,15 @@ extension Root {
 
             case .settings(.path(.element(id: _, action: .accountHWWalletSelection(.accountImportSucceeded)))):
                 state.path = nil
-                state.autoUpdateSwapCandidates.removeAll()
+                let switchedEffect = accountSwitchedEffect(state: &state)
                 return .merge(
+                    switchedEffect,
                     .send(.loadContacts),
                     .send(.loadChatContacts),
                     .concatenate(
                         .send(.resolveMetadataEncryptionKeys),
                         .send(.loadUserMetadata)
-                    ),
-                    .send(.fetchTransactionsForTheSelectedAccount)
+                    )
                 )
                 
                 // MARK: - Resync Wallet
@@ -652,6 +675,20 @@ extension Root {
                 exchangeRate.refreshExchangeRateUSD()
                 return .send(.sendCoordFlow(.sendForm(.addressUpdated(address))))
 
+                // MOB-1581: refresh immediately for every terminal send outcome that stored a
+                // transaction. An idle wallet may emit no sync event until the next block, and
+                // `sendFailed(_, false)` deliberately remains silent because nothing was stored.
+            case .scanCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendDone)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendPartial)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendFailed(_, true))))),
+                    .scanCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendDone)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendPartial)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendFailed(_, true))))),
+                    .scanCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendDone)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendPartial)))),
+                    .scanCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendFailed(_, true))))):
+                return .send(.fetchTransactionsForTheSelectedAccount)
+
                 // A scan started from a chat room unwinds back onto that room, the same way the
                 // send flow it feeds does. Every other entry point still unwinds to the tabs.
             case .scanCoordFlow(.scan(.cancelTapped)), .scanCoordFlow(.path(.element(id: _, action: .sendForm(.dismissRequired)))):
@@ -664,7 +701,7 @@ extension Root {
                 state.path = nil
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
-                return .none
+                return .send(.fetchTransactionsForTheSelectedAccount)
 
             case .scanCoordFlow(.path(.element(id: _, action: .sendResultSuccess(.closeTapped)))),
                     .scanCoordFlow(.path(.element(id: _, action: .sendResultFailure(.closeTapped)))),
@@ -701,6 +738,19 @@ extension Root {
 
                 // MARK: - Send Coord Flow
 
+                // MOB-1581: refresh immediately for every terminal send outcome that stored a
+                // transaction. `sendFailed(_, false)` stored nothing and must stay silent.
+            case .sendCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendDone)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendPartial)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .sendConfirmation(.sendFailed(_, true))))),
+                    .sendCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendDone)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendPartial)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .requestZecConfirmation(.sendFailed(_, true))))),
+                    .sendCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendDone)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendPartial)))),
+                    .sendCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendFailed(_, true))))):
+                return .send(.fetchTransactionsForTheSelectedAccount)
+
                 // A send started from a chat returns to that chat, the way Android's send screen
                 // pops back onto the room it was pushed from. Every other entry point still
                 // unwinds to the tabs.
@@ -722,7 +772,7 @@ extension Root {
                 state.path = nil
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
-                return .none
+                return .send(.fetchTransactionsForTheSelectedAccount)
 
                 // Android's `PrimaryButtonState.TopUp` → `TopUpArgs`. On iOS the bridge-funds
                 // corridor lives in Offramp; `addFundsTapped` is the action that opens its Top-Up
@@ -750,6 +800,11 @@ extension Root {
 
                 // MARK: - Sign with Keystone Coord Flow
 
+            case .signWithKeystoneCoordFlow(.sendConfirmation(.sendDone)),
+                    .signWithKeystoneCoordFlow(.sendConfirmation(.sendPartial)),
+                    .signWithKeystoneCoordFlow(.sendConfirmation(.sendFailed(_, true))):
+                return .send(.fetchTransactionsForTheSelectedAccount)
+
             case .signWithKeystoneCoordFlow(.path(.element(id: _, action: .sendResultSuccess(.closeTapped)))),
                     .signWithKeystoneCoordFlow(.path(.element(id: _, action: .sendResultFailure(.closeTapped)))),
                     .signWithKeystoneCoordFlow(.path(.element(id: _, action: .sendResultPending(.closeTapped)))):
@@ -758,7 +813,7 @@ extension Root {
 
             case .signWithKeystoneCoordFlow(.path(.element(id: _, action: .transactionDetails(.closeDetailTapped)))):
                 state.signWithKeystoneCoordFlowBinding = false
-                return .none
+                return .send(.fetchTransactionsForTheSelectedAccount)
 
                 // MARK: - Tor Setup
                 
@@ -767,6 +822,14 @@ extension Root {
                 return .send(.home(.smartBanner(.closeAndCleanupBanner)))
 
                 // MARK: - Swap and Pay Coord Flow
+
+            case .swapAndPayCoordFlow(.sendDone),
+                    .swapAndPayCoordFlow(.sendPartial),
+                    .swapAndPayCoordFlow(.sendFailed(_, true)),
+                    .swapAndPayCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendDone)))),
+                    .swapAndPayCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendPartial)))),
+                    .swapAndPayCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.sendFailed(_, true))))):
+                return .send(.fetchTransactionsForTheSelectedAccount)
 
             case .swapAndPayCoordFlow(.path(.element(id: _, action: .swapToZecSummary(.sentTheFundsButtonTapped)))):
                 state.path = nil
@@ -796,7 +859,7 @@ extension Root {
 
             case .swapAndPayCoordFlow(.path(.element(id: _, action: .transactionDetails(.closeDetailTapped)))):
                 state.path = nil
-                return .none
+                return .send(.fetchTransactionsForTheSelectedAccount)
 
                 // MARK: - Transactions Coord Flow
                 
@@ -850,5 +913,22 @@ extension Root {
             default: return .none
             }
         }
+    }
+
+    /// Applies the account-scoped reactions shared by a manual switch and every Keystone
+    /// auto-selection signal. The transaction fetch cancellation must finish before the refetch is
+    /// dispatched, or the switch could cancel its own work for the newly selected account.
+    private func accountSwitchedEffect(state: inout Root.State) -> Effect<Root.Action> {
+        state.autoUpdateSwapCandidates.removeAll()
+        state.homeState.transactionListState.isInvalidated = true
+        state.transactionsCoordFlowState.transactionsManagerState.isInvalidated = true
+        return .merge(
+            .send(.home(.smartBanner(.walletAccountChanged))),
+            .send(.home(.walletBalances(.updateBalances))),
+            .concatenate(
+                .cancel(id: state.CancelTransactionsFetchId),
+                .send(.fetchTransactionsForTheSelectedAccount)
+            )
+        )
     }
 }

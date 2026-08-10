@@ -298,8 +298,8 @@ import XCTestDynamicOverlay
         try await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
-            let markCalls = LockIsolated(0)
-            let store = makeUnifiedSendStore(markCalls: markCalls)
+            let markedAddresses = LockIsolated<[String]>([])
+            let store = makeUnifiedSendStore(markedAddresses: markedAddresses)
 
             store.send(
                 .path(
@@ -314,18 +314,19 @@ import XCTestDynamicOverlay
                 !store.state.path.filter { $0.is(\.keystoneFirmwareUpdate) }.isEmpty
             }
 
-            #expect(markCalls.value == 0)
+            #expect(markedAddresses.value.isEmpty)
         }
     }
 
     /// Once the unified send flow accepts the minimum firmware, it must perform the metadata write
-    /// that was deliberately removed from `.scan(.foundPCZT)`.
-    @Test func acceptedUnifiedSendSwapWritesSwapMetadata() async throws {
+    /// that was deliberately removed from `.scan(.foundPCZT)`. A nil quote uses the same fallback
+    /// address as the non-Keystone corridor.
+    @Test func acceptedUnifiedSendSwapWithNilQuoteUsesFallback() async throws {
         try await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
-            let markCalls = LockIsolated(0)
-            let store = makeUnifiedSendStore(markCalls: markCalls)
+            let markedAddresses = LockIsolated<[String]>([])
+            let store = makeUnifiedSendStore(markedAddresses: markedAddresses)
 
             store.send(
                 .path(
@@ -337,10 +338,68 @@ import XCTestDynamicOverlay
             )
 
             await waitForCoordFlowStore {
-                markCalls.value == 1
+                markedAddresses.value.count == 1
             }
 
-            #expect(markCalls.value == 1)
+            #expect(markedAddresses.value == ["utestfallbackaddress"])
+        }
+    }
+
+    /// A quote can exist before the provider has populated its deposit address. Match the
+    /// non-Keystone corridor by treating that empty value as absent instead of persisting it.
+    @Test func acceptedUnifiedSendSwapWithEmptyDepositAddressUsesFallback() async throws {
+        try await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let markedAddresses = LockIsolated<[String]>([])
+            let store = makeUnifiedSendStore(
+                markedAddresses: markedAddresses,
+                quoteDepositAddress: ""
+            )
+
+            store.send(
+                .path(
+                    .element(
+                        id: try #require(store.state.path.ids.last),
+                        action: .scan(.foundPCZT(signedPczt(stamp: (13, 0, 1))))
+                    )
+                )
+            )
+
+            await waitForCoordFlowStore {
+                markedAddresses.value.count == 1
+            }
+
+            #expect(markedAddresses.value == ["utestfallbackaddress"])
+        }
+    }
+
+    /// When the quote contains a deposit address, metadata must be keyed by that address rather
+    /// than the destination-chain recipient held in `swapState.address`.
+    @Test func acceptedUnifiedSendSwapUsesQuotedDepositAddress() async throws {
+        try await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let markedAddresses = LockIsolated<[String]>([])
+            let store = makeUnifiedSendStore(
+                markedAddresses: markedAddresses,
+                quoteDepositAddress: "utestquoteddepositaddress"
+            )
+
+            store.send(
+                .path(
+                    .element(
+                        id: try #require(store.state.path.ids.last),
+                        action: .scan(.foundPCZT(signedPczt(stamp: (13, 0, 1))))
+                    )
+                )
+            )
+
+            await waitForCoordFlowStore {
+                markedAddresses.value.count == 1
+            }
+
+            #expect(markedAddresses.value == ["utestquoteddepositaddress"])
         }
     }
 
@@ -373,10 +432,28 @@ import XCTestDynamicOverlay
         }
     }
 
-    private func makeUnifiedSendStore(markCalls: LockIsolated<Int>) -> StoreOf<SendCoordFlow> {
+    private func makeUnifiedSendStore(
+        markedAddresses: LockIsolated<[String]>,
+        quoteDepositAddress: String? = nil
+    ) -> StoreOf<SendCoordFlow> {
         var initialState = SendCoordFlow.State()
         initialState.mode = .swap
-        initialState.swapState.address = "utestdepositaddress"
+        initialState.swapState.address = "utestfallbackaddress"
+        if let quoteDepositAddress {
+            initialState.swapState.quote = SwapQuote(
+                depositAddress: quoteDepositAddress,
+                destinationAddress: initialState.swapState.address,
+                refundAddress: "utestrefundaddress",
+                originAssetId: "zec",
+                destinationAssetId: "eth-id",
+                amountIn: 1,
+                amountInUsd: "1.00",
+                minAmountIn: 0,
+                amountOut: 1,
+                amountOutUsd: "1.00",
+                timeEstimate: 60
+            )
+        }
         initialState.swapState.selectedAsset = SwapAsset(
             provider: "near",
             chain: "eth",
@@ -397,8 +474,8 @@ import XCTestDynamicOverlay
             SendCoordFlow()
         } withDependencies: {
             $0.mainQueue = .immediate
-            $0.userMetadataProvider.markTransactionAsSwapFor = { _, _, _, _, _, _, _, _, _ in
-                markCalls.withValue { $0 += 1 }
+            $0.userMetadataProvider.markTransactionAsSwapFor = { address, _, _, _, _, _, _, _, _ in
+                markedAddresses.withValue { $0.append(address) }
             }
             $0.userMetadataProvider.store = { _ in }
         }

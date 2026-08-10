@@ -56,13 +56,23 @@ extension Root {
                 guard let accountUUID = state.selectedWalletAccount?.id else {
                     return .none
                 }
+                // Account switches cancel this id explicitly before starting the new account's
+                // fetch. Do not add `cancelInFlight`: sync events can arrive every 0.2 seconds and
+                // would continually cancel slower reads before any could finish.
                 return .run { send in
                     if let transactions = try? await sdkSynchronizer.getAllTransactions(accountUUID) {
-                        await send(.fetchedTransactions(transactions))
+                        await send(.fetchedTransactions(accountUUID, transactions))
                     }
                 }
-                
-            case .fetchedTransactions(var transactions):
+                .cancellable(id: state.CancelTransactionsFetchId)
+
+            case .fetchedTransactions(let accountUUID, var transactions):
+                // `SyncStatus` streams are wallet-wide, so a fetch started for the previous account
+                // can finish after a switch. Never reconcile or decorate that stale payload; drop it
+                // whole unless its provenance still matches the selected account.
+                guard accountUUID == state.selectedWalletAccount?.id else {
+                    return .none
+                }
                 let mempoolHeight = sdkSynchronizer.latestState().latestBlockHeight + 1
 
                 // Resolve Swaps
@@ -117,7 +127,17 @@ extension Root {
                     }
                     return .send(.home(.smartBanner(.evaluatePriority6)))
                 }
-                return .none
+                // An identical result is still a completed refetch. Without a shared-state write,
+                // the transaction stores receive no publisher update and remain invalidated forever
+                // when switching between two empty accounts. Signal only stores actually waiting.
+                guard state.homeState.transactionListState.isInvalidated
+                    || state.transactionsCoordFlowState.transactionsManagerState.isInvalidated else {
+                    return .none
+                }
+                return .merge(
+                    .send(.home(.transactionList(.transactionsUpdated))),
+                    .send(.transactionsCoordFlow(.transactionsManager(.transactionsUpdated)))
+                )
 
             default: return .none
             }

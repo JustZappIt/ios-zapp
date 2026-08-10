@@ -4,11 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ZODL (formerly Zashi) is an iOS Zcash wallet built with SwiftUI and The Composable Architecture (TCA). It uses the Zcash Swift SDK (`ZcashLightClientKit`) for blockchain operations.
-
-## App name
-
-The app's name is always written **ZODL** — all uppercase. Whenever generated text refers to the app by name — UI strings (`Localizable.xcstrings`), code, comments, documentation, commit messages, PR titles/descriptions, etc. — it MUST be `ZODL`, never `Zodl` (nor `zodl`/`ZODl`). This rule is about the app name as a word; it does NOT change fixed technical identifiers such as the `zodl_internal` module, the `zodl-ios` repository, scheme names, or bundle IDs. The former name "Zashi" is unaffected.
+Zapp (formerly Zashi) is an iOS Zcash wallet built with SwiftUI and The Composable Architecture (TCA). It uses the Zcash Swift SDK (`ZcashLightClientKit`) for blockchain operations.
 
 ## Build & Development
 
@@ -46,6 +42,8 @@ The app's name is always written **ZODL** — all uppercase. Whenever generated 
 
 **Root feature** (`Features/Root/`) is the app coordinator - handles wallet initialization, navigation, and deep linking across 12 files.
 
+**Live home surfaces:** `HomeView` and `SmartBannerView` are unreachable legacy views. User-facing home and sync-error work belongs in `ZappTabsView`, `ZappPayView`, and `ZappSyncErrorSheet`.
+
 **Dependencies** use the `@DependencyClient` macro from `swift-dependencies` on a struct with `@Sendable` closures (Swift 6 concurrency). Layout per client:
 - `<Name>Interface.swift` - `@DependencyClient struct <Name>Client { ... }` plus the `DependencyValues` extension
 - `<Name>LiveKey.swift` - `liveValue` conformance for production
@@ -82,6 +80,11 @@ struct SomeCoordFlow {
 - **String interpolation** required over concatenation
 - **Features vs UI Components:** Features are standalone screens/flows; UI Components are reusable building blocks shared across features
 - **Commit messages:** `[#<issue_number>] <descriptive title>`
+- **Shared-state tests:** Pin `defaultInMemoryStorage` per test whenever using `@Shared(.inMemory(...))`; `@Suite(.serialized)` does not isolate concurrent suites.
+- **Regression tests:** Gate completion on explicit signals, never wall-clock timing, and assert non-default values so deleted wiring cannot pass vacuously.
+- **Support data tests:** Any test touching `SupportDataGenerator` must override `walletStorage`; resolving its live dependency fails at runtime in tests.
+- **Upstream ports:** Prefer `git cherry-pick -x` when the patch applies; rewrite only files that have genuinely diverged.
+- **Rationale comments:** When extracting or adapting code into a helper, carry the comments that explain security, data-loss, and ordering invariants.
 
 ## Design System
 
@@ -90,7 +93,7 @@ The app ships a complete design system — reusable SwiftUI components (`secant/
 - **Components:** Reuse the existing `UIComponents` (e.g. `ZashiButton`, plus the badges, text fields, toasts, sheets, toggles, toolbars, tooltips, etc. under `UIComponents/`) instead of hand-rolling new controls. Example: `ZashiButton(String(localizable: .generalRequest)) { action() }` — don't build a styled `Button` from scratch.
 - **Colors:** Use the generated palette — `Asset.Colors.<name>.color` (including the `Asset.Colors.ZDesign.*` semantic ramp). Never hardcode `Color(red:green:blue:)` or hex literals.
 - **Assets / icons:** Use bundled assets via `Asset.Assets.<name>.image` (namespaced, e.g. `Asset.Assets.Icons.*`, `Asset.Assets.Brandmarks.*`). Prefer these over SF Symbols (`Image(systemName:)`).
-- **Strings:** Every user-facing string goes into `Localizable.xcstrings` and is referenced with `String(localizable: .someKey)` — the established idiom (~850 call sites; there are no hardcoded display literals in views). Never put display strings directly in code. (Per **App name**, the app is always `ZODL` in those strings.)
+- **Strings:** Every user-facing string goes into `Localizable.xcstrings` and is referenced with `String(localizable: .someKey)` — the established idiom (~850 call sites; there are no hardcoded display literals in views). Never put display strings directly in code. Never round-trip the catalogue through `json.dump`, and never append a trailing newline; it must end with `}` and no `\n`.
 - **When the design system can't cover a need** — no suitable component, color, or asset exists — **stop and tell the user** instead of silently creating a one-off. Extend the design system deliberately, with the user's agreement, rather than diverging from it.
 
 > `Asset.*` symbols are SwiftGen-generated into `Sources/Generated/` — do not edit those files; add the asset/color to the `.xcassets` catalogue and let the build regenerate them.

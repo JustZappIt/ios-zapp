@@ -223,7 +223,7 @@ private actor OfframpNearBridgeWorker {
         let balances = try await sdkSynchronizer.getAccountsBalances()
         try requireActive()
         guard let balance = balances[account.id] else { throw OfframpBridgeError.balanceUnavailable }
-        let spendable = balance.saplingBalance.spendableValue + balance.orchardBalance.spendableValue
+        let spendable = balance.shieldedSpendableValue
         // Check the quoted principal before asking the SDK to build a proposal. Otherwise an empty
         // wallet can fail inside the SDK bridge as an opaque interop error before we can present the
         // Android-style spendable-balance validation.

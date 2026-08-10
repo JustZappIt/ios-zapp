@@ -61,6 +61,14 @@ struct Root {
         var CancelResyncStateId = UUID()
         var CancelStateId = UUID()
         var CancelTransactionsStateId = UUID()
+        /// The `.fetchTransactionsForTheSelectedAccount` fetch effect's own cancel id. An account
+        /// switch (`RootCoordinator.swift`'s `accountSwitchedEffect`) explicitly `.cancel`s this id
+        /// before sending a fresh fetch for the newly selected account, so work for the account
+        /// just left cannot land after the switch. This id deliberately does not use
+        /// `cancelInFlight`: sync events can dispatch faster than a fetch completes, which would
+        /// otherwise starve transaction updates. The payload provenance guard remains the
+        /// load-bearing protection against stale results.
+        var CancelTransactionsFetchId = UUID()
         var CancelBatteryStateId = UUID()
         var SynchronizerCancelId = UUID()
         var WalletConfigCancelId = UUID()
@@ -310,7 +318,7 @@ struct Root {
         case foundTransactions([ZcashTransaction.Overview])
         case minedTransaction(ZcashTransaction.Overview)
         case fetchTransactionsForTheSelectedAccount
-        case fetchedTransactions(IdentifiedArrayOf<TransactionState>)
+        case fetchedTransactions(AccountUUID, IdentifiedArrayOf<TransactionState>)
         case noChangeInTransactions
         
         // Address Book
@@ -679,10 +687,9 @@ extension Root {
     /// If not, clears the previous wallet's device-scoped state, wipes the database, and
     /// re-prepares so the SDK creates this seed's account. Returns `true` when a heal happened.
     ///
-    /// `knownStale` is reserved for an SDK result that can identify a mismatch without probing.
-    /// The current SDK cannot report that result, so production callers pass `false` and use
-    /// the relevance and derived-account probes. Keeping the final algorithm shape here makes
-    /// the later SDK-contract update isolated to the call site.
+    /// `knownStale` skips both probes when the SDK has already identified a seed/database
+    /// mismatch. This fast path is coupled to the SDK's result and error contract: after every
+    /// SDK bump, verify that both mismatch signals still reach this reconciliation helper.
     static func reconcileWalletDatabaseWithSeed(
         knownStale: Bool,
         seedBytes: [UInt8],
