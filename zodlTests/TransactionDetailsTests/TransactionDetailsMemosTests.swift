@@ -16,7 +16,7 @@ import ComposableArchitecture
 
 @Suite(.serialized) struct TransactionDetailsMemosTests {
     @Test @MainActor func memosLoadedDropsOnlyExactlyEmptyTextMemos() async throws {
-        await withDependencies {
+        try await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
             // Pins the ZIP-302 premise: an all-zero 512-byte memo parses as a text memo

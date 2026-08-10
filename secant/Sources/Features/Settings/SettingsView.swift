@@ -47,6 +47,7 @@ struct SettingsView: View {
 
                             ZappRowDivider(inset: true)
 
+                            #if VOTING_ENABLED
                             ZappRow(
                                 title: String(localizable: .settingsCoinholderPolling),
                                 icon: Asset.Assets.Icons.checkVerified.image,
@@ -57,6 +58,7 @@ struct SettingsView: View {
                             }
 
                             ZappRowDivider(inset: true)
+                            #endif
 
                             ZappRow(
                                 title: String(localizable: .settingsAdvanced),
@@ -189,6 +191,7 @@ struct SettingsView: View {
             .zashiSheet(isPresented: $store.isResyncHelpSheetPresented) {
                 resyncHelpSheetContent()
             }
+            #if VOTING_ENABLED
             .fullScreenCover(
                 item: $store.scope(state: \.votingCoordFlow, action: \.votingCoordFlow)
             ) { votingStore in
@@ -199,6 +202,7 @@ struct SettingsView: View {
                     VotingCoordFlowView(store: votingStore)
                 }
             }
+            #endif
         }
     }
 

@@ -21,6 +21,7 @@ extension Root {
             case onboarding
             case osStatusError
             case home
+            case ironwoodAnnouncement
             case welcome
         }
         

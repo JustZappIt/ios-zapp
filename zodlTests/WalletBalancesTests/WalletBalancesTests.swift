@@ -17,23 +17,31 @@ import ComposableArchitecture
     // MARK: - Computed props
 
     @Test func isProcessingZeroAvailableBalance() {
-        var transparentAboveThreshold = WalletBalances.State(shieldedBalance: .zero, totalBalance: Zatoshi(100), transparentBalance: Zatoshi(100))
-        transparentAboveThreshold.autoShieldingThreshold = Zatoshi(50)
-        #expect(!transparentAboveThreshold.isProcessingZeroAvailableBalance)
+        withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var transparentAboveThreshold = WalletBalances.State(shieldedBalance: .zero, totalBalance: Zatoshi(100), transparentBalance: Zatoshi(100))
+            transparentAboveThreshold.autoShieldingThreshold = Zatoshi(50)
+            #expect(!transparentAboveThreshold.isProcessingZeroAvailableBalance)
 
-        var shieldedZeroPending = WalletBalances.State(shieldedBalance: .zero, totalBalance: Zatoshi(10), transparentBalance: Zatoshi(10))
-        shieldedZeroPending.autoShieldingThreshold = Zatoshi(50)
-        #expect(shieldedZeroPending.isProcessingZeroAvailableBalance)
+            var shieldedZeroPending = WalletBalances.State(shieldedBalance: .zero, totalBalance: Zatoshi(10), transparentBalance: Zatoshi(10))
+            shieldedZeroPending.autoShieldingThreshold = Zatoshi(50)
+            #expect(shieldedZeroPending.isProcessingZeroAvailableBalance)
 
-        let hasShielded = WalletBalances.State(shieldedBalance: Zatoshi(100), totalBalance: Zatoshi(200), transparentBalance: Zatoshi(100))
-        #expect(!hasShielded.isProcessingZeroAvailableBalance)
+            let hasShielded = WalletBalances.State(shieldedBalance: Zatoshi(100), totalBalance: Zatoshi(200), transparentBalance: Zatoshi(100))
+            #expect(!hasShielded.isProcessingZeroAvailableBalance)
+        }
     }
 
     @Test func currencyValueIsEmptyWithoutConversionAndFormattedWithIt() {
-        var state = WalletBalances.State(totalBalance: Zatoshi(100_000_000))
-        #expect(state.currencyValue.isEmpty)
-        state.$currencyConversion.withLock { $0 = CurrencyConversion(.usd, ratio: 30, timestamp: 0) }
-        #expect(!state.currencyValue.isEmpty)
+        withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = WalletBalances.State(totalBalance: Zatoshi(100_000_000))
+            #expect(state.currencyValue.isEmpty)
+            state.$currencyConversion.withLock { $0 = CurrencyConversion(.usd, ratio: 30, timestamp: 0) }
+            #expect(!state.currencyValue.isEmpty)
+        }
     }
 
     @Test func isFiatAvailableReflectsFeatureFlagAndConversion() {
@@ -70,12 +78,7 @@ import ComposableArchitecture
     // MARK: - balanceUpdated(nil)
 
     @MainActor @Test func balanceUpdatedWithNilZerosBalancesAndMarksEverythingSpendable() async {
-        let store = TestStore(initialState: WalletBalances.State()) {
-            WalletBalances()
-        } withDependencies: {
-            $0.zcashSDKEnvironment.shieldingThreshold = { Zatoshi(1_000_000) }
-        }
-        store.exhaustivity = .off
+        let store = makeIsolatedStore()
         await store.send(.balanceUpdated(nil))
         #expect(store.state.shieldedBalance == .zero)
         #expect(store.state.totalBalance == .zero)
@@ -220,10 +223,14 @@ import ComposableArchitecture
 
     @MainActor
     private func makeStore(currencyConversion: CurrencyConversion? = nil) -> TestStoreOf<WalletBalances> {
-        var state = WalletBalances.State()
-        state.$currencyConversion.withLock { $0 = currencyConversion }
-        let store = TestStore(initialState: state) { WalletBalances() }
-        store.exhaustivity = .off
-        return store
+        withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = WalletBalances.State()
+            state.$currencyConversion.withLock { $0 = currencyConversion }
+            let store = TestStore(initialState: state) { WalletBalances() }
+            store.exhaustivity = .off
+            return store
+        }
     }
 }

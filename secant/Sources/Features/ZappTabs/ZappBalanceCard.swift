@@ -38,6 +38,7 @@ struct ZappBalanceCard: View {
     let tokenName: String
     let transactions: [TransactionState]
     let showZecAsPrimary: Bool
+    let onBalanceTapped: () -> Void
     let onToggleBalanceDisplay: () -> Void
     let onShieldTapped: () -> Void
 
@@ -66,48 +67,58 @@ struct ZappBalanceCard: View {
     }
 
     private var amount: some View {
-        Button(action: onToggleBalanceDisplay) {
-            VStack(alignment: .leading, spacing: 2) {
-                if let fiat, !showZecAsPrimary, !isSensitiveContentHidden {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
-                        Text(fiat.whole)
-                            .zappFont(Constants.hero, style: ZappColors.text)
-                            .contentTransition(.numericText())
+        VStack(alignment: .leading, spacing: 2) {
+            Button(action: onBalanceTapped) {
+                primaryAmount
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.zappPress)
+            .accessibilityIdentifier(PoolBalancesSheet.Accessibility.openButton)
 
-                        Text(fiat.fraction)
-                            .zappFont(Constants.heroFraction, style: ZappColors.textMuted)
-                            .contentTransition(.numericText())
-                    }
-                    .lineLimit(1)
-                    .minimumScaleFactor(Constants.heroMinimumScale)
-                    .animation(.easeOut(duration: Constants.heroTickerDuration), value: fiat.whole)
-
-                    Text("\(zecText) \(tokenName)")
-                        .zappFont(.caption, style: ZappColors.textMuted)
-                } else {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(zecText)
-                            .zappFont(Constants.hero, style: ZappColors.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(Constants.heroMinimumScale)
-                            .contentTransition(.numericText())
-                            .animation(.easeOut(duration: Constants.heroTickerDuration), value: zecText)
-
-                        Text(tokenName)
-                            .zappFont(Constants.ticker, style: ZappColors.textMuted)
-                    }
-
-                    if let fiat, !isSensitiveContentHidden {
+            if let fiat, !isSensitiveContentHidden {
+                Button(action: onToggleBalanceDisplay) {
+                    if showZecAsPrimary {
                         Text("\(fiat.whole)\(fiat.fraction)")
+                            .zappFont(.caption, style: ZappColors.textMuted)
+                    } else {
+                        Text("\(zecText) \(tokenName)")
                             .zappFont(.caption, style: ZappColors.textMuted)
                     }
                 }
+                .buttonStyle(.zappPress)
+                .contentShape(Rectangle())
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.zappPress)
-        .disabled(fiat == nil)
+    }
+
+    @ViewBuilder private var primaryAmount: some View {
+        if let fiat, !showZecAsPrimary, !isSensitiveContentHidden {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(fiat.whole)
+                    .zappFont(Constants.hero, style: ZappColors.text)
+                    .contentTransition(.numericText())
+
+                Text(fiat.fraction)
+                    .zappFont(Constants.heroFraction, style: ZappColors.textMuted)
+                    .contentTransition(.numericText())
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(Constants.heroMinimumScale)
+            .animation(.easeOut(duration: Constants.heroTickerDuration), value: fiat.whole)
+        } else {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(zecText)
+                    .zappFont(Constants.hero, style: ZappColors.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(Constants.heroMinimumScale)
+                    .contentTransition(.numericText())
+                    .animation(.easeOut(duration: Constants.heroTickerDuration), value: zecText)
+
+                Text(tokenName)
+                    .zappFont(Constants.ticker, style: ZappColors.textMuted)
+            }
+        }
     }
 
     private var breakdown: some View {

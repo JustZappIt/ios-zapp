@@ -86,6 +86,12 @@ extension WalletStorageClient: DependencyKey {
             exportTorSetupFlag: {
                 walletStorage.exportTorSetupFlag()
             },
+            importIronwoodAnnouncementFlag: { acknowledged in
+                try walletStorage.importIronwoodAnnouncementFlag(acknowledged)
+            },
+            exportIronwoodAnnouncementFlag: {
+                walletStorage.exportIronwoodAnnouncementFlag()
+            },
             importPINHash: { hash in
                 try walletStorage.importPINHash(hash)
             },

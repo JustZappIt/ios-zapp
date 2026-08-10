@@ -8,6 +8,7 @@
 import Testing
 import Foundation
 import Security
+import os
 @testable import zodl_internal
 
 extension WalletStorage.KeychainError {
@@ -131,5 +132,52 @@ extension WalletStorage.KeychainError {
         #expect(throws: (any Error).self) {
             try walletStorage.deleteData(forKey: "")
         }
+    }
+
+    // MARK: - Ironwood announcement flag
+
+    @Test func importIronwoodAnnouncementFlagUpdatesDuplicate() throws {
+        let updated = OSAllocatedUnfairLock<Bool>(initialState: false)
+        let storage = WalletStorage(secItem: SecItemClient(
+            copyMatching: { _, _ in errSecSuccess },
+            add: { _, _ in errSecDuplicateItem },
+            update: { _, _ in updated.withLock { $0 = true }; return errSecSuccess },
+            delete: { _ in errSecSuccess }
+        ))
+        try storage.importIronwoodAnnouncementFlag(true)
+        #expect(updated.withLock { $0 })
+    }
+
+    @Test func exportIronwoodAnnouncementFlagReturnsNilWhenAbsent() {
+        let storage = WalletStorage(secItem: SecItemClient(
+            copyMatching: { _, _ in errSecItemNotFound },
+            add: { _, _ in errSecSuccess }, update: { _, _ in errSecSuccess }, delete: { _ in errSecSuccess }
+        ))
+        #expect(storage.exportIronwoodAnnouncementFlag() == nil)
+    }
+
+    @Test func exportIronwoodAnnouncementFlagDecodesTrue() throws {
+        let data = try JSONEncoder().encode(true)
+        let storage = WalletStorage(secItem: SecItemClient(
+            copyMatching: { _, result in result = data as CFTypeRef; return errSecSuccess },
+            add: { _, _ in errSecSuccess }, update: { _, _ in errSecSuccess }, delete: { _ in errSecSuccess }
+        ))
+        #expect(storage.exportIronwoodAnnouncementFlag() == true)
+    }
+
+    @Test func resetZashiDoesNotDeleteIronwoodAnnouncementFlag() throws {
+        let deleted = OSAllocatedUnfairLock<[String]>(initialState: [])
+        let storage = WalletStorage(secItem: SecItemClient(
+            copyMatching: { _, _ in errSecSuccess }, add: { _, _ in errSecSuccess }, update: { _, _ in errSecSuccess },
+            delete: { query in
+                if let attributes = query as? [String: Any], let service = attributes[kSecAttrService as String] as? String {
+                    deleted.withLock { $0.append(service) }
+                }
+                return errSecSuccess
+            }
+        ))
+        try storage.resetZashi()
+        #expect(!deleted.withLock { $0 }.isEmpty)
+        #expect(!deleted.withLock { $0 }.contains(WalletStorage.Constants.zcashStoredIronwoodAnnouncementFlag))
     }
 }

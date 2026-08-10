@@ -79,7 +79,9 @@ struct Scan {
         case foundRequestZec(ParserResult)
         case foundAccounts(ZcashAccounts)
         case foundPCZT(Data)
+        #if VOTING_ENABLED
         case foundVotingDelegationPCZT(Data)
+        #endif
         case animatedQRProgress(Int, Int?, Int?)
         case scanFailed(ScanImageResult)
         case scan(RedactableString)
@@ -143,11 +145,13 @@ struct Scan {
                 state.progress = nil
                 return .none
 
+            #if VOTING_ENABLED
             case .foundVotingDelegationPCZT:
                 state.isAnythingFound = true
                 state.progress = nil
                 return .none
-                
+            #endif
+
             case .foundString:
                 state.isAnythingFound = true
                 return .none

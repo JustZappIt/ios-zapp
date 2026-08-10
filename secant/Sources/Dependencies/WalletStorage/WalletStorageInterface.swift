@@ -104,6 +104,11 @@ struct WalletStorageClient {
     var importTorSetupFlag: @Sendable (Bool) throws -> Void
     var exportTorSetupFlag: @Sendable () -> Bool? = { nil }
 
+    /// One-time Ironwood announcement acknowledgement. This is device-scoped
+    /// and deliberately survives a wallet reset.
+    var importIronwoodAnnouncementFlag: @Sendable (Bool) throws -> Void
+    var exportIronwoodAnnouncementFlag: @Sendable () -> Bool? = { nil }
+
     /// App lock PIN verifier
     var importPINHash: @Sendable (String) throws -> Void
     var exportPINHash: @Sendable () throws -> String?

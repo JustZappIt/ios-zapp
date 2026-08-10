@@ -31,6 +31,20 @@ extension Root {
                 .backToHomeFromServerSwitchTapped:
                 state.path = nil
                 return .none
+
+                // MARK: - Ironwood Announcement
+
+            case .ironwoodAnnouncement(.continueTapped):
+                // The child already wrote the acknowledgement. Routing through
+                // Destination rather than assigning directly delivers any
+                // stale-wallet-healed alert deferred while this screen was up.
+                return .send(.destination(.updateDestination(.home)))
+
+            case .settings(.path(.element(id: _, action: .advancedSettings(.debugResetIronwoodAnnouncementTapped)))):
+                // The debug row clears persistent acknowledgement; clear the
+                // session latch too so the gate can be exercised immediately.
+                state.ironwoodAnnouncementResolved = false
+                return .none
                 
                 // MARK: - Accounts
 

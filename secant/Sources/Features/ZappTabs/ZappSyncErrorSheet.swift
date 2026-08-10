@@ -18,20 +18,24 @@
 import SwiftUI
 
 struct ZappSyncErrorSheet: View {
+    enum PrimaryRemedy: Equatable {
+        case retry
+        case switchServer
+    }
+
     private enum Constants {
         static let iconSize: CGFloat = 24
         static let headerIconSize: CGFloat = 28
         static let rowVerticalPadding: CGFloat = 16
         static let rowHorizontalPadding: CGFloat = 16
         static let dividerInset: CGFloat = 8
-        static let height: CGFloat = 430
+        static let height: CGFloat = 540
     }
 
     @Environment(\.colorScheme) private var colorScheme
 
-    /// The raw synchronizer message. Android puts the stack trace in the *generic* error sheet
-    /// rather than this one, so it stays out of the body copy and travels with the support report.
     let errorMessage: String
+    let isIncompatibleServer: Bool
     let onTryAgain: () -> Void
     let onSwitchServer: () -> Void
     let onDisableTor: () -> Void
@@ -39,45 +43,55 @@ struct ZappSyncErrorSheet: View {
 
     static var detentHeight: CGFloat { Constants.height }
 
+    static func primaryRemedy(isIncompatibleServer: Bool) -> PrimaryRemedy {
+        isIncompatibleServer ? .switchServer : .retry
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header
+            // Generic SDK errors can include long diagnostic dumps. Keep the remedies reachable
+            // by scrolling the diagnostic region while the support action stays pinned below it.
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
 
-            VStack(spacing: 0) {
-                // Android's first and most-used remedy: reset the synchronizer and resync.
-                row(
-                    icon: Asset.Assets.Icons.refreshSingleCCW.image,
-                    label: String(localizable: .sheetSyncTimeoutRetry),
-                    action: onTryAgain
-                )
+                    VStack(spacing: 0) {
+                        if Self.primaryRemedy(isIncompatibleServer: isIncompatibleServer) == .switchServer {
+                            // Retrying cannot repair a consensus mismatch. Offer the route that can.
+                            row(
+                                icon: Asset.Assets.Icons.server.image,
+                                label: String(localizable: .sheetSyncTimeoutServer),
+                                action: onSwitchServer
+                            )
+                        } else {
+                            // Transient failures should retry without sending users into server setup.
+                            row(
+                                icon: Asset.Assets.Icons.refreshSingleCCW.image,
+                                label: String(localizable: .sheetSyncTimeoutRetry),
+                                action: onTryAgain
+                            )
+                        }
 
-                divider
+                        divider
 
-                row(
-                    icon: Asset.Assets.Icons.server.image,
-                    label: String(localizable: .sheetSyncTimeoutServer),
-                    action: onSwitchServer
-                )
-
-                divider
-
-                // Android hides this row when Tor is already off. iOS has no Tor flag on
-                // `SmartBanner.State`, and the pre-existing upstream sheet showed the row
-                // unconditionally too, so this keeps that behaviour rather than adding a
-                // dependency for it.
-                row(
-                    icon: Asset.Assets.Icons.powerOff.image,
-                    label: String(localizable: .sheetSyncTimeoutTor),
-                    action: onDisableTor
-                )
+                        // Android hides this row when Tor is already off. iOS has no Tor flag on
+                        // `SmartBanner.State`, and the pre-existing upstream sheet showed the row
+                        // unconditionally too, so this keeps that behaviour rather than adding a
+                        // dependency for it.
+                        row(
+                            icon: Asset.Assets.Icons.powerOff.image,
+                            label: String(localizable: .sheetSyncTimeoutTor),
+                            action: onDisableTor
+                        )
+                    }
+                    .padding(.top, Design.Spacing._xl)
+                }
             }
-            .padding(.top, Design.Spacing._xl)
-
-            Spacer(minLength: Design.Spacing._xl)
 
             ZappButton(title: String(localizable: .errorPageActionContactSupport)) {
                 onContactSupport()
             }
+            .padding(.top, Design.Spacing._xl)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -91,10 +105,16 @@ struct ZappSyncErrorSheet: View {
                     style: ZappColors.danger
                 )
 
-            Text(String(localizable: .sheetSyncTimeoutTitle))
+            Text(
+                String(
+                    localizable: isIncompatibleServer
+                        ? .smartBannerHelpSyncErrorIncompatibleServerTitle
+                        : .sheetSyncTimeoutTitle
+                )
+            )
                 .zappFont(.sectionTitle, style: ZappColors.text)
 
-            Text(String(localizable: .sheetSyncTimeoutDesc))
+            Text(errorMessage.isEmpty ? String(localizable: .sheetSyncTimeoutDesc) : errorMessage)
                 .zappFont(.caption, style: ZappColors.textSubtle)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)

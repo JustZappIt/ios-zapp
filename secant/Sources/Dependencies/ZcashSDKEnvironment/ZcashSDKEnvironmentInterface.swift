@@ -120,6 +120,9 @@ struct ZcashSDKEnvironment {
     }
     var exchangeRateIPRateLimit: @Sendable () -> TimeInterval = { 0 }
     var exchangeRateStaleLimit: @Sendable () -> TimeInterval = { 0 }
+    /// NU6.3 activation height. Unknown environments fail closed by treating
+    /// Ironwood as never active.
+    var ironwoodActivationHeight: @Sendable () -> BlockHeight = { .max }
     var memoCharLimit: @Sendable () -> Int = { 0 }
     var mnemonicWordsMaxCount: @Sendable () -> Int = { 0 }
     var network: @Sendable () -> ZcashNetwork = { ZcashNetworkBuilder.network(for: .testnet) }

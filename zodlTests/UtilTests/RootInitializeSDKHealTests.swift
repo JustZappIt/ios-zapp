@@ -174,6 +174,7 @@ import Testing
         #expect(removedKeys.value.contains(.appAuthenticationMethod))
         #expect(removedKeys.value.contains(.failedPINAttempts))
         #expect(removedKeys.value.contains(.pinLockoutEndTimestamp))
+        #expect(removedKeys.value.contains(.votingConfigOverrideURL))
         #expect(setBools.value[Root.Constants.udIsRestoringWallet] == true)
 
         await drain(store)

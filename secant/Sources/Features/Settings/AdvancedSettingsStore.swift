@@ -34,17 +34,25 @@ struct AdvancedSettings {
     }
 
     enum Action: Equatable {
+        case debugResetIronwoodAnnouncementTapped
         case operationAccessCheck(State.Operation)
         case operationAccessGranted(State.Operation)
     }
 
     @Dependency(\.localAuthentication) var localAuthentication
+    @Dependency(\.walletStorage) var walletStorage
 
     init() { }
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .debugResetIronwoodAnnouncementTapped:
+                // Root observes the same action to clear its session latch.
+                // No biometric gate is needed because this destroys nothing.
+                try? walletStorage.importIronwoodAnnouncementFlag(false)
+                return .none
+
             case .operationAccessCheck(let operation):
                 switch operation {
                 case .chooseServer, .torSetup:
