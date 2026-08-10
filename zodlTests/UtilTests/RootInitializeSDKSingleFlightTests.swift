@@ -13,10 +13,17 @@ import Testing
 @testable import zodl_internal
 
 // `Root.State` embeds feature states that are not `Equatable`, while `TestStore` requires an
-// equality witness. This test-scoped conformance compares only the latch asserted by this suite.
+// equality witness. Keep every Root integration-test field in this single conformance; declaring
+// another conformance in a sibling test file is a duplicate-conformance build error.
 extension Root.State: @retroactive Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.isInitializingSDK == rhs.isInitializingSDK
+            && lhs.isRestoringWallet == rhs.isRestoringWallet
+            && lhs.walletStatus == rhs.walletStatus
+            && lhs.appInitializationState == rhs.appInitializationState
+            && lhs.alert?.title == rhs.alert?.title
+            && lhs.alert?.message == rhs.alert?.message
+            && lhs.isStaleWalletHealedAlertPending == rhs.isStaleWalletHealedAlertPending
     }
 }
 

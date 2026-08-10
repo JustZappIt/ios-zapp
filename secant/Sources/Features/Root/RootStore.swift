@@ -70,6 +70,7 @@ struct Root {
         var zappMessagingCancelId = UUID()
         var chatNotificationTapCancelId = UUID()
         var automaticServerRefreshCancelId = UUID()
+        var staleWalletHealedAlertCancelId = UUID()
 
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
@@ -91,6 +92,7 @@ struct Root {
         var isInitializingSDK = false
         var isLockedInKeychainUnavailableState = false
         var isRestoringWallet = false
+        var isStaleWalletHealedAlertPending = false
         @Shared(.appStorage(.lastAuthenticationTimestamp)) var lastAuthenticationTimestamp: Int = 0
         var maxResetZashiAppAttempts = ResetZashiConstants.maxResetZashiAppAttempts
         var maxResetZashiSDKAttempts = ResetZashiConstants.maxResetZashiSDKAttempts
@@ -667,6 +669,95 @@ struct Root {
 }
 
 extension Root {
+    enum WalletDatabaseHealError: Error {
+        case wipeUnavailable
+        case viewOnlyDatabase
+        case reprepareFailed(underlying: Error)
+    }
+
+    /// After a `prepare`, verifies the opened wallet database actually belongs to `seedBytes`.
+    /// If not, clears the previous wallet's device-scoped state, wipes the database, and
+    /// re-prepares so the SDK creates this seed's account. Returns `true` when a heal happened.
+    ///
+    /// `knownStale` is reserved for an SDK result that can identify a mismatch without probing.
+    /// The current SDK cannot report that result, so production callers pass `false` and use
+    /// the relevance and derived-account probes. Keeping the final algorithm shape here makes
+    /// the later SDK-contract update isolated to the call site.
+    static func reconcileWalletDatabaseWithSeed(
+        knownStale: Bool,
+        seedBytes: [UInt8],
+        isSeedRelevant: ([UInt8]) async throws -> Bool,
+        hasSeedDerivedAccount: () async throws -> Bool,
+        clearDeviceScopedState: () async throws -> Void,
+        wipe: () async throws -> Void,
+        reprepare: () async throws -> Void
+    ) async throws -> Bool {
+        if !knownStale {
+            let seedIsRelevant = try await isSeedRelevant(seedBytes)
+            guard !seedIsRelevant else { return false }
+
+            guard try await hasSeedDerivedAccount() else {
+                throw WalletDatabaseHealError.viewOnlyDatabase
+            }
+        }
+
+        try await clearDeviceScopedState()
+        try await wipe()
+
+        do {
+            try await reprepare()
+        } catch {
+            throw WalletDatabaseHealError.reprepareFailed(underlying: error)
+        }
+
+        return true
+    }
+
+    /// Clears device/global-scoped wallet state that must never leak from one wallet into
+    /// the next on the same device. Shared by explicit reset and stale-database healing.
+    ///
+    /// Synchronous on purpose. The Zapp messaging worklet and offramp session have async
+    /// teardown APIs, so the heal closure performs those separately before wiping the SDK.
+    static func clearDeviceScopedWalletState(
+        userDefaults: UserDefaultsClient,
+        flexaHandler: FlexaHandlerClient,
+        userStoredPreferences: UserPreferencesStorageClient,
+        readTransactionsStorage: ReadTransactionsStorageClient,
+        chatContacts: ChatContactsClient,
+        walletAccounts: [WalletAccount]
+    ) {
+        userDefaults.remove(Constants.udIsRestoringWallet)
+        userDefaults.remove(Constants.udIsResyncingWallet)
+        userDefaults.remove(Constants.udLeavesScreenOpen)
+        userDefaults.remove(.hasSeenHowToVote)
+        userDefaults.remove(.hasSeenHowToVoteKeystone)
+        userDefaults.remove(.appAuthenticationMethod)
+        userDefaults.remove(.failedPINAttempts)
+        userDefaults.remove(.pinLockoutEndTimestamp)
+        userDefaults.remove(.votingConfigOverrideURL)
+        userDefaults.remove(.votingCustomChains)
+
+        if let documents = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)
+            .first {
+            let votingDbURL = documents.appendingPathComponent("voting.sqlite3")
+            try? FileManager.default.removeItem(at: votingDbURL)
+        }
+
+        let standardDefaults = UserDefaults.standard
+        for key in standardDefaults.dictionaryRepresentation().keys
+            where key.hasPrefix("voting.voteRecord.") || key.hasPrefix("voting.draftVotes.") {
+            standardDefaults.removeObject(forKey: key)
+        }
+
+        flexaHandler.signOut()
+        userStoredPreferences.removeAll()
+        try? readTransactionsStorage.resetZashi()
+        walletAccounts.forEach { account in
+            try? chatContacts.resetAccount(account.account)
+        }
+    }
+
     static func walletInitializationState(
         databaseFiles: DatabaseFilesClient,
         walletStorage: WalletStorageClient,
@@ -698,6 +789,17 @@ extension Root {
         }
         
         return .uninitialized
+    }
+
+    /// Defers the heal notice until SwiftUI has settled on the home destination. The dedicated
+    /// cancellation ID only supersedes another delivery of this same notice; delivery re-checks
+    /// the destination because navigating away does not itself cancel this effect.
+    func presentStaleWalletHealedAlertEffect(cancelId: UUID) -> Effect<Root.Action> {
+        .run { send in
+            try await mainQueue.sleep(for: .seconds(0.5))
+            await send(.initialization(.presentStaleWalletHealedAlert))
+        }
+        .cancellable(id: cancelId, cancelInFlight: true)
     }
 }
 
@@ -811,6 +913,14 @@ extension AlertState where Action == Root.Action {
             }
         } message: {
             TextState(String(localizable: .rootExistingWalletMessage))
+        }
+    }
+
+    static func staleWalletDatabaseHealed() -> AlertState {
+        AlertState {
+            TextState(String(localizable: .rootInitializationAlertStaleWalletDatabaseHealedTitle))
+        } message: {
+            TextState(String(localizable: .rootInitializationAlertStaleWalletDatabaseHealedMessage))
         }
     }
     
