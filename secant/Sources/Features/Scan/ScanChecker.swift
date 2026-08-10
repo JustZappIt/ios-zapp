@@ -102,6 +102,7 @@ struct SwapStringScanChecker: ScanChecker, Equatable {
     }
 }
 
+#if VOTING_ENABLED
 struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
     let id = 5
 
@@ -123,6 +124,7 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
         return nil
     }
 }
+#endif
 
 /// A chat peer's Ed25519 public key — 64 hex characters, optionally `0x`-prefixed. `parse`
 /// applies Android's strict rule rather than the lenient paste sanitizer, so anything else —
@@ -148,7 +150,9 @@ struct ScanCheckerWrapper: Equatable, Sendable {
     static let keystoneScanChecker = ScanCheckerWrapper(KeystoneScanChecker())
     static let keystonePCZTScanChecker = ScanCheckerWrapper(KeystonePcztScanChecker())
     static let swapStringScanChecker = ScanCheckerWrapper(SwapStringScanChecker())
+    #if VOTING_ENABLED
     static let keystoneVotingDelegationPCZTScanChecker = ScanCheckerWrapper(KeystoneVotingDelegationPcztScanChecker())
+    #endif
     static let chatPublicKeyScanChecker = ScanCheckerWrapper(ChatPublicKeyScanChecker())
 
     static func == (lhs: ScanCheckerWrapper, rhs: ScanCheckerWrapper) -> Bool {

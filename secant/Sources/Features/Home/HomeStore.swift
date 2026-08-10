@@ -16,6 +16,10 @@ struct Home {
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var isInAppBrowserKeystoneOn = false
         var isFiatFallbackLoading = false
+        /// Store-owned so Ironwood can see and preserve the live Zapp sheet across a temporary
+        /// Home unmount. Local view state would be lost when the announcement takes over Root.
+        var isZappPoolBalancesSheetPresented = false
+        var isZappSyncErrorSheetPresented = false
         var isRateEducationEnabled = false
         var isRateTooltipEnabled = false
         var migratingDatabase = true

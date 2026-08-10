@@ -95,6 +95,13 @@ struct Root {
         var homeState: Home.State = .initial
         var zappTabsState: ZappTabs.State = .initial
         var zappMessagingState = ZappMessagingState()
+        /// In-memory, per-session latch set once the Ironwood announcement gate
+        /// has resolved: either the screen was presented or the keychain flag
+        /// was already true. It keeps an acknowledged device to one keychain
+        /// read per session and prevents repeat presentation. It is deliberately
+        /// not persisted, so force-quitting before Continue shows the screen
+        /// again in the next session.
+        var ironwoodAnnouncementResolved = false
         /// Single-flight latch for wallet initialization. `prepareWith` must complete before a
         /// foreground re-entry can safely start another initialization attempt.
         var isInitializingSDK = false
@@ -146,6 +153,7 @@ struct Root {
         var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
         var groupInfoState = GroupInfo.State.initial
+        var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
         var offrampState = Offramp.State.initial()
         var receiveState = Receive.State.initial
@@ -213,6 +221,25 @@ struct Root {
             bgTask == nil && !isServerSetupVisible && !isSensitiveFlowActive
         }
 
+        /// Gate for taking the screen over with the one-time announcement.
+        /// `path == nil` excludes every pushed Root flow (including Zapp's chat,
+        /// offramp, payment, settings, and support destinations). The remaining
+        /// terms cover presentation states outside `Path`: Keystone signing,
+        /// Server Setup, background work, alerts, and the two live Zapp Pay sheets. Upstream
+        /// Home informational sheets keep their bindings in child state and can re-present, but
+        /// interrupting either actionable Zapp sheet would discard in-progress user context.
+        var canPresentIronwoodAnnouncement: Bool {
+            destinationState.destination == .home
+                && path == nil
+                && !signWithKeystoneCoordFlowBinding
+                && !serverSetupViewBinding
+                && !homeState.isZappPoolBalancesSheetPresented
+                && !homeState.isZappSyncErrorSheetPresented
+                && bgTask == nil
+                && alert == nil
+                && splashAppeared
+        }
+
         init(
             appInitializationState: InitializationState = .uninitialized,
             appStartState: AppStartState = .unknown,
@@ -263,6 +290,7 @@ struct Root {
         case home(Home.Action)
         case zappTabs(ZappTabs.Action)
         case initialization(InitializationAction)
+        case ironwoodAnnouncement(IronwoodAnnouncement.Action)
         case notEnoughFreeSpace(NotEnoughFreeSpace.Action)
         case resetZashiFinishProcessing
         case resetZashiKeychainFailed(OSStatus)
@@ -384,7 +412,9 @@ struct Root {
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
+    #if VOTING_ENABLED
     @Dependency(\.votingMetadata) var votingMetadata
+    #endif
     @Dependency(\.walletConfigProvider) var walletConfigProvider
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.readTransactionsStorage) var readTransactionsStorage
@@ -395,7 +425,7 @@ struct Root {
     init() { }
     
     /// Split into chunks purely for stack budget: a single `@ReducerBuilder` holding all
-    /// 43 elements needs more than the 1 MB main thread stack to materialise, and `body`
+    /// 47 elements needs more than the 1 MB main thread stack to materialise, and `body`
     /// is rebuilt on every action, so it overflowed during `didFinishLaunching`. The
     /// chunks must stay in this order — reducer order is semantic.
     @ReducerBuilder<State, Action>
@@ -549,6 +579,10 @@ struct Root {
 
         Scope(state: \.swapAndPayCoordFlowState, action: \.swapAndPayCoordFlow) {
             SwapAndPayCoordFlow()
+        }
+
+        Scope(state: \.ironwoodAnnouncementState, action: \.ironwoodAnnouncement) {
+            IronwoodAnnouncement()
         }
     }
 
@@ -736,12 +770,20 @@ extension Root {
         userDefaults.remove(Constants.udIsRestoringWallet)
         userDefaults.remove(Constants.udIsResyncingWallet)
         userDefaults.remove(Constants.udLeavesScreenOpen)
-        userDefaults.remove(.hasSeenHowToVote)
-        userDefaults.remove(.hasSeenHowToVoteKeystone)
+
+        // Authentication lockout is device-scoped, independent of the disabled Voting feature.
+        // Keep these outside and above VOTING_ENABLED so wallet reset always clears them.
         userDefaults.remove(.appAuthenticationMethod)
         userDefaults.remove(.failedPINAttempts)
         userDefaults.remove(.pinLockoutEndTimestamp)
+
+        // Keep clearing the user-supplied service override even while Voting is compiled out. It
+        // must not silently become active for a different wallet if the feature is re-enabled.
         userDefaults.remove(.votingConfigOverrideURL)
+
+        #if VOTING_ENABLED
+        userDefaults.remove(.hasSeenHowToVote)
+        userDefaults.remove(.hasSeenHowToVoteKeystone)
         userDefaults.remove(.votingCustomChains)
 
         if let documents = FileManager.default
@@ -756,6 +798,7 @@ extension Root {
             where key.hasPrefix("voting.voteRecord.") || key.hasPrefix("voting.draftVotes.") {
             standardDefaults.removeObject(forKey: key)
         }
+        #endif
 
         flexaHandler.signOut()
         userStoredPreferences.removeAll()

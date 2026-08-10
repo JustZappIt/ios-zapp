@@ -26,7 +26,13 @@ struct SyncStatusSnapshot: Equatable {
             return SyncStatusSnapshot(state, String(localizable: .syncMessageUnprepared))
             
         case .error(let error):
-            return SyncStatusSnapshot(state, String(localizable: .syncMessageError(error.toZcashError().detailedMessage)))
+            let zcashError = error.toZcashError()
+            // This is already readable prose and includes the server and support diagnostics, so it
+            // should not receive the generic "Error: " prefix or the SDK's raw enum dump.
+            if let message = zcashError.incompatibleServerMessage {
+                return SyncStatusSnapshot(state, message)
+            }
+            return SyncStatusSnapshot(state, String(localizable: .syncMessageError(zcashError.detailedMessage)))
 
         case .stopped:
             return SyncStatusSnapshot(state, String(localizable: .syncMessageStopped))

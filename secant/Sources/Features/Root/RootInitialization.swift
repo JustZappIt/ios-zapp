@@ -73,6 +73,13 @@ extension Root {
                     }
                 }
                 state.appStartState = .willEnterForeground
+                // Run after biometric handling, whose splash mutation is an
+                // input to the announcement safety gate. The in-memory chain
+                // tip survives backgrounding, so no new sync tick is required.
+                presentIronwoodAnnouncementIfNeeded(
+                    state: &state,
+                    tip: sdkSynchronizer.latestState().latestBlockHeight
+                )
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
                     return .send(.initialization(.initialSetups))
                 } else {
@@ -116,6 +123,11 @@ extension Root {
                 }
                 
             case .synchronizerStateChanged(let latestState):
+                // Keep this above every early return. A fresh install may not
+                // have a selected account yet, and background work is excluded
+                // by the announcement's own safety gate.
+                presentIronwoodAnnouncementIfNeeded(state: &state, tip: latestState.data.latestBlockHeight)
+
                 let snapshot = SyncStatusSnapshot.snapshotFor(state: latestState.data.syncStatus)
 
                 guard let account = state.selectedWalletAccount else {
@@ -668,7 +680,9 @@ extension Root {
                     state.walletAccounts.forEach { account in
                         try? userMetadataProvider.resetAccount(account.account)
                         try? addressBook.resetAccount(account.account)
+                        #if VOTING_ENABLED
                         try? votingMetadata.resetAccount(account.account)
+                        #endif
                     }
                 }
                 // Outside the `areMetadataPreserved` guard on purpose: the chat
@@ -680,7 +694,9 @@ extension Root {
                 }
                 state.autoUpdateSwapCandidates.removeAll()
                 try? userMetadataProvider.reset()
+                #if VOTING_ENABLED
                 votingMetadata.reset()
+                #endif
                 state.$walletStatus.withLock { $0 = .none }
                 state.$selectedWalletAccount.withLock { $0 = nil }
                 state.$walletAccounts.withLock { $0 = [] }
@@ -896,5 +912,32 @@ extension Root {
             return true
         default: return false
         }
+    }
+
+    /// Presents the one-time Ironwood announcement after activation when the
+    /// device has not acknowledged it and Root is safe to take over.
+    ///
+    /// Guard order is load-bearing: the session latch short-circuits resolved
+    /// sessions; the known, activated tip is checked before any keychain read;
+    /// only a stored `true` counts as acknowledged and then consumes the latch;
+    /// and a failed presentation-safety check does not consume the latch, so a
+    /// later sync tick or foreground entry can retry.
+    func presentIronwoodAnnouncementIfNeeded(state: inout Root.State, tip: BlockHeight) {
+        guard !state.ironwoodAnnouncementResolved else { return }
+        guard tip > 0, tip >= zcashSDKEnvironment.ironwoodActivationHeight() else { return }
+        guard walletStorage.exportIronwoodAnnouncementFlag() != true else {
+            state.ironwoodAnnouncementResolved = true
+            return
+        }
+        guard state.canPresentIronwoodAnnouncement else { return }
+
+        state.ironwoodAnnouncementResolved = true
+        // Direct assignment is intentional. Both call sites already have their
+        // own early-return paths, while the destination action's deeplink guard
+        // cannot apply because the safety gate requires Home. A pending stale-
+        // wallet-healed alert is also preserved here: that hook only fires when
+        // moving *to* Home, and Continue routes through updateDestination(.home),
+        // which delivers the deferred notice after this announcement closes.
+        state.destinationState.destination = .ironwoodAnnouncement
     }
 }

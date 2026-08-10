@@ -29,12 +29,6 @@ struct ZappPayView: View {
     /// Fiat leads by default (matches Android's `showZecAsPrimary = false`) when a rate exists.
     @State private var showZecAsPrimary = false
 
-    /// Presentation is owned locally rather than bound into `SmartBanner.State`: the reducer's
-    /// `isSyncTimedOutSheetPresented` is the *request* to auto-raise (Android's once-per-session
-    /// `hasSyncErrorBeenShown`), and mirroring it here keeps the upstream reducer unmutated from
-    /// the view while still letting a tap open the sheet for errors the reducer never flagged.
-    @State private var isSyncErrorSheetPresented = false
-
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
@@ -54,7 +48,7 @@ struct ZappPayView: View {
                 .onTapGesture {
                     guard isSyncErrorActionable else { return }
 
-                    isSyncErrorSheetPresented = true
+                    store.isZappSyncErrorSheetPresented = true
                 }
                 .accessibilityAddTraits(isSyncErrorActionable ? .isButton : [])
 
@@ -113,11 +107,14 @@ struct ZappPayView: View {
             // just follows it.
             .onChange(of: store.smartBannerState.isSyncTimedOutSheetPresented) { isRequested in
                 if isRequested {
-                    isSyncErrorSheetPresented = true
+                    store.isZappSyncErrorSheetPresented = true
                 }
             }
-            .sheet(isPresented: $isSyncErrorSheetPresented) {
+            .sheet(isPresented: $store.isZappSyncErrorSheetPresented) {
                 syncErrorSheet()
+            }
+            .sheet(isPresented: $store.isZappPoolBalancesSheetPresented) {
+                poolBalancesSheet()
             }
             .alert(
                 store:
@@ -144,6 +141,11 @@ struct ZappPayView: View {
                 tokenName: tokenName,
                 transactions: Array(store.transactionListState.transactions),
                 showZecAsPrimary: showZecAsPrimary,
+                onBalanceTapped: {
+                    // Keep the balance reachable in privacy mode; the sheet masks every value.
+                    store.send(.walletBalances(.balanceTapped))
+                    store.isZappPoolBalancesSheetPresented = true
+                },
                 onToggleBalanceDisplay: { showZecAsPrimary.toggle() },
                 onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }
             )
@@ -256,6 +258,22 @@ struct ZappPayView: View {
     }
 }
 
+// MARK: - Pool balances surface
+
+extension ZappPayView {
+    @ViewBuilder func poolBalancesSheet() -> some View {
+        WithPerceptionTracking {
+            PoolBalancesSheet(
+                store: store.scope(state: \.walletBalancesState, action: \.walletBalances),
+                tokenName: tokenName,
+                onDismiss: { store.isZappPoolBalancesSheetPresented = false }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+    }
+}
+
 // MARK: - Sync error surface
 
 /// Android's sync-error remedies, mirroring `SyncErrorView.kt`. Kept in an extension so the tab's
@@ -273,23 +291,27 @@ extension ZappPayView {
     @ViewBuilder func syncErrorSheet() -> some View {
         WithPerceptionTracking {
             ZappSyncErrorSheet(
-                errorMessage: store.smartBannerState.lastKnownErrorMessage,
+                // Offline is actionable but is not itself the previous synchronizer failure. Use
+                // the generic copy/remedy there instead of leaking a stale error classification.
+                errorMessage: syncState == .error ? store.smartBannerState.lastKnownErrorMessage : "",
+                isIncompatibleServer:
+                    syncState == .error && store.smartBannerState.lastKnownErrorIsIncompatibleServer,
                 onTryAgain: {
-                    isSyncErrorSheetPresented = false
+                    store.isZappSyncErrorSheetPresented = false
                     // `Home.retrySync` restarts the synchronizer — the counterpart to Android's
                     // `synchronizerProvider.resetSynchronizer()`. It existed but nothing sent it.
                     store.send(.retrySync)
                 },
                 onSwitchServer: {
-                    isSyncErrorSheetPresented = false
+                    store.isZappSyncErrorSheetPresented = false
                     store.send(.smartBanner(.serverSwitchRequested))
                 },
                 onDisableTor: {
-                    isSyncErrorSheetPresented = false
+                    store.isZappSyncErrorSheetPresented = false
                     store.send(.smartBanner(.torSettingsRequested))
                 },
                 onContactSupport: {
-                    isSyncErrorSheetPresented = false
+                    store.isZappSyncErrorSheetPresented = false
                     store.send(.smartBanner(.reportTapped))
                 }
             )

@@ -27,6 +27,10 @@ struct WalletStorage {
         static let zcashStoredWalletBackupAcknowledged = "zcashStoredWalletBackupAcknowledged"
         static let zcashStoredShieldingAcknowledged = "zcashStoredShieldingAcknowledged"
         static let zcashStoredTorSetupFlag = "zcashStoredTorSetupFlag"
+        /// Device-scoped acknowledgement for the one-time Ironwood announcement.
+        /// Deliberately excluded from `resetZashi` so wallet reset and app
+        /// reinstall do not make the device see the announcement again.
+        static let zcashStoredIronwoodAnnouncementFlag = "zcashStoredIronwoodAnnouncementFlag"
         static let zcashStoredPINHash = "zcashStoredPINHash"
         static let zcashStoredVotingHotkey = "zcashStoredVotingHotkey"
         static let zcashStoredZodlAnnouncementFlag = "zcashStoredZodlAnnouncementFlag"
@@ -435,6 +439,38 @@ struct WalletStorage {
             return nil
         }
         
+        return try? decode(json: reqData, as: Bool.self)
+    }
+
+    // MARK: - Ironwood announcement
+
+    func importIronwoodAnnouncementFlag(_ acknowledged: Bool) throws {
+        guard let data = try? encode(object: acknowledged) else {
+            throw KeychainError.encoding
+        }
+
+        do {
+            try setData(data, forKey: Constants.zcashStoredIronwoodAnnouncementFlag)
+        } catch KeychainError.duplicate {
+            try updateData(data, forKey: Constants.zcashStoredIronwoodAnnouncementFlag)
+        } catch {
+            throw WalletStorageError.storageError(error)
+        }
+    }
+
+    func exportIronwoodAnnouncementFlag() -> Bool? {
+        let reqData: Data?
+
+        do {
+            reqData = try data(forKey: Constants.zcashStoredIronwoodAnnouncementFlag)
+        } catch {
+            return nil
+        }
+
+        guard let reqData else {
+            return nil
+        }
+
         return try? decode(json: reqData, as: Bool.self)
     }
 

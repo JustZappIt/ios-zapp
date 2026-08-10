@@ -17,6 +17,14 @@ struct AdvancedSettingsView: View {
     init(store: StoreOf<AdvancedSettings>) {
         self.store = store
     }
+
+    private var isDisconnectHWWalletRowDividerVisible: Bool {
+        #if !SECANT_DISTRIB
+        return true
+        #else
+        return false
+        #endif
+    }
     
     var body: some View {
         WithPerceptionTracking {
@@ -73,11 +81,23 @@ struct AdvancedSettingsView: View {
                             ActionRow(
                                 icon: Asset.Assets.Icons.hardDrive.image,
                                 title: String(localizable: .disconnectHWWalletCta),
-                                divider: false
+                                divider: isDisconnectHWWalletRowDividerVisible
                             ) {
                                 store.send(.operationAccessCheck(.disconnectHWWallet))
                             }
                         }
+
+                        // Debug-only affordance for retesting the device-scoped,
+                        // wallet-reset-persistent one-time announcement.
+                        #if !SECANT_DISTRIB
+                        ActionRow(
+                            icon: Asset.Assets.Icons.refreshSingleCCW.image,
+                            title: String(localizable: .ironwoodAnnouncementDebugReset),
+                            divider: false
+                        ) {
+                            store.send(.debugResetIronwoodAnnouncementTapped)
+                        }
+                        #endif
                     }
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Asset.Colors.background.color)

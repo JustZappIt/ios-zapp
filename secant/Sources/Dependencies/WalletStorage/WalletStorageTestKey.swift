@@ -32,6 +32,11 @@ extension WalletStorageClient {
         exportShieldingAcknowledged: { false },
         importTorSetupFlag: { _ in },
         exportTorSetupFlag: { false },
+        importIronwoodAnnouncementFlag: { _ in },
+        // Keep Root's one-time announcement gate closed in tests that use
+        // `.noOp`; individual gate tests override this to exercise the
+        // unacknowledged path explicitly.
+        exportIronwoodAnnouncementFlag: { true },
         importPINHash: { _ in },
         exportPINHash: { nil },
         removePINHash: { },

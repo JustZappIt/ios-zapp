@@ -58,6 +58,9 @@ struct SmartBanner {
         var isWalletBackupAcknowledgedAtKeychain = false
         var lastKnownBlocksRemaining: BlockHeight = -1
         var lastKnownErrorMessage = ""
+        /// Whether the current message is a non-retryable server-validation failure. The UI uses
+        /// this to offer Server Setup only when switching servers is an appropriate next step.
+        var lastKnownErrorIsIncompatibleServer = false
         var lastKnownSyncPercentage = -1.0
         var messageToBeShared: String?
         var priorityContent: PriorityContent? = nil
@@ -357,6 +360,10 @@ struct SmartBanner {
                 var isDifferentError = false
                 if case .error = snapshot.syncStatus {
                     isDifferentError = snapshot.message != state.lastKnownErrorMessage
+                } else {
+                    // Classification belongs to the current synchronizer status, not the last
+                    // failure ever observed. Clear it on recovery before any early-return branch.
+                    state.lastKnownErrorIsIncompatibleServer = false
                 }
 
                 if snapshot.syncStatus != state.synchronizerStatusSnapshot.syncStatus || isDifferentError {
@@ -392,6 +399,11 @@ struct SmartBanner {
                     case .error, .unprepared:
                         if state.lastKnownErrorMessage != snapshot.message {
                             state.lastKnownErrorMessage = snapshot.message
+                            if case .error(let error) = snapshot.syncStatus {
+                                state.lastKnownErrorIsIncompatibleServer = error.toZcashError().isIncompatibleServer
+                            } else {
+                                state.lastKnownErrorIsIncompatibleServer = false
+                            }
                             return .send(.triggerPriority(.priority2))
                         }
                     default: break
@@ -614,7 +626,10 @@ struct SmartBanner {
                 return .send(.smartBannerContentTapped)
 
             case .serverSwitchRequested:
+                // The route is reachable from the timeout sheet and the incompatible-server error
+                // sheet. Navigating away must dismiss whichever one initiated it.
                 state.isSyncTimedOutSheetPresented = false
+                state.isSmartBannerSheetPresented = false
                 return .none
 
             case .shieldFundsTapped:
