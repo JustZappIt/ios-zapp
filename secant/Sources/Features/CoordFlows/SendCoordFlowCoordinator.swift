@@ -210,7 +210,9 @@ extension SendCoordFlow {
             // `swapSendAuthorized` and is deliberately unchanged.
             case .path(.element(id: _, action: .confirmWithKeystone(.keystoneFirmwareAccepted))):
                 guard state.mode == .swap else { return .none }
-                let depositAddress = state.swapState.quote?.depositAddress ?? state.swapState.address
+                let depositAddress = state.swapState.quote.map {
+                    $0.depositAddress.isEmpty ? state.swapState.address : $0.depositAddress
+                } ?? state.swapState.address
                 markSwapTransaction(&state, address: depositAddress)
                 return .none
 

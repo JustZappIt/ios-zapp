@@ -28,7 +28,9 @@ import Testing
         removedUserDefaultsKeys: LockIsolated<[String]>,
         setUserDefaultsBools: LockIsolated<[String: Bool]>,
         isSeedRelevant: Bool,
+        firstPrepareResult: Initializer.InitializationResult = .success,
         walletAccountsResult: [WalletAccount] = [RootInitializeSDKHealTests.seedDerivedAccount],
+        firstPrepareError: Error? = nil,
         reprepareError: Error? = nil,
         isStaleWalletHealedAlertPending: Bool = false,
         destination: Root.DestinationState.Destination = .welcome
@@ -46,6 +48,7 @@ import Testing
         let store = TestStore(initialState: initialState) {
             Root()
         } withDependencies: {
+            $0.defaultInMemoryStorage = InMemoryStorage()
             $0.mainQueue = .immediate
             $0.exchangeRate = .noOp
             $0.autolockHandler = .noOp
@@ -82,9 +85,16 @@ import Testing
                     case .existingWallet: modeLabel = "existingWallet"
                     }
                     calls.withValue { $0.append("prepareWith(\(modeLabel))") }
-                    if walletMode == .restoreWallet, let reprepareError {
-                        throw reprepareError
+                    if walletMode == .restoreWallet {
+                        if let reprepareError {
+                            throw reprepareError
+                        }
+                        return .success
                     }
+                    if let firstPrepareError {
+                        throw firstPrepareError
+                    }
+                    return firstPrepareResult
                 },
                 getAllTransactions: { _ in [] },
                 wipe: {
@@ -119,6 +129,7 @@ import Testing
         )
         initialState.isStaleWalletHealedAlertPending = pending
         let store = TestStore(initialState: initialState) { Root() } withDependencies: {
+            $0.defaultInMemoryStorage = InMemoryStorage()
             $0.mainQueue = mainQueue
         }
         store.exhaustivity = .off
@@ -165,6 +176,66 @@ import Testing
         #expect(removedKeys.value.contains(.pinLockoutEndTimestamp))
         #expect(setBools.value[Root.Constants.udIsRestoringWallet] == true)
 
+        await drain(store)
+    }
+
+    @Test func seedNotRelevantResultReachesKnownStaleHeal() async throws {
+        let calls = LockIsolated<[String]>([])
+        let store = makeStore(
+            calls: calls,
+            removedUserDefaultsKeys: LockIsolated([]),
+            setUserDefaultsBools: LockIsolated([:]),
+            isSeedRelevant: false,
+            firstPrepareResult: .seedNotRelevant
+        )
+
+        await store.send(.initialization(.initializeSDK(.existingWallet)))
+        await store.receive(
+            { if case .initialization(.staleWalletDatabaseHealed) = $0 { true } else { false } },
+            timeout: .seconds(5)
+        ) { state in
+            state.isRestoringWallet = true
+            state.$walletStatus.withLock { $0 = .restoring }
+            state.isStaleWalletHealedAlertPending = true
+        }
+
+        let recorded = calls.value
+        let wipeIndex = try #require(recorded.firstIndex(of: "wipe"))
+        let beforeWipe = recorded[..<wipeIndex]
+        #expect(!beforeWipe.contains("isSeedRelevant"))
+        // The fork still needs one account read to clear account-scoped chat contacts. A
+        // second read here would mean the derived-account probe was incorrectly taken.
+        #expect(beforeWipe.filter { $0 == "walletAccounts" }.count == 1)
+        await drain(store)
+    }
+
+    @Test func initializerSeedMismatchErrorReachesKnownStaleHeal() async throws {
+        let calls = LockIsolated<[String]>([])
+        let store = makeStore(
+            calls: calls,
+            removedUserDefaultsKeys: LockIsolated([]),
+            setUserDefaultsBools: LockIsolated([:]),
+            isSeedRelevant: false,
+            firstPrepareError: ZcashError.initializerSeedMismatch
+        )
+
+        await store.send(.initialization(.initializeSDK(.existingWallet)))
+        await store.receive(
+            { if case .initialization(.staleWalletDatabaseHealed) = $0 { true } else { false } },
+            timeout: .seconds(5)
+        ) { state in
+            state.isRestoringWallet = true
+            state.$walletStatus.withLock { $0 = .restoring }
+            state.isStaleWalletHealedAlertPending = true
+        }
+
+        let recorded = calls.value
+        let wipeIndex = try #require(recorded.firstIndex(of: "wipe"))
+        let beforeWipe = recorded[..<wipeIndex]
+        #expect(!beforeWipe.contains("isSeedRelevant"))
+        #expect(beforeWipe.filter { $0 == "walletAccounts" }.count == 1)
+        #expect(store.state.alert == nil)
+        #expect(store.state.appInitializationState != .failed)
         await drain(store)
     }
 

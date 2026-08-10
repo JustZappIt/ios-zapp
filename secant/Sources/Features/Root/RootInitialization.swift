@@ -124,8 +124,10 @@ extension Root {
                 
                 // update flexa balance
                 if let accountBalance = latestState.data.accountsBalances[account.id] {
-                    let shieldedBalance = accountBalance.saplingBalance.spendableValue + accountBalance.orchardBalance.spendableValue
-                    let shieldedWithPendingBalance = accountBalance.saplingBalance.total() + accountBalance.orchardBalance.total()
+                    // Pool-agnostic accessors: sum sapling + orchard + ironwood (and any future
+                    // shielded pool) instead of hand-summing individual pools.
+                    let shieldedBalance = accountBalance.shieldedSpendableValue
+                    let shieldedWithPendingBalance = accountBalance.shieldedTotal()
 
                     flexaHandler.updateBalance(shieldedWithPendingBalance, shieldedBalance)
                 }
@@ -360,57 +362,81 @@ extension Root {
                     state.isInitializingSDK = true
                     return .run { send in
                         do {
-                            try await sdkSynchronizer.prepareWith(
-                                seedBytes,
-                                birthday,
-                                walletMode,
-                                String(localizable: .accountsZashi),
-                                String(localizable: .accountsZashi).lowercased()
-                            )
+                            let result: Initializer.InitializationResult
+                            do {
+                                result = try await sdkSynchronizer.prepareWith(
+                                    seedBytes,
+                                    birthday,
+                                    walletMode,
+                                    String(localizable: .accountsZashi),
+                                    String(localizable: .accountsZashi).lowercased()
+                                )
+                            } catch ZcashError.initializerSeedMismatch {
+                                // The SDK now runs this same integrity check inside
+                                // Initializer.initialize and throws instead of returning, for
+                                // exactly the case reconcileWalletDatabaseWithSeed below already
+                                // exists to heal. Map the throw onto .seedNotRelevant so that
+                                // knownStale: true heal still runs unchanged.
+                                //
+                                // Safe unconditionally: wipe() below leaves no accounts in the
+                                // database, so the re-prepare that follows cannot hit this
+                                // mismatch again. And prepare() throws before the synchronizer
+                                // ever leaves .unprepared (SDKSynchronizer.prepare only advances
+                                // status once initialize() returns successfully), so that
+                                // re-prepare isn't blocked by prepare's own
+                                // `guard status == .unprepared` early-return either.
+                                result = .seedNotRelevant
+                            }
 
-                            // TODO: [#1512] When the SDK pin is upgraded, add its direct
-                            // stale-database initialization result and thrown mismatch error as
-                            // fast paths into this heal. The current SDK only supports the probe.
-                            let healed = try await Root.reconcileWalletDatabaseWithSeed(
-                                knownStale: false,
-                                seedBytes: seedBytes,
-                                isSeedRelevant: { try await sdkSynchronizer.isSeedRelevantToAnyDerivedAccount($0) },
-                                hasSeedDerivedAccount: {
-                                    let accounts = try await sdkSynchronizer.walletAccounts()
-                                    return accounts.contains { $0.zip32AccountIndex != nil }
-                                },
-                                clearDeviceScopedState: {
-                                    let accounts = try await sdkSynchronizer.walletAccounts()
-                                    await send(.initialization(.clearZappWalletScopedState))
-                                    Root.clearDeviceScopedWalletState(
-                                        userDefaults: userDefaults,
-                                        flexaHandler: flexaHandler,
-                                        userStoredPreferences: userStoredPreferences,
-                                        readTransactionsStorage: readTransactionsStorage,
-                                        chatContacts: chatContacts,
-                                        walletAccounts: accounts
-                                    )
-                                    // These clients own async process/session state and must be
-                                    // stopped before the database is replaced.
-                                    await offramp.invalidateSession()
-                                    await zappMessaging.wipe()
-                                },
-                                wipe: {
-                                    guard let wipePublisher = sdkSynchronizer.wipe() else {
-                                        throw Root.WalletDatabaseHealError.wipeUnavailable
+                            let healed: Bool
+                            switch result {
+                            case .seedRequired:
+                                throw ZcashError.synchronizerNotPrepared
+                            case .seedNotRelevant, .success:
+                                healed = try await Root.reconcileWalletDatabaseWithSeed(
+                                    knownStale: result == .seedNotRelevant,
+                                    seedBytes: seedBytes,
+                                    isSeedRelevant: { try await sdkSynchronizer.isSeedRelevantToAnyDerivedAccount($0) },
+                                    hasSeedDerivedAccount: {
+                                        let accounts = try await sdkSynchronizer.walletAccounts()
+                                        return accounts.contains { $0.zip32AccountIndex != nil }
+                                    },
+                                    clearDeviceScopedState: {
+                                        let accounts = try await sdkSynchronizer.walletAccounts()
+                                        await send(.initialization(.clearZappWalletScopedState))
+                                        Root.clearDeviceScopedWalletState(
+                                            userDefaults: userDefaults,
+                                            flexaHandler: flexaHandler,
+                                            userStoredPreferences: userStoredPreferences,
+                                            readTransactionsStorage: readTransactionsStorage,
+                                            chatContacts: chatContacts,
+                                            walletAccounts: accounts
+                                        )
+                                        // These clients own async process/session state and must be
+                                        // stopped before the database is replaced.
+                                        await offramp.invalidateSession()
+                                        await zappMessaging.wipe()
+                                    },
+                                    wipe: {
+                                        guard let wipePublisher = sdkSynchronizer.wipe() else {
+                                            throw Root.WalletDatabaseHealError.wipeUnavailable
+                                        }
+                                        for try await _ in wipePublisher.values { }
+                                    },
+                                    reprepare: {
+                                        let reprepareResult = try await sdkSynchronizer.prepareWith(
+                                            seedBytes,
+                                            birthday,
+                                            .restoreWallet,
+                                            String(localizable: .accountsZashi),
+                                            String(localizable: .accountsZashi).lowercased()
+                                        )
+                                        guard reprepareResult == .success else {
+                                            throw ZcashError.synchronizerNotPrepared
+                                        }
                                     }
-                                    for try await _ in wipePublisher.values { }
-                                },
-                                reprepare: {
-                                    try await sdkSynchronizer.prepareWith(
-                                        seedBytes,
-                                        birthday,
-                                        .restoreWallet,
-                                        String(localizable: .accountsZashi),
-                                        String(localizable: .accountsZashi).lowercased()
-                                    )
-                                }
-                            )
+                                )
+                            }
                             if healed {
                                 await send(.initialization(.staleWalletDatabaseHealed))
                             }

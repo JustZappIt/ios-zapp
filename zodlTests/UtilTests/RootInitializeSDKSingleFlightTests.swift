@@ -81,6 +81,7 @@ extension Root.State: @retroactive Equatable {
         let store = TestStore(initialState: initialState) {
             Root()
         } withDependencies: {
+            $0.defaultInMemoryStorage = InMemoryStorage()
             $0.mainQueue = .immediate
             $0.exchangeRate = .noOp
             $0.autolockHandler = .noOp
@@ -117,6 +118,7 @@ extension Root.State: @retroactive Equatable {
                     }
                     prepareModes.withValue { $0.append(modeLabel) }
                     await gate.wait()
+                    return .success
                 },
                 getAllTransactions: { _ in [] },
                 isSeedRelevantToAnyDerivedAccount: { _ in true },
