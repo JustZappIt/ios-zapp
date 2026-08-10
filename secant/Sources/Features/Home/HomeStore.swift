@@ -169,9 +169,7 @@ struct Home {
 
                 return .merge(
                     .publisher {
-                        // Filter BEFORE throttling: throttling the raw stream with `latest: true`
-                        // lets an unrelated event in the same window replace `foundTransactions`
-                        // as "latest" and silently drop the refresh trigger.
+                        // Filter first so unrelated events cannot displace the refresh signal.
                         sdkSynchronizer.eventStream()
                             .compactMap {
                                 if case SynchronizerEvent.foundTransactions = $0 {

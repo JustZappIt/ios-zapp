@@ -17,11 +17,7 @@ extension Root {
             case .observeTransactions:
                 return .merge(
                     .publisher {
-                        // The transaction events must be filtered out of the stream BEFORE throttling.
-                        // Throttling the raw stream with `latest: true` lets an unrelated event
-                        // (`.connectionStateChanged`, `.storedUTXOs`) arriving in the same window
-                        // replace a `foundTransactions`/`minedTransaction` as "latest", silently
-                        // dropping the only signal that a pending transaction got mined.
+                        // Filter first so unrelated events cannot displace transaction updates.
                         sdkSynchronizer.eventStream()
                             .compactMap {
                                 if case SynchronizerEvent.foundTransactions(let transactions, _) = $0 {
@@ -69,8 +65,7 @@ extension Root {
                         let transactions = try await sdkSynchronizer.getAllTransactions(accountUUID)
                         await send(.fetchedTransactions(accountUUID, transactions))
                     } catch {
-                        // No user-facing alert: the pending-transactions poller and the next
-                        // synchronizer event both retry this fetch.
+                        // The poller or next synchronizer event retries the fetch.
                         LoggerProxy.error("getAllTransactions failed: \(error.toZcashError())")
                     }
                 }
@@ -130,22 +125,8 @@ extension Root {
                 
                 let identifiedArray = IdentifiedArrayOf<TransactionState>(uniqueElements: sortedTransactions)
 
-                // Reconciliation poller: while anything is pending, the list must not depend solely
-                // on push signals (a dropped event or a missed `.upToDate` tick would otherwise leave
-                // a mined transaction rendered as "Sending…" forever). Re-read the local database
-                // every 30 seconds until nothing is pending — a cheap SQLite read, no network.
-                // Managed on every completed fetch, including ones whose payload equals the current
-                // state, so an unchanged list keeps the poller alive.
-                //
-                // Deliberately restricted to `.zcash` transactions, whose pending state is
-                // `minedHeight == nil` and therefore resolvable by exactly the local re-read this
-                // poller performs. For every other type `isPending` reports the SWAP status
-                // (`TransactionState.isPending`), which is owned by the swap provider's metadata and
-                // refreshed by `.autoUpdateCandidatesSwapDetails` in `RootSwaps` — re-reading the
-                // SDK database can never resolve it. Including those here would leave a swap parked
-                // in `.pending`/`.incomplete` (an abandoned or stalled swap never has to resolve)
-                // polling every 30 seconds for the rest of the session, with no state it could
-                // possibly settle.
+                // Re-read pending Zcash transactions in case a push signal was lost. Swap status is
+                // provider-owned, so the local SDK database cannot resolve it.
                 let pendingTransactionsPoller: Effect<Root.Action>
                 if identifiedArray.contains(where: { $0.type == .zcash && $0.isPending }) {
                     pendingTransactionsPoller = .run { send in

@@ -97,9 +97,7 @@ extension Root {
                 state.bgTask = nil
                 state.appStartState = .didEnterBackground
                 state.isLockedInKeychainUnavailableState = false
-                // Tear down ALL synchronizer-driven subscriptions (plus the pending-transactions
-                // poller) over the now-stopped synchronizer; `.retryStart` on foreground rebuilds
-                // every one of them.
+                // `.retryStart` rebuilds these subscriptions after foregrounding.
                 return .merge(
                     .cancel(id: state.CancelStateId),
                     .cancel(id: state.CancelTransactionsStateId),
@@ -241,13 +239,7 @@ extension Root {
                             LoggerProxy.event("BGTask synchronizer.start() PASSED")
                         }
                         await send(.initialization(.registerForSynchronizersUpdate))
-                        // Backgrounding cancels the transaction subscriptions (event stream and
-                        // `.upToDate` fetch trigger); without re-establishing them here, the first
-                        // background/foreground cycle would leave the transaction list refreshing
-                        // only via chance one-shot fetches for the rest of the process lifetime.
-                        // Re-dispatch is safe: the inner effects replace themselves via
-                        // `.cancellable(cancelInFlight: true)`, and the trailing fetch doubles as
-                        // the catch-up for anything mined while backgrounded.
+                        // Restore the transaction subscriptions cancelled on backgrounding.
                         await send(.observeTransactions)
                         await send(.refreshAutomaticServer)
                     } catch {
