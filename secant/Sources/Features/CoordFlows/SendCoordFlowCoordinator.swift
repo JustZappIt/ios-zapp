@@ -186,16 +186,46 @@ extension SendCoordFlow {
             case .path(.element(id: _, action: .scan(.foundPCZT(let pcztWithSigs)))):
                 for (id, element) in zip(state.path.ids, state.path) {
                     if case .confirmWithKeystone(let sendConfirmationState) = element {
-                        // A swap has to be recorded before the signed PCZT is submitted, exactly as
-                        // `SwapAndPayCoordFlow` does — the deposit address is what links the
-                        // broadcast transaction to the swap in transaction history.
-                        if state.mode == .swap {
-                            markSwapTransaction(&state, address: sendConfirmationState.address)
-                        }
                         state.path.append(.sending(sendConfirmationState))
                         return .send(.path(.element(id: id, action: .confirmWithKeystone(.foundPCZT(pcztWithSigs)))))
                     }
                 }
+                return .none
+
+            // MOB-1510: pop to `confirmWithKeystone` first so this only ever applies once (`break`)
+            // and drops the stale `.scan`/`.sending` pushed underneath before the append.
+            case .path(.element(id: _, action: .confirmWithKeystone(.keystoneFirmwareUpdateRequired))):
+                for (id, element) in zip(state.path.ids, state.path) {
+                    if case .confirmWithKeystone(let sendConfirmationState) = element {
+                        state.path.pop(to: id)
+                        state.path.append(.keystoneFirmwareUpdate(sendConfirmationState))
+                        break
+                    }
+                }
+                return .none
+
+            // The unified send flow is Zapp's fifth Keystone signing surface. Keep its swap
+            // metadata behind the same gate as the upstream swap flow so blocked firmware cannot
+            // leave a permanent phantom swap record. The non-Keystone corridor remains in
+            // `swapSendAuthorized` and is deliberately unchanged.
+            case .path(.element(id: _, action: .confirmWithKeystone(.keystoneFirmwareAccepted))):
+                guard state.mode == .swap else { return .none }
+                let depositAddress = state.swapState.quote?.depositAddress ?? state.swapState.address
+                markSwapTransaction(&state, address: depositAddress)
+                return .none
+
+            // Reset `confirmWithKeystone` here (not in its own reducer) so a fresh scan after a
+            // firmware update isn't silently dropped by the `isKeystoneCodeFound` guard in `foundPCZT`.
+            case .path(.element(id: _, action: .keystoneFirmwareUpdate(.keystoneFirmwareUpdateCloseTapped))):
+                for (id, element) in zip(state.path.ids, state.path) {
+                    if element.is(\.confirmWithKeystone) {
+                        state.path.pop(to: id)
+                        state.path[id: id, case: \.confirmWithKeystone]?.detectedKeystoneFirmware = nil
+                        state.path[id: id, case: \.confirmWithKeystone]?.isKeystoneCodeFound = false
+                        break
+                    }
+                }
+                keystoneHandler.resetQRDecoder()
                 return .none
 
             case .path(.element(id: _, action: .confirmWithKeystone(.updateResult(let result)))):
