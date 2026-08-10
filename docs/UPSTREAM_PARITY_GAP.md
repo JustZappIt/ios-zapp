@@ -2,7 +2,7 @@
 
 **What this is.** The post-port status and historical audit for everything upstream (`zodl-inc/zodl-ios`) shipped between the fork point and release 3.8.1. It supports the fork's standing policy: *we own the UI and Zapp-specific features; for wallet plumbing and correctness we defer to upstream.*
 
-**Current as of 2026-08-10, re-verified after PR #35.** Audited against `upstream/main = 512fa1c8` and **`origin/main = 862672ab`**, the merge commit for PR #35. Upstream `main` has not moved; Zapp `main` now includes the recurring-server-error fix and the adapted stuck-`Sending…` hardening.
+**Current as of 2026-08-10, re-verified after PR #35 and published in PR #36.** The app-source audit compares `upstream/main = 512fa1c8` with **the Zapp source snapshot at `862672ab`**, the merge commit for PR #35. PR #36 adds only this document. Upstream `main` has not moved; Zapp `main` includes the recurring-server-error fix and the adapted stuck-`Sending…` hardening.
 
 > **Verification pass, 2026-08-10.** Every section below was re-checked against the two refs. The **parity conclusion held** — of the 156 files upstream touched since BASE, 70 are now byte-identical to ours, 86 are non-identical (85 present-but-different plus the one deliberate absence at `Features/Home/PoolBalancesSheet.swift`), and we have deleted zero upstream files. The earlier pass corrected the §5.2 merge-conflict table (**57 files, not 30**), §5.2/§5.3/§5.4's both-sides and add/add counts (147 / 100 / 24, not 63 / 16 / 7), §4.5's trailing-newline row, §4.4's completed rows, §8's migration-overlap figure (51, not 36), and Appendix B's LOC meaning. PR #35 then closed the one functional regression that pass found (§4.2, #1948) and ported the non-duplicated final behavior from `upstream/fix/stuck-sending-tx`. PRs #33 and #34 remain the completed 3.8.1 parity program; PR #35 is post-parity correctness hardening.
 
@@ -32,7 +32,7 @@
 | **Byte-convergence with upstream** | ✅ 70 of upstream's 156 touched files are now byte-identical; 86 differ; 1 upstream file absent (deliberate); 0 upstream files deleted |
 | **Live functional defect** | ✅ None found in the audited parity surface; PR #35 fixed the recurring #1948 error and ported stuck-`Sending…` hardening |
 | **Changelog hygiene** | ⚠️ MOB-1593 and the Keystone account-switch fix still lack dedicated `CHANGELOG.md` entries; PR #35 added MOB-1581 |
-| **This document** | ✅ Added to the repository in the docs-only follow-up after PR #35 |
+| **This document** | ✅ Added to the repository in docs-only PR #36 |
 | **Hosted CI** | ⚠️ PRs #34 and #35 could not start jobs because the GitHub account's payment/spending limit blocks Actions |
 | **Post-merge review follow-up** | ⚠️ Verify/publish the Zapp Ironwood guide URL and await both RestoreWallet test effects |
 | **Remaining upstream-main housekeeping** | `d7121bec`, Zapp-versioned What's New data, `35dd58bb`; judge `2c72d041` separately |
@@ -55,7 +55,7 @@ Six current takeaways:
 
 ## 2. Method
 
-**Post-merge status (2026-08-10).** The original audit compared the refs below before the parity ports. The current authoritative refs are `upstream/main = 512fa1c8` and `origin/main = 862672ab`; upstream has not advanced since the audit, while origin now contains PRs #33–#35. Counts and line numbers in the historical sections intentionally describe the pre-port merge surface.
+**Post-merge status (2026-08-10).** The original audit compared the refs below before the parity ports. The authoritative app-source refs for this pass are `upstream/main = 512fa1c8` and Zapp at `862672ab`; upstream has not advanced since the audit, while Zapp contains app-source PRs #33–#35 plus docs-only PR #36. Counts and line numbers in the historical sections intentionally describe the pre-port merge surface.
 
 ```
 git fetch upstream && git fetch origin
@@ -525,7 +525,7 @@ The two positive magnitudes were also stale (they were pre-PR-#34 numbers, taken
 
 **Measured `git merge-tree` conflict hunks, before the ports → after:**
 
-| File | 60ca5dde | c8c3e942 (PR #32) | **origin/main (862672ab)** |
+| File | 60ca5dde | c8c3e942 (PR #32) | **Zapp source snapshot (862672ab)** |
 |---|---:|---:|---:|
 | `RootStore.swift` | 4 | 14 | **17** |
 | `RootInitialization.swift` | 1 | 9 | **15** |
@@ -701,13 +701,13 @@ The newly fetched upstream branches do not change that conclusion. `agent/fix-ma
 
 ### Recommended next sequence
 
-*(Re-verified 2026-08-10 against `upstream/main = 512fa1c8` and `origin/main = 862672ab`; all six branch positions in the watch table below reproduce exactly. PR #35 is the newest merged Zapp PR.)*
+*(Re-verified 2026-08-10 against `upstream/main = 512fa1c8` and the Zapp app-source snapshot at `862672ab`; all six branch positions in the watch table below reproduce exactly. PR #35 is the newest app-source PR; PR #36 is docs-only.)*
 
 0a. ✅ **Fix the incompatible-server flag regression — completed in PR #35** (§4.2, #1948). Recovery now clears the cached message together with the flag, so a recurring identical error re-arms correctly; a dedicated regression test covers the full sequence.
 
 0b. **Backfill two missing dedicated `CHANGELOG.md` entries.** MOB-1593 (empty-memo filter) and the Keystone account-switch history fix still lack dedicated lines. PR #35 added the MOB-1581 entry while landing the final transaction-refresh hardening.
 
-0c. ✅ **Commit this document — completed in the docs-only follow-up after PR #35.** The standing fork policy and its audited status now live in the repository.
+0c. ✅ **Commit this document — completed in docs-only PR #36.** The standing fork policy and its audited status now live in the repository.
 
 1. **Clear the two post-merge review follow-ups.** Verify/publish the configured first-party Ironwood guide (the endpoint returned HTTP 429 during this audit), and make both `RestoreWalletAnnouncementFlagTests` await their `Store.send` tasks through `.finish()` so no late wallet-provisioning effect can evade the invariant assertion.
 2. **Restore hosted CI.** GitHub Actions for PRs #34 and #35 never started because the account payment/spending limit blocked jobs. This is operational rather than a source defect, but it is the only missing validation channel; PR #34's focused local matrix passed 68 tests across 11 suites, and PR #35 compiled cleanly and passed 14 tests across 2 suites.
@@ -745,7 +745,7 @@ And when it does land, it's cheaper than the line count implies: roughly two-thi
 
 > ⚠️ **Two corrections here, both measured 2026-08-10.**
 >
-> - **The overlap is 51 files, not 36.** Under this document's own definition — the tag's 208 files intersected with the 679 files our fork changed since BASE — the count was 29 at `60ca5dde` and exactly 36 at `c8c3e942` (which is why "29 … the five ports added seven" checked out), but PR #33 raised it to 47 and PR #34 to 51. PR #35 changed one additional non-overlap file, so the overlap held. Under the alternative reading (files currently differing between `origin/main` and `upstream/main`) it is 42. The contended surface includes `RootStore.swift`, `RootCoordinator.swift`, `RootInitialization.swift`, `RootTransactions.swift`, `SmartBannerStore.swift`, `Localizable.xcstrings`, `project.pbxproj`, `SendConfirmationStore.swift`, `ZashiSheet.swift` and `FeatureFlags.swift`.
+> - **The overlap is 51 files, not 36.** Under this document's own definition — the tag's 208 files intersected with the 680 files our fork changed since BASE — the count was 29 at `60ca5dde` and exactly 36 at `c8c3e942` (which is why "29 … the five ports added seven" checked out), but PR #33 raised it to 47 and PR #34 to 51. PR #35 changed one additional non-overlap source file and PR #36 added this non-overlap document, so the overlap held. Under the alternative reading (files currently differing between the Zapp app-source snapshot and `upstream/main`) it is 42. The contended surface includes `RootStore.swift`, `RootCoordinator.swift`, `RootInitialization.swift`, `RootTransactions.swift`, `SmartBannerStore.swift`, `Localizable.xcstrings`, `project.pbxproj`, `SendConfirmationStore.swift`, `ZashiSheet.swift` and `FeatureFlags.swift`.
 > - **"`SmartBannerStore.swift` and `SDKSynchronizerInterface/Live.swift` are files we have never touched" is wrong** — all three have commits on `origin/main` since BASE, and the claim contradicts §4.3, which lists `SmartBannerStore` among the Ironwood rewrite sites. The *consequence* survives for two of the three: `SDKSynchronizerLive.swift` is now byte-identical to upstream and `SDKSynchronizerInterface.swift` differs by one trailing blank line, because our edits were **convergence onto upstream's own** `prepareWith → Initializer.InitializationResult` change — so the migration branch's hunks would indeed port clean there. Only **`SmartBannerStore.swift` is genuinely contended** (+32/−6 since BASE; 12/12 vs upstream today; +812/−91 on the migration tag). Treat it as a high-density conflict, not a clean port.
 
 Two things worth pre-paying now, while the tree is open, because they cost almost nothing extra and are dramatically cheaper outside a 42k-line merge:
