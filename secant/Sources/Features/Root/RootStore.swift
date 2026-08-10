@@ -86,6 +86,9 @@ struct Root {
         var homeState: Home.State = .initial
         var zappTabsState: ZappTabs.State = .initial
         var zappMessagingState = ZappMessagingState()
+        /// Single-flight latch for wallet initialization. `prepareWith` must complete before a
+        /// foreground re-entry can safely start another initialization attempt.
+        var isInitializingSDK = false
         var isLockedInKeychainUnavailableState = false
         var isRestoringWallet = false
         @Shared(.appStorage(.lastAuthenticationTimestamp)) var lastAuthenticationTimestamp: Int = 0

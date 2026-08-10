@@ -26,6 +26,7 @@ extension Root {
         case checkWalletInitialization
         case checkWalletConfig
         case initializeSDK(WalletInitMode)
+        case initializeSDKFinished
         case initialSetups
         case initializationFailed(ZcashError)
         case initializationSuccessfullyDone
@@ -338,6 +339,10 @@ extension Root {
                 /// Stored wallet is present, database files may or may not be present, trying to initialize app state variables and environments.
                 /// When initialization succeeds user is taken to the home screen.
             case .initialization(.initializeSDK(let walletMode)):
+                // The SDK remains unprepared until `prepareWith` returns. A foreground transition
+                // during that window re-enters this action, but initialization must never run
+                // concurrently. The in-flight effect clears this latch on every terminal path.
+                guard !state.isInitializingSDK else { return .none }
                 do {
                     let storedWallet: StoredWallet
                     do {
@@ -348,7 +353,8 @@ extension Root {
                     let birthday = storedWallet.birthday?.value() ?? zcashSDKEnvironment.latestCheckpoint()
                     try mnemonic.isValid(storedWallet.seedPhrase.value())
                     let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
-                    
+
+                    state.isInitializingSDK = true
                     return .run { send in
                         do {
                             try await sdkSynchronizer.prepareWith(
@@ -410,7 +416,12 @@ extension Root {
                     return .send(.initialization(.initializationFailed(error.toZcashError())))
                 }
                 
+            case .initialization(.initializeSDKFinished):
+                state.isInitializingSDK = false
+                return .none
+
             case .initialization(.initializationSuccessfullyDone):
+                state.isInitializingSDK = false
                 return .merge(
                     .send(.initialization(.registerForSynchronizersUpdate)),
                     .publisher {
@@ -784,6 +795,7 @@ extension Root {
                 return .none
 
             case .initialization(.initializationFailed(let error)):
+                state.isInitializingSDK = false
                 state.appInitializationState = .failed
                 state.alert = AlertState.initializationFailed(error)
                 return .none
