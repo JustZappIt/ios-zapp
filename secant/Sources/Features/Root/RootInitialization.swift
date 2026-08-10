@@ -97,9 +97,12 @@ extension Root {
                 state.bgTask = nil
                 state.appStartState = .didEnterBackground
                 state.isLockedInKeychainUnavailableState = false
+                // `.retryStart` rebuilds these subscriptions after foregrounding.
                 return .merge(
                     .cancel(id: state.CancelStateId),
-                    .cancel(id: state.CancelTransactionsStateId)
+                    .cancel(id: state.CancelTransactionsStateId),
+                    .cancel(id: state.CancelEventId),
+                    .cancel(id: state.CancelPendingTxPollId)
                 )
 
             case .initialization(.appDelegate(.backgroundTask(let task))):
@@ -186,6 +189,8 @@ extension Root {
                     return .merge(
                         .cancel(id: state.CancelStateId),
                         .cancel(id: state.CancelTransactionsStateId),
+                        .cancel(id: state.CancelEventId),
+                        .cancel(id: state.CancelPendingTxPollId),
                         // Same reason as `checkRestoreWalletFlag` below: a background sync that
                         // finishes a restore clears `walletStatus`, and the idle timer has to be
                         // handed back or the screen never sleeps once the user reopens the app.
@@ -234,6 +239,8 @@ extension Root {
                             LoggerProxy.event("BGTask synchronizer.start() PASSED")
                         }
                         await send(.initialization(.registerForSynchronizersUpdate))
+                        // Restore the transaction subscriptions cancelled on backgrounding.
+                        await send(.observeTransactions)
                         await send(.refreshAutomaticServer)
                     } catch {
                         if state.bgTask != nil {

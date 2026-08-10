@@ -361,8 +361,8 @@ struct SmartBanner {
                 if case .error = snapshot.syncStatus {
                     isDifferentError = snapshot.message != state.lastKnownErrorMessage
                 } else {
-                    // Classification belongs to the current synchronizer status, not the last
-                    // failure ever observed. Clear it on recovery before any early-return branch.
+                    // Clear both so the same error can be classified again after recovery.
+                    state.lastKnownErrorMessage = ""
                     state.lastKnownErrorIsIncompatibleServer = false
                 }
 

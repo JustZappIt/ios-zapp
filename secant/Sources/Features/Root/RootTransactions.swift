@@ -17,8 +17,8 @@ extension Root {
             case .observeTransactions:
                 return .merge(
                     .publisher {
+                        // Filter first so unrelated events cannot displace transaction updates.
                         sdkSynchronizer.eventStream()
-                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                             .compactMap {
                                 if case SynchronizerEvent.foundTransactions(let transactions, _) = $0 {
                                     return Root.Action.foundTransactions(transactions)
@@ -27,6 +27,7 @@ extension Root {
                                 }
                                 return nil
                             }
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                     }
                     .cancellable(id: state.CancelEventId, cancelInFlight: true),
                     .publisher {
@@ -60,8 +61,12 @@ extension Root {
                 // fetch. Do not add `cancelInFlight`: sync events can arrive every 0.2 seconds and
                 // would continually cancel slower reads before any could finish.
                 return .run { send in
-                    if let transactions = try? await sdkSynchronizer.getAllTransactions(accountUUID) {
+                    do {
+                        let transactions = try await sdkSynchronizer.getAllTransactions(accountUUID)
                         await send(.fetchedTransactions(accountUUID, transactions))
+                    } catch {
+                        // The poller or next synchronizer event retries the fetch.
+                        LoggerProxy.error("getAllTransactions failed: \(error.toZcashError())")
                     }
                 }
                 .cancellable(id: state.CancelTransactionsFetchId)
@@ -120,21 +125,40 @@ extension Root {
                 
                 let identifiedArray = IdentifiedArrayOf<TransactionState>(uniqueElements: sortedTransactions)
 
+                // Re-read pending Zcash transactions in case a push signal was lost. Swap status is
+                // provider-owned, so the local SDK database cannot resolve it.
+                let pendingTransactionsPoller: Effect<Root.Action>
+                if identifiedArray.contains(where: { $0.type == .zcash && $0.isPending }) {
+                    pendingTransactionsPoller = .run { send in
+                        while !Task.isCancelled {
+                            try await mainQueue.sleep(for: .seconds(30))
+                            await send(.fetchTransactionsForTheSelectedAccount)
+                        }
+                    }
+                    .cancellable(id: state.CancelPendingTxPollId, cancelInFlight: true)
+                } else {
+                    pendingTransactionsPoller = .cancel(id: state.CancelPendingTxPollId)
+                }
+
                 // Update transactions
                 if state.transactions != identifiedArray {
                     state.$transactions.withLock {
                         $0 = identifiedArray
                     }
-                    return .send(.home(.smartBanner(.evaluatePriority6)))
+                    return .merge(
+                        pendingTransactionsPoller,
+                        .send(.home(.smartBanner(.evaluatePriority6)))
+                    )
                 }
                 // An identical result is still a completed refetch. Without a shared-state write,
                 // the transaction stores receive no publisher update and remain invalidated forever
                 // when switching between two empty accounts. Signal only stores actually waiting.
                 guard state.homeState.transactionListState.isInvalidated
                     || state.transactionsCoordFlowState.transactionsManagerState.isInvalidated else {
-                    return .none
+                    return pendingTransactionsPoller
                 }
                 return .merge(
+                    pendingTransactionsPoller,
                     .send(.home(.transactionList(.transactionsUpdated))),
                     .send(.transactionsCoordFlow(.transactionsManager(.transactionsUpdated)))
                 )

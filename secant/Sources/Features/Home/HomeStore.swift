@@ -169,14 +169,15 @@ struct Home {
 
                 return .merge(
                     .publisher {
+                        // Filter first so unrelated events cannot displace the refresh signal.
                         sdkSynchronizer.eventStream()
-                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                             .compactMap {
                                 if case SynchronizerEvent.foundTransactions = $0 {
                                     return Home.Action.foundTransactions
                                 }
                                 return nil
                             }
+                            .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                     }
                     .cancellable(id: state.CancelEventId, cancelInFlight: true),
                     .send(.smartBanner(.onAppear)),
