@@ -86,6 +86,8 @@ directly impact users rather than highlighting other crucial architectural updat
 
 ### Fixed
 - [PRO-325] Swaps out of ZEC and CrossPays that fail on the swap provider's side now show "Swap Failed" or "Payment Failed" instead of appearing to stay in progress forever. Long-running swaps in this direction also correctly show their processing state.
+- [MOB-1512] Restoring a wallet over device-backup data from a different recovery phrase now replaces the stale database, clears the previous wallet's device-scoped sessions and chat data, and re-syncs the correct wallet without risking imported view-only accounts.
+- [#1943] Fixed a wallet initialization bug that could start the same setup twice when Zapp returned to the foreground before setup finished.
 - [ZAPP-1] The floating tab bar now uses the correct colours in dark mode. Its shadow was being drawn in the theme's primary text colour, which is near-white in dark mode, so the bar sat in a pale glow instead of a shadow; the bar, its border and the selected tab now read from the Zapp palette like the rest of the app.
 - [ZAPP-1] The sync progress ring on the Pay screen now follows dark mode instead of always drawing its light-mode colours.
 - [ZAPP-1] Several small controls were too small to reliably hit: the clear button in search fields, and status chips that can be tapped, now meet the 44-point minimum touch target without changing how they look.
