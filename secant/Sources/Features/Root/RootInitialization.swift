@@ -25,8 +25,11 @@ extension Root {
         case checkRestoreWalletFlag(SyncStatus)
         case checkWalletInitialization
         case checkWalletConfig
+        case clearZappWalletScopedState
         case initializeSDK(WalletInitMode)
         case initializeSDKFinished
+        case presentStaleWalletHealedAlert
+        case staleWalletDatabaseHealed
         case initialSetups
         case initializationFailed(ZcashError)
         case initializationSuccessfullyDone
@@ -365,6 +368,53 @@ extension Root {
                                 String(localizable: .accountsZashi).lowercased()
                             )
 
+                            // TODO: [#1512] When the SDK pin is upgraded, add its direct
+                            // stale-database initialization result and thrown mismatch error as
+                            // fast paths into this heal. The current SDK only supports the probe.
+                            let healed = try await Root.reconcileWalletDatabaseWithSeed(
+                                knownStale: false,
+                                seedBytes: seedBytes,
+                                isSeedRelevant: { try await sdkSynchronizer.isSeedRelevantToAnyDerivedAccount($0) },
+                                hasSeedDerivedAccount: {
+                                    let accounts = try await sdkSynchronizer.walletAccounts()
+                                    return accounts.contains { $0.zip32AccountIndex != nil }
+                                },
+                                clearDeviceScopedState: {
+                                    let accounts = try await sdkSynchronizer.walletAccounts()
+                                    await send(.initialization(.clearZappWalletScopedState))
+                                    Root.clearDeviceScopedWalletState(
+                                        userDefaults: userDefaults,
+                                        flexaHandler: flexaHandler,
+                                        userStoredPreferences: userStoredPreferences,
+                                        readTransactionsStorage: readTransactionsStorage,
+                                        chatContacts: chatContacts,
+                                        walletAccounts: accounts
+                                    )
+                                    // These clients own async process/session state and must be
+                                    // stopped before the database is replaced.
+                                    await offramp.invalidateSession()
+                                    await zappMessaging.wipe()
+                                },
+                                wipe: {
+                                    guard let wipePublisher = sdkSynchronizer.wipe() else {
+                                        throw Root.WalletDatabaseHealError.wipeUnavailable
+                                    }
+                                    for try await _ in wipePublisher.values { }
+                                },
+                                reprepare: {
+                                    try await sdkSynchronizer.prepareWith(
+                                        seedBytes,
+                                        birthday,
+                                        .restoreWallet,
+                                        String(localizable: .accountsZashi),
+                                        String(localizable: .accountsZashi).lowercased()
+                                    )
+                                }
+                            )
+                            if healed {
+                                await send(.initialization(.staleWalletDatabaseHealed))
+                            }
+
                             await send(.fetchTransactionsForTheSelectedAccount)
                             /// The TCA spins an async Task in `fetchTransactionsForTheSelectedAccount` and it's needed to run
                             /// before next code here therefore Task is asleep for 0.01s. The purpose is also to not block the main thread
@@ -408,6 +458,11 @@ extension Root {
                             } else {
                                 await send(.initialization(.initializationSuccessfullyDone))
                             }
+                        } catch Root.WalletDatabaseHealError.reprepareFailed {
+                            // Release the single-flight latch before re-entering initialization;
+                            // otherwise the re-entry's own prepare is silently dropped.
+                            await send(.initialization(.initializeSDKFinished))
+                            await send(.initialization(.checkWalletInitialization))
                         } catch {
                             await send(.initialization(.initializationFailed(error.toZcashError())))
                         }
@@ -418,6 +473,30 @@ extension Root {
                 
             case .initialization(.initializeSDKFinished):
                 state.isInitializingSDK = false
+                return .none
+
+            case .initialization(.clearZappWalletScopedState):
+                state.$chatContacts.withLock { $0 = .empty }
+                state.zappMessagingState = ZappMessagingState()
+                state.offrampState = .initial()
+                return .send(.offramp(.cancelAll))
+
+            case .initialization(.staleWalletDatabaseHealed):
+                state.isRestoringWallet = true
+                userDefaults.setValue(true, Constants.udIsRestoringWallet)
+                state.$walletStatus.withLock { $0 = .restoring }
+                state.isStaleWalletHealedAlertPending = true
+                if state.destinationState.destination == .home {
+                    return presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId)
+                }
+                return .none
+
+            case .initialization(.presentStaleWalletHealedAlert):
+                guard state.isStaleWalletHealedAlertPending, state.destinationState.destination == .home else {
+                    return .none
+                }
+                state.isStaleWalletHealedAlertPending = false
+                state.alert = AlertState.staleWalletDatabaseHealed()
                 return .none
 
             case .initialization(.initializationSuccessfullyDone):
@@ -551,43 +630,14 @@ extension Root {
             case .resetZashiSDKSucceeded:
                 state.splashAppeared = true
                 state.isRestoringWallet = false
-                userDefaults.remove(Constants.udIsRestoringWallet)
-                userDefaults.remove(Constants.udIsResyncingWallet)
-                userDefaults.remove(Constants.udLeavesScreenOpen)
-                userDefaults.remove(.hasSeenHowToVote)
-                userDefaults.remove(.hasSeenHowToVoteKeystone)
-                userDefaults.remove(.appAuthenticationMethod)
-                userDefaults.remove(.failedPINAttempts)
-                userDefaults.remove(.pinLockoutEndTimestamp)
-                // Drop the user-supplied voting chain override and the saved
-                // custom-chain list. Without this wipe, the next wallet on
-                // this device would silently resolve voting through whatever
-                // third-party host the previous owner had pointed at.
-                userDefaults.remove(.votingConfigOverrideURL)
-                userDefaults.remove(.votingCustomChains)
-                // Delete the voting SQLite DB so per-round share delegation
-                // history, vote records, and stored TX hashes from the
-                // previous wallet don't leak across the reset boundary. The
-                // file is recreated empty on the next voting flow entry.
-                if let documents = FileManager.default
-                    .urls(for: .documentDirectory, in: .userDomainMask)
-                    .first {
-                    let votingDbURL = documents.appendingPathComponent("voting.sqlite3")
-                    try? FileManager.default.removeItem(at: votingDbURL)
-                }
-                // Belt-and-suspenders: voting drafts and vote records live in
-                // the encrypted per-account `votingMetadata` file now, which
-                // resetAccount() below removes. This sweep catches any stale
-                // plaintext entries from the previous UserDefaults-based
-                // storage that hung around on internal dev devices.
-                let standardDefaults = UserDefaults.standard
-                for key in standardDefaults.dictionaryRepresentation().keys
-                    where key.hasPrefix("voting.voteRecord.") || key.hasPrefix("voting.draftVotes.") {
-                    standardDefaults.removeObject(forKey: key)
-                }
-                flexaHandler.signOut()
-                userStoredPreferences.removeAll()
-                try? readTransactionsStorage.resetZashi()
+                Root.clearDeviceScopedWalletState(
+                    userDefaults: userDefaults,
+                    flexaHandler: flexaHandler,
+                    userStoredPreferences: userStoredPreferences,
+                    readTransactionsStorage: readTransactionsStorage,
+                    chatContacts: chatContacts,
+                    walletAccounts: state.walletAccounts
+                )
                 if !state.areMetadataPreserved {
                     state.walletAccounts.forEach { account in
                         try? userMetadataProvider.resetAccount(account.account)
@@ -599,9 +649,6 @@ extension Root {
                 // identity is derived from the wallet seed, so chat contacts belong
                 // to the wallet being deleted, not to the user's portable metadata.
                 // Must run BEFORE clearEncryptionKeys — the file is keyed by them.
-                state.walletAccounts.forEach { account in
-                    try? chatContacts.resetAccount(account.account)
-                }
                 state.walletAccounts.forEach { account in
                     try? walletStorage.clearEncryptionKeys(account.account)
                 }
@@ -767,6 +814,9 @@ extension Root {
 
             case .phraseDisplay(.finishedTapped), .onboarding(.newWalletSuccessfullyCreated):
                 state.destinationState.destination = .home
+                if state.isStaleWalletHealedAlertPending {
+                    return presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId)
+                }
                 return .none
 
             case .onboarding(.createNewWalletTapped):

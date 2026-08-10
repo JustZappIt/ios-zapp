@@ -85,6 +85,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [MOB-1512] Restoring a wallet over device-backup data from a different recovery phrase now replaces the stale database, clears the previous wallet's device-scoped sessions and chat data, and re-syncs the correct wallet without risking imported view-only accounts.
 - [#1943] Fixed a wallet initialization bug that could start the same setup twice when Zapp returned to the foreground before setup finished.
 - [ZAPP-1] The floating tab bar now uses the correct colours in dark mode. Its shadow was being drawn in the theme's primary text colour, which is near-white in dark mode, so the bar sat in a pale glow instead of a shadow; the bar, its border and the selected tab now read from the Zapp palette like the rest of the app.
 - [ZAPP-1] The sync progress ring on the Pay screen now follows dark mode instead of always drawing its light-mode colours.

@@ -56,6 +56,9 @@ extension Root {
                     return .none
                 }
                 state.destinationState.destination = destination
+                if destination == .home && state.isStaleWalletHealedAlertPending {
+                    return presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId)
+                }
                 return .none
 
             case .destination(.deeplink(let url)):
