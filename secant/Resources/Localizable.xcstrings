@@ -26129,6 +26129,12 @@
             "state" : "translated",
             "value" : "Continue anyway"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Continuar de todos modos"
+          }
         }
       }
     },
@@ -26140,6 +26146,12 @@
             "state" : "translated",
             "value" : "We recommend migrating your funds first to avoid leaking the transaction amount on-chain."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Te recomendamos migrar tus fondos primero para evitar revelar el monto de la transacción en la cadena."
+          }
         }
       }
     },
@@ -26150,6 +26162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This send requires spending Orchard funds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Este envío requiere gastar fondos de Orchard"
           }
         }
       }
