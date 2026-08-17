@@ -25,17 +25,20 @@ runs:
         ref: ${{ steps.pin.outputs.ref }}
         path: .zappMessaging-src
 
+    # Before the move, not after: setup-node rejects any cache-dependency-path
+    # containing '..' ("Relative pathing '.' and '..' is not allowed"), and once
+    # the checkout is moved beside the app that is the only way to name it.
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: .zappMessaging-src/package-lock.json
+
     - name: Move it beside the app
       shell: bash
       run: |
         rm -rf "$GITHUB_WORKSPACE/../zappMessaging"
         mv "$GITHUB_WORKSPACE/.zappMessaging-src" "$GITHUB_WORKSPACE/../zappMessaging"
-
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: npm
-        cache-dependency-path: ../zappMessaging/package-lock.json
 
     # `npm run setup` = install + bare-link + bare-pack. bare-link only assembles
     # xcframeworks from npm-shipped prebuilds, so there is no native compilation.

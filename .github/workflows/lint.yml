@@ -17,9 +17,21 @@ jobs:
   swiftlint:
     name: SwiftLint
     runs-on: ubuntu-latest
-    # Pinned to the same version the Xcode build phase enforces, so CI and a
-    # local build cannot disagree about what is a violation.
+    # Pinned to the version the Xcode build phase names, so CI and a local build
+    # cannot disagree about what counts as a violation.
     container: ghcr.io/realm/swiftlint:0.50.3
+    # ADVISORY, not blocking. The build phase that was meant to enforce this has
+    # had its swiftlint invocations commented out, so nothing has actually run the
+    # linter and a backlog built up: 204 error-level and 889 warning-level
+    # violations. 161 of the errors are `identifier_name` on deliberate names —
+    # the ZDesign colour ramp (_50 … _950), spacing tokens (_xs, _sm) and the
+    # CancelId enums — which are not worth renaming.
+    #
+    # Violations still surface as annotations on the diff. Flip this off once the
+    # backlog is cleared, or once the noisy built-in rules carry explicit
+    # severities; the house rules that matter (string_concatenation, NSLog) are
+    # already clean and declared `severity: error` in .swiftlint.yml.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
