@@ -40,17 +40,25 @@ runs:
         rm -rf "$GITHUB_WORKSPACE/../zappMessaging"
         mv "$GITHUB_WORKSPACE/.zappMessaging-src" "$GITHUB_WORKSPACE/../zappMessaging"
 
-    # `npm run setup` = install + bare-link + bare-pack. bare-link only assembles
-    # xcframeworks from npm-shipped prebuilds, so there is no native compilation.
-    # It must be `setup`, never `link` alone: worklet.bundle names each addon by
-    # exact version, and a mismatch surfaces at RUNTIME as "No addon registered",
-    # not as a build error.
+    # `link` + `build`, i.e. `npm run setup` without its leading `npm install`.
+    # bare-link only assembles xcframeworks from npm-shipped prebuilds, so there is
+    # no native compilation. Both halves are required: worklet.bundle names each
+    # addon by exact version, so `link` without `build` surfaces at RUNTIME as
+    # "No addon registered", not as a build error.
+    #
+    # `npm install` is deliberately skipped. `npm ci` has already installed exactly
+    # the lockfile, and the SDK's committed package-lock.json is missing an
+    # `engines` block that `npm install` then writes back — dirtying the checkout
+    # and tripping Scripts/validate-zappmessaging-artifacts.sh with "bundle was
+    # generated from uncommitted SDK sources". Drop this once the SDK commits a
+    # regenerated lockfile.
     - name: Generate the addon xcframeworks and the worklet bundle
       shell: bash
       working-directory: ../zappMessaging
       run: |
         npm ci
-        npm run setup
+        npm run link
+        npm run build
 
     - name: Verify the artifacts the local package needs
       shell: bash
