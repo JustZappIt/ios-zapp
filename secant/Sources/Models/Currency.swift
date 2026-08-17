@@ -81,7 +81,7 @@ struct CurrencyConversion: Equatable {
         // For currencies with a unicode symbol, use it directly.
         // For others (symbol == rawValue), append a non-breaking space for readability.
         if iso4217.symbol == iso4217.rawValue {
-            formatter.currencySymbol = iso4217.code + "\u{00A0}"
+            formatter.currencySymbol = "\(iso4217.code)\u{00A0}"
         } else {
             formatter.currencySymbol = iso4217.symbol
         }

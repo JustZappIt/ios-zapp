@@ -21,7 +21,7 @@ runs:
     - name: Checkout zappMessaging
       uses: actions/checkout@v4
       with:
-        repository: JustZappIt/zappMessaging
+        repository: JustZappIt/zappmessaging-sdk
         ref: ${{ steps.pin.outputs.ref }}
         path: .zappMessaging-src
 

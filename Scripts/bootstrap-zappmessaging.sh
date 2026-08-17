@@ -20,7 +20,7 @@ PINNED_REF="$(grep '^zappMessaging=' "$APP_DIR/.zapp-deps" | cut -d= -f2)"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zappMessaging beside the app ($SIBLING)"
-  git clone https://github.com/JustZappIt/zappMessaging.git "$SIBLING"
+  git clone https://github.com/JustZappIt/zappmessaging-sdk.git "$SIBLING"
   git -C "$SIBLING" checkout "$PINNED_REF"
 else
   echo "==> Found $SIBLING"

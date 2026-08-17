@@ -66,7 +66,7 @@ import Testing
     }
 
     @Test func isValidEmojiPushingOverLimitIsFalse() {
-        let text = String(repeating: "a", count: 510) + "🎉"
+        let text = "\(String(repeating: "a", count: 510))🎉"
         let state = MessageEditor.State(charLimit: 512, text: text)
 
         #expect(
@@ -76,7 +76,7 @@ import Testing
     }
 
     @Test func isValidEmojiExactlyAtLimitIsTrue() {
-        let text = String(repeating: "a", count: 508) + "🎉"
+        let text = "\(String(repeating: "a", count: 508))🎉"
         let state = MessageEditor.State(charLimit: 512, text: text)
 
         #expect(

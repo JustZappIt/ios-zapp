@@ -1,0 +1,76 @@
+name: Lint
+
+# Independent of the messaging SDK checkout and of Xcode, so it runs in seconds on
+# a Linux runner and gives every pull request a fast first signal while the macOS
+# build is still starting.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    # Pinned to the same version the Xcode build phase enforces, so CI and a
+    # local build cannot disagree about what is a violation.
+    container: ghcr.io/realm/swiftlint:0.50.3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint app sources
+        run: swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
+
+      - name: Lint tests
+        run: swiftlint lint --config .swiftlint_tests.yml --reporter github-actions-logging
+
+  hygiene:
+    name: Repo hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # This repository is public. Key material must never be committed, and the
+      # four files below are the ones that carry it.
+      - name: No credential files are tracked
+        run: |
+          hits=$(git ls-files | grep -iE '(^|/)(PartnerKeys\.plist|GoogleService-Info.*\.plist)$|\.p8$|\.p12$|\.pem$|\.keystore$|\.jks$|\.mobileprovision$|(^|/)\.env$' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Credential files are tracked:"; echo "$hits"; exit 1
+          fi
+          echo "No credential files tracked."
+
+      - name: No secret material in tracked files
+        run: |
+          PAT='(AKIA[0-9A-Z]{16})|(gh[pousr]_[A-Za-z0-9]{36})|(github_pat_[A-Za-z0-9_]{22,})|(xox[baprs]-[A-Za-z0-9-]{10,})|(sk-[A-Za-z0-9]{32,})|(sk_live_[A-Za-z0-9]{20,})|(-----BEGIN [A-Z ]*PRIVATE KEY-----)|(AIza[0-9A-Za-z_-]{35})|(hooks\.slack\.com/services/)|(0x[a-fA-F0-9]{64})'
+          # Vendor/ holds compiled artifacts; .xcstrings and CHANGELOG are prose.
+          hits=$(git grep -nIE "$PAT" -- . ':!Vendor/**' ':!*.xcstrings' ':!CHANGELOG.md' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Possible secret material committed:"; echo "$hits"; exit 1
+          fi
+          echo "No secret patterns found."
+
+      # Xcode writes this catalogue without a trailing newline. Round-tripping it
+      # through a JSON pretty-printer reformats the whole file and produces an
+      # unreviewable diff on every string change, so the byte format is enforced.
+      - name: Localizable.xcstrings keeps Xcode's byte format
+        run: |
+          f=secant/Resources/Localizable.xcstrings
+          python3 -c "import json,sys; json.load(open('$f'))" \
+            || { echo "::error::$f is not valid JSON"; exit 1; }
+          [ "$(tail -c 1 "$f" | xxd -p)" = "7d" ] \
+            || { echo "::error::$f must end with '}' and no trailing newline"; exit 1; }
+          echo "Catalogue format OK."
+
+      - name: Sibling dependency pins are full commit SHAs
+        run: |
+          bad=$(grep -E '^[a-zA-Z-]+=' .zapp-deps | grep -vE '=[0-9a-f]{40}$' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::.zapp-deps entries must pin a full 40-character SHA:"; echo "$bad"; exit 1
+          fi
+          echo "Dependency pins OK."

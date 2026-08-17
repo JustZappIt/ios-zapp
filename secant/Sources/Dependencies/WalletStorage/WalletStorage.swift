@@ -39,7 +39,7 @@ struct WalletStorage {
         static let zcashKeychainVersion = 1
 
         static func accountMetadataFilename(account: Account) -> String {
-            Constants.zcashStoredUserMetadataEncryptionKeys + "_\(account.name?.lowercased() ?? "")"
+            "\(Constants.zcashStoredUserMetadataEncryptionKeys)_\(account.name?.lowercased() ?? "")"
         }
 
         /// Per-account keychain key for the voting hotkey. The suffix is the

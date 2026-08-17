@@ -289,7 +289,7 @@ import CoreImage
     }
 
     @Test func roundTripLongUnifiedAddress() throws {
-        let input = "u1" + String(repeating: "abcdef1234", count: 30)
+        let input = "u1\(String(repeating: "abcdef1234", count: 30))"
         let image = try #require(
             QRCodeGenerator.generateCode(from: input, scale: 20, color: .black, overlayedWithZcashLogo: false),
             "QRCodeGenerator tests: `testRoundTripLongUnifiedAddress` image is expected to be non-nil"

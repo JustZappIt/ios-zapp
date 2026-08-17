@@ -10,9 +10,12 @@ on:
     paths-ignore:
       - '.github/ISSUE_TEMPLATE/*'
       - '.github/pull_request_template.md'
-      - 'LICENSE'
-      - 'README.md'
       - 'docs/**'
+      - '**/*.md'
+      - 'LICENSE'
+      - 'LICENSE-MIT'
+      - 'LICENSE-APACHE'
+      - 'NOTICE'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

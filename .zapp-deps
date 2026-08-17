@@ -13,5 +13,13 @@
 # `npm run build` yields a runtime "No addon registered", not a build error. Always
 # run `npm run setup`.
 #
-# GitHub: https://github.com/JustZappIt/zappMessaging
-zappMessaging=f12d2718fd22700d218b70af7fb56b0883da7dcf
+# Sourced from the PUBLIC SDK repository, so a clone of this project builds without
+# any credential. The private JustZappIt/zappMessaging carries an extra store/city
+# room feature that this app does not use; if that is ever ported to iOS, this pin
+# has to move back to the private repo and CI needs a read token again.
+#
+# The sibling directory keeps the name `zappMessaging` because secant.xcodeproj
+# references ../zappMessaging/ios by path.
+#
+# GitHub: https://github.com/JustZappIt/zappmessaging-sdk
+zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
