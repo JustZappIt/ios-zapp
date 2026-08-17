@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for the Secant wallet.
+about: Suggest an idea for the Zapp iOS wallet.
 title: ''
 labels: 'use case'
 assignees: ''

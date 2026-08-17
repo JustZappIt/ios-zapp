@@ -1,6 +1,6 @@
 ---
 name: UX report
-about: Was this wallet hard to use? It's not you, it's us. We want to hear about it.
+about: Was Zapp hard to use? It's not you, it's us. We want to hear about it.
 title: 'UX: '
 labels: 'usability'
 assignees: ''
