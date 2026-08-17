@@ -1,0 +1,64 @@
+Zapp iOS Wallet
+Copyright (c) 2025-2026 The Zapp Contributors
+
+This product includes software developed as part of the Zcash ecosystem.
+
+================================================================================
+Upstream lineage (MIT License)
+================================================================================
+
+Zapp for iOS is a fork of Zodl (https://github.com/zodl-inc/zodl-ios), which is
+itself a fork of the Electric Coin Company's Zashi wallet
+(https://github.com/Electric-Coin-Company/zashi-ios).
+
+    Copyright (c) 2026 Znewco, Inc. (d/b/a Zcash Open Development Lab)
+    Copyright (c) 2020-2025 Electric Coin Company
+    Licensed under the MIT License. See LICENSE-MIT.
+
+All code inherited or derived from Zashi/Zodl remains under the MIT License and
+retains the upstream copyright notices above.
+
+================================================================================
+Zapp-original contributions (MIT OR Apache-2.0)
+================================================================================
+
+Code authored by the Zapp Contributors — including (but not limited to) the
+chat feature under `secant/Sources/Features/Chats/`, the offramp feature under
+`secant/Sources/Features/Offramp/` and `secant/Sources/Dependencies/Offramp/`,
+the messaging integration under `secant/Sources/Dependencies/ZappMessaging/`,
+and the Zapp shell and design components under
+`secant/Sources/Features/ZappTabs/` and `secant/Sources/UIComponents/Zapp/` —
+is dual-licensed and may be used under the terms of EITHER the MIT License
+(LICENSE-MIT) OR the Apache License, Version 2.0 (LICENSE-APACHE), at your
+option. Such files carry an SPDX header:
+
+    SPDX-License-Identifier: MIT OR Apache-2.0
+
+================================================================================
+Vendored binary artifacts
+================================================================================
+
+`Vendor/ZappOfframp.xcframework` is a compiled build of the Kotlin Multiplatform
+`offramp-lib` module for the iOS target. Its source is published at
+https://github.com/JustZappIt/zapp-android/tree/main/offramp-lib and is covered
+by that repository's license.
+
+================================================================================
+Bundled fonts
+================================================================================
+
+    Inter       — https://fonts.google.com/specimen/Inter
+                  SIL Open Font License 1.1 (https://openfontlicense.org)
+    Michroma    — https://fonts.google.com/specimen/Michroma
+                  SIL Open Font License 1.1 (https://openfontlicense.org)
+    Roboto Mono — https://fonts.google.com/specimen/Roboto+Mono
+                  Apache License 2.0
+    Zboto       — icon font inherited from the upstream Zashi wallet
+
+================================================================================
+Third-party dependencies
+================================================================================
+
+Swift package dependencies and their versions are declared in
+`secant.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+Each remains under its own license.

@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for coding agents and new contributors working in this repository.
 
 ## Project Overview
 
@@ -94,7 +94,7 @@ The app ships a complete design system — reusable SwiftUI components (`secant/
 - **Colors:** Use the generated palette — `Asset.Colors.<name>.color` (including the `Asset.Colors.ZDesign.*` semantic ramp). Never hardcode `Color(red:green:blue:)` or hex literals.
 - **Assets / icons:** Use bundled assets via `Asset.Assets.<name>.image` (namespaced, e.g. `Asset.Assets.Icons.*`, `Asset.Assets.Brandmarks.*`). Prefer these over SF Symbols (`Image(systemName:)`).
 - **Strings:** Every user-facing string goes into `Localizable.xcstrings` and is referenced with `String(localizable: .someKey)` — the established idiom (~850 call sites; there are no hardcoded display literals in views). Never put display strings directly in code. Never round-trip the catalogue through `json.dump`, and never append a trailing newline; it must end with `}` and no `\n`.
-- **When the design system can't cover a need** — no suitable component, color, or asset exists — **stop and tell the user** instead of silently creating a one-off. Extend the design system deliberately, with the user's agreement, rather than diverging from it.
+- **When the design system can't cover a need** — no suitable component, color, or asset exists — **stop and ask** instead of silently creating a one-off. Extend the design system deliberately, with agreement, rather than diverging from it.
 
 > `Asset.*` symbols are SwiftGen-generated into `Sources/Generated/` — do not edit those files; add the asset/color to the `.xcassets` catalogue and let the build regenerate them.
 

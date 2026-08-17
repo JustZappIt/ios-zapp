@@ -86,8 +86,8 @@ PartnerKeys.plist
 *.a
 *.generated.swift
 
-# Claude
-.claude/settings.local.json
+# Agent tooling (local only)
+.claude/
 .remember/
 
 # Release

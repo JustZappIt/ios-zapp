@@ -24,7 +24,7 @@ import ComposableArchitecture
 /// `sendConfirmation` path element and swap submits through the `sending` path element — both are
 /// `SendConfirmation`, whose `sendTriggered` / `createTransactionFromPCZT` cases make the *only*
 /// calls into the guarded `sdkSynchronizer` closures. No call site in this file acquires the guard,
-/// and no code path here calls two guarded closures in sequence (see `CLAUDE.md` on
+/// and no code path here calls two guarded closures in sequence (see `AGENTS.md` on
 /// `Dependencies/TransactionGuard/`).
 ///
 /// Swap-to-ZEC (deposit an external asset to receive ZEC) and cross-pay are *not* part of Android's

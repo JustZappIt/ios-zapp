@@ -10,7 +10,7 @@
 #
 # Run it after a fresh clone, and again whenever you pull JS changes in
 # zappMessaging — an ios-zapp build will otherwise link a STALE worklet.bundle
-# with no warning at all. (Android has the same coupling; see its CLAUDE.md.)
+# with no warning at all. (Android has the same coupling; see its AGENTS.md.)
 #
 set -euo pipefail
 
