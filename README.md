@@ -1,5 +1,7 @@
 # Zapp for iOS
 
+**[justzappit.xyz](https://www.justzappit.xyz/)**
+
 Zapp is a privacy-first Zcash wallet with an end-to-end encrypted peer-to-peer messenger built
 into it. Shielded ZEC for the money, Hyperswarm for the messages, and a peer-to-peer offramp for
 spending in local currency. No account, no custody, no tracking.
@@ -127,6 +129,12 @@ read it before your first change. Further documentation is in [docs/](docs/READM
 
 Please do not open a public issue for security vulnerabilities. See [SECURITY.md](SECURITY.md) for
 how to report one.
+
+## Links
+
+- Website — [justzappit.xyz](https://www.justzappit.xyz/)
+- Android app — [JustZappIt/zapp-android](https://github.com/JustZappIt/zapp-android)
+- Messaging runtime — [JustZappIt/zappmessaging-sdk](https://github.com/JustZappIt/zappmessaging-sdk)
 
 ## License
 

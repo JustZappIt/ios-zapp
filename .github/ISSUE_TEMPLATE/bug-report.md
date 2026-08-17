@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report about a bug in Secant iOS Wallet.
+about: Create a report about a bug in the Zapp iOS wallet.
 title: ''
 labels: 'bug'
 assignees: ''
@@ -8,44 +8,32 @@ assignees: ''
 ---
 
 <!--
-This issue tracker is only for technical issues related to Secant iOS Wallet.
+This issue tracker is only for technical issues related to the Zapp iOS wallet.
 
-General Zcash questions and/or support requests and are best directed to the
+DO NOT report security vulnerabilities here. Please report them privately via
+GitHub Security Advisories instead:
+https://github.com/JustZappIt/ios-zapp/security/advisories/new
+See SECURITY.md for the full policy.
+
+General Zcash questions and/or support requests are best directed to the
 Zcash Forum: https://forum.zcashcommunity.com/
 
-For reporting security vulnerabilities or for sensitive discussions with our
-security team, please email security@z.cash . You can use this GPG key to send
-an encrypted message:
-    https://z.cash/gpg-pubkeys/security.asc
-    fingerprint: AF85 0445 546C 18B7 86F9  2C62 88FB 8B86 D8B5 A68C
-
-The key and fingerprint are duplicated on our Public Keys page:
-https://z.cash/support/pubkeys.html
+More about Zapp: https://www.justzappit.xyz/
 -->
 
-### Describe the issue
-Please provide a general summary of the issue you're experiencing
+## Describe the bug
+A clear and concise description of what the bug is.
 
-### Can you reliably reproduce the issue?
-#### If so, please list the steps to reproduce below:
-1. 
-2. 
-3. 
+## To reproduce
+Steps to reproduce the behavior.
 
-### Expected behaviour
-Tell us what should happen
+## Expected behavior
+What you expected to happen instead.
 
-### Actual behaviour + errors
-Tell us what happens instead including any noticeable error output (any messages
-displayed on-screen when e.g. a crash occurred)
-<!-- Note: please do not include sensitive information. blur, scratch or annotate any
-information like addresses, usernames, amounts or anything other that you might consider sensitive and it's not relevant to the problem you are reporting.  -->
+## Environment
+- Device:
+- iOS version:
+- Zapp version (Settings → About):
 
-- App Version: 
-- iOS Version:
-- Device: (if applies)
-
-### Any extra information that might be useful in the debugging process.
-<!-- Note: please do not include sensitive information. blur, scratch or annotate any
-information like addresses, usernames, amounts or anything other that you might consider sensitive and it's not relevant to the problem you are reporting.  -->
-
+## Additional context
+Screenshots, logs, or anything else that might help.

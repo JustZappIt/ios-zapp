@@ -19,5 +19,5 @@ This code review checklist is intended to serve as a starting point for the auth
 - [ ] Automated tests: Did you review the automated tests?
 - [ ] Manual tests: Did you review the manual tests?_You will find manual testing guidelines under our [manual testing section](../blob/main/docs/testing/manual_testing)_
 - [ ] How is Code Coverage affected by this PR? _We encourage you to compare coverage before and after your changes and when possible, leave it in a better place. [Learn More...](../blob/main/docs/testing/local_coverage.md)_
-- [ ] Documentation: Did you review Docs, [README.md](../blob/main/README.md), [LICENSE.md](../blob/main/LICENSE.md), and [Architecture.md](../blob/main/docs/Architecture.md) as appropriate?
+- [ ] Documentation: Did you review Docs, [README.md](../blob/main/README.md), [LICENSE](../blob/main/LICENSE), and [Architecture.md](../blob/main/docs/Architecture.md) as appropriate?
 - [ ] Run the app: Did you run the app and try the changes? While the CI server runs the app to look for build failures or crashes, humans running the app are more likely to notice unexpected log messages, UI inconsistencies, or bad output data.

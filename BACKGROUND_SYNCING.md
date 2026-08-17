@@ -22,7 +22,7 @@ BGTaskScheduler.shared.register(
     // see the next steps
 }
 ```
-Note: The queue is an optional and most tutorials leave the parameter `nil` but Zashi requires main thread processing due to UI layer - therefore we pass `DispatchQueue.main`.
+Note: The queue is an optional and most tutorials leave the parameter `nil` but Zapp requires main thread processing due to UI layer - therefore we pass `DispatchQueue.main`.
 6. Call a method that schedules the task execution.
 7. Start the synchronizer.
 8. Set the expiration closure and stop the synchronizer inside it
@@ -57,7 +57,7 @@ do {
 ```
 11. Last step is to call `.setTaskCompleted(success: <bool>)` on the BGTask when the work is done. This is required by the system no matter what. We call it with `true` when the synchronizer finishes the work (up-to-date state) and with `false` for other or failed reasons (stopped state, error state, etc.).
 
-You can see specific details of the Zashi implementation in:
+You can see specific details of the Zapp implementation in:
 - Xcode project settings, steps 1-4.
 - AppDelegate.swift file, steps 5-9.
 - SecantApp.swift file, step 10.
