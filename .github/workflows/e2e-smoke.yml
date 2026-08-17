@@ -39,7 +39,24 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: read
+    outputs:
+      has_e2e_creds: ${{ steps.e2e_creds.outputs.has }}
     steps:
+      # The suite checks out a private QA repository in another organisation and
+      # drives wallets holding real mainnet funds. Neither is possible without the
+      # secrets below, and a fork never receives secrets at all. Report their
+      # presence so the phase jobs can skip cleanly instead of failing at checkout
+      # with an error that looks like a broken pipeline.
+      - name: Check for e2e credentials
+        id: e2e_creds
+        run: |
+          if [ -n "${{ secrets.ZODL_QA }}" ] && [ -n "${{ secrets.ZODL_TEST_SEED_IOS }}" ]; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::e2e phases will be skipped: ZODL_QA and/or ZODL_TEST_SEED_IOS is not configured."
+          fi
+
       - name: Select latest Xcode
         # macos-15 runners ship multiple Xcodes; default-selected may be 16.x.
         # XCUITest from older Xcode driving an iOS 26 sim causes maestro tap/
@@ -204,8 +221,11 @@ jobs:
 
   e2e-ios:
     needs: build
-    # Same draft-PR guard as `build` — keep it explicit on the expensive job.
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    # Same draft-PR guard as `build`, plus the credential gate: without the QA
+    # checkout token and the funded test seed this job can only fail, so skip it.
+    if: >-
+      ${{ needs.build.outputs.has_e2e_creds == 'true'
+          && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: macos-26
     # Cold-cache phase 2 runs spend ~25-30 min on the
     # restore-existing-wallet sync alone (chain-tip catchup from the
