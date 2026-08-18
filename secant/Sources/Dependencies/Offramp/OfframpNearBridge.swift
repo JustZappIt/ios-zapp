@@ -27,7 +27,10 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
         walletStorage: WalletStorageClient,
         mnemonic: MnemonicClient,
         derivationTool: DerivationToolClient,
-        environment: ZcashSDKEnvironment
+        environment: ZcashSDKEnvironment,
+        pollingClock: AnyClock<Duration> = AnyClock(ContinuousClock()),
+        pollingInterval: Duration = .seconds(5),
+        pollingTimeout: Duration = .seconds(30 * 60)
     ) {
         worker = OfframpNearBridgeWorker(
             account: account,
@@ -36,7 +39,10 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
             walletStorage: walletStorage,
             mnemonic: mnemonic,
             derivationTool: derivationTool,
-            environment: environment
+            environment: environment,
+            pollingClock: pollingClock,
+            pollingInterval: pollingInterval,
+            pollingTimeout: pollingTimeout
         )
     }
 
@@ -156,6 +162,9 @@ private actor OfframpNearBridgeWorker {
     private let mnemonic: MnemonicClient
     private let derivationTool: DerivationToolClient
     private let environment: ZcashSDKEnvironment
+    private let pollingClock: AnyClock<Duration>
+    private let pollingInterval: Duration
+    private let pollingTimeout: Duration
     private var prepared: [String: PreparedBridge] = [:]
     private var authorizedTopUps: [String: AuthorizedBridge] = [:]
     private var authorizedRefunds: [String: AuthorizedRefund] = [:]
@@ -168,7 +177,10 @@ private actor OfframpNearBridgeWorker {
         walletStorage: WalletStorageClient,
         mnemonic: MnemonicClient,
         derivationTool: DerivationToolClient,
-        environment: ZcashSDKEnvironment
+        environment: ZcashSDKEnvironment,
+        pollingClock: AnyClock<Duration>,
+        pollingInterval: Duration,
+        pollingTimeout: Duration
     ) {
         self.account = account
         self.swapAndPay = swapAndPay
@@ -177,6 +189,9 @@ private actor OfframpNearBridgeWorker {
         self.mnemonic = mnemonic
         self.derivationTool = derivationTool
         self.environment = environment
+        self.pollingClock = pollingClock
+        self.pollingInterval = pollingInterval
+        self.pollingTimeout = pollingTimeout
     }
 
     func prepare(accountAddress: String, usdcMicros: String) async throws -> String {
@@ -351,6 +366,7 @@ private actor OfframpNearBridgeWorker {
 
     func poll(depositAddress: String) async -> AppleBridgeExecution {
         var deterministicFailures = 0
+        let deadline = pollingClock.now.advanced(by: pollingTimeout)
         while !Task.isCancelled {
             do {
                 let details = try await swapAndPay.status(depositAddress, false)
@@ -365,7 +381,15 @@ private actor OfframpNearBridgeWorker {
                         message: "The 1-Click bridge ended with status \(details.status.rawName)."
                     )
                 case .pending, .pendingDeposit, .processing:
-                    break
+                    guard pollingClock.now < deadline else {
+                        // A local wait deadline is not proof that the provider-side transfer failed.
+                        // Keep the checkpoint resumable instead of inviting a duplicate deposit.
+                        return AppleBridgeExecution(
+                            succeeded: false,
+                            terminal: false,
+                            message: "The 1-Click bridge is still \(details.status.rawName) after 30 minutes. Resume to check again."
+                        )
+                    }
                 }
             } catch {
                 deterministicFailures += 1
@@ -373,7 +397,12 @@ private actor OfframpNearBridgeWorker {
                     return AppleBridgeExecution(succeeded: false, terminal: false, message: error.localizedDescription)
                 }
             }
-            try? await Task.sleep(for: .seconds(5))
+            do {
+                let nextPoll = min(pollingClock.now.advanced(by: pollingInterval), deadline)
+                try await pollingClock.sleep(until: nextPoll)
+            } catch {
+                break
+            }
         }
         return AppleBridgeExecution(succeeded: false, terminal: false, message: "Bridge polling was cancelled.")
     }

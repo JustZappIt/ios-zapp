@@ -126,12 +126,35 @@ struct KeystoneVotingDelegationPcztScanChecker: ScanChecker, Equatable {
 }
 #endif
 
+/// PHASE 7 — migration Keystone batch signing. Unlike every other checker in this file, this one
+/// does NOT run the accumulate-with-progress dance itself: the batch-signing bridge
+/// (`Synchronizer.decodeKeystoneSignBatchPart(_:expectedRequestId:)`) owns its OWN multi-part decode
+/// session over the raw scanned frame strings, so `keystoneHandler`'s BC-UR fountain decoder (used
+/// by every other Keystone checker above) plays no part here. `checkQRCode` cannot await that call
+/// (`ScanChecker.checkQRCode` is a synchronous, dependency-only, `state`-free function), so it hands
+/// the raw frame straight back as `.keystoneBatchPartScanned` — `Scan.body` runs the decode as an
+/// effect and reports progress/completion/failure from there.
+///
+/// Always matches (never `nil`): every scanned string during this ceremony is a candidate frame, and
+/// the decode call itself is what validates it.
+struct KeystoneMigrationBatchScanChecker: ScanChecker, Equatable {
+    let id = 6
+
+    func checkQRCode(_ qrCode: String) -> Scan.Action? {
+        .keystoneBatchPartScanned(qrCode)
+    }
+}
+
 /// A chat peer's Ed25519 public key — 64 hex characters, optionally `0x`-prefixed. `parse`
 /// applies Android's strict rule rather than the lenient paste sanitizer, so anything else —
 /// a wallet address above all — is rejected outright rather than left to fall through, and a
 /// Zcash address QR reports "not a public key" instead of the generic no-code-found message.
+///
+/// `id` must stay distinct from every other checker: `ScanCheckerWrapper.==` compares ids alone,
+/// so a collision (6 was taken by `KeystoneMigrationBatchScanChecker` in upstream 3.9.1) silently
+/// makes two different scanners compare equal and misroutes scans.
 struct ChatPublicKeyScanChecker: ScanChecker, Equatable {
-    let id = 6
+    let id = 7
 
     func checkQRCode(_ qrCode: String) -> Scan.Action? {
         guard let key = PublicKeyRules.parse(qrCode) else {
@@ -153,6 +176,7 @@ struct ScanCheckerWrapper: Equatable, Sendable {
     #if VOTING_ENABLED
     static let keystoneVotingDelegationPCZTScanChecker = ScanCheckerWrapper(KeystoneVotingDelegationPcztScanChecker())
     #endif
+    static let keystoneMigrationBatchScanChecker = ScanCheckerWrapper(KeystoneMigrationBatchScanChecker())
     static let chatPublicKeyScanChecker = ScanCheckerWrapper(ChatPublicKeyScanChecker())
 
     static func == (lhs: ScanCheckerWrapper, rhs: ScanCheckerWrapper) -> Bool {

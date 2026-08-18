@@ -227,6 +227,7 @@ struct Near1Click {
             case SwapConstants.failed: .failed
             case SwapConstants.incompleteDeposit: .incompleteDeposit
             case SwapConstants.processing: .processing
+            case SwapConstants.expired: .expired
             default: .pending
             }
         } else {
@@ -237,6 +238,7 @@ struct Near1Click {
             case SwapConstants.success: .success
             case SwapConstants.failed: .failed
             case SwapConstants.processing: .processing
+            case SwapConstants.expired: .expired
             default: .pending
             }
         }

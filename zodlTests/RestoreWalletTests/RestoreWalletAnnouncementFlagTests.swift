@@ -1,58 +1,72 @@
-import ComposableArchitecture
+//
+//  RestoreWalletAnnouncementFlagTests.swift
+//  zodlTests
+//
+//  Ironwood announcement — neither wallet-creation nor wallet-restore
+//  (Features/CoordFlows/RestoreWalletCoordFlowCoordinator.swift) may touch the
+//  Ironwood-announcement keychain flag. Ironwood is news about the network, not about a
+//  particular wallet, so both paths must leave the flag untouched and let Root's normal
+//  activation gate decide. An earlier revision pre-acknowledged the flag on creation; that made
+//  "fresh install, create a wallet" the one path on which the screen could never appear, which
+//  is also the most obvious way to test the feature by hand. These tests are what stop it
+//  coming back.
+//
+//  RestoreWalletCoordFlow.State is not Equatable (it holds a non-Equatable StackState, and its
+//  Action type — referenced via Action-typed AlertState — isn't Equatable either), so TestStore
+//  will not compile against it. These tests instead drive a plain Store and read/record state
+//  directly after sending actions — the same approach used by AddKeystoneHWWalletCoordFlowTests
+//  (see its header comment) and ScanCoordFlowZip321Tests. Initial state is set up before Store
+//  creation, never via store.state mutation (get-only on a plain Store).
+//
+//  Both cases under test perform their walletStorage calls synchronously inside the reducer body,
+//  before any returned effect runs, so no polling/waiting is needed after `send`.
+//
+
 import Testing
+import ComposableArchitecture
 @testable import zodl_internal
 
 @Suite(.serialized) @MainActor struct RestoreWalletAnnouncementFlagTests {
-    @Test func createNeverPreAcknowledgesAnnouncement() async {
-        await withDependencies {
-            $0.defaultInMemoryStorage = InMemoryStorage()
-        } operation: {
-            let calls = LockIsolated<[Bool]>([])
-            let clock = TestClock()
-            let store = makeStore(
-                state: RestoreWalletCoordFlow.State(),
-                calls: calls,
-                clock: clock
-            )
-            store.send(.createNewWalletRequested)
-            await clock.advance(by: .milliseconds(900))
-            await waitUntil { !store.state.path.isEmpty }
-            #expect(!store.state.path.isEmpty)
-            #expect(calls.value.isEmpty)
-        }
+    @Test func createNewWalletRequestedNeverWritesIronwoodAnnouncementFlag() async {
+        let calls = LockIsolated<[Bool]>([])
+        let store = makeStore(initialState: RestoreWalletCoordFlow.State(), flagCalls: calls)
+
+        store.send(.createNewWalletRequested)
+
+        // Creating a wallet must leave the flag completely untouched — not even written `true`.
+        // Writing it here would permanently suppress the announcement for every user who starts
+        // with a fresh wallet, and would make the feature untestable by hand without the debug
+        // reset row. Asserting an empty call list is what catches a reintroduction.
+        #expect(calls.value.isEmpty)
     }
 
-    @Test func restoreNeverPreAcknowledgesAnnouncement() async {
-        await withDependencies {
-            $0.defaultInMemoryStorage = InMemoryStorage()
-        } operation: {
-            var state = RestoreWalletCoordFlow.State()
-            state.birthday = 1_000_000
-            let calls = LockIsolated<[Bool]>([])
-            let store = makeStore(state: state, calls: calls)
-            store.send(.resolveRestore)
-            #expect(!store.state.path.isEmpty)
-            #expect(calls.value.isEmpty)
-        }
+    @Test func resolveRestoreNeverWritesIronwoodAnnouncementFlag() async {
+        var initialState = RestoreWalletCoordFlow.State()
+        initialState.birthday = 1_000_000
+        let calls = LockIsolated<[Bool]>([])
+        let store = makeStore(initialState: initialState, flagCalls: calls)
+
+        store.send(.resolveRestore)
+
+        // Restoring a seed likewise leaves the flag untouched, so the one-time announcement
+        // screen remains eligible to show for a returning user.
+        #expect(calls.value.isEmpty)
     }
+
+    // MARK: - Helpers
 
     private func makeStore(
-        state: RestoreWalletCoordFlow.State,
-        calls: LockIsolated<[Bool]>,
-        clock: any Clock<Duration> = ImmediateClock()
+        initialState: RestoreWalletCoordFlow.State,
+        flagCalls: LockIsolated<[Bool]>
     ) -> StoreOf<RestoreWalletCoordFlow> {
-        Store(initialState: state) { RestoreWalletCoordFlow() } withDependencies: {
+        Store(initialState: initialState) {
+            RestoreWalletCoordFlow()
+        } withDependencies: {
             $0.mnemonic = .noOp
-            $0.continuousClock = clock
             $0.walletStorage = .noOp
-            $0.walletStorage.importIronwoodAnnouncementFlag = { flag in calls.withValue { $0.append(flag) } }
-        }
-    }
-
-    private func waitUntil(_ condition: @escaping @MainActor () -> Bool) async {
-        let deadline = ContinuousClock.now + .seconds(1)
-        while !condition(), ContinuousClock.now < deadline {
-            try? await Task.sleep(for: .milliseconds(10))
+            $0.walletStorage.importIronwoodAnnouncementFlag = { value in
+                flagCalls.withValue { $0.append(value) }
+            }
         }
     }
 }

@@ -79,6 +79,8 @@ struct Home {
         case currencyConversionCloseTapped
         case currencyConversionSetupTapped
         case fiatFallbackResponse(ZappFiatQuote?)
+        /// The migration smart banner was tapped — Root opens `MigrationCoordFlow`.
+        case migrationTapped
         case foundTransactions
         case keystoneBannerTapped
         case moreTapped
@@ -342,6 +344,11 @@ struct Home {
             case .binding:
                 return .none
                 
+            case .migrationTapped:
+                // Root consumes this to open `MigrationCoordFlow` (same shape as
+                // `.currencyConversionSetupTapped` below).
+                return .none
+
             case .currencyConversionSetupTapped:
                 return .none
 
@@ -378,6 +385,9 @@ struct Home {
 
             case .smartBanner(.currencyConversionScreenRequested):
                 return .send(.currencyConversionSetupTapped)
+
+            case .smartBanner(.migrationScreenRequested):
+                return .send(.migrationTapped)
 
             case .smartBanner(.torSetupScreenRequested):
                 return .send(.torSetupTapped(false))
