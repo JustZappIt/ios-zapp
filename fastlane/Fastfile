@@ -121,8 +121,14 @@ lane :release do |options|
     # release that would fail it should fail before anyone is asked to confirm. Scoped
     # to the build path: submit-only runs archive nothing, so the local checkout's
     # artifact is not what they ship.
+    #
+    # EXPECTED_PIN is the REF's pin, not the operator's: the script resolves .zapp-deps
+    # from its own location, which is the current checkout, and that is the wrong file
+    # whenever the ref pins a different SDK revision.
     UI.message("Verifying the libzcashlc artifact this build would link…")
-    sh("#{repo_root.shellescape}/Scripts/verify-zcash-sdk-artifact.sh")
+    expected_pin = zapp_deps_pin(repo_root, sha, "zcashSwiftWalletSdk")
+    UI.user_error!("no zcashSwiftWalletSdk= pin in .zapp-deps at #{sha[0, 8]}") unless expected_pin
+    sh({ "EXPECTED_PIN" => expected_pin }, "#{repo_root.shellescape}/Scripts/verify-zcash-sdk-artifact.sh")
   end
 
   submission = nil
@@ -330,11 +336,17 @@ end
 # staleness problem rather than a licensing one.
 PINNED_LOCAL_PACKAGES = { "../zcash-swift-wallet-sdk" => "zcashSwiftWalletSdk" }.freeze
 
-def zapp_deps_pin(repo_root, key)
-  path = File.join(repo_root, ".zapp-deps")
-  return nil unless File.exist?(path)
+# Read a pin from `.zapp-deps` AS COMMITTED AT `sha`, never from the operator's
+# working checkout. The two diverge whenever branches pin different revisions, and
+# then the preflight validates the sibling against the wrong pin while the build
+# archives the ref's code — shipping an app/SDK pairing nobody reviewed. Everything
+# else in this preflight already reads the ref (`marketing_version_at`,
+# `local_packages_at`); this was the one hole.
+def zapp_deps_pin(repo_root, sha, key)
+  contents = run("git -C #{repo_root.shellescape} show #{sha}:.zapp-deps")
+  return nil if contents.strip.empty?
 
-  File.readlines(path).find { |l| l.start_with?("#{key}=") }&.split("=", 2)&.last&.strip
+  contents.lines.find { |l| l.start_with?("#{key}=") }&.split("=", 2)&.last&.strip
 end
 
 def local_packages_at(repo_root, sha)
@@ -342,7 +354,7 @@ def local_packages_at(repo_root, sha)
   Zodl::LocalPackages.parse(pbxproj).map do |rel|
     resolved = File.expand_path(rel, repo_root)
     key = PINNED_LOCAL_PACKAGES[rel]
-    pin = key && zapp_deps_pin(repo_root, key)
+    pin = key && zapp_deps_pin(repo_root, sha, key)
     unless File.directory?(resolved)
       next { path: rel, resolved: resolved, exists: false, git: nil, dirty: nil, pin: pin }
     end
