@@ -46,4 +46,4 @@ zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 # line's newer librustzcash generation. We do not ship that variant.
 #
 # GitHub: https://github.com/zcash/zcash-swift-wallet-sdk
-zcashSwiftWalletSdk=a3160f0c2a20dce12192b2f277492022a14d7dea
+zcashSwiftWalletSdk=89d7b08d89739d1a004f141e92e730894a78c6ae
