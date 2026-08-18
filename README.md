@@ -46,27 +46,21 @@ them so that future upstream merges stay cheap. That is why the Xcode project is
 
 ## Building
 
-### Known limitation: this cannot be built outside the org today
+### Checkout layout
 
-`secant.xcodeproj` references `../zappMessaging/ios` as a **local** Swift package
-(`XCLocalSwiftPackageReference`), so that sibling checkout is a build prerequisite, not an optional
-convenience:
+`secant.xcodeproj` references two **local** Swift packages by relative path, so both must be checked
+out beside this repository. Both are public:
 
 ```
 <some-dir>/
-  ios-zapp/            <-- this repository
-  zappMessaging/       <-- required, currently private
-  zcash-swift-wallet-sdk/  <-- required, public (zcash/zcash-swift-wallet-sdk)
+  ios-zapp/                 <-- this repository
+  zappMessaging/            <-- JustZappIt/zappmessaging-sdk, cloned under this name
+  zcash-swift-wallet-sdk/   <-- zcash/zcash-swift-wallet-sdk
 ```
 
-[`JustZappIt/zappMessaging`](https://github.com/JustZappIt/zappMessaging) is **private at the time
-of writing**. Xcode fails to resolve packages if it is missing, and there is no flag that stubs the
-messaging package out, so people outside the JustZappIt org cannot currently build this project. CI
-works only because it checks the repository out with a read token. This is a known limitation,
-stated here rather than worked around.
-
-The messaging runtime itself is open source at
-[JustZappIt/zappmessaging-sdk](https://github.com/JustZappIt/zappmessaging-sdk).
+`Scripts/bootstrap-zappmessaging.sh` clones the messaging SDK to the right place at the commit
+pinned in [`.zapp-deps`](.zapp-deps) and generates its build artifacts. The directory is named
+`zappMessaging` because that is the path the Xcode project references.
 
 ### Prerequisites
 

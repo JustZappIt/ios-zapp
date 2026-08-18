@@ -122,8 +122,8 @@ struct ProposalListView: View {
     }
 
     /// Pre-submission review header per the Figma — just the two text
-    /// blocks ("Review and submit vote" + the "Tap to edit / Confirm &
-    /// Submit" subtitle). The active-voting header's title + #block +
+    /// blocks: "Review and submit vote", then the "Tap to edit / Confirm &
+    /// Submit" subtitle. The active-voting header's title, #block and
     /// ends/power row is intentionally omitted on this screen since
     /// the user is no longer setting up the round, they're confirming
     /// answers.

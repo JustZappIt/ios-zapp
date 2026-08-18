@@ -155,11 +155,11 @@ import ComposableArchitecture
             }
 
             let elementId = try #require(store.state.sendCoordFlowState.path.ids.first)
-            // Await the action's complete effect tree instead of using a wall-clock delay. A regression
-            // that launches a refetch is observed before this task finishes.
-            await store.send(
-                .sendCoordFlow(.path(.element(id: elementId, action: .sendConfirmation(.sendFailed(nil, false)))))
-            ).finish()
+            store.send(.sendCoordFlow(.path(.element(id: elementId, action: .sendConfirmation(.sendFailed(nil, false))))))
+
+            // No polling helper here on purpose -- there is nothing to wait FOR. Give a wrongly-firing
+            // refetch a brief moment to land, then confirm nothing did.
+            try? await Task.sleep(nanoseconds: 300_000_000)
 
             #expect(fetchedAccounts.value.isEmpty)
         }

@@ -16,7 +16,7 @@ import Foundation
     @Test func votingHotkeyKeyEncodesAccountUUIDAsHex() {
         let accountId = AccountUUID(id: [UInt8](repeating: 0x01, count: 16))
         let key = WalletStorage.Constants.zcashStoredVotingHotkey(accountId: accountId)
-        #expect(key == "zcashStoredVotingHotkey_" + String(repeating: "01", count: 16))
+        #expect(key == "zcashStoredVotingHotkey_\(String(repeating: "01", count: 16))")
     }
 
     @Test func votingHotkeyKeyDiffersPerAccount() {

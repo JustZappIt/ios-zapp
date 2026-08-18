@@ -20,7 +20,7 @@ PINNED_REF="$(grep '^zappMessaging=' "$APP_DIR/.zapp-deps" | cut -d= -f2)"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zappMessaging beside the app ($SIBLING)"
-  git clone https://github.com/JustZappIt/zappMessaging.git "$SIBLING"
+  git clone https://github.com/JustZappIt/zappmessaging-sdk.git "$SIBLING"
   git -C "$SIBLING" checkout "$PINNED_REF"
 else
   echo "==> Found $SIBLING"
@@ -29,11 +29,16 @@ else
   echo "    Not switching branches for you — check out the pin yourself if they differ."
 fi
 
-# `setup` = install + bare-link + bare-pack. It must NOT be `npm run link` alone:
-# worklet.bundle names every addon by exact version, so a bundle/addon mismatch
+# `link` + `build` = `npm run setup` minus its leading `npm install`. Both halves
+# are required: worklet.bundle names every addon by exact version, so `link` alone
 # fails at RUNTIME with "No addon registered", never at build time.
-echo "==> npm run setup (assembles the 15 addon xcframeworks + packs worklet.bundle)"
-( cd "$SIBLING" && npm ci && npm run setup )
+#
+# `npm install` is skipped on purpose. `npm ci` already installed exactly the
+# lockfile, and the SDK's committed package-lock.json is missing an `engines` block
+# that `npm install` writes back, dirtying the checkout and tripping
+# Scripts/validate-zappmessaging-artifacts.sh. Drop this once the SDK repins its lock.
+echo "==> assembling the 15 addon xcframeworks + packing worklet.bundle"
+( cd "$SIBLING" && npm ci && npm run link && npm run build )
 
 COUNT=$(ls -d "$SIBLING"/ios/Addons/*.xcframework 2>/dev/null | wc -l | tr -d ' ')
 if [ "$COUNT" != "15" ]; then

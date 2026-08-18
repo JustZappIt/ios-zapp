@@ -2,8 +2,7 @@
 # https://github.com/raywenderlich/swift-style-guide
 
 included:
-  - secantTests/
-  - secantUITests/
+  - zodlTests/
 
 excluded:
   - secant/
