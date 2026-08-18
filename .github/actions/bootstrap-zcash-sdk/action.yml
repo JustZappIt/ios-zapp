@@ -25,14 +25,13 @@ runs:
     # workspace, and the package is referenced as ../zcash-swift-wallet-sdk — a SIBLING of
     # the checked-out app. Land it inside, then move it up one level.
     #
-    # The pin is a SHA on the unmerged pacu/zodl-slipstream-vendoring branch. It resolves
-    # because the branch exists on the remote; if upstream ever force-pushes or deletes it
-    # this step is where that surfaces, which is the argument for mirroring the SHA to a
-    # remote we control.
+    # The pin is a SHA on our reviewed zapp/sdk-mit-on-main branch. It lives in the
+    # JustZappIt fork so CI can resolve the exact commit even though the branch is not
+    # merged upstream.
     - name: Checkout the SDK at the pin
       uses: actions/checkout@v4
       with:
-        repository: zcash/zcash-swift-wallet-sdk
+        repository: JustZappIt/zcash-swift-wallet-sdk
         ref: ${{ steps.pin.outputs.ref }}
         path: .zcash-sdk-src
 

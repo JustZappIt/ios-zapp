@@ -28,8 +28,8 @@ zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 # after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
 # unmerged upstream. Retire once upstream cuts 2.9.0; the released artifact is clean by default.
 #
-# The pin is branch `zapp/sdk-mit-on-main`: SDK origin/main with our 8 slipstream-variant
-# commits replayed on top. Two properties it has to keep, both checked by
+# The pin is branch `zapp/sdk-mit-on-main`: SDK origin/main with our 10 fork commits
+# replayed on top. Two properties it has to keep, both checked by
 # Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the bootstrap script:
 #
 #   1. MIT-clean by default. The AGPL-3.0-only zodl-slipstream crate sits behind the
@@ -45,5 +45,5 @@ zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 # Consequence, accepted: the `slipstream` feature itself may no longer build against this
 # line's newer librustzcash generation. We do not ship that variant.
 #
-# GitHub: https://github.com/zcash/zcash-swift-wallet-sdk
+# GitHub: https://github.com/JustZappIt/zcash-swift-wallet-sdk
 zcashSwiftWalletSdk=c2fa72d897bfe9aff1087aa2f7543de7ad2e9148

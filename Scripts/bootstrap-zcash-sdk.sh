@@ -17,11 +17,10 @@ PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)"
   || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
 
 # The pin is on an unmerged branch, so a plain clone does not make the SHA reachable.
-# ZAPP_SDK_REMOTE is where our branch lives; upstream (zcash/) is only the clone source.
-# Until the branch is hosted somewhere we control, set ZAPP_SDK_REMOTE in the environment
-# or recover the commit from a teammate's clone — see the error path below.
+# ZAPP_SDK_REMOTE is where our branch lives; upstream (zcash/) remains the clone source.
+# Override it only when testing another fork.
 VENDORING_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
-ZAPP_SDK_REMOTE="${ZAPP_SDK_REMOTE:-}"
+ZAPP_SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
 
 # Registers $ZAPP_SDK_REMOTE (if given) and fetches the pin's branch from it. Called for
 # a fresh clone AND for an existing sibling that is off the pin: a returning developer is
@@ -45,11 +44,8 @@ if [ ! -d "$SIBLING" ]; then
   fetch_pin_sources
   if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
     echo "!! $PINNED_REF is not reachable from any fetched ref." >&2
-    echo "   The pin is branch $VENDORING_BRANCH: SDK origin/main with our slipstream-variant" >&2
-    echo "   commits replayed on top. It does not live on zcash/zcash-swift-wallet-sdk, so it" >&2
-    echo "   has to be fetched from wherever we host it:" >&2
-    echo "     ZAPP_SDK_REMOTE=<our fork url> Scripts/bootstrap-zcash-sdk.sh" >&2
-    echo "   Failing that, recover the commit from a teammate's clone." >&2
+    echo "   The pin should live on $ZAPP_SDK_REMOTE, branch $VENDORING_BRANCH." >&2
+    echo "   Check that the fork and branch are reachable, or override ZAPP_SDK_REMOTE." >&2
     exit 1
   fi
   git -C "$SIBLING" checkout "$PINNED_REF"
@@ -78,9 +74,8 @@ else
   if [ "$checked_out" != "$PINNED_REF" ]; then
     echo "!! $SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF." >&2
     if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-      echo "   That commit is not in this clone and could not be fetched. The pin is branch" >&2
-      echo "   $VENDORING_BRANCH, which does not live on zcash/zcash-swift-wallet-sdk:" >&2
-      echo "     ZAPP_SDK_REMOTE=<our fork url> Scripts/bootstrap-zcash-sdk.sh" >&2
+      echo "   That commit is not in this clone and could not be fetched from" >&2
+      echo "   $ZAPP_SDK_REMOTE, branch $VENDORING_BRANCH." >&2
     else
       echo "   The commit is present but the checkout has uncommitted changes, so it was" >&2
       echo "   left alone. Commit, stash or discard them, then:" >&2

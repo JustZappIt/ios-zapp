@@ -55,7 +55,7 @@ out beside this repository. Both are public:
 <some-dir>/
   ios-zapp/                 <-- this repository
   zappMessaging/            <-- JustZappIt/zappmessaging-sdk, cloned under this name
-  zcash-swift-wallet-sdk/   <-- zcash/zcash-swift-wallet-sdk
+  zcash-swift-wallet-sdk/   <-- JustZappIt/zcash-swift-wallet-sdk
 ```
 
 `Scripts/bootstrap-zappmessaging.sh` clones the messaging SDK to the right place at the commit
