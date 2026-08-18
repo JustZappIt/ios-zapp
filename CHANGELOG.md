@@ -92,6 +92,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [Ironwood] Sending, and shielding transparent funds, no longer fail with an internal error when the transaction Zapp just built has not yet appeared in the wallet's history view. The transaction is now read back for broadcast from the wallet store directly, so a send that used to stop with a "transaction not found" failure simply goes out. Fixed in the updated Zcash SDK.
+- [Ironwood] Signing a migration with a Keystone device now follows the batch-signing contract the device actually requires. *(Testnet builds only for now — migration is off in mainnet and App Store builds.)*
 - [MOB-1466] Bottom sheets now update while they are open. A sheet's contents are built when it appears rather than ahead of time, so amounts, statuses and other live values refresh in place instead of staying frozen on whatever they showed when the sheet was opened.
 - [MOB-1466] A transaction that has been sent but not yet mined now shows "Today" in the Activity list instead of a blank date.
 - [MOB-1466] The Activity list now fills in as soon as your accounts are ready on a cold start, instead of staying empty until the first sync had run.
