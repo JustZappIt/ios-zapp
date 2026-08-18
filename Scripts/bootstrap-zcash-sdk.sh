@@ -16,17 +16,28 @@ SIBLING="$(dirname "$APP_DIR")/zcash-swift-wallet-sdk"
 PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
   || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
 
-# The pin is on an unmerged branch, so a plain clone may not make the SHA reachable.
-VENDORING_BRANCH="pacu/zodl-slipstream-vendoring"
+# The pin is on an unmerged branch, so a plain clone does not make the SHA reachable.
+# ZAPP_SDK_REMOTE is where our branch lives; upstream (zcash/) is only the clone source.
+# Until the branch is hosted somewhere we control, set ZAPP_SDK_REMOTE in the environment
+# or recover the commit from a teammate's clone — see the error path below.
+VENDORING_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
+ZAPP_SDK_REMOTE="${ZAPP_SDK_REMOTE:-}"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zcash-swift-wallet-sdk beside the app ($SIBLING)"
   git clone https://github.com/zcash/zcash-swift-wallet-sdk.git "$SIBLING"
+  if [ -n "$ZAPP_SDK_REMOTE" ]; then
+    git -C "$SIBLING" remote add zapp "$ZAPP_SDK_REMOTE" 2>/dev/null || true
+    git -C "$SIBLING" fetch zapp "$VENDORING_BRANCH" || true
+  fi
   git -C "$SIBLING" fetch origin "$VENDORING_BRANCH" || true
   if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-    echo "!! $PINNED_REF is not reachable from any upstream ref." >&2
-    echo "   The vendoring branch was probably force-pushed or deleted. Recover the" >&2
-    echo "   commit from a teammate's clone, or fall back to the hand-excision branch." >&2
+    echo "!! $PINNED_REF is not reachable from any fetched ref." >&2
+    echo "   The pin is branch $VENDORING_BRANCH: SDK origin/main with our slipstream-variant" >&2
+    echo "   commits replayed on top. It does not live on zcash/zcash-swift-wallet-sdk, so it" >&2
+    echo "   has to be fetched from wherever we host it:" >&2
+    echo "     ZAPP_SDK_REMOTE=<our fork url> Scripts/bootstrap-zcash-sdk.sh" >&2
+    echo "   Failing that, recover the commit from a teammate's clone." >&2
     exit 1
   fi
   git -C "$SIBLING" checkout "$PINNED_REF"
@@ -41,7 +52,7 @@ else
   if [ "$checked_out" != "$PINNED_REF" ]; then
     echo "!! $SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF." >&2
     echo "   Recover with:" >&2
-    echo "     git -C $SIBLING fetch origin $VENDORING_BRANCH" >&2
+    echo "     git -C $SIBLING fetch origin $VENDORING_BRANCH   # or your zapp remote" >&2
     echo "     git -C $SIBLING checkout $PINNED_REF" >&2
     exit 1
   fi
