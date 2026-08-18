@@ -852,15 +852,27 @@ extension Root {
         #if VOTING_ENABLED
         userDefaults.remove(.hasSeenHowToVote)
         userDefaults.remove(.hasSeenHowToVoteKeystone)
+        // Drop the saved custom-chain list. Without this wipe, the next
+        // wallet on this device would silently resolve voting through
+        // whatever third-party host the previous owner had pointed at.
+        // The override itself is cleared above, outside this #if, so a
+        // build without Voting still clears it.
         userDefaults.remove(.votingCustomChains)
-
+        // Delete the voting SQLite DB so per-round share delegation
+        // history, vote records, and stored TX hashes from the
+        // previous wallet don't leak across the reset boundary. The
+        // file is recreated empty on the next voting flow entry.
         if let documents = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first {
             let votingDbURL = documents.appendingPathComponent("voting.sqlite3")
             try? FileManager.default.removeItem(at: votingDbURL)
         }
-
+        // Belt-and-suspenders: voting drafts and vote records live in
+        // the encrypted per-account `votingMetadata` file now, which
+        // resetAccount() below removes. This sweep catches any stale
+        // plaintext entries from the previous UserDefaults-based
+        // storage that hung around on internal dev devices.
         let standardDefaults = UserDefaults.standard
         for key in standardDefaults.dictionaryRepresentation().keys
             where key.hasPrefix("voting.voteRecord.") || key.hasPrefix("voting.draftVotes.") {
