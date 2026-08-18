@@ -336,7 +336,8 @@ enum Voting {
             }
         }
 
-        throw lastExhaustionError ?? ShareDelegationError.noReachableVoteServers
+        let finalError = lastExhaustionError ?? ShareDelegationError.noReachableVoteServers
+        throw finalError
     }
 }
 

@@ -1885,7 +1885,9 @@ extension VotingCoordFlow {
                     )
 
                     for bundleIndex: UInt32 in 0..<bundleCount {
-                        if submittedBundles.contains(bundleIndex) && bundlesWithRecordedShares.contains(bundleIndex) {
+                        let alreadySubmitted = submittedBundles.contains(bundleIndex)
+                        let hasRecordedShare = bundlesWithRecordedShares.contains(bundleIndex)
+                        if alreadySubmitted && hasRecordedShare {
                             LoggerProxy.debug("Batch: bundle \(bundleIndex + 1)/\(bundleCount) already submitted for proposal \(proposalId)")
                             continue
                         }
@@ -2574,6 +2576,8 @@ extension VotingCoordFlow {
     }
 
     func reduceRetryBatchSubmission(_ state: inout State, roundId: String) -> Effect<Action> {
+        // "Try again" on both the authorizationFailed and submissionFailed
+        // votingSheets (ConfirmSubmissionView) sends .retryBatchSubmission, which lands here.
         mutateSession(&state, roundId: roundId) { roundSession in
             roundSession.batchSubmissionStatus = .idle
             roundSession.batchVoteErrors = [:]
