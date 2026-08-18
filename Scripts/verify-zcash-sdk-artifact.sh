@@ -14,14 +14,26 @@ fail() { echo "!! GATE FAILED: $1" >&2; exit 1; }
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SIBLING="$(dirname "$APP_DIR")/zcash-swift-wallet-sdk"
-PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
-  || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
+# EXPECTED_PIN lets a caller name the revision it is actually releasing. The release
+# lane sets it from `.zapp-deps` AS COMMITTED AT THE REF being built, because this
+# script resolves $APP_DIR from its own location — the operator's checkout — which is
+# the wrong file whenever the ref pins a different SDK revision than the branch the
+# operator happens to be standing on. Unset (manual runs, CI) it falls back to the
+# checkout, which is correct there.
+if [ -n "${EXPECTED_PIN:-}" ]; then
+  PINNED_REF="$EXPECTED_PIN"
+  PIN_SOURCE="EXPECTED_PIN"
+else
+  PIN_SOURCE="$APP_DIR/.zapp-deps"
+  PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
+    || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
+fi
 
 [ -d "$SIBLING" ] || fail "sibling checkout not found at $SIBLING"
 
 checked_out="$(git -C "$SIBLING" rev-parse HEAD)" || fail "$SIBLING is not a git checkout"
 [ "$checked_out" = "$PINNED_REF" ] \
-  || fail "$SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF"
+  || fail "$SIBLING is at $checked_out, but $PIN_SOURCE pins $PINNED_REF"
 
 # A matching SHA says nothing about the working tree. Uncommitted edits to Cargo.toml, the
 # Rust sources or Package.swift are compiled by init-local-ffi.sh just the same, so a dirty
