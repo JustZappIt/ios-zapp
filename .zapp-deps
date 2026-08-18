@@ -25,9 +25,25 @@
 zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 
 # zcash-swift-wallet-sdk — sibling LOCAL Swift package; run Scripts/bootstrap-zcash-sdk.sh
-# after a fresh clone. Pinned to upstream's MIT-clean variant branch: the default build
-# links the AGPL-3.0-only zodl-slipstream crate, which we may not ship to the App Store.
-# Build with NO --slipstream. Pinned by SHA because the branch is unmerged upstream.
-# Retire once upstream cuts 2.9.0; the released artifact is clean by default.
+# after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
+# unmerged upstream. Retire once upstream cuts 2.9.0; the released artifact is clean by default.
+#
+# The pin is branch `zapp/sdk-mit-on-main`: SDK origin/main with our 8 slipstream-variant
+# commits replayed on top. Two properties it has to keep, both checked by
+# Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the bootstrap script:
+#
+#   1. MIT-clean by default. The AGPL-3.0-only zodl-slipstream crate sits behind the
+#      optional `slipstream` cargo feature, which we never enable, and is absent from the
+#      default dependency graph entirely.
+#   2. No credential needed to build. We deliberately do NOT carry upstream's
+#      [patch.crates-io] entry pointing slipstream-core at the PRIVATE
+#      zodl-inc/slipstream-internal repo — cargo fetches git dependencies while resolving,
+#      before feature selection, so that entry would make every build (and CI job) require a
+#      token for a repo we cannot read. We resolve zodl-slipstream 0.1.1 from crates.io
+#      instead, which is why the authorize-slipstream CI action stays deleted on our line.
+#
+# Consequence, accepted: the `slipstream` feature itself may no longer build against this
+# line's newer librustzcash generation. We do not ship that variant.
+#
 # GitHub: https://github.com/zcash/zcash-swift-wallet-sdk
-zcashSwiftWalletSdk=fcbcf1f17efcf01c93a9397180ee6a2f9241ee2e
+zcashSwiftWalletSdk=a3160f0c2a20dce12192b2f277492022a14d7dea
