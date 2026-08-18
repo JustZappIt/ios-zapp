@@ -259,7 +259,7 @@ extension SendCoordFlow {
                 return .none
 
                 // MARK: - Request ZEC Confirmation
-                
+
             // Share this case with the screen's own back button rather than a separate single
             // `popLast()`, so cancel from the Orchard-spend warning sheet can never diverge from
             // whatever "go back" already does here — see the identical reasoning in
