@@ -72,6 +72,13 @@
             ReferencedContainer = "container:secant.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "SWT_EXPERIMENTAL_MAXIMUM_PARALLELIZATION_WIDTH"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release-Testflight"

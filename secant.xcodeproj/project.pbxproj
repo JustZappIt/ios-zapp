@@ -471,7 +471,7 @@
 				34AA779A2F8583A500D244E2 /* XCRemoteSwiftPackageReference "BigDecimal" */,
 				34AA77B52F85848A00D244E2 /* XCRemoteSwiftPackageReference "xcstrings-tool-plugin" */,
 				34AA77B62F85860300D244E2 /* XCRemoteSwiftPackageReference "UInt128" */,
-				9E4841512F869F5E00D0649B /* XCRemoteSwiftPackageReference "zcash-swift-wallet-sdk" */,
+				5A99EE00000000000000D000 /* XCLocalSwiftPackageReference "../zcash-swift-wallet-sdk" */,
 				34B9675A2F8CC47200823B20 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 			);
 			productRefGroup = 0D4E7A0626B364170058B01E /* Products */;
@@ -1465,6 +1465,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../zappMessaging/ios;
 		};
+		5A99EE00000000000000D000 /* XCLocalSwiftPackageReference "../zcash-swift-wallet-sdk" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../zcash-swift-wallet-sdk";
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -1582,14 +1586,6 @@
 				minimumVersion = 1.3.0;
 			};
 		};
-		9E4841512F869F5E00D0649B /* XCRemoteSwiftPackageReference "zcash-swift-wallet-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/zcash/zcash-swift-wallet-sdk.git";
-			requirement = {
-				kind = exactVersion;
-				version = "2.8.0-rc.1";
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1645,7 +1641,7 @@
 		};
 		348ECA9F2FD5D95200BF9FE4 /* ZcashLightClientKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9E4841512F869F5E00D0649B /* XCRemoteSwiftPackageReference "zcash-swift-wallet-sdk" */;
+			package = 5A99EE00000000000000D000 /* XCLocalSwiftPackageReference "../zcash-swift-wallet-sdk" */;
 			productName = ZcashLightClientKit;
 		};
 		34AA77172F857DB300D244E2 /* ComposableArchitecture */ = {
@@ -1860,7 +1856,7 @@
 		};
 		9E4841522F869F5F00D0649B /* ZcashLightClientKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9E4841512F869F5E00D0649B /* XCRemoteSwiftPackageReference "zcash-swift-wallet-sdk" */;
+			package = 5A99EE00000000000000D000 /* XCLocalSwiftPackageReference "../zcash-swift-wallet-sdk" */;
 			productName = ZcashLightClientKit;
 		};
 /* End XCSwiftPackageProductDependency section */

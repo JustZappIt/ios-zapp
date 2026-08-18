@@ -91,6 +91,35 @@ class ZodlPreflightTest < Minitest::Test
     assert(report.warnings.any? { |w| w.include?("not a git repository") })
   end
 
+  def pinned_pkg(**overrides)
+    local_pkg(path: "../zcash-swift-wallet-sdk", git: "fcbcf1f1",
+              pin: "fcbcf1f17efcf01c93a9397180ee6a2f9241ee2e").merge(overrides)
+  end
+
+  def test_pinned_local_package_at_its_pin_passes_without_warning
+    report = Zodl::Preflight.check(facts(local_packages: [pinned_pkg]))
+    assert report.ok?, report.errors.join("; ")
+    assert_empty report.warnings
+  end
+
+  def test_pinned_local_package_off_pin_blocks
+    report = Zodl::Preflight.check(facts(local_packages: [pinned_pkg(git: "93a11081")]))
+    refute report.ok?
+    assert(report.errors.any? { |e| e.include?("93a11081") && e.include?("pins") })
+  end
+
+  def test_dirty_pinned_local_package_blocks
+    report = Zodl::Preflight.check(facts(local_packages: [pinned_pkg(dirty: true)]))
+    refute report.ok?
+    assert(report.errors.any? { |e| e.include?("uncommitted changes") })
+  end
+
+  def test_pinned_local_package_that_is_not_a_repo_blocks
+    report = Zodl::Preflight.check(facts(local_packages: [pinned_pkg(git: nil, dirty: nil)]))
+    refute report.ok?
+    assert(report.errors.any? { |e| e.include?("not a git repository") })
+  end
+
   def test_no_local_packages_is_silent
     report = Zodl::Preflight.check(facts(local_packages: []))
     assert report.ok?

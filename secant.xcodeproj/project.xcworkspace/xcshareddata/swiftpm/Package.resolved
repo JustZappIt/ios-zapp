@@ -1,5 +1,5 @@
 {
-  "originHash" : "c797eb6b348c9b5d4c042b467a84286b796d407a7bb2c84842e09b4d4ab16dc4",
+  "originHash" : "039f89a6e59d72aab70508936802f752a431ad96e427cfa68de6289f9c3d886a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -393,8 +393,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "a878e7f8f46cfc0e1125e565b5c08e7d5272dc9a",
-        "version" : "1.14.0"
+        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
+        "version" : "1.15.0"
       }
     },
     {
@@ -519,8 +519,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-system.git",
       "state" : {
-        "revision" : "50688cacbd41d547e9eb9f7a213542340b7c442b",
-        "version" : "1.7.5"
+        "revision" : "704705c5c51156ede21172a38654d522ce487074",
+        "version" : "1.8.0"
       }
     },
     {
@@ -602,15 +602,6 @@
       "state" : {
         "revision" : "798053ba8a2d80560b5e3f4899a8b35ac0c348bb",
         "version" : "1.0.1"
-      }
-    },
-    {
-      "identity" : "zcash-swift-wallet-sdk",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/zcash/zcash-swift-wallet-sdk.git",
-      "state" : {
-        "revision" : "64e1d590a9f6113ff6ac56ffb3dab32bde5997dc",
-        "version" : "2.8.0-rc.1"
       }
     }
   ],

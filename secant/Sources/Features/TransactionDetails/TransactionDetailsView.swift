@@ -82,7 +82,7 @@ struct TransactionDetailsView: View {
                                 .padding(.bottom, store.isSwap ? 0 : 20)
                                 .padding(.horizontal, Constants.horizontalPadding)
 
-                            if store.areMessagesResolved && !store.transaction.isShieldingTransaction {
+                            if store.areMessagesResolved && !store.transaction.isShieldingTransaction && !store.transaction.isMigrationTransaction {
                                 if !store.memos.isEmpty {
                                     messageViews()
                                         .padding(.horizontal, Constants.horizontalPadding)
@@ -245,7 +245,8 @@ struct TransactionDetailsView: View {
                     store.send(.noteButtonTapped)
                 }
 
-                if store.transaction.isSentTransaction && !store.transaction.isShieldingTransaction && !store.isSwap {
+                if store.transaction.isSentTransaction && !store.transaction.isShieldingTransaction && !store.isSwap
+                    && !store.transaction.isMigrationTransaction {
                     if store.alias == nil {
                         ZappButton(title: String(localizable: .transactionHistorySaveAddress)) {
                             store.send(.saveAddressTapped)
@@ -410,7 +411,7 @@ extension TransactionDetailsView {
                         unknownAmount()
                     }
                 } else {
-                    Text("\(store.transaction.netValue) \(tokenName)")
+                    Text("\(store.transaction.displayedAmount) \(tokenName)")
                         .zappFont(.display, style: amountStyle)
                 }
             }
@@ -469,7 +470,10 @@ extension TransactionDetailsView {
             )
         }
 
-        if transaction.isSentTransaction && !transaction.isShieldingTransaction {
+        let isSentToRowShown = transaction.isSentTransaction && !transaction.isShieldingTransaction
+            && !(transaction.isMigrationTransaction && store.alias == nil && transaction.address.isEmpty)
+
+        if isSentToRowShown {
             items.append(
                 DetailItem(
                     id: "sentTo",
@@ -593,7 +597,7 @@ extension TransactionDetailsView {
     @ViewBuilder func transactionDetailsList() -> some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                if store.transaction.isSentTransaction && !store.transaction.isShieldingTransaction {
+                if store.transaction.isSentTransaction && !store.transaction.isShieldingTransaction && !store.transaction.isMigrationTransaction {
                     showHideButton()
                         .padding(.bottom, 8)
                 }

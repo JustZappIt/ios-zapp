@@ -39,7 +39,10 @@ jobs:
     # on the main actor, so Swift Testing's parallel suites all queue behind it
     # and trivial tests report 30s+ under contention -- so test time is what it
     # is until that changes. Sized to fit a full run with headroom.
-    timeout-minutes: 60
+    # Raised for the cold-cache case: bootstrapping the Zcash SDK compiles librustzcash
+    # from source, ~20 min on a cold runner and ~1 min once the pin's cache entry exists.
+    # Only a pin change pays it, but when it does the old budget was not survivable.
+    timeout-minutes: 75
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,6 +53,12 @@ jobs:
       # so the sibling must exist (and be built) before packages resolve.
       - name: Bootstrap zappMessaging
         uses: ./.github/actions/bootstrap-zappmessaging
+
+      # secant.xcodeproj references ../zcash-swift-wallet-sdk as a local Swift package
+      # too. Unlike zappMessaging its artifact is compiled from Rust, and it must be the
+      # slipstream-free build — the action gates that before anything links it.
+      - name: Bootstrap zcash-swift-wallet-sdk
+        uses: ./.github/actions/bootstrap-zcash-sdk
 
       - name: Select latest Xcode
         # macos-26 runners ship multiple Xcodes; default-selected is 16.x

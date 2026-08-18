@@ -15,7 +15,8 @@ fail() {
   exit 1
 }
 
-[ -d "$SDK_DIR/.git" ] || fail "sibling checkout not found at $SDK_DIR"
+# -e, not -d: in a git worktree .git is a file pointing at the real gitdir.
+[ -e "$SDK_DIR/.git" ] || fail "sibling checkout not found at $SDK_DIR"
 [ -f "$MANIFEST" ] || fail "worklet-manifest.json is missing"
 [ -f "$BUNDLE" ] || fail "worklet.bundle is missing"
 

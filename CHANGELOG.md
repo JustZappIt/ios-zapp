@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [MOB-1466] Move to Ironwood: a guided migration that moves your Orchard funds into the new Ironwood shielded pool. You choose how — a private option that splits your balance into smaller transfers spread over time, or a single immediate transfer that is faster but publishes the amount on-chain. The private option adds Tor protection, step-by-step notifications, Keystone support and a home-screen banner that tracks progress. Nothing sends on its own: Zapp tells you when it is your turn to open the app, and opening it promptly keeps the run on track. *(Testnet builds only for now — the feature is off in mainnet and App Store builds.)*
 - [Ironwood] Zapp now recognizes funds held in the Ironwood shielded pool. Balances on the Pay screen, in the balances breakdown and in the shielding banner include Ironwood alongside Sapling and Orchard, so those funds are visible and counted as soon as the network upgrade activates.
 - [Ironwood] Once Zapp sees that the Ironwood network upgrade is live on the network, it shows a short one-time screen introducing the change, with a link to a support article. It appears once per device — after you continue past it, it never comes back.
 - [MOB-1535] Tapping your balance on the Pay screen now opens a "Total Balance Across Pools" breakdown showing how much ZEC sits in each Zcash pool — Ironwood, Orchard, Sapling and Transparent — so you can see exactly where your funds are. When currency conversion is turned on, each pool also shows its value in your selected currency. Pools you hold nothing in are still listed, and with balances hidden every amount stays masked.
@@ -91,6 +92,10 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [MOB-1466] Bottom sheets now update while they are open. A sheet's contents are built when it appears rather than ahead of time, so amounts, statuses and other live values refresh in place instead of staying frozen on whatever they showed when the sheet was opened.
+- [MOB-1466] A transaction that has been sent but not yet mined now shows "Today" in the Activity list instead of a blank date.
+- [MOB-1466] The Activity list now fills in as soon as your accounts are ready on a cold start, instead of staying empty until the first sync had run.
+- [MOB-1466] If syncing fails to start — a network blip, or Tor still coming up — Zapp now retries once by itself after a short wait, and keeps listening for sync updates in the meantime. Previously a failed start was a dead end until you backgrounded and reopened the app.
 - [#1948] Syncing Error details now name the server Zapp is connected to and show both consensus branch IDs in hexadecimal (for example, `0x37a5165b`). The same diagnostics are included in support reports. For a network-rules mismatch where retrying cannot succeed, the sheet consistently offers Switch server instead of Try again, including when the same error returns after recovery.
 - [MOB-1581] Confirmed transactions no longer remain stuck showing "Sending…" when a synchronizer event is missed or the app has returned from the background.
 - [#1920] Connecting a Keystone hardware wallet that fails now shows a clear "Connection Failed" message (with Contact Support and Cancel options) instead of silently doing nothing. Cancel leaves the flow so the user is never stuck on the connection screen. The support message includes a safe error identifier and never exposes any wallet keys.
