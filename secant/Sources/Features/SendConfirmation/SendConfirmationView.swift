@@ -61,6 +61,14 @@ struct SendConfirmationView: View {
             .background(ZappColors.bg.color(colorScheme))
             .onAppear { store.send(.onAppear) }
             .alert($store.scope(state: \.alert, action: \.alert))
+            // A12: shown BEFORE authentication when this account has a live migration run with
+            // unmigrated Orchard left — see `MigrationManualSendRisk`.
+            .zashiSheet(isPresented: $store.isOrchardWarningPresented) {
+                SendOrchardWarningSheet(
+                    sendAnywayTapped: { store.send(.orchardWarningSendAnywayTapped) },
+                    cancelTapped: { store.send(.orchardWarningCancelTapped) }
+                )
+            }
             .zashiBack(
                 store.isSending,
                 primaryAction: { confirmButton },

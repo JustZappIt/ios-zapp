@@ -1,0 +1,78 @@
+name: Bootstrap zcash-swift-wallet-sdk
+description: >
+  Check out the zcash-swift-wallet-sdk sibling at its .zapp-deps pin, build the
+  slipstream-free libzcashlc, and run the purity gates, so secant.xcodeproj's local
+  Swift package (../zcash-swift-wallet-sdk) resolves and is provably AGPL-free.
+
+runs:
+  using: composite
+  steps:
+    - name: Read the pinned SDK ref
+      id: pin
+      shell: bash
+      run: |
+        REF=$(grep '^zcashSwiftWalletSdk=' .zapp-deps | cut -d= -f2)
+        echo "ref=$REF" >> "$GITHUB_OUTPUT"
+        echo "zcash-swift-wallet-sdk pinned at: $REF"
+
+    # An absolute path with no '..' in it: actions/cache is unreliable about parent
+    # traversal, and every step below needs to name this directory.
+    - name: Resolve the sibling path
+      shell: bash
+      run: echo "ZCASH_SDK_DIR=$(cd "$GITHUB_WORKSPACE/.." && pwd)/zcash-swift-wallet-sdk" >> "$GITHUB_ENV"
+
+    # Same dance as bootstrap-zappmessaging: actions/checkout refuses a path outside the
+    # workspace, and the package is referenced as ../zcash-swift-wallet-sdk — a SIBLING of
+    # the checked-out app. Land it inside, then move it up one level.
+    #
+    # The pin is a SHA on the unmerged pacu/zodl-slipstream-vendoring branch. It resolves
+    # because the branch exists on the remote; if upstream ever force-pushes or deletes it
+    # this step is where that surfaces, which is the argument for mirroring the SHA to a
+    # remote we control.
+    - name: Checkout the SDK at the pin
+      uses: actions/checkout@v4
+      with:
+        repository: zcash/zcash-swift-wallet-sdk
+        ref: ${{ steps.pin.outputs.ref }}
+        path: .zcash-sdk-src
+
+    - name: Move it beside the app
+      shell: bash
+      run: |
+        rm -rf "$ZCASH_SDK_DIR"
+        mv "$GITHUB_WORKSPACE/.zcash-sdk-src" "$ZCASH_SDK_DIR"
+
+    # llvm-tools alongside the targets: the runner's Rust is typically ahead of the LLVM
+    # Xcode ships, and only the toolchain's own llvm-nm can read the object files it emits.
+    - name: Rust targets and llvm-tools for the iOS slices
+      shell: bash
+      run: |
+        rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+        rustup component add llvm-tools
+
+    # The artifact is a pure function of the pinned SHA, so key on it alone. A hit skips a
+    # cold librustzcash build, which is the expensive part of this job by a wide margin.
+    - name: Cache the built FFI
+      id: ffi-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ env.ZCASH_SDK_DIR }}/target
+          ${{ env.ZCASH_SDK_DIR }}/LocalPackages
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-${{ runner.arch }}-libzcashlc-${{ steps.pin.outputs.ref }}
+
+    # --arm-ios, never --arm-all: the app consumes only the two iOS slices. No
+    # --slipstream, which is the whole point — that flag is what would link the AGPL crate.
+    - name: Build the slipstream-free FFI
+      if: steps.ffi-cache.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: ${{ env.ZCASH_SDK_DIR }}
+      run: ./Scripts/init-local-ffi.sh --arm-ios
+
+    # Always, cache hit or not. The gates are cheap and a poisoned cache entry is exactly
+    # the thing that would otherwise sail through.
+    - name: Purity gates
+      shell: bash
+      run: ./Scripts/verify-zcash-sdk-artifact.sh

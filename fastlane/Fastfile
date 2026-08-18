@@ -95,6 +95,13 @@ lane :release do |options|
     UI.user_error!("Preflight failed for #{variant} — aborting.") unless report.ok?
   end
 
+  # The SDK is a local package, so the framework on disk is what gets archived. The
+  # preflight above proves the checkout is at its pin and clean; this proves the built
+  # artifact carries no AGPL sync engine. Runs on dry runs too — it is a check, and a
+  # release that would fail it should fail before anyone is asked to confirm.
+  UI.message("Verifying the libzcashlc artifact this build would link…")
+  sh("#{repo_root.shellescape}/Scripts/verify-zcash-sdk-artifact.sh")
+
   if dry_run
     Zodl::Notify.post(event: :dry_run_ok, variants: variants, version: version, build: build)
     UI.success("Dry run complete — preflight passed for: #{variants.join(', ')}. No build performed.")
@@ -269,18 +276,34 @@ end
 # and the build worktree is the repo's sibling, so the reference resolves to the
 # same directory for both. The referenced checkout is consumed as-is (HEAD plus
 # any uncommitted changes), so capture its git state for the preflight report.
+# Local packages whose exact revision is load-bearing, mapped to their `.zapp-deps` key.
+# The Zcash SDK is here because an off-pin or edited checkout means archiving a libzcashlc
+# that can link the AGPL sync engine. zappMessaging is deliberately absent: its pin is
+# already enforced by Scripts/validate-zappmessaging-artifacts.sh, and drift there is a
+# staleness problem rather than a licensing one.
+PINNED_LOCAL_PACKAGES = { "../zcash-swift-wallet-sdk" => "zcashSwiftWalletSdk" }.freeze
+
+def zapp_deps_pin(repo_root, key)
+  path = File.join(repo_root, ".zapp-deps")
+  return nil unless File.exist?(path)
+
+  File.readlines(path).find { |l| l.start_with?("#{key}=") }&.split("=", 2)&.last&.strip
+end
+
 def local_packages_at(repo_root, sha)
   pbxproj = run("git -C #{repo_root.shellescape} show #{sha}:secant.xcodeproj/project.pbxproj", must_succeed: true)
   Zodl::LocalPackages.parse(pbxproj).map do |rel|
     resolved = File.expand_path(rel, repo_root)
+    key = PINNED_LOCAL_PACKAGES[rel]
+    pin = key && zapp_deps_pin(repo_root, key)
     unless File.directory?(resolved)
-      next { path: rel, resolved: resolved, exists: false, git: nil, dirty: nil }
+      next { path: rel, resolved: resolved, exists: false, git: nil, dirty: nil, pin: pin }
     end
 
     head = run("git -C #{resolved.shellescape} rev-parse --short HEAD 2>/dev/null").strip
     git = head.empty? ? nil : head
     dirty = git && !run("git -C #{resolved.shellescape} status --porcelain 2>/dev/null").strip.empty?
-    { path: rel, resolved: resolved, exists: true, git: git, dirty: dirty }
+    { path: rel, resolved: resolved, exists: true, git: git, dirty: dirty, pin: pin }
   end
 end
 

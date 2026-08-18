@@ -2,6 +2,8 @@
 //  IronwoodAnnouncementStore.swift
 //  Zapp
 //
+//  Created by Michal Fousek on 25.07.2026.
+//
 
 import ComposableArchitecture
 
@@ -14,7 +16,6 @@ struct IronwoodAnnouncement {
 
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<IronwoodAnnouncement.State>)
-        case learnMoreTapped
         case guideTapped
         case continueTapped
     }
@@ -31,19 +32,22 @@ struct IronwoodAnnouncement {
             case .binding:
                 return .none
 
-            case .learnMoreTapped:
-                state.isInAppBrowserOn = true
-                return .none
-
             case .guideTapped:
-                // Opening either link is deliberately not acknowledgement;
-                // only Continue persists the one-time flag.
+                // The ONE route to the support article since the duplicate `learnMoreTapped`
+                // button was removed (2026-08-08) — the two arms were identical. Opening the
+                // guide is deliberately NOT acknowledgement of the announcement: only
+                // `continueTapped` writes the keychain flag below, so this case must never
+                // touch `walletStorage`.
                 state.isInAppBrowserOn = true
                 return .none
 
             case .continueTapped:
-                // Root observes this action and owns the transition to Home.
-                // A failed keychain write must not trap the user on this screen.
+                // Deliberately returns `.none` without navigating anywhere: the Root reducer
+                // observes this same `.continueTapped` action and performs the transition to
+                // Home itself. Do not "fix" this by adding navigation here.
+                // `try?` is deliberate too: a keychain write failure must not trap the user on
+                // this one-time announcement screen, so the failure is swallowed rather than
+                // surfaced or retried.
                 try? walletStorage.importIronwoodAnnouncementFlag(true)
                 return .none
             }

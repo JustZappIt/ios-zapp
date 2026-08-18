@@ -23,3 +23,11 @@
 #
 # GitHub: https://github.com/JustZappIt/zappmessaging-sdk
 zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
+
+# zcash-swift-wallet-sdk — sibling LOCAL Swift package; run Scripts/bootstrap-zcash-sdk.sh
+# after a fresh clone. Pinned to upstream's MIT-clean variant branch: the default build
+# links the AGPL-3.0-only zodl-slipstream crate, which we may not ship to the App Store.
+# Build with NO --slipstream. Pinned by SHA because the branch is unmerged upstream.
+# Retire once upstream cuts 2.9.0; the released artifact is clean by default.
+# GitHub: https://github.com/zcash/zcash-swift-wallet-sdk
+zcashSwiftWalletSdk=fcbcf1f17efcf01c93a9397180ee6a2f9241ee2e

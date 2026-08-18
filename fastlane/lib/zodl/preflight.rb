@@ -61,6 +61,22 @@ module Zodl
           next
         end
 
+        # A package carrying a pin is one whose exact revision is load-bearing: the Zcash
+        # SDK, where an off-pin or edited checkout means archiving a libzcashlc that can
+        # link the AGPL sync engine. "Shipped knowingly" is not available for that one, so
+        # drift is an error rather than a warning, and the release stops here rather than
+        # at an upload nobody can take back.
+        if pkg[:pin]
+          if pkg[:git].nil?
+            errors << "local Swift package #{pkg[:path]} is pinned to #{pkg[:pin]} but is not a git repository"
+          elsif !pkg[:pin].start_with?(pkg[:git])
+            errors << "local Swift package #{pkg[:path]} is at #{pkg[:git]}, but .zapp-deps pins #{pkg[:pin]}"
+          elsif pkg[:dirty]
+            errors << "local Swift package #{pkg[:path]} has uncommitted changes — the build would not match its pin #{pkg[:pin]}"
+          end
+          next
+        end
+
         state =
           if pkg[:git].nil?
             "not a git repository"

@@ -109,14 +109,10 @@ extension Root.State: @retroactive Equatable {
             }
             $0.sdkSynchronizer = .mocked(
                 stateStream: { Empty().eraseToAnyPublisher() },
-                prepareWith: { _, _, walletMode, _, _ in
-                    let modeLabel: String
-                    switch walletMode {
-                    case .newWallet: modeLabel = "newWallet"
-                    case .restoreWallet: modeLabel = "restoreWallet"
-                    case .existingWallet: modeLabel = "existingWallet"
-                    }
-                    prepareModes.withValue { $0.append(modeLabel) }
+                prepareWith: { _, _, _, _ in
+                    // The SDK derives the init flow itself now, so there is no mode to record; what this
+                    // test asserts is that exactly ONE prepare is dispatched per launch.
+                    prepareModes.withValue { $0.append("prepare") }
                     await gate.wait()
                     return .success
                 },
@@ -153,15 +149,17 @@ extension Root.State: @retroactive Equatable {
 
         await store.send(.initialization(.appDelegate(.didFinishLaunching)))
         await waitUntil { prepareModes.value.count >= 1 }
-        #expect(prepareModes.value == ["restoreWallet"])
+        #expect(prepareModes.value == ["prepare"], "launch must reach exactly one prepareWith")
 
         // The synchronizer remains unprepared while the first call waits on the gate, so this
         // foreground event re-enters the initialization chain. Wallet preparation is dropped,
         // while Zapp's independent messaging lifecycle still resumes immediately.
         await store.send(.initialization(.appDelegate(.willEnterForeground)))
         await waitUntil(iterations: 50) { prepareModes.value.count >= 2 }
-
-        #expect(prepareModes.value == ["restoreWallet"])
+        #expect(
+            prepareModes.value == ["prepare"],
+            "a foreground re-entry must not dispatch another prepareWith while one is in flight"
+        )
         #expect(messagingResumeCount.value == 1)
 
         gate.open()

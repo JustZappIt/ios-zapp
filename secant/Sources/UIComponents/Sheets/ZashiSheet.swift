@@ -5,6 +5,7 @@
 //  Created by Lukáš Korba on 31.03.2025.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 private struct SheetHeightKey: PreferenceKey {
@@ -56,32 +57,40 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
     let dragIndicatorVisibility: Visibility
     let onDismiss: (() -> Void)?
     @State var sheetHeight: CGFloat = .zero
-    var sheetContent: SheetContent
+    let sheetContent: () -> SheetContent
 
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $isPresented, onDismiss: onDismiss) {
-                if #available(iOS 26.0, *) {
-                    mainBody26()
-                        .presentationDetents([.height(sheetHeight)])
-                        .presentationDragIndicator(dragIndicatorVisibility)
-                        .applySheetBackground()
-                } else if #available(iOS 16.4, *) {
-                    mainBody()
-                        .id(sheetHeight)
-                        .presentationDetents([.height(sheetHeight)])
-                        .presentationDragIndicator(dragIndicatorVisibility)
-                        .presentationCornerRadius(Design.Radius._4xl)
-                        .applySheetBackground()
-                } else if #available(iOS 16.0, *) {
-                    mainBody()
-                        .id(sheetHeight)
-                        .presentationDetents([.height(sheetHeight)])
-                        .presentationDragIndicator(dragIndicatorVisibility)
-                        .applySheetBackground()
-                } else {
-                    mainBody(stickToBottom: true)
-                        .applySheetBackground()
+                // A `.sheet` closure renders in a NEW view tree: without its own tracking scope,
+                // `@ObservableState` reads inside never register and the sheet body does not
+                // re-render on store changes (the runtime Perception warning field-caught
+                // 2026-08-03 on the migration status screen). The content closure is also stored
+                // UNEVALUATED (`() -> SheetContent`) so its store reads happen here, inside the
+                // scope — never eagerly at the call site.
+                WithPerceptionTracking {
+                    if #available(iOS 26.0, *) {
+                        mainBody26()
+                            .presentationDetents([.height(sheetHeight)])
+                            .presentationDragIndicator(dragIndicatorVisibility)
+                            .applySheetBackground()
+                    } else if #available(iOS 16.4, *) {
+                        mainBody()
+                            .id(sheetHeight)
+                            .presentationDetents([.height(sheetHeight)])
+                            .presentationDragIndicator(dragIndicatorVisibility)
+                            .presentationCornerRadius(Design.Radius._4xl)
+                            .applySheetBackground()
+                    } else if #available(iOS 16.0, *) {
+                        mainBody()
+                            .id(sheetHeight)
+                            .presentationDetents([.height(sheetHeight)])
+                            .presentationDragIndicator(dragIndicatorVisibility)
+                            .applySheetBackground()
+                    } else {
+                        mainBody(stickToBottom: true)
+                            .applySheetBackground()
+                    }
                 }
             }
     }
@@ -92,7 +101,7 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
                Spacer()
             }
 
-            sheetContent
+            sheetContent()
         }
         // Measure at the same width used to lay out wrapping content.
         .padding(.horizontal, horizontalPadding)
@@ -112,7 +121,7 @@ struct ZashiSheetModifier<SheetContent: View>: ViewModifier {
                 Spacer()
             }
 
-            sheetContent
+            sheetContent()
         }
         .padding(.horizontal, horizontalPadding)
         // Fixed-height iOS 26 detents need explicit room below the final control.
@@ -139,7 +148,7 @@ extension View {
                 horizontalPadding: horizontalPadding,
                 dragIndicatorVisibility: dragIndicatorVisibility,
                 onDismiss: onDismiss,
-                sheetContent: content()
+                sheetContent: content
             )
         )
     }
