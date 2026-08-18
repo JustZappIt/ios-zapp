@@ -32,7 +32,14 @@ jobs:
     # (matches the e2e/smoke suite guard in e2e-smoke.yml).
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: macos-26
-    timeout-minutes: 30
+    # 30 was not enough to reach the end of zodlTests even once: a cold compile
+    # alone takes ~17.5 min (DerivedData is not cached, only SourcePackages is),
+    # which left ~10 min of test time and killed the job with 12 suites still
+    # unrun. The suite is main-actor bound -- TCA runs every `.run` effect body
+    # on the main actor, so Swift Testing's parallel suites all queue behind it
+    # and trivial tests report 30s+ under contention -- so test time is what it
+    # is until that changes. Sized to fit a full run with headroom.
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
