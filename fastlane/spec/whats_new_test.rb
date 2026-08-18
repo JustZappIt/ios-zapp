@@ -163,9 +163,16 @@ class ZodlWhatsNewTest < Minitest::Test
     end
   end
 
-  def test_render_matches_python_renderer
-    script = File.expand_path("../../.claude/skills/update-whatsnew/scripts/whatsnew.py", __dir__)
-    skip "python3 not available" unless system("python3 -c 1 >/dev/null 2>&1")
+  # Upstream pins this by shelling out to the `appstore` command of their
+  # /update-whatsnew skill and diffing the two renderers. We cannot: `.claude/` is
+  # gitignored here (see AGENTS.md), so that script is absent from every clone and
+  # the cross-check would fail for everyone rather than prove anything.
+  #
+  # The contract it exists to pin is small and stable, so pin it directly instead:
+  # the section title on its own line, one "* "-prefixed line per bullet, exactly one
+  # blank line between sections, and no trailing newline (the caller adds it). Keep
+  # this golden string byte-identical to what whatsnew.py's `appstore` command emits.
+  def test_render_matches_the_appstore_golden_output
     entry = {
       "version" => "9.9.9", "date" => "01-01-2026", "timestamp" => 1,
       "sections" => [
@@ -173,14 +180,15 @@ class ZodlWhatsNewTest < Minitest::Test
         { "title" => "Fixed:", "bulletpoints" => ["Three."] }
       ]
     }
-    Dir.mktmpdir do |dir|
-      payload = File.join(dir, "payload.json")
-      File.write(payload, JSON.generate(entry))
-      # external_encoding pins the read to UTF-8 regardless of the invoking shell's
-      # locale (python3 always emits UTF-8 here) — without it, a shell with no
-      # LANG/LC_ALL set tags the bytes US-ASCII and the comparison fails spuriously.
-      python = IO.popen(["python3", script, "appstore", "--payload", payload], external_encoding: Encoding::UTF_8, &:read)
-      assert_equal python, "#{Zodl::WhatsNew.render(entry)}\n" # print adds the trailing newline
-    end
+    golden = <<~TEXT.chomp
+      Added:
+      * One with 'quotes' and accents áé.
+      * Two.
+
+      Fixed:
+      * Three.
+    TEXT
+
+    assert_equal golden, Zodl::WhatsNew.render(entry)
   end
 end
