@@ -62,7 +62,7 @@ func reconcileBalanceHistory(
     var deltasByTimestamp: [Date: Int64] = [:]
 
     for transaction in transactions where transaction.isSettledForBalanceHistory {
-        let delta = transaction.zecAmount.amount
+        guard let delta = transaction.balanceHistoryDelta else { return .inconsistent }
         guard let timestamp = transaction.timestamp else {
             // A settled non-zero delta cannot be placed on the curve, so do not invent a timestamp.
             if delta != 0 { return .inconsistent }
@@ -197,6 +197,11 @@ func zecChartPoints(
 }
 
 private extension TransactionState {
+    var balanceHistoryDelta: Int64? {
+        guard zecAmount.amount >= 0 else { return nil }
+        return isSentTransaction ? -zecAmount.amount : zecAmount.amount
+    }
+
     var isSettledForBalanceHistory: Bool {
         switch status {
         case .paid, .received, .shielded:

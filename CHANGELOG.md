@@ -94,6 +94,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [PORTFOLIO-CHART] Wallets with completed sends now reconcile their history correctly instead of hiding the balance chart.
 - [PORTFOLIO-CHART] Wallet birthday estimates now remain usable on compact displays, and PIN entry is larger and easier to read across iPhone sizes.
 - [MOB-1466] Bottom sheets now update while they are open. A sheet's contents are built when it appears rather than ahead of time, so amounts, statuses and other live values refresh in place instead of staying frozen on whatever they showed when the sheet was opened.
 - [MOB-1466] A transaction that has been sent but not yet mined now shows "Today" in the Activity list instead of a blank date.

@@ -8,7 +8,7 @@ struct GetBalanceHistoryUseCaseTests {
     @Test
     func settledDeltasReconcileToConfirmedBalance() throws {
         let history = reconcileBalanceHistory(
-            transactions: [transaction("receive", .received, 100, 1), transaction("send", .paid, -25, 2)],
+            transactions: [transaction("receive", .received, 100, 1), transaction("send", .paid, 25, 2)],
             confirmedBalance: Zatoshi(75)
         )
         guard case .reconciled(let points, let balance) = history else {
@@ -22,7 +22,7 @@ struct GetBalanceHistoryUseCaseTests {
     @Test
     func negativeRunningBalanceIsInconsistent() {
         #expect(reconcileBalanceHistory(
-            transactions: [transaction("send", .paid, -1, 1)],
+            transactions: [transaction("send", .paid, 1, 1)],
             confirmedBalance: .zero
         ) == .inconsistent)
     }
@@ -78,7 +78,36 @@ struct GetBalanceHistoryUseCaseTests {
         #expect(points.map { $0.balance.amount } == [2])
     }
 
-    private func transaction(_ id: String, _ status: TransactionState.Status, _ amount: Int64, _ timestamp: TimeInterval?) -> TransactionState {
-        TransactionState(fee: nil, id: id, status: status, timestamp: timestamp, zecAmount: Zatoshi(amount))
+    @Test
+    func settledShieldingUsesItsNetFeeAsAWithdrawal() {
+        let history = reconcileBalanceHistory(
+            transactions: [
+                transaction("receive", .received, 100, 1),
+                transaction("shield", .shielded, 2, 2, isSent: true)
+            ],
+            confirmedBalance: Zatoshi(98)
+        )
+        guard case .reconciled(let points, _) = history else {
+            Issue.record("Expected reconciled history")
+            return
+        }
+        #expect(points.map { $0.balance.amount } == [100, 98])
+    }
+
+    private func transaction(
+        _ id: String,
+        _ status: TransactionState.Status,
+        _ amount: Int64,
+        _ timestamp: TimeInterval?,
+        isSent: Bool? = nil
+    ) -> TransactionState {
+        TransactionState(
+            fee: nil,
+            id: id,
+            status: status,
+            timestamp: timestamp,
+            zecAmount: Zatoshi(amount),
+            isSentTransaction: isSent ?? (status == .paid)
+        )
     }
 }
