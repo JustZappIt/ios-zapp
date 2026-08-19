@@ -163,7 +163,10 @@ func standardizedPriceRange(
     case .year:
         start = HistoricalPriceDate.addingDays(-365, to: completedDate)
     case .all:
-        start = availableFrom ?? HistoricalPriceDate.addingDays(-7, to: completedDate)
+        // Clamped, not trusted: `availableFrom` comes off the wire, and a value past the last
+        // completed day would invert the range and trip `PriceDateRange`'s precondition — a remote
+        // response should never be able to trap the app.
+        start = min(availableFrom ?? HistoricalPriceDate.addingDays(-7, to: completedDate), completedDate)
     }
     return PriceDateRange(from: start, to: completedDate)
 }

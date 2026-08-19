@@ -70,6 +70,29 @@ struct HistoricalPriceParserTests {
         #expect(parseHistoricalPriceError(status: 404, data: data) == .seriesUnavailable)
     }
 
+    /// Availability entirely after the requested range would reach the ALL period, which builds its
+    /// window from `availableFrom` — an inverted range there traps on `PriceDateRange`'s
+    /// precondition, so a response must never get that far.
+    @Test
+    func rejectsAvailabilityAfterTheRequestedRange() {
+        expectInvalid(
+            validBody()
+                .replacingOccurrences(of: #""availableFrom":"2026-08-01T00:00:00Z""#, with: #""availableFrom":"2030-01-01T00:00:00Z""#)
+                .replacingOccurrences(of: #""availableTo":"2026-08-03T00:00:00Z""#, with: #""availableTo":"2030-01-02T00:00:00Z""#)
+                .replacingOccurrences(of: #""dataAsOf":"2026-08-03T00:00:00Z""#, with: #""dataAsOf":"2030-01-02T00:00:00Z""#)
+        )
+    }
+
+    @Test
+    func rejectsAvailabilityBeforeTheRequestedRange() {
+        expectInvalid(
+            validBody()
+                .replacingOccurrences(of: #""availableFrom":"2026-08-01T00:00:00Z""#, with: #""availableFrom":"2020-01-01T00:00:00Z""#)
+                .replacingOccurrences(of: #""availableTo":"2026-08-03T00:00:00Z""#, with: #""availableTo":"2020-01-02T00:00:00Z""#)
+                .replacingOccurrences(of: #""dataAsOf":"2026-08-03T00:00:00Z""#, with: #""dataAsOf":"2020-01-02T00:00:00Z""#)
+        )
+    }
+
     private func parse(_ body: String) -> Result<HistoricalPricePage, PricingFailure> {
         parseHistoricalPricePage(data: Data(body.utf8), requestedRange: range, requestedFiat: .usd)
     }

@@ -105,4 +105,17 @@ struct ObservePortfolioHistoryUseCaseTests {
         guard case .data(let data) = result else { return nil }
         return data
     }
+
+    /// A server claiming availability past the last completed day must not invert the ALL window.
+    /// `PriceDateRange` traps on `from > to`, so this is a crash, not a bad chart.
+    @Test
+    func allPeriodClampsAvailabilityToTheCompletedDay() throws {
+        let completedDate = try #require(HistoricalPriceDate.parseDay("2026-08-17"))
+        let future = try #require(HistoricalPriceDate.parseDay("2030-01-01"))
+
+        let range = standardizedPriceRange(period: .all, completedDate: completedDate, availableFrom: future)
+
+        #expect(range.from == completedDate)
+        #expect(range.to == completedDate)
+    }
 }

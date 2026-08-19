@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 import ComposableArchitecture
-import Foundation
 import SwiftUI
 @preconcurrency import ZcashLightClientKit
 
@@ -240,6 +239,12 @@ struct ZappBalanceChart: View {
 
     @MainActor
     private func loadState() async {
+        // `isActive` is part of the task identity so returning to the foreground re-reads the
+        // clock — but that identity also changes on the way DOWN, and the repository's refresh is
+        // an unstructured task that cancellation does not reach. Without this guard, backgrounding
+        // would kick off a fetch that outlives the backgrounding that started it.
+        guard scenePhase == .active else { return }
+
         let history = balanceHistory()
         guard case .reconciled(let points, let balance) = history else {
             hide(.historyInconsistent)
@@ -326,19 +331,19 @@ struct ZappBalanceChart: View {
 
         #if DEBUG
         // Settled activity has to add up to the confirmed balance exactly, and the gap says which
-        // side is wrong. Internal builds only — a wallet's balance is not release-log material.
+        // side is wrong. This stays ON SCREEN and nowhere else: `walletLogs` is exportable from
+        // Support (`ExportLogsStore`), internal builds run real wallets, and a balance must not
+        // survive into a file someone can attach to a ticket. The log line above names the reason,
+        // which is all a support thread needs.
         let settled = transactions.filter(\.isSettledForBalanceHistoryDiagnostic)
         let sum = settled.reduce(Int64(0)) { $0 + $1.zecAmount.amount }
         let undated = settled.filter { $0.timestamp == nil }.count
-        let detail = """
+        hiddenDiagnostic = """
             chart hidden: \(reason.rawValue)
             settled \(settled.count)/\(transactions.count), undated \(undated)
             sum \(sum) vs confirmed \(confirmedBalance.amount)
             gap \(confirmedBalance.amount - sum)
             """
-        hiddenDiagnostic = detail
-        LoggerProxy.warn("[ZappBalanceChart] \(detail)")
-        FileHandle.standardError.write(Data("[ZappBalanceChart] \(detail)\n".utf8))
         #endif
     }
 

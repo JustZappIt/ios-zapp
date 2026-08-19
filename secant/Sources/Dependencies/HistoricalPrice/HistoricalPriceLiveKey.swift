@@ -202,6 +202,12 @@ func parseHistoricalPricePage(
     guard availableFrom <= availableTo, dataAsOf == availableTo else {
         return .failure(.invalidResponse("availability metadata is contradictory"))
     }
+    // Availability sitting entirely outside the range we asked about describes a different series.
+    // It also has teeth: the ALL period builds its window from `availableFrom`, so a value past the
+    // last completed day would invert that range.
+    guard availableFrom <= requestedRange.to, availableTo >= requestedRange.from else {
+        return .failure(.invalidResponse("availability metadata does not overlap the request"))
+    }
     guard let complete = response.complete else {
         return .failure(.invalidResponse("missing complete"))
     }
