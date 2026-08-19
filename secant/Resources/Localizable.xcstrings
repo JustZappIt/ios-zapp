@@ -3642,19 +3642,53 @@
         }
       }
     },
+    "chatProfile.addressBaseLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billetera Base"
+          }
+        }
+      }
+    },
+    "chatProfile.addressBaseCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where your P2P cash-out settles, on Base."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donde se liquida tu cobro P2P, en Base."
+          }
+        }
+      }
+    },
     "chatProfile.addressShieldedCaption" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shielded address — private by default"
+            "value" : "Private by default. Share this to receive shielded ZEC."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dirección blindada: privada por defecto"
+            "value" : "Privada por defecto. Compártela para recibir ZEC blindados."
           }
         }
       }
@@ -3682,13 +3716,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transparent address — visible on chain"
+            "value" : "Visible on chain. Use it only when a service needs it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dirección transparente: visible en la cadena"
+            "value" : "Visible en la cadena. Úsala solo si un servicio la exige."
           }
         }
       }
@@ -3744,6 +3778,23 @@
         }
       }
     },
+    "chatProfile.copyPublicKey" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy public key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar clave pública"
+          }
+        }
+      }
+    },
     "chatProfile.deleteButton" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3774,6 +3825,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminar"
+          }
+        }
+      }
+    },
+    "chatProfile.deleteIdentitySubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removes your messaging identity and chat history from this device"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina tu identidad de mensajería y el historial de chats de este dispositivo"
           }
         }
       }
@@ -3842,6 +3910,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cómo apareces ante todos con quienes chateas."
+          }
+        }
+      }
+    },
+    "chatProfile.groupIdentity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identidad"
+          }
+        }
+      }
+    },
+    "chatProfile.groupDangerZone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danger zone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona de riesgo"
+          }
+        }
+      }
+    },
+    "chatProfile.editDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit display name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar nombre visible"
           }
         }
       }
@@ -4022,13 +4141,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your public key"
+            "value" : "Public key"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu clave pública"
+            "value" : "Clave pública"
           }
         }
       }
@@ -4114,6 +4233,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo guardar. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatProfile.saving" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardando…"
           }
         }
       }
@@ -4220,87 +4356,19 @@
         }
       }
     },
-    "chatProfile.subtabShielded" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shielded"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blindada"
-          }
-        }
-      }
-    },
-    "chatProfile.subtabTransparent" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transparent"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Transparente"
-          }
-        }
-      }
-    },
-    "chatProfile.tabMessagingId" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Messaging ID"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID de mensajería"
-          }
-        }
-      }
-    },
-    "chatProfile.tabWalletAddress" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wallet address"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección de billetera"
-          }
-        }
-      }
-    },
     "chatProfile.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chat profile"
+            "value" : "Profile & identity"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Perfil de chat"
+            "value" : "Perfil e identidad"
           }
         }
       }
@@ -5440,6 +5508,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Términos de mensajería"
+          }
+        }
+      }
+    },
+    "chatWalletAddress.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección de billetera"
+          }
+        }
+      }
+    },
+    "chatWalletAddress.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shielded, transparent and Base addresses"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direcciones blindada, transparente y Base"
+          }
+        }
+      }
+    },
+    "chatWalletAddress.qrCode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the address QR code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el código QR de la dirección"
           }
         }
       }
@@ -25525,19 +25644,36 @@
         }
       }
     },
+    "settings.profileCopyKey" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar clave"
+          }
+        }
+      }
+    },
     "settings.profileQRCode" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your chat QR code"
+            "value" : "Open your messaging identity QR code"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu código QR de chat"
+            "value" : "Abrir el código QR de tu identidad de mensajería"
           }
         }
       }

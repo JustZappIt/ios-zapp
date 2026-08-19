@@ -20,6 +20,7 @@ struct Root {
             case chatProfile
             case chatReadReceipts
             case chatRoom
+            case chatWalletAddress
             case groupInfo
             case newChat
             case offramp
@@ -189,6 +190,7 @@ struct Root {
         var chatContactsListState = ChatContactsList.State.initial
         var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
+        var chatWalletAddressState = ChatWalletAddress.State.initial
         var groupInfoState = GroupInfo.State.initial
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
@@ -250,7 +252,7 @@ struct Root {
             case .migrationCoordFlow, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
-                 .chatReadReceipts, .chatRoom, .groupInfo,
+                 .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
                  .newChat, .currencyConversionSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
@@ -378,6 +380,7 @@ struct Root {
         case chatContactsList(ChatContactsList.Action)
         case chatProfile(ChatProfile.Action)
         case chatRoom(ChatRoom.Action)
+        case chatWalletAddress(ChatWalletAddress.Action)
         case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
         case offramp(Offramp.Action)
@@ -568,6 +571,10 @@ struct Root {
 
         Scope(state: \.chatRoomState, action: \.chatRoom) {
             ChatRoom()
+        }
+
+        Scope(state: \.chatWalletAddressState, action: \.chatWalletAddress) {
+            ChatWalletAddress()
         }
 
         Scope(state: \.groupInfoState, action: \.groupInfo) {

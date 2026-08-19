@@ -380,6 +380,15 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .chatWalletAddress {
+                                ChatWalletAddressView(
+                                    store: store.scope(
+                                        state: \.chatWalletAddressState,
+                                        action: \.chatWalletAddress
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .securitySettings {
                                 NavigationStack {
                                     SecuritySettingsView(
