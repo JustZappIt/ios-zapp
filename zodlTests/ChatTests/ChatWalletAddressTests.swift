@@ -13,7 +13,7 @@ import Testing
 @testable @preconcurrency import ZcashLightClientKit
 @testable import zodl_internal
 
-/// Serialized: the screen reads the process-wide `zashiWalletAccount` shared store.
+/// Serialized: the screen reads the process-wide selected-account shared store.
 @Suite(.serialized) struct ChatWalletAddressTests {
     private let unifiedAddress = """
         utest1zkkkjfxkamagznjr6ayemffj2d2gacdwpzcyw669pvg06xevzqslpmm27zjsctlkstl2vsw62xrjktmzqcu4yu9zdhdxqz3kafa4j2q85y6mv74rzjcgjg8c0ytrg7d\
@@ -22,31 +22,41 @@ import Testing
 
     private let baseAddress = "0xBa5eAcc0un7"
 
-    private func zashiAccount() throws -> WalletAccount {
+    private func account(idByte: UInt8, keySource: String?, hasAddress: Bool) throws -> WalletAccount {
         var account = WalletAccount(
             Account(
-                id: AccountUUID(id: [UInt8](repeating: 0, count: 16)),
+                id: AccountUUID(id: [UInt8](repeating: idByte, count: 16)),
                 name: "Zodl",
-                keySource: nil,
+                keySource: keySource,
                 seedFingerprint: nil,
                 hdAccountIndex: Zip32AccountIndex(0),
                 ufvk: nil,
                 uivk: nil
             )
         )
-        account.defaultUA = try UnifiedAddress(encoding: unifiedAddress, network: .testnet)
+        if hasAddress {
+            account.defaultUA = try UnifiedAddress(encoding: unifiedAddress, network: .testnet)
+        }
 
         return account
     }
 
+    private func zashiAccount(hasAddress: Bool = true) throws -> WalletAccount {
+        try account(idByte: 0, keySource: nil, hasAddress: hasAddress)
+    }
+
+    /// A hardware wallet is a DIFFERENT seed, so its addresses are a different wallet's.
+    private func keystoneAccount(hasAddress: Bool = true) throws -> WalletAccount {
+        try account(
+            idByte: 1,
+            keySource: String(localizable: .accountsKeystone).lowercased(),
+            hasAddress: hasAddress
+        )
+    }
+
     private func state(withAccount: Bool, base: String?) throws -> ChatWalletAddress.State {
         var state = ChatWalletAddress.State()
-        if withAccount {
-            let account = try zashiAccount()
-            state.$zashiWalletAccount.withLock { $0 = account }
-        } else {
-            state.$zashiWalletAccount.withLock { $0 = nil }
-        }
+        state.$selectedWalletAccount.withLock { $0 = withAccount ? try? zashiAccount() : nil }
         state.baseAddress = base
 
         return state
@@ -106,6 +116,36 @@ import Testing
         }
     }
 
+    /// The account halves of this screen must agree. `offramp.accountAddress()` resolves against
+    /// the SELECTED account, so reading the Zcash addresses off the Zashi one would show a
+    /// Keystone user the software wallet's addresses — a different seed, and money sent to an
+    /// account they are not looking at.
+    @Test func theAddressesFollowTheSelectedAccountNotTheZashiOne() throws {
+        try withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = ChatWalletAddress.State()
+            @Shared(.inMemory(.zashiWalletAccount)) var zashi: WalletAccount?
+            $zashi.withLock { $0 = try? zashiAccount(hasAddress: false) }
+            state.$selectedWalletAccount.withLock { $0 = try? keystoneAccount() }
+
+            #expect(state.addresses.first?.address == unifiedAddress)
+        }
+    }
+
+    @Test func aSelectionWithoutAddressesShowsNoneEvenWhenZashiHasThem() throws {
+        try withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = ChatWalletAddress.State()
+            @Shared(.inMemory(.zashiWalletAccount)) var zashi: WalletAccount?
+            $zashi.withLock { $0 = try? zashiAccount() }
+            state.$selectedWalletAccount.withLock { $0 = try? keystoneAccount(hasAddress: false) }
+
+            #expect(state.addresses.isEmpty)
+        }
+    }
+
     // MARK: - Base lookup
 
     @MainActor @Test func aResolvedBaseAddressAddsANonScannableCard() async {
@@ -161,7 +201,7 @@ import Testing
             var initial = ChatWalletAddress.State()
             initial.baseAddress = baseAddress
             let account = try zashiAccount()
-            initial.$zashiWalletAccount.withLock { $0 = account }
+            initial.$selectedWalletAccount.withLock { $0 = account }
 
             let store = TestStore(initialState: initial) {
                 ChatWalletAddress()

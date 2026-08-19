@@ -46,7 +46,10 @@ struct ChatWalletAddress {
 
     @ObservableState
     struct State: Equatable {
-        @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount?
+        /// The SELECTED account, as Android's `observeSelectedWalletAccount` does — not the Zashi
+        /// one. `offramp.accountAddress()` resolves against the selection too, so reading anything
+        /// else here would hand out a Keystone user the software wallet's addresses.
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount?
 
         /// Nil both before the lookup finishes and after it fails — the card is simply absent.
         var baseAddress: String?
@@ -57,8 +60,8 @@ struct ChatWalletAddress {
 
         var addresses: [AddressItem] {
             [
-                (AddressKind.shielded, zashiWalletAccount?.unifiedAddress),
-                (AddressKind.transparent, zashiWalletAccount?.transparentAddress),
+                (AddressKind.shielded, selectedWalletAccount?.unifiedAddress),
+                (AddressKind.transparent, selectedWalletAccount?.transparentAddress),
                 (AddressKind.base, baseAddress)
             ].compactMap { kind, address in
                 guard let address, !address.isEmpty else { return nil }
