@@ -5,6 +5,10 @@
 
 import SwiftUI
 
+enum ZappPINMetrics {
+    static let keyHeight: CGFloat = 66
+}
+
 struct ZappPINDots: View {
     @Environment(\.colorScheme)
     private var colorScheme
@@ -60,7 +64,7 @@ struct ZappPINPad: View {
                                 Text(key.label)
                                     .zappFont(.pinKey, style: ZappColors.text)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 60)
+                                    .frame(height: ZappPINMetrics.keyHeight)
                                     .contentShape(Rectangle())
                             }
                             .buttonStyle(.zappPress)
@@ -74,7 +78,7 @@ struct ZappPINPad: View {
                         } else {
                             Color.clear
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 60)
+                                .frame(height: ZappPINMetrics.keyHeight)
                         }
                     }
                 }

@@ -49,7 +49,7 @@ struct AppPINEntryView: View {
                 .padding(.bottom, 16)
             }
             .padding(.horizontal, 28)
-            .padding(.top, 38)
+            .padding(.top, 42)
 
             if let onBack {
                 ZappBottomActionBar(onBack: onBack)
