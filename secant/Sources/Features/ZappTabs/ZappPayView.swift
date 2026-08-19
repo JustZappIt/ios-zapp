@@ -10,6 +10,7 @@
 import ComposableArchitecture
 import StoreKit
 import SwiftUI
+@preconcurrency import ZcashLightClientKit
 
 struct ZappPayView: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -134,6 +135,7 @@ struct ZappPayView: View {
         WithPerceptionTracking {
             ZappBalanceCard(
                 totalBalance: store.walletBalancesState.totalBalance,
+                confirmedBalance: confirmedBalance,
                 shieldedBalance: store.walletBalancesState.shieldedWithPendingBalance,
                 transparentBalance: store.walletBalancesState.transparentBalance,
                 showsBreakdown: store.walletBalancesState.transparentBalance.amount > 0,
@@ -150,6 +152,11 @@ struct ZappPayView: View {
                 onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }
             )
         }
+    }
+
+    private var confirmedBalance: Zatoshi {
+        let pendingShielded = store.walletBalancesState.shieldedWithPendingBalance - store.walletBalancesState.shieldedBalance
+        return store.walletBalancesState.totalBalance - pendingShielded
     }
 
     @ViewBuilder private func activity() -> some View {

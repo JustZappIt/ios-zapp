@@ -26,6 +26,7 @@ extension Root {
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
+                .portfolioChartSetup(.backToHomeTapped),
                 .currencyConversionSetup(.backToHomeTapped),
                 .backToHomeFromChatPrivacyTapped,
                 .backToHomeFromServerSwitchTapped:
@@ -737,6 +738,11 @@ extension Root {
                 state.torSetupState = .initial
                 state.torSetupState.isSettingsView = true
                 state.path = .torSetup
+                return .none
+
+            case .zappTabs(.portfolioChartTapped):
+                state.portfolioChartSetupState = .initial
+                state.path = .portfolioChartSetup
                 return .none
 
             case .settings(.path(.element(id: _, action: .migrationRestart(.delegate(.restarted))))):

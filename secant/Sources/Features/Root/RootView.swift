@@ -276,6 +276,18 @@ private extension RootView {
                                 }
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .portfolioChartSetup {
+                                NavigationStack {
+                                    PortfolioChartSetupView(
+                                        store:
+                                            store.scope(
+                                                state: \.portfolioChartSetupState,
+                                                action: \.portfolioChartSetup
+                                            )
+                                    )
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .serverSwitch {
                                 NavigationStack {
                                     ServerSetupView(

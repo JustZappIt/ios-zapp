@@ -31,6 +31,7 @@ struct ZappBalanceCard: View {
     @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
 
     let totalBalance: Zatoshi
+    let confirmedBalance: Zatoshi
     let shieldedBalance: Zatoshi
     let transparentBalance: Zatoshi
     let showsBreakdown: Bool
@@ -51,7 +52,11 @@ struct ZappBalanceCard: View {
                 amount
 
                 if totalBalance.amount > 0 {
-                    ZappBalanceChart(transactions: transactions, tokenName: tokenName)
+                    ZappBalanceChart(
+                        transactions: transactions,
+                        confirmedBalance: confirmedBalance,
+                        tokenName: tokenName
+                    )
                         .padding(.top, 10)
                 }
 
