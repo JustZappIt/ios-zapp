@@ -56,7 +56,10 @@ struct AppPINEntryView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ZappColors.bg.color(colorScheme))
+        .background {
+            ZappColors.bg.color(colorScheme)
+                .ignoresSafeArea()
+        }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.keyboard)
     }
