@@ -36,6 +36,9 @@ private struct ZappQRSpotlight<QR: View, Action: View>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            // The page behind is unreachable while the code is up, by touch and by VoiceOver
+            // alike. Applied to `content` only, so the overlay below stays readable.
+            .accessibilityHidden(payload != nil)
             .overlay {
                 if let payload {
                     ZStack {
@@ -43,16 +46,22 @@ private struct ZappQRSpotlight<QR: View, Action: View>: ViewModifier {
                             .opacity(Constants.scrimOpacity)
                             .ignoresSafeArea()
                             .onTapGesture { dismiss() }
+                            .accessibilityHidden(true)
 
                         VStack(spacing: Constants.actionSpacing) {
                             qrCode(payload, edge)
                                 .onTapGesture { dismiss() }
+                                .accessibilityElement()
+                                .accessibilityLabel(String(localizable: .generalClose))
+                                .accessibilityAddTraits(.isButton)
 
                             action(payload)
                                 .frame(maxWidth: Constants.actionWidth)
                         }
                     }
                     .transition(.opacity)
+                    .accessibilityAddTraits(.isModal)
+                    .accessibilityAction(.escape) { dismiss() }
                 }
             }
             .animation(ZappMotion.content, value: payload)
@@ -60,6 +69,16 @@ private struct ZappQRSpotlight<QR: View, Action: View>: ViewModifier {
                 if presented == nil {
                     restoreBrightness()
                 } else {
+                    brighten()
+                }
+            }
+            // Screen brightness is a DEVICE setting: leaving it at full because the user pressed
+            // Home mid-scan would outlive the app. It is re-raised when they come back.
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                restoreBrightness()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                if payload != nil {
                     brighten()
                 }
             }

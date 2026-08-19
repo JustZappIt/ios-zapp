@@ -223,7 +223,11 @@ private extension ChatProfile {
                 .cancellable(id: state.messagingCancelId, cancelInFlight: true)
 
                 // Leaving the screen drops the secrets too — see `ChatProfileSecrets.swift`.
+                // `didCopy` is cleared alongside its timer: cancelling the one without the other
+                // leaves the button reading "Copied" for as long as the state survives.
             case .onDisappear:
+                state.didCopy = false
+
                 return .merge(
                     .cancel(id: state.messagingCancelId),
                     .cancel(id: CancelID.copyIndicator),

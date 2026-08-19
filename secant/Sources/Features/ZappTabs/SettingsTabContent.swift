@@ -35,9 +35,9 @@ struct SettingsTabContent: View {
 
                 ScrollView {
                     VStack(spacing: 0) {
-                        // Both halves or neither: a card with a blank code frame in it reads as
-                        // a broken image.
-                        if let displayName, chatProfileStore.hasPublicKey {
+                        // Both halves or neither: a blank code frame reads as a broken image, and
+                        // a legacy identity with an empty name would render a bare "@".
+                        if let displayName, !displayName.isEmpty, chatProfileStore.hasPublicKey {
                             ProfileCard(
                                 displayName: displayName,
                                 publicKey: chatProfileStore.publicKey,

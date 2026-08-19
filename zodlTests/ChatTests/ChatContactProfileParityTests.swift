@@ -230,6 +230,20 @@ import ZappMessaging
         #expect(!store.state.didCopy)
     }
 
+    /// Leaving cancels the expiry timer, so the tick has to be dropped in the same breath —
+    /// otherwise the button reads "Copied" for as long as Root keeps the state around.
+    @MainActor @Test func leavingTheScreenDropsTheCopiedTick() async {
+        var initial = identityState(key: publicKey)
+        initial.didCopy = true
+
+        let store = TestStore(initialState: initial) { ChatProfile() }
+        store.exhaustivity = .off
+
+        await store.send(.onDisappear)
+
+        #expect(!store.state.didCopy)
+    }
+
     @MainActor @Test func copyingIsANoOpBeforeTheIdentityResolves() async {
         let copied = LockIsolated<[String]>([])
 
