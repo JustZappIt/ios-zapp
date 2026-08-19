@@ -9,6 +9,10 @@ import Testing
 
 @Suite struct ZappDesignContractTests {
     @Test func androidTypographyContract() {
+        #expect(ZappTextStyle.pinHero.size == 42)
+        #expect(ZappTextStyle.pinHero.lineHeight == 44)
+        #expect(ZappTextStyle.pinHero.tracking == -1.8)
+
         #expect(ZappTextStyle.display.size == 32)
         #expect(ZappTextStyle.display.lineHeight == 36)
         #expect(ZappTextStyle.display.tracking == -1)
@@ -24,6 +28,9 @@ import Testing
         #expect(ZappTextStyle.body.size == 14)
         #expect(ZappTextStyle.body.lineHeight == 20)
         #expect(ZappTextStyle.button.tracking == 0)
+
+        #expect(ZappTextStyle.pinKey.size == 20)
+        #expect(ZappTextStyle.pinKey.lineHeight == 24)
     }
 
     @Test func navigationClearanceContract() {

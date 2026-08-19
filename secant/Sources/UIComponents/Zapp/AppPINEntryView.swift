@@ -28,7 +28,7 @@ struct AppPINEntryView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(title)
-                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .zappFont(.pinHero, style: ZappColors.text)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(errorMessage ?? subtitle)

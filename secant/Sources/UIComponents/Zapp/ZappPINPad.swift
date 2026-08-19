@@ -58,7 +58,7 @@ struct ZappPINPad: View {
                                 onKey(key)
                             } label: {
                                 Text(key.label)
-                                    .zappFont(.sectionTitle, style: ZappColors.text)
+                                    .zappFont(.pinKey, style: ZappColors.text)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 60)
                                     .contentShape(Rectangle())
