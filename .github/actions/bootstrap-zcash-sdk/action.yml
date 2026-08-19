@@ -25,14 +25,15 @@ runs:
     # workspace, and the package is referenced as ../zcash-swift-wallet-sdk — a SIBLING of
     # the checked-out app. Land it inside, then move it up one level.
     #
-    # The pin is a SHA on the unmerged pacu/zodl-slipstream-vendoring branch. It resolves
-    # because the branch exists on the remote; if upstream ever force-pushes or deletes it
-    # this step is where that surfaces, which is the argument for mirroring the SHA to a
-    # remote we control.
+    # The pin is a SHA on zapp/sdk-mit-on-main, a branch only our fork carries. Name the
+    # fork rather than upstream: upstream resolves the SHA today only because our repo is a
+    # GitHub fork of it and the two share an object store, which is incidental rather than a
+    # contract — and is exactly why this kept passing while a plain clone in
+    # Scripts/bootstrap-zcash-sdk.sh could not resolve the same ref at all.
     - name: Checkout the SDK at the pin
       uses: actions/checkout@v4
       with:
-        repository: zcash/zcash-swift-wallet-sdk
+        repository: JustZappIt/zcash-swift-wallet-sdk
         ref: ${{ steps.pin.outputs.ref }}
         path: .zcash-sdk-src
 

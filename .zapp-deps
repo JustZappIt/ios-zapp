@@ -29,5 +29,8 @@ zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 # links the AGPL-3.0-only zodl-slipstream crate, which we may not ship to the App Store.
 # Build with NO --slipstream. Pinned by SHA because the branch is unmerged upstream.
 # Retire once upstream cuts 2.9.0; the released artifact is clean by default.
-# GitHub: https://github.com/zcash/zcash-swift-wallet-sdk
-zcashSwiftWalletSdk=fcbcf1f17efcf01c93a9397180ee6a2f9241ee2e
+#
+# Hosted on our PUBLIC fork, branch zapp/sdk-mit-on-main. Upstream does not carry these
+# commits, so a clone of zcash/zcash-swift-wallet-sdk cannot resolve this SHA.
+# GitHub: https://github.com/JustZappIt/zcash-swift-wallet-sdk
+zcashSwiftWalletSdk=c2fa72d897bfe9aff1087aa2f7543de7ad2e9148
