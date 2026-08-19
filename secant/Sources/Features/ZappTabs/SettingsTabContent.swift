@@ -175,6 +175,18 @@ struct SettingsTabContent: View {
                             ZappRowDivider(inset: true)
 
                             ZappRow(
+                                title: String(localizable: .settingsPortfolioChartTitle),
+                                subtitle: String(localizable: .settingsPortfolioChartSubtitle),
+                                icon: Asset.Assets.Icons.currencyDollar.image,
+                                iconTint: .accentText,
+                                iconBackground: .accentSoft
+                            ) {
+                                store.send(.portfolioChartTapped)
+                            }
+
+                            ZappRowDivider(inset: true)
+
+                            ZappRow(
                                 title: String(localizable: .settingsYouServerTitle),
                                 subtitle: String(localizable: .settingsYouServerSubtitle),
                                 icon: Asset.Assets.Icons.server.image,

@@ -60,7 +60,6 @@ private struct ChatProfileSecretOverlays: ViewModifier {
                             onBack: { store.send(.pinCancelled) },
                             onKey: { store.send(.pinKeyTapped($0)) }
                         )
-                        .ignoresSafeArea()
                     }
                 }
                 .privacySensitive(store.isShowingSecret)

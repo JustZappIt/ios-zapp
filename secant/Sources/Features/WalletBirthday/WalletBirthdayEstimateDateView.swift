@@ -9,6 +9,15 @@ import SwiftUI
 import ComposableArchitecture
 
 struct WalletBirthdayEstimateDateView: View {
+    private enum Constants {
+        /// Android pins its wheel to seven 32dp rows — `32.dp * rowCount` in
+        /// `ZashiYearMonthWheelDatePicker.kt`. SwiftUI's `.wheel` picker is vertically greedy, so
+        /// without a cap it swallows every point a trailing `Spacer` would have taken and the whole
+        /// control reads as zoomed in next to Android's. `maxHeight` so a compact display can still
+        /// shrink it rather than clip.
+        static let wheelHeight: CGFloat = 224
+    }
+
     @Perception.Bindable var store: StoreOf<WalletBirthday>
 
     @State private var selectedMonth: String = ""
@@ -42,7 +51,7 @@ struct WalletBirthdayEstimateDateView: View {
                     : .firstWalletTransactionSubtitleRestore
                 )
                 .zFont(size: 14, style: Design.Text.primary)
-                .padding(.bottom, 32)
+                .padding(.bottom, 24)
 
                 HStack {
                     Picker("", selection: $selectedMonth) {
@@ -68,8 +77,21 @@ struct WalletBirthdayEstimateDateView: View {
                     }
                     .pickerStyle(.wheel)
                 }
-                
+                .frame(maxHeight: Constants.wheelHeight)
+
                 Spacer()
+
+                // Stacked above the dock, as Android and upstream both do. Two CTAs in the dock's
+                // single row overflow it and clip the screen — see `WalletBirthdayView`.
+                if store.isKeystoneFlow || store.isResyncFlow {
+                    ZashiButton(
+                        String(localizable: .keystoneAddHWWalletEnterManually),
+                        type: .ghost
+                    ) {
+                        store.send(.enterManuallyTapped)
+                    }
+                    .padding(.bottom, 12)
+                }
             }
             .onAppear {
                 store.send(.onAppear)
@@ -81,21 +103,10 @@ struct WalletBirthdayEstimateDateView: View {
             }
             .zashiBack(
                 primaryAction: {
-                    HStack(spacing: 12) {
-                        if store.isKeystoneFlow || store.isResyncFlow {
-                            ZashiButton(
-                                String(localizable: .keystoneAddHWWalletEnterManually),
-                                type: .ghost
-                            ) {
-                                store.send(.enterManuallyTapped)
-                            }
-                        }
-
-                        ZashiButton(String(localizable: .generalNext)) {
-                            store.send(.binding(.set(\.selectedMonth, selectedMonth)))
-                            store.send(.binding(.set(\.selectedYear, selectedYear)))
-                            store.send(.estimateHeightRequested)
-                        }
+                    ZashiButton(String(localizable: .generalNext)) {
+                        store.send(.binding(.set(\.selectedMonth, selectedMonth)))
+                        store.send(.binding(.set(\.selectedYear, selectedYear)))
+                        store.send(.estimateHeightRequested)
                     }
                 }
             )

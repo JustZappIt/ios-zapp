@@ -26,6 +26,15 @@ import Testing
         #expect(ZappTextStyle.button.tracking == 0)
     }
 
+    @Test func pinSizingContract() {
+        #expect(ZappTextStyle.pinHero.size == 46)
+        #expect(ZappTextStyle.pinHero.lineHeight == 49)
+        #expect(ZappTextStyle.pinHero.tracking == -2)
+        #expect(ZappTextStyle.pinKey.size == 22)
+        #expect(ZappTextStyle.pinKey.lineHeight == 26)
+        #expect(ZappPINMetrics.keyHeight == 66)
+    }
+
     @Test func navigationClearanceContract() {
         #expect(ZappNavBar.clearance == 80)
         #expect(ZappNavBar.fabBottomPadding == 80)

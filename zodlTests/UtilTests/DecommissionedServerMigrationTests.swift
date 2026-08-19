@@ -50,6 +50,8 @@ import ComposableArchitecture
             setServer: { try storage.setServer($0) },
             automaticServerSelection: { storage.automaticServerSelection },
             setAutomaticServerSelection: { storage.setAutomaticServerSelection($0) },
+            portfolioChartEnabled: { storage.portfolioChartEnabled },
+            setPortfolioChartEnabled: { storage.setPortfolioChartEnabled($0) },
             exchangeRate: { storage.exchangeRate },
             setExchangeRate: { try storage.setExchangeRate($0) },
             removeAll: { storage.removeAll() }

@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [PORTFOLIO-CHART] The Pay chart can now value wallet history in the selected local currency using privacy-aware cached market prices, with touch-and-drag inspection and a setting to keep the chart entirely in ZEC.
 - [MOB-1466] Move to Ironwood: a guided migration that moves your Orchard funds into the new Ironwood shielded pool. You choose how — a private option that splits your balance into smaller transfers spread over time, or a single immediate transfer that is faster but publishes the amount on-chain. The private option adds Tor protection, step-by-step notifications, Keystone support and a home-screen banner that tracks progress. Nothing sends on its own: Zapp tells you when it is your turn to open the app, and opening it promptly keeps the run on track. *(Testnet builds only for now — the feature is off in mainnet and App Store builds.)*
 - [Ironwood] Zapp now recognizes funds held in the Ironwood shielded pool. Balances on the Pay screen, in the balances breakdown and in the shielding banner include Ironwood alongside Sapling and Orchard, so those funds are visible and counted as soon as the network upgrade activates.
 - [Ironwood] Once Zapp sees that the Ironwood network upgrade is live on the network, it shows a short one-time screen introducing the change, with a link to a support article. It appears once per device — after you continue past it, it never comes back.
@@ -93,6 +94,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [PORTFOLIO-CHART] Wallets with completed sends now reconcile their history correctly instead of hiding the balance chart.
+- [PORTFOLIO-CHART] Wallet birthday estimates now remain usable on compact displays, and PIN entry is larger and easier to read across iPhone sizes.
 - [MOB-1466] Bottom sheets now update while they are open. A sheet's contents are built when it appears rather than ahead of time, so amounts, statuses and other live values refresh in place instead of staying frozen on whatever they showed when the sheet was opened.
 - [MOB-1466] A transaction that has been sent but not yet mined now shows "Today" in the Activity list instead of a blank date.
 - [MOB-1466] The Activity list now fills in as soon as your accounts are ready on a cold start, instead of staying empty until the first sync had run.

@@ -25,6 +25,7 @@ struct Root {
             case newChat
             case offramp
             case currencyConversionSetup
+            case portfolioChartSetup
             case migrationCoordFlow
             case receive
             case requestZecCoordFlow
@@ -185,6 +186,7 @@ struct Root {
 
         var addKeystoneHWWalletCoordFlowState = AddKeystoneHWWalletCoordFlow.State.initial
         var currencyConversionSetupState = CurrencyConversionSetup.State.initial
+        var portfolioChartSetupState = PortfolioChartSetup.State.initial
         var chatsListState = ChatsList.State.initial
         var chatIdentitySetupState = ChatIdentitySetup.State.initial
         var chatContactsListState = ChatContactsList.State.initial
@@ -253,7 +255,7 @@ struct Root {
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
-                 .newChat, .currencyConversionSetup, .receive,
+                 .newChat, .currencyConversionSetup, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -375,6 +377,7 @@ struct Root {
 
         case addKeystoneHWWalletCoordFlow(AddKeystoneHWWalletCoordFlow.Action)
         case currencyConversionSetup(CurrencyConversionSetup.Action)
+        case portfolioChartSetup(PortfolioChartSetup.Action)
         case chatsList(ChatsList.Action)
         case chatIdentitySetup(ChatIdentitySetup.Action)
         case chatContactsList(ChatContactsList.Action)
@@ -638,6 +641,10 @@ struct Root {
 
         Scope(state: \.currencyConversionSetupState, action: \.currencyConversionSetup) {
             CurrencyConversionSetup()
+        }
+
+        Scope(state: \.portfolioChartSetupState, action: \.portfolioChartSetup) {
+            PortfolioChartSetup()
         }
 
         Scope(state: \.signWithKeystoneCoordFlowState, action: \.signWithKeystoneCoordFlow) {
