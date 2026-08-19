@@ -10,6 +10,8 @@ enum ZappChipVariant {
     case success
     case accent
     case danger
+    /// Bordered rather than filled: the compact ACTION treatment, not a status.
+    case outlined
 }
 
 struct ZappStatusChip: View {
@@ -65,6 +67,12 @@ struct ZappStatusChip: View {
         .padding(.horizontal, Constants.horizontalPadding)
         .padding(.vertical, Constants.verticalPadding)
         .background(bg.color(colorScheme))
+        .overlay {
+            if let border {
+                Rectangle()
+                    .strokeBorder(border.color(colorScheme), lineWidth: 1)
+            }
+        }
     }
 
     private var bg: ZappColors {
@@ -73,16 +81,21 @@ struct ZappStatusChip: View {
         case .success: return .successSoft
         case .accent: return .accentSoft
         case .danger: return .dangerSoft
+        case .outlined: return .surfaceAlt
         }
     }
 
     private var fg: ZappColors {
         switch variant {
-        case .muted: return .textMuted
+        case .muted, .outlined: return .textMuted
         case .success: return .success
         case .accent: return .accentText
         case .danger: return .danger
         }
+    }
+
+    private var border: ZappColors? {
+        variant == .outlined ? .border : nil
     }
 }
 
@@ -92,6 +105,7 @@ struct ZappStatusChip: View {
         ZappStatusChip(text: "Online", variant: .success, dotColor: .success)
         ZappStatusChip(text: "Pending", variant: .accent)
         ZappStatusChip(text: "Failed", variant: .danger)
+        ZappStatusChip(text: "Copy key", variant: .outlined, leadingIcon: Asset.Assets.copy.image) { }
     }
     .padding()
     .applyScreenBackground()

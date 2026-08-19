@@ -436,6 +436,17 @@ extension Root {
                 state.path = .chatProfile
                 return .none
 
+            case .chatProfile(.walletAddressTapped):
+                state.chatWalletAddressState = .initial
+                state.path = .chatWalletAddress
+                return .none
+
+                // Back to the profile, not to the tabs. `path` holds one destination at a time,
+                // so a nested screen has to name the one it came from.
+            case .chatWalletAddress(.backTapped):
+                state.path = .chatProfile
+                return .none
+
                 // Android's `DeleteChatIdentityUseCase` shuts the messaging SDK down and then
                 // deletes the wallet data and preferences behind it. On iOS that whole sequence
                 // already exists as the reset the Settings path runs — including

@@ -371,15 +371,32 @@ private extension RootView {
                                 }
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
-                            } else if path == .chatProfile {
+                                // Wallet address is pushed ON TOP of the profile, not in place of
+                                // it: `path` holds one destination, so a lone address screen would
+                                // uncover the You tab mid-swipe and only snap to the profile once
+                                // the gesture finished.
+                            } else if path == .chatProfile || path == .chatWalletAddress {
                                 ChatProfileView(
                                     store: store.scope(
                                         state: \.chatProfileState,
                                         action: \.chatProfile
                                     )
                                 )
+                                .allowsHitTesting(path == .chatProfile)
+                                .accessibilityHidden(path == .chatWalletAddress)
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+
+                                if path == .chatWalletAddress {
+                                    ChatWalletAddressView(
+                                        store: store.scope(
+                                            state: \.chatWalletAddressState,
+                                            action: \.chatWalletAddress
+                                        )
+                                    )
+                                    .transition(.move(edge: .trailing))
+                                    .zIndex(2)
+                                }
                             } else if path == .securitySettings {
                                 NavigationStack {
                                     SecuritySettingsView(

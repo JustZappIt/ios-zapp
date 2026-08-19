@@ -12,6 +12,7 @@
 import ComposableArchitecture
 import Foundation
 import Testing
+import ZappMessaging
 @testable import zodl_internal
 
 @Suite(.serialized) struct ChatContactFormParityTests {
@@ -194,36 +195,172 @@ import Testing
     }
 }
 
-// MARK: - Profile: wallet-address surface
+// MARK: - Profile: public key, display name and delete
 
 @Suite(.serialized) struct ChatProfileSurfaceParityTests {
-    @MainActor @Test func theP2pKeyRowIsScopedToTheWalletTabLikeAndroid() async {
-        let store = TestStore(initialState: ChatProfile.State()) {
+    private let publicKey = String(repeating: "a", count: 64)
+
+    private func identityState(name: String = "ada", key: String) -> ChatProfile.State {
+        var state = ChatProfile.State()
+        state.displayName = name
+        state.publicKey = key
+
+        return state
+    }
+
+    @MainActor @Test func copyingWritesTheExactKeyAndTheTickExpiresOnItsTimer() async {
+        let mainQueue = DispatchQueue.test
+        let copied = LockIsolated<[String]>([])
+
+        let store = TestStore(initialState: identityState(key: publicKey)) {
             ChatProfile()
+        } withDependencies: {
+            $0.mainQueue = mainQueue.eraseToAnyScheduler()
+            $0.pasteboard.setString = { value in copied.withValue { $0.append(value.data) } }
         }
         store.exhaustivity = .off
 
-        // The seed backs up both identities, so it is offered on either tab.
-        #expect(!store.state.showsP2PKeyRow)
+        await store.send(.copyPublicKeyTapped)
+        #expect(copied.value == [publicKey])
+        #expect(store.state.didCopy)
 
-        await store.send(.tabSelected(.walletAddress))
-        #expect(store.state.showsP2PKeyRow)
+        await mainQueue.advance(by: .seconds(2))
+        await store.receive(\.copyIndicatorExpired)
 
-        await store.send(.tabSelected(.messagingID))
-        #expect(!store.state.showsP2PKeyRow)
+        #expect(!store.state.didCopy)
     }
 
-    @MainActor @Test func switchingWalletSubTabResetsTheCopiedTick() async {
-        var initial = ChatProfile.State()
-        initial.didCopyAddress = true
+    /// Leaving cancels the expiry timer, so the tick has to be dropped in the same breath —
+    /// otherwise the button reads "Copied" for as long as Root keeps the state around.
+    @MainActor @Test func leavingTheScreenDropsTheCopiedTick() async {
+        var initial = identityState(key: publicKey)
+        initial.didCopy = true
 
         let store = TestStore(initialState: initial) { ChatProfile() }
         store.exhaustivity = .off
 
-        await store.send(.walletSubTabSelected(.transparent))
+        await store.send(.onDisappear)
 
-        #expect(store.state.walletSubTab == .transparent)
-        #expect(!store.state.didCopyAddress)
+        #expect(!store.state.didCopy)
+    }
+
+    @MainActor @Test func copyingIsANoOpBeforeTheIdentityResolves() async {
+        let copied = LockIsolated<[String]>([])
+
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.mainQueue = DispatchQueue.test.eraseToAnyScheduler()
+            $0.pasteboard.setString = { value in copied.withValue { $0.append(value.data) } }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.copyPublicKeyTapped)
+
+        #expect(copied.value.isEmpty)
+        #expect(!store.state.didCopy)
+    }
+
+    // MARK: Display-name editor
+
+    @MainActor @Test func theEditorOpensOnTheSanitizedPersistedName() async {
+        let store = TestStore(initialState: identityState(name: "Ada_99", key: publicKey)) {
+            ChatProfile()
+        }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameTapped)
+
+        #expect(store.state.editName?.draft == "ada_99")
+        #expect(store.state.editName?.canSave == true)
+    }
+
+    @MainActor @Test func cancellingRestoresThePersistedNameAndClosesTheEditor() async {
+        let store = TestStore(initialState: identityState(key: publicKey)) {
+            ChatProfile()
+        }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameTapped)
+        await store.send(.editDisplayNameChanged("byron"))
+        await store.send(.editDisplayNameDismissed)
+
+        #expect(store.state.editName == nil)
+        #expect(store.state.displayName == "ada")
+    }
+
+    /// A throw means nothing persisted, so the modal stays up with the edit still in it.
+    @MainActor @Test func aFailedSaveKeepsTheDraftAndTheEditor() async {
+        struct Boom: Error { }
+
+        let store = TestStore(initialState: identityState(key: publicKey)) {
+            ChatProfile()
+        } withDependencies: {
+            $0.zappMessaging.updateDisplayName = { _ in throw Boom() }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameTapped)
+        await store.send(.editDisplayNameChanged("byron"))
+        await store.send(.editDisplayNameSaveTapped)
+        await store.receive(\.saveFailed)
+
+        #expect(store.state.editName?.draft == "byron")
+        #expect(store.state.editName?.failed == true)
+        #expect(store.state.editName?.isSaving == false)
+        #expect(store.state.displayName == "ada")
+    }
+
+    @MainActor @Test func theEditorClosesOnlyOnceTheWorkletHasTakenTheName() async {
+        let store = TestStore(initialState: identityState(key: publicKey)) {
+            ChatProfile()
+        } withDependencies: {
+            $0.zappMessaging.updateDisplayName = { _ in }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameTapped)
+        await store.send(.editDisplayNameChanged("byron"))
+        await store.send(.editDisplayNameSaveTapped)
+
+        await store.receive(\.saveSucceeded)
+
+        #expect(store.state.editName == nil)
+        #expect(store.state.displayName == "byron")
+    }
+
+    /// Dismissal is refused mid-save: nothing else is left to report the write's outcome.
+    @MainActor @Test func theEditorCannotBeDismissedWhileSaving() async {
+        var initial = identityState(key: publicKey)
+        initial.editName = ChatProfile.State.EditName(draft: "byron", isSaving: true)
+
+        let store = TestStore(initialState: initial) { ChatProfile() }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameDismissed)
+
+        #expect(store.state.editName?.draft == "byron")
+    }
+
+    /// The identity stream keeps emitting while the modal is open; the draft lives outside its
+    /// reach so an unrelated emission cannot overwrite an edit in progress.
+    @MainActor @Test func anIdentityEmissionDoesNotDisturbAnOpenDraft() async {
+        let store = TestStore(initialState: identityState(key: publicKey)) {
+            ChatProfile()
+        }
+        store.exhaustivity = .off
+
+        await store.send(.editDisplayNameTapped)
+        await store.send(.editDisplayNameChanged("byron"))
+
+        await store.send(
+            .messagingStateChanged(
+                ZappMessagingState(identity: ZMIdentity(publicKey: publicKey, displayName: "renamed"))
+            )
+        )
+
+        #expect(store.state.editName?.draft == "byron")
+        #expect(store.state.displayName == "renamed")
     }
 
     @MainActor @Test func deleteIdentityConfirmsBeforeHandingUpToRoot() async {
