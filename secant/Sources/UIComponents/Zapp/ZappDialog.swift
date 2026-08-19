@@ -33,6 +33,7 @@ struct ZappDialog<Content: View>: View {
                 .opacity(Constants.scrimOpacity)
                 .ignoresSafeArea()
                 .onTapGesture { onScrimTap?() }
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: Design.Spacing._md) {
                 content
@@ -46,6 +47,11 @@ struct ZappDialog<Content: View>: View {
             )
             .padding(.horizontal, Constants.horizontalInset)
         }
+        // Modal to VoiceOver as well as to the eye — a scrim the rotor walks straight past is
+        // how someone reaches Delete identity from behind a dialog. `escape` is the two-finger
+        // scrub, and is deliberately inert for a dialog that owns its own dismissal.
+        .accessibilityAddTraits(.isModal)
+        .accessibilityAction(.escape) { onScrimTap?() }
     }
 }
 

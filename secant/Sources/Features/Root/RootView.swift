@@ -383,6 +383,7 @@ private extension RootView {
                                     )
                                 )
                                 .allowsHitTesting(path == .chatProfile)
+                                .accessibilityHidden(path == .chatWalletAddress)
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
 

@@ -66,6 +66,9 @@ struct ChatProfileView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            // Applied before the overlays below, so the page goes out of VoiceOver's reach while
+            // one of them is up and the overlay itself stays reachable.
+            .accessibilityHidden(store.isModalPresented)
             .zappSwipeBack(isEnabled: !store.isModalPresented) { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
