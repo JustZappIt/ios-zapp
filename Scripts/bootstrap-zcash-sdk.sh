@@ -16,17 +16,18 @@ SIBLING="$(dirname "$APP_DIR")/zcash-swift-wallet-sdk"
 PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
   || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
 
-# The pin is on an unmerged branch, so a plain clone may not make the SHA reachable.
-VENDORING_BRANCH="pacu/zodl-slipstream-vendoring"
+# The pin is on an unmerged branch that only our fork carries; upstream cannot resolve it.
+SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
+PINNED_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zcash-swift-wallet-sdk beside the app ($SIBLING)"
-  git clone https://github.com/zcash/zcash-swift-wallet-sdk.git "$SIBLING"
-  git -C "$SIBLING" fetch origin "$VENDORING_BRANCH" || true
+  git clone "$SDK_REMOTE" "$SIBLING"
+  git -C "$SIBLING" fetch "$SDK_REMOTE" "$PINNED_BRANCH" || true
   if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-    echo "!! $PINNED_REF is not reachable from any upstream ref." >&2
-    echo "   The vendoring branch was probably force-pushed or deleted. Recover the" >&2
-    echo "   commit from a teammate's clone, or fall back to the hand-excision branch." >&2
+    echo "!! $PINNED_REF is not reachable from $SDK_REMOTE ($PINNED_BRANCH)." >&2
+    echo "   The branch was probably force-pushed. Re-pin .zapp-deps to its current head," >&2
+    echo "   or point ZAPP_SDK_REMOTE / ZAPP_SDK_BRANCH at wherever the commit now lives." >&2
     exit 1
   fi
   git -C "$SIBLING" checkout "$PINNED_REF"
@@ -41,7 +42,7 @@ else
   if [ "$checked_out" != "$PINNED_REF" ]; then
     echo "!! $SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF." >&2
     echo "   Recover with:" >&2
-    echo "     git -C $SIBLING fetch origin $VENDORING_BRANCH" >&2
+    echo "     git -C $SIBLING fetch $SDK_REMOTE $PINNED_BRANCH" >&2
     echo "     git -C $SIBLING checkout $PINNED_REF" >&2
     exit 1
   fi
@@ -51,6 +52,9 @@ else
     || fail "$SIBLING has uncommitted changes — commit, stash or discard them first"
   echo "    At the pin: $PINNED_REF, clean"
 fi
+
+command -v rustup >/dev/null \
+  || fail "rustup is not installed, and the FFI is compiled from Rust — see https://rustup.rs"
 
 for target in aarch64-apple-ios aarch64-apple-ios-sim; do
   if ! rustup target list --installed 2>/dev/null | grep -qx "$target"; then
