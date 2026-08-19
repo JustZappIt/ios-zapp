@@ -66,6 +66,54 @@ import Testing
         #expect(store.state.orchardPoolBalance + store.state.ironwoodPoolBalance == Zatoshi(999_845_000))
     }
 
+    /// `PoolBalance.total()` counts four things; only two of them are actually pending. A wallet
+    /// carrying a migration lock must not have that lock read as unsettled value — the Pay chart
+    /// reconciles settled history against `totalBalance - pendingShieldedBalance` and hides itself
+    /// on any mismatch, so a locked note used to delete the chart outright.
+    @MainActor @Test func lockedValueIsNotCountedAsPendingShieldedBalance() async {
+        let store = makeStore()
+        let balance = AccountBalance(
+            saplingBalance: .zero,
+            orchardBalance: PoolBalance(
+                spendableValue: Zatoshi(4_906_507),
+                changePendingConfirmation: .zero,
+                valuePendingSpendability: .zero,
+                lockedValue: Zatoshi(7_870_954)
+            ),
+            ironwoodBalance: .zero,
+            unshielded: .zero,
+            awaitingResolution: .zero
+        )
+
+        await store.send(.balanceUpdated(balance))
+
+        #expect(store.state.pendingShieldedBalance == .zero)
+        #expect(store.state.totalBalance - store.state.pendingShieldedBalance == Zatoshi(12_777_461))
+        // The formula this replaced subtracted the lock too, leaving the spendable value alone.
+        #expect(store.state.shieldedWithPendingBalance - store.state.shieldedBalance == Zatoshi(7_870_954))
+    }
+
+    @MainActor @Test func genuinelyPendingShieldedValueIsSubtracted() async {
+        let store = makeStore()
+        let balance = AccountBalance(
+            saplingBalance: PoolBalance(
+                spendableValue: Zatoshi(100),
+                changePendingConfirmation: Zatoshi(20),
+                valuePendingSpendability: Zatoshi(30),
+                lockedValue: Zatoshi(40)
+            ),
+            orchardBalance: .zero,
+            ironwoodBalance: .zero,
+            unshielded: Zatoshi(7),
+            awaitingResolution: .zero
+        )
+
+        await store.send(.balanceUpdated(balance))
+
+        #expect(store.state.pendingShieldedBalance == Zatoshi(50))
+        #expect(store.state.totalBalance - store.state.pendingShieldedBalance == Zatoshi(147))
+    }
+
     /// A migration snapshot still requests a fresh SDK balance, so pool cards move promptly when
     /// the wallet summary itself changes.
     @MainActor @Test func snapshotEventTriggersBalanceRefresh() async {

@@ -197,6 +197,11 @@ func zecChartPoints(
 }
 
 private extension TransactionState {
+    /// `zecAmount` is an unsigned magnitude; direction lives in `isSentTransaction`. The SDK's
+    /// `Overview.value` IS signed (`isSentTransaction` is literally `value < 0`), and
+    /// `TransactionState.init(transaction:)` negates it back to a magnitude — so the sign has to be
+    /// reapplied here. A negative magnitude means the row was built some other way; reject the
+    /// history rather than draw a line from a value whose convention is unknown.
     var balanceHistoryDelta: Int64? {
         guard zecAmount.amount >= 0 else { return nil }
         return isSentTransaction ? -zecAmount.amount : zecAmount.amount

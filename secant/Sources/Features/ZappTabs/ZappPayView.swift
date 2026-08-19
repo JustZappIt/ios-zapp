@@ -154,9 +154,13 @@ struct ZappPayView: View {
         }
     }
 
+    /// Android's `GetBalanceHistoryUseCase`: total minus the shielded value that has not settled
+    /// yet. It must be exactly that, because reconciliation compares it to the sum of settled
+    /// transactions and hides the chart on any mismatch. Subtracting `shieldedWithPendingBalance -
+    /// shieldedBalance` instead also removes `PoolBalance.lockedValue` — settled value the history
+    /// does count — and a wallet carrying a migration lock could never reconcile.
     private var confirmedBalance: Zatoshi {
-        let pendingShielded = store.walletBalancesState.shieldedWithPendingBalance - store.walletBalancesState.shieldedBalance
-        return store.walletBalancesState.totalBalance - pendingShielded
+        store.walletBalancesState.totalBalance - store.walletBalancesState.pendingShieldedBalance
     }
 
     @ViewBuilder private func activity() -> some View {
@@ -275,7 +279,10 @@ extension ZappPayView {
                 tokenName: tokenName,
                 onDismiss: { store.isZappPoolBalancesSheetPresented = false }
             )
-            .presentationDetents([.large])
+            // Android presents this as a wrap-content bottom sheet. `.large` pinned it open at
+            // full height with a stranded button below the cards; the derived detent stops it at
+            // its content, and `.large` stays available for larger type.
+            .presentationDetents([.height(PoolBalancesSheet.detentHeight), .large])
             .presentationDragIndicator(.visible)
         }
     }

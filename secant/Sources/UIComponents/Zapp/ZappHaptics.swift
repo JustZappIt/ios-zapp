@@ -47,6 +47,24 @@ enum ZappHaptics {
         UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
 
+    /// A burst of `selection` pulses, for a gesture that ticks continuously — chart scrubbing crosses
+    /// dozens of points a second. The per-call rule above assumes seconds between pulses; here a cold
+    /// generator would drop the first tick and lag the rest, so this one is held and kept warm for as
+    /// long as the gesture's view is on screen. Android gets the same from `LocalHapticFeedback`.
+    @MainActor
+    final class SelectionTicker {
+        private lazy var generator: UISelectionFeedbackGenerator = {
+            let generator = UISelectionFeedbackGenerator()
+            generator.prepare()
+            return generator
+        }()
+
+        func tick() {
+            generator.selectionChanged()
+            generator.prepare()
+        }
+    }
+
     /// Sending a message.
     ///
     /// Android fires `Confirm` here (`ChatRoomInputRow.kt`), but its literal iOS translation — a

@@ -25633,13 +25633,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, Zapp requests public market prices through Tor; wallet data stays on this device. When disabled, the chart remains available in ZEC."
+            "value" : "When enabled, Zapp requests public market prices — over Tor when Tor is on, directly otherwise; wallet data stays on this device. When disabled, the chart remains available in ZEC."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Al activarlo, Zapp solicita precios públicos del mercado mediante Tor; los datos de la billetera permanecen en este dispositivo. Al desactivarlo, el gráfico sigue disponible en ZEC."
+            "value" : "Al activarlo, Zapp solicita precios públicos del mercado — mediante Tor si Tor está activado; de lo contrario, directamente; los datos de la billetera permanecen en este dispositivo. Al desactivarlo, el gráfico sigue disponible en ZEC."
           }
         }
       }
@@ -32455,6 +32455,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Versión de Zapp %@"
+          }
+        }
+      }
+    },
+    "zappPay.balance.poolsAccessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View balance by pool"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver saldo por pool"
           }
         }
       }

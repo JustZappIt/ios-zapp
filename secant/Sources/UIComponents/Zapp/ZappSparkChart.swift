@@ -58,6 +58,7 @@ struct ZappSparkChart: View {
     @Environment(\.colorScheme)
     private var colorScheme
     @State private var selectedPointIndex: Int?
+    @State private var haptics = ZappHaptics.SelectionTicker()
 
     let points: [ZappChartPoint]
     let accessibilitySummary: String
@@ -209,14 +210,14 @@ struct ZappSparkChart: View {
         let nextIndex = nearestChartPointIndex(points: points, x: x, width: width)
         guard selectedPointIndex != nextIndex else { return }
         selectedPointIndex = nextIndex
-        UISelectionFeedbackGenerator().selectionChanged()
+        haptics.tick()
     }
 
     private func adjustSelection(direction: AccessibilityAdjustmentDirection) {
         guard !points.isEmpty else { return }
         guard let current = selectedPointIndex else {
             selectedPointIndex = direction == .decrement ? points.count - 1 : 0
-            UISelectionFeedbackGenerator().selectionChanged()
+            haptics.tick()
             return
         }
         let next: Int
@@ -230,7 +231,7 @@ struct ZappSparkChart: View {
         }
         guard selectedPointIndex != next else { return }
         selectedPointIndex = next
-        UISelectionFeedbackGenerator().selectionChanged()
+        haptics.tick()
     }
 
     private var selectedAccessibilityValue: String {
