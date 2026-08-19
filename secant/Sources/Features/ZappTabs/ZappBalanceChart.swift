@@ -30,8 +30,7 @@ enum BalanceChartState: Equatable {
     }
 }
 
-/// Why the Pay chart is not on screen. The chart removing itself is indistinguishable from the
-/// chart being broken, so every exit names itself in the log rather than vanishing quietly.
+/// Why the Pay chart is not on screen, for the log line in `hide(_:)`.
 enum BalanceChartHiddenReason: String {
     case historyInconsistent
     case noConfirmedBalance
@@ -83,9 +82,6 @@ struct ZappBalanceChart: View {
     @State private var state = BalanceChartState.loading
     @State private var reconciled: ReconciledHistory?
     @State private var formatters = ZappBalanceChartFormatters()
-    #if DEBUG
-    @State private var hiddenDiagnostic: String?
-    #endif
 
     let transactions: [TransactionState]
     let confirmedBalance: Zatoshi
@@ -95,13 +91,7 @@ struct ZappBalanceChart: View {
         Group {
             switch state {
             case .hidden:
-                #if DEBUG
-                // A chart that removes itself looks identical to a chart that is broken. Internal
-                // builds say which of the five exits was taken; release builds stay silent.
-                hiddenDiagnosticView
-                #else
                 EmptyView()
-                #endif
             case .loading:
                 content { loadingChart }
             case .data(let data):
@@ -150,18 +140,6 @@ struct ZappBalanceChart: View {
             )
         }
     }
-
-    #if DEBUG
-    @ViewBuilder private var hiddenDiagnosticView: some View {
-        if let hiddenDiagnostic {
-            Text(verbatim: hiddenDiagnostic)
-                .zappFont(.caption, style: ZappColors.danger)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 10)
-        }
-    }
-    #endif
 
     private var loadingChart: some View {
         Rectangle()
@@ -324,27 +302,13 @@ struct ZappBalanceChart: View {
         return latestSeries
     }
 
+    /// The chart removing itself is indistinguishable on screen from the chart being broken, so
+    /// every exit names itself. Reason only: `walletLogs` is exportable from Support, and a
+    /// balance must not survive into a file someone can attach to a ticket.
     @MainActor
     private func hide(_ reason: BalanceChartHiddenReason) {
         state = .hidden
         LoggerProxy.warn("[ZappBalanceChart] hidden — \(reason.rawValue)")
-
-        #if DEBUG
-        // Settled activity has to add up to the confirmed balance exactly, and the gap says which
-        // side is wrong. This stays ON SCREEN and nowhere else: `walletLogs` is exportable from
-        // Support (`ExportLogsStore`), internal builds run real wallets, and a balance must not
-        // survive into a file someone can attach to a ticket. The log line above names the reason,
-        // which is all a support thread needs.
-        let settled = transactions.filter(\.isSettledForBalanceHistoryDiagnostic)
-        let sum = settled.reduce(Int64(0)) { $0 + $1.zecAmount.amount }
-        let undated = settled.filter { $0.timestamp == nil }.count
-        hiddenDiagnostic = """
-            chart hidden: \(reason.rawValue)
-            settled \(settled.count)/\(transactions.count), undated \(undated)
-            sum \(sum) vs confirmed \(confirmedBalance.amount)
-            gap \(confirmedBalance.amount - sum)
-            """
-        #endif
     }
 
     /// Reconciliation walks the whole transaction list, so it is memoised: a period tap changes the
@@ -432,17 +396,7 @@ private final class ZappBalanceChartFormatters {
     }
 }
 
-extension TransactionState {
-    #if DEBUG
-    /// Mirrors `isSettledForBalanceHistory`, which is fileprivate to the reconciler.
-    var isSettledForBalanceHistoryDiagnostic: Bool {
-        switch status {
-        case .paid, .received, .shielded: return true
-        case .failed, .receiving, .sending, .shielding: return false
-        }
-    }
-    #endif
-
+private extension TransactionState {
     var balanceHistoryStatusCode: Int {
         switch status {
         case .failed: return 0
