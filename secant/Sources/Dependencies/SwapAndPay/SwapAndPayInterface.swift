@@ -21,8 +21,12 @@ struct SwapAndPayClient {
     }
     
     enum Constants {
-        /// Affiliate fee in basis points
-        static let zashiFeeBps = 67
+        /// Affiliate fee in basis points. Zapp charges nothing on top of the 1Click quote;
+        /// keep in sync with `AFFILIATE_FEE_BPS` in zapp-android.
+        static let affiliateFeeBps = 0
+        /// Recipient of the affiliate fee, used only when `affiliateFeeBps` is above zero.
+        /// Keep in sync with `AFFILIATE_ADDRESS` in zapp-android.
+        static let affiliateAddress = "042269ffc94d52b822b4bd053f9122c5a890a5483822421ac35a5236f63e390d"
     }
     
     var submitDepositTxId: @Sendable (String, String) async throws -> Void

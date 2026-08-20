@@ -318,10 +318,15 @@ extension Near1Click {
             
             let deadline = isoFormatter.string(from: twoHoursLater)
             
-            guard let nearFeeDepositAddress = PartnerKeys.nearFeeDepositAddress else {
-                throw "nearFeeDepositAddress missing"
-            }
-            
+            let appFees: [AppFee] = SwapAndPayClient.Constants.affiliateFeeBps > 0
+            ? [
+                AppFee(
+                    recipient: SwapAndPayClient.Constants.affiliateAddress,
+                    fee: SwapAndPayClient.Constants.affiliateFeeBps
+                )
+            ]
+            : []
+
             let requestData = SwapQuoteRequest(
                 dry: dry,
                 swapType: mode.rawValue,
@@ -337,12 +342,7 @@ extension Near1Click {
                 deadline: deadline,
                 referral: Constants.referral,
                 quoteWaitingTimeMs: 3000,
-                appFees: [
-                    AppFee(
-                        recipient: nearFeeDepositAddress,
-                        fee: SwapAndPayClient.Constants.zashiFeeBps
-                    )
-                ]
+                appFees: appFees
             )
             
             guard let jsonData = try? JSONEncoder().encode(requestData) else {
