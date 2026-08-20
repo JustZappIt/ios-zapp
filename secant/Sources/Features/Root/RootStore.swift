@@ -23,6 +23,7 @@ struct Root {
             case chatWalletAddress
             case groupInfo
             case newChat
+            case onramp
             case offramp
             case currencyConversionSetup
             case portfolioChartSetup
@@ -196,6 +197,7 @@ struct Root {
         var groupInfoState = GroupInfo.State.initial
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
+        var onrampState = Onramp.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
@@ -251,7 +253,7 @@ struct Root {
             // the manual lane broadcasts a real send-max transaction from inside it, and an
             // automatic server switch mid-broadcast is exactly what must not happen. #1930
             // classifies it identically.
-            case .migrationCoordFlow, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
+            case .migrationCoordFlow, .onramp, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
@@ -386,6 +388,7 @@ struct Root {
         case chatWalletAddress(ChatWalletAddress.Action)
         case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
+        case onramp(Onramp.Action)
         case offramp(Offramp.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
@@ -594,6 +597,10 @@ struct Root {
 
         Scope(state: \.newChatState, action: \.newChat) {
             NewChat()
+        }
+
+        Scope(state: \.onrampState, action: \.onramp) {
+            Onramp()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {

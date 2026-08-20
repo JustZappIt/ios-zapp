@@ -68,6 +68,23 @@ struct OfframpHistoryModel: Equatable, Identifiable, Sendable {
     let paymentAddress: String?
     let merchantAddress: String?
     let fixedFeeMicros: String?
+
+    var type: OfframpHistoryOrderType? { OfframpHistoryOrderType(rawValue: orderType.uppercased()) }
+    var canRecoverEscrow: Bool { status.uppercased() == "CANCELLED" && type != .buy }
+}
+
+enum OfframpHistoryOrderType: String, Equatable, Sendable {
+    case buy = "BUY"
+    case sell = "SELL"
+    case pay = "PAY"
+
+    var label: String {
+        switch self {
+        case .buy: return String(localizable: .offrampHistoryTypeBuy)
+        case .sell: return String(localizable: .offrampHistoryTypeSell)
+        case .pay: return String(localizable: .offrampHistoryTypePay)
+        }
+    }
 }
 
 enum OfframpClientError: LocalizedError, Equatable {
@@ -337,11 +354,13 @@ private actor OfframpPaymentDetailsWorker {
     }
 }
 
-private actor OfframpSession {
+actor OfframpSession {
     static let shared = OfframpSession()
 
     private var cachedClient: AppleOfframpClient?
     private var cachedBridge: OfframpNearBridge?
+    private var cachedOnrampClient: AppleOnrampClient?
+    private var cachedOnrampGateway: OnrampZecSwapGateway?
     private var cachedWalletIdentity: String?
 
     func client() async throws -> AppleOfframpClient {
@@ -405,10 +424,60 @@ private actor OfframpSession {
         return client
     }
 
+    func onrampClient() async throws -> AppleOnrampClient {
+        _ = try await client()
+        if let cachedOnrampClient { return cachedOnrampClient }
+
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
+        @Dependency(\.walletStorage) var walletStorage
+        @Dependency(\.swapAndPay) var swapAndPay
+        @Dependency(\.sdkSynchronizer) var sdkSynchronizer
+        @Dependency(\.zcashSDKEnvironment) var environment
+
+        guard let account = selectedAccount else {
+            throw OfframpClientError.configuration("Select a wallet account before buying ZEC.")
+        }
+        guard account.vendor == .zcash else { throw OfframpClientError.unsupportedAccount }
+        guard let pimlicoKey = PartnerKeys.p2pPimlicoApiKey, !pimlicoKey.isEmpty,
+              let baseURL = PartnerKeys.p2pOnrampBaseUrl, !baseURL.isEmpty else {
+            throw OfframpClientError.configuration("P2P buying is not configured in PartnerKeys.plist.")
+        }
+
+        let isTestnet = environment.network().networkType == .testnet
+        let seedPhrase = try walletStorage.exportWallet().seedPhrase.value()
+        let storage = try OnrampEncryptedStorage(account: account.account, walletStorage: walletStorage)
+        let gateway: OnrampZecSwapGateway? = isTestnet ? nil : OnrampZecSwapGateway(
+            account: account,
+            swapAndPay: swapAndPay,
+            sdkSynchronizer: sdkSynchronizer
+        )
+        let onrampClient = try await AppleOnrampClient.companion.create(
+            networkName: isTestnet ? "sepolia" : "mainnet",
+            seedPhrase: seedPhrase,
+            pimlicoApiKey: pimlicoKey,
+            onrampBaseUrl: baseURL,
+            onrampAppId: "zapp",
+            storage: storage,
+            deviceSignals: OnrampDeviceSignals(),
+            swapGateway: gateway,
+            rpcUrl: isTestnet ? nil : PartnerKeys.p2pRpcBaseMainnet,
+            subgraphUrl: isTestnet ? nil : PartnerKeys.p2pSubgraphMainnet,
+            sponsorshipPolicyId: PartnerKeys.p2pSponsorshipPolicyId,
+            useFakeDeliveryDriver: false
+        )
+        cachedOnrampClient = onrampClient
+        cachedOnrampGateway = gateway
+        return onrampClient
+    }
+
     func invalidate() {
         cachedBridge?.invalidate()
+        cachedOnrampGateway?.invalidate()
+        cachedOnrampClient?.close()
         cachedClient?.close()
         cachedBridge = nil
+        cachedOnrampGateway = nil
+        cachedOnrampClient = nil
         cachedClient = nil
         cachedWalletIdentity = nil
     }

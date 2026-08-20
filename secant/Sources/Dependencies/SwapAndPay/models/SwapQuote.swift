@@ -31,6 +31,8 @@ struct SwapQuote: Codable, Equatable, Hashable {
     let amountOutUsd: String
     /// Number of seconds it takes to process this quote
     let timeEstimate: TimeInterval
+    /// Provider deadline echoed by the quote. Money-moving consumers reject stale routes.
+    let deadline: Date
     
     init(
         depositAddress: String,
@@ -43,7 +45,8 @@ struct SwapQuote: Codable, Equatable, Hashable {
         minAmountIn: Decimal,
         amountOut: Decimal,
         amountOutUsd: String,
-        timeEstimate: TimeInterval
+        timeEstimate: TimeInterval,
+        deadline: Date = .distantFuture
     ) {
         self.depositAddress = depositAddress
         self.destinationAddress = destinationAddress
@@ -56,5 +59,6 @@ struct SwapQuote: Codable, Equatable, Hashable {
         self.amountOut = amountOut
         self.amountOutUsd = amountOutUsd
         self.timeEstimate = timeEstimate
+        self.deadline = deadline
     }
 }

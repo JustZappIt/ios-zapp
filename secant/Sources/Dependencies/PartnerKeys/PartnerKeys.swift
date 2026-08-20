@@ -18,6 +18,7 @@ struct PartnerKeys {
         static let cmcKey = "cmcKey"
         static let nearFeeDepositAddress = "nearFeeDepositAddress"
         static let p2pPimlicoApiKey = "p2pPimlicoApiKey"
+        static let p2pOnrampBaseUrl = "p2pOnrampBaseUrl"
         static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
         static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
         static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
@@ -53,6 +54,10 @@ struct PartnerKeys {
 
     static var p2pPimlicoApiKey: String? {
         PartnerKeys.value(for: Constants.p2pPimlicoApiKey)
+    }
+
+    static var p2pOnrampBaseUrl: String? {
+        PartnerKeys.value(for: Constants.p2pOnrampBaseUrl)
     }
 
     static var p2pRpcBaseMainnet: String? {

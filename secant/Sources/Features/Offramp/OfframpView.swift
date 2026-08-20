@@ -589,6 +589,8 @@ struct OfframpView: View {
             ZappScreenHeader(title: text("offramp.history.title", "P2P transactions"))
             ScrollView {
                 LazyVStack(spacing: 0) {
+                    historyAccountSummary
+                        .padding(.bottom, 16)
                     if store.history.isEmpty && !store.isLoading {
                         callout(
                             title: text("offramp.history.empty", "No P2P payments yet"),
@@ -637,6 +639,10 @@ struct OfframpView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("#\(item.id)").zappFont(.rowTitle, style: ZappColors.text)
+                if let type = item.type {
+                    Text(type.label.uppercased())
+                        .zappFont(.caption, style: ZappColors.textMuted)
+                }
                 Spacer()
                 Text(item.status.capitalized).zappFont(.caption, style: ZappColors.accent)
             }
@@ -652,13 +658,41 @@ struct OfframpView: View {
                 Text(date.formatted(date: .abbreviated, time: .shortened))
                     .zappFont(.caption, style: ZappColors.textSubtle)
             }
-            if item.status == "CANCELLED" {
+            if item.canRecoverEscrow {
                 ZappButton(title: text("offramp.history.recover", "Get funds back to ZEC"), variant: .ghost) {
                     store.send(.recoverTapped(item.id))
                 }
             }
         }
         .padding(.vertical, 14)
+    }
+
+    @ViewBuilder
+    private var historyAccountSummary: some View {
+        if let account = store.account {
+            VStack(alignment: .leading, spacing: 12) {
+                accountAddressCard(account)
+                ZappBorderedCard {
+                    ZappSummaryRow(
+                        label: String(localizable: .offrampHistoryBalance),
+                        value: account.balanceDisplay.map { "\($0) USDC" } ?? "—"
+                    )
+                    if account.canRefundToZec {
+                        ZappButton(title: String(localizable: .offrampHistoryRefund), variant: .ghost) {
+                            store.send(.refundTapped)
+                        }
+                    } else if account.balanceMicros.flatMap({ Decimal(string: $0) }).map({ $0 > 0 }) == true {
+                        Text(String(localizable: .offrampHistoryRefundBlocked))
+                            .zappFont(.caption, style: ZappColors.textMuted)
+                    }
+                }
+            }
+        } else if store.isLoading {
+            ProgressView()
+        } else {
+            Text(String(localizable: .offrampHistoryBalanceUnavailable))
+                .zappFont(.caption, style: ZappColors.textMuted)
+        }
     }
 
     private var paymentMethodInfo: some View {
@@ -719,54 +753,37 @@ struct OfframpView: View {
     }
 
     private func accountAddressCard(_ account: OfframpAccountModel) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(text("offramp.account.label", "Your Base account"))
-                .zappFont(.caption, style: ZappColors.textMuted)
-            HStack(spacing: 10) {
-                if let url = account.explorerURL {
-                    Link(account.address, destination: url)
-                        .zappFont(.mono, style: ZappColors.text)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                } else {
-                    Text(account.address)
-                        .zappFont(.mono, style: ZappColors.text)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+        ZappBorderedCard {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(text("offramp.account.label", "Your Base account"))
+                    .zappFont(.caption, style: ZappColors.textMuted)
+                HStack(spacing: 10) {
+                    ZappExplorerLink(address: account.address, url: account.explorerURL)
+                    Spacer()
+                    Button { store.send(.copyAccountAddressTapped) } label: {
+                        Asset.Assets.copy.image
+                            .zImage(width: 20, height: 20, style: store.isAddressCopied ? ZappColors.success : ZappColors.textMuted)
+                            .frame(width: 36, height: 36)
+                    }
+                    .buttonStyle(.zappPress)
+                    .accessibilityLabel(text("offramp.account.copy", "Copy Base account"))
                 }
-                Spacer()
-                Button { store.send(.copyAccountAddressTapped) } label: {
-                    Asset.Assets.copy.image
-                        .zImage(width: 20, height: 20, style: store.isAddressCopied ? ZappColors.success : ZappColors.textMuted)
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.zappPress)
-                .accessibilityLabel(text("offramp.account.copy", "Copy Base account"))
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(ZappColors.surfaceAlt.color(colorScheme))
-        .overlay(Rectangle().stroke(ZappColors.border.color(colorScheme), lineWidth: 1))
     }
 
     private func callout(title: String, detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Rectangle().fill(ZappColors.accent.color(colorScheme)).frame(width: 3, height: 20)
-            Text(title).zappFont(.rowTitle, style: ZappColors.text)
-            Text(detail).zappFont(.body, style: ZappColors.textMuted)
+        ZappBorderedCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Rectangle().fill(ZappColors.accent.color(colorScheme)).frame(width: 3, height: 20)
+                Text(title).zappFont(.rowTitle, style: ZappColors.text)
+                Text(detail).zappFont(.body, style: ZappColors.textMuted)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(ZappColors.surface.color(colorScheme))
     }
 
     private func infoRow(_ label: String, _ value: String) -> some View {
-        HStack(alignment: .top) {
-            Text(label).zappFont(.caption, style: ZappColors.textMuted)
-            Spacer()
-            Text(value).zappFont(.body, style: ZappColors.text).multilineTextAlignment(.trailing)
-        }
+        ZappSummaryRow(label: label, value: value)
     }
 
     private func formatMicros(_ value: String) -> String {

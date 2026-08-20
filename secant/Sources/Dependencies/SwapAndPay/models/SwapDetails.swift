@@ -54,6 +54,10 @@ struct SwapDetails: Codable, Equatable, Hashable {
     let whenInitiated: String
     let deadline: String
     let depositedAmountFormatted: Decimal?
+    /// Provider request/quote echoes retained for restart-safe route validation.
+    let swapType: String
+    let refundAddress: String?
+    let depositAddress: String?
 
     var isSwapToZec: Bool {
         toAsset == "nep141:zec.omft.near"
@@ -74,7 +78,10 @@ struct SwapDetails: Codable, Equatable, Hashable {
         addressToCheckShield: String,
         whenInitiated: String,
         deadline: String,
-        depositedAmountFormatted: Decimal?
+        depositedAmountFormatted: Decimal?,
+        swapType: String = "",
+        refundAddress: String? = nil,
+        depositAddress: String? = nil
     ) {
         self.amountInFormatted = amountInFormatted
         self.amountInUsd = amountInUsd
@@ -91,5 +98,8 @@ struct SwapDetails: Codable, Equatable, Hashable {
         self.whenInitiated = whenInitiated
         self.deadline = deadline
         self.depositedAmountFormatted = depositedAmountFormatted
+        self.swapType = swapType
+        self.refundAddress = refundAddress
+        self.depositAddress = depositAddress
     }
 }
