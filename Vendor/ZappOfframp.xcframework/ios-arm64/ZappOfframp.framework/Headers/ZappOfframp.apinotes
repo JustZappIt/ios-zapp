@@ -7752,6 +7752,41 @@ Classes:
     Parameters:
     - Position: 0
       Type: "void (^ _Nonnull)(ZappOfframpEvmKey * _Nullable, NSError * _Nullable)"
+- Name: "ZappOfframpAppleBaseAccount"
+  SwiftName: "AppleBaseAccount"
+  Properties:
+  - Name: "networkName"
+    PropertyKind: "Instance"
+    SwiftName: "networkName"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "close"
+    MethodKind: "Instance"
+    SwiftName: "close()"
+    ResultType: "void"
+- Name: "ZappOfframpAppleBaseAccountCompanion"
+  SwiftName: "AppleBaseAccount.Companion"
+  Methods:
+  - Selector: "createNetworkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__create(networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nullable"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "void (^ _Nonnull)(ZappOfframpAppleBaseAccount * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpAppleBridgeExecution"
   SwiftName: "AppleBridgeExecution"
   Properties:
@@ -7870,10 +7905,6 @@ Classes:
     Parameters:
     - Position: 0
       Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
-  - Selector: "close"
-    MethodKind: "Instance"
-    SwiftName: "close()"
-    ResultType: "void"
   - Selector: "corridors"
     MethodKind: "Instance"
     SwiftName: "corridors()"
@@ -7985,29 +8016,19 @@ Classes:
 - Name: "ZappOfframpAppleOfframpClientCompanion"
   SwiftName: "AppleOfframpClient.Companion"
   Methods:
-  - Selector: "createNetworkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:"
+  - Selector: "createAccount:storage:bridge:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:completionHandler:)"
+    SwiftName: "__create(account:storage:bridge:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
     - Position: 0
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
     - Position: 1
-      Type: "NSString * _Nonnull"
-    - Position: 2
-      Type: "NSString * _Nonnull"
-    - Position: 3
       Type: "id<ZappOfframpAppleOfframpStorage> _Nonnull"
-    - Position: 4
+    - Position: 2
       Type: "id<ZappOfframpAppleOfframpBridge> _Nullable"
-    - Position: 5
-      Type: "NSString * _Nullable"
-    - Position: 6
-      Type: "NSString * _Nullable"
-    - Position: 7
-      Type: "NSString * _Nullable"
-    - Position: 8
+    - Position: 3
       Type: "void (^ _Nonnull)(ZappOfframpAppleOfframpClient * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpAppleOfframpPaymentDetails"
   SwiftName: "AppleOfframpPaymentDetails"
@@ -8716,10 +8737,6 @@ Classes:
     Parameters:
     - Position: 0
       Type: "void (^ _Nonnull)(NSError * _Nullable)"
-  - Selector: "close"
-    MethodKind: "Instance"
-    SwiftName: "close()"
-    ResultType: "void"
   - Selector: "confirmPaid"
     MethodKind: "Instance"
     SwiftName: "confirmPaid()"
@@ -8797,6 +8814,10 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "resume()"
     ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpAppleOnrampStatus *> * _Nonnull"
+  - Selector: "resumeDelivery"
+    MethodKind: "Instance"
+    SwiftName: "resumeDelivery()"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpAppleOnrampDeliveryStatus *> * _Nonnull"
   - Selector: "retryDelivery"
     MethodKind: "Instance"
     SwiftName: "retryDelivery()"
@@ -8822,37 +8843,27 @@ Classes:
 - Name: "ZappOfframpAppleOnrampClientCompanion"
   SwiftName: "AppleOnrampClient.Companion"
   Methods:
-  - Selector: "createNetworkName:seedPhrase:pimlicoApiKey:onrampBaseUrl:onrampAppId:storage:deviceSignals:swapGateway:rpcUrl:subgraphUrl:sponsorshipPolicyId:useFakeDeliveryDriver:completionHandler:"
+  - Selector: "createAccount:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__create(networkName:seedPhrase:pimlicoApiKey:onrampBaseUrl:onrampAppId:storage:deviceSignals:swapGateway:rpcUrl:subgraphUrl:sponsorshipPolicyId:useFakeDeliveryDriver:completionHandler:)"
+    SwiftName: "__create(account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
     - Position: 0
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
     - Position: 1
       Type: "NSString * _Nonnull"
     - Position: 2
-      Type: "NSString * _Nonnull"
+      Type: "id<ZappOfframpAppleOnrampStorage> _Nonnull"
     - Position: 3
-      Type: "NSString * _Nonnull"
+      Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
     - Position: 4
       Type: "NSString * _Nonnull"
     - Position: 5
-      Type: "id<ZappOfframpAppleOnrampStorage> _Nonnull"
-    - Position: 6
-      Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
-    - Position: 7
       Type: "id<ZappOfframpAppleOnrampZecSwapGateway> _Nullable"
-    - Position: 8
-      Type: "NSString * _Nullable"
-    - Position: 9
-      Type: "NSString * _Nullable"
-    - Position: 10
-      Type: "NSString * _Nullable"
-    - Position: 11
+    - Position: 6
       Type: "BOOL"
-    - Position: 12
+    - Position: 7
       Type: "void (^ _Nonnull)(ZappOfframpAppleOnrampClient * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpAppleOnrampZecEstimate"
   SwiftName: "AppleOnrampZecEstimate"
@@ -12280,6 +12291,10 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "description()"
     ResultType: "NSString * _Nonnull"
+  - Selector: "restartedAfterRefund"
+    MethodKind: "Instance"
+    SwiftName: "restartedAfterRefund()"
+    ResultType: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nonnull"
 - Name: "ZappOfframpOnrampZecDeliveryCheckpointCompanion"
   SwiftName: "OnrampZecDeliveryCheckpoint.Companion"
   Properties:
@@ -13382,6 +13397,58 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "init(name:ordinal:)"
     Availability: "nonswift"
+- Name: "ZappOfframpOnrampZecDeliveryStatusFailed"
+  SwiftName: "OnrampZecDeliveryStatusFailed"
+  Properties:
+  - Name: "fundsLocation"
+    PropertyKind: "Instance"
+    SwiftName: "fundsLocation"
+    Type: "ZappOfframpFundsLocation * _Nonnull"
+  - Name: "retryable"
+    PropertyKind: "Instance"
+    SwiftName: "retryable"
+    Type: "BOOL"
+  - Name: "stage"
+    PropertyKind: "Instance"
+    SwiftName: "stage"
+    Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
+  Methods:
+  - Selector: "initWithStage:fundsLocation:retryable:"
+    MethodKind: "Instance"
+    SwiftName: "init(stage:fundsLocation:retryable:)"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpFundsLocation * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "doCopyStage:fundsLocation:retryable:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(stage:fundsLocation:retryable:)"
+    ResultType: "ZappOfframpOnrampZecDeliveryStatusFailed * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpFundsLocation * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
 - Name: "ZappOfframpOnrampZecDeliveryStatusPreparing"
   SwiftName: "OnrampZecDeliveryStatusPreparing"
   Properties:
@@ -13579,58 +13646,6 @@ Classes:
       Type: "id _Nonnull"
     - Position: 2
       Type: "ZappOfframpAddress * _Nonnull"
-  - Selector: "isEqual:"
-    MethodKind: "Instance"
-    SwiftName: "isEqual(_:)"
-    ResultType: "BOOL"
-    Parameters:
-    - Position: 0
-      Type: "id _Nullable"
-  - Selector: "hash"
-    MethodKind: "Instance"
-    SwiftName: "hash()"
-    ResultType: "NSUInteger"
-  - Selector: "description"
-    MethodKind: "Instance"
-    SwiftName: "description()"
-    ResultType: "NSString * _Nonnull"
-- Name: "ZappOfframpOnrampZecDeliveryStatusFailed"
-  SwiftName: "OnrampZecDeliveryStatusFailed"
-  Properties:
-  - Name: "fundsLocation"
-    PropertyKind: "Instance"
-    SwiftName: "fundsLocation"
-    Type: "ZappOfframpFundsLocation * _Nonnull"
-  - Name: "retryable"
-    PropertyKind: "Instance"
-    SwiftName: "retryable"
-    Type: "BOOL"
-  - Name: "stage"
-    PropertyKind: "Instance"
-    SwiftName: "stage"
-    Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
-  Methods:
-  - Selector: "initWithStage:fundsLocation:retryable:"
-    MethodKind: "Instance"
-    SwiftName: "init(stage:fundsLocation:retryable:)"
-    Parameters:
-    - Position: 0
-      Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
-    - Position: 1
-      Type: "ZappOfframpFundsLocation * _Nonnull"
-    - Position: 2
-      Type: "BOOL"
-  - Selector: "doCopyStage:fundsLocation:retryable:"
-    MethodKind: "Instance"
-    SwiftName: "doCopy(stage:fundsLocation:retryable:)"
-    ResultType: "ZappOfframpOnrampZecDeliveryStatusFailed * _Nonnull"
-    Parameters:
-    - Position: 0
-      Type: "ZappOfframpOnrampZecDeliveryPhase * _Nonnull"
-    - Position: 1
-      Type: "ZappOfframpFundsLocation * _Nonnull"
-    - Position: 2
-      Type: "BOOL"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -21280,6 +21295,18 @@ Classes:
     PropertyKind: "Class"
     SwiftName: "ZEC_QUOTE_EXPIRY_MARGIN_MILLIS"
     Type: "int64_t"
+- Name: "ZappOfframpOnrampZecDeliveryKt"
+  SwiftName: "OnrampZecDeliveryKt"
+  Methods:
+  - Selector: "onrampDeliveryFailureLatest:resumed:"
+    MethodKind: "Class"
+    SwiftName: "onrampDeliveryFailure(latest:resumed:)"
+    ResultType: "ZappOfframpOnrampZecDeliveryStatusFailed * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nullable"
 - Name: "ZappOfframpP2pOrderHistoryKt"
   SwiftName: "P2pOrderHistoryKt"
   Methods:
@@ -21842,9 +21869,31 @@ Classes:
       Type: "id<ZappOfframpSeedPhraseSource> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__34__executeDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__34__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__34__execute(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__34__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleBaseAccountCompanion * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "NSString * _Nullable"
+    - Position: 7
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__35__executeDispatchReceiver:depositAddress:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__35__execute(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21854,9 +21903,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__35__prepareDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__36__prepareDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__35__prepare(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__36__prepare(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21868,9 +21917,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__36__prepareRefundDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__37__prepareRefundDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__36__prepareRefund(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__37__prepareRefund(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21882,9 +21931,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__37__resumeDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__38__resumeDispatchReceiver:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__37__resume(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__38__resume(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21894,9 +21943,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__38__accountAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__39__accountAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__38__accountAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__39__accountAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21904,9 +21953,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__39__accountSummaryDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__40__accountSummaryDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__39__accountSummary(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__40__accountSummary(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21914,9 +21963,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__40__checkpointCurrencyCodeDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__41__checkpointCurrencyCodeDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__40__checkpointCurrencyCode(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__41__checkpointCurrencyCode(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21924,9 +21973,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__41__discardCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__42__discardCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__41__discardCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__42__discardCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21934,9 +21983,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__42__discardTopUpCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__43__discardTopUpCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__42__discardTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__43__discardTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21944,9 +21993,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__43__hasCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__44__hasCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__43__hasCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__44__hasCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21954,9 +22003,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__44__hasTopUpCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__45__hasTopUpCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__44__hasTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__45__hasTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21964,9 +22013,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__45__historyDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__46__historyDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__45__history(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__46__history(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21974,23 +22023,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__46__parsePaymentQrDispatchReceiver:currencyCode:rawPayload:suspendHandler:"
+  - Selector: "Skie_Suspend__47__parsePaymentQrDispatchReceiver:currencyCode:rawPayload:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__46__parsePaymentQr(dispatchReceiver:currencyCode:rawPayload:suspendHandler:)"
-    Availability: "nonswift"
-    ResultType: "void"
-    Parameters:
-    - Position: 0
-      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
-    - Position: 1
-      Type: "NSString * _Nonnull"
-    - Position: 2
-      Type: "NSString * _Nonnull"
-    - Position: 3
-      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__47__quoteDispatchReceiver:currencyCode:fiatAmount:suspendHandler:"
-    MethodKind: "Class"
-    SwiftName: "Skie_Suspend__47__quote(dispatchReceiver:currencyCode:fiatAmount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__47__parsePaymentQr(dispatchReceiver:currencyCode:rawPayload:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22002,9 +22037,23 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__48__topUpCheckpointMicrosDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__48__quoteDispatchReceiver:currencyCode:fiatAmount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__48__topUpCheckpointMicros(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__48__quote(dispatchReceiver:currencyCode:fiatAmount:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__49__topUpCheckpointMicrosDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__49__topUpCheckpointMicros(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22012,9 +22061,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__49__requestPaymentDetailsDispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:"
+  - Selector: "Skie_Suspend__50__requestPaymentDetailsDispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__49__requestPaymentDetails(dispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__50__requestPaymentDetails(dispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22028,35 +22077,25 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__50__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:"
+  - Selector: "Skie_Suspend__51__createDispatchReceiver:account:storage:bridge:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__50__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__51__create(dispatchReceiver:account:storage:bridge:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
     - Position: 0
       Type: "ZappOfframpAppleOfframpClientCompanion * _Nonnull"
     - Position: 1
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
     - Position: 2
-      Type: "NSString * _Nonnull"
-    - Position: 3
-      Type: "NSString * _Nonnull"
-    - Position: 4
       Type: "id<ZappOfframpAppleOfframpStorage> _Nonnull"
-    - Position: 5
+    - Position: 3
       Type: "id<ZappOfframpAppleOfframpBridge> _Nullable"
-    - Position: 6
-      Type: "NSString * _Nullable"
-    - Position: 7
-      Type: "NSString * _Nullable"
-    - Position: 8
-      Type: "NSString * _Nullable"
-    - Position: 9
+    - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__51__checkpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__52__checkpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__51__checkpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__52__checkpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22064,9 +22103,9 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__52__clearCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__53__clearCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__52__clearCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__53__clearCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22074,9 +22113,9 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__53__declaredAmountDisagreesDispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__54__declaredAmountDisagreesDispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__53__declaredAmountDisagrees(dispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__54__declaredAmountDisagrees(dispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22092,9 +22131,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__54__estimateToZecDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__55__estimateToZecDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__54__estimateToZec(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__55__estimateToZec(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22106,9 +22145,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__55__limitsDispatchReceiver:currencyCode:suspendHandler:"
+  - Selector: "Skie_Suspend__56__limitsDispatchReceiver:currencyCode:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__55__limits(dispatchReceiver:currencyCode:suspendHandler:)"
+    SwiftName: "Skie_Suspend__56__limits(dispatchReceiver:currencyCode:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22118,9 +22157,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__56__quoteDispatchReceiver:fiatMicros:currencyCode:suspendHandler:"
+  - Selector: "Skie_Suspend__57__quoteDispatchReceiver:fiatMicros:currencyCode:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__56__quote(dispatchReceiver:fiatMicros:currencyCode:suspendHandler:)"
+    SwiftName: "Skie_Suspend__57__quote(dispatchReceiver:fiatMicros:currencyCode:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22132,9 +22171,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__57__recipientAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__58__recipientAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__57__recipientAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__58__recipientAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22142,43 +22181,33 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__58__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:onrampBaseUrl:onrampAppId:storage:deviceSignals:swapGateway:rpcUrl:subgraphUrl:sponsorshipPolicyId:useFakeDeliveryDriver:suspendHandler:"
+  - Selector: "Skie_Suspend__59__createDispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__58__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:onrampBaseUrl:onrampAppId:storage:deviceSignals:swapGateway:rpcUrl:subgraphUrl:sponsorshipPolicyId:useFakeDeliveryDriver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__59__create(dispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
     - Position: 0
       Type: "ZappOfframpAppleOnrampClientCompanion * _Nonnull"
     - Position: 1
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
     - Position: 2
       Type: "NSString * _Nonnull"
     - Position: 3
-      Type: "NSString * _Nonnull"
+      Type: "id<ZappOfframpAppleOnrampStorage> _Nonnull"
     - Position: 4
-      Type: "NSString * _Nonnull"
+      Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
     - Position: 5
       Type: "NSString * _Nonnull"
     - Position: 6
-      Type: "id<ZappOfframpAppleOnrampStorage> _Nonnull"
-    - Position: 7
-      Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
-    - Position: 8
       Type: "id<ZappOfframpAppleOnrampZecSwapGateway> _Nullable"
-    - Position: 9
-      Type: "NSString * _Nullable"
-    - Position: 10
-      Type: "NSString * _Nullable"
-    - Position: 11
-      Type: "NSString * _Nullable"
-    - Position: 12
+    - Position: 7
       Type: "BOOL"
-    - Position: 13
+    - Position: 8
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__59__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__60__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__59__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__60__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22190,9 +22219,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__60__quoteDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__61__quoteDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__60__quote(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__61__quote(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22204,9 +22233,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__61__statusDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__62__statusDispatchReceiver:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__61__status(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__62__status(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22216,9 +22245,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__62__collectDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__63__collectDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__62__collect(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__63__collect(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22226,9 +22255,9 @@ Classes:
       Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__63__ensureFundedDispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:"
+  - Selector: "Skie_Suspend__64__ensureFundedDispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__63__ensureFunded(dispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:)"
+    SwiftName: "Skie_Suspend__64__ensureFunded(dispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22244,9 +22273,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__64__invokeDispatchReceiver:p1:suspendHandler:"
+  - Selector: "Skie_Suspend__65__invokeDispatchReceiver:p1:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__64__invoke(dispatchReceiver:p1:suspendHandler:)"
+    SwiftName: "Skie_Suspend__65__invoke(dispatchReceiver:p1:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22256,9 +22285,9 @@ Classes:
       Type: "id _Nullable"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__65__awaitSettlementDispatchReceiver:handle:suspendHandler:"
+  - Selector: "Skie_Suspend__66__awaitSettlementDispatchReceiver:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__65__awaitSettlement(dispatchReceiver:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__66__awaitSettlement(dispatchReceiver:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22268,9 +22297,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__66__markTransferStartingDispatchReceiver:handle:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__67__markTransferStartingDispatchReceiver:handle:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__66__markTransferStarting(dispatchReceiver:handle:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__67__markTransferStarting(dispatchReceiver:handle:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22282,9 +22311,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__67__markTransferSubmittedDispatchReceiver:handle:amount:txHash:suspendHandler:"
+  - Selector: "Skie_Suspend__68__markTransferSubmittedDispatchReceiver:handle:amount:txHash:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__67__markTransferSubmitted(dispatchReceiver:handle:amount:txHash:suspendHandler:)"
+    SwiftName: "Skie_Suspend__68__markTransferSubmitted(dispatchReceiver:handle:amount:txHash:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22298,9 +22327,9 @@ Classes:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__68__pullbackTargetDispatchReceiver:account:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__69__pullbackTargetDispatchReceiver:account:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__68__pullbackTarget(dispatchReceiver:account:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__69__pullbackTarget(dispatchReceiver:account:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22312,9 +22341,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__69__bridgeDispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:"
+  - Selector: "Skie_Suspend__70__bridgeDispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__69__bridge(dispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:)"
+    SwiftName: "Skie_Suspend__70__bridge(dispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22330,9 +22359,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__70__cancelDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__71__cancelDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__70__cancel(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__71__cancel(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22342,9 +22371,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__71__configDispatchReceiver:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__72__configDispatchReceiver:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__71__config(dispatchReceiver:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__72__config(dispatchReceiver:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22354,9 +22383,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nullable"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__72__createOrderDispatchReceiver:quoteId:recipient:device:suspendHandler:"
+  - Selector: "Skie_Suspend__73__createOrderDispatchReceiver:quoteId:recipient:device:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__72__createOrder(dispatchReceiver:quoteId:recipient:device:suspendHandler:)"
+    SwiftName: "Skie_Suspend__73__createOrder(dispatchReceiver:quoteId:recipient:device:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22370,9 +22399,9 @@ Classes:
       Type: "ZappOfframpOnrampDeviceSignals * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__73__markPaidDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__74__markPaidDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__73__markPaid(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__74__markPaid(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22382,9 +22411,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__74__orderDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__75__orderDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__74__order(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__75__order(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22394,9 +22423,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__75__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__76__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__75__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__76__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22408,9 +22437,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__76__signerDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__77__signerDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__76__signer(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__77__signer(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22418,9 +22447,9 @@ Classes:
       Type: "id<ZappOfframpOnrampSignerProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__77__recipientDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__78__recipientDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__77__recipient(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__78__recipient(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22428,9 +22457,9 @@ Classes:
       Type: "id<ZappOfframpOnrampRecipientProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__78__collectDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__79__collectDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__78__collect(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__79__collect(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22438,9 +22467,9 @@ Classes:
       Type: "id<ZappOfframpOnrampDeviceSignalsProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__79__limitsDispatchReceiver:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__80__limitsDispatchReceiver:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__79__limits(dispatchReceiver:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__80__limits(dispatchReceiver:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22450,9 +22479,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__80__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__81__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__80__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__81__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22464,9 +22493,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__81__recipientAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__82__recipientAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__81__recipientAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__82__recipientAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22474,9 +22503,9 @@ Classes:
       Type: "id<ZappOfframpOnrampDriver> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__82__awaitReceiptDispatchReceiver:account:userOperationHash:suspendHandler:"
+  - Selector: "Skie_Suspend__83__awaitReceiptDispatchReceiver:account:userOperationHash:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__82__awaitReceipt(dispatchReceiver:account:userOperationHash:suspendHandler:)"
+    SwiftName: "Skie_Suspend__83__awaitReceipt(dispatchReceiver:account:userOperationHash:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22488,9 +22517,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__83__balanceDispatchReceiver:account:suspendHandler:"
+  - Selector: "Skie_Suspend__84__balanceDispatchReceiver:account:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__83__balance(dispatchReceiver:account:suspendHandler:)"
+    SwiftName: "Skie_Suspend__84__balance(dispatchReceiver:account:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22500,9 +22529,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__84__resolveAccountDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__85__resolveAccountDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__84__resolveAccount(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__85__resolveAccount(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22510,9 +22539,9 @@ Classes:
       Type: "id<ZappOfframpOnrampZecTransferGateway> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__85__submitDispatchReceiver:account:depositAddress:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__86__submitDispatchReceiver:account:depositAddress:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__85__submit(dispatchReceiver:account:depositAddress:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__86__submit(dispatchReceiver:account:depositAddress:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22526,9 +22555,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__86__saveDispatchReceiver:orderId:checkpoint:suspendHandler:"
+  - Selector: "Skie_Suspend__87__saveDispatchReceiver:orderId:checkpoint:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__86__save(dispatchReceiver:orderId:checkpoint:suspendHandler:)"
+    SwiftName: "Skie_Suspend__87__save(dispatchReceiver:orderId:checkpoint:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22540,9 +22569,9 @@ Classes:
       Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__87__balanceDispatchReceiver:account:suspendHandler:"
+  - Selector: "Skie_Suspend__88__balanceDispatchReceiver:account:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__87__balance(dispatchReceiver:account:suspendHandler:)"
+    SwiftName: "Skie_Suspend__88__balance(dispatchReceiver:account:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22552,9 +22581,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__88__invokeDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__89__invokeDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__88__invoke(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__89__invoke(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22562,9 +22591,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction0> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__89__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__90__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__89__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__90__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22576,9 +22605,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__90__quoteDispatchReceiver:account:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__91__quoteDispatchReceiver:account:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__90__quote(dispatchReceiver:account:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__91__quote(dispatchReceiver:account:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22590,9 +22619,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__91__statusDispatchReceiver:checkpoint:suspendHandler:"
+  - Selector: "Skie_Suspend__92__statusDispatchReceiver:checkpoint:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__91__status(dispatchReceiver:checkpoint:suspendHandler:)"
+    SwiftName: "Skie_Suspend__92__status(dispatchReceiver:checkpoint:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22602,9 +22631,9 @@ Classes:
       Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__92__sessionDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__93__sessionDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__92__session(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__93__session(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22612,9 +22641,9 @@ Classes:
       Type: "id<ZappOfframpOnrampScreeningSessionProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__93__declaredAmountDispatchReceiver:currency:instruction:suspendHandler:"
+  - Selector: "Skie_Suspend__94__declaredAmountDispatchReceiver:currency:instruction:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__93__declaredAmount(dispatchReceiver:currency:instruction:suspendHandler:)"
+    SwiftName: "Skie_Suspend__94__declaredAmount(dispatchReceiver:currency:instruction:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22626,9 +22655,9 @@ Classes:
       Type: "id<ZappOfframpOnrampPaymentInstruction> _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__94__disagreesWithDispatchReceiver:currency:instruction:expected:suspendHandler:"
+  - Selector: "Skie_Suspend__95__disagreesWithDispatchReceiver:currency:instruction:expected:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__94__disagreesWith(dispatchReceiver:currency:instruction:expected:suspendHandler:)"
+    SwiftName: "Skie_Suspend__95__disagreesWith(dispatchReceiver:currency:instruction:expected:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22642,9 +22671,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__95__requestPaymentDetailsDispatchReceiver:orderId:accepted:request:suspendHandler:"
+  - Selector: "Skie_Suspend__96__requestPaymentDetailsDispatchReceiver:orderId:accepted:request:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__95__requestPaymentDetails(dispatchReceiver:orderId:accepted:request:suspendHandler:)"
+    SwiftName: "Skie_Suspend__96__requestPaymentDetails(dispatchReceiver:orderId:accepted:request:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22658,9 +22687,9 @@ Classes:
       Type: "ZappOfframpOfframpRequest * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__96__getDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__97__getDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__96__get(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__97__get(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22670,9 +22699,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__97__putDispatchReceiver:orderId:recipientUpi:suspendHandler:"
+  - Selector: "Skie_Suspend__98__putDispatchReceiver:orderId:recipientUpi:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__97__put(dispatchReceiver:orderId:recipientUpi:suspendHandler:)"
+    SwiftName: "Skie_Suspend__98__put(dispatchReceiver:orderId:recipientUpi:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22684,9 +22713,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__98__getDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__99__getDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__98__get(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__99__get(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22694,9 +22723,9 @@ Classes:
       Type: "id<ZappOfframpRelayIdentityStore> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__99__setDispatchReceiver:identity:suspendHandler:"
+  - Selector: "Skie_Suspend__100__setDispatchReceiver:identity:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__99__set(dispatchReceiver:identity:suspendHandler:)"
+    SwiftName: "Skie_Suspend__100__set(dispatchReceiver:identity:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22706,9 +22735,9 @@ Classes:
       Type: "ZappOfframpRelayIdentity * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__100__selectCircleForOrderDispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:"
+  - Selector: "Skie_Suspend__101__selectCircleForOrderDispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__100__selectCircleForOrder(dispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__101__selectCircleForOrder(dispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22722,9 +22751,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__101__fetchOrderDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__102__fetchOrderDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__101__fetchOrder(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__102__fetchOrder(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22734,9 +22763,9 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__102__circlesForRoutingDispatchReceiver:currencyBytes32Hex:suspendHandler:"
+  - Selector: "Skie_Suspend__103__circlesForRoutingDispatchReceiver:currencyBytes32Hex:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__102__circlesForRouting(dispatchReceiver:currencyBytes32Hex:suspendHandler:)"
+    SwiftName: "Skie_Suspend__103__circlesForRouting(dispatchReceiver:currencyBytes32Hex:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22746,9 +22775,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__103__ordersForUserDispatchReceiver:userAddress:first:skip:suspendHandler:"
+  - Selector: "Skie_Suspend__104__ordersForUserDispatchReceiver:userAddress:first:skip:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__103__ordersForUser(dispatchReceiver:userAddress:first:skip:suspendHandler:)"
+    SwiftName: "Skie_Suspend__104__ordersForUser(dispatchReceiver:userAddress:first:skip:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22762,9 +22791,9 @@ Classes:
       Type: "int32_t"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__104__rawOrderByIdDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__105__rawOrderByIdDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__104__rawOrderById(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__105__rawOrderById(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22774,9 +22803,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__105__isMerchantAvailableDispatchReceiver:usdc:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__106__isMerchantAvailableDispatchReceiver:usdc:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__105__isMerchantAvailable(dispatchReceiver:usdc:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__106__isMerchantAvailable(dispatchReceiver:usdc:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22788,9 +22817,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__106__resolveAmountDispatchReceiver:locationUrl:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__107__resolveAmountDispatchReceiver:locationUrl:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__106__resolveAmount(dispatchReceiver:locationUrl:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__107__resolveAmount(dispatchReceiver:locationUrl:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22802,9 +22831,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__107__fetchAllDispatchReceiver:userAddress:maxOrders:suspendHandler:"
+  - Selector: "Skie_Suspend__108__fetchAllDispatchReceiver:userAddress:maxOrders:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__107__fetchAll(dispatchReceiver:userAddress:maxOrders:suspendHandler:)"
+    SwiftName: "Skie_Suspend__108__fetchAll(dispatchReceiver:userAddress:maxOrders:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22816,9 +22845,9 @@ Classes:
       Type: "int32_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__108__parseDispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__109__parseDispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__108__parse(dispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__109__parse(dispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22834,9 +22863,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__109__parseDispatchReceiver:qrData:resolver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__110__parseDispatchReceiver:qrData:resolver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__109__parse(dispatchReceiver:qrData:resolver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__110__parse(dispatchReceiver:qrData:resolver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22850,9 +22879,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__110__activeOrdersForDispatchReceiver:depositor:suspendHandler:"
+  - Selector: "Skie_Suspend__111__activeOrdersForDispatchReceiver:depositor:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__110__activeOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
+    SwiftName: "Skie_Suspend__111__activeOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22862,9 +22891,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__111__allOrdersForDispatchReceiver:depositor:suspendHandler:"
+  - Selector: "Skie_Suspend__112__allOrdersForDispatchReceiver:depositor:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__111__allOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
+    SwiftName: "Skie_Suspend__112__allOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22874,9 +22903,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__112__fillSamplesDispatchReceiver:platform:sinceSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__113__fillSamplesDispatchReceiver:platform:sinceSeconds:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__112__fillSamples(dispatchReceiver:platform:sinceSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__113__fillSamples(dispatchReceiver:platform:sinceSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22888,9 +22917,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__113__orderDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__114__orderDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__113__order(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__114__order(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22900,9 +22929,9 @@ Classes:
       Type: "ZappOfframpPeerDepositId * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__114__queueSamplesDispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:"
+  - Selector: "Skie_Suspend__115__queueSamplesDispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__114__queueSamples(dispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:)"
+    SwiftName: "Skie_Suspend__115__queueSamples(dispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22918,9 +22947,9 @@ Classes:
       Type: "int32_t"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__115__registerPayeeDispatchReceiver:platform:handle:suspendHandler:"
+  - Selector: "Skie_Suspend__116__registerPayeeDispatchReceiver:platform:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__115__registerPayee(dispatchReceiver:platform:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__116__registerPayee(dispatchReceiver:platform:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22932,9 +22961,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__116__validatePayeeDispatchReceiver:platform:handle:suspendHandler:"
+  - Selector: "Skie_Suspend__117__validatePayeeDispatchReceiver:platform:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__116__validatePayee(dispatchReceiver:platform:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__117__validatePayee(dispatchReceiver:platform:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22946,9 +22975,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__117__activeOrdersDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__118__activeOrdersDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__117__activeOrders(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__118__activeOrders(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22956,9 +22985,9 @@ Classes:
       Type: "id<ZappOfframpPeerCashOutOrchestrator> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__118__allOrdersDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__119__allOrdersDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__118__allOrders(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__119__allOrders(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22966,9 +22995,9 @@ Classes:
       Type: "id<ZappOfframpPeerCashOutOrchestrator> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__119__fiatPerUsdcDispatchReceiver:currency:nowSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__120__fiatPerUsdcDispatchReceiver:currency:nowSeconds:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__119__fiatPerUsdc(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__120__fiatPerUsdc(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22980,9 +23009,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__120__quoteDispatchReceiver:currency:nowSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__121__quoteDispatchReceiver:currency:nowSeconds:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__120__quote(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__121__quote(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22994,9 +23023,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__121__upgradeDispatchReceiver:input:output:engineContext:userContext:suspendHandler:"
+  - Selector: "Skie_Suspend__122__upgradeDispatchReceiver:input:output:engineContext:userContext:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__121__upgrade(dispatchReceiver:input:output:engineContext:userContext:suspendHandler:)"
+    SwiftName: "Skie_Suspend__122__upgrade(dispatchReceiver:input:output:engineContext:userContext:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23012,9 +23041,9 @@ Classes:
       Type: "id<ZappOfframpKotlinCoroutineContext> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__122__flushDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__123__flushDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__122__flush(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__123__flush(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23022,9 +23051,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__123__flushAndCloseDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__124__flushAndCloseDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__123__flushAndClose(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__124__flushAndClose(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23032,9 +23061,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__124__writeToDispatchReceiver:channel:suspendHandler:"
+  - Selector: "Skie_Suspend__125__writeToDispatchReceiver:channel:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__124__writeTo(dispatchReceiver:channel:suspendHandler:)"
+    SwiftName: "Skie_Suspend__125__writeTo(dispatchReceiver:channel:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23044,9 +23073,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__125__getUsdcBalanceExtensionReceiver:usdcAddress:owner:suspendHandler:"
+  - Selector: "Skie_Suspend__126__getUsdcBalanceExtensionReceiver:usdcAddress:owner:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__125__getUsdcBalance(extensionReceiver:usdcAddress:owner:suspendHandler:)"
+    SwiftName: "Skie_Suspend__126__getUsdcBalance(extensionReceiver:usdcAddress:owner:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23058,9 +23087,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__126__getAdditionalOrderDetailsExtensionReceiver:diamondAddress:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__127__getAdditionalOrderDetailsExtensionReceiver:diamondAddress:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__126__getAdditionalOrderDetails(extensionReceiver:diamondAddress:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__127__getAdditionalOrderDetails(extensionReceiver:diamondAddress:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23072,9 +23101,9 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__127__getPriceConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__128__getPriceConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__127__getPriceConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__128__getPriceConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23086,9 +23115,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__128__getPayFeeConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__129__getPayFeeConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__128__getPayFeeConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__129__getPayFeeConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23100,9 +23129,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__129__getSmallOrderFixedFeePayExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__130__getSmallOrderFixedFeePayExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__129__getSmallOrderFixedFeePay(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__130__getSmallOrderFixedFeePay(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23114,9 +23143,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__130__getSmallOrderThresholdExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__131__getSmallOrderThresholdExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__130__getSmallOrderThreshold(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__131__getSmallOrderThreshold(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:

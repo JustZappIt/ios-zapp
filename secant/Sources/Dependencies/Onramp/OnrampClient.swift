@@ -25,6 +25,9 @@ enum OnrampClientError: LocalizedError, Equatable {
     }
 }
 
+typealias OnrampStatusStream = AsyncThrowingStream<OnrampStatusModel, Error>
+typealias OnrampDeliveryStream = AsyncThrowingStream<OnrampDeliveryModel, Error>
+
 @DependencyClient
 struct OnrampClient {
     var isConfigured: @Sendable () -> Bool = { false }
@@ -40,16 +43,19 @@ struct OnrampClient {
         _ quote: OnrampQuoteModel,
         _ destination: OnrampDestinationModel,
         _ estimate: OnrampZecEstimateModel?
-    ) async throws -> AsyncStream<OnrampStatusModel>
-    var confirmPaid: @Sendable () async throws -> AsyncStream<OnrampStatusModel>
-    var resume: @Sendable () async throws -> AsyncStream<OnrampStatusModel>
-    var cancel: @Sendable () async throws -> AsyncStream<OnrampStatusModel>
+    ) async throws -> OnrampStatusStream
+    var confirmPaid: @Sendable () async throws -> OnrampStatusStream
+    var resume: @Sendable () async throws -> OnrampStatusStream
+    var cancel: @Sendable () async throws -> OnrampStatusStream
     var deliverToZec: @Sendable (
         _ orderID: String,
         _ recipient: String,
         _ usdcMicros: String
-    ) async throws -> AsyncStream<OnrampDeliveryModel>
-    var retryDelivery: @Sendable () async throws -> AsyncStream<OnrampDeliveryModel>
+    ) async throws -> OnrampDeliveryStream
+    /// Picks the recorded delivery back up. A confirmed refund is replayed, never respent.
+    var resumeDelivery: @Sendable () async throws -> OnrampDeliveryStream
+    /// The user's explicit "convert again" — the only path allowed to spend a confirmed refund.
+    var retryDelivery: @Sendable () async throws -> OnrampDeliveryStream
     var checkpoint: @Sendable () async throws -> OnrampCheckpointModel?
     var clearCheckpoint: @Sendable () async throws -> Void
     var declaredAmountDisagrees: @Sendable (
@@ -131,6 +137,9 @@ extension OnrampClient: DependencyKey {
                     usdcMicros: usdcMicros
                 )
                 return flow.onrampDeliveryStream()
+            },
+            resumeDelivery: {
+                try await OfframpSession.shared.onrampClient().resumeDelivery().onrampDeliveryStream()
             },
             retryDelivery: {
                 @Dependency(\.localAuthentication) var authentication
@@ -344,19 +353,21 @@ private extension OnrampDeliveryCheckpointModel {
     }
 }
 
+/// A value the framework emits but this build cannot read is a real failure, not the end of the
+/// stream: finishing quietly would let the reducer treat an interrupted order as a completed one.
 private extension SkieSwiftFlow where T == AppleOnrampStatus {
-    func onrampStream() -> AsyncStream<OnrampStatusModel> {
-        AsyncStream { continuation in
+    func onrampStream() -> OnrampStatusStream {
+        OnrampStatusStream { continuation in
             let task = Task {
                 do {
                     for await status in self {
                         guard !Task.isCancelled else { break }
                         continuation.yield(try OnrampStatusModel(status))
                     }
+                    continuation.finish()
                 } catch {
-                    // Kotlin has already flattened all expected failures into status values.
+                    continuation.finish(throwing: error)
                 }
-                continuation.finish()
             }
             continuation.onTermination = { _ in task.cancel() }
         }
@@ -364,18 +375,18 @@ private extension SkieSwiftFlow where T == AppleOnrampStatus {
 }
 
 private extension SkieSwiftFlow where T == AppleOnrampDeliveryStatus {
-    func onrampDeliveryStream() -> AsyncStream<OnrampDeliveryModel> {
-        AsyncStream { continuation in
+    func onrampDeliveryStream() -> OnrampDeliveryStream {
+        OnrampDeliveryStream { continuation in
             let task = Task {
                 do {
                     for await status in self {
                         guard !Task.isCancelled else { break }
                         continuation.yield(try OnrampDeliveryModel(status))
                     }
+                    continuation.finish()
                 } catch {
-                    // Kotlin has already flattened all expected failures into status values.
+                    continuation.finish(throwing: error)
                 }
-                continuation.finish()
             }
             continuation.onTermination = { _ in task.cancel() }
         }

@@ -30408,6 +30408,16 @@
         ]
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
         "kind": "Function",
         "name": "SkieKotlinFlow",
         "printedName": "SkieKotlinFlow(_:)",
@@ -62331,6 +62341,65 @@
       },
       {
         "kind": "Function",
+        "name": "onrampDeliveryFailure",
+        "printedName": "onrampDeliveryFailure(latest:resumed:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "OnrampZecDeliveryStatusFailed",
+            "printedName": "ZappOfframp.OnrampZecDeliveryStatusFailed",
+            "usr": "c:objc(cs)ZappOfframpOnrampZecDeliveryStatusFailed"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "ZappOfframp.OnrampZecDeliveryCheckpoint?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "OnrampZecDeliveryCheckpoint",
+                "printedName": "ZappOfframp.OnrampZecDeliveryCheckpoint",
+                "usr": "c:objc(cs)ZappOfframpOnrampZecDeliveryCheckpoint"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "ZappOfframp.OnrampZecDeliveryCheckpoint?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "OnrampZecDeliveryCheckpoint",
+                "printedName": "ZappOfframp.OnrampZecDeliveryCheckpoint",
+                "usr": "c:objc(cs)ZappOfframpOnrampZecDeliveryCheckpoint"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:11ZappOfframp21onrampDeliveryFailure6latest7resumedSo0ab9OnrampZecD12StatusFailedCSo0abhiD10CheckpointCSg_AItF",
+        "mangledName": "$s11ZappOfframp21onrampDeliveryFailure6latest7resumedSo0ab9OnrampZecD12StatusFailedCSo0abhiD10CheckpointCSg_AItF",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Function",
         "name": "extractUpiVpa",
         "printedName": "extractUpiVpa(plain:)",
         "children": [
@@ -64706,6 +64775,185 @@
       },
       {
         "kind": "TypeDecl",
+        "name": "Companion",
+        "printedName": "Companion",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "create",
+            "printedName": "create(networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AppleBaseAccount",
+                "printedName": "ZappOfframp.AppleBaseAccount",
+                "usr": "c:objc(cs)ZappOfframpAppleBaseAccount"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So36ZappOfframpAppleBaseAccountCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey6rpcUrl08subgraphP019sponsorshipPolicyIdSo0abcdE0CSS_S3SSgA2MtYaKF",
+            "mangledName": "$sSo36ZappOfframpAppleBaseAccountCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey6rpcUrl08subgraphP019sponsorshipPolicyIdSo0abcdE0CSS_S3SSgA2MtYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:objc(cs)ZappOfframpAppleBaseAccountCompanion",
+        "moduleName": "ZappOfframp",
+        "objc_name": "ZappOfframpAppleBaseAccountCompanion",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "isFromExtension": true,
+        "superclassUsr": "c:objc(cs)ZappOfframpBase",
+        "isExternal": true,
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ZappOfframp.KotlinBase",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
         "name": "AppleOfframpBridge",
         "printedName": "AppleOfframpBridge",
         "children": [
@@ -65473,7 +65721,7 @@
           {
             "kind": "Function",
             "name": "create",
-            "printedName": "create(networkName:seedPhrase:pimlicoApiKey:storage:bridge:rpcUrl:subgraphUrl:sponsorshipPolicyId:)",
+            "printedName": "create(account:storage:bridge:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -65483,21 +65731,9 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
+                "name": "AppleBaseAccount",
+                "printedName": "ZappOfframp.AppleBaseAccount",
+                "usr": "c:objc(cs)ZappOfframpAppleBaseAccount"
               },
               {
                 "kind": "TypeNominal",
@@ -65518,53 +65754,11 @@
                   }
                 ],
                 "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
               }
             ],
             "declKind": "Func",
-            "usr": "s:So016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyIdSo0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA2RtYaKF",
-            "mangledName": "$sSo016ZappOfframpAppleB15ClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey7storage6bridge6rpcUrl08subgraphQ019sponsorshipPolicyIdSo0abcbD0CSS_S2SSo0abcB7Storage_pSo0abcB6Bridge_pSgSSSgA2RtYaKF",
+            "usr": "s:So016ZappOfframpAppleB15ClientCompanionC0aB0E6create7account7storage6bridgeSo0abcbD0CSo0abC11BaseAccountC_So0abcB7Storage_pSo0abcB6Bridge_pSgtYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB15ClientCompanionC0aB0E6create7account7storage6bridgeSo0abcbD0CSo0abC11BaseAccountC_So0abcB7Storage_pSo0abcB6Bridge_pSgtYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",
@@ -66037,7 +66231,7 @@
           {
             "kind": "Function",
             "name": "create",
-            "printedName": "create(networkName:seedPhrase:pimlicoApiKey:onrampBaseUrl:onrampAppId:storage:deviceSignals:swapGateway:rpcUrl:subgraphUrl:sponsorshipPolicyId:useFakeDeliveryDriver:)",
+            "printedName": "create(account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -66047,27 +66241,9 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
+                "name": "AppleBaseAccount",
+                "printedName": "ZappOfframp.AppleBaseAccount",
+                "usr": "c:objc(cs)ZappOfframpAppleBaseAccount"
               },
               {
                 "kind": "TypeNominal",
@@ -66089,6 +66265,12 @@
               },
               {
                 "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
                 "name": "Optional",
                 "printedName": "(any ZappOfframp.AppleOnrampZecSwapGateway)?",
                 "children": [
@@ -66103,56 +66285,14 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
                 "name": "Bool",
                 "printedName": "Swift.Bool",
                 "usr": "s:Sb"
               }
             ],
             "declKind": "Func",
-            "usr": "s:So37ZappOfframpAppleOnrampClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey13onrampBaseUrl0O5AppId7storage13deviceSignals11swapGateway03rpcQ008subgraphQ0017sponsorshipPolicyS021useFakeDeliveryDriverSo0abcdE0CSS_S4SSo0abcD7Storage_pSo0abcd6DeviceV0_pSo0abcd7ZecSwapX0_pSgSSSgA2WSbtYaKF",
-            "mangledName": "$sSo37ZappOfframpAppleOnrampClientCompanionC0aB0E6create11networkName10seedPhrase13pimlicoApiKey13onrampBaseUrl0O5AppId7storage13deviceSignals11swapGateway03rpcQ008subgraphQ0017sponsorshipPolicyS021useFakeDeliveryDriverSo0abcdE0CSS_S4SSo0abcD7Storage_pSo0abcd6DeviceV0_pSo0abcd7ZecSwapX0_pSgSSSgA2WSbtYaKF",
+            "usr": "s:So37ZappOfframpAppleOnrampClientCompanionC0aB0E6create7account13onrampBaseUrl7storage13deviceSignals0I5AppId11swapGateway21useFakeDeliveryDriverSo0abcdE0CSo0abcJ7AccountC_SSSo0abcD7Storage_pSo0abcd6DeviceN0_pSSSo0abcd7ZecSwapR0_pSgSbtYaKF",
+            "mangledName": "$sSo37ZappOfframpAppleOnrampClientCompanionC0aB0E6create7account13onrampBaseUrl7storage13deviceSignals0I5AppId11swapGateway21useFakeDeliveryDriverSo0abcdE0CSo0abcJ7AccountC_SSSo0abcD7Storage_pSo0abcd6DeviceN0_pSSSo0abcd7ZecSwapR0_pSgSbtYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",

@@ -31,6 +31,6 @@ struct SwapAndPayClient {
     /// Full provider catalog — for resolving/rendering historical or exotic assets
     /// that are no longer offered for swaps (MOB-1472).
     var swapAssetsCatalog: @Sendable () async throws -> IdentifiedArrayOf<SwapAsset>
-    var quote: @Sendable (Bool, Bool, Bool, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
+    var quote: @Sendable (Bool, Bool, SwapQuoteMode, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
     var status: @Sendable (String, Bool) async throws -> SwapDetails
 }

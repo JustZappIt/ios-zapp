@@ -536,6 +536,10 @@ extension ZappOfframp.SeedPhraseSource {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func getSeedPhrase() async throws -> ZappOfframp.KotlinCharArray
 }
+extension ZappOfframp.AppleBaseAccount.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleBaseAccount
+}
 extension ZappOfframp.AppleOfframpBridge {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func execute(depositAddress: Swift.String) async throws -> ZappOfframp.AppleBridgeExecution
@@ -576,7 +580,7 @@ extension ZappOfframp.AppleOfframpPaymentDetailsProvider {
 }
 extension ZappOfframp.AppleOfframpClient.Companion {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleOfframpClient
+  public func create(account: ZappOfframp.AppleBaseAccount, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?) async throws -> ZappOfframp.AppleOfframpClient
 }
 extension ZappOfframp.AppleOnrampClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -596,7 +600,7 @@ extension ZappOfframp.AppleOnrampClient {
 }
 extension ZappOfframp.AppleOnrampClient.Companion {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, onrampBaseUrl: Swift.String, onrampAppId: Swift.String, storage: any ZappOfframp.AppleOnrampStorage, deviceSignals: any ZappOfframp.AppleOnrampDeviceSignals, swapGateway: (any ZappOfframp.AppleOnrampZecSwapGateway)?, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?, useFakeDeliveryDriver: Swift.Bool) async throws -> ZappOfframp.AppleOnrampClient
+  public func create(account: ZappOfframp.AppleBaseAccount, onrampBaseUrl: Swift.String, storage: any ZappOfframp.AppleOnrampStorage, deviceSignals: any ZappOfframp.AppleOnrampDeviceSignals, onrampAppId: Swift.String, swapGateway: (any ZappOfframp.AppleOnrampZecSwapGateway)?, useFakeDeliveryDriver: Swift.Bool) async throws -> ZappOfframp.AppleOnrampClient
 }
 extension ZappOfframp.AppleOnrampZecSwapGateway {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -2862,6 +2866,7 @@ extension Swift.String {
 public var ZEC_QUOTE_EXPIRY_MARGIN_MILLIS: Swift.Int64 {
   get
 }
+public func onrampDeliveryFailure(latest: ZappOfframp.OnrampZecDeliveryCheckpoint?, resumed: ZappOfframp.OnrampZecDeliveryCheckpoint?) -> ZappOfframp.OnrampZecDeliveryStatusFailed
 public func extractUpiVpa(plain: Swift.String) -> Swift.String
 extension ZappOfframp.KotlinKVariance : Swift.Sendable {}
 extension ZappOfframp.KotlinKVariance : Swift.BitwiseCopyable {}

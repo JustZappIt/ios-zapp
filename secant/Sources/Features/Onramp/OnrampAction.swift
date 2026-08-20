@@ -42,6 +42,7 @@ extension Onramp {
         case transactionURLLoaded(URL?)
         case paymentTicked(Int)
         case paymentWindowExpired(String)
+        case recheckOrderTapped
         case infoTapped
         case infoDismissed
         case backTapped

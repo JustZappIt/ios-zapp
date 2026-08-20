@@ -63,6 +63,7 @@ struct Onramp {
         var isSendingBaseBalanceToZec = false
         var expiryRecheckedFor: String?
         var deliveryStartedFor: String?
+        var isRecheckingOrder = false
 
         var isPaymentWindowClosed: Bool {
             paymentSecondsRemaining.map { $0 <= 0 } ?? false
@@ -72,6 +73,12 @@ struct Onramp {
 
         var isSettledAgainstUser: Bool {
             progress?.kind == .failed || progress?.kind == .cancelled
+        }
+
+        /// Only the service may end an order. A local countdown reaching zero is not that answer,
+        /// so until one arrives the resume checkpoint is the sole handle on money already sent.
+        var isOrderResolved: Bool {
+            progress.map(\.isTerminal) ?? true
         }
 
         var canRetryDelivery: Bool {
@@ -209,7 +216,7 @@ struct Onramp {
                 state.requestID = checkpoint.id
                 state.orderID = checkpoint.orderID
                 if checkpoint.phase == .completed, checkpoint.destination == .zcash {
-                    return deliveryEffect(retry: true)
+                    return deliveryEffect(.resume)
                 }
                 return statusEffect { try await onramp.resume() }
 
@@ -308,6 +315,7 @@ struct Onramp {
 
             case .statusReceived(let status):
                 state.progress = status
+                state.isRecheckingOrder = false
                 state.requestID = status.id ?? state.requestID
                 state.orderID = status.orderID ?? state.orderID
                 state.isPlacingOrder = false
@@ -340,7 +348,9 @@ struct Onramp {
                         state.page = .convertingToZec
                         guard state.deliveryStartedFor != requestID else { return .none }
                         state.deliveryStartedFor = requestID
-                        return deliveryEffect(orderID: requestID, recipient: recipient, amount: amount)
+                        return deliveryEffect(
+                            .fresh(orderID: requestID, recipient: recipient, usdcMicros: amount)
+                        )
                     }
                     state.page = .completion
                     return transactionURLEffect(status.paidTransactionHash)
@@ -364,11 +374,13 @@ struct Onramp {
             case .statusStreamFinished:
                 state.isPlacingOrder = false
                 state.isConfirmingPaid = false
+                state.isRecheckingOrder = false
                 return .none
 
             case .authenticationCancelled:
                 state.isPlacingOrder = false
                 state.isConfirmingPaid = false
+                state.isRecheckingOrder = false
                 if state.page == .progress, state.orderID == nil, state.quote != nil {
                     state.page = .confirmation
                 }
@@ -378,6 +390,7 @@ struct Onramp {
             case .statusOperationFailed(let message):
                 state.isPlacingOrder = false
                 state.isConfirmingPaid = false
+                state.isRecheckingOrder = false
                 state.errorMessage = message
                 guard let orderID = state.orderID else {
                     state.page = state.quote == nil ? .unavailable : .confirmation
@@ -433,6 +446,9 @@ struct Onramp {
                     state.page = .progress
                     return statusEffect { try await onramp.resume() }
                 }
+                // Discarding the checkpoint here is what makes starting over irreversible, so it
+                // waits for the service's own terminal word rather than a lapsed local deadline.
+                guard state.isOrderResolved else { return .send(.recheckOrderTapped) }
                 state = .initial(currencyCode: state.currencyCode)
                 return .merge(
                     cancelEffects(),
@@ -477,7 +493,7 @@ struct Onramp {
                 return .none
 
             case .deliveryActionTapped:
-                return deliveryEffect(retry: true)
+                return deliveryEffect(.retry)
 
             case .copyAccountAddressTapped:
                 guard let address = state.accountAddress else { return .none }
@@ -538,6 +554,12 @@ struct Onramp {
             case .paymentWindowExpired(let orderID):
                 guard state.expiryRecheckedFor != orderID else { return .none }
                 state.expiryRecheckedFor = orderID
+                return .send(.recheckOrderTapped)
+
+            case .recheckOrderTapped:
+                guard !state.isRecheckingOrder else { return .none }
+                state.isRecheckingOrder = true
+                state.errorMessage = nil
                 return statusEffect { try await onramp.resume() }
 
             case .infoTapped:

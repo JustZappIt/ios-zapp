@@ -4,12 +4,20 @@ import ComposableArchitecture
 import Foundation
 
 extension Onramp {
+    /// How a ZEC delivery leg is entered. Only `retry` may respend a confirmed refund, so the
+    /// relaunch path has to name itself rather than borrow the user's explicit action.
+    enum DeliveryEntry: Equatable {
+        case fresh(orderID: String, recipient: String, usdcMicros: String)
+        case resume
+        case retry
+    }
+
     func statusEffect(
-        _ operation: @escaping @Sendable () async throws -> AsyncStream<OnrampStatusModel>
+        _ operation: @escaping @Sendable () async throws -> OnrampStatusStream
     ) -> Effect<Action> {
         .run { send in
             do {
-                for await status in try await operation() { await send(.statusReceived(status)) }
+                for try await status in try await operation() { await send(.statusReceived(status)) }
                 await send(.statusStreamFinished)
             } catch OnrampClientError.authenticationCancelled {
                 await send(.authenticationCancelled)
@@ -20,23 +28,19 @@ extension Onramp {
         .cancellable(id: CancelID.driver, cancelInFlight: true)
     }
 
-    func deliveryEffect(
-        orderID: String? = nil,
-        recipient: String? = nil,
-        amount: String? = nil,
-        retry: Bool = false
-    ) -> Effect<Action> {
+    func deliveryEffect(_ entry: DeliveryEntry) -> Effect<Action> {
         .run { send in
             do {
-                let stream: AsyncStream<OnrampDeliveryModel>
-                if retry {
+                let stream: OnrampDeliveryStream
+                switch entry {
+                case let .fresh(orderID, recipient, usdcMicros):
+                    stream = try await onramp.deliverToZec(orderID, recipient, usdcMicros)
+                case .resume:
+                    stream = try await onramp.resumeDelivery()
+                case .retry:
                     stream = try await onramp.retryDelivery()
-                } else if let orderID, let recipient, let amount {
-                    stream = try await onramp.deliverToZec(orderID, recipient, amount)
-                } else {
-                    return
                 }
-                for await status in stream { await send(.deliveryStatusReceived(status)) }
+                for try await status in stream { await send(.deliveryStatusReceived(status)) }
                 await send(.deliveryStreamFinished)
             } catch {
                 // Never infer the disposition of funds from an exception. The durable Kotlin
@@ -58,7 +62,7 @@ extension Onramp {
                 )))
             }
         }
-        .cancellable(id: CancelID.delivery, cancelInFlight: retry)
+        .cancellable(id: CancelID.delivery, cancelInFlight: entry == .retry)
     }
 
     func quoteCountdown(to deadline: Date) -> Effect<Action> {

@@ -501,7 +501,11 @@ struct OnrampView: View {
                 ? String(localizable: .onrampStartOver)
                 : String(localizable: .onrampCancelOrder)
         case .payment:
-            return store.isPayable ? String(localizable: .onrampIHavePaid) : String(localizable: .onrampStartOver)
+            // A lapsed local deadline says nothing about the order, so the way out is to ask the
+            // service — not an irreversible start over that would drop the resume checkpoint.
+            return store.isPayable
+                ? String(localizable: .onrampIHavePaid)
+                : String(localizable: .onrampCheckOrderStatus)
         case .convertingToZec: return String(localizable: .onrampConvertingAction)
         case .completion, .refundedToBase: return String(localizable: .onrampDone)
         case .deliveryNeedsAttention:
@@ -517,6 +521,7 @@ struct OnrampView: View {
         switch store.page {
         case .loading, .convertingToZec: return false
         case .amount, .confirmation: return store.canContinue
+        case .payment: return store.isPayable || !store.isRecheckingOrder
         case .progress: return store.isSettledAgainstUser || store.progress?.phase == .awaitingMerchant
         default: return true
         }
@@ -528,7 +533,7 @@ struct OnrampView: View {
         case .unavailable: store.send(.onAppear)
         case .amount, .confirmation: store.send(.continueTapped)
         case .progress: store.send(store.isSettledAgainstUser ? .retryTapped : .cancelTapped)
-        case .payment: store.send(store.isPayable ? .paidTapped : .retryTapped)
+        case .payment: store.send(store.isPayable ? .paidTapped : .recheckOrderTapped)
         case .convertingToZec: break
         case .completion, .refundedToBase: store.send(.doneTapped)
         case .deliveryNeedsAttention:

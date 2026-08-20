@@ -28,7 +28,7 @@ struct OnrampStoreTests {
         state.page = .confirmation
         state.quote = quote()
         state.zecEstimate = estimate()
-        let pair = AsyncStream<OnrampStatusModel>.makeStream()
+        let pair = OnrampStatusStream.makeStream()
         let starts = LockIsolated(0)
         let store = TestStore(initialState: state) { Onramp() } withDependencies: {
             $0.onramp.start = { _, _, _ in
@@ -57,14 +57,19 @@ struct OnrampStoreTests {
         let store = TestStore(initialState: state) { Onramp() } withDependencies: {
             $0.onramp.resume = {
                 resumes.withValue { $0 += 1 }
-                return AsyncStream { $0.finish() }
+                return OnrampStatusStream { $0.finish() }
             }
         }
 
         await store.send(.paymentWindowExpired("order-1")) {
             $0.expiryRecheckedFor = "order-1"
         }
-        await store.receive(.statusStreamFinished)
+        await store.receive(.recheckOrderTapped) {
+            $0.isRecheckingOrder = true
+        }
+        await store.receive(.statusStreamFinished) {
+            $0.isRecheckingOrder = false
+        }
         await store.send(.paymentWindowExpired("order-1"))
 
         #expect(resumes.value == 1)
@@ -93,7 +98,7 @@ struct OnrampStoreTests {
         let store = TestStore(initialState: state) { Onramp() } withDependencies: {
             $0.onramp.resume = {
                 resumes.withValue { $0 += 1 }
-                return AsyncStream { $0.finish() }
+                return OnrampStatusStream { $0.finish() }
             }
             $0.onramp.clearCheckpoint = { clears.withValue { $0 += 1 } }
         }
@@ -114,7 +119,7 @@ struct OnrampStoreTests {
         let store = TestStore(initialState: state) { Onramp() } withDependencies: {
             $0.onramp.deliverToZec = { id, _, _ in
                 deliveredIDs.withValue { $0.append(id) }
-                return AsyncStream { $0.finish() }
+                return OnrampDeliveryStream { $0.finish() }
             }
         }
         let completed = OnrampStatusModel(
@@ -144,6 +149,82 @@ struct OnrampStoreTests {
         await store.receive(.deliveryStreamFinished)
 
         #expect(deliveredIDs.value == ["request-1"])
+    }
+
+    @Test func relaunchAfterARefundReplaysItInsteadOfSpendingItAgain() async {
+        let state = Onramp.State.initial(currencyCode: "INR")
+        let resumes = LockIsolated(0)
+        let retries = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.resumeDelivery = {
+                resumes.withValue { $0 += 1 }
+                return OnrampDeliveryStream { $0.finish() }
+            }
+            $0.onramp.retryDelivery = {
+                retries.withValue { $0 += 1 }
+                return OnrampDeliveryStream { $0.finish() }
+            }
+        }
+        let checkpoint = OnrampCheckpointModel(
+            id: "request-1",
+            phase: .completed,
+            orderID: "order-1",
+            destination: .zcash,
+            zecDelivery: OnrampDeliveryCheckpointModel(
+                phase: .refundedToBase,
+                usdcMicros: "1190000",
+                baseAccount: "0x1234",
+                transferStarted: true,
+                refundedUsdcMicros: "1180000",
+                acceptedCostBasisPoints: 168,
+                fundsLocation: .baseAccount
+            )
+        )
+
+        await store.send(.resumeLoadedCheckpoint(checkpoint)) {
+            $0.requestID = "request-1"
+            $0.orderID = "order-1"
+        }
+        await store.receive(.deliveryStreamFinished)
+
+        #expect(resumes.value == 1)
+        #expect(retries.value == 0)
+    }
+
+    @Test func aLapsedPaymentWindowCannotDiscardTheCheckpoint() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .payment
+        state.paymentSecondsRemaining = 0
+        state.orderID = "order-1"
+        state.progress = OnrampStatusModel(
+            kind: .awaitingPayment,
+            phase: .awaitingPayment,
+            id: "request-1",
+            orderID: "order-1",
+            failureCode: nil,
+            instruction: .plain(address: "merchant"),
+            fiatMicros: "100000000",
+            netUsdcMicros: nil,
+            recipientAddress: nil,
+            paidTransactionHash: nil,
+            expiresAt: nil,
+            isTerminal: false
+        )
+        let clears = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.resume = { OnrampStatusStream { $0.finish() } }
+            $0.onramp.clearCheckpoint = { clears.withValue { $0 += 1 } }
+        }
+
+        await store.send(.retryTapped)
+        await store.receive(.recheckOrderTapped) {
+            $0.isRecheckingOrder = true
+        }
+        await store.receive(.statusStreamFinished) {
+            $0.isRecheckingOrder = false
+        }
+
+        #expect(clears.value == 0)
     }
 
     private func quote() -> OnrampQuoteModel {

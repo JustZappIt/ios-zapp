@@ -107,7 +107,7 @@ struct Near1Click {
     /// The full provider catalog — every asset, uncurated. For resolving/rendering
     /// historical or exotic assets that are no longer offered for swaps (MOB-1472).
     let swapAssetsCatalog: @Sendable () async throws -> IdentifiedArrayOf<SwapAsset>
-    let quote: @Sendable (Bool, Bool, Bool, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
+    let quote: @Sendable (Bool, Bool, SwapQuoteMode, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
     let status: @Sendable (String, Bool) async throws -> SwapDetails
 
     static func getCall(urlString: String, includeJwtKey: Bool = false) async throws -> (Data, URLResponse) {
@@ -308,7 +308,7 @@ extension Near1Click {
         swapAssetsCatalog: {
             IdentifiedArrayOf(uniqueElements: try await Near1Click.fetchAllAssets())
         },
-        quote: { dry, isSwapToZec, exactInput, slippageTolerance, zecAsset, toAsset, refundTo, destination, amount in
+        quote: { dry, isSwapToZec, mode, slippageTolerance, zecAsset, toAsset, refundTo, destination, amount in
             // Deadline in ISO 8601 UTC format
             let now = Date()
             let twoHoursLater = now.addingTimeInterval(120 * 60)
@@ -324,7 +324,7 @@ extension Near1Click {
             
             let requestData = SwapQuoteRequest(
                 dry: dry,
-                swapType: exactInput ? Constants.exactInput : isSwapToZec ? Constants.flexInput : Constants.exactOutput,
+                swapType: mode.rawValue,
                 slippageTolerance: slippageTolerance,
                 originAsset: isSwapToZec ? toAsset.assetId : zecAsset.assetId,
                 depositType: Constants.originChain,
@@ -361,7 +361,7 @@ extension Near1Click {
             
             if httpResponse.statusCode >= 400 {
                 try amountMessageResolution(
-                    exactInput: exactInput,
+                    exactInput: mode == .exactInput,
                     isSwapToZec: isSwapToZec,
                     toAsset: toAsset,
                     jsonObject: jsonObject

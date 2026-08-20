@@ -59,7 +59,6 @@ final class OnrampZecSwapGateway: NSObject, AppleOnrampZecSwapGateway, @unchecke
 
 private actor OnrampZecSwapWorker {
     private enum Constants {
-        static let exactInput = "EXACT_INPUT"
         static let slippageBasisPoints = 100
         static let slippagePercent = "1"
         static let microsPerUnit = Decimal(1_000_000)
@@ -84,7 +83,7 @@ private actor OnrampZecSwapWorker {
         let quote = try await swapAndPay.quote(
             false,
             true,
-            true,
+            .exactInput,
             Constants.slippageBasisPoints,
             assets.zec,
             assets.usdc,
@@ -98,7 +97,7 @@ private actor OnrampZecSwapWorker {
             throw OnrampZecSwapError.routeMismatch
         }
         return AppleZecSwapQuote(
-            mode: Constants.exactInput,
+            mode: SwapQuoteMode.exactInput.rawValue,
             inputUsdcMicros: try Self.micros(quote.amountIn),
             refundAddress: quote.refundAddress,
             recipientAddress: recipient,
