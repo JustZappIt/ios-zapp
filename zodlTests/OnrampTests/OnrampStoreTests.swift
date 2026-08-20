@@ -227,6 +227,151 @@ struct OnrampStoreTests {
         #expect(clears.value == 0)
     }
 
+    @Test func aRefundTheBridgeRejectsIsNotReportedAsSent() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .amount
+        state.baseBalance = "12.50"
+        state.baseRefundState = .available
+        state.baseRefundPreview = preview()
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.offramp.recoverFunds = { _ in
+                AsyncStream { continuation in
+                    continuation.yield(Self.progress(kind: "failed", isTerminal: true, isSuccess: false))
+                    continuation.finish()
+                }
+            }
+        }
+
+        await store.send(.sendBaseBalanceToZecConfirmed) {
+            $0.isSendBaseBalanceConfirmationPresented = false
+            $0.isSendingBaseBalanceToZec = true
+            $0.baseRefundState = .inProgress
+        }
+        await store.receive(.baseBalanceSendFailed(String(localizable: .onrampSendToZecFailed))) {
+            $0.isSendingBaseBalanceToZec = false
+            $0.baseRefundPreview = nil
+            $0.baseRefundState = .failedRetry
+            $0.errorMessage = String(localizable: .onrampSendToZecFailed)
+        }
+        #expect(store.state.baseBalance == "12.50")
+    }
+
+    @Test func aRefundStreamThatEndsWithoutATerminalStatusIsNotSuccess() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.baseBalance = "12.50"
+        state.baseRefundState = .available
+        state.baseRefundPreview = preview()
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.offramp.recoverFunds = { _ in AsyncStream { $0.finish() } }
+        }
+
+        await store.send(.sendBaseBalanceToZecConfirmed) {
+            $0.isSendBaseBalanceConfirmationPresented = false
+            $0.isSendingBaseBalanceToZec = true
+            $0.baseRefundState = .inProgress
+        }
+        await store.receive(.baseBalanceSendFailed(String(localizable: .onrampSendToZecFailed))) {
+            $0.isSendingBaseBalanceToZec = false
+            $0.baseRefundPreview = nil
+            $0.baseRefundState = .failedRetry
+            $0.errorMessage = String(localizable: .onrampSendToZecFailed)
+        }
+        #expect(store.state.baseBalance == "12.50")
+    }
+
+    @Test func aSuccessfulRefundClearsTheBaseBalance() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.baseBalance = "12.50"
+        state.baseRefundState = .available
+        state.baseRefundPreview = preview()
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.offramp.recoverFunds = { _ in
+                AsyncStream { continuation in
+                    continuation.yield(Self.progress(kind: "waiting", isTerminal: false, isSuccess: false))
+                    continuation.yield(Self.progress(kind: "funds_recovered", isTerminal: true, isSuccess: true))
+                    continuation.finish()
+                }
+            }
+        }
+
+        await store.send(.sendBaseBalanceToZecConfirmed) {
+            $0.isSendBaseBalanceConfirmationPresented = false
+            $0.isSendingBaseBalanceToZec = true
+            $0.baseRefundState = .inProgress
+        }
+        await store.receive(.baseBalanceSent) {
+            $0.isSendingBaseBalanceToZec = false
+            $0.baseRefundPreview = nil
+            $0.baseBalance = nil
+            $0.baseRefundState = .hidden
+        }
+    }
+
+    @Test func theRefundIsQuotedBeforeTheSheetAsksToSendIt() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.baseBalance = "12.50"
+        state.baseRefundState = .available
+        let previews = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.offramp.previewRefund = {
+                previews.withValue { $0 += 1 }
+                return Self.previewValue
+            }
+        }
+
+        await store.send(.sendBaseBalanceToZecTapped) {
+            $0.baseRefundState = .inProgress
+        }
+        await store.receive(.baseRefundPreviewLoaded(Self.previewValue)) {
+            $0.baseRefundPreview = Self.previewValue
+            $0.baseRefundState = .available
+            $0.isSendBaseBalanceConfirmationPresented = true
+        }
+        #expect(previews.value == 1)
+    }
+
+    @Test func anUnquotedRefundCannotBeConfirmed() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.baseBalance = "12.50"
+        state.baseRefundState = .available
+        state.isSendBaseBalanceConfirmationPresented = true
+        let recoveries = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.offramp.recoverFunds = { _ in
+                recoveries.withValue { $0 += 1 }
+                return AsyncStream { $0.finish() }
+            }
+        }
+
+        await store.send(.sendBaseBalanceToZecConfirmed)
+        #expect(recoveries.value == 0)
+    }
+
+    private nonisolated static let previewValue = OfframpBridgePreview(
+        sourceAmount: "12.50",
+        sourceAsset: "USDC on Base",
+        destinationAmount: "0.045",
+        destinationAsset: "ZEC",
+        networkFee: "0.0001",
+        estimatedSeconds: 60
+    )
+
+    private func preview() -> OfframpBridgePreview { Self.previewValue }
+
+    private nonisolated static func progress(kind: String, isTerminal: Bool, isSuccess: Bool) -> OfframpProgressModel {
+        OfframpProgressModel(
+            kind: kind,
+            step: "WAITING_FOR_ACCEPTANCE",
+            title: "Funds returned",
+            detail: isSuccess ? nil : "The refund quote was never authorized",
+            orderId: nil,
+            txHash: nil,
+            bridgeDepositAddress: nil,
+            isTerminal: isTerminal,
+            isSuccess: isSuccess
+        )
+    }
+
     private func quote() -> OnrampQuoteModel {
         OnrampQuoteModel(
             quoteID: "quote-1",

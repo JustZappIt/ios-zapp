@@ -61,6 +61,7 @@ struct Onramp {
         var isInfoPresented = false
         var isSendBaseBalanceConfirmationPresented = false
         var isSendingBaseBalanceToZec = false
+        var baseRefundPreview: OfframpBridgePreview?
         var expiryRecheckedFor: String?
         var deliveryStartedFor: String?
         var isRecheckingOrder = false
@@ -507,24 +508,49 @@ struct Onramp {
 
             case .sendBaseBalanceToZecTapped:
                 guard [.available, .failedRetry].contains(state.baseRefundState), !state.isRequestingQuote else { return .none }
+                // The bridge only executes a refund it has already quoted, so the preview is what
+                // authorizes the send — not merely what the confirmation sheet reads from.
+                state.baseRefundState = .inProgress
+                state.errorMessage = nil
+                return .run { send in
+                    do { await send(.baseRefundPreviewLoaded(try await offramp.previewRefund())) }
+                    catch { await send(.baseBalanceSendFailed(error.localizedDescription)) }
+                }
+                .cancellable(id: CancelID.baseRefund, cancelInFlight: true)
+
+            case .baseRefundPreviewLoaded(let preview):
+                state.baseRefundPreview = preview
+                state.baseRefundState = .available
                 state.isSendBaseBalanceConfirmationPresented = true
                 return .none
 
             case .sendBaseBalanceToZecDismissed:
                 guard !state.isSendingBaseBalanceToZec else { return .none }
                 state.isSendBaseBalanceConfirmationPresented = false
+                state.baseRefundPreview = nil
                 return .none
 
             case .sendBaseBalanceToZecConfirmed:
-                guard [.available, .failedRetry].contains(state.baseRefundState), !state.isSendingBaseBalanceToZec else { return .none }
+                guard [.available, .failedRetry].contains(state.baseRefundState),
+                      !state.isSendingBaseBalanceToZec,
+                      state.baseRefundPreview != nil else { return .none }
                 state.isSendBaseBalanceConfirmationPresented = false
                 state.isSendingBaseBalanceToZec = true
                 state.baseRefundState = .inProgress
                 return .run { send in
                     do {
                         let stream = try await offramp.recoverFunds(nil)
-                        for await _ in stream { }
+                        // The bridge reports a failed refund as a terminal status, not as a thrown
+                        // error, so a stream that ends without a successful one moved no money.
+                        var terminal: OfframpProgressModel?
+                        for await status in stream where status.isTerminal { terminal = status }
+                        guard let terminal, terminal.isSuccess else {
+                            await send(.baseBalanceSendFailed(String(localizable: .onrampSendToZecFailed)))
+                            return
+                        }
                         await send(.baseBalanceSent)
+                    } catch OfframpClientError.authenticationCancelled {
+                        await send(.baseBalanceSendCancelled)
                     } catch {
                         await send(.baseBalanceSendFailed(error.localizedDescription))
                     }
@@ -533,14 +559,24 @@ struct Onramp {
 
             case .baseBalanceSent:
                 state.isSendingBaseBalanceToZec = false
+                state.baseRefundPreview = nil
                 state.baseBalance = nil
                 state.baseRefundState = .hidden
                 return .none
 
-            case .baseBalanceSendFailed:
+            case .baseBalanceSendFailed(let message):
                 state.isSendingBaseBalanceToZec = false
+                state.isSendBaseBalanceConfirmationPresented = false
+                state.baseRefundPreview = nil
                 state.baseRefundState = .failedRetry
-                state.errorMessage = String(localizable: .onrampSendToZecFailed)
+                state.errorMessage = message
+                return .none
+
+            case .baseBalanceSendCancelled:
+                state.isSendingBaseBalanceToZec = false
+                state.isSendBaseBalanceConfirmationPresented = false
+                state.baseRefundPreview = nil
+                state.baseRefundState = .available
                 return .none
 
             case .transactionURLLoaded(let url):

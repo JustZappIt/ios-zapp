@@ -17,12 +17,14 @@ final class OnrampDeviceSignals: NSObject, AppleOnrampDeviceSignals, @unchecked 
         completionHandler: @escaping @Sendable (AppleOnrampDeviceSignalsRecord?, Error?) -> Void
     ) {
         Task { @MainActor [connection] in
-            completionHandler(Self.record(connectionType: connection.type), nil)
+            let snapshot = connection.snapshot
+            completionHandler(Self.record(connectionType: snapshot.type, isOnline: snapshot.isOnline), nil)
         }
     }
 
     @MainActor static func record(
         connectionType: String?,
+        isOnline: Bool = true,
         timeZone: TimeZone = .current,
         locale: Locale = .current,
         screen: UIScreen = .main,
@@ -44,7 +46,7 @@ final class OnrampDeviceSignals: NSObject, AppleOnrampDeviceSignals, @unchecked 
             timezoneOffset: Int32(-(timeZone.secondsFromGMT() / 60)),
             cookiesEnabled: true,
             doNotTrack: nil,
-            online: connectionType != nil,
+            online: isOnline,
             touchSupport: true,
             maxTouchPoints: 5,
             vendor: "Apple",
@@ -60,30 +62,39 @@ final class OnrampDeviceSignals: NSObject, AppleOnrampDeviceSignals, @unchecked 
 }
 
 private final class OnrampConnectionSnapshot: @unchecked Sendable {
+    struct Reading {
+        let type: String?
+        let isOnline: Bool
+    }
+
     private let lock = NSLock()
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "app.zapp.onramp.network-path")
-    private var currentType: String?
+    /// Reachability is a separate question from which transport carries it: a satisfied path over
+    /// an interface we do not name is still online, and so is one collected before the monitor's
+    /// first callback lands. Reporting either as offline would be a false fraud signal.
+    private var current = Reading(type: nil, isOnline: true)
 
-    var type: String? {
-        lock.withLock { currentType }
+    var snapshot: Reading {
+        lock.withLock { current }
     }
 
     func start() {
         monitor.pathUpdateHandler = { [weak self] path in
-            let value: String?
+            let type: String?
             if path.status != .satisfied {
-                value = nil
+                type = nil
             } else if path.usesInterfaceType(.wifi) {
-                value = "wifi"
+                type = "wifi"
             } else if path.usesInterfaceType(.wiredEthernet) {
-                value = "ethernet"
+                type = "ethernet"
             } else if path.usesInterfaceType(.cellular) {
-                value = "4g"
+                type = "4g"
             } else {
-                value = nil
+                type = nil
             }
-            self?.lock.withLock { self?.currentType = value }
+            let reading = Reading(type: type, isOnline: path.status == .satisfied)
+            self?.lock.withLock { self?.current = reading }
         }
         monitor.start(queue: queue)
     }

@@ -9335,9 +9335,11 @@ __attribute__((swift_name("KotlinByteArray")))
 - (ZappOfframpOnrampZecDeliveryCheckpoint *)restartedAfterRefund __attribute__((swift_name("restartedAfterRefund()")));
 
 /**
- * Where a checkpoint proves the money is, from durable evidence alone. A mined Base transaction is
- * the only proof the deposit reached the intent; a started-but-unproven transfer stays ambiguous so
- * no caller can claim either side of it.
+ * Where a checkpoint proves the money is, from durable evidence alone. A phase the delivery already
+ * settled into outranks the hashes that got it there, so a delivered or refunded checkpoint is never
+ * described as still in flight. Below that, a mined Base transaction is the only proof the deposit
+ * reached the intent; a started-but-unproven transfer stays ambiguous so no caller can claim either
+ * side of it.
  */
 @end
 

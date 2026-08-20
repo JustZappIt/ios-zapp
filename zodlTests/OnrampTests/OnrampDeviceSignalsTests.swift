@@ -17,4 +17,19 @@ struct OnrampDeviceSignalsTests {
         #expect(record.connectionType == "wifi")
         #expect(record.platform == "iOS")
     }
+
+    @MainActor
+    @Test func anUnnamedTransportIsStillReportedOnline() {
+        let record = OnrampDeviceSignals.record(connectionType: nil, isOnline: true)
+
+        #expect(record.online)
+        #expect(record.connectionType == nil)
+    }
+
+    @MainActor
+    @Test func anUnsatisfiedPathIsReportedOffline() {
+        let record = OnrampDeviceSignals.record(connectionType: nil, isOnline: false)
+
+        #expect(!record.online)
+    }
 }

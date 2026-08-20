@@ -35,10 +35,12 @@ extension Onramp {
         case copyAccountAddressTapped
         case copyPaymentAddressTapped
         case sendBaseBalanceToZecTapped
+        case baseRefundPreviewLoaded(OfframpBridgePreview)
         case sendBaseBalanceToZecConfirmed
         case sendBaseBalanceToZecDismissed
         case baseBalanceSent
         case baseBalanceSendFailed(String)
+        case baseBalanceSendCancelled
         case transactionURLLoaded(URL?)
         case paymentTicked(Int)
         case paymentWindowExpired(String)

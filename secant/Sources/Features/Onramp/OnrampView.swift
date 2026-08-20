@@ -335,7 +335,7 @@ struct OnrampView: View {
                         ZappSummaryRow(label: String(localizable: .onrampBaseBalanceLabel), value: "\(balance) USDC")
                         if store.baseRefundState != .hidden {
                             ZappButton(
-                                title: store.isSendingBaseBalanceToZec
+                                title: store.baseRefundState == .inProgress
                                     ? String(localizable: .onrampSendToZecInProgress)
                                     : String(localizable: .onrampSendToZec),
                                 variant: .ghost,
@@ -427,6 +427,7 @@ struct OnrampView: View {
         confirmationSheet(
             title: String(localizable: .onrampSendToZecConfirmTitle),
             body: String(localizable: .onrampSendToZecConfirmBody),
+            detail: baseRefundPreviewMessage,
             actionTitle: String(localizable: .onrampSendToZecConfirmAction),
             cancelTitle: String(localizable: .onrampSendToZecCancel),
             action: { store.send(.sendBaseBalanceToZecConfirmed) },
@@ -434,9 +435,26 @@ struct OnrampView: View {
         )
     }
 
+    /// The exact quote the bridge holds authorized, so the sheet asks about the send that will run.
+    private var baseRefundPreviewMessage: String? {
+        guard let preview = store.baseRefundPreview else { return nil }
+        var lines = [
+            "\(preview.sourceAmount) \(preview.sourceAsset)",
+            "\u{2192} \(preview.destinationAmount) \(preview.destinationAsset)"
+        ]
+        if let fee = preview.networkFee {
+            lines.append("\(String(localizable: .offrampBridgePreviewFee)): \(fee) ZEC")
+        }
+        if preview.estimatedSeconds > 0 {
+            lines.append("\(String(localizable: .offrampBridgePreviewTime)): \(preview.estimatedSeconds) s")
+        }
+        return lines.joined(separator: "\n")
+    }
+
     private func confirmationSheet(
         title: String,
         body: String,
+        detail: String? = nil,
         actionTitle: String,
         cancelTitle: String,
         action: @escaping () -> Void,
@@ -445,6 +463,9 @@ struct OnrampView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text(title).zappFont(.screenTitle, style: ZappColors.text)
             Text(body).zappFont(.body, style: ZappColors.textMuted)
+            if let detail {
+                Text(detail).zappFont(.body, style: ZappColors.text)
+            }
             ZappButton(title: actionTitle, action: action)
             ZappButton(title: cancelTitle, variant: .ghost, action: cancel)
         }
