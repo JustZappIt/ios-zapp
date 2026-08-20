@@ -860,28 +860,40 @@ extension Root {
         userDefaults.remove(Constants.udIsResyncingWallet)
         userDefaults.remove(Constants.udLeavesScreenOpen)
 
-        // Authentication lockout is device-scoped, independent of the disabled Voting feature.
-        // Keep these outside and above VOTING_ENABLED so wallet reset always clears them.
+        // Authentication lockout is device-scoped and unrelated to Voting. Keep these outside
+        // and above VOTING_ENABLED so wallet reset always clears them.
         userDefaults.remove(.appAuthenticationMethod)
         userDefaults.remove(.failedPINAttempts)
         userDefaults.remove(.pinLockoutEndTimestamp)
 
-        // Keep clearing the user-supplied service override even while Voting is compiled out. It
-        // must not silently become active for a different wallet if the feature is re-enabled.
+        // Keep clearing the user-supplied service override even in builds without Voting. It must
+        // not silently become active for a different wallet in a build that does have Voting.
         userDefaults.remove(.votingConfigOverrideURL)
 
         #if VOTING_ENABLED
         userDefaults.remove(.hasSeenHowToVote)
         userDefaults.remove(.hasSeenHowToVoteKeystone)
+        // Drop the saved custom-chain list. Without this wipe, the next
+        // wallet on this device would silently resolve voting through
+        // whatever third-party host the previous owner had pointed at.
+        // The override itself is cleared above, outside this #if, so a
+        // build without Voting still clears it.
         userDefaults.remove(.votingCustomChains)
-
+        // Delete the voting SQLite DB so per-round share delegation
+        // history, vote records, and stored TX hashes from the
+        // previous wallet don't leak across the reset boundary. The
+        // file is recreated empty on the next voting flow entry.
         if let documents = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first {
             let votingDbURL = documents.appendingPathComponent("voting.sqlite3")
             try? FileManager.default.removeItem(at: votingDbURL)
         }
-
+        // Belt-and-suspenders: voting drafts and vote records live in
+        // the encrypted per-account `votingMetadata` file now, which
+        // resetAccount() below removes. This sweep catches any stale
+        // plaintext entries from the previous UserDefaults-based
+        // storage that hung around on internal dev devices.
         let standardDefaults = UserDefaults.standard
         for key in standardDefaults.dictionaryRepresentation().keys
             where key.hasPrefix("voting.voteRecord.") || key.hasPrefix("voting.draftVotes.") {

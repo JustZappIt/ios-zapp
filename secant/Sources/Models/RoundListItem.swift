@@ -1,9 +1,9 @@
-#if VOTING_ENABLED
 //
 //  RoundListItem.swift
 //  Zashi
 //
 
+#if VOTING_ENABLED
 import Foundation
 
 /// A single entry in the polls list: a voting round paired with the index

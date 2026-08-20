@@ -101,8 +101,8 @@ extension WalletStorageClient: DependencyKey {
             removePINHash: {
                 try walletStorage.removePINHash()
             },
-            importVotingHotkey: { phrase, accountId in
-                try walletStorage.importVotingHotkey(phrase, accountId: accountId)
+            importVotingHotkey: { storedSecret, accountId in
+                try walletStorage.importVotingHotkey(storedSecret, accountId: accountId)
             },
             exportVotingHotkey: { accountId in
                 try walletStorage.exportVotingHotkey(accountId: accountId)

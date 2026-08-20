@@ -25,12 +25,28 @@
 zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 
 # zcash-swift-wallet-sdk — sibling LOCAL Swift package; run Scripts/bootstrap-zcash-sdk.sh
-# after a fresh clone. Pinned to upstream's MIT-clean variant branch: the default build
-# links the AGPL-3.0-only zodl-slipstream crate, which we may not ship to the App Store.
-# Build with NO --slipstream. Pinned by SHA because the branch is unmerged upstream.
-# Retire once upstream cuts 2.9.0; the released artifact is clean by default.
+# after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
+# unmerged upstream. Retire once upstream cuts 2.9.0; the released artifact is clean by default.
 #
-# Hosted on our PUBLIC fork, branch zapp/sdk-mit-on-main. Upstream does not carry these
-# commits, so a clone of zcash/zcash-swift-wallet-sdk cannot resolve this SHA.
+# The pin is branch `zapp/sdk-mit-on-main`, hosted on our PUBLIC fork: SDK origin/main with
+# our 10 fork commits replayed on top. Upstream carries none of them, so a clone of
+# zcash/zcash-swift-wallet-sdk cannot resolve this SHA. Two properties the branch has to
+# keep, both checked by Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the
+# bootstrap script:
+#
+#   1. MIT-clean by default, because we may not ship AGPL to the App Store. The
+#      AGPL-3.0-only zodl-slipstream crate sits behind the optional `slipstream` cargo
+#      feature, which we never enable, and is absent from the default dependency graph
+#      entirely. Upstream's own default build does link it.
+#   2. No credential needed to build. We deliberately do NOT carry upstream's
+#      [patch.crates-io] entry pointing slipstream-core at the PRIVATE
+#      zodl-inc/slipstream-internal repo — cargo fetches git dependencies while resolving,
+#      before feature selection, so that entry would make every build (and CI job) require a
+#      token for a repo we cannot read. We resolve zodl-slipstream 0.1.1 from crates.io
+#      instead, which is why the authorize-slipstream CI action stays deleted on our line.
+#
+# Consequence, accepted: the `slipstream` feature itself may no longer build against this
+# line's newer librustzcash generation. We do not ship that variant.
+#
 # GitHub: https://github.com/JustZappIt/zcash-swift-wallet-sdk
 zcashSwiftWalletSdk=c2fa72d897bfe9aff1087aa2f7543de7ad2e9148
