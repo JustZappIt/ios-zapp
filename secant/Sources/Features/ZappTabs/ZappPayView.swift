@@ -237,8 +237,15 @@ struct ZappPayView: View {
         ZappSpeedDialFab(
             expandLabel: String(localizable: .zappPayFabExpand),
             collapseLabel: String(localizable: .zappPayFabCollapse),
-            actions: [
-                ZappSpeedDialAction(
+            actions: speedDialActions,
+            trailingPadding: Constants.fabTrailingPadding,
+            bottomPadding: ZappNavBar.fabBottomPadding
+        )
+    }
+
+    private var speedDialActions: [ZappSpeedDialAction] {
+        var actions = [
+            ZappSpeedDialAction(
                     icon: Asset.Assets.Icons.pay.image,
                     label: String(localizable: .zappPayFabPay)
                 ) {
@@ -262,10 +269,20 @@ struct ZappPayView: View {
                 ) {
                     store.send(.receiveScreenRequested)
                 }
-            ],
-            trailingPadding: Constants.fabTrailingPadding,
-            bottomPadding: ZappNavBar.fabBottomPadding
-        )
+        ]
+        if let baseURL = PartnerKeys.p2pOnrampBaseUrl,
+           !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            actions.insert(
+                ZappSpeedDialAction(
+                    icon: Asset.Assets.Icons.walletBuy.image,
+                    label: String(localizable: .onrampSpeedDialBuy)
+                ) {
+                    store.send(.buyTapped)
+                },
+                at: 0
+            )
+        }
+        return actions
     }
 }
 

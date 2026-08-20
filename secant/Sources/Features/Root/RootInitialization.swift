@@ -1228,8 +1228,9 @@ extension Root {
             case .initialization(.clearZappWalletScopedState):
                 state.$chatContacts.withLock { $0 = .empty }
                 state.zappMessagingState = ZappMessagingState()
+                state.onrampState = .initial(currencyCode: state.offrampState.selectedCurrencyCode)
                 state.offrampState = .initial()
-                return .send(.offramp(.cancelAll))
+                return .merge(.send(.onramp(.cancelAll)), .send(.offramp(.cancelAll)))
 
             case .initialization(.staleWalletDatabaseHealed):
                 state.isRestoringWallet = true
@@ -1385,6 +1386,7 @@ extension Root {
             case .initialization(.resetZashiRequest(let areMetadataPreserved)):
                 state.areMetadataPreserved = areMetadataPreserved
                 return .merge(
+                    .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
                     .run { send in
                         // Await key/client invalidation before wallet storage is wiped. The child

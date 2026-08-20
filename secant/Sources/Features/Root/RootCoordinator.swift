@@ -22,6 +22,7 @@ extension Root {
                 .chatRoom(.backToHomeTapped),
                 .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
+                .onramp(.delegate(.close)),
                 .offramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
@@ -56,6 +57,7 @@ extension Root {
                 state.$selectedWalletAccount.withLock { $0 = walletAccount }
                 let switchedEffect = accountSwitchedEffect(state: &state)
                 return .merge(
+                    .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
                     switchedEffect,
                     .send(.loadContacts),
@@ -274,6 +276,11 @@ extension Root {
             case .home(.payWithNearTapped):
                 state.offrampState = .initial(page: .amount, corridorContext: .payment)
                 state.path = .offramp
+                return .none
+
+            case .home(.buyTapped):
+                state.onrampState = .initial(currencyCode: state.offrampState.selectedCurrencyCode)
+                state.path = .onramp
                 return .none
 
             case .home(.transactionList(.transactionTapped(let txId))):
@@ -790,6 +797,7 @@ extension Root {
                 state.path = nil
                 state.$selectedWalletAccount.withLock { $0 = nil }
                 return .merge(
+                    .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
                     .run { send in
                         let walletAccounts = try await sdkSynchronizer.walletAccounts()

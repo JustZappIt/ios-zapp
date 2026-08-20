@@ -201,6 +201,15 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .onramp {
+                                OnrampView(
+                                    store: store.scope(
+                                        state: \.onrampState,
+                                        action: \.onramp
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .scanCoordFlow {
                                 // FIXME: missing back button
                                 // TODO: this is no longer connected in the UI, it was under `scan` button

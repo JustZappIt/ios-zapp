@@ -685,7 +685,10 @@ struct SwapAndPay {
                 }
 
                 let isSwapToZec = state.isSwapToZecExperienceEnabled
-                let exactInput = state.isSwapToZecExperienceEnabled ? true : state.isSwapExperienceEnabled
+                // Deposits arrive from an external wallet, so the provider prices whatever lands.
+                let swapMode: SwapQuoteMode = isSwapToZec
+                    ? .flexInput
+                    : state.isSwapExperienceEnabled ? .exactInput : .exactOutput
                 let slippageTolerance = NSDecimalNumber(decimal: (state.slippage * 100.0)).intValue
                 let destination = state.address
                 let zecAmountInt = NSDecimalNumber(decimal: zecAmountDecimal)
@@ -710,7 +713,7 @@ struct SwapAndPay {
                         let swapQuote = try await swapAndPay.quote(
                             false,
                             isSwapToZec,
-                            exactInput,
+                            swapMode,
                             slippageTolerance,
                             zecAsset,
                             toAsset,

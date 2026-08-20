@@ -216,7 +216,7 @@ private actor OfframpNearBridgeWorker {
         let quote = try await swapAndPay.quote(
             false,
             false,
-            false,
+            .exactOutput,
             100,
             assets.zec,
             assets.usdc,
@@ -331,7 +331,7 @@ private actor OfframpNearBridgeWorker {
         let quote = try await swapAndPay.quote(
             false,
             true,
-            true,
+            .flexInput,
             100,
             assets.zec,
             assets.usdc,

@@ -107,7 +107,7 @@ struct Near1Click {
     /// The full provider catalog — every asset, uncurated. For resolving/rendering
     /// historical or exotic assets that are no longer offered for swaps (MOB-1472).
     let swapAssetsCatalog: @Sendable () async throws -> IdentifiedArrayOf<SwapAsset>
-    let quote: @Sendable (Bool, Bool, Bool, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
+    let quote: @Sendable (Bool, Bool, SwapQuoteMode, Int, SwapAsset, SwapAsset, String, String, String) async throws -> SwapQuote
     let status: @Sendable (String, Bool) async throws -> SwapDetails
 
     static func getCall(urlString: String, includeJwtKey: Bool = false) async throws -> (Data, URLResponse) {
@@ -308,7 +308,7 @@ extension Near1Click {
         swapAssetsCatalog: {
             IdentifiedArrayOf(uniqueElements: try await Near1Click.fetchAllAssets())
         },
-        quote: { dry, isSwapToZec, exactInput, slippageTolerance, zecAsset, toAsset, refundTo, destination, amount in
+        quote: { dry, isSwapToZec, mode, slippageTolerance, zecAsset, toAsset, refundTo, destination, amount in
             // Deadline in ISO 8601 UTC format
             let now = Date()
             let twoHoursLater = now.addingTimeInterval(120 * 60)
@@ -324,7 +324,7 @@ extension Near1Click {
             
             let requestData = SwapQuoteRequest(
                 dry: dry,
-                swapType: isSwapToZec ? Constants.flexInput : exactInput ? Constants.exactInput : Constants.exactOutput,
+                swapType: mode.rawValue,
                 slippageTolerance: slippageTolerance,
                 originAsset: isSwapToZec ? toAsset.assetId : zecAsset.assetId,
                 depositType: Constants.originChain,
@@ -361,7 +361,7 @@ extension Near1Click {
             
             if httpResponse.statusCode >= 400 {
                 try amountMessageResolution(
-                    exactInput: exactInput,
+                    exactInput: mode == .exactInput,
                     isSwapToZec: isSwapToZec,
                     toAsset: toAsset,
                     jsonObject: jsonObject
@@ -380,6 +380,8 @@ extension Near1Click {
                   let minAmountInString = quote[Constants.minAmountIn] as? String,
                   let amountOutString = quote[Constants.amountOut] as? String,
                   let amountOutUsdString = quote[Constants.amountOutUsd] as? String,
+                  let deadlineString = (quote[Constants.deadline] ?? quoteRequest[Constants.deadline]) as? String,
+                  let quoteDeadline = Near1Click.iso8601Date(deadlineString),
                   let timeEstimate = quote[Constants.timeEstimate] as? Int else {
                 throw SwapAndPayClient.EndpointError.message("Parse of the quote failed.")
             }
@@ -400,7 +402,8 @@ extension Near1Click {
                     minAmountIn: minAmountIn / Decimal(pow(10.0, Double(toAsset.decimals))),
                     amountOut: amountOut / Decimal(pow(10.0, Double(zecAsset.decimals))),
                     amountOutUsd: amountOutUsdString,
-                    timeEstimate: TimeInterval(timeEstimate)
+                    timeEstimate: TimeInterval(timeEstimate),
+                    deadline: quoteDeadline
                 )
             }
             
@@ -415,7 +418,8 @@ extension Near1Click {
                 minAmountIn: minAmountIn,
                 amountOut: amountOut / Decimal(pow(10.0, Double(toAsset.decimals))),
                 amountOutUsd: amountOutUsdString,
-                timeEstimate: TimeInterval(timeEstimate)
+                timeEstimate: TimeInterval(timeEstimate),
+                deadline: quoteDeadline
             )
         },
         status: { depositAddress, isSwapToZec in
@@ -527,11 +531,13 @@ extension Near1Click {
             
             // dates
             var deadline = ""
+            var echoedDepositAddress: String?
             
             if let quoteDict = quoteResponseDict[Constants.quote] as? [String: Any] {
                 if let deadlineStr = quoteDict[Constants.deadline] as? String {
                     deadline = deadlineStr
                 }
+                echoedDepositAddress = quoteDict[Constants.depositAddress] as? String
             }
 
             var whenInitiated = ""
@@ -572,9 +578,24 @@ extension Near1Click {
                 addressToCheckShield: (isSwapToZec ? swapRecipient : refundTo) ?? "",
                 whenInitiated: whenInitiated,
                 deadline: deadline,
-                depositedAmountFormatted: depositedAmountFormattedDecimal
+                depositedAmountFormatted: depositedAmountFormattedDecimal,
+                swapType: swapType,
+                refundAddress: refundTo,
+                depositAddress: echoedDepositAddress
             )
         }
         )
+    }
+}
+
+private extension Near1Click {
+    static func iso8601Date(_ value: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) { return date }
+
+        let standard = ISO8601DateFormatter()
+        standard.formatOptions = [.withInternetDateTime]
+        return standard.date(from: value)
     }
 }
