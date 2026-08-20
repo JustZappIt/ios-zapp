@@ -16,36 +16,18 @@ SIBLING="$(dirname "$APP_DIR")/zcash-swift-wallet-sdk"
 PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
   || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
 
-# The pin is on an unmerged branch, so a plain clone does not make the SHA reachable.
-# ZAPP_SDK_REMOTE is where our branch lives; upstream (zcash/) remains the clone source.
-# Override it only when testing another fork.
-VENDORING_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
-ZAPP_SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
-
-# Registers $ZAPP_SDK_REMOTE (if given) and fetches the pin's branch from it. Called for
-# a fresh clone AND for an existing sibling that is off the pin: a returning developer is
-# the common case, and telling them to re-run with ZAPP_SDK_REMOTE only to ignore it would
-# make the recovery advice circular.
-fetch_pin_sources() {
-  if [ -n "$ZAPP_SDK_REMOTE" ]; then
-    if git -C "$SIBLING" remote get-url zapp >/dev/null 2>&1; then
-      git -C "$SIBLING" remote set-url zapp "$ZAPP_SDK_REMOTE"
-    else
-      git -C "$SIBLING" remote add zapp "$ZAPP_SDK_REMOTE"
-    fi
-    git -C "$SIBLING" fetch zapp "$VENDORING_BRANCH" || true
-  fi
-  git -C "$SIBLING" fetch origin "$VENDORING_BRANCH" || true
-}
+# The pin is on an unmerged branch that only our fork carries; upstream cannot resolve it.
+SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
+PINNED_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zcash-swift-wallet-sdk beside the app ($SIBLING)"
-  git clone https://github.com/zcash/zcash-swift-wallet-sdk.git "$SIBLING"
-  fetch_pin_sources
+  git clone "$SDK_REMOTE" "$SIBLING"
+  git -C "$SIBLING" fetch "$SDK_REMOTE" "$PINNED_BRANCH" || true
   if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-    echo "!! $PINNED_REF is not reachable from any fetched ref." >&2
-    echo "   The pin should live on $ZAPP_SDK_REMOTE, branch $VENDORING_BRANCH." >&2
-    echo "   Check that the fork and branch are reachable, or override ZAPP_SDK_REMOTE." >&2
+    echo "!! $PINNED_REF is not reachable from $SDK_REMOTE ($PINNED_BRANCH)." >&2
+    echo "   The branch was probably force-pushed. Re-pin .zapp-deps to its current head," >&2
+    echo "   or point ZAPP_SDK_REMOTE / ZAPP_SDK_BRANCH at wherever the commit now lives." >&2
     exit 1
   fi
   git -C "$SIBLING" checkout "$PINNED_REF"
@@ -58,29 +40,10 @@ else
   # zodl-slipstream is still a MANDATORY dependency rather than an optional feature.
   checked_out="$(git -C "$SIBLING" rev-parse HEAD)" || fail "$SIBLING is not a git checkout"
   if [ "$checked_out" != "$PINNED_REF" ]; then
-    # Off the pin. Try to fetch it before giving up, so ZAPP_SDK_REMOTE works here too —
-    # but never move a dirty checkout: init-local-ffi.sh compiles whatever is on disk, and
-    # a checkout would silently discard work in progress.
-    if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-      fetch_pin_sources
-    fi
-    if git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null \
-       && [ -z "$(git -C "$SIBLING" status --porcelain)" ]; then
-      echo "    At $checked_out, pin is $PINNED_REF — checking out the pin"
-      git -C "$SIBLING" checkout --detach "$PINNED_REF"
-      checked_out="$(git -C "$SIBLING" rev-parse HEAD)"
-    fi
-  fi
-  if [ "$checked_out" != "$PINNED_REF" ]; then
     echo "!! $SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF." >&2
-    if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
-      echo "   That commit is not in this clone and could not be fetched from" >&2
-      echo "   $ZAPP_SDK_REMOTE, branch $VENDORING_BRANCH." >&2
-    else
-      echo "   The commit is present but the checkout has uncommitted changes, so it was" >&2
-      echo "   left alone. Commit, stash or discard them, then:" >&2
-      echo "     git -C $SIBLING checkout $PINNED_REF" >&2
-    fi
+    echo "   Recover with:" >&2
+    echo "     git -C $SIBLING fetch $SDK_REMOTE $PINNED_BRANCH" >&2
+    echo "     git -C $SIBLING checkout $PINNED_REF" >&2
     exit 1
   fi
   # A matching SHA says nothing about the working tree, and init-local-ffi.sh compiles
@@ -89,6 +52,9 @@ else
     || fail "$SIBLING has uncommitted changes — commit, stash or discard them first"
   echo "    At the pin: $PINNED_REF, clean"
 fi
+
+command -v rustup >/dev/null \
+  || fail "rustup is not installed, and the FFI is compiled from Rust — see https://rustup.rs"
 
 for target in aarch64-apple-ios aarch64-apple-ios-sim; do
   if ! rustup target list --installed 2>/dev/null | grep -qx "$target"; then

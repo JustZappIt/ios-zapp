@@ -10,6 +10,7 @@
 import ComposableArchitecture
 import StoreKit
 import SwiftUI
+@preconcurrency import ZcashLightClientKit
 
 struct ZappPayView: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -134,6 +135,7 @@ struct ZappPayView: View {
         WithPerceptionTracking {
             ZappBalanceCard(
                 totalBalance: store.walletBalancesState.totalBalance,
+                confirmedBalance: confirmedBalance,
                 shieldedBalance: store.walletBalancesState.shieldedWithPendingBalance,
                 transparentBalance: store.walletBalancesState.transparentBalance,
                 showsBreakdown: store.walletBalancesState.transparentBalance.amount > 0,
@@ -150,6 +152,15 @@ struct ZappPayView: View {
                 onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }
             )
         }
+    }
+
+    /// Android's `GetBalanceHistoryUseCase`: total minus the shielded value that has not settled
+    /// yet. It must be exactly that, because reconciliation compares it to the sum of settled
+    /// transactions and hides the chart on any mismatch. Subtracting `shieldedWithPendingBalance -
+    /// shieldedBalance` instead also removes `PoolBalance.lockedValue` — settled value the history
+    /// does count — and a wallet carrying a migration lock could never reconcile.
+    private var confirmedBalance: Zatoshi {
+        store.walletBalancesState.totalBalance - store.walletBalancesState.pendingShieldedBalance
     }
 
     @ViewBuilder private func activity() -> some View {
@@ -226,8 +237,15 @@ struct ZappPayView: View {
         ZappSpeedDialFab(
             expandLabel: String(localizable: .zappPayFabExpand),
             collapseLabel: String(localizable: .zappPayFabCollapse),
-            actions: [
-                ZappSpeedDialAction(
+            actions: speedDialActions,
+            trailingPadding: Constants.fabTrailingPadding,
+            bottomPadding: ZappNavBar.fabBottomPadding
+        )
+    }
+
+    private var speedDialActions: [ZappSpeedDialAction] {
+        var actions = [
+            ZappSpeedDialAction(
                     icon: Asset.Assets.Icons.pay.image,
                     label: String(localizable: .zappPayFabPay)
                 ) {
@@ -251,10 +269,20 @@ struct ZappPayView: View {
                 ) {
                     store.send(.receiveScreenRequested)
                 }
-            ],
-            trailingPadding: Constants.fabTrailingPadding,
-            bottomPadding: ZappNavBar.fabBottomPadding
-        )
+        ]
+        if let baseURL = PartnerKeys.p2pOnrampBaseUrl,
+           !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            actions.insert(
+                ZappSpeedDialAction(
+                    icon: Asset.Assets.Icons.walletBuy.image,
+                    label: String(localizable: .onrampSpeedDialBuy)
+                ) {
+                    store.send(.buyTapped)
+                },
+                at: 0
+            )
+        }
+        return actions
     }
 }
 
@@ -268,7 +296,10 @@ extension ZappPayView {
                 tokenName: tokenName,
                 onDismiss: { store.isZappPoolBalancesSheetPresented = false }
             )
-            .presentationDetents([.large])
+            // Android presents this as a wrap-content bottom sheet. `.large` pinned it open at
+            // full height with a stranded button below the cards; the derived detent stops it at
+            // its content, and `.large` stays available for larger type.
+            .presentationDetents([.height(PoolBalancesSheet.detentHeight), .large])
             .presentationDragIndicator(.visible)
         }
     }

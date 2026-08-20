@@ -23,6 +23,9 @@ struct UserPreferencesStorageClient {
     var automaticServerSelection: @Sendable () -> Bool? = { nil }
     var setAutomaticServerSelection: @Sendable (Bool) -> Void
 
+    var portfolioChartEnabled: @Sendable () -> Bool = { true }
+    var setPortfolioChartEnabled: @Sendable (Bool) -> Void
+
     var exchangeRate: @Sendable () -> UserPreferencesStorage.ExchangeRate? = { nil }
     var setExchangeRate: @Sendable (UserPreferencesStorage.ExchangeRate) throws -> Void
 

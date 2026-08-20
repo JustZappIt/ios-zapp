@@ -28,13 +28,16 @@ zappMessaging=a8b88ed4f6cc22382a4c79167340031aa12c42b1
 # after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
 # unmerged upstream. Retire once upstream cuts 2.9.0; the released artifact is clean by default.
 #
-# The pin is branch `zapp/sdk-mit-on-main`: SDK origin/main with our 10 fork commits
-# replayed on top. Two properties it has to keep, both checked by
-# Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the bootstrap script:
+# The pin is branch `zapp/sdk-mit-on-main`, hosted on our PUBLIC fork: SDK origin/main with
+# our 10 fork commits replayed on top. Upstream carries none of them, so a clone of
+# zcash/zcash-swift-wallet-sdk cannot resolve this SHA. Two properties the branch has to
+# keep, both checked by Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the
+# bootstrap script:
 #
-#   1. MIT-clean by default. The AGPL-3.0-only zodl-slipstream crate sits behind the
-#      optional `slipstream` cargo feature, which we never enable, and is absent from the
-#      default dependency graph entirely.
+#   1. MIT-clean by default, because we may not ship AGPL to the App Store. The
+#      AGPL-3.0-only zodl-slipstream crate sits behind the optional `slipstream` cargo
+#      feature, which we never enable, and is absent from the default dependency graph
+#      entirely. Upstream's own default build does link it.
 #   2. No credential needed to build. We deliberately do NOT carry upstream's
 #      [patch.crates-io] entry pointing slipstream-core at the PRIVATE
 #      zodl-inc/slipstream-internal repo — cargo fetches git dependencies while resolving,

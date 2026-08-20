@@ -60,7 +60,6 @@ private struct ChatProfileSecretOverlays: ViewModifier {
                             onBack: { store.send(.pinCancelled) },
                             onKey: { store.send(.pinKeyTapped($0)) }
                         )
-                        .ignoresSafeArea()
                     }
                 }
                 .privacySensitive(store.isShowingSecret)
@@ -192,59 +191,34 @@ private struct ChatProfileP2PKeyDialog: View {
 
 // MARK: - Shell
 
-/// Sharp-rectangle modal panel over a scrim, matching the Android dialogs' geometry while
-/// staying inside the profile's own view tree — so the screen-level hide handlers keep running.
-private enum ChatProfileDialogConstants {
-    static let scrimOpacity: CGFloat = 0.6
-    static let horizontalInset: CGFloat = 24
-    static let maxHeightFraction: CGFloat = 0.8
-}
-
+/// The read-only reveal shape both secret dialogs take: a title, an explanation, the secret, and
+/// a single Done. `ZappDialog` supplies the panel itself.
 private struct ChatProfileDialogShell<Content: View>: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    private typealias Constants = ChatProfileDialogConstants
-
     let title: String
     let message: String
     let onDismiss: () -> Void
     @ViewBuilder let content: Content
 
     var body: some View {
-        ZStack {
-            Color.black
-                .opacity(Constants.scrimOpacity)
-                .ignoresSafeArea()
-                .onTapGesture { onDismiss() }
+        ZappDialog(onScrimTap: onDismiss) {
+            Text(title)
+                .zappFont(.sectionTitle, style: ZappColors.text)
 
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
-                Text(title)
-                    .zappFont(.sectionTitle, style: ZappColors.text)
+            Text(message)
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
 
-                Text(message)
-                    .zappFont(.body, style: ZappColors.textMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                ScrollView {
-                    content
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-
-                Button(action: onDismiss) {
-                    Text(String(localizable: .generalDone))
-                        .zappFont(.button, style: ZappColors.accent)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .buttonStyle(.zappPress)
+            ScrollView {
+                content
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(Design.Spacing._lg)
-            .frame(maxHeight: UIScreen.main.bounds.height * Constants.maxHeightFraction)
-            .background(ZappColors.surface.color(colorScheme))
-            .overlay(
-                Rectangle()
-                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-            )
-            .padding(.horizontal, Constants.horizontalInset)
+
+            Button(action: onDismiss) {
+                Text(String(localizable: .generalDone))
+                    .zappFont(.button, style: ZappColors.accent)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .buttonStyle(.zappPress)
         }
     }
 }

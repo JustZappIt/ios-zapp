@@ -42,7 +42,7 @@ struct ZappCompactLedger: View {
     }
 }
 
-enum ZappOfframpStepStatus: Equatable {
+enum ZappOfframpStepStatus: Equatable, Sendable {
     case pending
     case inProgress
     case completed

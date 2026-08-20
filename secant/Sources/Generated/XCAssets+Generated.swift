@@ -317,6 +317,7 @@ public enum Asset {
       public static let userFilled = ImageAsset(name: "userFilled")
       public static let userPlus = ImageAsset(name: "userPlus")
       public static let users = ImageAsset(name: "users")
+      public static let walletBuy = ImageAsset(name: "walletBuy")
       public static let wifiOff = ImageAsset(name: "wifiOff")
       public static let xClose = ImageAsset(name: "xClose")
       public static let zashiLogoSq = ImageAsset(name: "zashiLogoSq")

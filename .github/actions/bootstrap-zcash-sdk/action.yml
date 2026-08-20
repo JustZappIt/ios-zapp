@@ -25,9 +25,11 @@ runs:
     # workspace, and the package is referenced as ../zcash-swift-wallet-sdk — a SIBLING of
     # the checked-out app. Land it inside, then move it up one level.
     #
-    # The pin is a SHA on our reviewed zapp/sdk-mit-on-main branch. It lives in the
-    # JustZappIt fork so CI can resolve the exact commit even though the branch is not
-    # merged upstream.
+    # The pin is a SHA on zapp/sdk-mit-on-main, a branch only our fork carries. Name the
+    # fork rather than upstream: upstream resolves the SHA today only because our repo is a
+    # GitHub fork of it and the two share an object store, which is incidental rather than a
+    # contract — and is exactly why this kept passing while a plain clone in
+    # Scripts/bootstrap-zcash-sdk.sh could not resolve the same ref at all.
     - name: Checkout the SDK at the pin
       uses: actions/checkout@v4
       with:

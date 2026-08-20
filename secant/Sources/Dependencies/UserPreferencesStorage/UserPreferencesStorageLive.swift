@@ -19,6 +19,8 @@ extension UserPreferencesStorageClient: DependencyKey {
             setServer: { try live.setServer($0) },
             automaticServerSelection: { live.automaticServerSelection },
             setAutomaticServerSelection: { live.setAutomaticServerSelection($0) },
+            portfolioChartEnabled: { live.portfolioChartEnabled },
+            setPortfolioChartEnabled: { live.setPortfolioChartEnabled($0) },
             exchangeRate: { live.exchangeRate },
             setExchangeRate: { try live.setExchangeRate($0) },
             removeAll: { live.removeAll() }

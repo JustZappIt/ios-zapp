@@ -18,6 +18,10 @@ struct ZappBalanceCard: View {
         static let horizontalPadding: CGFloat = 20
         static let verticalPadding: CGFloat = 18
         static let dotSize: CGFloat = 8
+        static let chevronGap: CGFloat = 6
+        /// Lifts the 14pt label to the 44pt HIG target without moving anything around it — the
+        /// same trick Android plays by folding the card's leading padding into the row.
+        static let labelHitSlop: CGFloat = 15
         static let heroMinimumScale: CGFloat = 22 / 52
         static let heroTickerDuration: TimeInterval = 0.24
 
@@ -31,6 +35,7 @@ struct ZappBalanceCard: View {
     @Shared(.inMemory(.zappFiatQuote)) var zappFiatQuote: ZappFiatQuote? = nil
 
     let totalBalance: Zatoshi
+    let confirmedBalance: Zatoshi
     let shieldedBalance: Zatoshi
     let transparentBalance: Zatoshi
     let showsBreakdown: Bool
@@ -45,13 +50,21 @@ struct ZappBalanceCard: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                ZappSectionLabel(text: String(localizable: .zappPayTotalBalance))
+                sectionLabel
                     .padding(.bottom, 8)
 
                 amount
 
-                if totalBalance.amount > 0 {
-                    ZappBalanceChart(transactions: transactions, tokenName: tokenName)
+                // Removed, not redacted, while balances are masked: the chart leaks exact values
+                // three ways — the delta row, the scrub readout, and the VoiceOver value — and the
+                // rest of this card already drops value-bearing content outright under the toggle
+                // rather than starring it out.
+                if totalBalance.amount > 0, !isSensitiveContentHidden {
+                    ZappBalanceChart(
+                        transactions: transactions,
+                        confirmedBalance: confirmedBalance,
+                        tokenName: tokenName
+                    )
                         .padding(.top, 10)
                 }
 
@@ -66,28 +79,49 @@ struct ZappBalanceCard: View {
         }
     }
 
-    private var amount: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Button(action: onBalanceTapped) {
-                primaryAmount
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    /// The label doubles as the entry point to the per-pool breakdown, as it does on Android
+    /// (`WalletBalanceCard.kt:161`). The balance figure already owns a tap — it flips ZEC/fiat — so
+    /// the sheet hangs off the label rather than stealing that gesture.
+    private var sectionLabel: some View {
+        Button(action: onBalanceTapped) {
+            HStack(spacing: Constants.chevronGap) {
+                ZappSectionLabel(text: String(localizable: .zappPayTotalBalance))
+
+                // A glyph, not a word: the chevron is Android's `BasicText("›")` verbatim.
+                Text(verbatim: "›")
+                    .zappFont(.groupLabel, style: ZappColors.textSubtle)
+            }
+            .padding(.vertical, Constants.labelHitSlop)
+            .contentShape(Rectangle())
+            .padding(.vertical, -Constants.labelHitSlop)
+        }
+        // Android passes `indication = null` on both this row and the amount below it.
+        .buttonStyle(.plain)
+        .accessibilityLabel(String(localizable: .zappPayBalancePoolsAccessibility))
+        .accessibilityIdentifier(PoolBalancesSheet.Accessibility.openButton)
+    }
+
+    @ViewBuilder private var amount: some View {
+        // Android only makes the figure tappable when there is a fiat rate to flip to.
+        if fiat != nil {
+            Button(action: onToggleBalanceDisplay) {
+                amountStack
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.zappPress)
-            .accessibilityIdentifier(PoolBalancesSheet.Accessibility.openButton)
+            .buttonStyle(.plain)
+        } else {
+            amountStack
+        }
+    }
+
+    private var amountStack: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            primaryAmount
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if let fiat, !isSensitiveContentHidden {
-                Button(action: onToggleBalanceDisplay) {
-                    if showZecAsPrimary {
-                        Text("\(fiat.whole)\(fiat.fraction)")
-                            .zappFont(.caption, style: ZappColors.textMuted)
-                    } else {
-                        Text("\(zecText) \(tokenName)")
-                            .zappFont(.caption, style: ZappColors.textMuted)
-                    }
-                }
-                .buttonStyle(.zappPress)
-                .contentShape(Rectangle())
+                Text(showZecAsPrimary ? "\(fiat.whole)\(fiat.fraction)" : "\(zecText) \(tokenName)")
+                    .zappFont(.caption, style: ZappColors.textMuted)
             }
         }
     }

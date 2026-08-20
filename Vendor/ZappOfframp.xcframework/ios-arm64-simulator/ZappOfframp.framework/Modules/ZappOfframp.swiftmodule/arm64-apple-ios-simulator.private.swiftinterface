@@ -139,6 +139,12 @@ public enum Skie {
   public enum OfframpLib {
     public enum FundingOutcome {
     }
+    public enum OnrampPaymentInstruction {
+    }
+    public enum OnrampStatus {
+    }
+    public enum OnrampZecDeliveryStatus {
+    }
     public enum BridgeToBaseStatus {
     }
     public enum OfframpStatus {
@@ -150,6 +156,16 @@ public enum Skie {
     public enum UpiQrParseResult {
     }
     public enum UpiQrError {
+    }
+    public enum PeerResumeAction {
+    }
+    public enum PeerCashOutStatus {
+    }
+    public enum PeerRecovery {
+    }
+    public enum PeerMarketVerdict {
+    }
+    public enum PeerSpendable {
     }
   }
   public typealias zcash_android_app__offramp_lib = ZappOfframp.Skie.OfframpLib
@@ -508,13 +524,21 @@ extension ZappOfframp.OfframpAccountProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func nextOfframpAccount() async throws -> ZappOfframp.EvmKey
 }
-extension ZappOfframp.SeedPhraseSource {
+extension ZappOfframp.Erc4337SubmitterProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func getSeedPhrase() async throws -> ZappOfframp.KotlinCharArray
+  public func resolve() async throws -> ZappOfframp.SubmittingAccount
 }
 extension ZappOfframp.SmartOfframpAccountProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func resolve() async throws -> ZappOfframp.OfframpSmartAccount
+}
+extension ZappOfframp.SeedPhraseSource {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func getSeedPhrase() async throws -> ZappOfframp.KotlinCharArray
+}
+extension ZappOfframp.AppleBaseAccount.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleBaseAccount
 }
 extension ZappOfframp.AppleOfframpBridge {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -556,7 +580,39 @@ extension ZappOfframp.AppleOfframpPaymentDetailsProvider {
 }
 extension ZappOfframp.AppleOfframpClient.Companion {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func create(networkName: Swift.String, seedPhrase: Swift.String, pimlicoApiKey: Swift.String, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?, rpcUrl: Swift.String?, subgraphUrl: Swift.String?, sponsorshipPolicyId: Swift.String?) async throws -> ZappOfframp.AppleOfframpClient
+  public func create(account: ZappOfframp.AppleBaseAccount, storage: any ZappOfframp.AppleOfframpStorage, bridge: (any ZappOfframp.AppleOfframpBridge)?) async throws -> ZappOfframp.AppleOfframpClient
+}
+extension ZappOfframp.AppleOnrampClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func checkpoint() async throws -> ZappOfframp.AppleOnrampCheckpoint?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func clearCheckpoint() async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func declaredAmountDisagrees(currencyCode: Swift.String, instructionKind: Swift.String, payload: Swift.String, expectedMicros: Swift.String) async throws -> ZappOfframp.KotlinBoolean
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func estimateToZec(accountAddress: Swift.String, usdcMicros: Swift.String) async throws -> ZappOfframp.AppleOnrampZecEstimate
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func limits(currencyCode: Swift.String) async throws -> ZappOfframp.AppleOnrampLimits
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(fiatMicros: Swift.String, currencyCode: Swift.String) async throws -> ZappOfframp.AppleOnrampQuote
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func recipientAddress() async throws -> Swift.String
+}
+extension ZappOfframp.AppleOnrampClient.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(account: ZappOfframp.AppleBaseAccount, onrampBaseUrl: Swift.String, storage: any ZappOfframp.AppleOnrampStorage, deviceSignals: any ZappOfframp.AppleOnrampDeviceSignals, onrampAppId: Swift.String, swapGateway: (any ZappOfframp.AppleOnrampZecSwapGateway)?, useFakeDeliveryDriver: Swift.Bool) async throws -> ZappOfframp.AppleOnrampClient
+}
+extension ZappOfframp.AppleOnrampZecSwapGateway {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func notifyDeposit(baseTransactionHash: Swift.String, depositAddress: Swift.String) async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(accountAddress: Swift.String, usdcMicros: Swift.String) async throws -> ZappOfframp.AppleZecSwapQuote
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func status(depositAddress: Swift.String) async throws -> ZappOfframp.AppleZecSwapStatus
+}
+extension ZappOfframp.AppleOnrampDeviceSignals {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func collect() async throws -> ZappOfframp.AppleOnrampDeviceSignalsRecord
 }
 extension ZappOfframp.OfframpFunding {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -579,6 +635,80 @@ extension ZappOfframp.OfframpRefund {
 extension ZappOfframp.OfframpTopUp {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func bridge(account: ZappOfframp.Address, usdc: Any, resumeHandle: Swift.String?, onBridgeStarted: any ZappOfframp.KotlinSuspendFunction1) async throws -> any ZappOfframp.FundingOutcome
+}
+extension ZappOfframp.CustodialOnrampClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func cancel(id: Swift.String) async throws -> ZappOfframp.OnrampOrderDto
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func config(currency: ZappOfframp.CurrencyCode?) async throws -> ZappOfframp.OnrampConfigDto
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func createOrder(quoteId: Swift.String, recipient: ZappOfframp.Address, device: ZappOfframp.OnrampDeviceSignals) async throws -> ZappOfframp.OnrampOrderDto
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func markPaid(id: Swift.String) async throws -> ZappOfframp.OnrampOrderDto
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func order(id: Swift.String) async throws -> ZappOfframp.OnrampOrderDto
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(fiatAmount: Any, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.OnrampQuoteDto
+}
+extension ZappOfframp.OnrampSignerProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func signer() async throws -> ZappOfframp.OnrampRequestSigner
+}
+extension ZappOfframp.OnrampRecipientProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func recipient() async throws -> ZappOfframp.Address
+}
+extension ZappOfframp.OnrampDeviceSignalsProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func collect() async throws -> ZappOfframp.OnrampDeviceSignals
+}
+extension ZappOfframp.OnrampDriver {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func limits(currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.OnrampLimits
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(fiatAmount: Any, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.OnrampQuote
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func recipientAddress() async throws -> ZappOfframp.Address
+}
+extension ZappOfframp.OnrampZecTransferGateway {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func awaitReceipt(account: ZappOfframp.Address, userOperationHash: Swift.String) async throws -> ZappOfframp.OnrampBaseTransferReceipt
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func balance(account: ZappOfframp.Address) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func resolveAccount() async throws -> ZappOfframp.Address
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func submit(account: ZappOfframp.Address, depositAddress: ZappOfframp.Address, amount: Any) async throws -> Swift.String
+}
+extension ZappOfframp.OnrampZecDeliveryCheckpointStore {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func save(orderId: Swift.String, checkpoint: ZappOfframp.OnrampZecDeliveryCheckpoint) async throws
+}
+extension ZappOfframp.OnrampUsdcBalanceReader {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func balance(account: ZappOfframp.Address) async throws -> Any
+}
+extension ZappOfframp.KotlinSuspendFunction0 {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func invoke() async throws -> Any?
+}
+extension ZappOfframp.OnrampZecSwapGateway {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func notifyDeposit(baseTransactionHash: Swift.String, depositAddress: ZappOfframp.Address) async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(account: ZappOfframp.Address, amount: Any) async throws -> ZappOfframp.ValidatedZecSwapQuote
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func status(checkpoint: ZappOfframp.OnrampZecDeliveryCheckpoint) async throws -> ZappOfframp.OnrampZecSwapResult
+}
+extension ZappOfframp.OnrampScreeningSessionProvider {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func session() async throws -> Swift.String?
+}
+extension ZappOfframp.OnrampIntentAmount {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func declaredAmount(currency: ZappOfframp.CurrencyCode, instruction: any ZappOfframp.OnrampPaymentInstruction) async throws -> Any?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func disagreesWith(currency: ZappOfframp.CurrencyCode, instruction: any ZappOfframp.OnrampPaymentInstruction, expected: Any) async throws -> ZappOfframp.KotlinBoolean
 }
 extension ZappOfframp.OfframpPaymentDetailsProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -634,6 +764,36 @@ extension ZappOfframp.PaymentQrParser {
 extension ZappOfframp.PixQrParser {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func parse(qrData: Swift.String, resolver: (any ZappOfframp.DynamicPixResolver)?, orderId: Swift.String?) async throws -> ZappOfframp.PaymentQrParseResult
+}
+extension ZappOfframp.PeerIndexerClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func activeOrdersFor(depositor: ZappOfframp.Address) async throws -> [ZappOfframp.PeerOrderSnapshot]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func allOrdersFor(depositor: ZappOfframp.Address) async throws -> [ZappOfframp.PeerOrderSnapshot]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func fillSamples(platform: ZappOfframp.PeerPlatform, sinceSeconds: Swift.Int64) async throws -> [ZappOfframp.PeerFillSample]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func order(id: ZappOfframp.PeerDepositId) async throws -> ZappOfframp.PeerOrderSnapshot?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func queueSamples(platform: ZappOfframp.PeerPlatform, currency: ZappOfframp.PeerCurrency, maturedBeforeSeconds: Swift.Int64, limit: Swift.Int32) async throws -> [ZappOfframp.PeerQueueSample]
+}
+extension ZappOfframp.PeerCuratorClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func registerPayee(platform: ZappOfframp.PeerPlatform, handle: Any) async throws -> Any
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func validatePayee(platform: ZappOfframp.PeerPlatform, handle: Any) async throws -> ZappOfframp.KotlinBoolean
+}
+extension ZappOfframp.PeerCashOutOrchestrator {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func activeOrders() async throws -> [ZappOfframp.PeerOrderSnapshot]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func allOrders() async throws -> [ZappOfframp.PeerOrderSnapshot]
+}
+extension ZappOfframp.PeerOracleRate {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func fiatPerUsdc(currency: ZappOfframp.PeerCurrency, nowSeconds: Swift.Int64) async throws -> ZappOfframp.BigDecimal?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func quote(currency: ZappOfframp.PeerCurrency, nowSeconds: Swift.Int64) async throws -> ZappOfframp.PeerRateQuote?
 }
 extension ZappOfframp.Ktor_httpOutgoingContent.ProtocolUpgrade {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -996,6 +1156,7 @@ extension ZappOfframp.__KotlinKVariance {
 @frozen public enum DecimalRounding : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
   case halfUp
   case down
+  case up
   public var name: Swift.String {
     get
   }
@@ -1204,6 +1365,251 @@ extension ZappOfframp.CurrencyCode {
 }
 extension ZappOfframp.__CurrencyCode {
   public func toSwiftEnum() -> ZappOfframp.CurrencyCode
+}
+@frozen public enum OnrampFailureCode : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case badRequest
+  case unauthenticated
+  case nonceInvalid
+  case recipientNotAllowed
+  case routeDisabled
+  case orderNotFound
+  case wrongPhase
+  case quoteExpired
+  case capExceeded
+  case screeningRejected
+  case upstreamFailed
+  case operatorUnavailable
+  case noMerchant
+  case orderExpired
+  case networkUnavailable
+  case unknown
+  public var isTransient: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OnrampFailureCode.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampFailureCode, result: inout ZappOfframp.OnrampFailureCode?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampFailureCode, result: inout ZappOfframp.OnrampFailureCode?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampFailureCode?) -> ZappOfframp.OnrampFailureCode
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OnrampFailureCode
+  public typealias _ObjectiveCType = ZappOfframp.__OnrampFailureCode
+  public typealias Companion = ZappOfframp.__OnrampFailureCode.Companion
+  public static func == (a: ZappOfframp.OnrampFailureCode, b: ZappOfframp.OnrampFailureCode) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OnrampFailureCode]
+  nonisolated public static var allCases: [ZappOfframp.OnrampFailureCode] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OnrampFailureCode {
+  public func toKotlinEnum() -> ZappOfframp.__OnrampFailureCode
+}
+extension ZappOfframp.__OnrampFailureCode {
+  public func toSwiftEnum() -> ZappOfframp.OnrampFailureCode
+}
+@frozen public enum OnrampPhase : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case placing
+  case awaitingMerchant
+  case awaitingPayment
+  case confirmingPaid
+  case awaitingSettlement
+  case completed
+  case expired
+  case cancelled
+  case failed
+  public var isTerminal: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OnrampPhase.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampPhase, result: inout ZappOfframp.OnrampPhase?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampPhase, result: inout ZappOfframp.OnrampPhase?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampPhase?) -> ZappOfframp.OnrampPhase
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OnrampPhase
+  public typealias _ObjectiveCType = ZappOfframp.__OnrampPhase
+  public typealias Companion = ZappOfframp.__OnrampPhase.Companion
+  public static func == (a: ZappOfframp.OnrampPhase, b: ZappOfframp.OnrampPhase) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OnrampPhase]
+  nonisolated public static var allCases: [ZappOfframp.OnrampPhase] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OnrampPhase {
+  public func toKotlinEnum() -> ZappOfframp.__OnrampPhase
+}
+extension ZappOfframp.__OnrampPhase {
+  public func toSwiftEnum() -> ZappOfframp.OnrampPhase
+}
+@frozen public enum OnrampZecDeliveryPhase : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case fundsOnBase
+  case quoting
+  case quoteReady
+  case transferStarting
+  case transferSubmitted
+  case awaitingZec
+  case delivered
+  case refundedToBase
+  case needsAttention
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OnrampZecDeliveryPhase.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampZecDeliveryPhase, result: inout ZappOfframp.OnrampZecDeliveryPhase?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampZecDeliveryPhase, result: inout ZappOfframp.OnrampZecDeliveryPhase?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampZecDeliveryPhase?) -> ZappOfframp.OnrampZecDeliveryPhase
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OnrampZecDeliveryPhase
+  public typealias _ObjectiveCType = ZappOfframp.__OnrampZecDeliveryPhase
+  public typealias Companion = ZappOfframp.__OnrampZecDeliveryPhase.Companion
+  public static func == (a: ZappOfframp.OnrampZecDeliveryPhase, b: ZappOfframp.OnrampZecDeliveryPhase) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OnrampZecDeliveryPhase]
+  nonisolated public static var allCases: [ZappOfframp.OnrampZecDeliveryPhase] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OnrampZecDeliveryPhase {
+  public func toKotlinEnum() -> ZappOfframp.__OnrampZecDeliveryPhase
+}
+extension ZappOfframp.__OnrampZecDeliveryPhase {
+  public func toSwiftEnum() -> ZappOfframp.OnrampZecDeliveryPhase
+}
+@frozen public enum OnrampDestination : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case zcash
+  case base
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__OnrampDestination.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampDestination, result: inout ZappOfframp.OnrampDestination?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampDestination, result: inout ZappOfframp.OnrampDestination?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__OnrampDestination?) -> ZappOfframp.OnrampDestination
+  public func _bridgeToObjectiveC() -> ZappOfframp.__OnrampDestination
+  public typealias _ObjectiveCType = ZappOfframp.__OnrampDestination
+  public typealias Companion = ZappOfframp.__OnrampDestination.Companion
+  public static func == (a: ZappOfframp.OnrampDestination, b: ZappOfframp.OnrampDestination) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.OnrampDestination]
+  nonisolated public static var allCases: [ZappOfframp.OnrampDestination] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.OnrampDestination {
+  public func toKotlinEnum() -> ZappOfframp.__OnrampDestination
+}
+extension ZappOfframp.__OnrampDestination {
+  public func toSwiftEnum() -> ZappOfframp.OnrampDestination
+}
+@frozen public enum SwapStatus : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case incompleteDeposit
+  case pending
+  case success
+  case refunded
+  case failed
+  case processing
+  case expired
+  public var isTerminal: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var value: Swift.String {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__SwapStatus, result: inout ZappOfframp.SwapStatus?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__SwapStatus, result: inout ZappOfframp.SwapStatus?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__SwapStatus?) -> ZappOfframp.SwapStatus
+  public func _bridgeToObjectiveC() -> ZappOfframp.__SwapStatus
+  public typealias _ObjectiveCType = ZappOfframp.__SwapStatus
+  public static func == (a: ZappOfframp.SwapStatus, b: ZappOfframp.SwapStatus) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.SwapStatus]
+  nonisolated public static var allCases: [ZappOfframp.SwapStatus] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.SwapStatus {
+  public func toKotlinEnum() -> ZappOfframp.__SwapStatus
+}
+extension ZappOfframp.__SwapStatus {
+  public func toSwiftEnum() -> ZappOfframp.SwapStatus
+}
+@frozen public enum FundsLocation : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case baseAccount
+  case recipientMismatch
+  case transferAmbiguous
+  case nearIntent
+  case zcashWallet
+  case baseRefundConfirmed
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__FundsLocation, result: inout ZappOfframp.FundsLocation?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__FundsLocation, result: inout ZappOfframp.FundsLocation?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__FundsLocation?) -> ZappOfframp.FundsLocation
+  public func _bridgeToObjectiveC() -> ZappOfframp.__FundsLocation
+  public typealias _ObjectiveCType = ZappOfframp.__FundsLocation
+  public static func == (a: ZappOfframp.FundsLocation, b: ZappOfframp.FundsLocation) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.FundsLocation]
+  nonisolated public static var allCases: [ZappOfframp.FundsLocation] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.FundsLocation {
+  public func toKotlinEnum() -> ZappOfframp.__FundsLocation
+}
+extension ZappOfframp.__FundsLocation {
+  public func toSwiftEnum() -> ZappOfframp.FundsLocation
 }
 extension ZappOfframp.OrderSnapshot {
   public typealias Source = ZappOfframp.__Bridge__OrderSnapshot_Source
@@ -1432,15 +1838,484 @@ extension ZappOfframp.KnownRevertReason {
 extension ZappOfframp.__KnownRevertReason {
   public func toSwiftEnum() -> ZappOfframp.KnownRevertReason
 }
+@frozen public enum PeerCurrency : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case usd
+  case eur
+  case gbp
+  case aud
+  case cad
+  case chf
+  case mxn
+  case nzd
+  case sgd
+  case `try`
+  case zar
+  public var code: Swift.String {
+    get
+  }
+  public var codeHash: Any {
+    get
+  }
+  public var feed: ZappOfframp.Address? {
+    get
+  }
+  public var feedHex: Swift.String? {
+    get
+  }
+  public var invert: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var precision: Swift.Int32 {
+    get
+  }
+  public var symbol: Swift.String {
+    get
+  }
+  public static var companion: ZappOfframp.__PeerCurrency.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCurrency, result: inout ZappOfframp.PeerCurrency?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCurrency, result: inout ZappOfframp.PeerCurrency?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCurrency?) -> ZappOfframp.PeerCurrency
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerCurrency
+  public typealias _ObjectiveCType = ZappOfframp.__PeerCurrency
+  public typealias Companion = ZappOfframp.__PeerCurrency.Companion
+  public static func == (a: ZappOfframp.PeerCurrency, b: ZappOfframp.PeerCurrency) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerCurrency]
+  nonisolated public static var allCases: [ZappOfframp.PeerCurrency] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerCurrency {
+  public func toKotlinEnum() -> ZappOfframp.__PeerCurrency
+}
+extension ZappOfframp.__PeerCurrency {
+  public func toSwiftEnum() -> ZappOfframp.PeerCurrency
+}
+@frozen public enum PeerPlatform : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case revolut
+  case zelle
+  case chime
+  case monzo
+  public var currencies: Swift.Set<ZappOfframp.PeerCurrency> {
+    get
+  }
+  public var defaultCurrencies: Swift.Set<ZappOfframp.PeerCurrency> {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var offersCurrencyChoice: Swift.Bool {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var paymentMethodHash: Any {
+    get
+  }
+  public var validatesHandleLive: Swift.Bool {
+    get
+  }
+  public var wireName: Swift.String {
+    get
+  }
+  public static var companion: ZappOfframp.__PeerPlatform.Companion {
+    get
+  }
+  public func hasPlausibleFormat(handle: Any) -> Swift.Bool
+  public func normalizeHandle(raw: Swift.String) -> Any
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerPlatform, result: inout ZappOfframp.PeerPlatform?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerPlatform, result: inout ZappOfframp.PeerPlatform?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerPlatform?) -> ZappOfframp.PeerPlatform
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerPlatform
+  public typealias _ObjectiveCType = ZappOfframp.__PeerPlatform
+  public typealias Companion = ZappOfframp.__PeerPlatform.Companion
+  public static func == (a: ZappOfframp.PeerPlatform, b: ZappOfframp.PeerPlatform) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerPlatform]
+  nonisolated public static var allCases: [ZappOfframp.PeerPlatform] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerPlatform {
+  public func toKotlinEnum() -> ZappOfframp.__PeerPlatform
+}
+extension ZappOfframp.__PeerPlatform {
+  public func toSwiftEnum() -> ZappOfframp.PeerPlatform
+}
+@frozen public enum PeerIntentStatus : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case signaled
+  case fulfilled
+  case pruned
+  case manuallyReleased
+  case unknown
+  public var isPaidOut: Swift.Bool {
+    get
+  }
+  public var isTerminal: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__PeerIntentStatus.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentStatus, result: inout ZappOfframp.PeerIntentStatus?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentStatus, result: inout ZappOfframp.PeerIntentStatus?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentStatus?) -> ZappOfframp.PeerIntentStatus
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerIntentStatus
+  public typealias _ObjectiveCType = ZappOfframp.__PeerIntentStatus
+  public typealias Companion = ZappOfframp.__PeerIntentStatus.Companion
+  public static func == (a: ZappOfframp.PeerIntentStatus, b: ZappOfframp.PeerIntentStatus) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerIntentStatus]
+  nonisolated public static var allCases: [ZappOfframp.PeerIntentStatus] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerIntentStatus {
+  public func toKotlinEnum() -> ZappOfframp.__PeerIntentStatus
+}
+extension ZappOfframp.__PeerIntentStatus {
+  public func toSwiftEnum() -> ZappOfframp.PeerIntentStatus
+}
+@frozen public enum PeerIntentOutcome : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case paying
+  case outOfTime
+  case paid
+  case backedOut
+  case timedOut
+  case unknown
+  public var holdsFunds: Swift.Bool {
+    get
+  }
+  public var isPaidOut: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentOutcome, result: inout ZappOfframp.PeerIntentOutcome?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentOutcome, result: inout ZappOfframp.PeerIntentOutcome?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerIntentOutcome?) -> ZappOfframp.PeerIntentOutcome
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerIntentOutcome
+  public typealias _ObjectiveCType = ZappOfframp.__PeerIntentOutcome
+  public static func == (a: ZappOfframp.PeerIntentOutcome, b: ZappOfframp.PeerIntentOutcome) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerIntentOutcome]
+  nonisolated public static var allCases: [ZappOfframp.PeerIntentOutcome] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerIntentOutcome {
+  public func toKotlinEnum() -> ZappOfframp.__PeerIntentOutcome
+}
+extension ZappOfframp.__PeerIntentOutcome {
+  public func toSwiftEnum() -> ZappOfframp.PeerIntentOutcome
+}
+@frozen public enum PeerDepositStatus : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case active
+  case closed
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__PeerDepositStatus.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerDepositStatus, result: inout ZappOfframp.PeerDepositStatus?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerDepositStatus, result: inout ZappOfframp.PeerDepositStatus?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerDepositStatus?) -> ZappOfframp.PeerDepositStatus
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerDepositStatus
+  public typealias _ObjectiveCType = ZappOfframp.__PeerDepositStatus
+  public typealias Companion = ZappOfframp.__PeerDepositStatus.Companion
+  public static func == (a: ZappOfframp.PeerDepositStatus, b: ZappOfframp.PeerDepositStatus) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerDepositStatus]
+  nonisolated public static var allCases: [ZappOfframp.PeerDepositStatus] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerDepositStatus {
+  public func toKotlinEnum() -> ZappOfframp.__PeerDepositStatus
+}
+extension ZappOfframp.__PeerDepositStatus {
+  public func toSwiftEnum() -> ZappOfframp.PeerDepositStatus
+}
+@frozen public enum PeerOrderPhase : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case waiting
+  case buyerPaying
+  case partlySold
+  case sold
+  case paused
+  case closed
+  public var isFinished: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerOrderPhase, result: inout ZappOfframp.PeerOrderPhase?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerOrderPhase, result: inout ZappOfframp.PeerOrderPhase?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerOrderPhase?) -> ZappOfframp.PeerOrderPhase
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerOrderPhase
+  public typealias _ObjectiveCType = ZappOfframp.__PeerOrderPhase
+  public static func == (a: ZappOfframp.PeerOrderPhase, b: ZappOfframp.PeerOrderPhase) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerOrderPhase]
+  nonisolated public static var allCases: [ZappOfframp.PeerOrderPhase] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerOrderPhase {
+  public func toKotlinEnum() -> ZappOfframp.__PeerOrderPhase
+}
+extension ZappOfframp.__PeerOrderPhase {
+  public func toSwiftEnum() -> ZappOfframp.PeerOrderPhase
+}
+@frozen public enum EscrowRevert : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case amountExceedsAvailable
+  case depositNotFound
+  case unauthorizedCallerOrDelegate
+  case unauthorizedCaller
+  case depositAlreadyInState
+  case paymentMethodNotWhitelisted
+  case currencyNotSupported
+  case invalidOracleAdapter
+  case arrayLengthMismatch
+  case emptyPayeeDetails
+  case zeroConversionRate
+  case currencyAlreadyExists
+  case paymentMethodAlreadyExists
+  case invalidSpread
+  case adapterConfigTooLong
+  case invalidRange
+  case zeroMinValue
+  case zeroValue
+  case zeroAddress
+  public var isBenign: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var selector: ZappOfframp.Selector4 {
+    get
+  }
+  public var signature: Swift.String {
+    get
+  }
+  public var userFacing: ZappOfframp.EscrowRevertBucket? {
+    get
+  }
+  public static var companion: ZappOfframp.__EscrowRevert.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevert, result: inout ZappOfframp.EscrowRevert?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevert, result: inout ZappOfframp.EscrowRevert?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevert?) -> ZappOfframp.EscrowRevert
+  public func _bridgeToObjectiveC() -> ZappOfframp.__EscrowRevert
+  public typealias _ObjectiveCType = ZappOfframp.__EscrowRevert
+  public typealias Companion = ZappOfframp.__EscrowRevert.Companion
+  public static func == (a: ZappOfframp.EscrowRevert, b: ZappOfframp.EscrowRevert) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.EscrowRevert]
+  nonisolated public static var allCases: [ZappOfframp.EscrowRevert] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.EscrowRevert {
+  public func toKotlinEnum() -> ZappOfframp.__EscrowRevert
+}
+extension ZappOfframp.__EscrowRevert {
+  public func toSwiftEnum() -> ZappOfframp.EscrowRevert
+}
+@frozen public enum EscrowRevertBucket : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case insufficientAvailableFunds
+  case staleDepositId
+  case railUnavailable
+  case currencyUnavailable
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevertBucket, result: inout ZappOfframp.EscrowRevertBucket?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevertBucket, result: inout ZappOfframp.EscrowRevertBucket?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__EscrowRevertBucket?) -> ZappOfframp.EscrowRevertBucket
+  public func _bridgeToObjectiveC() -> ZappOfframp.__EscrowRevertBucket
+  public typealias _ObjectiveCType = ZappOfframp.__EscrowRevertBucket
+  public static func == (a: ZappOfframp.EscrowRevertBucket, b: ZappOfframp.EscrowRevertBucket) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.EscrowRevertBucket]
+  nonisolated public static var allCases: [ZappOfframp.EscrowRevertBucket] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.EscrowRevertBucket {
+  public func toKotlinEnum() -> ZappOfframp.__EscrowRevertBucket
+}
+extension ZappOfframp.__EscrowRevertBucket {
+  public func toSwiftEnum() -> ZappOfframp.EscrowRevertBucket
+}
+@frozen public enum PeerCashOutStep : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case initialization
+  case validatingPayee
+  case funding
+  case approvingUsdc
+  case creatingDeposit
+  case awaitingBuyer
+  case settling
+  case withdrawing
+  public var name: Swift.String {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public static var companion: ZappOfframp.__PeerCashOutStep.Companion {
+    get
+  }
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCashOutStep, result: inout ZappOfframp.PeerCashOutStep?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCashOutStep, result: inout ZappOfframp.PeerCashOutStep?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerCashOutStep?) -> ZappOfframp.PeerCashOutStep
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerCashOutStep
+  public typealias _ObjectiveCType = ZappOfframp.__PeerCashOutStep
+  public typealias Companion = ZappOfframp.__PeerCashOutStep.Companion
+  public static func == (a: ZappOfframp.PeerCashOutStep, b: ZappOfframp.PeerCashOutStep) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerCashOutStep]
+  nonisolated public static var allCases: [ZappOfframp.PeerCashOutStep] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerCashOutStep {
+  public func toKotlinEnum() -> ZappOfframp.__PeerCashOutStep
+}
+extension ZappOfframp.__PeerCashOutStep {
+  public func toSwiftEnum() -> ZappOfframp.PeerCashOutStep
+}
+@frozen public enum PeerErrorCode : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case unsupportedPlatform
+  case unsupportedPlatformCurrency
+  case payeeRegistrationFailed
+  case payeeNotFoundOnPlatform
+  case curatorUnavailable
+  case insufficientTokenBalance
+  case depositResolutionFailed
+  case transactionFailed
+  case transactionSubmissionUnknown
+  case transactionStatusUnknown
+  case orderNotFound
+  case indexerUnavailable
+  case invalidDepositId
+  case nothingToWithdraw
+  case activeIntentBlocksWithdrawal
+  case insufficientAvailableFunds
+  case fundingBridgeFailed
+  public var allowsManualRetry: Swift.Bool {
+    get
+  }
+  public var name: Swift.String {
+    get
+  }
+  public var nothingEscrowed: Swift.Bool {
+    get
+  }
+  public var ordinal: Swift.Int32 {
+    get
+  }
+  public var retryable: Swift.Bool {
+    get
+  }
+  public func asError(recovery: (any ZappOfframp.PeerRecovery)?, cause: ZappOfframp.KotlinThrowable?) -> ZappOfframp.PeerError
+  public func asException(recovery: (any ZappOfframp.PeerRecovery)?, cause: ZappOfframp.KotlinThrowable?) -> ZappOfframp.PeerException
+  public static func _forceBridgeFromObjectiveC(_ source: ZappOfframp.__PeerErrorCode, result: inout ZappOfframp.PeerErrorCode?)
+  public static func _conditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerErrorCode, result: inout ZappOfframp.PeerErrorCode?) -> Swift.Bool
+  public static func _unconditionallyBridgeFromObjectiveC(_ source: ZappOfframp.__PeerErrorCode?) -> ZappOfframp.PeerErrorCode
+  public func _bridgeToObjectiveC() -> ZappOfframp.__PeerErrorCode
+  public typealias _ObjectiveCType = ZappOfframp.__PeerErrorCode
+  public static func == (a: ZappOfframp.PeerErrorCode, b: ZappOfframp.PeerErrorCode) -> Swift.Bool
+  public typealias AllCases = [ZappOfframp.PeerErrorCode]
+  nonisolated public static var allCases: [ZappOfframp.PeerErrorCode] {
+    get
+  }
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension ZappOfframp.PeerErrorCode {
+  public func toKotlinEnum() -> ZappOfframp.__PeerErrorCode
+}
+extension ZappOfframp.__PeerErrorCode {
+  public func toSwiftEnum() -> ZappOfframp.PeerErrorCode
+}
 extension ZappOfframp.Skie.EvmLib.AbiArg {
   @frozen public enum __Sealed : Swift.Hashable {
     case abiAddress(ZappOfframp.AbiAddress)
+    case abiArray(ZappOfframp.AbiArray)
     case abiBool(ZappOfframp.AbiBool)
     case abiBytes(ZappOfframp.AbiBytes)
     case abiBytes32(ZappOfframp.AbiBytes32)
     case abiInt(ZappOfframp.AbiInt)
+    case abiInt16(ZappOfframp.AbiInt16)
     case abiString(ZappOfframp.AbiString)
+    case abiTuple(ZappOfframp.AbiTuple)
     case abiUint(ZappOfframp.AbiUint)
+    case abiUint32(ZappOfframp.AbiUint32)
     case abiUint8(ZappOfframp.AbiUint8)
     case abiUintArray(ZappOfframp.AbiUintArray)
     public static func == (a: ZappOfframp.Skie.EvmLib.AbiArg.__Sealed, b: ZappOfframp.Skie.EvmLib.AbiArg.__Sealed) -> Swift.Bool
@@ -1684,6 +2559,76 @@ extension ZappOfframp.Skie.OfframpLib.FundingOutcome {
 }
 public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed where __Sealed : ZappOfframp.FundingOutcome
 @_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed? where __Sealed : ZappOfframp.FundingOutcome
+extension ZappOfframp.Skie.OfframpLib.OnrampPaymentInstruction {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case fields(ZappOfframp.OnrampPaymentInstructionFields)
+    case plain(ZappOfframp.OnrampPaymentInstructionPlain)
+    case qr(ZappOfframp.OnrampPaymentInstructionQr)
+    case upi(ZappOfframp.OnrampPaymentInstructionUpi)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.OnrampPaymentInstruction.__Sealed, b: ZappOfframp.Skie.OfframpLib.OnrampPaymentInstruction.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.OnrampPaymentInstruction.__Sealed where __Sealed : ZappOfframp.OnrampPaymentInstruction
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.OnrampPaymentInstruction.__Sealed? where __Sealed : ZappOfframp.OnrampPaymentInstruction
+extension ZappOfframp.Skie.OfframpLib.OnrampStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case awaitingMerchant(ZappOfframp.OnrampStatusAwaitingMerchant)
+    case awaitingPayment(ZappOfframp.OnrampStatusAwaitingPayment)
+    case awaitingSettlement(ZappOfframp.OnrampStatusAwaitingSettlement)
+    case cancelled(ZappOfframp.OnrampStatusCancelled)
+    case completed(ZappOfframp.OnrampStatusCompleted)
+    case confirmingPaid(ZappOfframp.OnrampStatusConfirmingPaid)
+    case failed(ZappOfframp.OnrampStatusFailed)
+    case idle(ZappOfframp.OnrampStatusIdle)
+    case placing(ZappOfframp.OnrampStatusPlacing)
+    case quoting(ZappOfframp.OnrampStatusQuoting)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.OnrampStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.OnrampStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.OnrampStatus.__Sealed where __Sealed : ZappOfframp.OnrampStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.OnrampStatus.__Sealed? where __Sealed : ZappOfframp.OnrampStatus
+extension ZappOfframp.OnrampStatus {
+  public var id_: Swift.String? {
+    get
+  }
+  public var isTerminal: Swift.Bool {
+    get
+  }
+  public var leavesOrderAlive: Swift.Bool {
+    get
+  }
+  public var orderId_: Swift.String? {
+    get
+  }
+  public var phase_: ZappOfframp.OnrampPhase {
+    get
+  }
+}
+extension ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case awaitingZec(ZappOfframp.OnrampZecDeliveryStatusAwaitingZec)
+    case delivered(ZappOfframp.OnrampZecDeliveryStatusDelivered)
+    case failed(ZappOfframp.OnrampZecDeliveryStatusFailed)
+    case preparing(ZappOfframp.OnrampZecDeliveryStatusPreparing)
+    case refundedToBase(ZappOfframp.OnrampZecDeliveryStatusRefundedToBase)
+    case submitting(ZappOfframp.OnrampZecDeliveryStatusSubmitting)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed where __Sealed : ZappOfframp.OnrampZecDeliveryStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed? where __Sealed : ZappOfframp.OnrampZecDeliveryStatus
 extension ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus {
   @frozen public enum __Sealed : Swift.Hashable {
     case bridging(ZappOfframp.BridgeToBaseStatusBridging)
@@ -1785,6 +2730,84 @@ extension ZappOfframp.Skie.OfframpLib.UpiQrError {
 }
 public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed where __Sealed : ZappOfframp.UpiQrError
 @_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.UpiQrError.__Sealed? where __Sealed : ZappOfframp.UpiQrError
+extension ZappOfframp.Skie.OfframpLib.PeerResumeAction {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case freshStart(ZappOfframp.PeerResumeActionFreshStart)
+    case readOrder(ZappOfframp.PeerResumeActionReadOrder)
+    case reconcileSubmission(ZappOfframp.PeerResumeActionReconcileSubmission)
+    case resolveSubmittedDeposit(ZappOfframp.PeerResumeActionResolveSubmittedDeposit)
+    case resumeBridge(ZappOfframp.PeerResumeActionResumeBridge)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PeerResumeAction.__Sealed, b: ZappOfframp.Skie.OfframpLib.PeerResumeAction.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PeerResumeAction.__Sealed where __Sealed : ZappOfframp.PeerResumeAction
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PeerResumeAction.__Sealed? where __Sealed : ZappOfframp.PeerResumeAction
+extension ZappOfframp.Skie.OfframpLib.PeerCashOutStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case approvingUsdc(ZappOfframp.PeerCashOutStatus.ApprovingUsdc)
+    case bridgingFunds(ZappOfframp.PeerCashOutStatus.BridgingFunds)
+    case creatingDeposit(ZappOfframp.PeerCashOutStatus.CreatingDeposit)
+    case failed(ZappOfframp.PeerCashOutStatus.Failed)
+    case fundedFromBase(ZappOfframp.PeerCashOutStatus.FundedFromBase)
+    case idle(ZappOfframp.PeerCashOutStatus.Idle)
+    case orderLive(ZappOfframp.PeerCashOutStatus.OrderLive)
+    case validatingPayee(ZappOfframp.PeerCashOutStatus.ValidatingPayee)
+    case withdrawing(ZappOfframp.PeerCashOutStatus.Withdrawing)
+    case withdrawn(ZappOfframp.PeerCashOutStatus.Withdrawn)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PeerCashOutStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.PeerCashOutStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PeerCashOutStatus.__Sealed where __Sealed : ZappOfframp.PeerCashOutStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PeerCashOutStatus.__Sealed? where __Sealed : ZappOfframp.PeerCashOutStatus
+extension ZappOfframp.Skie.OfframpLib.PeerRecovery {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case inspectBaseTransaction(ZappOfframp.PeerRecoveryInspectBaseTransaction)
+    case inspectDepositor(ZappOfframp.PeerRecoveryInspectDepositor)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PeerRecovery.__Sealed, b: ZappOfframp.Skie.OfframpLib.PeerRecovery.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PeerRecovery.__Sealed where __Sealed : ZappOfframp.PeerRecovery
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PeerRecovery.__Sealed? where __Sealed : ZappOfframp.PeerRecovery
+extension ZappOfframp.Skie.OfframpLib.PeerMarketVerdict {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case band(ZappOfframp.PeerMarketVerdictBand)
+    case littleActivity(ZappOfframp.PeerMarketVerdictLittleActivity)
+    case unknown(ZappOfframp.PeerMarketVerdictUnknown)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PeerMarketVerdict.__Sealed, b: ZappOfframp.Skie.OfframpLib.PeerMarketVerdict.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PeerMarketVerdict.__Sealed where __Sealed : ZappOfframp.PeerMarketVerdict
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PeerMarketVerdict.__Sealed? where __Sealed : ZappOfframp.PeerMarketVerdict
+extension ZappOfframp.Skie.OfframpLib.PeerSpendable {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case loading(ZappOfframp.PeerSpendableLoading)
+    case ready(ZappOfframp.PeerSpendableReady)
+    case unavailable(ZappOfframp.PeerSpendableUnavailable)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.PeerSpendable.__Sealed, b: ZappOfframp.Skie.OfframpLib.PeerSpendable.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.PeerSpendable.__Sealed where __Sealed : ZappOfframp.PeerSpendable
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.PeerSpendable.__Sealed? where __Sealed : ZappOfframp.PeerSpendable
 extension ZappOfframp.Skie.KotlinxSerializationJson.JsonElement {
   @frozen public enum __Sealed : Swift.Hashable {
     case jsonPrimitive(ZappOfframp.Kotlinx_serialization_jsonJsonPrimitive)
@@ -1819,6 +2842,7 @@ public func decimalMovePointRight(value: ZappOfframp.BigDecimal, distance: Swift
 public func decimalMultiply(left: ZappOfframp.BigDecimal, right: ZappOfframp.BigDecimal) -> ZappOfframp.BigDecimal
 public func decimalSetScale(value: ZappOfframp.BigDecimal, scale: Swift.Int32, rounding: ZappOfframp.DecimalRounding) -> ZappOfframp.BigDecimal
 public func decimalStripTrailingZeros(value: ZappOfframp.BigDecimal) -> ZappOfframp.BigDecimal
+public func decimalSubtract(left: ZappOfframp.BigDecimal, right: ZappOfframp.BigDecimal) -> ZappOfframp.BigDecimal
 public func decimalToBigInteger(value: ZappOfframp.BigDecimal) -> ZappOfframp.BigInteger
 public func decimalToLong(value: ZappOfframp.BigDecimal) -> Swift.Int64
 public func decimalToPlainString(value: ZappOfframp.BigDecimal) -> Swift.String
@@ -1839,6 +2863,10 @@ public func hexToBigInteger(hex: Swift.String) -> ZappOfframp.BigInteger
 extension Swift.String {
   public func hexToBytes() -> ZappOfframp.KotlinByteArray
 }
+public var ZEC_QUOTE_EXPIRY_MARGIN_MILLIS: Swift.Int64 {
+  get
+}
+public func onrampDeliveryFailure(latest: ZappOfframp.OnrampZecDeliveryCheckpoint?, resumed: ZappOfframp.OnrampZecDeliveryCheckpoint?) -> ZappOfframp.OnrampZecDeliveryStatusFailed
 public func extractUpiVpa(plain: Swift.String) -> Swift.String
 extension ZappOfframp.KotlinKVariance : Swift.Sendable {}
 extension ZappOfframp.KotlinKVariance : Swift.BitwiseCopyable {}
@@ -1852,6 +2880,18 @@ extension ZappOfframp.Ktor_client_loggingLogLevel : Swift.Sendable {}
 extension ZappOfframp.Ktor_client_loggingLogLevel : Swift.BitwiseCopyable {}
 extension ZappOfframp.CurrencyCode : Swift.Sendable {}
 extension ZappOfframp.CurrencyCode : Swift.BitwiseCopyable {}
+extension ZappOfframp.OnrampFailureCode : Swift.Sendable {}
+extension ZappOfframp.OnrampFailureCode : Swift.BitwiseCopyable {}
+extension ZappOfframp.OnrampPhase : Swift.Sendable {}
+extension ZappOfframp.OnrampPhase : Swift.BitwiseCopyable {}
+extension ZappOfframp.OnrampZecDeliveryPhase : Swift.Sendable {}
+extension ZappOfframp.OnrampZecDeliveryPhase : Swift.BitwiseCopyable {}
+extension ZappOfframp.OnrampDestination : Swift.Sendable {}
+extension ZappOfframp.OnrampDestination : Swift.BitwiseCopyable {}
+extension ZappOfframp.SwapStatus : Swift.Sendable {}
+extension ZappOfframp.SwapStatus : Swift.BitwiseCopyable {}
+extension ZappOfframp.FundsLocation : Swift.Sendable {}
+extension ZappOfframp.FundsLocation : Swift.BitwiseCopyable {}
 extension ZappOfframp.__Bridge__OrderSnapshot_Source : Swift.Sendable {}
 extension ZappOfframp.__Bridge__OrderSnapshot_Source : Swift.BitwiseCopyable {}
 extension ZappOfframp.OrderType : Swift.Sendable {}
@@ -1864,6 +2904,26 @@ extension ZappOfframp.CircleStatus : Swift.Sendable {}
 extension ZappOfframp.CircleStatus : Swift.BitwiseCopyable {}
 extension ZappOfframp.KnownRevertReason : Swift.Sendable {}
 extension ZappOfframp.KnownRevertReason : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerCurrency : Swift.Sendable {}
+extension ZappOfframp.PeerCurrency : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerPlatform : Swift.Sendable {}
+extension ZappOfframp.PeerPlatform : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerIntentStatus : Swift.Sendable {}
+extension ZappOfframp.PeerIntentStatus : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerIntentOutcome : Swift.Sendable {}
+extension ZappOfframp.PeerIntentOutcome : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerDepositStatus : Swift.Sendable {}
+extension ZappOfframp.PeerDepositStatus : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerOrderPhase : Swift.Sendable {}
+extension ZappOfframp.PeerOrderPhase : Swift.BitwiseCopyable {}
+extension ZappOfframp.EscrowRevert : Swift.Sendable {}
+extension ZappOfframp.EscrowRevert : Swift.BitwiseCopyable {}
+extension ZappOfframp.EscrowRevertBucket : Swift.Sendable {}
+extension ZappOfframp.EscrowRevertBucket : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerCashOutStep : Swift.Sendable {}
+extension ZappOfframp.PeerCashOutStep : Swift.BitwiseCopyable {}
+extension ZappOfframp.PeerErrorCode : Swift.Sendable {}
+extension ZappOfframp.PeerErrorCode : Swift.BitwiseCopyable {}
 extension ZappOfframp.Skie.EvmLib.RlpItem.__Sealed : Swift.Sendable {}
 extension ZappOfframp.Skie.EvmLib.RlpItem.__Sealed : Swift.BitwiseCopyable {}
 extension ZappOfframp.Skie.KotlinxSerializationCore.SerializersModule.__Sealed : Swift.Sendable {}

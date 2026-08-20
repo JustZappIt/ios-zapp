@@ -27,6 +27,11 @@ struct ZappComponentGallery: View {
                             ZappStatusChip(text: "Muted")
                             ZappStatusChip(text: "Pending", variant: .accent)
                             ZappStatusChip(text: "Failed", variant: .danger)
+                            ZappStatusChip(
+                                text: "Copy key",
+                                variant: .outlined,
+                                leadingIcon: Asset.Assets.copy.image
+                            ) { }
                         }
                     }
                 }
@@ -42,6 +47,20 @@ struct ZappComponentGallery: View {
 
                         Text(isToggleOn ? "On / Off" : "Off / On")
                             .zappFont(.body, style: ZappColors.textMuted)
+                    }
+                }
+
+                section("VALUE CARDS") {
+                    VStack(spacing: Design.Spacing._lg) {
+                        ZappValueCard(value: String(repeating: "a", count: 64), label: "Public key")
+
+                        ZappValueCard(
+                            value: "u1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+                            label: "Shielded address",
+                            caption: "Private by default. Share this to receive shielded ZEC."
+                        ) {
+                            ZappCopyIconButton(isCopied: false, accessibilityLabel: "Copy address") { }
+                        }
                     }
                 }
 

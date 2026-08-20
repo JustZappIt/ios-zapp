@@ -9,7 +9,7 @@ import Foundation
 @preconcurrency import ZcashLightClientKit
 
 // Both will be defined in the SDK
-enum CurrencyISO4217: String, CaseIterable, Equatable, Codable {
+enum CurrencyISO4217: String, CaseIterable, Equatable, Codable, Sendable {
     case usd = "USD"
     case eur = "EUR"
     case gbp = "GBP"

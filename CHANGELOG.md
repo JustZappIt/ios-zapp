@@ -7,6 +7,8 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [ZAPP-3] Buy ZEC now supports P2P purchases in local currency, delivering either shielded ZEC by default or USDC to your self-custodial Base account, with resumable payment and delivery recovery if the app closes or a provider is temporarily unavailable.
+- [PORTFOLIO-CHART] The Pay chart can now value wallet history in the selected local currency using privacy-aware cached market prices, with touch-and-drag inspection and a setting to keep the chart entirely in ZEC.
 - [MOB-1466] Move to Ironwood: a guided migration that moves your Orchard funds into the new Ironwood shielded pool. You choose how — a private option that splits your balance into smaller transfers spread over time, or a single immediate transfer that is faster but publishes the amount on-chain. The private option adds Tor protection, step-by-step notifications, Keystone support and a home-screen banner that tracks progress. Nothing sends on its own: Zapp tells you when it is your turn to open the app, and opening it promptly keeps the run on track. *(Testnet builds only for now — the feature is off in mainnet and App Store builds.)*
 - [Ironwood] Zapp now recognizes funds held in the Ironwood shielded pool. Balances on the Pay screen, in the balances breakdown and in the shielding banner include Ironwood alongside Sapling and Orchard, so those funds are visible and counted as soon as the network upgrade activates.
 - [Ironwood] Once Zapp sees that the Ironwood network upgrade is live on the network, it shows a short one-time screen introducing the change, with a link to a support article. It appears once per device — after you continue past it, it never comes back.
@@ -56,6 +58,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [ZAPP-3] P2P transaction history now identifies Buy, Sell, and Pay orders, shows the Base account balance and refund availability, and never offers escrow recovery for a Buy order that did not escrow user funds.
+- [ZAPP-1] Your profile now matches Android. The You tab shows your messaging QR code — tap it to fill the screen at full brightness so someone across the table can scan it — with your handle and a one-tap "Copy key" underneath; the initials tile is gone. "Profile & identity" is a single page: tap the pencil beside your name to rename yourself in a dialog, see your public key, and reach your wallet addresses, recovery phrase and P2P wallet key as Identity rows, with Delete identity in its own Danger zone. Wallet address is now a screen of its own listing every address you have at once — shielded, transparent and your Base cash-out account — each with a copy button, and a QR you can tap to enlarge for the two Zcash ones. Both the Messaging ID / Wallet Address tabs and the shielded/transparent sub-tabs are gone.
 - [Ironwood] Coinholder Polling is temporarily unavailable and no longer appears in Settings while voting is updated for the Ironwood network upgrade. Existing voting data is retained for when the feature returns.
 - [MOB-1535] The "Total Balance Across Pools" breakdown shows each pool's balance to its full precision (up to 8 decimal places), so small amounts are not hidden, and lists the pools in the order Ironwood, Orchard, Sapling, Transparent.
 - [ZAPP-1] The send button in a chat is now an up arrow rather than the word "Send", matching Android.
@@ -92,6 +96,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [PORTFOLIO-CHART] Wallets with completed sends now reconcile their history correctly instead of hiding the balance chart.
+- [PORTFOLIO-CHART] Wallet birthday estimates now remain usable on compact displays, and PIN entry is larger and easier to read across iPhone sizes.
 - [MOB-1678] Sending, and shielding transparent funds, no longer fail with an internal error when the transaction Zapp just built has not yet appeared in the wallet's history view. The transaction is now read back for broadcast from the wallet store directly, so a send that used to stop with a "transaction not found" failure simply goes out. Fixed in the updated Zcash SDK.
 - [MOB-1466] Bottom sheets now update while they are open. A sheet's contents are built when it appears rather than ahead of time, so amounts, statuses and other live values refresh in place instead of staying frozen on whatever they showed when the sheet was opened.
 - [MOB-1466] A transaction that has been sent but not yet mined now shows "Today" in the Activity list instead of a blank date.

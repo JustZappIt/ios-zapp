@@ -15,6 +15,7 @@ struct ZappTypeSpecimen: View {
         """
 
     private static let tokens: [(String, ZappTextStyle)] = [
+        ("pinHero", .pinHero),
         ("display", .display),
         ("displaySecondary", .displaySecondary),
         ("balanceDisplay", .balanceDisplay),
@@ -30,6 +31,7 @@ struct ZappTypeSpecimen: View {
         ("chip", .chip),
         ("button", .button),
         ("buttonSmall", .buttonSmall),
+        ("pinKey", .pinKey),
         ("mono", .mono)
     ]
 

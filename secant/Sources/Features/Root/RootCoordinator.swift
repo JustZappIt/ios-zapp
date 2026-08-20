@@ -22,10 +22,12 @@ extension Root {
                 .chatRoom(.backToHomeTapped),
                 .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
+                .onramp(.delegate(.close)),
                 .offramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
+                .portfolioChartSetup(.backToHomeTapped),
                 .currencyConversionSetup(.backToHomeTapped),
                 .backToHomeFromChatPrivacyTapped,
                 .backToHomeFromServerSwitchTapped:
@@ -55,6 +57,7 @@ extension Root {
                 state.$selectedWalletAccount.withLock { $0 = walletAccount }
                 let switchedEffect = accountSwitchedEffect(state: &state)
                 return .merge(
+                    .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
                     switchedEffect,
                     .send(.loadContacts),
@@ -275,6 +278,11 @@ extension Root {
                 state.path = .offramp
                 return .none
 
+            case .home(.buyTapped):
+                state.onrampState = .initial(currencyCode: state.offrampState.selectedCurrencyCode)
+                state.path = .onramp
+                return .none
+
             case .home(.transactionList(.transactionTapped(let txId))):
                 state.transactionsCoordFlowState = .initial
                 state.transactionsCoordFlowState.transactionToOpen = txId
@@ -433,6 +441,17 @@ extension Root {
 
             case .zappTabs(.chatProfileTapped):
                 state.chatProfileState = .initial
+                state.path = .chatProfile
+                return .none
+
+            case .chatProfile(.walletAddressTapped):
+                state.chatWalletAddressState = .initial
+                state.path = .chatWalletAddress
+                return .none
+
+                // Back to the profile, not to the tabs. `path` holds one destination at a time,
+                // so a nested screen has to name the one it came from.
+            case .chatWalletAddress(.backTapped):
                 state.path = .chatProfile
                 return .none
 
@@ -728,6 +747,11 @@ extension Root {
                 state.path = .torSetup
                 return .none
 
+            case .zappTabs(.portfolioChartTapped):
+                state.portfolioChartSetupState = .initial
+                state.path = .portfolioChartSetup
+                return .none
+
             case .settings(.path(.element(id: _, action: .migrationRestart(.delegate(.restarted))))):
                 // MOB-1466 (Lukas, 2026-08-07): "once I finish restart migration, we need to reset
                 // smart banner.. because it renders me 2 of 11 transactions done.. aka previous
@@ -773,6 +797,7 @@ extension Root {
                 state.path = nil
                 state.$selectedWalletAccount.withLock { $0 = nil }
                 return .merge(
+                    .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
                     .run { send in
                         let walletAccounts = try await sdkSynchronizer.walletAccounts()

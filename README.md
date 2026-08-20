@@ -55,12 +55,18 @@ out beside this repository. Both are public:
 <some-dir>/
   ios-zapp/                 <-- this repository
   zappMessaging/            <-- JustZappIt/zappmessaging-sdk, cloned under this name
-  zcash-swift-wallet-sdk/   <-- JustZappIt/zcash-swift-wallet-sdk
+  zcash-swift-wallet-sdk/   <-- JustZappIt/zcash-swift-wallet-sdk, branch zapp/sdk-mit-on-main
 ```
 
 `Scripts/bootstrap-zappmessaging.sh` clones the messaging SDK to the right place at the commit
 pinned in [`.zapp-deps`](.zapp-deps) and generates its build artifacts. The directory is named
 `zappMessaging` because that is the path the Xcode project references.
+
+`Scripts/bootstrap-zcash-sdk.sh` does the same for the wallet SDK, then compiles its Rust FFI
+(`libzcashlc.xcframework` — a few minutes from cold). The pin lives on our fork's
+`zapp/sdk-mit-on-main` branch rather than upstream: upstream's default build links the
+AGPL-3.0-only zodl-slipstream crate, which we may not ship, so `zcash/zcash-swift-wallet-sdk`
+cannot resolve the pinned SHA. Override the source with `ZAPP_SDK_REMOTE` / `ZAPP_SDK_BRANCH`.
 
 ### Prerequisites
 
@@ -68,9 +74,11 @@ pinned in [`.zapp-deps`](.zapp-deps) and generates its build artifacts. The dire
 - [SwiftGen](https://github.com/SwiftGen/SwiftGen) — `brew install swiftgen`
 - [SwiftLint](https://github.com/realm/SwiftLint) **0.50.3** specifically — install from the
   [official 0.50.3 package](https://github.com/realm/SwiftLint/releases/download/0.50.3/SwiftLint.pkg)
+- [Rust](https://rustup.rs) with the iOS targets, to build the wallet SDK's FFI —
+  `rustup target add aarch64-apple-ios aarch64-apple-ios-sim`
 
-Both run automatically as Xcode build phases. On Apple Silicon, if you installed either via
-Homebrew, symlink it so the build phase can find it:
+SwiftGen and SwiftLint run automatically as Xcode build phases. On Apple Silicon, if you installed
+either via Homebrew, symlink it so the build phase can find it:
 
 ```
 ln -s /opt/homebrew/bin/swiftgen /usr/local/bin
@@ -81,6 +89,7 @@ ln -s /opt/homebrew/bin/swiftlint /usr/local/bin
 
 ```bash
 Scripts/bootstrap-zappmessaging.sh   # clones/pins the sibling and generates its artifacts
+Scripts/bootstrap-zcash-sdk.sh       # clones/pins the wallet SDK and builds its Rust FFI
 open secant.xcodeproj
 ```
 

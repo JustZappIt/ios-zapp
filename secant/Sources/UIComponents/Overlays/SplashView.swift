@@ -464,7 +464,6 @@ struct SplashView: View {
                 isInputEnabled: !splashManager.isProcessing && splashManager.lockoutSeconds == 0,
                 onKey: splashManager.pinKeyTapped
             )
-            .ignoresSafeArea()
         case .migrateCreatePIN, .migrateConfirmPIN:
             AppPINEntryView(
                 title: splashManager.lockScreen == .migrateCreatePIN
@@ -478,7 +477,6 @@ struct SplashView: View {
                 isInputEnabled: !splashManager.isProcessing,
                 onKey: splashManager.pinKeyTapped
             )
-            .ignoresSafeArea()
         case .none:
             EmptyView()
         }

@@ -34,6 +34,7 @@ struct ZappTextStyle: Equatable {
 }
 
 extension ZappTextStyle {
+    static let pinHero = ZappTextStyle(weight: .black, size: 46, lineHeight: 49, tracking: -2)
     static let screenTitle = ZappTextStyle(weight: .bold, size: 22, lineHeight: 28, tracking: -0.5)
     static let sectionTitle = ZappTextStyle(weight: .bold, size: 18, lineHeight: 24, tracking: -0.3)
     static let display = ZappTextStyle(weight: .bold, size: 32, lineHeight: 36, tracking: -1.0)
@@ -49,6 +50,7 @@ extension ZappTextStyle {
     static let chip = ZappTextStyle(weight: .semiBold, size: 11, lineHeight: 14, tracking: 0.4)
     static let button = ZappTextStyle(weight: .semiBold, size: 15, lineHeight: 20)
     static let buttonSmall = ZappTextStyle(weight: .semiBold, size: 12, lineHeight: 16)
+    static let pinKey = ZappTextStyle(weight: .black, size: 22, lineHeight: 26)
     static let mono = ZappTextStyle(family: .robotoMono, weight: .medium, size: 12, lineHeight: 16)
 }
 

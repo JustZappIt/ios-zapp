@@ -28,7 +28,7 @@ struct AppPINEntryView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(title)
-                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .zappFont(.pinHero, style: ZappColors.text)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(errorMessage ?? subtitle)
@@ -49,14 +49,17 @@ struct AppPINEntryView: View {
                 .padding(.bottom, 16)
             }
             .padding(.horizontal, 28)
-            .padding(.top, 38)
+            .padding(.top, 42)
 
             if let onBack {
                 ZappBottomActionBar(onBack: onBack)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(ZappColors.bg.color(colorScheme))
+        .background {
+            ZappColors.bg.color(colorScheme)
+                .ignoresSafeArea()
+        }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.keyboard)
     }

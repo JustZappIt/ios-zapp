@@ -20,10 +20,13 @@ struct Root {
             case chatProfile
             case chatReadReceipts
             case chatRoom
+            case chatWalletAddress
             case groupInfo
             case newChat
+            case onramp
             case offramp
             case currencyConversionSetup
+            case portfolioChartSetup
             case migrationCoordFlow
             case receive
             case requestZecCoordFlow
@@ -184,14 +187,17 @@ struct Root {
 
         var addKeystoneHWWalletCoordFlowState = AddKeystoneHWWalletCoordFlow.State.initial
         var currencyConversionSetupState = CurrencyConversionSetup.State.initial
+        var portfolioChartSetupState = PortfolioChartSetup.State.initial
         var chatsListState = ChatsList.State.initial
         var chatIdentitySetupState = ChatIdentitySetup.State.initial
         var chatContactsListState = ChatContactsList.State.initial
         var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
+        var chatWalletAddressState = ChatWalletAddress.State.initial
         var groupInfoState = GroupInfo.State.initial
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
+        var onrampState = Onramp.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
@@ -247,11 +253,11 @@ struct Root {
             // the manual lane broadcasts a real send-max transaction from inside it, and an
             // automatic server switch mid-broadcast is exactly what must not happen. #1930
             // classifies it identically.
-            case .migrationCoordFlow, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
+            case .migrationCoordFlow, .onramp, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
-                 .chatReadReceipts, .chatRoom, .groupInfo,
-                 .newChat, .currencyConversionSetup, .receive,
+                 .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
+                 .newChat, .currencyConversionSetup, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -373,13 +379,16 @@ struct Root {
 
         case addKeystoneHWWalletCoordFlow(AddKeystoneHWWalletCoordFlow.Action)
         case currencyConversionSetup(CurrencyConversionSetup.Action)
+        case portfolioChartSetup(PortfolioChartSetup.Action)
         case chatsList(ChatsList.Action)
         case chatIdentitySetup(ChatIdentitySetup.Action)
         case chatContactsList(ChatContactsList.Action)
         case chatProfile(ChatProfile.Action)
         case chatRoom(ChatRoom.Action)
+        case chatWalletAddress(ChatWalletAddress.Action)
         case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
+        case onramp(Onramp.Action)
         case offramp(Offramp.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
@@ -570,6 +579,10 @@ struct Root {
             ChatRoom()
         }
 
+        Scope(state: \.chatWalletAddressState, action: \.chatWalletAddress) {
+            ChatWalletAddress()
+        }
+
         Scope(state: \.groupInfoState, action: \.groupInfo) {
             GroupInfo()
         }
@@ -584,6 +597,10 @@ struct Root {
 
         Scope(state: \.newChatState, action: \.newChat) {
             NewChat()
+        }
+
+        Scope(state: \.onrampState, action: \.onramp) {
+            Onramp()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {
@@ -631,6 +648,10 @@ struct Root {
 
         Scope(state: \.currencyConversionSetupState, action: \.currencyConversionSetup) {
             CurrencyConversionSetup()
+        }
+
+        Scope(state: \.portfolioChartSetupState, action: \.portfolioChartSetup) {
+            PortfolioChartSetup()
         }
 
         Scope(state: \.signWithKeystoneCoordFlowState, action: \.signWithKeystoneCoordFlow) {

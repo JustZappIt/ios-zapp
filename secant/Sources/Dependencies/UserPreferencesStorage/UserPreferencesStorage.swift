@@ -20,6 +20,7 @@ struct UserPreferencesStorage {
         case ups_exchangeRate2
         case ups_server
         case ups_automaticServerSelection
+        case ups_portfolioChartEnabled
     }
 
     enum UserPreferencesStorageError: Error {
@@ -71,6 +72,14 @@ struct UserPreferencesStorage {
 
     func setAutomaticServerSelection(_ enabled: Bool) {
         setValue(enabled, forKey: Constants.ups_automaticServerSelection.rawValue)
+    }
+
+    var portfolioChartEnabled: Bool {
+        getValue(forKey: Constants.ups_portfolioChartEnabled.rawValue, default: true)
+    }
+
+    func setPortfolioChartEnabled(_ enabled: Bool) {
+        setValue(enabled, forKey: Constants.ups_portfolioChartEnabled.rawValue)
     }
 
     /// Currency conversion is on by default (see `defaultExchangeRateOn`); users can opt out in settings.

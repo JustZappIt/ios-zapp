@@ -22,9 +22,18 @@ struct PoolBalancesSheet: View {
 
     private enum Constants {
         static let cardSpacing: CGFloat = 8
-        static let contentPadding: CGFloat = 20
-        static let cardHorizontalPadding: CGFloat = 16
-        static let cardVerticalPadding: CGFloat = 12
+        /// Android's sheet gutter (`BalanceBreakdownView.kt`: start/end = 24.dp).
+        static let contentPadding: CGFloat = 24
+        /// `ZappBorderedCard(padding = 16.dp)` — uniform, unlike the split padding it replaces.
+        static let cardPadding: CGFloat = 16
+        static let topPadding: CGFloat = 16
+        static let amountSize: CGFloat = 15
+        static let amountFractionSize: CGFloat = 12
+        static let amountLineHeight: CGFloat = 20
+        static let cardRows: CGFloat = 3
+        /// The description wraps to three lines at the narrowest width the app supports.
+        static let subtitleLines: CGFloat = 3
+        static let buttonHeight: CGFloat = 52
     }
 
     @Environment(\.colorScheme) private var colorScheme
@@ -38,65 +47,89 @@ struct PoolBalancesSheet: View {
     let tokenName: String
     let onDismiss: () -> Void
 
+    /// Derived from this sheet's own layout rather than eyeballed, so the detent keeps matching the
+    /// content if a padding changes: heading block, three card rows, the gap before the button, and
+    /// the button itself. The `ScrollView` absorbs whatever larger type adds, and `.large` is
+    /// offered alongside it so the content can never be trapped.
+    static var detentHeight: CGFloat {
+        let cardHeight = Constants.cardPadding * 2
+            + ZappTextStyle.rowSubtitle.lineHeight
+            + Design.Spacing._sm
+            + Constants.amountLineHeight
+            + ZappTextStyle.caption.lineHeight
+        let heading = Constants.topPadding
+            + ZappTextStyle.sheetTitle.lineHeight
+            + Design.Spacing._md
+            + ZappTextStyle.body.lineHeight * Constants.subtitleLines
+            + Design.Spacing._3xl
+
+        return heading
+            + cardHeight * Constants.cardRows
+            + Constants.cardSpacing * (Constants.cardRows - 1)
+            + Design.Spacing._4xl
+            + Constants.buttonHeight
+            + Design.Spacing.sheetBottomSpace
+    }
+
     var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(localizable: .poolBalancesTitle)
-                            .zappFont(.screenTitle, style: ZappColors.text)
-                            .padding(.top, Design.Spacing._xl)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(localizable: .poolBalancesTitle)
+                        .zappFont(.sheetTitle, style: ZappColors.text)
+                        .padding(.top, Constants.topPadding)
 
-                        Text(localizable: .poolBalancesDesc)
-                            .zappFont(.body, style: ZappColors.textMuted)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.leading)
-                            .padding(.top, Design.Spacing._sm)
-                            .padding(.bottom, Design.Spacing._3xl)
+                    Text(localizable: .poolBalancesDesc)
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
+                        .padding(.top, Design.Spacing._md)
+                        .padding(.bottom, Design.Spacing._3xl)
 
+                    poolCard(
+                        title: String(localizable: .poolBalancesTotalBalance),
+                        balance: store.totalBalance,
+                        identifier: Accessibility.total,
+                        isTotal: true
+                    )
+                    .padding(.bottom, Constants.cardSpacing)
+
+                    HStack(spacing: Constants.cardSpacing) {
                         poolCard(
-                            title: String(localizable: .poolBalancesTotalBalance),
-                            balance: store.totalBalance,
-                            identifier: Accessibility.total,
-                            dimmedToken: true
+                            title: String(localizable: .poolBalancesIronwood),
+                            balance: store.ironwoodPoolBalance,
+                            identifier: Accessibility.ironwood
                         )
-                        .padding(.bottom, Constants.cardSpacing)
-
-                        HStack(spacing: Constants.cardSpacing) {
-                            poolCard(
-                                title: String(localizable: .poolBalancesIronwood),
-                                balance: store.ironwoodPoolBalance,
-                                identifier: Accessibility.ironwood
-                            )
-                            poolCard(
-                                title: String(localizable: .poolBalancesOrchard),
-                                balance: store.orchardPoolBalance,
-                                identifier: Accessibility.orchard
-                            )
-                        }
-                        .padding(.bottom, Constants.cardSpacing)
-
-                        HStack(spacing: Constants.cardSpacing) {
-                            poolCard(
-                                title: String(localizable: .poolBalancesSapling),
-                                balance: store.saplingPoolBalance,
-                                identifier: Accessibility.sapling
-                            )
-                            poolCard(
-                                title: String(localizable: .poolBalancesTransparent),
-                                balance: store.transparentPoolBalance,
-                                identifier: Accessibility.transparent
-                            )
-                        }
+                        poolCard(
+                            title: String(localizable: .poolBalancesOrchard),
+                            balance: store.orchardPoolBalance,
+                            identifier: Accessibility.orchard
+                        )
                     }
-                }
+                    .padding(.bottom, Constants.cardSpacing)
 
-                ZappButton(title: String(localizable: .poolBalancesGotIt), action: onDismiss)
-                    .accessibilityIdentifier(Accessibility.dismissButton)
-                    .padding(.top, Design.Spacing._2xl)
-                    .padding(.bottom, Design.Spacing.sheetBottomSpace)
+                    HStack(spacing: Constants.cardSpacing) {
+                        poolCard(
+                            title: String(localizable: .poolBalancesSapling),
+                            balance: store.saplingPoolBalance,
+                            identifier: Accessibility.sapling
+                        )
+                        poolCard(
+                            title: String(localizable: .poolBalancesTransparent),
+                            balance: store.transparentPoolBalance,
+                            identifier: Accessibility.transparent
+                        )
+                    }
+
+                    // Android scrolls the button with the content instead of pinning it, so a sheet
+                    // taller than its content never strands it against the bottom edge.
+                    ZappButton(title: String(localizable: .poolBalancesGotIt), action: onDismiss)
+                        .accessibilityIdentifier(Accessibility.dismissButton)
+                        .padding(.top, Design.Spacing._4xl)
+                }
+                .padding(.horizontal, Constants.contentPadding)
+                .padding(.bottom, Design.Spacing.sheetBottomSpace)
             }
-            .padding(.horizontal, Constants.contentPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(ZappColors.surface.color(colorScheme))
         }
@@ -107,11 +140,11 @@ struct PoolBalancesSheet: View {
         title: String,
         balance: Zatoshi,
         identifier: String,
-        dimmedToken: Bool = false
+        isTotal: Bool = false
     ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
-                .zappFont(.caption, style: ZappColors.textMuted)
+                .zappFont(.rowSubtitle, style: ZappColors.textMuted)
                 .padding(.bottom, Design.Spacing._sm)
 
             HStack(spacing: Design.Spacing._sm) {
@@ -119,9 +152,9 @@ struct PoolBalancesSheet: View {
                 // of rounding away zatoshi. `couldBeHidden` masks every card when privacy mode is on.
                 ZatoshiRepresentationView(
                     balance: balance,
-                    fontName: FontFamily.Inter.semiBold.name,
-                    mostSignificantFontSize: 16,
-                    leastSignificantFontSize: 12,
+                    fontName: FontFamily.Inter.black.name,
+                    mostSignificantFontSize: Constants.amountSize,
+                    leastSignificantFontSize: Constants.amountFractionSize,
                     format: .expanded,
                     couldBeHidden: true
                 )
@@ -129,7 +162,7 @@ struct PoolBalancesSheet: View {
 
                 if !isSensitiveContentHidden {
                     Text(tokenName)
-                        .zappFont(.rowTitle, style: dimmedToken ? ZappColors.textMuted : ZappColors.text)
+                        .zappFont(.rowTitle, style: ZappColors.text)
                 }
             }
 
@@ -140,12 +173,13 @@ struct PoolBalancesSheet: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Constants.cardHorizontalPadding)
-        .padding(.vertical, Constants.cardVerticalPadding)
-        .background(ZappColors.surfaceAlt.color(colorScheme))
+        .padding(Constants.cardPadding)
+        // Android's card sits on the same `surface` as the sheet; only the border separates it,
+        // and the total card takes a `text` border so it reads as the sum of the four below it.
+        .background(ZappColors.surface.color(colorScheme))
         .overlay {
             Rectangle()
-                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+                .strokeBorder((isTotal ? ZappColors.text : ZappColors.border).color(colorScheme), lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title)
@@ -178,4 +212,9 @@ struct PoolBalancesSheet: View {
             at: date.now()
         )
     }
+}
+
+private extension ZappTextStyle {
+    /// Android renders this heading as `sectionTitle` at Black weight (`BalanceBreakdownView.kt`).
+    static let sheetTitle = ZappTextStyle(weight: .black, size: 18, lineHeight: 24, tracking: -0.3)
 }

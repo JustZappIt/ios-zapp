@@ -2,13 +2,12 @@
 //  ChatProfileStore.swift
 //  Zapp
 //
-//  Your own chat identity: the display name peers see, the key they need to reach you,
-//  the wallet addresses they can pay, and the two privacy switches.
+//  Your own chat identity: the display name peers see and the key they need to reach you.
 //
 //  Mirrors Android's ChatProfileVM, including its secret-reveal surfaces (seed phrase,
 //  P2P wallet key) and Delete identity. The reveals are gated on the app lock and their
 //  contents are dropped the moment the app leaves the foreground — see
-//  `ChatProfileSecrets.swift`.
+//  `ChatProfileSecrets.swift`. Wallet addresses live on their own screen, `ChatWalletAddress`.
 //
 
 @preconcurrency import Combine
@@ -17,18 +16,6 @@ import Foundation
 
 @Reducer
 struct ChatProfile {
-    /// Android's `ChatProfileTab`.
-    enum Tab: Int, Equatable, CaseIterable {
-        case messagingID
-        case walletAddress
-    }
-
-    /// Android's `ChatProfileWalletSubTab`.
-    enum WalletSubTab: Int, Equatable, CaseIterable {
-        case shielded
-        case transparent
-    }
-
     /// Which secret a reveal is being authorised for.
     enum SecretTarget: Equatable {
         case seedPhrase
@@ -37,22 +24,17 @@ struct ChatProfile {
 
     @ObservableState
     struct State: Equatable {
-        @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount?
-
         var messagingCancelId = UUID()
 
-        /// The edited field. Sanitized on every keystroke, so it is always a candidate name.
+        /// What the worklet has persisted. Never assumed to satisfy `UsernameRules` — it was
+        /// written by whatever version of the app created the identity.
         var displayName = ""
 
-        /// What the worklet has actually persisted. The baseline for "changed", and the value the
-        /// field is re-seeded from — never assumed to satisfy `UsernameRules`, since it was written
-        /// by whatever version of the app created the identity.
-        var savedDisplayName = ""
-
         var publicKey = ""
-        var isSaving = false
-        var saveFailed = false
         var didCopy = false
+
+        /// Non-nil only while the edit-name modal is up.
+        var editName: EditName?
 
         var readReceiptsEnabled = true
         var presenceVisible = true
@@ -64,10 +46,6 @@ struct ChatProfile {
         var isReadReceiptsBusy = false
         var isPresenceBusy = false
         var isBackgroundNotificationsBusy = false
-
-        var activeTab = Tab.messagingID
-        var walletSubTab = WalletSubTab.shielded
-        var didCopyAddress = false
 
         // MARK: Secret reveal — see ChatProfileSecrets.swift
 
@@ -99,6 +77,18 @@ struct ChatProfile {
 
         @Presents var alert: AlertState<Action>?
 
+        /// The display-name editor. Keeping the draft in here rather than beside `displayName` is
+        /// what stops an incoming identity-stream emission from overwriting an edit in progress.
+        struct EditName: Equatable {
+            var draft = ""
+            var isSaving = false
+            var failed = false
+
+            /// Android enables Save for any valid value, changed or not, and lets the SDK absorb
+            /// the no-op.
+            var canSave: Bool { UsernameRules.isValid(draft) && !isSaving }
+        }
+
         struct PINEntry: Equatable {
             var pin = ""
             var errorMessage: String?
@@ -106,33 +96,17 @@ struct ChatProfile {
             var isVerifying = false
         }
 
-        var isNameValid: Bool { UsernameRules.isValid(displayName) }
-        var isNameChanged: Bool { displayName != savedDisplayName }
-        var canSave: Bool { isNameValid && isNameChanged && !isSaving }
         var hasPublicKey: Bool { !publicKey.isEmpty }
-
-        var shieldedAddress: String? { zashiWalletAccount?.unifiedAddress }
-        var transparentAddress: String? { zashiWalletAccount?.transparentAddress }
-
-        var selectedWalletAddress: String? {
-            switch walletSubTab {
-            case .shielded: return shieldedAddress
-            case .transparent: return transparentAddress
-            }
-        }
-
-        /// Android only offers the sub-tabs once there is a shielded address to switch away from.
-        var showsWalletSubTabs: Bool { activeTab == .walletAddress && shieldedAddress != nil }
-
-        /// Android shows the P2P key row on the wallet tab only — it is a wallet key, not a
-        /// messaging one. The seed phrase backs up both identities, so it is always offered.
-        var showsP2PKeyRow: Bool { activeTab == .walletAddress }
 
         var showsSeedDialog: Bool { !seedWords.isEmpty }
         var showsP2PKeyDialog: Bool { p2pKey != nil }
 
         /// Any surface that must never be photographed, recorded, or left up in the app switcher.
         var isShowingSecret: Bool { showsSeedDialog || showsP2PKeyDialog }
+
+        /// Interactive back must not slip out from under a modal — least of all out from under a
+        /// save in flight or a revealed secret.
+        var isModalPresented: Bool { editName != nil || pinEntry != nil || isShowingSecret }
 
         init() { }
     }
@@ -142,12 +116,10 @@ struct ChatProfile {
         case onDisappear
         case backToHomeTapped
         case messagingStateChanged(ZappMessagingState)
-        case displayNameChanged(String)
-        case saveTapped
-        case saveSucceeded(String)
-        case saveFailed
         case copyPublicKeyTapped
         case copyIndicatorExpired
+        /// Consumed by Root, which pushes the wallet-address screen.
+        case walletAddressTapped
         case readReceiptsToggled
         case readReceiptsFinished(Bool)
         case presenceToggled
@@ -155,10 +127,13 @@ struct ChatProfile {
         case backgroundNotificationsToggled
         case backgroundNotificationsFinished(Bool)
 
-        case tabSelected(Tab)
-        case walletSubTabSelected(WalletSubTab)
-        case copyAddressTapped
-        case copyAddressIndicatorExpired
+        // MARK: Display name editor
+        case editDisplayNameTapped
+        case editDisplayNameChanged(String)
+        case editDisplayNameSaveTapped
+        case editDisplayNameDismissed
+        case saveSucceeded(String)
+        case saveFailed
 
         case deleteIdentityTapped
         /// Consumed by Root, which runs the same full reset the Settings path uses.
@@ -200,7 +175,6 @@ struct ChatProfile {
 
     enum CancelID {
         case copyIndicator
-        case addressCopyIndicator
         case p2pCopyIndicator
         case pinLockout
     }
@@ -209,7 +183,7 @@ struct ChatProfile {
         secretsReduce()
         identityReduce()
         displayNameReduce()
-        surfaceReduce()
+        publicKeyCopyReduce()
         privacyReduce()
         deleteReduce()
             .ifLet(\.$alert, action: \.alert)
@@ -217,15 +191,10 @@ struct ChatProfile {
 }
 
 private extension ChatProfile {
-    /// Adopts the worklet's view of the identity without stepping on an edit in progress: the field
-    /// only follows the persisted name while the two agree.
+    /// Adopts the worklet's view of the identity.
     func seed(_ state: inout State, from messagingState: ZappMessagingState) {
         if let identity = messagingState.identity {
-            if state.displayName == state.savedDisplayName {
-                state.displayName = identity.displayName
-            }
-
-            state.savedDisplayName = identity.displayName
+            state.displayName = identity.displayName
             state.publicKey = identity.publicKey
         }
 
@@ -254,11 +223,14 @@ private extension ChatProfile {
                 .cancellable(id: state.messagingCancelId, cancelInFlight: true)
 
                 // Leaving the screen drops the secrets too — see `ChatProfileSecrets.swift`.
+                // `didCopy` is cleared alongside its timer: cancelling the one without the other
+                // leaves the button reading "Copied" for as long as the state survives.
             case .onDisappear:
+                state.didCopy = false
+
                 return .merge(
                     .cancel(id: state.messagingCancelId),
                     .cancel(id: CancelID.copyIndicator),
-                    .cancel(id: CancelID.addressCopyIndicator),
                     .send(.hideSensitiveContent)
                 )
 
@@ -272,24 +244,30 @@ private extension ChatProfile {
         }
     }
 
-    /// The display-name editor.
+    /// The display-name editor, presented as a modal over the profile.
     func displayNameReduce() -> Reduce<State, Action> {
         Reduce { state, action in
             switch action {
-            case .displayNameChanged(let value):
-                state.displayName = UsernameRules.sanitize(value)
-                state.saveFailed = false
+                // Every opening starts from the persisted name — which predates `UsernameRules`
+                // on an old identity, so it is sanitized on the way in.
+            case .editDisplayNameTapped:
+                state.editName = State.EditName(draft: UsernameRules.sanitize(state.displayName))
                 return .none
 
-            case .saveTapped:
-                guard state.canSave else { return .none }
+            case .editDisplayNameChanged(let value):
+                state.editName?.draft = UsernameRules.sanitize(value)
+                state.editName?.failed = false
+                return .none
 
-                let name = state.displayName
-                state.isSaving = true
-                state.saveFailed = false
+            case .editDisplayNameSaveTapped:
+                guard let editName = state.editName, editName.canSave else { return .none }
+
+                let name = editName.draft
+                state.editName?.isSaving = true
+                state.editName?.failed = false
 
                 // The SDK only adopts the name once the worklet echoes it back, so a throw means
-                // nothing persisted: the field stays dirty and the user keeps their edit.
+                // nothing persisted: the modal stays open and the user keeps their edit.
                 return .run { send in
                     do {
                         try await zappMessaging.updateDisplayName(name)
@@ -301,14 +279,21 @@ private extension ChatProfile {
                 }
 
             case .saveSucceeded(let name):
-                state.isSaving = false
-                state.savedDisplayName = name
                 state.displayName = name
+                state.editName = nil
                 return .none
 
             case .saveFailed:
-                state.isSaving = false
-                state.saveFailed = true
+                state.editName?.isSaving = false
+                state.editName?.failed = true
+                return .none
+
+                // A save in flight owns the modal: dismissing under it would strand a write whose
+                // result nothing is left to show.
+            case .editDisplayNameDismissed:
+                guard state.editName?.isSaving == false else { return .none }
+
+                state.editName = nil
                 return .none
 
             default:
@@ -317,19 +302,10 @@ private extension ChatProfile {
         }
     }
 
-    /// Tabs and the two "copy, then flash a tick" affordances.
-    func surfaceReduce() -> Reduce<State, Action> {
+    /// Copy the key, then flash a tick.
+    func publicKeyCopyReduce() -> Reduce<State, Action> {
         Reduce { state, action in
             switch action {
-            case .tabSelected(let tab):
-                state.activeTab = tab
-                return .none
-
-            case .walletSubTabSelected(let tab):
-                state.walletSubTab = tab
-                state.didCopyAddress = false
-                return .none
-
             case .copyPublicKeyTapped:
                 guard state.hasPublicKey else { return .none }
 
@@ -344,22 +320,6 @@ private extension ChatProfile {
 
             case .copyIndicatorExpired:
                 state.didCopy = false
-                return .none
-
-            case .copyAddressTapped:
-                guard let address = state.selectedWalletAddress, !address.isEmpty else { return .none }
-
-                pasteboard.setString(RedactableString(address))
-                state.didCopyAddress = true
-
-                return .run { send in
-                    try await mainQueue.sleep(for: .seconds(2))
-                    await send(.copyAddressIndicatorExpired)
-                }
-                .cancellable(id: CancelID.addressCopyIndicator, cancelInFlight: true)
-
-            case .copyAddressIndicatorExpired:
-                state.didCopyAddress = false
                 return .none
 
             default:
@@ -384,10 +344,8 @@ private extension ChatProfile {
                 state.alert = nil
                 return .none
 
-                // Root runs the reset; nothing to do locally.
-            case .alert, .deleteIdentityConfirmed, .backToHomeTapped:
-                return .none
-
+                // `deleteIdentityConfirmed`, `walletAddressTapped` and `backToHomeTapped` are
+                // Root's: it owns the reset and the navigation behind them.
             default:
                 return .none
             }

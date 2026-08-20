@@ -28,6 +28,11 @@ struct WalletBalances {
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         var shieldedBalance: Zatoshi
         var shieldedWithPendingBalance: Zatoshi
+        /// Shielded value that has arrived but is not yet spendable: change awaiting confirmation
+        /// plus value awaiting spendability. Deliberately NOT `shieldedWithPendingBalance -
+        /// shieldedBalance` — `PoolBalance.total()` also carries `lockedValue`, the migration
+        /// residual lock, which is settled wallet value and must not be counted as pending.
+        var pendingShieldedBalance: Zatoshi = .zero
         var spendability: Spendability = .everything
         var totalBalance: Zatoshi
         var transparentBalance: Zatoshi
@@ -230,6 +235,8 @@ struct WalletBalances {
                 // shielded pool) instead of hand-summing individual pools.
                 state.shieldedBalance = accountBalance?.shieldedSpendableValue ?? .zero
                 state.shieldedWithPendingBalance = accountBalance?.shieldedTotal() ?? .zero
+                state.pendingShieldedBalance = (accountBalance?.shieldedChangePendingConfirmation ?? .zero)
+                    + (accountBalance?.shieldedValuePendingSpendability ?? .zero)
                 state.transparentBalance = accountBalance?.unshielded ?? .zero
                 state.totalBalance = state.shieldedWithPendingBalance + state.transparentBalance + (accountBalance?.awaitingResolution ?? .zero)
                 state.saplingPoolBalance = accountBalance?.saplingBalance.total() ?? .zero

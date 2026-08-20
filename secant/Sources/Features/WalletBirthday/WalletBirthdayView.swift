@@ -52,30 +52,34 @@ struct WalletBirthdayView: View {
                     .zFont(size: 12, style: Design.Text.tertiary)
                 
                 Spacer()
+
+                // Android stacks the secondary CTA above the primary, both full width
+                // (`RestoreBDHeightView.kt`), and so does upstream. The dock holds exactly one
+                // primary action — a second button crammed into that row demands more width than
+                // the screen has, which pushes the whole content column out and clips it on both
+                // edges rather than truncating the button.
+                if !store.isKeystoneFlow && !store.isResyncFlow && !keyboardVisible {
+                    ZashiButton(
+                        String(localizable: .restoreWalletBirthdayEstimate),
+                        type: .ghost
+                    ) {
+                        store.send(.estimateHeightTapped)
+                    }
+                    .padding(.bottom, 12)
+                }
             }
             .zashiBack(
                 primaryAction: {
-                    HStack(spacing: 12) {
-                        if !store.isKeystoneFlow && !store.isResyncFlow && !keyboardVisible {
-                            ZashiButton(
-                                String(localizable: .restoreWalletBirthdayEstimate),
-                                type: .ghost
-                            ) {
-                                store.send(.estimateHeightTapped)
-                            }
-                        }
-
-                        ZashiButton(
-                            store.isKeystoneFlow
-                            ? String(localizable: .keystoneAddHWWalletConnect)
-                            : store.isResyncFlow
-                            ? String(localizable: .generalConfirm)
-                            : String(localizable: .importWalletButtonRestoreWallet)
-                        ) {
-                            store.send(.restoreTapped)
-                        }
-                        .disabled(!store.isValidBirthday)
+                    ZashiButton(
+                        store.isKeystoneFlow
+                        ? String(localizable: .keystoneAddHWWalletConnect)
+                        : store.isResyncFlow
+                        ? String(localizable: .generalConfirm)
+                        : String(localizable: .importWalletButtonRestoreWallet)
+                    ) {
+                        store.send(.restoreTapped)
                     }
+                    .disabled(!store.isValidBirthday)
                 }
             )
             .onAppear {
