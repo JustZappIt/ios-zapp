@@ -860,14 +860,14 @@ extension Root {
         userDefaults.remove(Constants.udIsResyncingWallet)
         userDefaults.remove(Constants.udLeavesScreenOpen)
 
-        // Authentication lockout is device-scoped, independent of the disabled Voting feature.
-        // Keep these outside and above VOTING_ENABLED so wallet reset always clears them.
+        // Authentication lockout is device-scoped and unrelated to Voting. Keep these outside
+        // and above VOTING_ENABLED so wallet reset always clears them.
         userDefaults.remove(.appAuthenticationMethod)
         userDefaults.remove(.failedPINAttempts)
         userDefaults.remove(.pinLockoutEndTimestamp)
 
-        // Keep clearing the user-supplied service override even while Voting is compiled out. It
-        // must not silently become active for a different wallet if the feature is re-enabled.
+        // Keep clearing the user-supplied service override even in builds without Voting. It must
+        // not silently become active for a different wallet in a build that does have Voting.
         userDefaults.remove(.votingConfigOverrideURL)
 
         #if VOTING_ENABLED
