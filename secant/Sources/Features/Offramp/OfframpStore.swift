@@ -68,7 +68,10 @@ struct Offramp {
         }
 
         init(page: Page = .amount, corridorContext: CorridorContext = .settings) {
-            let saved = UserDefaults.standard.string(forKey: Offramp.currencyPreferenceKey) ?? "INR"
+            @Dependency(\.userStoredPreferences) var userStoredPreferences
+            // A Peer selection carries no p2p.me corridor, so this screen shows the default one:
+            // the rail it belongs to is chosen in P2P payment method, not here.
+            let saved = (userStoredPreferences.p2pRail() ?? .default).scanAndPayCurrencyCode
             self.page = page
             self.corridorContext = corridorContext
             self.selectedCurrencyCode = saved
@@ -141,6 +144,7 @@ struct Offramp {
     }
 
     @Dependency(\.offramp) var offramp
+    @Dependency(\.userStoredPreferences) var userStoredPreferences
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.continuousClock) var continuousClock
 
@@ -220,7 +224,7 @@ struct Offramp {
             case .saveCorridorTapped:
                 guard state.canSaveCorridor else { return .none }
                 state.selectedCurrencyCode = state.draftCurrencyCode
-                UserDefaults.standard.set(state.selectedCurrencyCode, forKey: Self.currencyPreferenceKey)
+                userStoredPreferences.setP2pRail(.scanAndPay(currencyCode: state.selectedCurrencyCode))
                 state.quote = nil
                 state.errorMessage = nil
                 if state.corridorContext == .payment {
@@ -689,8 +693,6 @@ struct Offramp {
             }
         }
     }
-
-    fileprivate static let currencyPreferenceKey = "zapp.offramp.currency"
 
     private static func sanitizedAmount(_ value: String) -> String {
         var seenSeparator = false

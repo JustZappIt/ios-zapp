@@ -21,6 +21,8 @@ extension UserPreferencesStorageClient: TestDependencyKey {
             setAutomaticServerSelection: { mock.setAutomaticServerSelection($0) },
             portfolioChartEnabled: { mock.portfolioChartEnabled },
             setPortfolioChartEnabled: { mock.setPortfolioChartEnabled($0) },
+            p2pRail: { mock.p2pRail },
+            setP2pRail: { mock.setP2pRail($0) },
             exchangeRate: { mock.exchangeRate },
             setExchangeRate: mock.setExchangeRate(_:),
             removeAll: mock.removeAll

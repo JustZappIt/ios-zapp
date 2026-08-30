@@ -273,9 +273,43 @@ extension Root {
                 exchangeRate.refreshExchangeRateUSD()
                 return .none
 
+                // The primary action resolves the stored rail rather than assuming one. A Peer
+                // selection can outlive the build that offered it — a flavour switch leaves it
+                // behind — so availability is confirmed before the flow opens, not after.
             case .home(.payWithNearTapped):
+                let isSoftwareWallet = state.selectedWalletAccount?.vendor == .zcash
+                return .run { send in
+                    guard
+                        isSoftwareWallet,
+                        case let .peerCashOut(destinationCode) = userStoredPreferences.p2pRail() ?? .default,
+                        try await peerCashOut.capabilities().isAvailable
+                    else {
+                        return await send(.openScanAndPay)
+                    }
+                    await send(.openPeerCashOut(destinationCode: destinationCode))
+                } catch: { _, send in
+                    await send(.openScanAndPay)
+                }
+
+            case .openScanAndPay:
                 state.offrampState = .initial(page: .amount, corridorContext: .payment)
                 state.path = .offramp
+                return .none
+
+            case let .openPeerCashOut(destinationCode):
+                state.peerCashOutState = PeerCashOut.State(destinationCode: destinationCode)
+                state.path = .peerCashOut
+                return .none
+
+                // Topping up is the off-ramp's bridge screen with its own progress and its own
+                // authentication; a cash-out never starts one behind the user's back.
+            case .peerCashOut(.delegate(.topUp)):
+                state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.path = .offramp
+                return .send(.offramp(.addFundsTapped))
+
+            case .peerCashOut(.delegate(.close)), .p2pPaymentMethod(.delegate(.close)):
+                state.path = nil
                 return .none
 
             case .home(.buyTapped):
@@ -724,8 +758,8 @@ extension Root {
                 return .none
 
             case .zappTabs(.p2pPaymentMethodTapped):
-                state.offrampState = .initial(page: .corridors)
-                state.path = .offramp
+                state.p2pPaymentMethodState = .initial
+                state.path = .p2pPaymentMethod
                 return .none
 
             case .zappTabs(.p2pTransactionsTapped):
@@ -1098,6 +1132,9 @@ extension Root {
         state.homeState.transactionListState.isInvalidated = true
         state.transactionsCoordFlowState.transactionsManagerState.isInvalidated = true
         return .merge(
+            // Cancels and joins the Base rails, including any Peer cash-out still driving the
+            // previous wallet's smart account. The rails rebuild lazily on the next P2P screen.
+            .run { _ in await offramp.invalidateSession() },
             .send(.home(.smartBanner(.walletAccountChanged))),
             .send(.home(.walletBalances(.updateBalances))),
             .concatenate(

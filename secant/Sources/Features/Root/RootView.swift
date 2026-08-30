@@ -201,6 +201,24 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .peerCashOut {
+                                PeerCashOutView(
+                                    store: store.scope(
+                                        state: \.peerCashOutState,
+                                        action: \.peerCashOut
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .p2pPaymentMethod {
+                                P2pPaymentMethodView(
+                                    store: store.scope(
+                                        state: \.p2pPaymentMethodState,
+                                        action: \.p2pPaymentMethod
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .onramp {
                                 OnrampView(
                                     store: store.scope(

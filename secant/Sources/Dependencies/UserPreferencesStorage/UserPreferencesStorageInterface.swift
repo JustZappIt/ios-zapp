@@ -26,6 +26,9 @@ struct UserPreferencesStorageClient {
     var portfolioChartEnabled: @Sendable () -> Bool = { true }
     var setPortfolioChartEnabled: @Sendable (Bool) -> Void
 
+    var p2pRail: @Sendable () -> P2pRail? = { nil }
+    var setP2pRail: @Sendable (P2pRail) -> Void
+
     var exchangeRate: @Sendable () -> UserPreferencesStorage.ExchangeRate? = { nil }
     var setExchangeRate: @Sendable (UserPreferencesStorage.ExchangeRate) throws -> Void
 

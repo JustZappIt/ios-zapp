@@ -21,6 +21,10 @@ struct UserPreferencesStorage {
         case ups_server
         case ups_automaticServerSelection
         case ups_portfolioChartEnabled
+        /// The selected P2P rail. The key predates the typed rail — it held a bare currency code
+        /// when p2p.me was the only product — and is kept so an existing selection survives the
+        /// upgrade instead of silently resetting to the default corridor.
+        case ups_p2pRail = "zapp.offramp.currency"
     }
 
     enum UserPreferencesStorageError: Error {
@@ -72,6 +76,16 @@ struct UserPreferencesStorage {
 
     func setAutomaticServerSelection(_ enabled: Bool) {
         setValue(enabled, forKey: Constants.ups_automaticServerSelection.rawValue)
+    }
+
+    /// Nil only when nothing has ever been chosen; a value that no longer parses reads as nil too,
+    /// so the caller falls back rather than opening a flow the build does not have.
+    var p2pRail: P2pRail? {
+        (userDefaults.objectForKey(Constants.ups_p2pRail.rawValue) as? String).flatMap(P2pRail.init(id:))
+    }
+
+    func setP2pRail(_ rail: P2pRail) {
+        setValue(rail.id, forKey: Constants.ups_p2pRail.rawValue)
     }
 
     var portfolioChartEnabled: Bool {
