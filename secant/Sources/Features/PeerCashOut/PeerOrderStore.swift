@@ -89,6 +89,7 @@ struct PeerOrderDetail {
         case backTapped
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case close
         }

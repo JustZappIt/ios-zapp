@@ -210,6 +210,15 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .p2pActivity {
+                                P2pActivityView(
+                                    store: store.scope(
+                                        state: \.p2pActivityState,
+                                        action: \.p2pActivity
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .p2pPaymentMethod {
                                 P2pPaymentMethodView(
                                     store: store.scope(

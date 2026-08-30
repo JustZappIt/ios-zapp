@@ -37,6 +37,7 @@ struct P2pPaymentMethod {
         case backTapped
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case close
         }

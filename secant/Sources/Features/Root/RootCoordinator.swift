@@ -308,9 +308,33 @@ extension Root {
                 state.path = .offramp
                 return .send(.offramp(.addFundsTapped))
 
-            case .peerCashOut(.delegate(.close)), .p2pPaymentMethod(.delegate(.close)):
+            case .peerCashOut(.delegate(.close)),
+                 .p2pPaymentMethod(.delegate(.close)),
+                 .p2pActivity(.delegate(.close)):
                 state.path = nil
                 return .none
+
+            case let .p2pActivity(.delegate(.openPeerAttempt(attemptID))):
+                state.peerCashOutState.progress = PeerCashOutProgress.State(attemptID: attemptID)
+                state.path = .peerCashOut
+                return .none
+
+            case let .p2pActivity(.delegate(.openPeerOrder(depositID))):
+                state.peerCashOutState.order = PeerOrderDetail.State(depositID: depositID)
+                state.path = .peerCashOut
+                return .none
+
+                // The p2p.me recovery actions stay in the off-ramp, which already owns their
+                // progress stream; the activity feed only routes into them.
+            case let .p2pActivity(.delegate(.recoverScanAndPayOrder(orderID))):
+                state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.path = .offramp
+                return .send(.offramp(.recoverTapped(orderID)))
+
+            case .p2pActivity(.delegate(.refundToZec)):
+                state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.path = .offramp
+                return .send(.offramp(.refundTapped))
 
             case .home(.buyTapped):
                 state.onrampState = .initial(currencyCode: state.offrampState.selectedCurrencyCode)
@@ -762,9 +786,9 @@ extension Root {
                 state.path = .p2pPaymentMethod
                 return .none
 
-            case .zappTabs(.p2pTransactionsTapped):
-                state.offrampState = .initial(page: .history)
-                state.path = .offramp
+            case .zappTabs(.p2pTransactionsTapped), .offramp(.delegate(.openActivity)):
+                state.p2pActivityState = .initial
+                state.path = .p2pActivity
                 return .none
 
             case .zappTabs(.readReceiptsTapped):

@@ -134,6 +134,7 @@ struct PeerCashOutForm {
         case backTapped
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case close
             case topUp

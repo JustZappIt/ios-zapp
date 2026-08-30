@@ -16,7 +16,6 @@ struct Offramp {
         case amount
         case topUp
         case progress
-        case history
     }
 
     @ObservableState
@@ -30,7 +29,6 @@ struct Offramp {
         var fiatAmount = ""
         var quote: OfframpQuoteModel?
         var progress: [OfframpProgressModel] = []
-        var history: [OfframpHistoryModel] = []
         var isLoading = false
         var errorMessage: String?
         var hasCheckpoint = false
@@ -48,7 +46,6 @@ struct Offramp {
         var isTopUpConfirmationPresented = false
         var isTopUpDiscardConfirmationPresented = false
         var bridgePreview: OfframpBridgePreview?
-        var historyReturnPage: Page?
         var isTopUpAmountInsufficient = false
         var isTopUpValidationLoading = false
         var topUpValidatedMicros: String?
@@ -117,8 +114,7 @@ struct Offramp {
         case topUpDismissed
         case progressReceived(OfframpProgressModel)
         case progressFinished
-        case historyTapped
-        case historyLoaded([OfframpHistoryModel])
+        case activityTapped
         case recoverTapped(String?)
         case refundTapped
         case refundPreviewLoaded(OfframpBridgePreview)
@@ -140,10 +136,16 @@ struct Offramp {
         case retryTapped
         case delegate(Delegate)
 
-        enum Delegate: Equatable { case close }
+        enum Delegate: Equatable {
+            case close
+            /// P2P history is one unified feed now, so this screen hands it over rather than
+            /// carrying a second copy of the list beside it.
+            case openActivity
+        }
     }
 
     @Dependency(\.offramp) var offramp
+    @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.userStoredPreferences) var userStoredPreferences
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.continuousClock) var continuousClock
@@ -171,12 +173,7 @@ struct Offramp {
                             try await checkpointCurrency,
                             try await topUpCheckpoint
                         ))
-                        if page == .history {
-                            async let history = offramp.history()
-                            async let account = offramp.accountSummary()
-                            await send(.historyLoaded(try await history))
-                            await send(.accountLoaded(try await account))
-                        } else if page == .corridors || page == .amount || page == .topUp {
+                        if page == .corridors || page == .amount || page == .topUp {
                             await send(.accountLoaded(try await offramp.accountSummary()))
                         }
                     } catch {
@@ -520,22 +517,8 @@ struct Offramp {
                 }
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
-            case .historyTapped:
-                state.historyReturnPage = state.page
-                state.page = .history
-                state.isLoading = true
-                return .run { send in
-                    do {
-                        await send(.historyLoaded(try await offramp.history()))
-                    }
-                    catch { await send(.loadFailed(error.localizedDescription)) }
-                }
-                .cancellable(id: CancelID.request, cancelInFlight: true)
-
-            case .historyLoaded(let history):
-                state.history = history
-                state.isLoading = false
-                return .none
+            case .activityTapped:
+                return .send(.delegate(.openActivity))
 
             case .recoverTapped(let orderId):
                 state.page = .progress
@@ -547,17 +530,24 @@ struct Offramp {
                         for await status in stream { await send(.progressReceived(status)) }
                         await send(.progressFinished)
                     } catch OfframpClientError.authenticationCancelled {
-                        await send(.operationCancelled(.history))
+                        await send(.operationCancelled(.amount))
                     } catch { await send(.loadFailed(error.localizedDescription)) }
                 }
                 .cancellable(id: CancelID.operation, cancelInFlight: true)
 
             case .refundTapped:
-                guard state.account?.canRefundToZec == true else { return .none }
                 state.isLoading = true
                 state.errorMessage = nil
                 return .run { send in
-                    do { await send(.refundPreviewLoaded(try await offramp.previewRefund())) }
+                    do {
+                        // The single gate every refund passes through, so the check holds whichever
+                        // screen started it. A Peer cash-out that has not escrowed its amount yet
+                        // and a refund would both spend the same Base USDC.
+                        if try await peerCashOut.spendableBalance().committed != nil {
+                            return await send(.loadFailed(String(localizable: .p2pActivityRefundBlockedByPeer)))
+                        }
+                        await send(.refundPreviewLoaded(try await offramp.previewRefund()))
+                    }
                     catch { await send(.loadFailed(error.localizedDescription)) }
                 }
                 .cancellable(id: CancelID.request, cancelInFlight: true)
@@ -676,12 +666,7 @@ struct Offramp {
                         .cancel(id: CancelID.request),
                         .send(.delegate(.close))
                     )
-                case .history where state.historyReturnPage != nil:
-                    state.page = state.historyReturnPage ?? .amount
-                    state.historyReturnPage = nil
-                    state.errorMessage = nil
-                    return .none
-                case .corridors, .history, .progress:
+                case .corridors, .progress:
                     return .send(.delegate(.close))
                 }
 
@@ -690,6 +675,9 @@ struct Offramp {
 
             case .delegate(.close):
                 return .send(.cancelAll)
+
+            case .delegate(.openActivity):
+                return .none
             }
         }
     }

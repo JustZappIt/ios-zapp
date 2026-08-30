@@ -40,6 +40,7 @@ struct PeerCashOut {
         case order(PeerOrderDetail.Action)
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case close
             case topUp

@@ -20,9 +20,12 @@ struct UsdcAmount: Equatable, Comparable, Sendable {
         self.micros = micros
     }
 
-    /// The wire form. Rejects negatives, fractions and anything a chain read never produces.
+    /// The wire form: plain digits, which is all a chain read ever produces. Deliberately stricter
+    /// than `Decimal(string:)`, which also accepts signs, separators and exponents — `1e6` parsing
+    /// as a million is a reasonable thing for a formatter to do and a terrible thing for a balance.
     init?(micros: String) {
-        guard let value = Decimal(string: micros), value >= 0, value == value.rounded(.down) else { return nil }
+        guard !micros.isEmpty, micros.allSatisfy(\.isASCII), micros.allSatisfy(\.isNumber) else { return nil }
+        guard let value = Decimal(string: micros) else { return nil }
         self.micros = value
     }
 

@@ -25,6 +25,7 @@ struct Root {
             case newChat
             case onramp
             case offramp
+            case p2pActivity
             case p2pPaymentMethod
             case peerCashOut
             case currencyConversionSetup
@@ -201,6 +202,7 @@ struct Root {
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
+        var p2pActivityState = P2pActivity.State.initial
         var p2pPaymentMethodState = P2pPaymentMethod.State.initial
         /// Built when a cash-out is opened, because it is scoped to one destination and carries the
         /// screens pushed on top of it.
@@ -264,7 +266,7 @@ struct Root {
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
-                 .newChat, .currencyConversionSetup, .p2pPaymentMethod, .portfolioChartSetup, .receive,
+                 .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -399,6 +401,7 @@ struct Root {
         case offramp(Offramp.Action)
         case openPeerCashOut(destinationCode: String)
         case openScanAndPay
+        case p2pActivity(P2pActivity.Action)
         case p2pPaymentMethod(P2pPaymentMethod.Action)
         case peerCashOut(PeerCashOut.Action)
         case receive(Receive.Action)
@@ -613,6 +616,10 @@ struct Root {
 
         Scope(state: \.onrampState, action: \.onramp) {
             Onramp()
+        }
+
+        Scope(state: \.p2pActivityState, action: \.p2pActivity) {
+            P2pActivity()
         }
 
         Scope(state: \.p2pPaymentMethodState, action: \.p2pPaymentMethod) {

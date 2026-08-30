@@ -70,6 +70,7 @@ struct PeerCashOutProgress {
         case backTapped
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case close
             case openOrder(depositID: String)
