@@ -15,6 +15,11 @@ private struct OfframpStoragePayload: Codable {
     var checkpointJSON: String?
     var topUpCheckpointJSON: String?
     var refundCheckpointJSON: String?
+    /// Peer's two books, opaque here: their shape, their locking and their privacy rules live in
+    /// the KMP facade, so there is one implementation of them rather than one per platform.
+    /// Optional, so a payload written before Peer existed still decodes.
+    var peerCheckpointBookJSON: String?
+    var peerPayeeBookJSON: String?
 }
 
 enum OfframpStorageError: Error {
@@ -25,7 +30,11 @@ enum OfframpStorageError: Error {
 }
 
 /// Wallet-scoped encrypted storage. Unknown payload versions throw and are never overwritten.
-final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked Sendable {
+///
+/// Peer shares this file rather than opening its own. Both rails spend from one Base smart account,
+/// so their records are only ever read and written together, and a second envelope would mean a
+/// second lock, a second key and a second chance for a wallet reset to clear one and miss the other.
+final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCashOutStorage, @unchecked Sendable {
     private let lock = NSLock()
     private let key: AddressBookKey
     private let fileURL: URL
@@ -100,6 +109,26 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
 
     func clearRefundCheckpoint() throws {
         try mutate { $0.refundCheckpointJSON = nil }
+    }
+
+    // MARK: - Peer
+
+    func peerCheckpointBookJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.peerCheckpointBookJSON })
+    }
+
+    func storePeerCheckpointBookJson(value: String) throws {
+        try mutate { $0.peerCheckpointBookJSON = value }
+    }
+
+    func peerPayeeBookJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.peerPayeeBookJSON })
+    }
+
+    /// Raw payment handles. They never reach a checkpoint, a log, a diagnostic or a support export
+    /// — only the curator hash does — so this slot is the one place they exist on the device.
+    func storePeerPayeeBookJson(value: String) throws {
+        try mutate { $0.peerPayeeBookJSON = value }
     }
 
     private func withPayload<T>(_ body: (OfframpStoragePayload) -> T?) throws -> T? {

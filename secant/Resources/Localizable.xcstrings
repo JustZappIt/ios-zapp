@@ -33291,6 +33291,40 @@
           }
         }
       }
+    },
+    "peer.error.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer cash-out is only available on Base mainnet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El cobro con Peer solo está disponible en Base mainnet."
+          }
+        }
+      }
+    },
+    "peer.error.authenticationCancelled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication was cancelled. Nothing was sent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se canceló la autenticación. No se envió nada."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
