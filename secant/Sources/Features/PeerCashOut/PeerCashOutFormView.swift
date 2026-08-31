@@ -8,12 +8,23 @@ struct PeerCashOutFormView: View {
 
     @Perception.Bindable var store: StoreOf<PeerCashOutForm>
 
+    @State private var isInfoPresented = false
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZappScreenHeader(
                     title: String(localizable: .peerFormTitle(PeerDestination.displayName(for: store.destinationCode)))
-                )
+                ) {
+                    Button { isInfoPresented = true } label: {
+                        Asset.Assets.infoCircle.image
+                            .zImage(width: 20, height: 20, style: ZappColors.text)
+                            .frame(width: 32, height: 32)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.zappPress)
+                    .accessibilityLabel(String(localizable: .peerFormInfoAccessibility))
+                }
 
                 GeometryReader { geometry in
                     ScrollView {
@@ -27,7 +38,6 @@ struct PeerCashOutFormView: View {
                             openOrders
 
                             Spacer(minLength: 16)
-                            terms.padding(.bottom, 4)
                         }
                         .frame(minHeight: geometry.size.height, alignment: .top)
                         .padding(.horizontal, 18)
@@ -43,22 +53,24 @@ struct PeerCashOutFormView: View {
                 }
             }
             .applyScreenBackground()
+            .sheet(isPresented: $isInfoPresented) { infoSheet }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
         }
     }
 
+    /// Symbol, field, then the balance — Android's `ZappOfframpHeroAmountField` order, so the
+    /// balance sits against the field it caps rather than in the label row above it.
     private var amountHero: some View {
-        VStack(spacing: 6) {
-            HStack {
-                Text(String(localizable: .peerFormAmountLabel))
-                    .zappFont(.eyebrow, style: ZappColors.textMuted)
-                Spacer()
-                Text(availableLabel)
-                    .zappFont(.caption, style: ZappColors.textMuted)
-            }
+        VStack(alignment: .leading, spacing: 6) {
+            Text(String(localizable: .peerFormAmountLabel))
+                .zappFont(.eyebrow, style: ZappColors.textMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
+            HStack(alignment: .center, spacing: 8) {
+                Text(String(localizable: .peerUsdcTicker))
+                    .zappFont(.displaySecondary, style: ZappColors.textMuted)
+
                 TextField("0", text: Binding(
                     get: { store.amountInput },
                     set: { store.send(.amountChanged($0)) }
@@ -68,8 +80,7 @@ struct PeerCashOutFormView: View {
                 .zappFont(.display, style: ZappColors.text)
                 .accessibilityLabel(String(localizable: .peerFormAmountLabel))
 
-                Text(String(localizable: .peerUsdcTicker))
-                    .zappFont(.displaySecondary, style: ZappColors.textMuted)
+                balanceReadout
             }
             .padding(.vertical, 4)
 
@@ -186,12 +197,43 @@ struct PeerCashOutFormView: View {
         }
     }
 
-    /// Who the user is actually dealing with, and that a completed payment is final. It sits at the
-    /// bottom rather than in a sheet: it is a term of the product, not a help topic.
-    private var terms: some View {
-        Text(String(localizable: .peerFormTerms))
-            .zappFont(.caption, style: ZappColors.textSubtle)
-            .frame(maxWidth: .infinity, alignment: .leading)
+    private var balanceReadout: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            Text(String(localizable: .peerFormBalanceLabel))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+            Text(balanceValue)
+                .zappFont(.caption, style: ZappColors.textMuted)
+        }
+        .lineLimit(1)
+        .fixedSize(horizontal: true, vertical: false)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Behind the header's info button rather than pinned under the form, where the last line fell
+    /// off the bottom of the screen.
+    private var infoSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(String(localizable: .peerFormInfoTitle))
+                .zappFont(.sectionTitle, style: ZappColors.text)
+
+            Text(String(localizable: .peerFormTerms))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(String(localizable: .peerFormRateDisclosure))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer()
+
+            ZappButton(title: String(localizable: .peerFormInfoDismiss)) {
+                isInfoPresented = false
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(24)
+        .applyScreenBackground()
+        .presentationDetents([.medium])
     }
 
     private var topUpButton: some View {
@@ -277,9 +319,9 @@ struct PeerCashOutFormView: View {
         return rows
     }
 
-    private var availableLabel: String {
+    private var balanceValue: String {
         guard let available = store.spendable.available else { return String(localizable: .peerFormBalancePending) }
-        return String(localizable: .peerFormAvailable(available.display))
+        return available.display
     }
 
     private var fiatEquivalent: String? {

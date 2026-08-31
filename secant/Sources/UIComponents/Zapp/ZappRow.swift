@@ -15,6 +15,8 @@ struct ZappRow<Trailing: View>: View {
     var icon: Image?
     var iconTint: ZappColors = .text
     var iconBackground: ZappColors = .surfaceAlt
+    /// Drawn in its own colours, unlike `icon`, which takes the row's tint.
+    var logo: Image?
     var titleColor: ZappColors = .text
     var action: (() -> Void)?
 
@@ -28,6 +30,7 @@ struct ZappRow<Trailing: View>: View {
         icon: Image? = nil,
         iconTint: ZappColors = .text,
         iconBackground: ZappColors = .surfaceAlt,
+        logo: Image? = nil,
         titleColor: ZappColors = .text,
         @ViewBuilder trailing: () -> Trailing,
         action: (() -> Void)? = nil
@@ -37,6 +40,7 @@ struct ZappRow<Trailing: View>: View {
         self.icon = icon
         self.iconTint = iconTint
         self.iconBackground = iconBackground
+        self.logo = logo
         self.titleColor = titleColor
         self.action = action
         self.trailing = trailing()
@@ -53,7 +57,12 @@ struct ZappRow<Trailing: View>: View {
 
     private var row: some View {
         HStack(spacing: Constants.spacing) {
-            if let icon {
+            if let logo {
+                logo
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: Constants.logoWidth, height: Constants.logoHeight)
+            } else if let icon {
                 icon
                     .zImage(width: Constants.iconSize, height: Constants.iconSize, style: iconTint)
                     .frame(width: Constants.iconBoxSize, height: Constants.iconBoxSize)
@@ -90,6 +99,8 @@ private enum ZappRowConstants {
     static let spacing: CGFloat = 14
     static let iconBoxSize: CGFloat = 36
     static let iconSize: CGFloat = 18
+    static let logoWidth: CGFloat = 30
+    static let logoHeight: CGFloat = 20
     static let trailingIconSize: CGFloat = 18
     static let dividerHeight: CGFloat = 1
     /// Clears the icon box and the gap after it, so an inset divider starts under the title.
@@ -137,6 +148,7 @@ struct ZappRowChevron: View {
 struct ZappSelectionRow: View {
     let title: String
     var subtitle: String?
+    var logo: Image?
     let isSelected: Bool
     var isEnabled = true
     let action: () -> Void
@@ -145,6 +157,7 @@ struct ZappSelectionRow: View {
         ZappRow(
             title: title,
             subtitle: subtitle,
+            logo: logo,
             titleColor: titleColor,
             trailing: {
                 if isEnabled && isSelected {

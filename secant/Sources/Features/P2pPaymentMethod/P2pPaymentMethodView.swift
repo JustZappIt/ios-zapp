@@ -29,7 +29,12 @@ struct P2pPaymentMethodView: View {
                     .padding(.vertical, Design.Spacing._lg)
                 }
 
-                ZappBottomActionBar(onBack: { store.send(.backTapped) })
+                ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
+                    ZappButton(
+                        title: String(localizable: .p2pPaymentMethodSave),
+                        isEnabled: store.canSave
+                    ) { store.send(.saveTapped) }
+                }
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
@@ -40,7 +45,10 @@ struct P2pPaymentMethodView: View {
     /// Cash-out first: it is the newer product and the one a user arriving from Pay is least likely
     /// to expect, so it is the group they read rather than the one they scroll past.
     private var cashOutGroup: some View {
-        ZappSettingsGroup(title: String(localizable: .p2pPaymentMethodCashOutGroup)) {
+        ZappSettingsGroup(
+            title: String(localizable: .p2pPaymentMethodCashOutGroup),
+            titleLogo: Asset.Assets.Icons.providerPeer.image
+        ) {
             Text(String(localizable: .p2pPaymentMethodCashOutExplainer))
                 .zappFont(.caption, style: ZappColors.textMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -56,10 +64,12 @@ struct P2pPaymentMethodView: View {
                 unavailableNote(String(localizable: .p2pPaymentMethodPeerNetwork))
             }
 
-            ForEach(store.destinations) { destination in
+            ForEach(Array(store.destinations.enumerated()), id: \.element.id) { index, destination in
+                if index > 0 { ZappRowDivider(inset: true) }
                 selectableRow(
                     title: destination.displayName,
                     subtitle: destination.currencyCodes.joined(separator: " · "),
+                    logo: destination.logo,
                     rail: .peerCashOut(destinationCode: destination.code),
                     isEnabled: store.canSelectPeer
                 )
@@ -68,14 +78,18 @@ struct P2pPaymentMethodView: View {
     }
 
     private var scanAndPayGroup: some View {
-        ZappSettingsGroup(title: String(localizable: .p2pPaymentMethodScanAndPayGroup)) {
+        ZappSettingsGroup(
+            title: String(localizable: .p2pPaymentMethodScanAndPayGroup),
+            titleLogo: Asset.Assets.Icons.providerP2pMe.image
+        ) {
             Text(String(localizable: .p2pPaymentMethodScanAndPayExplainer))
                 .zappFont(.caption, style: ZappColors.textMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
 
-            ForEach(store.corridors) { corridor in
+            ForEach(Array(store.corridors.enumerated()), id: \.element.id) { index, corridor in
+                if index > 0 { ZappRowDivider(inset: true) }
                 selectableRow(
                     title: corridor.countryName,
                     subtitle: "\(corridor.paymentRail) · \(corridor.currencyCode)",
@@ -91,15 +105,16 @@ struct P2pPaymentMethodView: View {
         title: String,
         subtitle: String,
         leading: String? = nil,
+        logo: Image? = nil,
         rail: P2pRail,
         isEnabled: Bool
     ) -> some View {
-        let isSelected = store.selected == rail
         let displayedTitle = [leading, title].compactMap { $0 }.joined(separator: " ")
         return ZappSelectionRow(
             title: displayedTitle,
             subtitle: subtitle,
-            isSelected: isSelected,
+            logo: logo,
+            isSelected: store.selected == rail,
             isEnabled: isEnabled
         ) {
             store.send(.railTapped(rail))

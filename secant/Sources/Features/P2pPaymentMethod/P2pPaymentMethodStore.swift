@@ -22,13 +22,18 @@ struct P2pPaymentMethod {
         /// not expose. The rails are shown as unavailable rather than hidden, so the absence is
         /// explained rather than mysterious.
         var isSoftwareWallet = true
+        /// What the rows show. Only `saveTapped` writes it to preferences.
         var selected: P2pRail = .default
+        /// What preferences hold, so the button knows whether anything changed.
+        var saved: P2pRail = .default
         var isLoading = false
         var isPeerLoading = false
         var isScanAndPayLoading = false
         var errorMessage: String?
 
         var canSelectPeer: Bool { isPeerAvailable && isSoftwareWallet }
+
+        var canSave: Bool { selected != saved }
     }
 
     enum Action: Equatable {
@@ -39,6 +44,7 @@ struct P2pPaymentMethod {
         case scanAndPayLoaded([OfframpCorridor])
         case scanAndPayLoadFailed(String)
         case railTapped(P2pRail)
+        case saveTapped
         case backTapped
         case delegate(Delegate)
 
@@ -63,7 +69,8 @@ struct P2pPaymentMethod {
             case .onAppear:
                 @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
                 state.isSoftwareWallet = selectedAccount?.vendor == .zcash
-                state.selected = userStoredPreferences.p2pRail() ?? .default
+                state.saved = userStoredPreferences.p2pRail() ?? .default
+                state.selected = state.saved
                 state.isLoading = true
                 state.isPeerLoading = true
                 state.isScanAndPayLoading = true
@@ -123,9 +130,12 @@ struct P2pPaymentMethod {
             case let .railTapped(rail):
                 guard rail.provider != .peer || state.canSelectPeer else { return .none }
                 state.selected = rail
-                // Written on the tap rather than behind a Save: there is nothing to review, and a
-                // selection the user can see but the app has not stored is the confusing state.
-                userStoredPreferences.setP2pRail(rail)
+                return .none
+
+            case .saveTapped:
+                guard state.canSave else { return .none }
+                userStoredPreferences.setP2pRail(state.selected)
+                state.saved = state.selected
                 return .none
 
             case .backTapped:
