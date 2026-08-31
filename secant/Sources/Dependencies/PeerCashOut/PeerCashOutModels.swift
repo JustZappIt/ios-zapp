@@ -23,10 +23,6 @@ struct PeerDestination: Equatable, Identifiable, Sendable {
     let offersCurrencyChoice: Bool
 
     var id: String { code }
-
-    var defaultCurrencies: [PeerFiatCurrency] {
-        currencies.filter { defaultCurrencyCodes.contains($0.code) }
-    }
 }
 
 struct PeerFiatCurrency: Equatable, Identifiable, Sendable {
@@ -198,7 +194,6 @@ struct PeerFailure: Equatable, Sendable {
 
     let code: String
     let step: PeerProgress.Step
-    let retryable: Bool
     /// False on the three unknown-outcome codes: a second attempt is how one deposit becomes two,
     /// so those must not even show a retry button.
     let allowsManualRetry: Bool

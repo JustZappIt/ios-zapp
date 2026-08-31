@@ -123,7 +123,10 @@ struct PeerRunHoldsFundsTests {
 
         reconciled.reconciledDepositID = "escrow_1"
         #expect(!reconciled.holdsFunds)
-        #expect(!reconciled.isUnindexed)
+        // Still owed a row until the order list catches up: the deposit id comes from a receipt,
+        // which is ahead of the indexer.
+        #expect(reconciled.isAwaitingIndex(in: []))
+        #expect(!reconciled.isAwaitingIndex(in: ["escrow_1"]))
     }
 
     /// A send that provably reverted escrowed nothing, so the amount goes back to the balance.
@@ -180,7 +183,6 @@ struct PeerRunHoldsFundsTests {
             failure: PeerFailure(
                 code: nothingEscrowed ? "TRANSACTION_FAILED" : "TRANSACTION_SUBMISSION_UNKNOWN",
                 step: .creatingDeposit,
-                retryable: false,
                 allowsManualRetry: nothingEscrowed,
                 nothingEscrowed: nothingEscrowed,
                 recovery: nil,

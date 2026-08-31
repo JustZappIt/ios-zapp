@@ -3,13 +3,6 @@
 import Foundation
 
 extension Onramp {
-    static func sanitizedAmount(_ value: String) -> String {
-        let allowed = value.filter { $0.isNumber || $0 == "." }
-        let parts = allowed.split(separator: ".", omittingEmptySubsequences: false)
-        guard parts.count > 1 else { return allowed }
-        return "\(parts[0]).\(parts[1].prefix(6))"
-    }
-
     static func fiatMicros(_ value: String) -> String? {
         guard var decimal = Decimal(string: value), decimal > 0 else { return nil }
         decimal *= 1_000_000

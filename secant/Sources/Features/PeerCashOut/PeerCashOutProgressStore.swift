@@ -15,6 +15,9 @@ struct PeerCashOutProgress {
         var run: PeerRun?
         var transactionURL: URL?
         var startupErrorMessage: String?
+        /// A retry is admitted against the balance like any other spend, so it can be refused. The
+        /// attempt's own failure is still on screen, so the refusal needs a line of its own.
+        var retryErrorMessage: String?
         var isLoading = true
         /// Cancellation does not guarantee a foreign async call stops. Results are accepted only
         /// while they belong to the currently visible subscription.
@@ -75,6 +78,7 @@ struct PeerCashOutProgress {
         case startupFailed(String, generation: Int)
         case transactionURLResolved(URL?, generation: Int)
         case retryTapped
+        case retryFailed(String, generation: Int)
         case viewOrderTapped
         case backTapped
         case delegate(Delegate)
@@ -132,6 +136,7 @@ struct PeerCashOutProgress {
                 guard generation == state.observationGeneration else { return .none }
                 state.isLoading = false
                 state.startupErrorMessage = nil
+                if runnerState.run(id: state.attemptID)?.isDriving == true { state.retryErrorMessage = nil }
                 state.run = runnerState.run(id: state.attemptID)
                 guard let hash = state.failure?.recoveryTransactionHash, state.transactionURL == nil else {
                     return .none
@@ -158,12 +163,23 @@ struct PeerCashOutProgress {
 
             case .retryTapped:
                 guard state.offersRetry else { return .none }
+                state.retryErrorMessage = nil
                 let attemptID = state.attemptID
+                let generation = state.observationGeneration
                 return .run { _ in
                     try await peerCashOut.retryCashOut(attemptID)
-                } catch: { _, _ in
-                    // A refused authentication leaves the attempt exactly as it was.
+                } catch: { error, send in
+                    // A refused authentication leaves the attempt exactly as it was and needs no
+                    // words. A refused admission does: the balance this attempt was going to
+                    // re-offer has been promised to something else since it failed.
+                    guard !(error is PeerCashOutClientError) else { return }
+                    await send(.retryFailed(error.localizedDescription, generation: generation))
                 }
+
+            case let .retryFailed(message, generation):
+                guard generation == state.observationGeneration else { return .none }
+                state.retryErrorMessage = message
+                return .none
 
             case .viewOrderTapped:
                 guard let depositID = state.depositID else { return .none }

@@ -124,7 +124,6 @@ extension PeerFailure {
         self.init(
             code: value.code,
             step: PeerProgress.Step(rawValue: value.step) ?? .initialization,
-            retryable: value.retryable,
             allowsManualRetry: value.allowsManualRetry,
             nothingEscrowed: value.nothingEscrowed,
             recovery: Recovery(value),

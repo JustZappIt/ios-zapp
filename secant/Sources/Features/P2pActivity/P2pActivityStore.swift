@@ -64,7 +64,9 @@ struct P2pActivity {
         var filter: Filter = .all
         var account: OfframpAccountModel?
         var peerOrders: [PeerOrder] = []
-        var unindexedRuns: [PeerRun] = []
+        /// Every attempt the runner is carrying, not only the ones without a deposit yet: which of
+        /// them the order list can already answer for is decided against that list, below.
+        var runs: [PeerRun] = []
         var scanAndPayHistory: [OfframpHistoryModel] = []
         /// Only an explicit readable zero permits a refund. Loading and unavailable are security
         /// answers, not aliases for "nothing committed".
@@ -75,6 +77,15 @@ struct P2pActivity {
         var errorMessage: String?
         var peerSource = SourceLoadState.idle
         var scanAndPaySource = SourceLoadState.idle
+
+        /// The attempts still owed a row of their own. An attempt keeps one until the order it
+        /// opened actually appears in the list: the deposit id is resolved from a transaction
+        /// receipt, which runs ahead of the indexer, so dropping the row when the id arrives leaves
+        /// the amount subtracted from the balance with nothing on screen to explain it.
+        var unindexedRuns: [PeerRun] {
+            let indexed = Set(peerOrders.map(\.depositID))
+            return runs.filter { $0.isAwaitingIndex(in: indexed) }
+        }
 
         var entries: [P2pActivityEntry] {
             let all = unindexedRuns.map(P2pActivityEntry.peerAttempt)
@@ -109,6 +120,14 @@ struct P2pActivity {
             return false
         }
 
+        /// Recovering a cancelled order's escrow sweeps the whole Base account exactly as a refund
+        /// does, so it is offered under exactly the same conditions. Ungated it lands on a progress
+        /// screen carrying the amount form's "you can offer up to" refusal instead.
+        var offersEscrowRecovery: Bool {
+            guard case .ready(_, committed: .zero) = spendable else { return false }
+            return true
+        }
+
         /// An outage is not an empty financial history. Both sources must have answered
         /// successfully before the screen can conclude there is no activity.
         var showsEmptyHistory: Bool {
@@ -125,8 +144,9 @@ struct P2pActivity {
         case onAppear
         case onDisappear
         case accountLoaded(OfframpAccountModel?)
-        case peerLoaded(orders: [PeerOrder], spendable: PeerSpendableBalance, isAvailable: Bool)
+        case peerLoaded(orders: [PeerOrder], isAvailable: Bool)
         case peerLoadFailed(String)
+        case spendableLoaded(PeerSpendableBalance)
         case scanAndPayLoaded([OfframpHistoryModel])
         case scanAndPayLoadFailed(String)
         case runnerStateChanged(PeerRunnerState)
@@ -157,6 +177,7 @@ struct P2pActivity {
     private enum CancelID {
         case account
         case peer
+        case spendable
         case scanAndPay
         case runner
         case copyReset
@@ -183,7 +204,8 @@ struct P2pActivity {
                         await send(.scanAndPayLoadFailed(error.localizedDescription))
                     }
                     .cancellable(id: CancelID.scanAndPay, cancelInFlight: true),
-                    loadPeer(),
+                    loadPeerOrders(),
+                    loadSpendable(),
                     .run { send in
                         for await runnerState in try await peerCashOut.runnerState() {
                             await send(.runnerStateChanged(runnerState))
@@ -198,6 +220,7 @@ struct P2pActivity {
                 return .merge(
                     .cancel(id: CancelID.account),
                     .cancel(id: CancelID.peer),
+                    .cancel(id: CancelID.spendable),
                     .cancel(id: CancelID.scanAndPay),
                     .cancel(id: CancelID.runner),
                     .cancel(id: CancelID.copyReset)
@@ -207,9 +230,8 @@ struct P2pActivity {
                 state.account = account
                 return .none
 
-            case let .peerLoaded(orders, spendable, isAvailable):
+            case let .peerLoaded(orders, isAvailable):
                 state.peerOrders = orders
-                state.spendable = spendable
                 state.isPeerAvailable = isAvailable
                 state.peerSource = .loaded
                 state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
@@ -217,9 +239,12 @@ struct P2pActivity {
 
             case let .peerLoadFailed(message):
                 state.peerSource = .failed(message)
-                state.spendable = .unavailable
                 state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
                 state.errorMessage = message
+                return .none
+
+            case let .spendableLoaded(spendable):
+                state.spendable = spendable
                 return .none
 
             case let .scanAndPayLoaded(history):
@@ -235,10 +260,14 @@ struct P2pActivity {
                 return .none
 
             case let .runnerStateChanged(runnerState):
-                state.unindexedRuns = runnerState.runs.filter(\.isUnindexed)
+                state.runs = runnerState.runs
                 // An attempt settling turns into an order and frees what it reserved, so both the
-                // list and the refund gate are stale the moment one does.
-                return loadPeer()
+                // list and the refund gate are stale the moment one does. Availability is not: it
+                // is a build-and-account fact, read once rather than on every tick.
+                return .merge(
+                    loadPeerOrders(knownAvailable: state.isPeerAvailable),
+                    loadSpendable()
+                )
 
             case let .loadFailed(message):
                 state.isLoading = false
@@ -266,14 +295,25 @@ struct P2pActivity {
             case let .entryTapped(entry):
                 switch entry {
                 case let .peerAttempt(run):
-                    return .send(.delegate(.openPeerAttempt(attemptID: run.id, destinationCode: run.destinationCode)))
+                    // Once the deposit is known the order is the surface, even while the indexer is
+                    // still catching up: the progress screen has nothing left to resolve.
+                    guard let depositID = run.depositID else {
+                        return .send(.delegate(.openPeerAttempt(
+                            attemptID: run.id,
+                            destinationCode: run.destinationCode
+                        )))
+                    }
+                    return .send(.delegate(.openPeerOrder(
+                        depositID: depositID,
+                        destinationCode: run.destinationCode
+                    )))
                 case let .peerOrder(order):
                     return .send(.delegate(.openPeerOrder(
                         depositID: order.depositID,
                         destinationCode: order.destinationCode
                     )))
                 case let .scanAndPay(item):
-                    guard item.canRecoverEscrow else { return .none }
+                    guard item.canRecoverEscrow, state.offersEscrowRecovery else { return .none }
                     return .send(.delegate(.recoverScanAndPayOrder(orderID: item.id)))
                 }
 
@@ -292,19 +332,32 @@ struct P2pActivity {
 
     /// Peer is mainnet-only, so an unavailable build reports nothing rather than failing — the
     /// p2p.me half of the list is still worth showing.
-    private func loadPeer() -> Effect<Action> {
+    private func loadPeerOrders(knownAvailable: Bool = false) -> Effect<Action> {
         .run { send in
-            let capabilities = try await peerCashOut.capabilities()
-            guard capabilities.isAvailable else {
-                return await send(.peerLoaded(orders: [], spendable: .unavailable, isAvailable: false))
+            if !knownAvailable {
+                guard try await peerCashOut.capabilities().isAvailable else {
+                    return await send(.peerLoaded(orders: [], isAvailable: false))
+                }
             }
-            let orders = try await peerCashOut.orderHistory()
-            let spendable = try await peerCashOut.spendableBalance()
-            await send(.peerLoaded(orders: orders, spendable: spendable, isAvailable: true))
+            await send(.peerLoaded(orders: try await peerCashOut.orderHistory(), isAvailable: true))
         } catch: { error, send in
             await send(.peerLoadFailed(error.localizedDescription))
         }
         .cancellable(id: CancelID.peer, cancelInFlight: true)
+    }
+
+    /// What the whole Base account has promised, which is what the refund and escrow-recovery
+    /// actions are gated on. Read on its own rather than behind the Peer order list: Scan & Pay and
+    /// top-up deliveries commit the same balance, and on a build with no Peer rails at all there is
+    /// still a refund to offer. An indexer outage must not be what decides whether the user can
+    /// move their funds back to ZEC.
+    private func loadSpendable() -> Effect<Action> {
+        .run { send in
+            await send(.spendableLoaded(try await peerCashOut.spendableBalance()))
+        } catch: { _, send in
+            await send(.spendableLoaded(.unavailable))
+        }
+        .cancellable(id: CancelID.spendable, cancelInFlight: true)
     }
 }
 

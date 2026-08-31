@@ -130,7 +130,9 @@ struct P2pActivityView: View {
             )
 
         case let .scanAndPay(item):
-            if item.canRecoverEscrow {
+            // Recovering an escrow sweeps the Base account, so it is withheld under the same
+            // conditions as a refund rather than offered and refused on the next screen.
+            if item.canRecoverEscrow && store.offersEscrowRecovery {
                 entryRow(
                     title: "\(item.fiatDisplay) \(item.currencyCode)",
                     subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),

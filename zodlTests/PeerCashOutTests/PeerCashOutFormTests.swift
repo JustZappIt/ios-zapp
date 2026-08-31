@@ -185,6 +185,44 @@ struct PeerCashOutFormTests {
         }
     }
 
+    /// A pasted amount carries grouping separators. Reading the first one as the decimal point
+    /// escrows a thousandth of what is on screen.
+    @Test func aPastedGroupedAmountKeepsItsMagnitude() {
+        #expect(DecimalAmountInput.sanitized("1,234.56") == "1234.56")
+        #expect(DecimalAmountInput.sanitized("1 234.56") == "1234.56")
+        #expect(DecimalAmountInput.sanitized("20") == "20")
+        #expect(DecimalAmountInput.sanitized("20.5") == "20.5")
+        // Mid-typing states survive, and a stray second tap cannot multiply the amount.
+        #expect(DecimalAmountInput.sanitized("20.") == "20.")
+        #expect(DecimalAmountInput.sanitized("1.5.") == "1.5")
+        #expect(DecimalAmountInput.sanitized("1.1234567") == "1.123456")
+    }
+
+    /// The rail's rules decide who gets paid, so a check that never answered is not a pass — and
+    /// silence would leave a filled-in form permanently un-submittable with nothing saying why.
+    @MainActor @Test func anUnansweredHandleCheckSaysSoRatherThanQuietlyBlockingContinue() async {
+        var state = form(available: "100000000")
+        state.amountInput = "20"
+
+        let clock = TestClock()
+        let store = TestStore(initialState: state) { PeerCashOutForm() } withDependencies: {
+            $0.continuousClock = clock
+            $0.peerCashOut.normalizeHandle = { _, _ in throw PeerCashOutClientError.unavailable }
+        }
+
+        await store.send(.handleChanged("anotherrevtag")) {
+            $0.handleInput = "anotherrevtag"
+            $0.handleCheck = nil
+        }
+        await clock.advance(by: .milliseconds(200))
+        await store.receive(.handleCheckFailed(destinationCode: "revolut", rawInput: "anotherrevtag")) {
+            $0.isHandleCheckUnanswered = true
+        }
+
+        #expect(store.state.handleError != nil)
+        #expect(!store.state.canSubmit)
+    }
+
     /// Cancellation is not an identity boundary: a dependency can finish after cancellation. A
     /// response for a prior raw value or destination must not validate the currently displayed one.
     @MainActor @Test func aLateHandleCheckCannotValidateDifferentDisplayedInput() async {

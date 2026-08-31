@@ -21,16 +21,6 @@ private struct OfframpUncheckedSendable<Value>: @unchecked Sendable {
     let value: Value
 }
 
-struct ScanAndPayInterruptionEvidence: Sendable {
-    let pendingMicros: String?
-    let hasCheckpoint: Bool
-}
-
-struct OnrampInterruptionEvidence: Sendable {
-    let pendingMicros: String?
-    let fundsLocation: OnrampFundsLocationModel?
-}
-
 /// One wallet-scoped P2P session. Cash-out, buy, refund and top-up all move USDC from the same
 /// Base smart account, so every rail is built on one `AppleBaseAccount` and therefore shares the
 /// single ERC-4337 submitter that account's nonce cursor lives in.
@@ -392,14 +382,18 @@ actor OfframpSession {
         }
     }
 
-    func reservationForResumedScanAndPay() async throws -> BaseUSDCReservationLedger.Owner {
+    /// Nil where the checkpoint no longer holds unescrowed Base USDC. A payment resumed after its
+    /// order was placed owns nothing another spender could take, and refusing it would be a dead
+    /// end: the checkpoint still blocks a new payment while the resume that would clear it errors.
+    func reservationForResumedScanAndPay() async throws -> BaseUSDCReservationLedger.Owner? {
         let startedIn = generation
         try await prepareBaseReservations()
         let pending = try await offrampRail().client.pendingBaseCommitmentMicros()
-        guard startedIn == generation, !isInvalidating,
-              let pending,
-              let amount = UsdcAmount(micros: pending),
-              amount.isPositive else {
+        guard startedIn == generation, !isInvalidating else {
+            throw BaseUSDCReservationLedger.ClaimError.recoveryUnavailable
+        }
+        guard let pending else { return nil }
+        guard let amount = UsdcAmount(micros: pending), amount.isPositive else {
             throw BaseUSDCReservationLedger.ClaimError.recoveryUnavailable
         }
         return try await baseUSDCReservations.restoreOrFindScanAndPay(
@@ -419,7 +413,7 @@ actor OfframpSession {
         try validateGeneration(expectedGeneration)
         return try trackOfframpFlow(
             client.resumePayment(paymentDetailsProvider: paymentDetailsProvider),
-            reservation: .scanAndPay(owner),
+            reservation: owner.map(OfframpReservation.scanAndPay),
             generation: expectedGeneration
         )
     }
@@ -546,20 +540,6 @@ actor OfframpSession {
         return pending
     }
 
-    func scanAndPayInterruptionEvidence() async throws -> ScanAndPayInterruptionEvidence {
-        try requireActive()
-        let client = try await offrampRail().client
-        try requireActive()
-        async let pending = client.pendingBaseCommitmentMicros()
-        async let hasCheckpoint = client.hasCheckpoint().boolValue
-        let evidence = try await ScanAndPayInterruptionEvidence(
-            pendingMicros: pending,
-            hasCheckpoint: hasCheckpoint
-        )
-        try requireActive()
-        return evidence
-    }
-
     func pendingRefundCommitmentForSettlement() async throws -> String? {
         try requireActive()
         let client = try await offrampRail().client
@@ -576,20 +556,6 @@ actor OfframpSession {
         let pending = try await client.pendingBaseCommitmentMicros()
         try requireActive()
         return pending
-    }
-
-    func onrampInterruptionEvidence() async throws -> OnrampInterruptionEvidence {
-        try requireActive()
-        let client = try await onrampRail().client
-        try requireActive()
-        async let pending = client.pendingBaseCommitmentMicros()
-        async let checkpoint = client.checkpoint()
-        let values = try await (pending, checkpoint)
-        try requireActive()
-        return OnrampInterruptionEvidence(
-            pendingMicros: values.0,
-            fundsLocation: values.1?.zecDelivery.map { OnrampFundsLocationModel($0.fundsLocation) }
-        )
     }
 
     func startPeerCashOut(
@@ -626,11 +592,23 @@ actor OfframpSession {
         await peerRunner.recover(id: attemptID, sessionGeneration: expectedGeneration)
     }
 
+    /// Reads the balance the retry is admitted against, exactly as starting one does: a retry that
+    /// may broadcast has to pass the same admission check as the first attempt.
     func retryPeerCashOut(attemptID: String, expectedGeneration: Int) async throws {
         guard expectedGeneration == generation else { throw CancellationError() }
-        _ = try await peerClient()
+        try await prepareBaseReservations()
         try validateGeneration(expectedGeneration)
-        await peerRunner.retry(id: attemptID, sessionGeneration: expectedGeneration)
+        let client = try await peerClient()
+        try validateGeneration(expectedGeneration)
+        guard let rawBalance = PeerAccount(try await client.account()).balance else {
+            throw PeerCashOutClientError.unavailable
+        }
+        try validateGeneration(expectedGeneration)
+        try await peerRunner.retry(
+            id: attemptID,
+            rawBalance: rawBalance,
+            sessionGeneration: expectedGeneration
+        )
     }
 
     func withdrawPeerCashOut(

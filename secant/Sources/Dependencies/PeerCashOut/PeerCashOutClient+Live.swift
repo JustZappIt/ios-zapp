@@ -9,20 +9,13 @@ extension PeerCashOutClient: DependencyKey {
 
     static func live() -> Self {
         Self(
+            isConfigured: { Self.isConfigured() },
             capabilities: {
-                @Dependency(\.zcashSDKEnvironment) var environment
-                // Known product/configuration absence is availability. Storage, wallet and network
-                // failures are not: callers must preserve their last-known financial rows instead
-                // of translating an outage into a successful empty history.
-                guard environment.network().networkType != .testnet,
-                      let pimlicoKey = PartnerKeys.p2pPimlicoApiKey,
-                      !pimlicoKey.isEmpty else {
-                    return .unavailable
-                }
+                // Known product, configuration and account absence is availability. Storage and
+                // network failures are not: callers must preserve their last-known financial rows
+                // instead of translating an outage into a successful empty history.
+                guard Self.isConfigured() else { return .unavailable }
                 return PeerCapabilities(try await OfframpSession.shared.peerClient().capabilities())
-            },
-            account: {
-                PeerAccount(try await OfframpSession.shared.peerClient().account())
             },
             spendableBalance: {
                 try await OfframpSession.shared.peerSpendableBalance()
@@ -117,14 +110,24 @@ extension PeerCashOutClient: DependencyKey {
                 _ = try await OfframpSession.shared.peerClient()
                 return await OfframpSession.shared.peerRunner.observe()
             },
-            reconcile: {
-                _ = try await OfframpSession.shared.peerClient()
-                await OfframpSession.shared.peerRunner.reconcile()
-            },
             transactionURL: { hash in
                 URL(string: try await OfframpSession.shared.peerClient().transactionUrl(txHash: hash))
             }
         )
+    }
+
+    /// Everything that decides whether the Peer rails exist at all, and nothing that can fail.
+    ///
+    /// The rails are pinned to Base mainnet by local config, and they sign from a Base account only
+    /// a software wallet can derive — so the whole answer is on the device. Building the client to
+    /// ask it would turn an outage into a "not available", which is what callers must never see.
+    static func isConfigured() -> Bool {
+        @Dependency(\.zcashSDKEnvironment) var environment
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
+
+        guard selectedAccount?.vendor == .zcash else { return false }
+        guard let pimlicoKey = PartnerKeys.p2pPimlicoApiKey, !pimlicoKey.isEmpty else { return false }
+        return environment.network().networkType != .testnet
     }
 
     private static func authenticate() async throws {

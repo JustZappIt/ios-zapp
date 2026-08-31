@@ -276,7 +276,7 @@ struct Offramp {
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
             case .fiatAmountChanged(let value):
-                state.fiatAmount = Self.sanitizedAmount(value)
+                state.fiatAmount = DecimalAmountInput.sanitized(value)
                 state.quote = nil
                 state.errorMessage = nil
                 return .none
@@ -372,12 +372,12 @@ struct Offramp {
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
             case .topUpAmountChanged(let value):
-                state.topUpAmount = Self.sanitizedAmount(value)
+                state.topUpAmount = DecimalAmountInput.sanitized(value)
                 state.errorMessage = nil
                 return .send(.topUpValidationRequested)
 
             case .topUpFiatAmountChanged(let value):
-                state.topUpFiatAmount = Self.sanitizedAmount(value)
+                state.topUpFiatAmount = DecimalAmountInput.sanitized(value)
                 state.errorMessage = nil
                 guard
                     let fiat = Decimal(string: state.topUpFiatAmount),
@@ -688,18 +688,6 @@ struct Offramp {
                 return .none
             }
         }
-    }
-
-    private static func sanitizedAmount(_ value: String) -> String {
-        var seenSeparator = false
-        return value.filter { character in
-            if character.isNumber { return true }
-            if (character == "." || character == ",") && !seenSeparator {
-                seenSeparator = true
-                return true
-            }
-            return false
-        }.replacingOccurrences(of: ",", with: ".")
     }
 
     static func usdcMicros(_ value: String) -> String? {

@@ -13,7 +13,7 @@ struct P2pActivityTests {
         var state = P2pActivity.State.initial
         state.peerOrders = [order(id: "1", at: 200)]
         state.scanAndPayHistory = [history(id: "a", at: 300), history(id: "b", at: 100)]
-        state.unindexedRuns = [run(id: attemptID, at: 400)]
+        state.runs = [run(id: attemptID, at: 400)]
 
         #expect(state.entries.map(\.id) == ["attempt:\(attemptID)", "p2pme:a", "order:escrow_1", "p2pme:b"])
     }
@@ -35,24 +35,84 @@ struct P2pActivityTests {
         var state = P2pActivity.State.initial
         state.peerOrders = [order(id: "1", at: 200)]
         state.scanAndPayHistory = [history(id: "a", at: 300)]
-        state.unindexedRuns = [run(id: attemptID, at: 400)]
+        state.runs = [run(id: attemptID, at: 400)]
         state.filter = filter
 
         #expect(state.entries.allSatisfy { entry in prefixes.contains { entry.id.hasPrefix($0) } })
         #expect(state.entries.count == prefixes.count)
     }
 
-    /// An attempt whose deposit is now known is the order, not a second row beside it. The runner
-    /// stops reporting it as unindexed, and the feed must not resurrect it from anywhere else.
+    /// An attempt whose deposit is now listed is the order, not a second row beside it.
     @Test func anIndexedAttemptIsReplacedByItsOrderRatherThanShownTwice() {
         var settled = run(id: attemptID, at: 400)
         settled.reconciledDepositID = "escrow_1"
 
         var state = P2pActivity.State.initial
         state.peerOrders = [order(id: "1", at: 400)]
-        state.unindexedRuns = [settled].filter(\.isUnindexed)
+        state.runs = [settled]
 
         #expect(state.entries.map(\.id) == ["order:escrow_1"])
+    }
+
+    /// The deposit id is resolved from a transaction receipt, which runs ahead of the indexer the
+    /// order list is read from. Dropping the row the moment the id exists leaves the amount
+    /// subtracted from the balance with nothing on screen accounting for it.
+    @Test func aReconciledAttemptKeepsItsRowUntilTheOrderListCanShowIt() {
+        var settled = run(id: attemptID, at: 400)
+        settled.reconciledDepositID = "escrow_1"
+
+        var state = P2pActivity.State.initial
+        state.runs = [settled]
+
+        #expect(state.entries.map(\.id) == ["attempt:\(attemptID)"])
+
+        state.peerOrders = [order(id: "1", at: 400)]
+        #expect(state.entries.map(\.id) == ["order:escrow_1"])
+    }
+
+    /// Its progress screen has nothing left to resolve once the deposit is known, so the row opens
+    /// the order it already belongs to.
+    @MainActor
+    @Test func tappingAReconciledAttemptOpensItsOrder() async {
+        var settled = run(id: attemptID, at: 400)
+        settled.reconciledDepositID = "escrow_1"
+        let store = TestStore(initialState: P2pActivity.State.initial) { P2pActivity() }
+
+        await store.send(.entryTapped(.peerAttempt(settled)))
+        await store.receive(\.delegate.openPeerOrder)
+    }
+
+    /// The refund gate is a Base-wide reading. A build with no Peer rails still has a balance to
+    /// recover, and a Peer indexer outage is not a reason to hide fund recovery.
+    @MainActor
+    @Test func aPeerOrderOutageDoesNotHideTheRefundAction() async {
+        var state = P2pActivity.State.initial
+        state.account = account(canRefundToZec: true)
+        let store = TestStore(initialState: state) { P2pActivity() }
+
+        await store.send(.spendableLoaded(.ready(balance: usdc("20000000"), committed: .zero))) {
+            $0.spendable = .ready(balance: self.usdc("20000000"), committed: .zero)
+        }
+        await store.send(.peerLoadFailed("Indexer unavailable")) {
+            $0.peerSource = .failed("Indexer unavailable")
+            $0.errorMessage = "Indexer unavailable"
+        }
+
+        #expect(store.state.offersRefund)
+    }
+
+    /// Recovering an escrow sweeps the Base account exactly as a refund does, so an unfinished
+    /// cash-out blocks it too — otherwise it lands on a progress screen showing the amount form's
+    /// "you can offer up to" refusal.
+    @MainActor
+    @Test func escrowRecoveryIsWithheldWhileACashOutHoldsUnescrowedFunds() async {
+        var state = P2pActivity.State.initial
+        state.spendable = .ready(balance: usdc("20000000"), committed: usdc("20000000"))
+        let entry = P2pActivityEntry.scanAndPay(history(id: "a", at: 100, status: "CANCELLED"))
+        let store = TestStore(initialState: state) { P2pActivity() }
+
+        #expect(!store.state.offersEscrowRecovery)
+        await store.send(.entryTapped(entry))
     }
 
     /// A refund and a Peer `createDeposit` that has not landed would spend the same Base USDC, so
@@ -146,8 +206,10 @@ struct P2pActivityTests {
 
     /// The p2p.me recovery action stays in the off-ramp, which already owns its progress stream.
     @Test func aRecoverableScanAndPayOrderRoutesIntoTheOffRamp() async {
+        var state = P2pActivity.State.initial
+        state.spendable = .ready(balance: usdc("20000000"), committed: .zero)
         let entry = P2pActivityEntry.scanAndPay(history(id: "a", at: 100, status: "CANCELLED"))
-        let store = await TestStore(initialState: P2pActivity.State.initial) { P2pActivity() }
+        let store = await TestStore(initialState: state) { P2pActivity() }
 
         await store.send(.entryTapped(entry))
         await store.receive(\.delegate.recoverScanAndPayOrder)
@@ -161,6 +223,10 @@ struct P2pActivityTests {
     }
 
     private let attemptID = "0123456789abcdef0123456789abcdef"
+
+    private func usdc(_ micros: String) -> UsdcAmount {
+        UsdcAmount(micros: micros) ?? .zero
+    }
 
     private func run(id: String, at seconds: TimeInterval) -> PeerRun {
         PeerRun(

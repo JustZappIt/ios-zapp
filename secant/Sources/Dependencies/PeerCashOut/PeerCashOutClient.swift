@@ -38,10 +38,14 @@ extension DependencyValues {
 /// train the user to approve prompts without reading them.
 @DependencyClient
 struct PeerCashOutClient {
+    /// Whether the rails exist for this build and this account, answered from local configuration
+    /// alone. Routing reads this rather than ``capabilities`` so an outage cannot be mistaken for a
+    /// product that is not there and quietly open a different one.
+    var isConfigured: @Sendable () -> Bool = { false }
+
     /// Peer exists only on Base mainnet. Every surface is gated on this, so a build without the
     /// rails hides them rather than failing at the first call.
     var capabilities: @Sendable () async throws -> PeerCapabilities
-    var account: @Sendable () async throws -> PeerAccount
 
     /// The Base balance less everything unfinished attempts have promised and not yet escrowed.
     var spendableBalance: @Sendable () async throws -> PeerSpendableBalance
@@ -79,10 +83,6 @@ struct PeerCashOutClient {
     /// Everything the runner is carrying, republished on every change. Several screens observe at
     /// once and each gets its own stream.
     var runnerState: @Sendable () async throws -> AsyncStream<PeerRunnerState>
-
-    /// Matches stored attempts to the orders they turned out to open, so a settled one stops
-    /// reserving its amount against the balance.
-    var reconcile: @Sendable () async throws -> Void
 
     var transactionURL: @Sendable (_ txHash: String) async throws -> URL?
 }

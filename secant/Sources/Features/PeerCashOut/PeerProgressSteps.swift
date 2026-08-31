@@ -14,7 +14,7 @@ enum PeerProgressSteps {
         let latest = statuses.last
         let failure = latest?.failure
         let visible = PeerProgress.Step.displayed.filter { shows($0, statuses: statuses, failure: failure) }
-        let pivot = pivotIndex(in: visible, latest: latest, failure: failure)
+        let pivot = pivotIndex(in: visible, statuses: statuses, failure: failure)
 
         return visible.enumerated().map { index, step in
             ZappOfframpStepItem(
@@ -40,16 +40,28 @@ enum PeerProgressSteps {
         }
     }
 
-    /// Where the list is "up to". A hidden step resolves forward to the next visible row, so
-    /// everything before it still reads as done rather than the whole list resetting to pending.
+    /// Where the list is "up to", and never behind the furthest row the attempt actually reached.
+    ///
+    /// A step this build does not recognise decodes as `initialization`, which has no row and would
+    /// otherwise pull the marker back to the first one — reporting a failure that happened after the
+    /// escrow took the money as "we could not check your details".
     private static func pivotIndex(
         in visible: [PeerProgress.Step],
-        latest: PeerProgress?,
+        statuses: [PeerProgress],
         failure: PeerFailure?
     ) -> Int? {
-        guard let step = failure?.step ?? latest?.step else { return nil }
+        guard let step = failure?.step ?? statuses.last?.step else { return nil }
+        let reached = statuses.compactMap { rowIndex(of: $0.step, in: visible) }.max()
+        guard let index = rowIndex(of: step, in: visible) else { return reached ?? 0 }
+        return max(index, reached ?? index)
+    }
+
+    /// The visible row a step belongs to: its own, or the next one still on screen when the step is
+    /// hidden, so everything before it reads as done rather than the list resetting to pending. Nil
+    /// for a step that precedes every row, which is the only thing `initialization` can mean.
+    private static func rowIndex(of step: PeerProgress.Step, in visible: [PeerProgress.Step]) -> Int? {
         if let index = visible.firstIndex(of: step) { return index }
-        guard let canonical = PeerProgress.Step.displayed.firstIndex(of: step) else { return 0 }
+        guard let canonical = PeerProgress.Step.displayed.firstIndex(of: step) else { return nil }
         let next = PeerProgress.Step.displayed[canonical...].dropFirst().first { visible.contains($0) }
         return next.flatMap { visible.firstIndex(of: $0) } ?? visible.count
     }

@@ -26,10 +26,14 @@ struct PeerCashOutForm {
         var rate: PeerRate?
         var market: PeerMarketReading?
         var handleCheck: PeerHandleCheck?
+        /// The rail's own rules decide who gets paid, so an unanswered check is not a pass. It is
+        /// carried separately from `handleCheck` because "we could not ask" and "the rail said no"
+        /// need different words.
+        var isHandleCheckUnanswered = false
         var recommendedMinimum: UsdcAmount = .zero
         /// Orders already on chain, plus the attempts too young for the indexer to know about.
         var activeOrders: [PeerOrder] = []
-        var unindexedRuns: [PeerRun] = []
+        var runs: [PeerRun] = []
         /// Claimed on the tap. The reservation a start records is only observable a frame later, so
         /// two taps would both pass the same rendered balance check and open two cash-outs.
         var isSubmitting = false
@@ -72,8 +76,17 @@ struct PeerCashOutForm {
         }
 
         var handleError: String? {
-            guard !handleInput.isEmpty, let check = handleCheck, !check.isAcceptable else { return nil }
+            guard !handleInput.isEmpty else { return nil }
+            if isHandleCheckUnanswered { return String(localizable: .peerFormErrorHandleUnchecked) }
+            guard let check = handleCheck, !check.isAcceptable else { return nil }
             return String(localizable: .peerFormErrorHandleFormat)
+        }
+
+        /// The attempts the order list cannot answer for yet, so the amount already promised to one
+        /// is visible beside the orders rather than only missing from the balance.
+        var unindexedRuns: [PeerRun] {
+            let indexed = Set(activeOrders.map(\.depositID))
+            return runs.filter { $0.isAwaitingIndex(in: indexed) }
         }
 
         /// Set only where normalizing changed what was typed — Chime's leading `$`, a stripped `@`,
@@ -122,6 +135,7 @@ struct PeerCashOutForm {
         case ordersLoaded([PeerOrder])
         case marketLoaded(rate: PeerRate?, market: PeerMarketReading?)
         case handleChecked(destinationCode: String, rawInput: String, check: PeerHandleCheck)
+        case handleCheckFailed(destinationCode: String, rawInput: String)
         case runnerStateChanged(PeerRunnerState)
         case amountChanged(String)
         case handleChanged(String)
@@ -151,6 +165,8 @@ struct PeerCashOutForm {
         case runner
         case handle
         case market
+        case balance
+        case orders
     }
 
     var body: some Reducer<State, Action> {
@@ -177,7 +193,9 @@ struct PeerCashOutForm {
                 return .merge(
                     .cancel(id: CancelID.runner),
                     .cancel(id: CancelID.handle),
-                    .cancel(id: CancelID.market)
+                    .cancel(id: CancelID.market),
+                    .cancel(id: CancelID.balance),
+                    .cancel(id: CancelID.orders)
                 )
 
             case let .capabilitiesLoaded(capabilities, storedHandle):
@@ -209,16 +227,26 @@ struct PeerCashOutForm {
                     return .none
                 }
                 state.handleCheck = check
+                state.isHandleCheckUnanswered = false
+                return .none
+
+            // Silence here is what leaves a filled-in form permanently un-submittable with nothing
+            // on screen saying why — including the stored handle the screen pre-fills on first open.
+            case let .handleCheckFailed(destinationCode, rawInput):
+                guard destinationCode == state.destinationCode, rawInput == state.handleInput else {
+                    return .none
+                }
+                state.isHandleCheckUnanswered = true
                 return .none
 
             case let .runnerStateChanged(runnerState):
-                state.unindexedRuns = runnerState.runs.filter(\.isUnindexed)
+                state.runs = runnerState.runs
                 // An attempt settling frees the amount it reserved and turns into an order the
                 // indexer can answer for, so both readings are stale the moment one does.
                 return .merge(refreshBalance(), refreshOrders())
 
             case let .amountChanged(value):
-                state.amountInput = Self.sanitizedAmount(value)
+                state.amountInput = DecimalAmountInput.sanitized(value)
                 state.errorMessage = nil
                 return refreshMarket(state)
 
@@ -228,6 +256,7 @@ struct PeerCashOutForm {
                 // in the same reducer turn as the edit so the debounce cannot leave the previous
                 // recipient submit-ready, and accept only the response keyed to this exact input.
                 state.handleCheck = nil
+                state.isHandleCheckUnanswered = false
                 state.errorMessage = nil
                 return checkHandle(state.destinationCode, value)
 
@@ -301,6 +330,7 @@ struct PeerCashOutForm {
         } catch: { _, send in
             await send(.balanceLoaded(.unavailable))
         }
+        .cancellable(id: CancelID.balance, cancelInFlight: true)
     }
 
     private func refreshOrders() -> Effect<Action> {
@@ -309,6 +339,7 @@ struct PeerCashOutForm {
         } catch: { _, _ in
             // A failed order read leaves the last known list on screen; it is not a form error.
         }
+        .cancellable(id: CancelID.orders, cancelInFlight: true)
     }
 
     /// Debounced because normalizing crosses into Kotlin, where the rail's rules live. Repeating
@@ -318,7 +349,8 @@ struct PeerCashOutForm {
             try await continuousClock.sleep(for: .milliseconds(200))
             let check = try await peerCashOut.normalizeHandle(destinationCode, raw)
             await send(.handleChecked(destinationCode: destinationCode, rawInput: raw, check: check))
-        } catch: { _, _ in
+        } catch: { _, send in
+            await send(.handleCheckFailed(destinationCode: destinationCode, rawInput: raw))
         }
         .cancellable(id: CancelID.handle, cancelInFlight: true)
     }
@@ -338,19 +370,5 @@ struct PeerCashOutForm {
             // Fails open: generic copy, never an invented estimate.
         }
         .cancellable(id: CancelID.market, cancelInFlight: true)
-    }
-
-    /// One separator, digits only. The field is a decimal pad, but a paste is not.
-    private static func sanitizedAmount(_ value: String) -> String {
-        var seenSeparator = false
-        return value.filter { character in
-            if character.isNumber { return true }
-            if (character == "." || character == ",") && !seenSeparator {
-                seenSeparator = true
-                return true
-            }
-            return false
-        }
-        .replacingOccurrences(of: ",", with: ".")
     }
 }

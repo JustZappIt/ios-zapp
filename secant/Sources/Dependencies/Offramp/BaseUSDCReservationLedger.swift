@@ -8,7 +8,9 @@ import Foundation
 /// landed yet. Every Base spender therefore claims here before broadcasting. Claims are serialized
 /// on this actor, so two callers that both read the same balance cannot both spend it.
 actor BaseUSDCReservationLedger {
-    enum Source: Hashable, Sendable {
+    /// `CaseIterable` rather than a hand-written list: readiness is what makes every claim
+    /// fail-closed, and a source added without being enumerated would fail open instead.
+    enum Source: Hashable, Sendable, CaseIterable {
         case peer
         case scanAndPay
         case onrampDelivery
@@ -63,11 +65,7 @@ actor BaseUSDCReservationLedger {
         let wasRestored: Bool
     }
 
-    private var readiness: [Source: Readiness] = [
-        .peer: .loading,
-        .scanAndPay: .loading,
-        .onrampDelivery: .loading
-    ]
+    private var readiness = Dictionary(uniqueKeysWithValues: Source.allCases.map { ($0, Readiness.loading) })
     private var reservations: [Owner: Reservation] = [:]
     private var exclusiveOwner: Owner?
 
@@ -262,13 +260,13 @@ actor BaseUSDCReservationLedger {
     }
 
     func reset() {
-        readiness = [.peer: .loading, .scanAndPay: .loading, .onrampDelivery: .loading]
+        readiness = Dictionary(uniqueKeysWithValues: Source.allCases.map { ($0, Readiness.loading) })
         reservations.removeAll()
         exclusiveOwner = nil
     }
 
     private var recoveryIsReadable: Bool {
-        Source.allCasesForReservationLedger.allSatisfy { readiness[$0] == .ready }
+        Source.allCases.allSatisfy { readiness[$0] == .ready }
     }
 
     private func requireReadableRecovery() throws {
@@ -329,8 +327,4 @@ private extension BaseUSDCReservationLedger.Owner {
         if case .onrampDelivery = self { return true }
         return false
     }
-}
-
-private extension BaseUSDCReservationLedger.Source {
-    static let allCasesForReservationLedger: [Self] = [.peer, .scanAndPay, .onrampDelivery]
 }

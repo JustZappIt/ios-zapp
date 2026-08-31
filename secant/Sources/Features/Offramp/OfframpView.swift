@@ -700,11 +700,6 @@ struct OfframpView: View {
         ZappSummaryRow(label: label, value: value)
     }
 
-    private func formatMicros(_ value: String) -> String {
-        let decimal = Decimal(string: value) ?? 0
-        return NSDecimalNumber(decimal: decimal / 1_000_000).stringValue
-    }
-
     private func text(_ key: String, _ fallback: String) -> String {
         Bundle.main.localizedString(forKey: key, value: fallback, table: nil)
     }

@@ -227,7 +227,7 @@ struct Onramp {
                 return .none
 
             case .amountChanged(let value):
-                state.amount = Self.sanitizedAmount(value)
+                state.amount = DecimalAmountInput.sanitized(value)
                 state.quote = nil
                 state.zecEstimate = nil
                 state.errorMessage = nil
