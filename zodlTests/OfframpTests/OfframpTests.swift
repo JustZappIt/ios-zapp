@@ -310,13 +310,17 @@ struct OfframpTests {
         state.quote = quote()
         let store = TestStore(initialState: state) { Offramp() }
 
-        // Grouping separators are dropped, not read as the decimal point: `1,234.56` is the amount
-        // on screen, and taking the comma for the point would quote a thousandth of it.
+        // Letters go. Neither separator here has three digits behind it, so this is not a grouped
+        // number and the first one is the point — a reading smaller than what was typed, which is
+        // the direction a malformed amount has to fail in.
         await store.send(.fiatAmountChanged("1a2,3.4")) {
-            $0.fiatAmount = "123.4"
+            $0.fiatAmount = "12.34"
             $0.quote = nil
         }
 
+        // Grouping is three digits, and it is dropped rather than read as the decimal point:
+        // `1,234.56` is the amount on screen, and taking the comma for the point would quote a
+        // thousandth of it.
         await store.send(.fiatAmountChanged("1,234.56")) {
             $0.fiatAmount = "1234.56"
         }

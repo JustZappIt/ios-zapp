@@ -4,21 +4,41 @@ import Foundation
 
 /// One implementation of "what the user meant by that amount", shared by every money field.
 ///
-/// Typing goes through a decimal pad, which emits the user's own separator and nothing else. A
-/// paste does not: `1,234.56` carries a grouping separator as well, and a sanitizer that keeps the
-/// first separator it sees reads that as `1.23456` — the amount that then gets escrowed is a
-/// thousandth of the one on screen. The locale says which of the two is the decimal point, so the
-/// other one is grouping and is dropped.
+/// The separator is read from the number rather than from the locale, because this function
+/// consumes its own output: the field is rebound to what it returns, so the next keystroke arrives
+/// carrying the `.` this wrote. A filter that keeps only the locale's separator drops that `.`
+/// again in every comma-decimal region, and `1,5` becomes `15` — ten times the amount, silently,
+/// on its way to an escrow.
+///
+/// Grouping is what a separator followed by exactly three digits means, so `1,234.56` and
+/// `1.234,56` both read as 1234.56. Anything else has one separator that counts, and it is the
+/// decimal point: `1.234` reads as one and a bit rather than as a thousand, which is the direction
+/// that under-reads rather than over-spends.
 ///
 /// The result always uses `.`, because that is what `Decimal(string:)` parses.
 enum DecimalAmountInput {
     /// - Parameter fractionDigits: the currency's precision. Six is USDC's, and also the finest a
     ///   micro amount can express, so a longer fraction is only a rounding surprise later.
     static func sanitized(_ value: String, fractionDigits: Int = 6) -> String {
-        let separator: Character = Locale.current.decimalSeparator?.first ?? "."
-        let allowed: String = value.filter { $0.isNumber || $0 == separator }
-        let groups = allowed.split(separator: separator, omittingEmptySubsequences: false)
-        guard groups.count > 1 else { return allowed }
-        return "\(groups[0]).\(groups[1].prefix(fractionDigits))"
+        let allowed = value.filter { $0.isNumber || separators.contains($0) }
+        guard let decimalIndex = decimalSeparatorIndex(in: allowed) else { return allowed }
+        let whole = allowed[..<decimalIndex].filter(\.isNumber)
+        let fraction = allowed[allowed.index(after: decimalIndex)...].filter(\.isNumber)
+        return "\(whole).\(fraction.prefix(fractionDigits))"
     }
+
+    /// The decimal point, or nil where the amount carries no separator at all. Every separator but
+    /// the last has to look like grouping for the last one to be the point; otherwise this is a
+    /// typed amount with a stray separator in it, and the first one is the one the user meant.
+    private static func decimalSeparatorIndex(in value: String) -> String.Index? {
+        let found = value.indices.filter { separators.contains(value[$0]) }
+        guard let first = found.first, let last = found.last else { return nil }
+        let isGrouped = zip(found, found.dropFirst()).allSatisfy { separator, next in
+            value.distance(from: value.index(after: separator), to: next) == groupSize
+        }
+        return isGrouped ? last : first
+    }
+
+    private static let separators: Set<Character> = [".", ","]
+    private static let groupSize = 3
 }
