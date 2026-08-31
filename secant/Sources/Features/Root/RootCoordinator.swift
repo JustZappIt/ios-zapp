@@ -275,22 +275,27 @@ extension Root {
                 // The primary action resolves the stored rail rather than assuming one. A Peer
                 // selection can outlive the build that offered it — a flavour switch leaves it
                 // behind — so availability is confirmed before the flow opens, not after.
+                //
+                // "Not available" and "could not be read" are different answers. The product and
+                // account gate is local and cannot fail; only the destination list crosses the
+                // network, and an outage there keeps the rail the user chose rather than silently
+                // opening the other product, which the destination screen would then have to
+                // explain instead of reporting its own error.
             case .home(.payWithNearTapped):
-                let isSoftwareWallet = state.selectedWalletAccount?.vendor == .zcash
+                guard peerCashOut.isConfigured(),
+                      case let .peerCashOut(destinationCode) = userStoredPreferences.p2pRail() ?? .default else {
+                    return .send(.openScanAndPay)
+                }
                 return .run { send in
-                    guard
-                        isSoftwareWallet,
-                        case let .peerCashOut(destinationCode) = userStoredPreferences.p2pRail() ?? .default,
-                        let capabilities = try? await peerCashOut.capabilities(),
-                        capabilities.isAvailable,
-                        capabilities.destination(code: destinationCode) != nil
-                    else {
+                    let capabilities = try await peerCashOut.capabilities()
+                    guard capabilities.isAvailable, capabilities.destination(code: destinationCode) != nil else {
                         return await send(.openScanAndPay)
                     }
                     await send(.openPeerCashOut(destinationCode: destinationCode))
                 } catch: { _, send in
-                    await send(.openScanAndPay)
+                    await send(.openPeerCashOut(destinationCode: destinationCode))
                 }
+                .cancellable(id: state.p2pRailResolveCancelId, cancelInFlight: true)
 
             case .openScanAndPay:
                 state.offrampActivityReturn = nil

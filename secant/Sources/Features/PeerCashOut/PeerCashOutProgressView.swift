@@ -76,6 +76,11 @@ struct PeerCashOutProgressView: View {
                 }
             }
 
+            if let message = store.retryErrorMessage {
+                Text(message)
+                    .zappFont(.caption, style: ZappColors.textMuted)
+            }
+
             if store.offersRetry {
                 ZappButton(title: String(localizable: .peerProgressRetry)) { store.send(.retryTapped) }
             }

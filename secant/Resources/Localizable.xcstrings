@@ -34023,6 +34023,23 @@
         }
       }
     },
+    "peer.form.error.handle.unchecked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't check that handle. Edit it to try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pudimos verificar ese identificador. Edítalo para volver a intentarlo."
+          }
+        }
+      }
+    },
     "peer.form.sizing.warning" : {
       "extractionState" : "manual",
       "localizations" : {

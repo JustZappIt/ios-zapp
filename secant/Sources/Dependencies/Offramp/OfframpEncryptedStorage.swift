@@ -212,10 +212,11 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCas
             to: fileURL,
             options: [.atomic, .completeFileProtection]
         )
-        // The atomic write is the commit point observed by KMP. Metadata is defense in depth (the
-        // write already requests complete protection) and must not turn a committed broadcast
-        // marker into a reported failure: that ambiguity could leave a never-broadcast identity
-        // reserved forever on the next launch.
+        // The atomic write is the commit point observed by KMP. Neither metadata write below may
+        // turn a committed broadcast marker into a reported failure — that ambiguity could leave a
+        // never-broadcast identity reserved forever on the next launch — and neither needs to:
+        // protection is already requested above, and backup exclusion is a privacy hardening on a
+        // file whose contents are encrypted with a wallet-scoped key.
         try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: fileURL.path)
         var resourceValues = URLResourceValues()
         resourceValues.isExcludedFromBackup = true

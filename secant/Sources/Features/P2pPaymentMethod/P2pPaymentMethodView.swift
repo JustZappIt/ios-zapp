@@ -47,10 +47,13 @@ struct P2pPaymentMethodView: View {
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
 
-            if !store.isPeerAvailable {
-                unavailableNote(String(localizable: .p2pPaymentMethodPeerNetwork))
-            } else if !store.isSoftwareWallet {
+            // The account reason first: it is the more specific of the two and the only one the
+            // user can act on. A hardware wallet cannot derive the Base account the rails sign
+            // from, so the capability read reports them unavailable for that reason too.
+            if !store.isSoftwareWallet {
                 unavailableNote(String(localizable: .p2pPaymentMethodPeerHardwareWallet))
+            } else if !store.isPeerAvailable {
+                unavailableNote(String(localizable: .p2pPaymentMethodPeerNetwork))
             }
 
             ForEach(store.destinations) { destination in

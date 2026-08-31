@@ -167,7 +167,6 @@ struct PeerStatusStoreTests {
             failure: PeerFailure(
                 code: "INDEXER_UNAVAILABLE",
                 step: .settling,
-                retryable: true,
                 allowsManualRetry: true,
                 nothingEscrowed: false,
                 recovery: nil,

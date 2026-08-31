@@ -238,6 +238,9 @@ struct Root {
         var peerCashOutActivityReturn: PeerCashOutActivityReturn?
         var peerCashOutOrigin = PeerCashOutOrigin.pay
         var offrampOrigin = OfframpOrigin.pay
+        /// The Pay action's rail lookup can take a moment on a cold session, so a second tap
+        /// replaces the first rather than racing a second navigation against it.
+        var p2pRailResolveCancelId = UUID()
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial

@@ -158,6 +158,7 @@ struct P2pRootRoutingTests {
             let store = TestStore(initialState: state) {
                 Root().coordinatorReduce()
             } withDependencies: {
+                $0.peerCashOut.isConfigured = { true }
                 $0.peerCashOut.capabilities = {
                     PeerCapabilities(
                         isAvailable: true,
@@ -176,6 +177,56 @@ struct P2pRootRoutingTests {
 
             #expect(store.state.path == .offramp)
             #expect(store.state.offrampOrigin == .pay)
+        }
+    }
+
+    /// The capability read throws for an outage as well as for an absent rail. Reading the first as
+    /// the second would silently open the other product, which is not a way to report a network
+    /// error — the rail the user chose opens and reports its own.
+    @MainActor
+    @Test func anUnreadableCapabilityKeepsTheChosenRailInsteadOfSwitchingProducts() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = Root.State.initial
+            state.$selectedWalletAccount.withLock { $0 = softwareWallet() }
+            let store = TestStore(initialState: state) {
+                Root().coordinatorReduce()
+            } withDependencies: {
+                $0.peerCashOut.isConfigured = { true }
+                $0.peerCashOut.capabilities = { throw PeerCashOutClientError.unavailable }
+                $0.userStoredPreferences.p2pRail = { .peerCashOut(destinationCode: "revolut") }
+            }
+
+            await store.send(.home(.payWithNearTapped))
+            await store.receive(\.openPeerCashOut)
+
+            #expect(store.state.path == .peerCashOut)
+            #expect(store.state.peerCashOutState.form.destinationCode == "revolut")
+        }
+    }
+
+    /// A hardware wallet cannot derive the Base account the rails sign from, and the answer is on
+    /// the device: no client is built and no read can fail on the way to it.
+    @MainActor
+    @Test func aWalletWithoutTheRailsGoesStraightToScanAndPay() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = Root.State.initial
+            state.$selectedWalletAccount.withLock { $0 = softwareWallet() }
+            let store = TestStore(initialState: state) {
+                Root().coordinatorReduce()
+            } withDependencies: {
+                $0.peerCashOut.isConfigured = { false }
+                $0.peerCashOut.capabilities = { Issue.record("capabilities must not be read"); return .unavailable }
+                $0.userStoredPreferences.p2pRail = { .peerCashOut(destinationCode: "revolut") }
+            }
+
+            await store.send(.home(.payWithNearTapped))
+            await store.receive(\.openScanAndPay)
+
+            #expect(store.state.path == .offramp)
         }
     }
 

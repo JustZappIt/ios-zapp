@@ -26,8 +26,15 @@ struct PeerRun: Equatable, Identifiable, Sendable {
 
     var failure: PeerFailure? { latest?.failure }
 
-    /// True until the order exists on chain, which is exactly while no indexer list can show it.
-    var isUnindexed: Bool { depositID == nil }
+    /// Whether an order list holding these deposits can already answer for this attempt.
+    ///
+    /// Not "has no deposit id": that id is resolved from a transaction receipt, which runs ahead of
+    /// the indexer the order lists are read from. Dropping the row the moment the id exists leaves
+    /// the amount subtracted from the balance with nothing on screen to explain it.
+    func isAwaitingIndex(in indexedDepositIDs: Set<String>) -> Bool {
+        guard let depositID else { return true }
+        return !indexedDepositIDs.contains(depositID)
+    }
 
     /// Whether this attempt still has a claim on the smart account's USDC. A failure before the
     /// deposit was ever broadcast released nothing; from `creatingDeposit` onward a send may have
@@ -241,19 +248,38 @@ actor PeerCashOutRunner {
     /// record to resolve, and its draft is the only thing that can describe it — so this one may
     /// broadcast, and callers authenticate first. Where a checkpoint does exist the facade prefers
     /// it, so a retry still cannot re-send what was already sent.
-    func retry(id: String, sessionGeneration: Int) {
+    ///
+    /// Re-admits before it does. A failure that proved nothing was escrowed released the
+    /// reservation, and between then and now a second cash-out, a p2p.me payment or a refund may
+    /// have been admitted against the same coins — so this claims them again rather than assuming
+    /// the amount is still spoken for.
+    func retry(id: String, rawBalance: UsdcAmount, sessionGeneration: Int) async throws {
         guard boundSessionGeneration == sessionGeneration else { return }
         guard let draft = drafts[id] else { return recover(id: id, sessionGeneration: sessionGeneration) }
+        guard canLaunch(id: id) else { return }
+        let startedIn = generation
+        try await reservations.claim(.peer(attemptID: id), amount: draft.amount, rawBalance: rawBalance)
+        guard startedIn == generation, boundSessionGeneration == sessionGeneration else {
+            await reservations.settle(.peer(attemptID: id), as: .available)
+            return
+        }
+        // Another launch may have entered while the reservation actor was serving this one. Its
+        // idempotent claim belongs to the job now driving the attempt, so leave it in place.
         launch(id: id) { $0.run(request: draft.apple(attemptID: id)) }
     }
 
-    /// A no-op while the attempt is already running, and for one that reached the chain: from there
+    /// False while the attempt is already running, and for one that reached the chain: from there
     /// its order is the record, and a second pass through setup would escrow a second lot of USDC.
+    private func canLaunch(id: String) -> Bool {
+        guard jobs[id] == nil, let run = state.run(id: id) else { return false }
+        return run.depositID == nil
+    }
+
     private func launch(
         id: String,
         operation: @escaping @Sendable (ApplePeerCashOutClient) -> SkieSwiftFlow<ApplePeerStatus>
     ) {
-        guard jobs[id] == nil, let run = state.run(id: id), run.depositID == nil else { return }
+        guard canLaunch(id: id) else { return }
         mutate(id: id) { $0.statuses.removeAll() }
         launchDrive(id: id, operation: operation)
     }

@@ -141,6 +141,40 @@ struct PeerCashOutRunnerTests {
         #expect(run.holdsFunds)
     }
 
+    /// A pre-send failure released what the attempt reserved. Between then and Try again another
+    /// spender may have been admitted against the same coins, so the retry has to re-admit rather
+    /// than assume the amount is still its own.
+    @Test func retryingReclaimsTheReservationTheFailureReleased() async throws {
+        let reservations = BaseUSDCReservationLedger()
+        let runner = await readyRunner(reservations)
+        let id = await runner.newAttemptID(byteCount: 16)
+        _ = try await runner.start(id: id, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
+        await reservations.settle(.peer(attemptID: id), as: .available)
+        #expect(await reservations.committed == .zero)
+
+        try await runner.retry(id: id, rawBalance: amount("100000000"), sessionGeneration: 0)
+
+        #expect(await reservations.committed.microsString == "20000000")
+    }
+
+    /// The whole point of re-admitting: a balance already promised elsewhere must refuse the retry
+    /// instead of letting a second broadcast spend the same coins.
+    @Test func retryingIsRefusedWhenTheBalanceIsNoLongerAvailable() async throws {
+        let reservations = BaseUSDCReservationLedger()
+        let runner = await readyRunner(reservations)
+        let id = await runner.newAttemptID(byteCount: 16)
+        _ = try await runner.start(id: id, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
+        await reservations.settle(.peer(attemptID: id), as: .available)
+        try await reservations.claimExclusive(
+            .refund(operationID: "refund"),
+            rawBalance: amount("100000000")
+        )
+
+        await #expect(throws: BaseUSDCReservationLedger.ClaimError.self) {
+            try await runner.retry(id: id, rawBalance: amount("100000000"), sessionGeneration: 0)
+        }
+    }
+
     /// A decode/I/O failure is not evidence that the checkpoint book contained no attempts.
     @Test func unreadableHydrationFailsClosed() async {
         let reservations = BaseUSDCReservationLedger()
@@ -200,11 +234,12 @@ struct PeerCashOutRunnerTests {
         #expect(await reservations.spendable(rawBalance: amount("100000000")) == .unavailable)
     }
 
-    private func readyRunner() async -> PeerCashOutRunner {
-        let reservations = BaseUSDCReservationLedger()
-        await reservations.markReady(.peer)
-        await reservations.markReady(.scanAndPay)
-        await reservations.markReady(.onrampDelivery)
+    private func readyRunner(
+        _ reservations: BaseUSDCReservationLedger = BaseUSDCReservationLedger()
+    ) async -> PeerCashOutRunner {
+        for source in BaseUSDCReservationLedger.Source.allCases {
+            await reservations.markReady(source)
+        }
         return PeerCashOutRunner(reservations: reservations)
     }
 
@@ -236,7 +271,6 @@ struct PeerCashOutRunnerTests {
             failure: PeerFailure(
                 code: "RECOVERY_STATE_UNREADABLE",
                 step: .creatingDeposit,
-                retryable: false,
                 allowsManualRetry: false,
                 nothingEscrowed: nothingEscrowed,
                 recovery: nil,

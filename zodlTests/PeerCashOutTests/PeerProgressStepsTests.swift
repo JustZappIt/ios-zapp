@@ -73,6 +73,38 @@ struct PeerProgressStepsTests {
         #expect(detail.contains("20"))
     }
 
+    /// A step this build does not recognise decodes as `initialization`, which has no row of its
+    /// own. Letting it pull the marker back to the first row reports a failure that happened after
+    /// the escrow took the money as "we could not check your details".
+    @Test func anUnknownFailureStepDoesNotRewindToThePayeeCheck() throws {
+        let unknown = PeerProgress(
+            subjectID: "0123456789abcdef0123456789abcdef",
+            kind: .failed,
+            step: .initialization,
+            amount: nil,
+            txHash: nil,
+            depositID: nil,
+            order: nil,
+            failure: PeerFailure(
+                code: "SOMETHING_NEWER",
+                step: .initialization,
+                allowsManualRetry: false,
+                nothingEscrowed: false,
+                recovery: nil,
+                escrowRevertBucket: nil
+            ),
+            isTerminal: true
+        )
+        let steps = PeerProgressSteps.build(
+            from: run(statuses: [status(.creatingDeposit, step: .creatingDeposit), unknown])
+        )
+        let validating = try #require(steps.first { $0.id == PeerProgress.Step.validatingPayee.rawValue })
+        let creating = try #require(steps.first { $0.id == PeerProgress.Step.creatingDeposit.rawValue })
+
+        #expect(validating.status == .completed)
+        #expect(creating.status == .failed)
+    }
+
     @Test func anAttemptWithNoStatusYetShowsEverythingAsPending() {
         let steps = PeerProgressSteps.build(from: nil)
 
@@ -121,7 +153,6 @@ struct PeerProgressStepsTests {
             failure: PeerFailure(
                 code: "TRANSACTION_FAILED",
                 step: step,
-                retryable: false,
                 allowsManualRetry: true,
                 nothingEscrowed: true,
                 recovery: nil,
