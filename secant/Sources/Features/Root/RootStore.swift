@@ -25,6 +25,9 @@ struct Root {
             case newChat
             case onramp
             case offramp
+            case p2pActivity
+            case p2pPaymentMethod
+            case peerCashOut
             case currencyConversionSetup
             case portfolioChartSetup
             case migrationCoordFlow
@@ -41,6 +44,32 @@ struct Root {
             case torSetup
             case transactionsCoordFlow
             case walletBackup
+        }
+
+        enum P2pActivityOrigin: Equatable {
+            case tabs
+            case offramp
+        }
+
+        enum PeerCashOutOrigin: Equatable {
+            case pay
+            case activity
+        }
+
+        enum OfframpOrigin: Equatable {
+            case pay
+            case peerCashOut
+            case activity
+        }
+
+        struct OfframpActivityReturn: Equatable {
+            let state: Offramp.State
+            let origin: OfframpOrigin
+        }
+
+        struct PeerCashOutActivityReturn: Equatable {
+            let state: PeerCashOut.State
+            let origin: PeerCashOutOrigin
         }
 
         /// Android's `ChatSendContextProvider.ChatSendContext`. `requestId` is set only when the
@@ -199,6 +228,16 @@ struct Root {
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
+        var offrampActivityReturn: OfframpActivityReturn?
+        var p2pActivityState = P2pActivity.State.initial
+        var p2pActivityOrigin = P2pActivityOrigin.tabs
+        var p2pPaymentMethodState = P2pPaymentMethod.State.initial
+        /// Built when a cash-out is opened, because it is scoped to one destination and carries the
+        /// screens pushed on top of it.
+        var peerCashOutState = PeerCashOut.State(destinationCode: "revolut")
+        var peerCashOutActivityReturn: PeerCashOutActivityReturn?
+        var peerCashOutOrigin = PeerCashOutOrigin.pay
+        var offrampOrigin = OfframpOrigin.pay
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
@@ -253,11 +292,12 @@ struct Root {
             // the manual lane broadcasts a real send-max transaction from inside it, and an
             // automatic server switch mid-broadcast is exactly what must not happen. #1930
             // classifies it identically.
-            case .migrationCoordFlow, .onramp, .offramp, .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
+            case .migrationCoordFlow, .onramp, .offramp, .peerCashOut, .sendCoordFlow, .scanCoordFlow,
+                 .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
-                 .newChat, .currencyConversionSetup, .portfolioChartSetup, .receive,
+                 .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -390,6 +430,11 @@ struct Root {
         case newChat(NewChat.Action)
         case onramp(Onramp.Action)
         case offramp(Offramp.Action)
+        case openPeerCashOut(destinationCode: String)
+        case openScanAndPay
+        case p2pActivity(P2pActivity.Action)
+        case p2pPaymentMethod(P2pPaymentMethod.Action)
+        case peerCashOut(PeerCashOut.Action)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -476,6 +521,7 @@ struct Root {
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.numberFormatter) var numberFormatter
     @Dependency(\.offramp) var offramp
+    @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.shieldingProcessor) var shieldingProcessor
@@ -601,6 +647,18 @@ struct Root {
 
         Scope(state: \.onrampState, action: \.onramp) {
             Onramp()
+        }
+
+        Scope(state: \.p2pActivityState, action: \.p2pActivity) {
+            P2pActivity()
+        }
+
+        Scope(state: \.p2pPaymentMethodState, action: \.p2pPaymentMethod) {
+            P2pPaymentMethod()
+        }
+
+        Scope(state: \.peerCashOutState, action: \.peerCashOut) {
+            PeerCashOut()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {

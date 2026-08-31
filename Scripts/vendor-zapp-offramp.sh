@@ -35,6 +35,29 @@ fi
 
 [ -d "$BUILD_OUTPUT" ] || fail "$BUILD_OUTPUT is missing"
 
+# The Apple facade classes Swift compiles against. A binary missing any of them is a stale build
+# from before that rail landed, and the app would fail to link rather than fail here.
+REQUIRED_CLASSES=(
+  ZappOfframpAppleOfframpClient
+  ZappOfframpAppleOnrampClient
+  ZappOfframpApplePeerCashOutClient
+  ZappOfframpApplePeerCapabilities
+  ZappOfframpApplePeerOrder
+  ZappOfframpApplePeerStatus
+  ZappOfframpApplePeerAttempt
+  ZappOfframpApplePeerCashOutRequest
+)
+
+# Protocol constants compiled into the binary as UTF-16 string literals. They prove the rails are
+# configured, not merely declared: a facade that exports its classes but lost its escrow address or
+# its curator path would link and then move funds nowhere.
+REQUIRED_LITERALS=(
+  usdcRecipientAddress
+  orders_collection
+  0x777777779d229cdF3110e9de47943791c26300Ef
+  /v2/makers/create
+)
+
 verify_slice() {
   local slice="$1"
   local framework="$2/$slice/ZappOfframp.framework"
@@ -44,20 +67,20 @@ verify_slice() {
   [ -f "$header" ] || fail "$slice header is missing"
   [ -f "$binary" ] || fail "$slice binary is missing"
 
-  local symbols
-  symbols="$(grep -aci onramp "$header")"
-  [ "$symbols" -gt 0 ] || fail "$slice exports no on-ramp symbols"
+  for class in "${REQUIRED_CLASSES[@]}"; do
+    grep -aq "$class" "$header" || fail "$slice header does not export $class"
+  done
 
-  python3 - "$binary" <<'PY'
+  python3 - "$binary" "${REQUIRED_LITERALS[@]}" <<'GATE'
 import sys
 
 data = open(sys.argv[1], "rb").read()
-for value in ("usdcRecipientAddress", "orders_collection"):
+for value in sys.argv[2:]:
     if not data.count(value.encode("utf-16-le")):
         raise SystemExit(f"missing UTF-16 protocol literal: {value}")
-PY
+GATE
 
-  echo "    $slice: $symbols on-ramp header matches; protocol literals present"
+  echo "    $slice: ${#REQUIRED_CLASSES[@]} facade classes exported; protocol literals present"
 }
 
 echo "==> Verifying built framework"

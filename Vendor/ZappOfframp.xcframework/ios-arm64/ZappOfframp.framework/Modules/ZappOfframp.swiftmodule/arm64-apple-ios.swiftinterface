@@ -145,6 +145,8 @@ public enum Skie {
     }
     public enum OnrampZecDeliveryStatus {
     }
+    public enum MerchantAvailability {
+    }
     public enum BridgeToBaseStatus {
     }
     public enum OfframpStatus {
@@ -484,11 +486,19 @@ extension ZappOfframp.BundlerClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func sponsorUserOperation(op: ZappOfframp.UserOperationV06) async throws -> ZappOfframp.PaymasterResult
 }
+extension ZappOfframp.KotlinSuspendFunction1 {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func invoke(p1: Any?) async throws -> Any?
+}
 extension ZappOfframp.TxSubmitter {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func awaitReceipt(txHash: ZappOfframp.TxHash) async throws -> ZappOfframp.TransactionReceipt
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func sendTransaction(to: ZappOfframp.Address, value: Any, data: ZappOfframp.KotlinByteArray) async throws -> ZappOfframp.TxHash
+  public func receiptIfIncluded(txHash: ZappOfframp.TxHash) async throws -> ZappOfframp.TransactionReceipt?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func restorePendingTransaction(hash: ZappOfframp.TxHash?, nonce: ZappOfframp.BigInteger?) async throws
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func sendTransaction(to: ZappOfframp.Address, value: Any, data: ZappOfframp.KotlinByteArray, beforeBroadcast: any ZappOfframp.KotlinSuspendFunction1) async throws -> ZappOfframp.TxHash
 }
 extension ZappOfframp.Skie.RuntimeKotlin.SkieColdFlowIterator {
   public struct __Suspend<E> where E : AnyObject {
@@ -508,6 +518,14 @@ extension ZappOfframp.Kotlinx_coroutines_coreFlow {
 extension ZappOfframp.Kotlinx_coroutines_coreFlowCollector {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func emit(value: Any?) async throws
+}
+extension ZappOfframp.AllowanceTransactionGuard {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func withApprovalAndSpend(block: any ZappOfframp.KotlinSuspendFunction0) async throws -> Any?
+}
+extension ZappOfframp.KotlinSuspendFunction0 {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func invoke() async throws -> Any?
 }
 extension ZappOfframp.OfframpAccountProvider {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -559,6 +577,10 @@ extension ZappOfframp.AppleOfframpClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func parsePaymentQr(currencyCode: Swift.String, rawPayload: Swift.String) async throws -> ZappOfframp.ApplePaymentQrResult
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func pendingBaseCommitmentMicros() async throws -> Swift.String?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func pendingRefundCommitmentMicros() async throws -> Swift.String?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func quote(currencyCode: Swift.String, fiatAmount: Swift.String) async throws -> ZappOfframp.AppleOfframpQuote
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func topUpCheckpointMicros() async throws -> Swift.String?
@@ -583,6 +605,8 @@ extension ZappOfframp.AppleOnrampClient {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func limits(currencyCode: Swift.String) async throws -> ZappOfframp.AppleOnrampLimits
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func pendingBaseCommitmentMicros() async throws -> Swift.String?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func quote(fiatMicros: Swift.String, currencyCode: Swift.String) async throws -> ZappOfframp.AppleOnrampQuote
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func recipientAddress() async throws -> Swift.String
@@ -603,13 +627,33 @@ extension ZappOfframp.AppleOnrampDeviceSignals {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func collect() async throws -> ZappOfframp.AppleOnrampDeviceSignalsRecord
 }
+extension ZappOfframp.ApplePeerCashOutClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func account() async throws -> ZappOfframp.ApplePeerAccount
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func activeOrders() async throws -> [ZappOfframp.ApplePeerOrder]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func allOrders() async throws -> [ZappOfframp.ApplePeerOrder]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func attempts() async throws -> [ZappOfframp.ApplePeerAttempt]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func market(platformCode: Swift.String, currencyCode: Swift.String, amountMicros: Swift.String?) async throws -> ZappOfframp.ApplePeerMarket?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func order(depositIdComposite: Swift.String) async throws -> ZappOfframp.ApplePeerOrder?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func rate(currencyCode: Swift.String) async throws -> ZappOfframp.ApplePeerRate?
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func reconcile(drivingAttemptIds: [Swift.String]) async throws -> [ZappOfframp.ApplePeerReconciliation]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func storedHandle(platformCode: Swift.String) async throws -> Swift.String?
+}
+extension ZappOfframp.ApplePeerCashOutClient.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(account: ZappOfframp.AppleBaseAccount, storage: any ZappOfframp.ApplePeerCashOutStorage) async throws -> ZappOfframp.ApplePeerCashOutClient
+}
 extension ZappOfframp.OfframpFunding {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func ensureFunded(account: ZappOfframp.Address, request: ZappOfframp.OfframpRequest, resumeHandle: Swift.String?, onBridgeStarted: any ZappOfframp.KotlinSuspendFunction1) async throws -> any ZappOfframp.FundingOutcome
-}
-extension ZappOfframp.KotlinSuspendFunction1 {
-  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func invoke(p1: Any?) async throws -> Any?
 }
 extension ZappOfframp.OfframpRefund {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -653,6 +697,8 @@ extension ZappOfframp.OnrampDeviceSignalsProvider {
 }
 extension ZappOfframp.OnrampDriver {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func buyCorridors() async throws -> Swift.Set<ZappOfframp.CurrencyCode>
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func limits(currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.OnrampLimits
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func quote(fiatAmount: Any, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.OnrampQuote
@@ -676,10 +722,6 @@ extension ZappOfframp.OnrampZecDeliveryCheckpointStore {
 extension ZappOfframp.OnrampUsdcBalanceReader {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func balance(account: ZappOfframp.Address) async throws -> Any
-}
-extension ZappOfframp.KotlinSuspendFunction0 {
-  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func invoke() async throws -> Any?
 }
 extension ZappOfframp.OnrampZecSwapGateway {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -736,7 +778,7 @@ extension ZappOfframp.SubgraphClient {
 }
 extension ZappOfframp.OfframpDriver {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
-  public func isMerchantAvailable(usdc: Any, currency: ZappOfframp.CurrencyCode) async throws -> ZappOfframp.KotlinBoolean
+  public func merchantAvailability(usdc: Any, fiat: Any, currency: ZappOfframp.CurrencyCode) async throws -> any ZappOfframp.MerchantAvailability
 }
 extension ZappOfframp.DynamicPixResolver {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -777,6 +819,8 @@ extension ZappOfframp.PeerCashOutOrchestrator {
   public func activeOrders() async throws -> [ZappOfframp.PeerOrderSnapshot]
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func allOrders() async throws -> [ZappOfframp.PeerOrderSnapshot]
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func resolveCheckpoint(checkpoint: ZappOfframp.PeerCashOutCheckpoint) async throws -> ZappOfframp.PeerDepositId
 }
 extension ZappOfframp.PeerOracleRate {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -1312,6 +1356,11 @@ extension ZappOfframp.__Ktor_client_loggingLogLevel {
   case ven
   case ngn
   case cop
+  case bob
+  case cup
+  case ecu
+  case pen
+  case php
   public var code: Swift.String {
     get
   }
@@ -2237,6 +2286,9 @@ extension ZappOfframp.__PeerCashOutStep {
   public func toSwiftEnum() -> ZappOfframp.PeerCashOutStep
 }
 @frozen public enum PeerErrorCode : Swift.Hashable, Swift.CaseIterable, Swift._ObjectiveCBridgeable {
+  case invalidRequest
+  case initializationFailed
+  case recoveryActionUnsafe
   case unsupportedPlatform
   case unsupportedPlatformCurrency
   case payeeRegistrationFailed
@@ -2254,6 +2306,7 @@ extension ZappOfframp.__PeerCashOutStep {
   case activeIntentBlocksWithdrawal
   case insufficientAvailableFunds
   case fundingBridgeFailed
+  case recoveryStateUnreadable
   public var allowsManualRetry: Swift.Bool {
     get
   }
@@ -2618,6 +2671,20 @@ extension ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus {
 }
 public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed where __Sealed : ZappOfframp.OnrampZecDeliveryStatus
 @_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.OnrampZecDeliveryStatus.__Sealed? where __Sealed : ZappOfframp.OnrampZecDeliveryStatus
+extension ZappOfframp.Skie.OfframpLib.MerchantAvailability {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case available(ZappOfframp.MerchantAvailabilityAvailable)
+    case unavailable(ZappOfframp.MerchantAvailabilityUnavailable)
+    case undetermined(ZappOfframp.MerchantAvailabilityUndetermined)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.MerchantAvailability.__Sealed, b: ZappOfframp.Skie.OfframpLib.MerchantAvailability.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.MerchantAvailability.__Sealed where __Sealed : ZappOfframp.MerchantAvailability
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.MerchantAvailability.__Sealed? where __Sealed : ZappOfframp.MerchantAvailability
 extension ZappOfframp.Skie.OfframpLib.BridgeToBaseStatus {
   @frozen public enum __Sealed : Swift.Hashable {
     case bridging(ZappOfframp.BridgeToBaseStatusBridging)

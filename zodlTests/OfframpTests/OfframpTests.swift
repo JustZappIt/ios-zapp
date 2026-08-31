@@ -213,6 +213,91 @@ struct OfframpTests {
         }
     }
 
+    /// Closing Scan & Pay owns only its reducer effects. Peer's runner belongs to the wallet and
+    /// must survive ordinary navigation so an approval/create already in flight keeps its owner.
+    @MainActor
+    @Test func closingScreenDoesNotInvalidateWalletSession() async {
+        let screenResets = LockIsolated(0)
+        let sessionInvalidations = LockIsolated(0)
+        let store = TestStore(initialState: Offramp.State.initial()) { Offramp() } withDependencies: {
+            $0.offramp.resetScreen = { screenResets.withValue { $0 += 1 } }
+            $0.offramp.invalidateSession = { sessionInvalidations.withValue { $0 += 1 } }
+        }
+
+        await store.send(.delegate(.close))
+        await store.receive(\.cancelAll)
+        await store.finish()
+
+        #expect(screenResets.value == 1)
+        #expect(sessionInvalidations.value == 0)
+    }
+
+    /// Root sends the Activity refund intent as soon as it mounts Offramp. The new screen's
+    /// `onAppear` load must not cancel that already-running preview.
+    @MainActor
+    @Test func onAppearDoesNotCancelActivityRefundPreview() async {
+        let previewStarted = AsyncStream<Void>.makeStream()
+        var startedIterator = previewStarted.stream.makeAsyncIterator()
+        let releasePreview = AsyncStream<Void>.makeStream()
+        let cancellation = CancellationFlag()
+        let preview = OfframpBridgePreview(
+            sourceAmount: "2",
+            sourceAsset: "USDC on Base",
+            destinationAmount: "0.01",
+            destinationAsset: "ZEC",
+            networkFee: nil,
+            estimatedSeconds: 60
+        )
+        let store = TestStore(initialState: Offramp.State.initial()) { Offramp() } withDependencies: {
+            $0.peerCashOut.spendableBalance = {
+                .ready(balance: UsdcAmount(micros: "2000000") ?? .zero, committed: .zero)
+            }
+            $0.offramp.previewRefund = {
+                previewStarted.continuation.yield()
+                previewStarted.continuation.finish()
+                return try await withTaskCancellationHandler {
+                    var iterator = releasePreview.stream.makeAsyncIterator()
+                    guard await iterator.next() != nil else { throw CancellationError() }
+                    return preview
+                } onCancel: {
+                    cancellation.markCancelled()
+                }
+            }
+            $0.offramp.corridors = { [] }
+            $0.offramp.checkpointCurrencyCode = { nil }
+            $0.offramp.topUpCheckpointMicros = { nil }
+            $0.offramp.accountSummary = { self.account() }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.refundTapped)
+        _ = await startedIterator.next()
+        await store.send(.onAppear)
+        #expect(!cancellation.isCancelled)
+
+        releasePreview.continuation.yield()
+        releasePreview.continuation.finish()
+        await store.receive(\.refundPreviewLoaded) {
+            $0.bridgePreview = preview
+            $0.isLoading = false
+            $0.isRefundConfirmationPresented = true
+        }
+        #expect(!cancellation.isCancelled)
+    }
+
+    @MainActor
+    @Test func unreadableReservationsFailRefundPreviewClosed() async {
+        let store = TestStore(initialState: Offramp.State.initial()) { Offramp() } withDependencies: {
+            $0.peerCashOut.spendableBalance = { .unavailable }
+        }
+
+        await store.send(.refundTapped) { $0.isLoading = true }
+        await store.receive(\.loadFailed) {
+            $0.isLoading = false
+            $0.errorMessage = String(localizable: .peerFormErrorBalanceUnavailable)
+        }
+    }
+
     @Test func topUpAmountConvertsToUsdcMicrosWithoutRoundingUp() {
         #expect(Offramp.usdcMicros("2.5000009") == "2500000")
         #expect(Offramp.usdcMicros("0") == nil)
@@ -345,6 +430,7 @@ struct OfframpTests {
             usdcDisplay: "1",
             sellRate: "100",
             fixedFeeDisplay: "0.1",
+            requiredBalanceMicros: usdcMicros,
             baseBalanceDisplay: "2",
             shortfallMicros: "0",
             shortfallDisplay: "0",

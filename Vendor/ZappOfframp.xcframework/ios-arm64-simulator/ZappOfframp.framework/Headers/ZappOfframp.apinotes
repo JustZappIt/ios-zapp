@@ -3663,9 +3663,31 @@ Classes:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 1
       Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable)"
-  - Selector: "sendTransactionTo:value:data:completionHandler:"
+  - Selector: "receiptIfIncludedTxHash:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__sendTransaction(to:value:data:completionHandler:)"
+    SwiftName: "__receiptIfIncluded(txHash:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable_result, NSError * _Nullable)"
+  - Selector: "restorePendingTransactionHash:nonce:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__restorePendingTransaction(hash:nonce:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
+    - Position: 2
+      Type: "void (^ _Nonnull)(NSError * _Nullable)"
+  - Selector: "sendTransactionTo:value:data:beforeBroadcast:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__sendTransaction(to:value:data:beforeBroadcast:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
@@ -3676,6 +3698,8 @@ Classes:
     - Position: 2
       Type: "ZappOfframpKotlinByteArray * _Nonnull"
     - Position: 3
+      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
+    - Position: 4
       Type: "void (^ _Nonnull)(ZappOfframpTxHash * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpEoaSignerCompanion"
   SwiftName: "EoaSigner.Companion"
@@ -3716,9 +3740,31 @@ Classes:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 1
       Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable)"
-  - Selector: "sendTransactionTo:value:data:completionHandler:"
+  - Selector: "receiptIfIncludedTxHash:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__sendTransaction(to:value:data:completionHandler:)"
+    SwiftName: "__receiptIfIncluded(txHash:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable_result, NSError * _Nullable)"
+  - Selector: "restorePendingTransactionHash:nonce:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__restorePendingTransaction(hash:nonce:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
+    - Position: 2
+      Type: "void (^ _Nonnull)(NSError * _Nullable)"
+  - Selector: "sendTransactionTo:value:data:beforeBroadcast:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__sendTransaction(to:value:data:beforeBroadcast:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
@@ -3729,6 +3775,8 @@ Classes:
     - Position: 2
       Type: "ZappOfframpKotlinByteArray * _Nonnull"
     - Position: 3
+      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
+    - Position: 4
       Type: "void (^ _Nonnull)(ZappOfframpTxHash * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpErc4337SubmitterCompanion"
   SwiftName: "Erc4337Submitter.Companion"
@@ -3785,6 +3833,50 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpKotlinByteArray * _Nonnull"
+- Name: "ZappOfframpPreparedTransaction"
+  SwiftName: "PreparedTransaction"
+  Properties:
+  - Name: "hash"
+    PropertyKind: "Instance"
+    SwiftName: "hash_"
+    Type: "ZappOfframpTxHash * _Nonnull"
+  - Name: "nonce"
+    PropertyKind: "Instance"
+    SwiftName: "nonce"
+    Type: "ZappOfframpBigInteger * _Nonnull"
+  Methods:
+  - Selector: "initWithHash:nonce:"
+    MethodKind: "Instance"
+    SwiftName: "init(hash:nonce:)"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nonnull"
+  - Selector: "doCopyHash:nonce:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(hash:nonce:)"
+    ResultType: "ZappOfframpPreparedTransaction * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
 - Name: "ZappOfframpKeccakKt"
   SwiftName: "KeccakKt"
   Methods:
@@ -7450,6 +7542,22 @@ Classes:
 - Name: "ZappOfframpSkie_SuspendResultCanceled"
   SwiftName: "Skie_SuspendResult.Canceled"
   SwiftPrivate: true
+- Name: "ZappOfframpAllowanceTransactionGuard"
+  SwiftName: "AllowanceTransactionGuard"
+  Methods:
+  - Selector: "init"
+    MethodKind: "Instance"
+    SwiftName: "init()"
+  - Selector: "withApprovalAndSpendBlock:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__withApprovalAndSpend(block:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpKotlinSuspendFunction0> _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(id _Nullable_result, NSError * _Nullable)"
 - Name: "ZappOfframpDevOfframpAccountProvider"
   SwiftName: "DevOfframpAccountProvider"
   Properties:
@@ -7477,28 +7585,36 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "address"
     Type: "ZappOfframpAddress * _Nonnull"
+  - Name: "allowanceTransactions"
+    PropertyKind: "Instance"
+    SwiftName: "allowanceTransactions"
+    Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
   - Name: "submitter"
     PropertyKind: "Instance"
     SwiftName: "submitter"
     Type: "id<ZappOfframpTxSubmitter> _Nonnull"
   Methods:
-  - Selector: "initWithAddress:submitter:"
+  - Selector: "initWithAddress:submitter:allowanceTransactions:"
     MethodKind: "Instance"
-    SwiftName: "init(address:submitter:)"
+    SwiftName: "init(address:submitter:allowanceTransactions:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 1
       Type: "id<ZappOfframpTxSubmitter> _Nonnull"
-  - Selector: "doCopyAddress:submitter:"
+    - Position: 2
+      Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
+  - Selector: "doCopyAddress:submitter:allowanceTransactions:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(address:submitter:)"
+    SwiftName: "doCopy(address:submitter:allowanceTransactions:)"
     ResultType: "ZappOfframpSubmittingAccount * _Nonnull"
     Parameters:
     - Position: 0
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 1
       Type: "id<ZappOfframpTxSubmitter> _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -7972,6 +8088,22 @@ Classes:
       Type: "id<ZappOfframpAppleOfframpPaymentDetailsProvider> _Nonnull"
     - Position: 2
       Type: "NSString * _Nullable"
+  - Selector: "pendingBaseCommitmentMicrosWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__pendingBaseCommitmentMicros(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
+  - Selector: "pendingRefundCommitmentMicrosWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__pendingRefundCommitmentMicros(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
   - Selector: "quoteCurrencyCode:fiatAmount:completionHandler:"
     MethodKind: "Instance"
     SwiftName: "__quote(currencyCode:fiatAmount:completionHandler:)"
@@ -8790,6 +8922,14 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 1
       Type: "void (^ _Nonnull)(ZappOfframpAppleOnrampLimits * _Nullable, NSError * _Nullable)"
+  - Selector: "pendingBaseCommitmentMicrosWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__pendingBaseCommitmentMicros(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
   - Selector: "quoteFiatMicros:currencyCode:completionHandler:"
     MethodKind: "Instance"
     SwiftName: "__quote(fiatMicros:currencyCode:completionHandler:)"
@@ -10029,6 +10169,1563 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "description()"
     ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerCashOutClient"
+  SwiftName: "ApplePeerCashOutClient"
+  Methods:
+  - Selector: "accountWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__account(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(ZappOfframpApplePeerAccount * _Nullable, NSError * _Nullable)"
+  - Selector: "activeOrdersWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__activeOrders(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSArray<ZappOfframpApplePeerOrder *> * _Nullable, NSError * _Nullable)"
+  - Selector: "allOrdersWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__allOrders(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSArray<ZappOfframpApplePeerOrder *> * _Nullable, NSError * _Nullable)"
+  - Selector: "attemptsWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__attempts(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSArray<ZappOfframpApplePeerAttempt *> * _Nullable, NSError * _Nullable)"
+  - Selector: "capabilities"
+    MethodKind: "Instance"
+    SwiftName: "capabilities()"
+    ResultType: "ZappOfframpApplePeerCapabilities * _Nonnull"
+  - Selector: "marketPlatformCode:currencyCode:amountMicros:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__market(platformCode:currencyCode:amountMicros:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nullable"
+    - Position: 3
+      Type: "void (^ _Nonnull)(ZappOfframpApplePeerMarket * _Nullable_result, NSError * _Nullable)"
+  - Selector: "normalizeHandlePlatformCode:raw:"
+    MethodKind: "Instance"
+    SwiftName: "normalizeHandle(platformCode:raw:)"
+    ResultType: "ZappOfframpApplePeerHandleCheck * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+  - Selector: "observeOrderDepositIdComposite:"
+    MethodKind: "Instance"
+    SwiftName: "observeOrder(depositIdComposite:)"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpApplePeerStatus *> * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "orderDepositIdComposite:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__order(depositIdComposite:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpApplePeerOrder * _Nullable_result, NSError * _Nullable)"
+  - Selector: "rateCurrencyCode:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__rate(currencyCode:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpApplePeerRate * _Nullable_result, NSError * _Nullable)"
+  - Selector: "reconcileDrivingAttemptIds:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__reconcile(drivingAttemptIds:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(NSArray<ZappOfframpApplePeerReconciliation *> * _Nullable, NSError * _Nullable)"
+  - Selector: "resumeAttemptId:"
+    MethodKind: "Instance"
+    SwiftName: "resume(attemptId:)"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpApplePeerStatus *> * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "runRequest:"
+    MethodKind: "Instance"
+    SwiftName: "run(request:)"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpApplePeerStatus *> * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutRequest * _Nonnull"
+  - Selector: "setAcceptingIntentsDepositIdComposite:accepting:"
+    MethodKind: "Instance"
+    SwiftName: "setAcceptingIntents(depositIdComposite:accepting:)"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpApplePeerStatus *> * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "BOOL"
+  - Selector: "storedHandlePlatformCode:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__storedHandle(platformCode:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
+  - Selector: "transactionUrlTxHash:"
+    MethodKind: "Instance"
+    SwiftName: "transactionUrl(txHash:)"
+    ResultType: "NSString * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "withdrawDepositIdComposite:amountMicros:"
+    MethodKind: "Instance"
+    SwiftName: "withdraw(depositIdComposite:amountMicros:)"
+    ResultType: "ZappOfframpSkieKotlinFlow<ZappOfframpApplePeerStatus *> * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerCashOutClientCompanion"
+  SwiftName: "ApplePeerCashOutClient.Companion"
+  Methods:
+  - Selector: "createAccount:storage:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__create(account:storage:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
+    - Position: 1
+      Type: "id<ZappOfframpApplePeerCashOutStorage> _Nonnull"
+    - Position: 2
+      Type: "void (^ _Nonnull)(ZappOfframpApplePeerCashOutClient * _Nullable, NSError * _Nullable)"
+- Name: "ZappOfframpApplePeerCashOutRequest"
+  SwiftName: "ApplePeerCashOutRequest"
+  Properties:
+  - Name: "amountMicros"
+    PropertyKind: "Instance"
+    SwiftName: "amountMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "attemptId"
+    PropertyKind: "Instance"
+    SwiftName: "attemptId"
+    Type: "NSString * _Nonnull"
+  - Name: "currencyCodes"
+    PropertyKind: "Instance"
+    SwiftName: "currencyCodes"
+    Type: "NSArray<NSString *> * _Nonnull"
+  - Name: "handle"
+    PropertyKind: "Instance"
+    SwiftName: "handle"
+    Type: "NSString * _Nonnull"
+  - Name: "platformCode"
+    PropertyKind: "Instance"
+    SwiftName: "platformCode"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithAttemptId:platformCode:handle:currencyCodes:amountMicros:"
+    MethodKind: "Instance"
+    SwiftName: "init(attemptId:platformCode:handle:currencyCodes:amountMicros:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+  - Selector: "doCopyAttemptId:platformCode:handle:currencyCodes:amountMicros:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(attemptId:platformCode:handle:currencyCodes:amountMicros:)"
+    ResultType: "ZappOfframpApplePeerCashOutRequest * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerReconciliation"
+  SwiftName: "ApplePeerReconciliation"
+  Properties:
+  - Name: "attemptId"
+    PropertyKind: "Instance"
+    SwiftName: "attemptId"
+    Type: "NSString * _Nonnull"
+  - Name: "depositIdComposite"
+    PropertyKind: "Instance"
+    SwiftName: "depositIdComposite"
+    Type: "NSString * _Nullable"
+  - Name: "retiredWithoutEscrow"
+    PropertyKind: "Instance"
+    SwiftName: "retiredWithoutEscrow"
+    Type: "BOOL"
+  Methods:
+  - Selector: "initWithAttemptId:depositIdComposite:retiredWithoutEscrow:"
+    MethodKind: "Instance"
+    SwiftName: "init(attemptId:depositIdComposite:retiredWithoutEscrow:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "doCopyAttemptId:depositIdComposite:retiredWithoutEscrow:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(attemptId:depositIdComposite:retiredWithoutEscrow:)"
+    ResultType: "ZappOfframpApplePeerReconciliation * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerRate"
+  SwiftName: "ApplePeerRate"
+  Properties:
+  - Name: "currencyCode"
+    PropertyKind: "Instance"
+    SwiftName: "currencyCode"
+    Type: "NSString * _Nonnull"
+  - Name: "fiatPerUsdc"
+    PropertyKind: "Instance"
+    SwiftName: "fiatPerUsdc"
+    Type: "NSString * _Nonnull"
+  - Name: "readAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "readAtEpochSeconds"
+    Type: "int64_t"
+  Methods:
+  - Selector: "initWithCurrencyCode:fiatPerUsdc:readAtEpochSeconds:"
+    MethodKind: "Instance"
+    SwiftName: "init(currencyCode:fiatPerUsdc:readAtEpochSeconds:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "int64_t"
+  - Selector: "doCopyCurrencyCode:fiatPerUsdc:readAtEpochSeconds:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(currencyCode:fiatPerUsdc:readAtEpochSeconds:)"
+    ResultType: "ZappOfframpApplePeerRate * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "int64_t"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerOrder"
+  SwiftName: "ApplePeerOrder"
+  Properties:
+  - Name: "acceptingIntents"
+    PropertyKind: "Instance"
+    SwiftName: "acceptingIntents"
+    Type: "BOOL"
+  - Name: "creationTxHash"
+    PropertyKind: "Instance"
+    SwiftName: "creationTxHash"
+    Type: "NSString * _Nullable"
+  - Name: "currencies"
+    PropertyKind: "Instance"
+    SwiftName: "currencies"
+    Type: "NSArray<ZappOfframpApplePeerOrderCurrency *> * _Nonnull"
+  - Name: "depositIdComposite"
+    PropertyKind: "Instance"
+    SwiftName: "depositIdComposite"
+    Type: "NSString * _Nonnull"
+  - Name: "explorerUrl"
+    PropertyKind: "Instance"
+    SwiftName: "explorerUrl"
+    Type: "NSString * _Nullable"
+  - Name: "grossMicros"
+    PropertyKind: "Instance"
+    SwiftName: "grossMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "intents"
+    PropertyKind: "Instance"
+    SwiftName: "intents"
+    Type: "NSArray<ZappOfframpApplePeerIntent *> * _Nonnull"
+  - Name: "isAllOrNothing"
+    PropertyKind: "Instance"
+    SwiftName: "isAllOrNothing"
+    Type: "BOOL"
+  - Name: "isFinished"
+    PropertyKind: "Instance"
+    SwiftName: "isFinished"
+    Type: "BOOL"
+  - Name: "isHiddenFromBuyers"
+    PropertyKind: "Instance"
+    SwiftName: "isHiddenFromBuyers"
+    Type: "BOOL"
+  - Name: "lastActivityAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "lastActivityAtEpochSeconds"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "lockedMicros"
+    PropertyKind: "Instance"
+    SwiftName: "lockedMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "offersMatchingToggle"
+    PropertyKind: "Instance"
+    SwiftName: "offersMatchingToggle"
+    Type: "BOOL"
+  - Name: "offersWithdrawal"
+    PropertyKind: "Instance"
+    SwiftName: "offersWithdrawal"
+    Type: "BOOL"
+  - Name: "openedAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "openedAtEpochSeconds"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "phase"
+    PropertyKind: "Instance"
+    SwiftName: "phase"
+    Type: "NSString * _Nonnull"
+  - Name: "platformCode"
+    PropertyKind: "Instance"
+    SwiftName: "platformCode"
+    Type: "NSString * _Nullable"
+  - Name: "remainingMicros"
+    PropertyKind: "Instance"
+    SwiftName: "remainingMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "secondsToFirstBuyer"
+    PropertyKind: "Instance"
+    SwiftName: "secondsToFirstBuyer"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "soldMicros"
+    PropertyKind: "Instance"
+    SwiftName: "soldMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "withdrawableMicros"
+    PropertyKind: "Instance"
+    SwiftName: "withdrawableMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "withdrawnMicros"
+    PropertyKind: "Instance"
+    SwiftName: "withdrawnMicros"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithDepositIdComposite:phase:isFinished:acceptingIntents:grossMicros:remainingMicros:soldMicros:lockedMicros:withdrawnMicros:withdrawableMicros:platformCode:currencies:intents:offersWithdrawal:offersMatchingToggle:isHiddenFromBuyers:isAllOrNothing:creationTxHash:openedAtEpochSeconds:lastActivityAtEpochSeconds:secondsToFirstBuyer:explorerUrl:"
+    MethodKind: "Instance"
+    SwiftName: "init(depositIdComposite:phase:isFinished:acceptingIntents:grossMicros:remainingMicros:soldMicros:lockedMicros:withdrawnMicros:withdrawableMicros:platformCode:currencies:intents:offersWithdrawal:offersMatchingToggle:isHiddenFromBuyers:isAllOrNothing:creationTxHash:openedAtEpochSeconds:lastActivityAtEpochSeconds:secondsToFirstBuyer:explorerUrl:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+    - Position: 5
+      Type: "NSString * _Nonnull"
+    - Position: 6
+      Type: "NSString * _Nonnull"
+    - Position: 7
+      Type: "NSString * _Nonnull"
+    - Position: 8
+      Type: "NSString * _Nonnull"
+    - Position: 9
+      Type: "NSString * _Nonnull"
+    - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
+      Type: "NSArray<ZappOfframpApplePeerOrderCurrency *> * _Nonnull"
+    - Position: 12
+      Type: "NSArray<ZappOfframpApplePeerIntent *> * _Nonnull"
+    - Position: 13
+      Type: "BOOL"
+    - Position: 14
+      Type: "BOOL"
+    - Position: 15
+      Type: "BOOL"
+    - Position: 16
+      Type: "BOOL"
+    - Position: 17
+      Type: "NSString * _Nullable"
+    - Position: 18
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 19
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 20
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 21
+      Type: "NSString * _Nullable"
+  - Selector: "doCopyDepositIdComposite:phase:isFinished:acceptingIntents:grossMicros:remainingMicros:soldMicros:lockedMicros:withdrawnMicros:withdrawableMicros:platformCode:currencies:intents:offersWithdrawal:offersMatchingToggle:isHiddenFromBuyers:isAllOrNothing:creationTxHash:openedAtEpochSeconds:lastActivityAtEpochSeconds:secondsToFirstBuyer:explorerUrl:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(depositIdComposite:phase:isFinished:acceptingIntents:grossMicros:remainingMicros:soldMicros:lockedMicros:withdrawnMicros:withdrawableMicros:platformCode:currencies:intents:offersWithdrawal:offersMatchingToggle:isHiddenFromBuyers:isAllOrNothing:creationTxHash:openedAtEpochSeconds:lastActivityAtEpochSeconds:secondsToFirstBuyer:explorerUrl:)"
+    ResultType: "ZappOfframpApplePeerOrder * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+    - Position: 5
+      Type: "NSString * _Nonnull"
+    - Position: 6
+      Type: "NSString * _Nonnull"
+    - Position: 7
+      Type: "NSString * _Nonnull"
+    - Position: 8
+      Type: "NSString * _Nonnull"
+    - Position: 9
+      Type: "NSString * _Nonnull"
+    - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
+      Type: "NSArray<ZappOfframpApplePeerOrderCurrency *> * _Nonnull"
+    - Position: 12
+      Type: "NSArray<ZappOfframpApplePeerIntent *> * _Nonnull"
+    - Position: 13
+      Type: "BOOL"
+    - Position: 14
+      Type: "BOOL"
+    - Position: 15
+      Type: "BOOL"
+    - Position: 16
+      Type: "BOOL"
+    - Position: 17
+      Type: "NSString * _Nullable"
+    - Position: 18
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 19
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 20
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 21
+      Type: "NSString * _Nullable"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerOrderCompanion"
+  SwiftName: "ApplePeerOrder.Companion"
+  Properties:
+  - Name: "PHASE_BUYER_PAYING"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_BUYER_PAYING"
+    Type: "NSString * _Nonnull"
+  - Name: "PHASE_CLOSED"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_CLOSED"
+    Type: "NSString * _Nonnull"
+  - Name: "PHASE_PARTLY_SOLD"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_PARTLY_SOLD"
+    Type: "NSString * _Nonnull"
+  - Name: "PHASE_PAUSED"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_PAUSED"
+    Type: "NSString * _Nonnull"
+  - Name: "PHASE_SOLD"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_SOLD"
+    Type: "NSString * _Nonnull"
+  - Name: "PHASE_WAITING"
+    PropertyKind: "Instance"
+    SwiftName: "PHASE_WAITING"
+    Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerIntent"
+  SwiftName: "ApplePeerIntent"
+  Properties:
+  - Name: "amountMicros"
+    PropertyKind: "Instance"
+    SwiftName: "amountMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "expiresAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "expiresAtEpochSeconds"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "holdsFunds"
+    PropertyKind: "Instance"
+    SwiftName: "holdsFunds"
+    Type: "BOOL"
+  - Name: "intentHash"
+    PropertyKind: "Instance"
+    SwiftName: "intentHash"
+    Type: "NSString * _Nonnull"
+  - Name: "isPaidOut"
+    PropertyKind: "Instance"
+    SwiftName: "isPaidOut"
+    Type: "BOOL"
+  - Name: "outcome"
+    PropertyKind: "Instance"
+    SwiftName: "outcome"
+    Type: "NSString * _Nonnull"
+  - Name: "paymentAmount"
+    PropertyKind: "Instance"
+    SwiftName: "paymentAmount"
+    Type: "NSString * _Nullable"
+  - Name: "paymentCurrencyCode"
+    PropertyKind: "Instance"
+    SwiftName: "paymentCurrencyCode"
+    Type: "NSString * _Nullable"
+  - Name: "releasedMicros"
+    PropertyKind: "Instance"
+    SwiftName: "releasedMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "settlementTxHash"
+    PropertyKind: "Instance"
+    SwiftName: "settlementTxHash"
+    Type: "NSString * _Nullable"
+  - Name: "signalledAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "signalledAtEpochSeconds"
+    Type: "ZappOfframpLong * _Nullable"
+  Methods:
+  - Selector: "initWithIntentHash:outcome:amountMicros:releasedMicros:paymentCurrencyCode:paymentAmount:signalledAtEpochSeconds:expiresAtEpochSeconds:settlementTxHash:holdsFunds:isPaidOut:"
+    MethodKind: "Instance"
+    SwiftName: "init(intentHash:outcome:amountMicros:releasedMicros:paymentCurrencyCode:paymentAmount:signalledAtEpochSeconds:expiresAtEpochSeconds:settlementTxHash:holdsFunds:isPaidOut:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 7
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 8
+      Type: "NSString * _Nullable"
+    - Position: 9
+      Type: "BOOL"
+    - Position: 10
+      Type: "BOOL"
+  - Selector: "doCopyIntentHash:outcome:amountMicros:releasedMicros:paymentCurrencyCode:paymentAmount:signalledAtEpochSeconds:expiresAtEpochSeconds:settlementTxHash:holdsFunds:isPaidOut:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(intentHash:outcome:amountMicros:releasedMicros:paymentCurrencyCode:paymentAmount:signalledAtEpochSeconds:expiresAtEpochSeconds:settlementTxHash:holdsFunds:isPaidOut:)"
+    ResultType: "ZappOfframpApplePeerIntent * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 7
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 8
+      Type: "NSString * _Nullable"
+    - Position: 9
+      Type: "BOOL"
+    - Position: 10
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerIntentCompanion"
+  SwiftName: "ApplePeerIntent.Companion"
+  Properties:
+  - Name: "OUTCOME_BACKED_OUT"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_BACKED_OUT"
+    Type: "NSString * _Nonnull"
+  - Name: "OUTCOME_OUT_OF_TIME"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_OUT_OF_TIME"
+    Type: "NSString * _Nonnull"
+  - Name: "OUTCOME_PAID"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_PAID"
+    Type: "NSString * _Nonnull"
+  - Name: "OUTCOME_PAYING"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_PAYING"
+    Type: "NSString * _Nonnull"
+  - Name: "OUTCOME_TIMED_OUT"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_TIMED_OUT"
+    Type: "NSString * _Nonnull"
+  - Name: "OUTCOME_UNKNOWN"
+    PropertyKind: "Instance"
+    SwiftName: "OUTCOME_UNKNOWN"
+    Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerOrderCurrency"
+  SwiftName: "ApplePeerOrderCurrency"
+  Properties:
+  - Name: "code"
+    PropertyKind: "Instance"
+    SwiftName: "code"
+    Type: "NSString * _Nullable"
+  - Name: "lastOracleUpdateEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "lastOracleUpdateEpochSeconds"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "oracleRate"
+    PropertyKind: "Instance"
+    SwiftName: "oracleRate"
+    Type: "NSString * _Nullable"
+  - Name: "spreadBasisPoints"
+    PropertyKind: "Instance"
+    SwiftName: "spreadBasisPoints"
+    Type: "int32_t"
+  Methods:
+  - Selector: "initWithCode:spreadBasisPoints:oracleRate:lastOracleUpdateEpochSeconds:"
+    MethodKind: "Instance"
+    SwiftName: "init(code:spreadBasisPoints:oracleRate:lastOracleUpdateEpochSeconds:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nullable"
+    - Position: 1
+      Type: "int32_t"
+    - Position: 2
+      Type: "NSString * _Nullable"
+    - Position: 3
+      Type: "ZappOfframpLong * _Nullable"
+  - Selector: "doCopyCode:spreadBasisPoints:oracleRate:lastOracleUpdateEpochSeconds:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(code:spreadBasisPoints:oracleRate:lastOracleUpdateEpochSeconds:)"
+    ResultType: "ZappOfframpApplePeerOrderCurrency * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nullable"
+    - Position: 1
+      Type: "int32_t"
+    - Position: 2
+      Type: "NSString * _Nullable"
+    - Position: 3
+      Type: "ZappOfframpLong * _Nullable"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerHandleCheck"
+  SwiftName: "ApplePeerHandleCheck"
+  Properties:
+  - Name: "changedWhatWasTyped"
+    PropertyKind: "Instance"
+    SwiftName: "changedWhatWasTyped"
+    Type: "BOOL"
+  - Name: "normalized"
+    PropertyKind: "Instance"
+    SwiftName: "normalized"
+    Type: "NSString * _Nullable"
+  - Name: "validatesLive"
+    PropertyKind: "Instance"
+    SwiftName: "validatesLive"
+    Type: "BOOL"
+  Methods:
+  - Selector: "initWithNormalized:changedWhatWasTyped:validatesLive:"
+    MethodKind: "Instance"
+    SwiftName: "init(normalized:changedWhatWasTyped:validatesLive:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nullable"
+    - Position: 1
+      Type: "BOOL"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "doCopyNormalized:changedWhatWasTyped:validatesLive:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(normalized:changedWhatWasTyped:validatesLive:)"
+    ResultType: "ZappOfframpApplePeerHandleCheck * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nullable"
+    - Position: 1
+      Type: "BOOL"
+    - Position: 2
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerMarket"
+  SwiftName: "ApplePeerMarket"
+  Properties:
+  - Name: "averageFillMicros"
+    PropertyKind: "Instance"
+    SwiftName: "averageFillMicros"
+    Type: "NSString * _Nullable"
+  - Name: "currencyCode"
+    PropertyKind: "Instance"
+    SwiftName: "currencyCode"
+    Type: "NSString * _Nonnull"
+  - Name: "fillsInWindow"
+    PropertyKind: "Instance"
+    SwiftName: "fillsInWindow"
+    Type: "int32_t"
+  - Name: "isOversized"
+    PropertyKind: "Instance"
+    SwiftName: "isOversized"
+    Type: "BOOL"
+  - Name: "lastFillSecondsAgo"
+    PropertyKind: "Instance"
+    SwiftName: "lastFillSecondsAgo"
+    Type: "ZappOfframpLong * _Nullable"
+  - Name: "platformCode"
+    PropertyKind: "Instance"
+    SwiftName: "platformCode"
+    Type: "NSString * _Nonnull"
+  - Name: "verdict"
+    PropertyKind: "Instance"
+    SwiftName: "verdict"
+    Type: "NSString * _Nonnull"
+  - Name: "waitHighSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "waitHighSeconds"
+    Type: "int64_t"
+  - Name: "waitLowSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "waitLowSeconds"
+    Type: "int64_t"
+  Methods:
+  - Selector: "initWithPlatformCode:currencyCode:verdict:fillsInWindow:averageFillMicros:lastFillSecondsAgo:waitLowSeconds:waitHighSeconds:isOversized:"
+    MethodKind: "Instance"
+    SwiftName: "init(platformCode:currencyCode:verdict:fillsInWindow:averageFillMicros:lastFillSecondsAgo:waitLowSeconds:waitHighSeconds:isOversized:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "int32_t"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 6
+      Type: "int64_t"
+    - Position: 7
+      Type: "int64_t"
+    - Position: 8
+      Type: "BOOL"
+  - Selector: "doCopyPlatformCode:currencyCode:verdict:fillsInWindow:averageFillMicros:lastFillSecondsAgo:waitLowSeconds:waitHighSeconds:isOversized:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(platformCode:currencyCode:verdict:fillsInWindow:averageFillMicros:lastFillSecondsAgo:waitLowSeconds:waitHighSeconds:isOversized:)"
+    ResultType: "ZappOfframpApplePeerMarket * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "int32_t"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "ZappOfframpLong * _Nullable"
+    - Position: 6
+      Type: "int64_t"
+    - Position: 7
+      Type: "int64_t"
+    - Position: 8
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerMarketCompanion"
+  SwiftName: "ApplePeerMarket.Companion"
+  Properties:
+  - Name: "VERDICT_BAND"
+    PropertyKind: "Instance"
+    SwiftName: "VERDICT_BAND"
+    Type: "NSString * _Nonnull"
+  - Name: "VERDICT_LITTLE_ACTIVITY"
+    PropertyKind: "Instance"
+    SwiftName: "VERDICT_LITTLE_ACTIVITY"
+    Type: "NSString * _Nonnull"
+  - Name: "VERDICT_UNKNOWN"
+    PropertyKind: "Instance"
+    SwiftName: "VERDICT_UNKNOWN"
+    Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerCapabilities"
+  SwiftName: "ApplePeerCapabilities"
+  Properties:
+  - Name: "attemptIdByteCount"
+    PropertyKind: "Instance"
+    SwiftName: "attemptIdByteCount"
+    Type: "int32_t"
+  - Name: "isAvailable"
+    PropertyKind: "Instance"
+    SwiftName: "isAvailable"
+    Type: "BOOL"
+  - Name: "minimumMicros"
+    PropertyKind: "Instance"
+    SwiftName: "minimumMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "networkName"
+    PropertyKind: "Instance"
+    SwiftName: "networkName"
+    Type: "NSString * _Nullable"
+  - Name: "platforms"
+    PropertyKind: "Instance"
+    SwiftName: "platforms"
+    Type: "NSArray<ZappOfframpApplePeerPlatformCapability *> * _Nonnull"
+  - Name: "recommendedMinimumMicros"
+    PropertyKind: "Instance"
+    SwiftName: "recommendedMinimumMicros"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithIsAvailable:networkName:platforms:minimumMicros:recommendedMinimumMicros:attemptIdByteCount:"
+    MethodKind: "Instance"
+    SwiftName: "init(isAvailable:networkName:platforms:minimumMicros:recommendedMinimumMicros:attemptIdByteCount:)"
+    Parameters:
+    - Position: 0
+      Type: "BOOL"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "NSArray<ZappOfframpApplePeerPlatformCapability *> * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+    - Position: 5
+      Type: "int32_t"
+  - Selector: "doCopyIsAvailable:networkName:platforms:minimumMicros:recommendedMinimumMicros:attemptIdByteCount:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(isAvailable:networkName:platforms:minimumMicros:recommendedMinimumMicros:attemptIdByteCount:)"
+    ResultType: "ZappOfframpApplePeerCapabilities * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "BOOL"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "NSArray<ZappOfframpApplePeerPlatformCapability *> * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "NSString * _Nonnull"
+    - Position: 5
+      Type: "int32_t"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerPlatformCapability"
+  SwiftName: "ApplePeerPlatformCapability"
+  Properties:
+  - Name: "code"
+    PropertyKind: "Instance"
+    SwiftName: "code"
+    Type: "NSString * _Nonnull"
+  - Name: "currencies"
+    PropertyKind: "Instance"
+    SwiftName: "currencies"
+    Type: "NSArray<ZappOfframpApplePeerCurrency *> * _Nonnull"
+  - Name: "defaultCurrencyCodes"
+    PropertyKind: "Instance"
+    SwiftName: "defaultCurrencyCodes"
+    Type: "NSArray<NSString *> * _Nonnull"
+  - Name: "offersCurrencyChoice"
+    PropertyKind: "Instance"
+    SwiftName: "offersCurrencyChoice"
+    Type: "BOOL"
+  - Name: "validatesHandleLive"
+    PropertyKind: "Instance"
+    SwiftName: "validatesHandleLive"
+    Type: "BOOL"
+  Methods:
+  - Selector: "initWithCode:currencies:defaultCurrencyCodes:validatesHandleLive:offersCurrencyChoice:"
+    MethodKind: "Instance"
+    SwiftName: "init(code:currencies:defaultCurrencyCodes:validatesHandleLive:offersCurrencyChoice:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSArray<ZappOfframpApplePeerCurrency *> * _Nonnull"
+    - Position: 2
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "BOOL"
+  - Selector: "doCopyCode:currencies:defaultCurrencyCodes:validatesHandleLive:offersCurrencyChoice:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(code:currencies:defaultCurrencyCodes:validatesHandleLive:offersCurrencyChoice:)"
+    ResultType: "ZappOfframpApplePeerPlatformCapability * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSArray<ZappOfframpApplePeerCurrency *> * _Nonnull"
+    - Position: 2
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerCurrency"
+  SwiftName: "ApplePeerCurrency"
+  Properties:
+  - Name: "code"
+    PropertyKind: "Instance"
+    SwiftName: "code"
+    Type: "NSString * _Nonnull"
+  - Name: "precision"
+    PropertyKind: "Instance"
+    SwiftName: "precision"
+    Type: "int32_t"
+  - Name: "symbol"
+    PropertyKind: "Instance"
+    SwiftName: "symbol"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithCode:symbol:precision:"
+    MethodKind: "Instance"
+    SwiftName: "init(code:symbol:precision:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "int32_t"
+  - Selector: "doCopyCode:symbol:precision:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(code:symbol:precision:)"
+    ResultType: "ZappOfframpApplePeerCurrency * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "int32_t"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerAttempt"
+  SwiftName: "ApplePeerAttempt"
+  Properties:
+  - Name: "amountMicros"
+    PropertyKind: "Instance"
+    SwiftName: "amountMicros"
+    Type: "NSString * _Nonnull"
+  - Name: "createdAtEpochSeconds"
+    PropertyKind: "Instance"
+    SwiftName: "createdAtEpochSeconds"
+    Type: "int64_t"
+  - Name: "currencyCodes"
+    PropertyKind: "Instance"
+    SwiftName: "currencyCodes"
+    Type: "NSArray<NSString *> * _Nonnull"
+  - Name: "depositIdComposite"
+    PropertyKind: "Instance"
+    SwiftName: "depositIdComposite"
+    Type: "NSString * _Nullable"
+  - Name: "holdsUnescrowedFunds"
+    PropertyKind: "Instance"
+    SwiftName: "holdsUnescrowedFunds"
+    Type: "BOOL"
+  - Name: "id"
+    PropertyKind: "Instance"
+    SwiftName: "id"
+    Type: "NSString * _Nonnull"
+  - Name: "platformCode"
+    PropertyKind: "Instance"
+    SwiftName: "platformCode"
+    Type: "NSString * _Nonnull"
+  - Name: "resumeAction"
+    PropertyKind: "Instance"
+    SwiftName: "resumeAction"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithId:platformCode:currencyCodes:amountMicros:createdAtEpochSeconds:depositIdComposite:holdsUnescrowedFunds:resumeAction:"
+    MethodKind: "Instance"
+    SwiftName: "init(id:platformCode:currencyCodes:amountMicros:createdAtEpochSeconds:depositIdComposite:holdsUnescrowedFunds:resumeAction:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "int64_t"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "BOOL"
+    - Position: 7
+      Type: "NSString * _Nonnull"
+  - Selector: "doCopyId:platformCode:currencyCodes:amountMicros:createdAtEpochSeconds:depositIdComposite:holdsUnescrowedFunds:resumeAction:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(id:platformCode:currencyCodes:amountMicros:createdAtEpochSeconds:depositIdComposite:holdsUnescrowedFunds:resumeAction:)"
+    ResultType: "ZappOfframpApplePeerAttempt * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nonnull"
+    - Position: 4
+      Type: "int64_t"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "BOOL"
+    - Position: 7
+      Type: "NSString * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerAttemptCompanion"
+  SwiftName: "ApplePeerAttempt.Companion"
+  Properties:
+  - Name: "RESUME_BRIDGE"
+    PropertyKind: "Instance"
+    SwiftName: "RESUME_BRIDGE"
+    Type: "NSString * _Nonnull"
+  - Name: "RESUME_FRESH_START"
+    PropertyKind: "Instance"
+    SwiftName: "RESUME_FRESH_START"
+    Type: "NSString * _Nonnull"
+  - Name: "RESUME_READ_ORDER"
+    PropertyKind: "Instance"
+    SwiftName: "RESUME_READ_ORDER"
+    Type: "NSString * _Nonnull"
+  - Name: "RESUME_RECONCILE"
+    PropertyKind: "Instance"
+    SwiftName: "RESUME_RECONCILE"
+    Type: "NSString * _Nonnull"
+  - Name: "RESUME_RESOLVE_SUBMITTED"
+    PropertyKind: "Instance"
+    SwiftName: "RESUME_RESOLVE_SUBMITTED"
+    Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerAccount"
+  SwiftName: "ApplePeerAccount"
+  Properties:
+  - Name: "address"
+    PropertyKind: "Instance"
+    SwiftName: "address"
+    Type: "NSString * _Nonnull"
+  - Name: "balanceMicros"
+    PropertyKind: "Instance"
+    SwiftName: "balanceMicros"
+    Type: "NSString * _Nullable"
+  - Name: "explorerUrl"
+    PropertyKind: "Instance"
+    SwiftName: "explorerUrl"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithAddress:balanceMicros:explorerUrl:"
+    MethodKind: "Instance"
+    SwiftName: "init(address:balanceMicros:explorerUrl:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+  - Selector: "doCopyAddress:balanceMicros:explorerUrl:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(address:balanceMicros:explorerUrl:)"
+    ResultType: "ZappOfframpApplePeerAccount * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nullable"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerStatus"
+  SwiftName: "ApplePeerStatus"
+  Properties:
+  - Name: "amountMicros"
+    PropertyKind: "Instance"
+    SwiftName: "amountMicros"
+    Type: "NSString * _Nullable"
+  - Name: "depositIdComposite"
+    PropertyKind: "Instance"
+    SwiftName: "depositIdComposite"
+    Type: "NSString * _Nullable"
+  - Name: "failure"
+    PropertyKind: "Instance"
+    SwiftName: "failure"
+    Type: "ZappOfframpApplePeerFailure * _Nullable"
+  - Name: "isTerminal"
+    PropertyKind: "Instance"
+    SwiftName: "isTerminal"
+    Type: "BOOL"
+  - Name: "kind"
+    PropertyKind: "Instance"
+    SwiftName: "kind"
+    Type: "NSString * _Nonnull"
+  - Name: "order"
+    PropertyKind: "Instance"
+    SwiftName: "order"
+    Type: "ZappOfframpApplePeerOrder * _Nullable"
+  - Name: "payeeHashHex"
+    PropertyKind: "Instance"
+    SwiftName: "payeeHashHex"
+    Type: "NSString * _Nullable"
+  - Name: "step"
+    PropertyKind: "Instance"
+    SwiftName: "step"
+    Type: "NSString * _Nonnull"
+  - Name: "subjectId"
+    PropertyKind: "Instance"
+    SwiftName: "subjectId"
+    Type: "NSString * _Nonnull"
+  - Name: "txHash"
+    PropertyKind: "Instance"
+    SwiftName: "txHash"
+    Type: "NSString * _Nullable"
+  Methods:
+  - Selector: "initWithSubjectId:kind:step:amountMicros:txHash:payeeHashHex:depositIdComposite:order:failure:isTerminal:"
+    MethodKind: "Instance"
+    SwiftName: "init(subjectId:kind:step:amountMicros:txHash:payeeHashHex:depositIdComposite:order:failure:isTerminal:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nullable"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "NSString * _Nullable"
+    - Position: 7
+      Type: "ZappOfframpApplePeerOrder * _Nullable"
+    - Position: 8
+      Type: "ZappOfframpApplePeerFailure * _Nullable"
+    - Position: 9
+      Type: "BOOL"
+  - Selector: "doCopySubjectId:kind:step:amountMicros:txHash:payeeHashHex:depositIdComposite:order:failure:isTerminal:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(subjectId:kind:step:amountMicros:txHash:payeeHashHex:depositIdComposite:order:failure:isTerminal:)"
+    ResultType: "ZappOfframpApplePeerStatus * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nullable"
+    - Position: 4
+      Type: "NSString * _Nullable"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "NSString * _Nullable"
+    - Position: 7
+      Type: "ZappOfframpApplePeerOrder * _Nullable"
+    - Position: 8
+      Type: "ZappOfframpApplePeerFailure * _Nullable"
+    - Position: 9
+      Type: "BOOL"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerStatusCompanion"
+  SwiftName: "ApplePeerStatus.Companion"
+  Properties:
+  - Name: "KIND_APPROVING_USDC"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_APPROVING_USDC"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_CREATING_DEPOSIT"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_CREATING_DEPOSIT"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_FAILED"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_FAILED"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_FUNDED"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_FUNDED"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_IDLE"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_IDLE"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_ORDER_LIVE"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_ORDER_LIVE"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_VALIDATING_PAYEE"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_VALIDATING_PAYEE"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_WITHDRAWING"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_WITHDRAWING"
+    Type: "NSString * _Nonnull"
+  - Name: "KIND_WITHDRAWN"
+    PropertyKind: "Instance"
+    SwiftName: "KIND_WITHDRAWN"
+    Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerFailure"
+  SwiftName: "ApplePeerFailure"
+  Properties:
+  - Name: "allowsManualRetry"
+    PropertyKind: "Instance"
+    SwiftName: "allowsManualRetry"
+    Type: "BOOL"
+  - Name: "code"
+    PropertyKind: "Instance"
+    SwiftName: "code"
+    Type: "NSString * _Nonnull"
+  - Name: "escrowRevertBucket"
+    PropertyKind: "Instance"
+    SwiftName: "escrowRevertBucket"
+    Type: "NSString * _Nullable"
+  - Name: "nothingEscrowed"
+    PropertyKind: "Instance"
+    SwiftName: "nothingEscrowed"
+    Type: "BOOL"
+  - Name: "recoveryAddress"
+    PropertyKind: "Instance"
+    SwiftName: "recoveryAddress"
+    Type: "NSString * _Nullable"
+  - Name: "recoveryKind"
+    PropertyKind: "Instance"
+    SwiftName: "recoveryKind"
+    Type: "NSString * _Nullable"
+  - Name: "recoveryTxHash"
+    PropertyKind: "Instance"
+    SwiftName: "recoveryTxHash"
+    Type: "NSString * _Nullable"
+  - Name: "retryable"
+    PropertyKind: "Instance"
+    SwiftName: "retryable"
+    Type: "BOOL"
+  - Name: "step"
+    PropertyKind: "Instance"
+    SwiftName: "step"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithCode:step:retryable:allowsManualRetry:nothingEscrowed:recoveryKind:recoveryTxHash:recoveryAddress:escrowRevertBucket:"
+    MethodKind: "Instance"
+    SwiftName: "init(code:step:retryable:allowsManualRetry:nothingEscrowed:recoveryKind:recoveryTxHash:recoveryAddress:escrowRevertBucket:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "BOOL"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "NSString * _Nullable"
+    - Position: 7
+      Type: "NSString * _Nullable"
+    - Position: 8
+      Type: "NSString * _Nullable"
+  - Selector: "doCopyCode:step:retryable:allowsManualRetry:nothingEscrowed:recoveryKind:recoveryTxHash:recoveryAddress:escrowRevertBucket:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(code:step:retryable:allowsManualRetry:nothingEscrowed:recoveryKind:recoveryTxHash:recoveryAddress:escrowRevertBucket:)"
+    ResultType: "ZappOfframpApplePeerFailure * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "BOOL"
+    - Position: 3
+      Type: "BOOL"
+    - Position: 4
+      Type: "BOOL"
+    - Position: 5
+      Type: "NSString * _Nullable"
+    - Position: 6
+      Type: "NSString * _Nullable"
+    - Position: 7
+      Type: "NSString * _Nullable"
+    - Position: 8
+      Type: "NSString * _Nullable"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerFailureCompanion"
+  SwiftName: "ApplePeerFailure.Companion"
+  Properties:
+  - Name: "RECOVERY_INSPECT_DEPOSITOR"
+    PropertyKind: "Instance"
+    SwiftName: "RECOVERY_INSPECT_DEPOSITOR"
+    Type: "NSString * _Nonnull"
+  - Name: "RECOVERY_INSPECT_TRANSACTION"
+    PropertyKind: "Instance"
+    SwiftName: "RECOVERY_INSPECT_TRANSACTION"
+    Type: "NSString * _Nonnull"
 - Name: "ZappOfframpP2pConfigProvider"
   SwiftName: "P2pConfigProvider"
   Methods:
@@ -10170,6 +11867,14 @@ Classes:
 - Name: "ZappOfframpOfframpRequest"
   SwiftName: "OfframpRequest"
   Properties:
+  - Name: "authorizedPayFee"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedPayFee"
+    Type: "id _Nullable"
+  - Name: "authorizedRequiredBalance"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedRequiredBalance"
+    Type: "id _Nullable"
   - Name: "currency"
     PropertyKind: "Instance"
     SwiftName: "currency"
@@ -10195,9 +11900,9 @@ Classes:
     SwiftName: "usdcAmount"
     Type: "id _Nonnull"
   Methods:
-  - Selector: "initWithRecipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:"
+  - Selector: "initWithRecipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:authorizedPayFee:authorizedRequiredBalance:"
     MethodKind: "Instance"
-    SwiftName: "init(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:)"
+    SwiftName: "init(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:authorizedPayFee:authorizedRequiredBalance:)"
     Parameters:
     - Position: 0
       Type: "NSString * _Nonnull"
@@ -10211,9 +11916,13 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 5
       Type: "id _Nullable"
-  - Selector: "doCopyRecipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:"
+    - Position: 6
+      Type: "id _Nullable"
+    - Position: 7
+      Type: "id _Nullable"
+  - Selector: "doCopyRecipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:authorizedPayFee:authorizedRequiredBalance:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:)"
+    SwiftName: "doCopy(recipientUpi:usdcAmount:fiatAmount:currency:payeeName:fiatAmountLimit:authorizedPayFee:authorizedRequiredBalance:)"
     ResultType: "ZappOfframpOfframpRequest * _Nonnull"
     Parameters:
     - Position: 0
@@ -10227,6 +11936,10 @@ Classes:
     - Position: 4
       Type: "NSString * _Nullable"
     - Position: 5
+      Type: "id _Nullable"
+    - Position: 6
+      Type: "id _Nullable"
+    - Position: 7
       Type: "id _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
@@ -10291,6 +12004,26 @@ Classes:
   - Name: "cop"
     PropertyKind: "Class"
     SwiftName: "cop"
+    Type: "ZappOfframpCurrencyCode * _Nonnull"
+  - Name: "bob"
+    PropertyKind: "Class"
+    SwiftName: "bob"
+    Type: "ZappOfframpCurrencyCode * _Nonnull"
+  - Name: "cup"
+    PropertyKind: "Class"
+    SwiftName: "cup"
+    Type: "ZappOfframpCurrencyCode * _Nonnull"
+  - Name: "ecu"
+    PropertyKind: "Class"
+    SwiftName: "ecu"
+    Type: "ZappOfframpCurrencyCode * _Nonnull"
+  - Name: "pen"
+    PropertyKind: "Class"
+    SwiftName: "pen"
+    Type: "ZappOfframpCurrencyCode * _Nonnull"
+  - Name: "php"
+    PropertyKind: "Class"
+    SwiftName: "php"
     Type: "ZappOfframpCurrencyCode * _Nonnull"
   Methods:
   - Selector: "description"
@@ -11802,6 +13535,10 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "chainId"
     Type: "ZappOfframpLong * _Nullable"
+  - Name: "currencies"
+    PropertyKind: "Instance"
+    SwiftName: "currencies"
+    Type: "NSArray<ZappOfframpOnrampCurrencyDto *> * _Nonnull"
   - Name: "currency"
     PropertyKind: "Instance"
     SwiftName: "currency"
@@ -11827,9 +13564,9 @@ Classes:
     SwiftName: "perUserDailyFiat"
     Type: "NSString * _Nullable"
   Methods:
-  - Selector: "initWithNonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:"
+  - Selector: "initWithNonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:currencies:"
     MethodKind: "Instance"
-    SwiftName: "init(nonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:)"
+    SwiftName: "init(nonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:currencies:)"
     Parameters:
     - Position: 0
       Type: "NSString * _Nonnull"
@@ -11845,9 +13582,15 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 6
       Type: "ZappOfframpLong * _Nullable"
-  - Selector: "doCopyNonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:"
+    - Position: 7
+      Type: "NSArray<ZappOfframpOnrampCurrencyDto *> * _Nonnull"
+  - Selector: "buyCorridors"
     MethodKind: "Instance"
-    SwiftName: "doCopy(nonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:)"
+    SwiftName: "buyCorridors()"
+    ResultType: "NSSet<ZappOfframpCurrencyCode *> * _Nonnull"
+  - Selector: "doCopyNonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:currencies:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(nonce:enabled:currency:minFiat:maxFiat:perUserDailyFiat:chainId:currencies:)"
     ResultType: "ZappOfframpOnrampConfigDto * _Nonnull"
     Parameters:
     - Position: 0
@@ -11864,6 +13607,8 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 6
       Type: "ZappOfframpLong * _Nullable"
+    - Position: 7
+      Type: "NSArray<ZappOfframpOnrampCurrencyDto *> * _Nonnull"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -11965,6 +13710,49 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "DISABLED"
     Type: "ZappOfframpOnrampLimits * _Nonnull"
+- Name: "ZappOfframpOnrampCurrencyDto"
+  SwiftName: "OnrampCurrencyDto"
+  Properties:
+  - Name: "code"
+    PropertyKind: "Instance"
+    SwiftName: "code"
+    Type: "NSString * _Nonnull"
+  Methods:
+  - Selector: "initWithCode:"
+    MethodKind: "Instance"
+    SwiftName: "init(code:)"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "doCopyCode:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(code:)"
+    ResultType: "ZappOfframpOnrampCurrencyDto * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpOnrampCurrencyDtoCompanion"
+  SwiftName: "OnrampCurrencyDto.Companion"
+  Methods:
+  - Selector: "serializer"
+    MethodKind: "Instance"
+    SwiftName: "serializer()"
+    ResultType: "id<ZappOfframpKotlinx_serialization_coreKSerializer> _Nonnull"
 - Name: "ZappOfframpOnrampRequestSigner"
   SwiftName: "OnrampRequestSigner"
   Properties:
@@ -12022,6 +13810,14 @@ Classes:
       Type: "int64_t"
     - Position: 6
       Type: "int32_t"
+  - Selector: "buyCorridorsWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__buyCorridors(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSSet<ZappOfframpCurrencyCode *> * _Nullable, NSError * _Nullable)"
   - Selector: "cancelCheckpoint:"
     MethodKind: "Instance"
     SwiftName: "cancel(checkpoint:)"
@@ -12412,6 +14208,14 @@ Classes:
     Parameters:
     - Position: 0
       Type: "int64_t"
+  - Selector: "buyCorridorsWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__buyCorridors(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSSet<ZappOfframpCurrencyCode *> * _Nullable, NSError * _Nullable)"
   - Selector: "cancelCheckpoint:"
     MethodKind: "Instance"
     SwiftName: "cancel(checkpoint:)"
@@ -13708,18 +15512,20 @@ Classes:
       Type: "id _Nonnull"
     - Position: 1
       Type: "NSString * _Nullable"
-  - Selector: "isMerchantAvailableUsdc:currency:completionHandler:"
+  - Selector: "merchantAvailabilityUsdc:fiat:currency:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__isMerchantAvailable(usdc:currency:completionHandler:)"
+    SwiftName: "__merchantAvailability(usdc:fiat:currency:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
     - Position: 0
       Type: "id _Nonnull"
     - Position: 1
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "id _Nonnull"
     - Position: 2
-      Type: "void (^ _Nonnull)(ZappOfframpBoolean * _Nullable, NSError * _Nullable)"
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 3
+      Type: "void (^ _Nonnull)(id<ZappOfframpMerchantAvailability> _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint:paymentDetailsProvider:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:paymentDetailsProvider:)"
@@ -14085,6 +15891,22 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "approveTxHash"
     Type: "ZappOfframpTxHash * _Nullable"
+  - Name: "authorizedPayFee"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedPayFee"
+    Type: "id _Nullable"
+  - Name: "authorizedPayFeeMicroDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedPayFeeMicroDecimal"
+    Type: "NSString * _Nullable"
+  - Name: "authorizedRequiredBalance"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedRequiredBalance"
+    Type: "id _Nullable"
+  - Name: "authorizedRequiredBalanceMicroDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "authorizedRequiredBalanceMicroDecimal"
+    Type: "NSString * _Nullable"
   - Name: "bridgeDepositAddress"
     PropertyKind: "Instance"
     SwiftName: "bridgeDepositAddress"
@@ -14117,6 +15939,10 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "fiatAmountMicroDecimal"
     Type: "NSString * _Nullable"
+  - Name: "hasUnresolvedPlaceSubmission"
+    PropertyKind: "Instance"
+    SwiftName: "hasUnresolvedPlaceSubmission"
+    Type: "BOOL"
   - Name: "orderId"
     PropertyKind: "Instance"
     SwiftName: "orderId"
@@ -14128,6 +15954,14 @@ Classes:
   - Name: "payeeName"
     PropertyKind: "Instance"
     SwiftName: "payeeName"
+    Type: "NSString * _Nullable"
+  - Name: "placeOrderNonce"
+    PropertyKind: "Instance"
+    SwiftName: "placeOrderNonce"
+    Type: "ZappOfframpBigInteger * _Nullable"
+  - Name: "placeOrderNonceDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "placeOrderNonceDecimal"
     Type: "NSString * _Nullable"
   - Name: "placeOrderTxHash"
     PropertyKind: "Instance"
@@ -14150,9 +15984,9 @@ Classes:
     SwiftName: "usdcAmountMicroDecimal"
     Type: "NSString * _Nonnull"
   Methods:
-  - Selector: "initWithOrderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:"
+  - Selector: "initWithOrderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:placeOrderNonceDecimal:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:authorizedPayFeeMicroDecimal:authorizedRequiredBalanceMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:"
     MethodKind: "Instance"
-    SwiftName: "init(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)"
+    SwiftName: "init(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:placeOrderNonceDecimal:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:authorizedPayFeeMicroDecimal:authorizedRequiredBalanceMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)"
     Parameters:
     - Position: 0
       Type: "NSString * _Nullable"
@@ -14165,24 +15999,30 @@ Classes:
     - Position: 4
       Type: "ZappOfframpTxHash * _Nullable"
     - Position: 5
-      Type: "ZappOfframpTxHash * _Nullable"
+      Type: "NSString * _Nullable"
     - Position: 6
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpTxHash * _Nullable"
     - Position: 7
       Type: "NSString * _Nonnull"
     - Position: 8
-      Type: "NSString * _Nullable"
+      Type: "NSString * _Nonnull"
     - Position: 9
       Type: "NSString * _Nullable"
     - Position: 10
       Type: "NSString * _Nullable"
     - Position: 11
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "NSString * _Nullable"
     - Position: 12
+      Type: "NSString * _Nullable"
+    - Position: 13
+      Type: "NSString * _Nullable"
+    - Position: 14
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 15
       Type: "int64_t"
-  - Selector: "doCopyOrderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:"
+  - Selector: "doCopyOrderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:placeOrderNonceDecimal:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:authorizedPayFeeMicroDecimal:authorizedRequiredBalanceMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)"
+    SwiftName: "doCopy(orderId:currentStep:bridgeDepositAddress:approveTxHash:placeOrderTxHash:placeOrderNonceDecimal:setUpiTxHash:recipientUpi:usdcAmountMicroDecimal:authorizedPayFeeMicroDecimal:authorizedRequiredBalanceMicroDecimal:fiatAmountMicroDecimal:fiatAmountLimitMicroDecimal:payeeName:currency:createdAtMillis:)"
     ResultType: "ZappOfframpOfframpCheckpoint * _Nonnull"
     Parameters:
     - Position: 0
@@ -14196,20 +16036,26 @@ Classes:
     - Position: 4
       Type: "ZappOfframpTxHash * _Nullable"
     - Position: 5
-      Type: "ZappOfframpTxHash * _Nullable"
+      Type: "NSString * _Nullable"
     - Position: 6
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpTxHash * _Nullable"
     - Position: 7
       Type: "NSString * _Nonnull"
     - Position: 8
-      Type: "NSString * _Nullable"
+      Type: "NSString * _Nonnull"
     - Position: 9
       Type: "NSString * _Nullable"
     - Position: 10
       Type: "NSString * _Nullable"
     - Position: 11
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "NSString * _Nullable"
     - Position: 12
+      Type: "NSString * _Nullable"
+    - Position: 13
+      Type: "NSString * _Nullable"
+    - Position: 14
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 15
       Type: "int64_t"
   - Selector: "isEqual:"
     MethodKind: "Instance"
@@ -14297,6 +16143,78 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "UI_PROGRESS"
     Type: "NSArray<ZappOfframpOfframpStep *> * _Nonnull"
+- Name: "ZappOfframpMerchantAvailabilityAvailable"
+  SwiftName: "MerchantAvailabilityAvailable"
+  Methods:
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpMerchantAvailabilityUnavailable"
+  SwiftName: "MerchantAvailabilityUnavailable"
+  Methods:
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpMerchantAvailabilityUndetermined"
+  SwiftName: "MerchantAvailabilityUndetermined"
+  Properties:
+  - Name: "cause"
+    PropertyKind: "Instance"
+    SwiftName: "cause"
+    Type: "ZappOfframpKotlinThrowable * _Nonnull"
+  Methods:
+  - Selector: "initWithCause:"
+    MethodKind: "Instance"
+    SwiftName: "init(cause:)"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpKotlinThrowable * _Nonnull"
+  - Selector: "doCopyCause:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(cause:)"
+    ResultType: "ZappOfframpMerchantAvailabilityUndetermined * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpKotlinThrowable * _Nonnull"
+  - Selector: "isEqual:"
+    MethodKind: "Instance"
+    SwiftName: "isEqual(_:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "id _Nullable"
+  - Selector: "hash"
+    MethodKind: "Instance"
+    SwiftName: "hash()"
+    ResultType: "NSUInteger"
+  - Selector: "description"
+    MethodKind: "Instance"
+    SwiftName: "description()"
+    ResultType: "NSString * _Nonnull"
 - Name: "ZappOfframpRelayIdentity"
   SwiftName: "RelayIdentity"
   Properties:
@@ -15085,41 +17003,43 @@ Classes:
 - Name: "ZappOfframpOfframpOrchestrator"
   SwiftName: "OfframpOrchestrator"
   Methods:
-  - Selector: "initWithRpc:submitter:accountAddress:network:subgraph:orderReader:funding:refund:topUp:router:pollIntervalMs:stalledAfterMs:clockMs:onChainOrderReader:relayIdentityStore:orderRecipientUpiCache:"
+  - Selector: "initWithRpc:submitter:allowanceTransactions:accountAddress:network:subgraph:orderReader:funding:refund:topUp:router:pollIntervalMs:stalledAfterMs:clockMs:onChainOrderReader:relayIdentityStore:orderRecipientUpiCache:"
     MethodKind: "Instance"
-    SwiftName: "init(rpc:submitter:accountAddress:network:subgraph:orderReader:funding:refund:topUp:router:pollIntervalMs:stalledAfterMs:clockMs:onChainOrderReader:relayIdentityStore:orderRecipientUpiCache:)"
+    SwiftName: "init(rpc:submitter:allowanceTransactions:accountAddress:network:subgraph:orderReader:funding:refund:topUp:router:pollIntervalMs:stalledAfterMs:clockMs:onChainOrderReader:relayIdentityStore:orderRecipientUpiCache:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpBaseRpcClient * _Nonnull"
     - Position: 1
       Type: "id<ZappOfframpTxSubmitter> _Nonnull"
     - Position: 2
-      Type: "ZappOfframpAddress * _Nonnull"
+      Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
     - Position: 3
-      Type: "ZappOfframpP2pNetworkConfig * _Nonnull"
+      Type: "ZappOfframpAddress * _Nonnull"
     - Position: 4
-      Type: "ZappOfframpSubgraphClient * _Nonnull"
+      Type: "ZappOfframpP2pNetworkConfig * _Nonnull"
     - Position: 5
-      Type: "id<ZappOfframpOrderReadSource> _Nonnull"
+      Type: "ZappOfframpSubgraphClient * _Nonnull"
     - Position: 6
-      Type: "id<ZappOfframpOfframpFunding> _Nonnull"
+      Type: "id<ZappOfframpOrderReadSource> _Nonnull"
     - Position: 7
-      Type: "id<ZappOfframpOfframpRefund> _Nonnull"
+      Type: "id<ZappOfframpOfframpFunding> _Nonnull"
     - Position: 8
-      Type: "id<ZappOfframpOfframpTopUp> _Nonnull"
+      Type: "id<ZappOfframpOfframpRefund> _Nonnull"
     - Position: 9
-      Type: "ZappOfframpCircleRouter * _Nonnull"
+      Type: "id<ZappOfframpOfframpTopUp> _Nonnull"
     - Position: 10
-      Type: "int64_t"
+      Type: "ZappOfframpCircleRouter * _Nonnull"
     - Position: 11
       Type: "int64_t"
     - Position: 12
-      Type: "ZappOfframpLong * _Nonnull (^ _Nonnull)(void)"
+      Type: "int64_t"
     - Position: 13
-      Type: "id<ZappOfframpOrderReadSource> _Nonnull"
+      Type: "ZappOfframpLong * _Nonnull (^ _Nonnull)(void)"
     - Position: 14
-      Type: "id<ZappOfframpRelayIdentityStore> _Nonnull"
+      Type: "id<ZappOfframpOrderReadSource> _Nonnull"
     - Position: 15
+      Type: "id<ZappOfframpRelayIdentityStore> _Nonnull"
+    - Position: 16
       Type: "id<ZappOfframpOrderRecipientUpiCache> _Nonnull"
   - Selector: "bridgeFundsBackToZecOrderId:resume:"
     MethodKind: "Instance"
@@ -15139,18 +17059,20 @@ Classes:
       Type: "id _Nonnull"
     - Position: 1
       Type: "NSString * _Nullable"
-  - Selector: "isMerchantAvailableUsdc:currency:completionHandler:"
+  - Selector: "merchantAvailabilityUsdc:fiat:currency:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__isMerchantAvailable(usdc:currency:completionHandler:)"
+    SwiftName: "__merchantAvailability(usdc:fiat:currency:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
     - Position: 0
       Type: "id _Nonnull"
     - Position: 1
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "id _Nonnull"
     - Position: 2
-      Type: "void (^ _Nonnull)(ZappOfframpBoolean * _Nullable, NSError * _Nullable)"
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 3
+      Type: "void (^ _Nonnull)(id<ZappOfframpMerchantAvailability> _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint:paymentDetailsProvider:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:paymentDetailsProvider:)"
@@ -15369,14 +17291,18 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "circleId"
     Type: "ZappOfframpBigInteger * _Nonnull"
+  - Name: "submissionNonceDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "submissionNonceDecimal"
+    Type: "NSString * _Nullable"
   - Name: "txHash"
     PropertyKind: "Instance"
     SwiftName: "txHash"
     Type: "ZappOfframpTxHash * _Nonnull"
   Methods:
-  - Selector: "initWithTxHash:circleId:amount:"
+  - Selector: "initWithTxHash:circleId:amount:submissionNonceDecimal:"
     MethodKind: "Instance"
-    SwiftName: "init(txHash:circleId:amount:)"
+    SwiftName: "init(txHash:circleId:amount:submissionNonceDecimal:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpTxHash * _Nonnull"
@@ -15384,9 +17310,11 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 2
       Type: "id _Nonnull"
-  - Selector: "doCopyTxHash:circleId:amount:"
+    - Position: 3
+      Type: "NSString * _Nullable"
+  - Selector: "doCopyTxHash:circleId:amount:submissionNonceDecimal:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(txHash:circleId:amount:)"
+    SwiftName: "doCopy(txHash:circleId:amount:submissionNonceDecimal:)"
     ResultType: "ZappOfframpOfframpStatusPlacingOrder * _Nonnull"
     Parameters:
     - Position: 0
@@ -15395,6 +17323,8 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 2
       Type: "id _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -15901,6 +17831,10 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "message"
     Type: "NSString * _Nonnull"
+  - Name: "nothingEscrowed"
+    PropertyKind: "Instance"
+    SwiftName: "nothingEscrowed"
+    Type: "BOOL"
   - Name: "orderId"
     PropertyKind: "Instance"
     SwiftName: "orderId"
@@ -15930,9 +17864,9 @@ Classes:
     SwiftName: "txHash"
     Type: "ZappOfframpTxHash * _Nullable"
   Methods:
-  - Selector: "initWithMessage:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:"
+  - Selector: "initWithMessage:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:nothingEscrowed:cause:"
     MethodKind: "Instance"
-    SwiftName: "init(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:)"
+    SwiftName: "init(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:nothingEscrowed:cause:)"
     Parameters:
     - Position: 0
       Type: "NSString * _Nonnull"
@@ -15953,10 +17887,12 @@ Classes:
     - Position: 8
       Type: "NSString * _Nullable"
     - Position: 9
+      Type: "BOOL"
+    - Position: 10
       Type: "ZappOfframpKotlinThrowable * _Nullable"
-  - Selector: "doCopyMessage:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:"
+  - Selector: "doCopyMessage:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:nothingEscrowed:cause:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:cause:)"
+    SwiftName: "doCopy(message:orderId:step:txHash:revertSelector:knownRevertReason:sdkErrorName:sdkErrorMessage:solidityErrorString:nothingEscrowed:cause:)"
     ResultType: "ZappOfframpOfframpStatusFailed * _Nonnull"
     Parameters:
     - Position: 0
@@ -15978,6 +17914,8 @@ Classes:
     - Position: 8
       Type: "NSString * _Nullable"
     - Position: 9
+      Type: "BOOL"
+    - Position: 10
       Type: "ZappOfframpKotlinThrowable * _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
@@ -15994,8 +17932,8 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "description()"
     ResultType: "NSString * _Nonnull"
-- Name: "ZappOfframpCopQrParser"
-  SwiftName: "CopQrParser"
+- Name: "ZappOfframpBobQrParser"
+  SwiftName: "BobQrParser"
   Methods:
   - Selector: "parseQrData:"
     MethodKind: "Instance"
@@ -16078,6 +18016,26 @@ Classes:
     MethodKind: "Instance"
     SwiftName: "description()"
     ResultType: "NSString * _Nonnull"
+- Name: "ZappOfframpCopQrParser"
+  SwiftName: "CopQrParser"
+  Methods:
+  - Selector: "parseQrData:"
+    MethodKind: "Instance"
+    SwiftName: "parse(qrData:)"
+    ResultType: "ZappOfframpPaymentQrParseResult * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+- Name: "ZappOfframpCupQrParser"
+  SwiftName: "CupQrParser"
+  Methods:
+  - Selector: "parseQrData:"
+    MethodKind: "Instance"
+    SwiftName: "parse(qrData:)"
+    ResultType: "ZappOfframpPaymentQrParseResult * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
 - Name: "ZappOfframpPlaceOrderArgs"
   SwiftName: "PlaceOrderArgs"
   Properties:
@@ -16289,6 +18247,16 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 2
       Type: "void (^ _Nonnull)(NSString * _Nullable_result, NSError * _Nullable)"
+- Name: "ZappOfframpEcuQrParser"
+  SwiftName: "EcuQrParser"
+  Methods:
+  - Selector: "parseQrData:"
+    MethodKind: "Instance"
+    SwiftName: "parse(qrData:)"
+    ResultType: "ZappOfframpPaymentQrParseResult * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
 - Name: "ZappOfframpEmvQr"
   SwiftName: "EmvQr"
   Methods:
@@ -17081,6 +19049,26 @@ Classes:
     Parameters:
     - Position: 0
       Type: "NSString * _Nonnull"
+- Name: "ZappOfframpPenQrParser"
+  SwiftName: "PenQrParser"
+  Methods:
+  - Selector: "parseQrData:"
+    MethodKind: "Instance"
+    SwiftName: "parse(qrData:)"
+    ResultType: "ZappOfframpPaymentQrParseResult * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+- Name: "ZappOfframpPhpQrParser"
+  SwiftName: "PhpQrParser"
+  Methods:
+  - Selector: "parseQrData:"
+    MethodKind: "Instance"
+    SwiftName: "parse(qrData:)"
+    ResultType: "ZappOfframpPaymentQrParseResult * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
 - Name: "ZappOfframpPixFetchException"
   SwiftName: "PixFetchException"
   Methods:
@@ -17661,6 +19649,16 @@ Classes:
     Parameters:
     - Position: 0
       Type: "ZappOfframpPeerDepositId * _Nonnull"
+  - Selector: "resolveCheckpointCheckpoint:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__resolveCheckpoint(checkpoint:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpPeerDepositId * _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint_:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:)"
@@ -17797,6 +19795,18 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "bridgeDepositAddress"
     Type: "NSString * _Nullable"
+  - Name: "createDepositSubmissionHash"
+    PropertyKind: "Instance"
+    SwiftName: "createDepositSubmissionHash"
+    Type: "ZappOfframpTxHash * _Nullable"
+  - Name: "createDepositSubmissionNonce"
+    PropertyKind: "Instance"
+    SwiftName: "createDepositSubmissionNonce"
+    Type: "ZappOfframpBigInteger * _Nullable"
+  - Name: "createDepositSubmissionNonceDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "createDepositSubmissionNonceDecimal"
+    Type: "NSString * _Nullable"
   - Name: "createDepositTxHash"
     PropertyKind: "Instance"
     SwiftName: "createDepositTxHash"
@@ -17842,9 +19852,9 @@ Classes:
     SwiftName: "resumeAction"
     Type: "id<ZappOfframpPeerResumeAction> _Nonnull"
   Methods:
-  - Selector: "initWithId:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:"
+  - Selector: "initWithId:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositSubmissionHash:createDepositSubmissionNonceDecimal:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:"
     MethodKind: "Instance"
-    SwiftName: "init(id:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:)"
+    SwiftName: "init(id:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositSubmissionHash:createDepositSubmissionNonceDecimal:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:)"
     Parameters:
     - Position: 0
       Type: "Skie__TypeDef__0__id"
@@ -17865,12 +19875,16 @@ Classes:
     - Position: 8
       Type: "NSString * _Nullable"
     - Position: 9
-      Type: "ZappOfframpPeerDepositId * _Nullable"
+      Type: "ZappOfframpTxHash * _Nullable"
     - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
+      Type: "ZappOfframpPeerDepositId * _Nullable"
+    - Position: 12
       Type: "int64_t"
-  - Selector: "doCopyId:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:"
+  - Selector: "doCopyId:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositSubmissionHash:createDepositSubmissionNonceDecimal:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(id:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:)"
+    SwiftName: "doCopy(id:platform:currencies:payeeHashHex:amountMicroDecimal:bridgeDepositAddress:approveTxHash:createDepositSubmissionHash:createDepositSubmissionNonceDecimal:createDepositTxHash:blockBeforeCreateDeposit:depositId:createdAtMillis:)"
     ResultType: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
     Parameters:
     - Position: 0
@@ -17892,8 +19906,12 @@ Classes:
     - Position: 8
       Type: "NSString * _Nullable"
     - Position: 9
-      Type: "ZappOfframpPeerDepositId * _Nullable"
+      Type: "ZappOfframpTxHash * _Nullable"
     - Position: 10
+      Type: "NSString * _Nullable"
+    - Position: 11
+      Type: "ZappOfframpPeerDepositId * _Nullable"
+    - Position: 12
       Type: "int64_t"
   - Selector: "isEqual:"
     MethodKind: "Instance"
@@ -18185,24 +20203,32 @@ Classes:
 - Name: "ZappOfframpPeerResumeActionResolveSubmittedDeposit"
   SwiftName: "PeerResumeActionResolveSubmittedDeposit"
   Properties:
+  - Name: "submissionNonce"
+    PropertyKind: "Instance"
+    SwiftName: "submissionNonce"
+    Type: "ZappOfframpBigInteger * _Nullable"
   - Name: "txHash"
     PropertyKind: "Instance"
     SwiftName: "txHash"
     Type: "ZappOfframpTxHash * _Nonnull"
   Methods:
-  - Selector: "initWithTxHash:"
+  - Selector: "initWithTxHash:submissionNonce:"
     MethodKind: "Instance"
-    SwiftName: "init(txHash:)"
+    SwiftName: "init(txHash:submissionNonce:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpTxHash * _Nonnull"
-  - Selector: "doCopyTxHash:"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
+  - Selector: "doCopyTxHash:submissionNonce:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(txHash:)"
+    SwiftName: "doCopy(txHash:submissionNonce:)"
     ResultType: "ZappOfframpPeerResumeActionResolveSubmittedDeposit * _Nonnull"
     Parameters:
     - Position: 0
       Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -18220,7 +20246,33 @@ Classes:
     ResultType: "NSString * _Nonnull"
 - Name: "ZappOfframpPeerResumeActionReconcileSubmission"
   SwiftName: "PeerResumeActionReconcileSubmission"
+  Properties:
+  - Name: "submissionHash"
+    PropertyKind: "Instance"
+    SwiftName: "submissionHash"
+    Type: "ZappOfframpTxHash * _Nullable"
+  - Name: "submissionNonce"
+    PropertyKind: "Instance"
+    SwiftName: "submissionNonce"
+    Type: "ZappOfframpBigInteger * _Nullable"
   Methods:
+  - Selector: "initWithSubmissionHash:submissionNonce:"
+    MethodKind: "Instance"
+    SwiftName: "init(submissionHash:submissionNonce:)"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
+  - Selector: "doCopySubmissionHash:submissionNonce:"
+    MethodKind: "Instance"
+    SwiftName: "doCopy(submissionHash:submissionNonce:)"
+    ResultType: "ZappOfframpPeerResumeActionReconcileSubmission * _Nonnull"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
     SwiftName: "isEqual(_:)"
@@ -19562,9 +21614,9 @@ Classes:
 - Name: "ZappOfframpPeerCashOutOrchestratorImpl"
   SwiftName: "PeerCashOutOrchestratorImpl"
   Methods:
-  - Selector: "initWithNetwork:account:txSubmitter:rpcClient:curatorClient:indexerClient:topUp:pollIntervalMillis:"
+  - Selector: "initWithNetwork:account:txSubmitter:allowanceTransactions:rpcClient:curatorClient:indexerClient:topUp:pollIntervalMillis:"
     MethodKind: "Instance"
-    SwiftName: "init(network:account:txSubmitter:rpcClient:curatorClient:indexerClient:topUp:pollIntervalMillis:)"
+    SwiftName: "init(network:account:txSubmitter:allowanceTransactions:rpcClient:curatorClient:indexerClient:topUp:pollIntervalMillis:)"
     Parameters:
     - Position: 0
       Type: "ZappOfframpPeerNetworkConfig * _Nonnull"
@@ -19573,14 +21625,16 @@ Classes:
     - Position: 2
       Type: "id<ZappOfframpTxSubmitter> _Nonnull"
     - Position: 3
-      Type: "ZappOfframpBaseRpcClient * _Nonnull"
+      Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
     - Position: 4
-      Type: "ZappOfframpPeerCuratorClient * _Nonnull"
+      Type: "ZappOfframpBaseRpcClient * _Nonnull"
     - Position: 5
-      Type: "ZappOfframpPeerIndexerClient * _Nonnull"
+      Type: "ZappOfframpPeerCuratorClient * _Nonnull"
     - Position: 6
-      Type: "id<ZappOfframpOfframpTopUp> _Nonnull"
+      Type: "ZappOfframpPeerIndexerClient * _Nonnull"
     - Position: 7
+      Type: "id<ZappOfframpOfframpTopUp> _Nonnull"
+    - Position: 8
       Type: "int64_t"
   - Selector: "activeOrdersWithCompletionHandler:"
     MethodKind: "Instance"
@@ -19612,6 +21666,16 @@ Classes:
     Parameters:
     - Position: 0
       Type: "ZappOfframpPeerDepositId * _Nonnull"
+  - Selector: "resolveCheckpointCheckpoint:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__resolveCheckpoint(checkpoint:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpPeerDepositId * _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint_:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:)"
@@ -19849,35 +21913,43 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "amount"
     Type: "id _Nonnull"
-  - Name: "fromBlockNumber"
+  - Name: "submissionHash"
     PropertyKind: "Instance"
-    SwiftName: "fromBlockNumber"
-    Type: "NSString * _Nonnull"
+    SwiftName: "submissionHash"
+    Type: "ZappOfframpTxHash * _Nonnull"
+  - Name: "submissionNonceDecimal"
+    PropertyKind: "Instance"
+    SwiftName: "submissionNonceDecimal"
+    Type: "NSString * _Nullable"
   - Name: "txHash"
     PropertyKind: "Instance"
     SwiftName: "txHash"
     Type: "ZappOfframpTxHash * _Nullable"
   Methods:
-  - Selector: "initWithAmount:fromBlockNumber:txHash:"
+  - Selector: "initWithAmount:submissionHash:submissionNonceDecimal:txHash:"
     MethodKind: "Instance"
-    SwiftName: "init(amount:fromBlockNumber:txHash:)"
+    SwiftName: "init(amount:submissionHash:submissionNonceDecimal:txHash:)"
     Parameters:
     - Position: 0
       Type: "id _Nonnull"
     - Position: 1
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 2
+      Type: "NSString * _Nullable"
+    - Position: 3
       Type: "ZappOfframpTxHash * _Nullable"
-  - Selector: "doCopyAmount:fromBlockNumber:txHash:"
+  - Selector: "doCopyAmount:submissionHash:submissionNonceDecimal:txHash:"
     MethodKind: "Instance"
-    SwiftName: "doCopy(amount:fromBlockNumber:txHash:)"
+    SwiftName: "doCopy(amount:submissionHash:submissionNonceDecimal:txHash:)"
     ResultType: "ZappOfframpPeerCashOutStatusCreatingDeposit * _Nonnull"
     Parameters:
     - Position: 0
       Type: "id _Nonnull"
     - Position: 1
-      Type: "NSString * _Nonnull"
+      Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 2
+      Type: "NSString * _Nullable"
+    - Position: 3
       Type: "ZappOfframpTxHash * _Nullable"
   - Selector: "isEqual:"
     MethodKind: "Instance"
@@ -20324,6 +22396,18 @@ Classes:
     PropertyKind: "Instance"
     SwiftName: "retryable"
     Type: "BOOL"
+  - Name: "invalidRequest"
+    PropertyKind: "Class"
+    SwiftName: "invalidRequest"
+    Type: "ZappOfframpPeerErrorCode * _Nonnull"
+  - Name: "initializationFailed"
+    PropertyKind: "Class"
+    SwiftName: "initializationFailed"
+    Type: "ZappOfframpPeerErrorCode * _Nonnull"
+  - Name: "recoveryActionUnsafe"
+    PropertyKind: "Class"
+    SwiftName: "recoveryActionUnsafe"
+    Type: "ZappOfframpPeerErrorCode * _Nonnull"
   - Name: "unsupportedPlatform"
     PropertyKind: "Class"
     SwiftName: "unsupportedPlatform"
@@ -20391,6 +22475,10 @@ Classes:
   - Name: "fundingBridgeFailed"
     PropertyKind: "Class"
     SwiftName: "fundingBridgeFailed"
+    Type: "ZappOfframpPeerErrorCode * _Nonnull"
+  - Name: "recoveryStateUnreadable"
+    PropertyKind: "Class"
+    SwiftName: "recoveryStateUnreadable"
     Type: "ZappOfframpPeerErrorCode * _Nonnull"
   Methods:
   - Selector: "initWithName:ordinal:"
@@ -21225,6 +23313,16 @@ Classes:
     Parameters:
     - Position: 0
       Type: "ZappOfframpPeerDepositId * _Nonnull"
+  - Selector: "resolveCheckpointCheckpoint:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__resolveCheckpoint(checkpoint:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpPeerDepositId * _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint_:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:)"
@@ -21767,9 +23865,21 @@ Classes:
       Type: "ZappOfframpUserOperationV06 * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__25__awaitReceiptDispatchReceiver:txHash:suspendHandler:"
+  - Selector: "Skie_Suspend__25__invokeDispatchReceiver:p1:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__25__awaitReceipt(dispatchReceiver:txHash:suspendHandler:)"
+    SwiftName: "Skie_Suspend__25__invoke(dispatchReceiver:p1:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
+    - Position: 1
+      Type: "id _Nullable"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__26__awaitReceiptDispatchReceiver:txHash:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__26__awaitReceipt(dispatchReceiver:txHash:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21779,9 +23889,35 @@ Classes:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__26__sendTransactionDispatchReceiver:to:value:data:suspendHandler:"
+  - Selector: "Skie_Suspend__27__receiptIfIncludedDispatchReceiver:txHash:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__26__sendTransaction(dispatchReceiver:to:value:data:suspendHandler:)"
+    SwiftName: "Skie_Suspend__27__receiptIfIncluded(dispatchReceiver:txHash:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpTxSubmitter> _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__28__restorePendingTransactionDispatchReceiver:hash:nonce:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__28__restorePendingTransaction(dispatchReceiver:hash:nonce:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpTxSubmitter> _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 2
+      Type: "ZappOfframpBigInteger * _Nullable"
+    - Position: 3
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__29__sendTransactionDispatchReceiver:to:value:data:beforeBroadcast:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__29__sendTransaction(dispatchReceiver:to:value:data:beforeBroadcast:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21794,10 +23930,12 @@ Classes:
     - Position: 3
       Type: "ZappOfframpKotlinByteArray * _Nonnull"
     - Position: 4
+      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
+    - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__27__hasNextDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__30__hasNextDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__27__hasNext(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__30__hasNext(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21805,9 +23943,9 @@ Classes:
       Type: "ZappOfframpSkieColdFlowIterator<id> * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__28__collectDispatchReceiver:collector:suspendHandler:"
+  - Selector: "Skie_Suspend__31__collectDispatchReceiver:collector:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__28__collect(dispatchReceiver:collector:suspendHandler:)"
+    SwiftName: "Skie_Suspend__31__collect(dispatchReceiver:collector:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21817,9 +23955,9 @@ Classes:
       Type: "id<ZappOfframpKotlinx_coroutines_coreFlowCollector> _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__29__emitDispatchReceiver:value:suspendHandler:"
+  - Selector: "Skie_Suspend__32__emitDispatchReceiver:value:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__29__emit(dispatchReceiver:value:suspendHandler:)"
+    SwiftName: "Skie_Suspend__32__emit(dispatchReceiver:value:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21829,9 +23967,31 @@ Classes:
       Type: "id _Nullable"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__30__nextOfframpAccountDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__33__withApprovalAndSpendDispatchReceiver:block:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__30__nextOfframpAccount(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__33__withApprovalAndSpend(dispatchReceiver:block:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAllowanceTransactionGuard * _Nonnull"
+    - Position: 1
+      Type: "id<ZappOfframpKotlinSuspendFunction0> _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__34__invokeDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__34__invoke(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpKotlinSuspendFunction0> _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__35__nextOfframpAccountDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__35__nextOfframpAccount(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21839,9 +23999,9 @@ Classes:
       Type: "id<ZappOfframpOfframpAccountProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__31__resolveDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__36__resolveDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__31__resolve(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__36__resolve(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21849,9 +24009,9 @@ Classes:
       Type: "ZappOfframpErc4337SubmitterProvider * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__32__resolveDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__37__resolveDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__32__resolve(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__37__resolve(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21859,9 +24019,9 @@ Classes:
       Type: "ZappOfframpSmartOfframpAccountProvider * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__33__getSeedPhraseDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__38__getSeedPhraseDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__33__getSeedPhrase(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__38__getSeedPhrase(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21869,9 +24029,9 @@ Classes:
       Type: "id<ZappOfframpSeedPhraseSource> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__34__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:"
+  - Selector: "Skie_Suspend__39__createDispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__34__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__39__create(dispatchReceiver:networkName:seedPhrase:pimlicoApiKey:rpcUrl:subgraphUrl:sponsorshipPolicyId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21891,9 +24051,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 7
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__35__executeDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__40__executeDispatchReceiver:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__35__execute(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__40__execute(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21903,23 +24063,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__36__prepareDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__41__prepareDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__36__prepare(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
-    Availability: "nonswift"
-    ResultType: "void"
-    Parameters:
-    - Position: 0
-      Type: "id<ZappOfframpAppleOfframpBridge> _Nonnull"
-    - Position: 1
-      Type: "NSString * _Nonnull"
-    - Position: 2
-      Type: "NSString * _Nonnull"
-    - Position: 3
-      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__37__prepareRefundDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
-    MethodKind: "Class"
-    SwiftName: "Skie_Suspend__37__prepareRefund(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__41__prepare(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21931,9 +24077,23 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__38__resumeDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__42__prepareRefundDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__38__resume(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__42__prepareRefund(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpAppleOfframpBridge> _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__43__resumeDispatchReceiver:depositAddress:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__43__resume(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21943,9 +24103,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__39__accountAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__44__accountAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__39__accountAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__44__accountAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21953,9 +24113,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__40__accountSummaryDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__45__accountSummaryDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__40__accountSummary(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__45__accountSummary(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21963,9 +24123,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__41__checkpointCurrencyCodeDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__46__checkpointCurrencyCodeDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__41__checkpointCurrencyCode(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__46__checkpointCurrencyCode(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21973,9 +24133,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__42__discardCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__47__discardCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__42__discardCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__47__discardCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21983,9 +24143,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__43__discardTopUpCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__48__discardTopUpCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__43__discardTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__48__discardTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -21993,9 +24153,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__44__hasCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__49__hasCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__44__hasCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__49__hasCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22003,9 +24163,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__45__hasTopUpCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__50__hasTopUpCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__45__hasTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__50__hasTopUpCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22013,9 +24173,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__46__historyDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__51__historyDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__46__history(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__51__history(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22023,23 +24183,9 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__47__parsePaymentQrDispatchReceiver:currencyCode:rawPayload:suspendHandler:"
+  - Selector: "Skie_Suspend__52__parsePaymentQrDispatchReceiver:currencyCode:rawPayload:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__47__parsePaymentQr(dispatchReceiver:currencyCode:rawPayload:suspendHandler:)"
-    Availability: "nonswift"
-    ResultType: "void"
-    Parameters:
-    - Position: 0
-      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
-    - Position: 1
-      Type: "NSString * _Nonnull"
-    - Position: 2
-      Type: "NSString * _Nonnull"
-    - Position: 3
-      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__48__quoteDispatchReceiver:currencyCode:fiatAmount:suspendHandler:"
-    MethodKind: "Class"
-    SwiftName: "Skie_Suspend__48__quote(dispatchReceiver:currencyCode:fiatAmount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__52__parsePaymentQr(dispatchReceiver:currencyCode:rawPayload:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22051,9 +24197,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__49__topUpCheckpointMicrosDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__53__pendingBaseCommitmentMicrosDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__49__topUpCheckpointMicros(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__53__pendingBaseCommitmentMicros(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22061,9 +24207,43 @@ Classes:
       Type: "ZappOfframpAppleOfframpClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__50__requestPaymentDetailsDispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:"
+  - Selector: "Skie_Suspend__54__pendingRefundCommitmentMicrosDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__50__requestPaymentDetails(dispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__54__pendingRefundCommitmentMicros(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__55__quoteDispatchReceiver:currencyCode:fiatAmount:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__55__quote(dispatchReceiver:currencyCode:fiatAmount:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__56__topUpCheckpointMicrosDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__56__topUpCheckpointMicros(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleOfframpClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__57__requestPaymentDetailsDispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__57__requestPaymentDetails(dispatchReceiver:orderId:currencyCode:fiatAmount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22077,9 +24257,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__51__createDispatchReceiver:account:storage:bridge:suspendHandler:"
+  - Selector: "Skie_Suspend__58__createDispatchReceiver:account:storage:bridge:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__51__create(dispatchReceiver:account:storage:bridge:suspendHandler:)"
+    SwiftName: "Skie_Suspend__58__create(dispatchReceiver:account:storage:bridge:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22093,9 +24273,9 @@ Classes:
       Type: "id<ZappOfframpAppleOfframpBridge> _Nullable"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__52__checkpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__59__checkpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__52__checkpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__59__checkpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22103,9 +24283,9 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__53__clearCheckpointDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__60__clearCheckpointDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__53__clearCheckpoint(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__60__clearCheckpoint(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22113,9 +24293,9 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__54__declaredAmountDisagreesDispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__61__declaredAmountDisagreesDispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__54__declaredAmountDisagrees(dispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__61__declaredAmountDisagrees(dispatchReceiver:currencyCode:instructionKind:payload:expectedMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22131,9 +24311,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__55__estimateToZecDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__62__estimateToZecDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__55__estimateToZec(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__62__estimateToZec(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22145,9 +24325,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__56__limitsDispatchReceiver:currencyCode:suspendHandler:"
+  - Selector: "Skie_Suspend__63__limitsDispatchReceiver:currencyCode:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__56__limits(dispatchReceiver:currencyCode:suspendHandler:)"
+    SwiftName: "Skie_Suspend__63__limits(dispatchReceiver:currencyCode:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22157,9 +24337,19 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__57__quoteDispatchReceiver:fiatMicros:currencyCode:suspendHandler:"
+  - Selector: "Skie_Suspend__64__pendingBaseCommitmentMicrosDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__57__quote(dispatchReceiver:fiatMicros:currencyCode:suspendHandler:)"
+    SwiftName: "Skie_Suspend__64__pendingBaseCommitmentMicros(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpAppleOnrampClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__65__quoteDispatchReceiver:fiatMicros:currencyCode:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__65__quote(dispatchReceiver:fiatMicros:currencyCode:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22171,9 +24361,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__58__recipientAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__66__recipientAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__58__recipientAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__66__recipientAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22181,9 +24371,9 @@ Classes:
       Type: "ZappOfframpAppleOnrampClient * _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__59__createDispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:"
+  - Selector: "Skie_Suspend__67__createDispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__59__create(dispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__67__create(dispatchReceiver:account:onrampBaseUrl:storage:deviceSignals:onrampAppId:swapGateway:useFakeDeliveryDriver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22205,9 +24395,9 @@ Classes:
       Type: "BOOL"
     - Position: 8
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__60__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__68__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__60__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__68__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22219,9 +24409,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__61__quoteDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
+  - Selector: "Skie_Suspend__69__quoteDispatchReceiver:accountAddress:usdcMicros:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__61__quote(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
+    SwiftName: "Skie_Suspend__69__quote(dispatchReceiver:accountAddress:usdcMicros:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22233,9 +24423,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__62__statusDispatchReceiver:depositAddress:suspendHandler:"
+  - Selector: "Skie_Suspend__70__statusDispatchReceiver:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__62__status(dispatchReceiver:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__70__status(dispatchReceiver:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22245,9 +24435,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__63__collectDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__71__collectDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__63__collect(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__71__collect(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22255,9 +24445,127 @@ Classes:
       Type: "id<ZappOfframpAppleOnrampDeviceSignals> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__64__ensureFundedDispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:"
+  - Selector: "Skie_Suspend__72__accountDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__64__ensureFunded(dispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:)"
+    SwiftName: "Skie_Suspend__72__account(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__73__activeOrdersDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__73__activeOrders(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__74__allOrdersDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__74__allOrders(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__75__attemptsDispatchReceiver:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__75__attempts(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__76__marketDispatchReceiver:platformCode:currencyCode:amountMicros:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__76__market(dispatchReceiver:platformCode:currencyCode:amountMicros:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "NSString * _Nonnull"
+    - Position: 3
+      Type: "NSString * _Nullable"
+    - Position: 4
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__77__orderDispatchReceiver:depositIdComposite:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__77__order(dispatchReceiver:depositIdComposite:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__78__rateDispatchReceiver:currencyCode:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__78__rate(dispatchReceiver:currencyCode:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__79__reconcileDispatchReceiver:drivingAttemptIds:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__79__reconcile(dispatchReceiver:drivingAttemptIds:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "NSArray<NSString *> * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__80__storedHandleDispatchReceiver:platformCode:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__80__storedHandle(dispatchReceiver:platformCode:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClient * _Nonnull"
+    - Position: 1
+      Type: "NSString * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__81__createDispatchReceiver:account:storage:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__81__create(dispatchReceiver:account:storage:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpApplePeerCashOutClientCompanion * _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpAppleBaseAccount * _Nonnull"
+    - Position: 2
+      Type: "id<ZappOfframpApplePeerCashOutStorage> _Nonnull"
+    - Position: 3
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__82__ensureFundedDispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__82__ensureFunded(dispatchReceiver:account:request:resumeHandle:onBridgeStarted:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22273,21 +24581,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__65__invokeDispatchReceiver:p1:suspendHandler:"
+  - Selector: "Skie_Suspend__83__awaitSettlementDispatchReceiver:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__65__invoke(dispatchReceiver:p1:suspendHandler:)"
-    Availability: "nonswift"
-    ResultType: "void"
-    Parameters:
-    - Position: 0
-      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
-    - Position: 1
-      Type: "id _Nullable"
-    - Position: 2
-      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__66__awaitSettlementDispatchReceiver:handle:suspendHandler:"
-    MethodKind: "Class"
-    SwiftName: "Skie_Suspend__66__awaitSettlement(dispatchReceiver:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__83__awaitSettlement(dispatchReceiver:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22297,9 +24593,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__67__markTransferStartingDispatchReceiver:handle:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__84__markTransferStartingDispatchReceiver:handle:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__67__markTransferStarting(dispatchReceiver:handle:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__84__markTransferStarting(dispatchReceiver:handle:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22311,9 +24607,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__68__markTransferSubmittedDispatchReceiver:handle:amount:txHash:suspendHandler:"
+  - Selector: "Skie_Suspend__85__markTransferSubmittedDispatchReceiver:handle:amount:txHash:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__68__markTransferSubmitted(dispatchReceiver:handle:amount:txHash:suspendHandler:)"
+    SwiftName: "Skie_Suspend__85__markTransferSubmitted(dispatchReceiver:handle:amount:txHash:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22327,9 +24623,9 @@ Classes:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__69__pullbackTargetDispatchReceiver:account:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__86__pullbackTargetDispatchReceiver:account:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__69__pullbackTarget(dispatchReceiver:account:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__86__pullbackTarget(dispatchReceiver:account:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22341,9 +24637,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__70__bridgeDispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:"
+  - Selector: "Skie_Suspend__87__bridgeDispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__70__bridge(dispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:)"
+    SwiftName: "Skie_Suspend__87__bridge(dispatchReceiver:account:usdc:resumeHandle:onBridgeStarted:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22359,9 +24655,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__71__cancelDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__88__cancelDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__71__cancel(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__88__cancel(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22371,9 +24667,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__72__configDispatchReceiver:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__89__configDispatchReceiver:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__72__config(dispatchReceiver:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__89__config(dispatchReceiver:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22383,9 +24679,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nullable"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__73__createOrderDispatchReceiver:quoteId:recipient:device:suspendHandler:"
+  - Selector: "Skie_Suspend__90__createOrderDispatchReceiver:quoteId:recipient:device:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__73__createOrder(dispatchReceiver:quoteId:recipient:device:suspendHandler:)"
+    SwiftName: "Skie_Suspend__90__createOrder(dispatchReceiver:quoteId:recipient:device:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22399,9 +24695,9 @@ Classes:
       Type: "ZappOfframpOnrampDeviceSignals * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__74__markPaidDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__91__markPaidDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__74__markPaid(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__91__markPaid(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22411,9 +24707,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__75__orderDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__92__orderDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__75__order(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__92__order(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22423,9 +24719,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__76__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__93__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__76__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__93__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22437,9 +24733,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__77__signerDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__94__signerDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__77__signer(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__94__signer(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22447,9 +24743,9 @@ Classes:
       Type: "id<ZappOfframpOnrampSignerProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__78__recipientDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__95__recipientDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__78__recipient(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__95__recipient(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22457,9 +24753,9 @@ Classes:
       Type: "id<ZappOfframpOnrampRecipientProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__79__collectDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__96__collectDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__79__collect(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__96__collect(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22467,9 +24763,19 @@ Classes:
       Type: "id<ZappOfframpOnrampDeviceSignalsProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__80__limitsDispatchReceiver:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__97__buyCorridorsDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__80__limits(dispatchReceiver:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__97__buyCorridors(dispatchReceiver:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpOnrampDriver> _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__98__limitsDispatchReceiver:currency:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__98__limits(dispatchReceiver:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22479,9 +24785,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__81__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__99__quoteDispatchReceiver:fiatAmount:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__81__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__99__quote(dispatchReceiver:fiatAmount:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22493,9 +24799,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__82__recipientAddressDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__100__recipientAddressDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__82__recipientAddress(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__100__recipientAddress(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22503,9 +24809,9 @@ Classes:
       Type: "id<ZappOfframpOnrampDriver> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__83__awaitReceiptDispatchReceiver:account:userOperationHash:suspendHandler:"
+  - Selector: "Skie_Suspend__101__awaitReceiptDispatchReceiver:account:userOperationHash:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__83__awaitReceipt(dispatchReceiver:account:userOperationHash:suspendHandler:)"
+    SwiftName: "Skie_Suspend__101__awaitReceipt(dispatchReceiver:account:userOperationHash:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22517,9 +24823,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__84__balanceDispatchReceiver:account:suspendHandler:"
+  - Selector: "Skie_Suspend__102__balanceDispatchReceiver:account:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__84__balance(dispatchReceiver:account:suspendHandler:)"
+    SwiftName: "Skie_Suspend__102__balance(dispatchReceiver:account:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22529,9 +24835,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__85__resolveAccountDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__103__resolveAccountDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__85__resolveAccount(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__103__resolveAccount(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22539,9 +24845,9 @@ Classes:
       Type: "id<ZappOfframpOnrampZecTransferGateway> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__86__submitDispatchReceiver:account:depositAddress:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__104__submitDispatchReceiver:account:depositAddress:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__86__submit(dispatchReceiver:account:depositAddress:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__104__submit(dispatchReceiver:account:depositAddress:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22555,9 +24861,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__87__saveDispatchReceiver:orderId:checkpoint:suspendHandler:"
+  - Selector: "Skie_Suspend__105__saveDispatchReceiver:orderId:checkpoint:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__87__save(dispatchReceiver:orderId:checkpoint:suspendHandler:)"
+    SwiftName: "Skie_Suspend__105__save(dispatchReceiver:orderId:checkpoint:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22569,9 +24875,9 @@ Classes:
       Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__88__balanceDispatchReceiver:account:suspendHandler:"
+  - Selector: "Skie_Suspend__106__balanceDispatchReceiver:account:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__88__balance(dispatchReceiver:account:suspendHandler:)"
+    SwiftName: "Skie_Suspend__106__balance(dispatchReceiver:account:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22581,19 +24887,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__89__invokeDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__107__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__89__invoke(dispatchReceiver:suspendHandler:)"
-    Availability: "nonswift"
-    ResultType: "void"
-    Parameters:
-    - Position: 0
-      Type: "id<ZappOfframpKotlinSuspendFunction0> _Nonnull"
-    - Position: 1
-      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__90__notifyDepositDispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:"
-    MethodKind: "Class"
-    SwiftName: "Skie_Suspend__90__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
+    SwiftName: "Skie_Suspend__107__notifyDeposit(dispatchReceiver:baseTransactionHash:depositAddress:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22605,9 +24901,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__91__quoteDispatchReceiver:account:amount:suspendHandler:"
+  - Selector: "Skie_Suspend__108__quoteDispatchReceiver:account:amount:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__91__quote(dispatchReceiver:account:amount:suspendHandler:)"
+    SwiftName: "Skie_Suspend__108__quote(dispatchReceiver:account:amount:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22619,9 +24915,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__92__statusDispatchReceiver:checkpoint:suspendHandler:"
+  - Selector: "Skie_Suspend__109__statusDispatchReceiver:checkpoint:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__92__status(dispatchReceiver:checkpoint:suspendHandler:)"
+    SwiftName: "Skie_Suspend__109__status(dispatchReceiver:checkpoint:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22631,9 +24927,9 @@ Classes:
       Type: "ZappOfframpOnrampZecDeliveryCheckpoint * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__93__sessionDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__110__sessionDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__93__session(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__110__session(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22641,9 +24937,9 @@ Classes:
       Type: "id<ZappOfframpOnrampScreeningSessionProvider> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__94__declaredAmountDispatchReceiver:currency:instruction:suspendHandler:"
+  - Selector: "Skie_Suspend__111__declaredAmountDispatchReceiver:currency:instruction:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__94__declaredAmount(dispatchReceiver:currency:instruction:suspendHandler:)"
+    SwiftName: "Skie_Suspend__111__declaredAmount(dispatchReceiver:currency:instruction:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22655,9 +24951,9 @@ Classes:
       Type: "id<ZappOfframpOnrampPaymentInstruction> _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__95__disagreesWithDispatchReceiver:currency:instruction:expected:suspendHandler:"
+  - Selector: "Skie_Suspend__112__disagreesWithDispatchReceiver:currency:instruction:expected:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__95__disagreesWith(dispatchReceiver:currency:instruction:expected:suspendHandler:)"
+    SwiftName: "Skie_Suspend__112__disagreesWith(dispatchReceiver:currency:instruction:expected:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22671,9 +24967,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__96__requestPaymentDetailsDispatchReceiver:orderId:accepted:request:suspendHandler:"
+  - Selector: "Skie_Suspend__113__requestPaymentDetailsDispatchReceiver:orderId:accepted:request:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__96__requestPaymentDetails(dispatchReceiver:orderId:accepted:request:suspendHandler:)"
+    SwiftName: "Skie_Suspend__113__requestPaymentDetails(dispatchReceiver:orderId:accepted:request:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22687,9 +24983,9 @@ Classes:
       Type: "ZappOfframpOfframpRequest * _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__97__getDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__114__getDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__97__get(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__114__get(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22699,9 +24995,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__98__putDispatchReceiver:orderId:recipientUpi:suspendHandler:"
+  - Selector: "Skie_Suspend__115__putDispatchReceiver:orderId:recipientUpi:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__98__put(dispatchReceiver:orderId:recipientUpi:suspendHandler:)"
+    SwiftName: "Skie_Suspend__115__put(dispatchReceiver:orderId:recipientUpi:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22713,9 +25009,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__99__getDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__116__getDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__99__get(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__116__get(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22723,9 +25019,9 @@ Classes:
       Type: "id<ZappOfframpRelayIdentityStore> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__100__setDispatchReceiver:identity:suspendHandler:"
+  - Selector: "Skie_Suspend__117__setDispatchReceiver:identity:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__100__set(dispatchReceiver:identity:suspendHandler:)"
+    SwiftName: "Skie_Suspend__117__set(dispatchReceiver:identity:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22735,9 +25031,9 @@ Classes:
       Type: "ZappOfframpRelayIdentity * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__101__selectCircleForOrderDispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:"
+  - Selector: "Skie_Suspend__118__selectCircleForOrderDispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__101__selectCircleForOrder(dispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__118__selectCircleForOrder(dispatchReceiver:circles:orderCurrency:validateCircle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22751,9 +25047,9 @@ Classes:
       Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__102__fetchOrderDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__119__fetchOrderDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__102__fetchOrder(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__119__fetchOrder(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22763,9 +25059,9 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__103__circlesForRoutingDispatchReceiver:currencyBytes32Hex:suspendHandler:"
+  - Selector: "Skie_Suspend__120__circlesForRoutingDispatchReceiver:currencyBytes32Hex:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__103__circlesForRouting(dispatchReceiver:currencyBytes32Hex:suspendHandler:)"
+    SwiftName: "Skie_Suspend__120__circlesForRouting(dispatchReceiver:currencyBytes32Hex:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22775,9 +25071,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__104__ordersForUserDispatchReceiver:userAddress:first:skip:suspendHandler:"
+  - Selector: "Skie_Suspend__121__ordersForUserDispatchReceiver:userAddress:first:skip:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__104__ordersForUser(dispatchReceiver:userAddress:first:skip:suspendHandler:)"
+    SwiftName: "Skie_Suspend__121__ordersForUser(dispatchReceiver:userAddress:first:skip:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22791,9 +25087,9 @@ Classes:
       Type: "int32_t"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__105__rawOrderByIdDispatchReceiver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__122__rawOrderByIdDispatchReceiver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__105__rawOrderById(dispatchReceiver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__122__rawOrderById(dispatchReceiver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22803,9 +25099,9 @@ Classes:
       Type: "NSString * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__106__isMerchantAvailableDispatchReceiver:usdc:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__123__merchantAvailabilityDispatchReceiver:usdc:fiat:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__106__isMerchantAvailable(dispatchReceiver:usdc:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__123__merchantAvailability(dispatchReceiver:usdc:fiat:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22814,12 +25110,14 @@ Classes:
     - Position: 1
       Type: "id _Nonnull"
     - Position: 2
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "id _Nonnull"
     - Position: 3
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__107__resolveAmountDispatchReceiver:locationUrl:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__124__resolveAmountDispatchReceiver:locationUrl:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__107__resolveAmount(dispatchReceiver:locationUrl:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__124__resolveAmount(dispatchReceiver:locationUrl:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22831,9 +25129,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__108__fetchAllDispatchReceiver:userAddress:maxOrders:suspendHandler:"
+  - Selector: "Skie_Suspend__125__fetchAllDispatchReceiver:userAddress:maxOrders:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__108__fetchAll(dispatchReceiver:userAddress:maxOrders:suspendHandler:)"
+    SwiftName: "Skie_Suspend__125__fetchAll(dispatchReceiver:userAddress:maxOrders:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22845,9 +25143,9 @@ Classes:
       Type: "int32_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__109__parseDispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__126__parseDispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__109__parse(dispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__126__parse(dispatchReceiver:currency:qrData:dynamicPixResolver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22863,9 +25161,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__110__parseDispatchReceiver:qrData:resolver:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__127__parseDispatchReceiver:qrData:resolver:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__110__parse(dispatchReceiver:qrData:resolver:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__127__parse(dispatchReceiver:qrData:resolver:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22879,9 +25177,9 @@ Classes:
       Type: "NSString * _Nullable"
     - Position: 4
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__111__activeOrdersForDispatchReceiver:depositor:suspendHandler:"
+  - Selector: "Skie_Suspend__128__activeOrdersForDispatchReceiver:depositor:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__111__activeOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
+    SwiftName: "Skie_Suspend__128__activeOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22891,9 +25189,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__112__allOrdersForDispatchReceiver:depositor:suspendHandler:"
+  - Selector: "Skie_Suspend__129__allOrdersForDispatchReceiver:depositor:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__112__allOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
+    SwiftName: "Skie_Suspend__129__allOrdersFor(dispatchReceiver:depositor:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22903,9 +25201,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__113__fillSamplesDispatchReceiver:platform:sinceSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__130__fillSamplesDispatchReceiver:platform:sinceSeconds:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__113__fillSamples(dispatchReceiver:platform:sinceSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__130__fillSamples(dispatchReceiver:platform:sinceSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22917,9 +25215,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__114__orderDispatchReceiver:id:suspendHandler:"
+  - Selector: "Skie_Suspend__131__orderDispatchReceiver:id:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__114__order(dispatchReceiver:id:suspendHandler:)"
+    SwiftName: "Skie_Suspend__131__order(dispatchReceiver:id:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22929,9 +25227,9 @@ Classes:
       Type: "ZappOfframpPeerDepositId * _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__115__queueSamplesDispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:"
+  - Selector: "Skie_Suspend__132__queueSamplesDispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__115__queueSamples(dispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:)"
+    SwiftName: "Skie_Suspend__132__queueSamples(dispatchReceiver:platform:currency:maturedBeforeSeconds:limit:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22947,9 +25245,9 @@ Classes:
       Type: "int32_t"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__116__registerPayeeDispatchReceiver:platform:handle:suspendHandler:"
+  - Selector: "Skie_Suspend__133__registerPayeeDispatchReceiver:platform:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__116__registerPayee(dispatchReceiver:platform:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__133__registerPayee(dispatchReceiver:platform:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22961,9 +25259,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__117__validatePayeeDispatchReceiver:platform:handle:suspendHandler:"
+  - Selector: "Skie_Suspend__134__validatePayeeDispatchReceiver:platform:handle:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__117__validatePayee(dispatchReceiver:platform:handle:suspendHandler:)"
+    SwiftName: "Skie_Suspend__134__validatePayee(dispatchReceiver:platform:handle:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22975,9 +25273,9 @@ Classes:
       Type: "id _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__118__activeOrdersDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__135__activeOrdersDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__118__activeOrders(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__135__activeOrders(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22985,9 +25283,9 @@ Classes:
       Type: "id<ZappOfframpPeerCashOutOrchestrator> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__119__allOrdersDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__136__allOrdersDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__119__allOrders(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__136__allOrders(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -22995,9 +25293,21 @@ Classes:
       Type: "id<ZappOfframpPeerCashOutOrchestrator> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__120__fiatPerUsdcDispatchReceiver:currency:nowSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__137__resolveCheckpointDispatchReceiver:checkpoint:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__120__fiatPerUsdc(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__137__resolveCheckpoint(dispatchReceiver:checkpoint:suspendHandler:)"
+    Availability: "nonswift"
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "id<ZappOfframpPeerCashOutOrchestrator> _Nonnull"
+    - Position: 1
+      Type: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
+    - Position: 2
+      Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
+  - Selector: "Skie_Suspend__138__fiatPerUsdcDispatchReceiver:currency:nowSeconds:suspendHandler:"
+    MethodKind: "Class"
+    SwiftName: "Skie_Suspend__138__fiatPerUsdc(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23009,9 +25319,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__121__quoteDispatchReceiver:currency:nowSeconds:suspendHandler:"
+  - Selector: "Skie_Suspend__139__quoteDispatchReceiver:currency:nowSeconds:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__121__quote(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
+    SwiftName: "Skie_Suspend__139__quote(dispatchReceiver:currency:nowSeconds:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23023,9 +25333,9 @@ Classes:
       Type: "int64_t"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__122__upgradeDispatchReceiver:input:output:engineContext:userContext:suspendHandler:"
+  - Selector: "Skie_Suspend__140__upgradeDispatchReceiver:input:output:engineContext:userContext:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__122__upgrade(dispatchReceiver:input:output:engineContext:userContext:suspendHandler:)"
+    SwiftName: "Skie_Suspend__140__upgrade(dispatchReceiver:input:output:engineContext:userContext:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23041,9 +25351,9 @@ Classes:
       Type: "id<ZappOfframpKotlinCoroutineContext> _Nonnull"
     - Position: 5
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__123__flushDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__141__flushDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__123__flush(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__141__flush(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23051,9 +25361,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__124__flushAndCloseDispatchReceiver:suspendHandler:"
+  - Selector: "Skie_Suspend__142__flushAndCloseDispatchReceiver:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__124__flushAndClose(dispatchReceiver:suspendHandler:)"
+    SwiftName: "Skie_Suspend__142__flushAndClose(dispatchReceiver:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23061,9 +25371,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 1
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__125__writeToDispatchReceiver:channel:suspendHandler:"
+  - Selector: "Skie_Suspend__143__writeToDispatchReceiver:channel:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__125__writeTo(dispatchReceiver:channel:suspendHandler:)"
+    SwiftName: "Skie_Suspend__143__writeTo(dispatchReceiver:channel:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23073,9 +25383,9 @@ Classes:
       Type: "id<ZappOfframpKtor_ioByteWriteChannel> _Nonnull"
     - Position: 2
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__126__getUsdcBalanceExtensionReceiver:usdcAddress:owner:suspendHandler:"
+  - Selector: "Skie_Suspend__144__getUsdcBalanceExtensionReceiver:usdcAddress:owner:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__126__getUsdcBalance(extensionReceiver:usdcAddress:owner:suspendHandler:)"
+    SwiftName: "Skie_Suspend__144__getUsdcBalance(extensionReceiver:usdcAddress:owner:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23087,9 +25397,9 @@ Classes:
       Type: "ZappOfframpAddress * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__127__getAdditionalOrderDetailsExtensionReceiver:diamondAddress:orderId:suspendHandler:"
+  - Selector: "Skie_Suspend__145__getAdditionalOrderDetailsExtensionReceiver:diamondAddress:orderId:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__127__getAdditionalOrderDetails(extensionReceiver:diamondAddress:orderId:suspendHandler:)"
+    SwiftName: "Skie_Suspend__145__getAdditionalOrderDetails(extensionReceiver:diamondAddress:orderId:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23101,9 +25411,9 @@ Classes:
       Type: "ZappOfframpBigInteger * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__128__getPriceConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__146__getPriceConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__128__getPriceConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__146__getPriceConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23115,9 +25425,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__129__getPayFeeConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__147__getPayFeeConfigExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__129__getPayFeeConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__147__getPayFeeConfig(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23129,9 +25439,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__130__getSmallOrderFixedFeePayExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__148__getSmallOrderFixedFeePayExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__130__getSmallOrderFixedFeePay(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__148__getSmallOrderFixedFeePay(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23143,9 +25453,9 @@ Classes:
       Type: "ZappOfframpCurrencyCode * _Nonnull"
     - Position: 3
       Type: "ZappOfframpSkie_SuspendHandler * _Nonnull"
-  - Selector: "Skie_Suspend__131__getSmallOrderThresholdExtensionReceiver:diamondAddress:currency:suspendHandler:"
+  - Selector: "Skie_Suspend__149__getSmallOrderThresholdExtensionReceiver:diamondAddress:currency:suspendHandler:"
     MethodKind: "Class"
-    SwiftName: "Skie_Suspend__131__getSmallOrderThreshold(extensionReceiver:diamondAddress:currency:suspendHandler:)"
+    SwiftName: "Skie_Suspend__149__getSmallOrderThreshold(extensionReceiver:diamondAddress:currency:suspendHandler:)"
     Availability: "nonswift"
     ResultType: "void"
     Parameters:
@@ -23496,9 +25806,31 @@ Protocols:
       Type: "ZappOfframpTxHash * _Nonnull"
     - Position: 1
       Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable, NSError * _Nullable)"
-  - Selector: "sendTransactionTo:value:data:completionHandler:"
+  - Selector: "receiptIfIncludedTxHash:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__sendTransaction(to:value:data:completionHandler:)"
+    SwiftName: "__receiptIfIncluded(txHash:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpTransactionReceipt * _Nullable_result, NSError * _Nullable)"
+  - Selector: "restorePendingTransactionHash:nonce:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__restorePendingTransaction(hash:nonce:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpTxHash * _Nullable"
+    - Position: 1
+      Type: "ZappOfframpBigInteger * _Nullable"
+    - Position: 2
+      Type: "void (^ _Nonnull)(NSError * _Nullable)"
+  - Selector: "sendTransactionTo:value:data:beforeBroadcast:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__sendTransaction(to:value:data:beforeBroadcast:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
@@ -23509,6 +25841,8 @@ Protocols:
     - Position: 2
       Type: "ZappOfframpKotlinByteArray * _Nonnull"
     - Position: 3
+      Type: "id<ZappOfframpKotlinSuspendFunction1> _Nonnull"
+    - Position: 4
       Type: "void (^ _Nonnull)(ZappOfframpTxHash * _Nullable, NSError * _Nullable)"
 - Name: "ZappOfframpRlpItem"
   SwiftName: "RlpItem"
@@ -25398,6 +27732,31 @@ Protocols:
     Parameters:
     - Position: 0
       Type: "NSString * _Nonnull"
+- Name: "ZappOfframpApplePeerCashOutStorage"
+  SwiftName: "ApplePeerCashOutStorage"
+  Methods:
+  - Selector: "peerCheckpointBookJsonAndReturnError:"
+    MethodKind: "Instance"
+    SwiftName: "peerCheckpointBookJson()"
+    ResultType: "ZappOfframpAppleStorageValue * _Nullable"
+  - Selector: "peerPayeeBookJsonAndReturnError:"
+    MethodKind: "Instance"
+    SwiftName: "peerPayeeBookJson()"
+    ResultType: "ZappOfframpAppleStorageValue * _Nullable"
+  - Selector: "storePeerCheckpointBookJsonValue:error:"
+    MethodKind: "Instance"
+    SwiftName: "storePeerCheckpointBookJson(value:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
+  - Selector: "storePeerPayeeBookJsonValue:error:"
+    MethodKind: "Instance"
+    SwiftName: "storePeerPayeeBookJson(value:)"
+    ResultType: "BOOL"
+    Parameters:
+    - Position: 0
+      Type: "NSString * _Nonnull"
 - Name: "ZappOfframpFundingOutcome"
   SwiftName: "FundingOutcome"
 - Name: "ZappOfframpOfframpFunding"
@@ -25527,6 +27886,14 @@ Protocols:
 - Name: "ZappOfframpOnrampDriver"
   SwiftName: "OnrampDriver"
   Methods:
+  - Selector: "buyCorridorsWithCompletionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__buyCorridors(completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "void (^ _Nonnull)(NSSet<ZappOfframpCurrencyCode *> * _Nullable, NSError * _Nullable)"
   - Selector: "cancelCheckpoint:"
     MethodKind: "Instance"
     SwiftName: "cancel(checkpoint:)"
@@ -25745,6 +28112,8 @@ Protocols:
       Type: "ZappOfframpOfframpRequest * _Nonnull"
     - Position: 3
       Type: "void (^ _Nonnull)(ZappOfframpOfframpPaymentDetails * _Nullable, NSError * _Nullable)"
+- Name: "ZappOfframpMerchantAvailability"
+  SwiftName: "MerchantAvailability"
 - Name: "ZappOfframpOrderRecipientUpiCache"
   SwiftName: "OrderRecipientUpiCache"
   Methods:
@@ -25825,18 +28194,20 @@ Protocols:
       Type: "id _Nonnull"
     - Position: 1
       Type: "NSString * _Nullable"
-  - Selector: "isMerchantAvailableUsdc:currency:completionHandler:"
+  - Selector: "merchantAvailabilityUsdc:fiat:currency:completionHandler:"
     MethodKind: "Instance"
-    SwiftName: "__isMerchantAvailable(usdc:currency:completionHandler:)"
+    SwiftName: "__merchantAvailability(usdc:fiat:currency:completionHandler:)"
     SwiftPrivate: true
     ResultType: "void"
     Parameters:
     - Position: 0
       Type: "id _Nonnull"
     - Position: 1
-      Type: "ZappOfframpCurrencyCode * _Nonnull"
+      Type: "id _Nonnull"
     - Position: 2
-      Type: "void (^ _Nonnull)(ZappOfframpBoolean * _Nullable, NSError * _Nullable)"
+      Type: "ZappOfframpCurrencyCode * _Nonnull"
+    - Position: 3
+      Type: "void (^ _Nonnull)(id<ZappOfframpMerchantAvailability> _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint:paymentDetailsProvider:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:paymentDetailsProvider:)"
@@ -25919,6 +28290,16 @@ Protocols:
     Parameters:
     - Position: 0
       Type: "ZappOfframpPeerDepositId * _Nonnull"
+  - Selector: "resolveCheckpointCheckpoint:completionHandler:"
+    MethodKind: "Instance"
+    SwiftName: "__resolveCheckpoint(checkpoint:completionHandler:)"
+    SwiftPrivate: true
+    ResultType: "void"
+    Parameters:
+    - Position: 0
+      Type: "ZappOfframpPeerCashOutCheckpoint * _Nonnull"
+    - Position: 1
+      Type: "void (^ _Nonnull)(ZappOfframpPeerDepositId * _Nullable, NSError * _Nullable)"
   - Selector: "resumeCheckpoint_:"
     MethodKind: "Instance"
     SwiftName: "resume(checkpoint:)"

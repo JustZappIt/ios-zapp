@@ -15,6 +15,11 @@ private struct OfframpStoragePayload: Codable {
     var checkpointJSON: String?
     var topUpCheckpointJSON: String?
     var refundCheckpointJSON: String?
+    /// Peer's two books, opaque here: their shape, their locking and their privacy rules live in
+    /// the KMP facade, so there is one implementation of them rather than one per platform.
+    /// Optional, so a payload written before Peer existed still decodes.
+    var peerCheckpointBookJSON: String?
+    var peerPayeeBookJSON: String?
 }
 
 enum OfframpStorageError: Error {
@@ -24,11 +29,44 @@ enum OfframpStorageError: Error {
     case unsupportedVersion(Int)
 }
 
+/// A file is the unit of consistency, not a storage object. KMP creates separate rail facades, and
+/// nothing prevents another caller from constructing a second Swift adapter for the same wallet.
+/// Keeping the mutexes here makes every whole-payload read-modify-write share one critical section
+/// even when those adapters have different lifetimes.
+private final class OfframpStorageLockRegistry: @unchecked Sendable {
+    static let shared = OfframpStorageLockRegistry()
+
+    private let registryLock = NSLock()
+    private var locks: [String: NSLock] = [:]
+
+    func lock(for fileURL: URL) -> NSLock {
+        // Resolve the parent because the file usually does not exist when the first adapter is
+        // built. Standardizing only the leaf would still let a symlinked Documents path create a
+        // second identity for the same encrypted envelope.
+        let parent = fileURL.deletingLastPathComponent().resolvingSymlinksInPath().standardizedFileURL
+        let identity = parent.appendingPathComponent(fileURL.lastPathComponent).path
+        return registryLock.withLock {
+            if let lock = locks[identity] { return lock }
+            let lock = NSLock()
+            locks[identity] = lock
+            return lock
+        }
+    }
+}
+
 /// Wallet-scoped encrypted storage. Unknown payload versions throw and are never overwritten.
-final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked Sendable {
-    private let lock = NSLock()
+///
+/// Peer shares this file rather than opening its own. Both rails spend from one Base smart account,
+/// so their records are only ever read and written together, and a second envelope would mean a
+/// second lock, a second key and a second chance for a wallet reset to clear one and miss the other.
+final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCashOutStorage, @unchecked Sendable {
+    private let lock: NSLock
     private let key: AddressBookKey
     private let fileURL: URL
+
+    /// A deterministic assertion seam for the concurrency regression: two adapters for one file
+    /// must literally share the same mutex, independent of how the scheduler interleaves writes.
+    var lockIdentityForTesting: ObjectIdentifier { ObjectIdentifier(lock) }
 
     init(account: Account, walletStorage: WalletStorageClient) throws {
         let keys = try walletStorage.exportAddressBookEncryptionKeys()
@@ -41,6 +79,15 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
         }
         self.key = key
         self.fileURL = documents.appendingPathComponent(filename)
+        self.lock = OfframpStorageLockRegistry.shared.lock(for: fileURL)
+    }
+
+    /// Direct construction keeps file-identity concurrency tests out of the user's Documents
+    /// directory. Production always uses the wallet-scoped initializer above.
+    init(key: AddressBookKey, fileURL: URL) {
+        self.key = key
+        self.fileURL = fileURL
+        self.lock = OfframpStorageLockRegistry.shared.lock(for: fileURL)
     }
 
     func relayPrivateKey() throws -> AppleStorageValue {
@@ -102,6 +149,26 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
         try mutate { $0.refundCheckpointJSON = nil }
     }
 
+    // MARK: - Peer
+
+    func peerCheckpointBookJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.peerCheckpointBookJSON })
+    }
+
+    func storePeerCheckpointBookJson(value: String) throws {
+        try mutate { $0.peerCheckpointBookJSON = value }
+    }
+
+    func peerPayeeBookJson() throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.peerPayeeBookJSON })
+    }
+
+    /// Raw payment handles. They never reach a checkpoint, a log, a diagnostic or a support export
+    /// — only the curator hash does — so this slot is the one place they exist on the device.
+    func storePeerPayeeBookJson(value: String) throws {
+        try mutate { $0.peerPayeeBookJSON = value }
+    }
+
     private func withPayload<T>(_ body: (OfframpStoragePayload) -> T?) throws -> T? {
         lock.lock()
         defer { lock.unlock() }
@@ -145,10 +212,14 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, @unchecked S
             to: fileURL,
             options: [.atomic, .completeFileProtection]
         )
-        try FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: fileURL.path)
+        // The atomic write is the commit point observed by KMP. Metadata is defense in depth (the
+        // write already requests complete protection) and must not turn a committed broadcast
+        // marker into a reported failure: that ambiguity could leave a never-broadcast identity
+        // reserved forever on the next launch.
+        try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: fileURL.path)
         var resourceValues = URLResourceValues()
         resourceValues.isExcludedFromBackup = true
         var protectedURL = fileURL
-        try protectedURL.setResourceValues(resourceValues)
+        try? protectedURL.setResourceValues(resourceValues)
     }
 }

@@ -20,7 +20,6 @@ struct OfframpView: View {
                 case .amount: amount
                 case .topUp: topUp
                 case .progress: progress
-                case .history: history
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -332,7 +331,7 @@ struct OfframpView: View {
     }
 
     private var recentTransactionsButton: some View {
-        Button { store.send(.historyTapped) } label: {
+        Button { store.send(.activityTapped) } label: {
             HStack(spacing: 6) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .semibold))
@@ -584,31 +583,6 @@ struct OfframpView: View {
         }
     }
 
-    private var history: some View {
-        VStack(spacing: 0) {
-            ZappScreenHeader(title: text("offramp.history.title", "P2P transactions"))
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    historyAccountSummary
-                        .padding(.bottom, 16)
-                    if store.history.isEmpty && !store.isLoading {
-                        callout(
-                            title: text("offramp.history.empty", "No P2P payments yet"),
-                            detail: text("offramp.history.emptyDetail", "Your completed and cancelled orders will appear here.")
-                        )
-                    }
-                    ForEach(store.history) { item in
-                        historyRow(item)
-                        ZappRowDivider(inset: false)
-                    }
-                }
-                .padding(18)
-                .padding(.bottom, 90)
-            }
-            ZappBottomActionBar(onBack: { store.send(.backTapped) })
-        }
-    }
-
     private func corridorRow(_ corridor: OfframpCorridor) -> some View {
         Button { store.send(.draftCorridorTapped(corridor.currencyCode)) } label: {
             HStack(spacing: 14) {
@@ -633,66 +607,6 @@ struct OfframpView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-    }
-
-    private func historyRow(_ item: OfframpHistoryModel) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("#\(item.id)").zappFont(.rowTitle, style: ZappColors.text)
-                if let type = item.type {
-                    Text(type.label.uppercased())
-                        .zappFont(.caption, style: ZappColors.textMuted)
-                }
-                Spacer()
-                Text(item.status.capitalized).zappFont(.caption, style: ZappColors.accent)
-            }
-            if let address = item.paymentAddress {
-                Text(address).zappFont(.caption, style: ZappColors.textMuted).lineLimit(1)
-            }
-            Text("\(formatMicros(item.fiatMicros)) \(item.currencyCode) · \(formatMicros(item.usdcMicros)) USDC")
-                .zappFont(.body, style: ZappColors.text)
-            if let fee = item.fixedFeeMicros {
-                infoRow(text("offramp.history.fee", "Fee"), "\(formatMicros(fee)) USDC")
-            }
-            if let date = item.completedAt ?? item.cancelledAt ?? item.placedAt {
-                Text(date.formatted(date: .abbreviated, time: .shortened))
-                    .zappFont(.caption, style: ZappColors.textSubtle)
-            }
-            if item.canRecoverEscrow {
-                ZappButton(title: text("offramp.history.recover", "Get funds back to ZEC"), variant: .ghost) {
-                    store.send(.recoverTapped(item.id))
-                }
-            }
-        }
-        .padding(.vertical, 14)
-    }
-
-    @ViewBuilder
-    private var historyAccountSummary: some View {
-        if let account = store.account {
-            VStack(alignment: .leading, spacing: 12) {
-                accountAddressCard(account)
-                ZappBorderedCard {
-                    ZappSummaryRow(
-                        label: String(localizable: .offrampHistoryBalance),
-                        value: account.balanceDisplay.map { "\($0) USDC" } ?? "—"
-                    )
-                    if account.canRefundToZec {
-                        ZappButton(title: String(localizable: .offrampHistoryRefund), variant: .ghost) {
-                            store.send(.refundTapped)
-                        }
-                    } else if account.balanceMicros.flatMap({ Decimal(string: $0) }).map({ $0 > 0 }) == true {
-                        Text(String(localizable: .offrampHistoryRefundBlocked))
-                            .zappFont(.caption, style: ZappColors.textMuted)
-                    }
-                }
-            }
-        } else if store.isLoading {
-            ProgressView()
-        } else {
-            Text(String(localizable: .offrampHistoryBalanceUnavailable))
-                .zappFont(.caption, style: ZappColors.textMuted)
-        }
     }
 
     private var paymentMethodInfo: some View {
