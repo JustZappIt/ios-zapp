@@ -10,12 +10,16 @@ extension PeerCashOutClient: DependencyKey {
     static func live() -> Self {
         Self(
             capabilities: {
-                // A build without the rails must still answer rather than throw: the settings
-                // screen lists Peer destinations as unavailable instead of hiding that they exist.
-                guard let client = try? await OfframpSession.shared.peerClient() else {
+                @Dependency(\.zcashSDKEnvironment) var environment
+                // Known product/configuration absence is availability. Storage, wallet and network
+                // failures are not: callers must preserve their last-known financial rows instead
+                // of translating an outage into a successful empty history.
+                guard environment.network().networkType != .testnet,
+                      let pimlicoKey = PartnerKeys.p2pPimlicoApiKey,
+                      !pimlicoKey.isEmpty else {
                     return .unavailable
                 }
-                return PeerCapabilities(client.capabilities())
+                return PeerCapabilities(try await OfframpSession.shared.peerClient().capabilities())
             },
             account: {
                 PeerAccount(try await OfframpSession.shared.peerClient().account())
@@ -56,37 +60,53 @@ extension PeerCashOutClient: DependencyKey {
                     .peerProgressStream()
             },
             startCashOut: { draft in
+                let generation = try await OfframpSession.shared.generationToken()
+                // Both recovery books must be readable before authentication or admission. The
+                // eventual claim below is atomic with Scan & Pay and refunds, not a UI-only check.
+                try await OfframpSession.shared.prepareBaseReservations()
                 let capabilities = PeerCapabilities(try await OfframpSession.shared.peerClient().capabilities())
                 guard capabilities.isAvailable else { throw PeerCashOutClientError.unavailable }
                 // Approve and create-deposit are one operation the user explicitly confirmed, so
                 // they share this single authentication rather than prompting twice mid-flight.
                 try await authenticate()
-                let runner = OfframpSession.shared.peerRunner
-                let id = await runner.newAttemptID(byteCount: capabilities.attemptIDByteCount)
-                guard let started = await runner.start(id: id, draft: draft) else {
-                    throw PeerCashOutClientError.unavailable
-                }
-                return started
+                return try await OfframpSession.shared.startPeerCashOut(
+                    draft: draft,
+                    attemptIDByteCount: capabilities.attemptIDByteCount,
+                    expectedGeneration: generation
+                )
             },
             recoverCashOut: { attemptID in
-                _ = try await OfframpSession.shared.peerClient()
-                await OfframpSession.shared.peerRunner.recover(id: attemptID)
+                let generation = try await OfframpSession.shared.generationToken()
+                try await OfframpSession.shared.recoverPeerCashOut(
+                    attemptID: attemptID,
+                    expectedGeneration: generation
+                )
             },
             retryCashOut: { attemptID in
-                _ = try await OfframpSession.shared.peerClient()
+                let generation = try await OfframpSession.shared.generationToken()
                 try await authenticate()
-                await OfframpSession.shared.peerRunner.retry(id: attemptID)
+                try await OfframpSession.shared.retryPeerCashOut(
+                    attemptID: attemptID,
+                    expectedGeneration: generation
+                )
             },
             withdraw: { depositID, amount in
-                _ = try await OfframpSession.shared.peerClient()
+                let generation = try await OfframpSession.shared.generationToken()
                 try await authenticate()
-                await OfframpSession.shared.peerRunner.withdraw(depositID: depositID, amount: amount)
+                try await OfframpSession.shared.withdrawPeerCashOut(
+                    depositID: depositID,
+                    amount: amount,
+                    expectedGeneration: generation
+                )
             },
             setAcceptingIntents: { depositID, accepting in
-                _ = try await OfframpSession.shared.peerClient()
+                let generation = try await OfframpSession.shared.generationToken()
                 try await authenticate()
-                await OfframpSession.shared.peerRunner
-                    .setAcceptingIntents(depositID: depositID, accepting: accepting)
+                try await OfframpSession.shared.setPeerAcceptingIntents(
+                    depositID: depositID,
+                    accepting: accepting,
+                    expectedGeneration: generation
+                )
             },
             clearOrderAction: { depositID in
                 await OfframpSession.shared.peerRunner.clearOrderAction(depositID: depositID)
@@ -124,16 +144,11 @@ extension OfframpSession {
     /// twice hides funds the user still has.
     func peerSpendableBalance() async throws -> PeerSpendableBalance {
         let client = try await peerClient()
+        let startedIn = try generationToken()
+        try await prepareBaseReservations()
         guard let balance = PeerAccount(try await client.account()).balance else { return .unavailable }
-        let runs = await peerRunner.currentState.runs
-        let liveIDs = Set(runs.map(\.id))
-        let dormant = try await client.attempts()
-            .filter { $0.holdsUnescrowedFunds && !liveIDs.contains($0.id) }
-            .map { PeerAttempt($0).amount }
-        return .ready(
-            balance: balance,
-            committed: UsdcAmount.sum(runs.filter(\.holdsFunds).map(\.amount)) + UsdcAmount.sum(dormant)
-        )
+        try validateGeneration(startedIn)
+        return await baseUSDCReservations.spendable(rawBalance: balance)
     }
 }
 

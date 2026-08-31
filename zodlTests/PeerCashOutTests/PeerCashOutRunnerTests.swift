@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+import ComposableArchitecture
 import Foundation
 import Testing
 @testable import zodl_internal
@@ -11,11 +12,15 @@ struct PeerCashOutRunnerTests {
     /// The amount screen validates against a balance with committed attempts already subtracted, so
     /// a reservation nobody can observe yet is what lets a second tap spend the same coins. It has
     /// to be recorded before `start` returns, not a frame later.
-    @Test func startingAnAttemptReservesItsAmountImmediately() async {
-        let runner = PeerCashOutRunner()
+    @Test func startingAnAttemptReservesItsAmountImmediately() async throws {
+        let runner = await readyRunner()
         let id = await runner.newAttemptID(byteCount: 16)
 
-        let started = await runner.start(id: id, draft: draft(amount: "20000000"))
+        let started = try await runner.start(
+            id: id,
+            draft: draft(amount: "20000000"),
+            rawBalance: amount("100000000")
+        )
 
         #expect(started == id)
         let state = await runner.currentState
@@ -24,12 +29,12 @@ struct PeerCashOutRunnerTests {
     }
 
     /// A repeat start on the same attempt must not rewind one already in flight.
-    @Test func aRepeatStartIsDroppedRatherThanRestarting() async {
-        let runner = PeerCashOutRunner()
+    @Test func aRepeatStartIsDroppedRatherThanRestarting() async throws {
+        let runner = await readyRunner()
         let id = await runner.newAttemptID(byteCount: 16)
 
-        _ = await runner.start(id: id, draft: draft(amount: "20000000"))
-        let second = await runner.start(id: id, draft: draft(amount: "50000000"))
+        _ = try await runner.start(id: id, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
+        let second = try await runner.start(id: id, draft: draft(amount: "50000000"), rawBalance: amount("100000000"))
 
         #expect(second == nil)
         let state = await runner.currentState
@@ -38,13 +43,13 @@ struct PeerCashOutRunnerTests {
     }
 
     /// Several cash-outs can be unfinished at once, and each reserves its own amount.
-    @Test func concurrentAttemptsEachReserveTheirOwnAmount() async {
-        let runner = PeerCashOutRunner()
+    @Test func concurrentAttemptsEachReserveTheirOwnAmount() async throws {
+        let runner = await readyRunner()
         let first = await runner.newAttemptID(byteCount: 16)
         let second = await runner.newAttemptID(byteCount: 16)
 
-        _ = await runner.start(id: first, draft: draft(amount: "20000000"))
-        _ = await runner.start(id: second, draft: draft(amount: "30000000"))
+        _ = try await runner.start(id: first, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
+        _ = try await runner.start(id: second, draft: draft(amount: "30000000"), rawBalance: amount("100000000"))
 
         let state = await runner.currentState
         #expect(state.runs.count == 2)
@@ -65,10 +70,10 @@ struct PeerCashOutRunnerTests {
 
     /// Wallet-scoped state on an app-lifetime actor: a seed change must not leave the previous
     /// wallet's attempts reserving a balance that is no longer theirs.
-    @Test func resetClearsEveryReservation() async {
-        let runner = PeerCashOutRunner()
+    @Test func resetClearsEveryReservation() async throws {
+        let runner = await readyRunner()
         let id = await runner.newAttemptID(byteCount: 16)
-        _ = await runner.start(id: id, draft: draft(amount: "20000000"))
+        _ = try await runner.start(id: id, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
 
         await runner.reset()
 
@@ -80,9 +85,9 @@ struct PeerCashOutRunnerTests {
     /// A screen that subscribes after the work started still needs to see it, so the current state
     /// is published on subscription rather than only on the next change.
     @Test func subscribingPublishesTheCurrentStateImmediately() async throws {
-        let runner = PeerCashOutRunner()
+        let runner = await readyRunner()
         let id = await runner.newAttemptID(byteCount: 16)
-        _ = await runner.start(id: id, draft: draft(amount: "20000000"))
+        _ = try await runner.start(id: id, draft: draft(amount: "20000000"), rawBalance: amount("100000000"))
 
         var iterator = await runner.observe().makeAsyncIterator()
         let first = try #require(await iterator.next())
@@ -121,6 +126,126 @@ struct PeerCashOutRunnerTests {
         #expect(await runner.currentState.orderActions["escrow_1"] == nil)
     }
 
+    /// `RECOVERY_STATE_UNREADABLE` explicitly says the outcome is unknown. It holds funds even
+    /// when retry/recovery has cleared the transient `creatingDeposit` history.
+    @Test func unknownFailureWithoutStatusHistoryStillHoldsFunds() {
+        var run = PeerRun(
+            id: "attempt",
+            destinationCode: "revolut",
+            amount: amount("20000000"),
+            currencyCodes: ["EUR"],
+            startedAt: .distantPast
+        )
+        run.statuses = [failure(nothingEscrowed: false)]
+
+        #expect(run.holdsFunds)
+    }
+
+    /// A decode/I/O failure is not evidence that the checkpoint book contained no attempts.
+    @Test func unreadableHydrationFailsClosed() async {
+        let reservations = BaseUSDCReservationLedger()
+        await reservations.markReady(.scanAndPay)
+        await reservations.markReady(.onrampDelivery)
+        let runner = PeerCashOutRunner(reservations: reservations)
+
+        await runner.hydrate(storedAttempts: { throw HydrationError.unreadable }, reconcileAfter: false)
+
+        #expect(await runner.currentState.runs.isEmpty)
+        #expect(await reservations.spendable(rawBalance: amount("100000000")) == .unavailable)
+    }
+
+    /// Cancellation is advisory: a foreign call can ignore it. Reset must join that call, and its
+    /// old-generation result must be unable to stamp state after the wallet boundary moved.
+    @Test func resetJoinsHydrationAndRejectsItsLateCompletion() async {
+        let reservations = BaseUSDCReservationLedger()
+        await reservations.markReady(.scanAndPay)
+        await reservations.markReady(.onrampDelivery)
+        let runner = PeerCashOutRunner(reservations: reservations)
+        let release = TestContinuationGate()
+        let started = AsyncStream<Void>.makeStream()
+        let cancelled = AsyncStream<Void>.makeStream()
+        let storedAttempt = attempt()
+
+        var startedIterator = started.stream.makeAsyncIterator()
+        var cancelledIterator = cancelled.stream.makeAsyncIterator()
+        let hydration = Task {
+            await runner.hydrate(storedAttempts: {
+                started.continuation.yield()
+                started.continuation.finish()
+                return await withTaskCancellationHandler {
+                    await release.wait()
+                    return [storedAttempt]
+                } onCancel: {
+                    cancelled.continuation.yield()
+                    cancelled.continuation.finish()
+                }
+            }, reconcileAfter: false)
+        }
+        _ = await startedIterator.next()
+
+        let resetCompleted = LockIsolated(false)
+        let reset = Task {
+            await runner.reset()
+            resetCompleted.setValue(true)
+        }
+        _ = await cancelledIterator.next()
+        #expect(!resetCompleted.value)
+
+        await release.open()
+        await reset.value
+        await hydration.value
+
+        #expect(resetCompleted.value)
+        #expect(await runner.currentState.runs.isEmpty)
+        #expect(await reservations.spendable(rawBalance: amount("100000000")) == .unavailable)
+    }
+
+    private func readyRunner() async -> PeerCashOutRunner {
+        let reservations = BaseUSDCReservationLedger()
+        await reservations.markReady(.peer)
+        await reservations.markReady(.scanAndPay)
+        await reservations.markReady(.onrampDelivery)
+        return PeerCashOutRunner(reservations: reservations)
+    }
+
+    private func amount(_ micros: String) -> UsdcAmount {
+        UsdcAmount(micros: micros) ?? .zero
+    }
+
+    private func attempt() -> PeerAttempt {
+        PeerAttempt(
+            id: "stored-attempt",
+            destinationCode: "revolut",
+            currencyCodes: ["EUR"],
+            amount: amount("20000000"),
+            createdAt: .distantPast,
+            depositID: nil,
+            holdsUnescrowedFunds: true
+        )
+    }
+
+    private func failure(nothingEscrowed: Bool) -> PeerProgress {
+        PeerProgress(
+            subjectID: "attempt",
+            kind: .failed,
+            step: .creatingDeposit,
+            amount: nil,
+            txHash: nil,
+            depositID: nil,
+            order: nil,
+            failure: PeerFailure(
+                code: "RECOVERY_STATE_UNREADABLE",
+                step: .creatingDeposit,
+                retryable: false,
+                allowsManualRetry: false,
+                nothingEscrowed: nothingEscrowed,
+                recovery: nil,
+                escrowRevertBucket: nil
+            ),
+            isTerminal: true
+        )
+    }
+
     private func draft(amount: String) -> PeerCashOutDraft {
         PeerCashOutDraft(
             destinationCode: "revolut",
@@ -128,5 +253,26 @@ struct PeerCashOutRunnerTests {
             currencyCodes: ["EUR"],
             amount: UsdcAmount(micros: amount) ?? .zero
         )
+    }
+}
+
+private enum HydrationError: Error {
+    case unreadable
+}
+
+private actor TestContinuationGate {
+    private var isOpen = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func open() {
+        isOpen = true
+        let waiters = waiters
+        self.waiters.removeAll()
+        waiters.forEach { $0.resume() }
     }
 }

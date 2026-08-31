@@ -35,8 +35,7 @@ struct PeerRun: Equatable, Identifiable, Sendable {
     /// proves the escrow took nothing, which a reverted send does.
     var holdsFunds: Bool {
         if depositID != nil { return false }
-        guard let failure else { return true }
-        return statuses.contains { $0.kind == .creatingDeposit } && !failure.nothingEscrowed
+        return failure.map { !$0.nothingEscrowed } ?? true
     }
 }
 
@@ -92,10 +91,17 @@ struct PeerRunnerState: Equatable, Sendable {
 /// Several attempts run at once, each keyed by its own id, because the protocol allows it and a
 /// single anonymous slot cannot say which attempt a transaction hash belongs to.
 actor PeerCashOutRunner {
+    private let reservations: BaseUSDCReservationLedger
     private var client: ApplePeerCashOutClient?
     private var state = PeerRunnerState.empty
     private var jobs: [String: Task<Void, Never>] = [:]
     private var actionJobs: [String: Task<Void, Never>] = [:]
+    private var hydrationJob: Task<Bool, Never>?
+    private var reconciliationJob: Task<Void, Never>?
+    private var hydrationSucceeded = false
+    /// Session generation this client belongs to. A stale screen action cannot be accepted by a
+    /// runner that invalidation has already rebound to another wallet.
+    private var boundSessionGeneration: Int? = 0
     /// What each attempt was actually asked to do. A retry reads its payee from here rather than
     /// from the rail's current handle, which is not necessarily the one this attempt was opened for.
     private var drafts: [String: PeerCashOutDraft] = [:]
@@ -104,6 +110,10 @@ actor PeerCashOutRunner {
     /// Bumped by ``reset()``. Every launch reads it before starting and again once it resumes, so a
     /// task parked on an await cannot wake up and start driving a wallet that has been replaced.
     private var generation = 0
+
+    init(reservations: BaseUSDCReservationLedger = BaseUSDCReservationLedger()) {
+        self.reservations = reservations
+    }
 
     var currentState: PeerRunnerState { state }
 
@@ -127,11 +137,15 @@ actor PeerCashOutRunner {
     /// Deliberately does not start driving them. Everything a stored attempt needs is a read, and
     /// the one operation that would write — finishing a funding bridge — cannot exist here, because
     /// iOS has never had a Peer rail to start one.
-    func bind(_ client: ApplePeerCashOutClient) async {
+    func bind(_ client: ApplePeerCashOutClient, sessionGeneration: Int) async {
         guard self.client !== client else { return }
         await reset()
         self.client = client
-        await hydrate()
+        boundSessionGeneration = sessionGeneration
+        await reservations.markLoading(.peer)
+        await hydrate(storedAttempts: {
+            try await client.attempts().map(PeerAttempt.init)
+        })
     }
 
     /// Cancels and joins everything before the caller erases wallet-scoped storage. Joining rather
@@ -140,15 +154,26 @@ actor PeerCashOutRunner {
     func reset() async {
         generation &+= 1
         let running = Array(jobs.values) + Array(actionJobs.values)
+        let hydrationJob = self.hydrationJob
+        let reconciliationJob = self.reconciliationJob
         running.forEach { $0.cancel() }
+        hydrationJob?.cancel()
+        reconciliationJob?.cancel()
         jobs.removeAll()
         actionJobs.removeAll()
+        self.hydrationJob = nil
+        self.reconciliationJob = nil
+        hydrationSucceeded = false
+        boundSessionGeneration = nil
         drafts.removeAll()
         client = nil
         publish(.empty)
+        await reservations.markLoading(.peer)
         for job in running {
             await job.value
         }
+        if let hydrationJob { _ = await hydrationJob.value }
+        if let reconciliationJob { await reconciliationJob.value }
     }
 
     /// A 16-byte identity minted before anything is stored, so the attempt has a name from the
@@ -165,7 +190,22 @@ actor PeerCashOutRunner {
     /// nobody can observe yet is what lets a second tap spend the same coins.
     ///
     /// Returns nil when that attempt is already running, which makes a repeat call harmless.
-    func start(id: String, draft: PeerCashOutDraft) -> String? {
+    func start(
+        id: String,
+        draft: PeerCashOutDraft,
+        rawBalance: UsdcAmount,
+        sessionGeneration: Int = 0
+    ) async throws -> String? {
+        guard boundSessionGeneration == sessionGeneration else { return nil }
+        guard state.run(id: id) == nil else { return nil }
+        let startedIn = generation
+        try await reservations.claim(.peer(attemptID: id), amount: draft.amount, rawBalance: rawBalance)
+        guard startedIn == generation, boundSessionGeneration == sessionGeneration else {
+            await reservations.settle(.peer(attemptID: id), as: .available)
+            return nil
+        }
+        // Another call with the same id may have entered while the reservation actor was serving
+        // this one. Its idempotent claim belongs to the call that published first.
         guard state.run(id: id) == nil else { return nil }
         var next = state
         next.runs.append(
@@ -192,7 +232,8 @@ actor PeerCashOutRunner {
     ///
     /// Because it cannot move funds it needs no authentication, which is what makes it safe to run
     /// on every entry to the progress screen and on the cold start after the process died.
-    func recover(id: String) {
+    func recover(id: String, sessionGeneration: Int) {
+        guard boundSessionGeneration == sessionGeneration else { return }
         launch(id: id) { $0.resume(attemptId: id) }
     }
 
@@ -200,8 +241,9 @@ actor PeerCashOutRunner {
     /// record to resolve, and its draft is the only thing that can describe it — so this one may
     /// broadcast, and callers authenticate first. Where a checkpoint does exist the facade prefers
     /// it, so a retry still cannot re-send what was already sent.
-    func retry(id: String) {
-        guard let draft = drafts[id] else { return recover(id: id) }
+    func retry(id: String, sessionGeneration: Int) {
+        guard boundSessionGeneration == sessionGeneration else { return }
+        guard let draft = drafts[id] else { return recover(id: id, sessionGeneration: sessionGeneration) }
         launch(id: id) { $0.run(request: draft.apple(attemptID: id)) }
     }
 
@@ -216,13 +258,15 @@ actor PeerCashOutRunner {
         launchDrive(id: id, operation: operation)
     }
 
-    func withdraw(depositID: String, amount: UsdcAmount) {
+    func withdraw(depositID: String, amount: UsdcAmount, sessionGeneration: Int) {
+        guard boundSessionGeneration == sessionGeneration else { return }
         runOrderAction(depositID: depositID, kind: .withdraw) { client in
             client.withdraw(depositIdComposite: depositID, amountMicros: amount.microsString)
         }
     }
 
-    func setAcceptingIntents(depositID: String, accepting: Bool) {
+    func setAcceptingIntents(depositID: String, accepting: Bool, sessionGeneration: Int) {
+        guard boundSessionGeneration == sessionGeneration else { return }
         runOrderAction(depositID: depositID, kind: .setAccepting) { client in
             client.setAcceptingIntents(depositIdComposite: depositID, accepting: accepting)
         }
@@ -241,40 +285,115 @@ actor PeerCashOutRunner {
     /// writes hashes that stamping would overwrite with a copy taken before they existed.
     func reconcile() async {
         guard let client else { return }
+        if let reconciliationJob {
+            await reconciliationJob.value
+            return
+        }
+        let startedIn = generation
         let driving = state.runs.filter(\.isDriving).map(\.id)
-        guard let matches = try? await client.reconcile(drivingAttemptIds: driving) else { return }
-        for match in matches {
-            mutate(id: match.attemptId) { run in
-                guard !run.isDriving, run.depositID == nil else { return }
-                run.reconciledDepositID = match.depositIdComposite
+        let task = Task { [weak self] in
+            guard let matches = try? await client.reconcile(drivingAttemptIds: driving), !Task.isCancelled else {
+                return
+            }
+            for match in matches {
+                if match.retiredWithoutEscrow {
+                    await self?.recordRetiredReconciliation(
+                        attemptID: match.attemptId,
+                        generation: startedIn
+                    )
+                } else if let depositID = match.depositIdComposite {
+                    await self?.recordReconciliation(
+                        attemptID: match.attemptId,
+                        depositID: depositID,
+                        generation: startedIn
+                    )
+                }
             }
         }
+        reconciliationJob = task
+        await task.value
+        if reconciliationJob == task { reconciliationJob = nil }
     }
 
     /// Attempts with a durable record that this process is not carrying. They are what keeps a
     /// cash-out visible after a cold start: the indexer cannot show an order that does not exist
     /// yet, and without these the amount stays subtracted from the balance with nothing to explain
     /// it and no route back.
-    private func hydrate() async {
-        guard let client else { return }
+    func hydrate(
+        storedAttempts load: @escaping @Sendable () async throws -> [PeerAttempt],
+        reconcileAfter: Bool = true
+    ) async {
         let startedIn = generation
-        let stored = (try? await client.attempts()) ?? []
-        guard startedIn == generation else { return }
+        let task = Task { [weak self] in
+            do {
+                let stored = try await load()
+                guard !Task.isCancelled else { return false }
+                return try await self?.applyHydration(stored, generation: startedIn) ?? false
+            } catch is CancellationError {
+                return false
+            } catch {
+                await self?.failHydration(generation: startedIn)
+                return false
+            }
+        }
+        hydrationJob = task
+        let hydrated = await task.value
+        if hydrationJob == task { hydrationJob = nil }
+        guard hydrated, reconcileAfter, startedIn == generation else { return }
+        await reconcile()
+    }
+
+    /// A failed cold-start read is retryable but remains fail-closed between attempts. The client
+    /// itself may be cached safely; the checkpoint read is single-flight and is repeated until it
+    /// establishes a complete recovery book.
+    func ensureHydrated() async -> Bool {
+        if hydrationSucceeded { return true }
+        if let hydrationJob {
+            _ = await hydrationJob.value
+            return hydrationSucceeded
+        }
+        guard let client else { return false }
+        await reservations.markLoading(.peer)
+        await hydrate(storedAttempts: {
+            try await client.attempts().map(PeerAttempt.init)
+        })
+        return hydrationSucceeded
+    }
+
+    private func applyHydration(_ stored: [PeerAttempt], generation: Int) async throws -> Bool {
+        guard generation == self.generation else { return false }
+        let held = stored.filter(\.holdsUnescrowedFunds)
+        for attempt in held {
+            try await reservations.restore(.peer(attemptID: attempt.id), amount: attempt.amount)
+            guard generation == self.generation else { return false }
+        }
+        await reservations.markReady(.peer)
+        guard generation == self.generation else { return false }
         var next = state
-        for attempt in stored where attempt.holdsUnescrowedFunds && next.run(id: attempt.id) == nil {
+        for attempt in held where next.run(id: attempt.id) == nil {
             next.runs.append(
                 PeerRun(
                     id: attempt.id,
-                    destinationCode: attempt.platformCode,
-                    amount: UsdcAmount(micros: attempt.amountMicros) ?? .zero,
+                    destinationCode: attempt.destinationCode,
+                    amount: attempt.amount,
                     currencyCodes: attempt.currencyCodes,
-                    startedAt: Date(timeIntervalSince1970: TimeInterval(attempt.createdAtEpochSeconds))
+                    startedAt: attempt.createdAt,
+                    reconciledDepositID: attempt.depositID
                 )
             )
         }
         next.runs.sort { $0.startedAt < $1.startedAt }
         publish(next)
-        await reconcile()
+        hydrationSucceeded = true
+        return true
+    }
+
+    private func failHydration(generation: Int) async {
+        guard generation == self.generation else { return }
+        // An unreadable recovery book is not an empty one. No Base spender may be admitted until a
+        // later read establishes which promises the previous process left behind.
+        await reservations.markUnavailable(.peer)
+        hydrationSucceeded = false
     }
 
     /// Stops when the flow completes, which the facade arranges at the live order: from there the
@@ -296,9 +415,36 @@ actor PeerCashOutRunner {
         }
     }
 
-    private func record(id: String, status: PeerProgress, generation: Int) {
+    private func record(id: String, status: PeerProgress, generation: Int) async {
         guard generation == self.generation else { return }
         mutate(id: id) { $0.statuses.append(status) }
+        if status.depositID != nil || status.order != nil {
+            await reservations.settle(.peer(attemptID: id), as: .spent)
+        } else if status.failure?.nothingEscrowed == true {
+            await reservations.settle(.peer(attemptID: id), as: .available)
+        } else if status.failure != nil {
+            await reservations.settle(.peer(attemptID: id), as: .unknown)
+        }
+    }
+
+    private func recordReconciliation(attemptID: String, depositID: String, generation: Int) async {
+        guard generation == self.generation,
+              let run = state.run(id: attemptID),
+              !run.isDriving,
+              run.depositID == nil else { return }
+        mutate(id: attemptID) { $0.reconciledDepositID = depositID }
+        await reservations.settle(.peer(attemptID: attemptID), as: .spent)
+    }
+
+    private func recordRetiredReconciliation(attemptID: String, generation: Int) async {
+        guard generation == self.generation,
+              let run = state.run(id: attemptID),
+              !run.isDriving,
+              run.depositID == nil else { return }
+        var next = state
+        next.runs.removeAll { $0.id == attemptID }
+        publish(next)
+        await reservations.settle(.peer(attemptID: attemptID), as: .available)
     }
 
     private func finishDrive(id: String, generation: Int) {

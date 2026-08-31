@@ -27,6 +27,8 @@ struct OfframpQuoteModel: Equatable, Sendable {
     let usdcDisplay: String
     let sellRate: String
     let fixedFeeDisplay: String
+    /// Order plus the protocol's fixed PAY fee: the exact Base allowance and reservation.
+    let requiredBalanceMicros: String
     let baseBalanceDisplay: String
     let shortfallMicros: String
     let shortfallDisplay: String
@@ -137,6 +139,9 @@ struct OfframpClient {
     var accountAddress: @Sendable () async throws -> String
     var accountSummary: @Sendable () async throws -> OfframpAccountModel
     var transactionURL: @Sendable (_ txHash: String) async throws -> URL?
+    /// Drops screen-owned authorization and payment-detail waiters without touching the
+    /// wallet-lifetime account, Peer runner, or another P2P screen's work.
+    var resetScreen: @Sendable () async -> Void
     var invalidateSession: @Sendable () async -> Void
 
     /// The owner key behind the P2P cash-out account, for the profile's reveal surface.
@@ -168,47 +173,67 @@ extension OfframpClient: DependencyKey {
                 return OfframpScanResult(rawPayload: payload, paymentAddress: address, fiatAmount: parsed.fiatAmount)
             },
             quote: { currency, amount in
-                let native = try await OfframpSession.shared.client().quote(
-                    currencyCode: currency,
-                    fiatAmount: amount
+                let result = try await OfframpSession.shared.quote(currencyCode: currency, fiatAmount: amount)
+                guard let required = UsdcAmount(micros: result.native.requiredBalanceMicros),
+                      let availableBalance = result.spendable.available else {
+                    throw BaseUSDCReservationLedger.ClaimError.recoveryUnavailable
+                }
+                let model = OfframpQuoteModel(
+                    result.native,
+                    availableBalance: availableBalance,
+                    required: required
                 )
-                let model = OfframpQuoteModel(native)
-                quoteAuthorization.authorize(native, model: model)
+                quoteAuthorization.authorize(
+                    result.native,
+                    model: model,
+                    generation: result.generation,
+                    operationID: UUID().uuidString
+                )
                 return model
             },
             pay: { quote, payeeName in
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
-                let client = try await OfframpSession.shared.client()
                 await paymentDetails.reset()
-                guard let nativeQuote = quoteAuthorization.consume(matching: quote) else {
+                guard let authorization = quoteAuthorization.consume(matching: quote) else {
                     throw OfframpClientError.staleQuote
                 }
-                let flow = client.pay(
-                    quote: nativeQuote,
+                guard let required = UsdcAmount(micros: quote.requiredBalanceMicros) else {
+                    throw BaseUSDCReservationLedger.ClaimError.recoveryUnavailable
+                }
+                // The quote is advisory; this is the atomic commit-time admission shared with
+                // Peer and refunds, using a fresh chain balance after authentication.
+                return try await OfframpSession.shared.startScanAndPay(
+                    quote: authorization.native,
                     paymentDetailsProvider: paymentDetails,
-                    payeeName: payeeName
+                    payeeName: payeeName,
+                    amount: required,
+                    quoteGeneration: authorization.generation,
+                    operationID: authorization.operationID
                 )
-                return flow.offrampStream()
             },
             resumePayment: {
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
-                let client = try await OfframpSession.shared.client()
                 await paymentDetails.reset()
-                return client.resumePayment(paymentDetailsProvider: paymentDetails).offrampStream()
+                return try await OfframpSession.shared.resumeScanAndPay(
+                    paymentDetailsProvider: paymentDetails,
+                    expectedGeneration: generation
+                )
             },
             submitPaymentDetails: { scan in
                 try await paymentDetails.submit(scan)
             },
             bridgeToBase: { micros, resume in
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
-                let flow = try await OfframpSession.shared.client().bridgeToBase(
+                return try await OfframpSession.shared.bridgeToBase(
                     usdcMicros: micros,
-                    resumeDepositAddress: resume
+                    resumeDepositAddress: resume,
+                    expectedGeneration: generation
                 )
-                return flow.offrampStream()
             },
             previewTopUp: { micros in
                 try await OfframpSession.shared.previewTopUp(usdcMicros: micros)
@@ -217,10 +242,15 @@ extension OfframpClient: DependencyKey {
                 try await OfframpSession.shared.client().history().map(OfframpHistoryModel.init)
             },
             recoverFunds: { orderId in
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OfframpClientError.authenticationCancelled }
-                let flow = try await OfframpSession.shared.client().recoverFunds(orderId: orderId)
-                return flow.offrampStream()
+                // Preview is deliberately not a reservation. Confirmation rechecks and takes the
+                // exclusive claim immediately before the recover/refund flow can move anything.
+                return try await OfframpSession.shared.recoverFunds(
+                    orderID: orderId,
+                    expectedGeneration: generation
+                )
             },
             previewRefund: {
                 try await OfframpSession.shared.previewRefund()
@@ -232,7 +262,7 @@ extension OfframpClient: DependencyKey {
                 try await OfframpSession.shared.client().checkpointCurrencyCode()
             },
             discardCheckpoint: {
-                try await OfframpSession.shared.client().discardCheckpoint()
+                try await OfframpSession.shared.discardPaymentCheckpoint()
             },
             hasTopUpCheckpoint: {
                 try await OfframpSession.shared.client().hasTopUpCheckpoint().boolValue
@@ -241,7 +271,7 @@ extension OfframpClient: DependencyKey {
                 try await OfframpSession.shared.client().topUpCheckpointMicros()
             },
             discardTopUpCheckpoint: {
-                try await OfframpSession.shared.client().discardTopUpCheckpoint()
+                try await OfframpSession.shared.discardTopUpCheckpoint()
             },
             accountAddress: {
                 try await OfframpSession.shared.client().accountAddress()
@@ -251,6 +281,10 @@ extension OfframpClient: DependencyKey {
             },
             transactionURL: { hash in
                 URL(string: try await OfframpSession.shared.client().transactionUrl(txHash: hash))
+            },
+            resetScreen: {
+                await paymentDetails.reset()
+                quoteAuthorization.reset()
             },
             invalidateSession: {
                 await paymentDetails.reset()
@@ -266,17 +300,17 @@ extension OfframpClient: DependencyKey {
 
 private final class OfframpQuoteAuthorization: @unchecked Sendable {
     private let lock = NSLock()
-    private var authorized: (model: OfframpQuoteModel, native: AppleOfframpQuote)?
+    private var authorized: (model: OfframpQuoteModel, native: AppleOfframpQuote, generation: Int, operationID: String)?
 
-    func authorize(_ native: AppleOfframpQuote, model: OfframpQuoteModel) {
-        lock.withLock { authorized = (model, native) }
+    func authorize(_ native: AppleOfframpQuote, model: OfframpQuoteModel, generation: Int, operationID: String) {
+        lock.withLock { authorized = (model, native, generation, operationID) }
     }
 
-    func consume(matching model: OfframpQuoteModel) -> AppleOfframpQuote? {
+    func consume(matching model: OfframpQuoteModel) -> (native: AppleOfframpQuote, generation: Int, operationID: String)? {
         lock.withLock {
             guard let authorized, authorized.model == model else { return nil }
             self.authorized = nil
-            return authorized.native
+            return (authorized.native, authorized.generation, authorized.operationID)
         }
     }
 
@@ -368,7 +402,8 @@ private extension OfframpCorridor {
 }
 
 private extension OfframpQuoteModel {
-    init(_ value: AppleOfframpQuote) {
+    init(_ value: AppleOfframpQuote, availableBalance: UsdcAmount, required: UsdcAmount) {
+        let shortfall = required.subtractingClampedToZero(availableBalance)
         self.init(
             currencyCode: value.currencyCode,
             fiatAmount: value.fiatAmount,
@@ -376,10 +411,11 @@ private extension OfframpQuoteModel {
             usdcDisplay: value.usdcDisplay,
             sellRate: value.sellRate,
             fixedFeeDisplay: value.fixedFeeDisplay,
-            baseBalanceDisplay: value.baseBalanceDisplay,
-            shortfallMicros: value.shortfallMicros,
-            shortfallDisplay: value.shortfallDisplay,
-            canPayFromBase: value.canPayFromBase,
+            requiredBalanceMicros: value.requiredBalanceMicros,
+            baseBalanceDisplay: availableBalance.display,
+            shortfallMicros: shortfall.microsString,
+            shortfallDisplay: shortfall.display,
+            canPayFromBase: availableBalance >= required,
             canBridgeToBase: value.canBridgeToBase
         )
     }
@@ -398,7 +434,7 @@ private extension OfframpAccountModel {
     }
 }
 
-private extension OfframpProgressModel {
+extension OfframpProgressModel {
     init(_ value: AppleOfframpStatus) {
         self.init(
             kind: value.kind,
@@ -437,17 +473,97 @@ private extension KotlinLong {
     var date: Date { Date(timeIntervalSince1970: TimeInterval(int64Value)) }
 }
 
-private extension SkieSwiftFlow where T == AppleOfframpStatus {
-    func offrampStream() -> AsyncStream<OfframpProgressModel> {
-        AsyncStream { continuation in
-            let task = Task {
-                for await status in self {
-                    guard !Task.isCancelled else { break }
-                    continuation.yield(OfframpProgressModel(status))
-                }
-                continuation.finish()
+enum OfframpReservation: Sendable {
+    case scanAndPay(BaseUSDCReservationLedger.Owner)
+    case refund(BaseUSDCReservationLedger.Owner)
+
+    func record(_ status: OfframpProgressModel) async -> Bool {
+        switch self {
+        case let .scanAndPay(owner):
+            switch status.kind {
+            case "waiting_for_payment_details", "sending_payment_details", "waiting_for_completion", "completed":
+                await OfframpSession.shared.settleScanAndPay(owner, as: .spent)
+                return true
+            case "cancelled":
+                // Contract cancellation is positive evidence that the order's USDC returned.
+                await OfframpSession.shared.settleScanAndPay(owner, as: .available)
+                return true
+            case "failed":
+                await settleScanFailure(status, owner: owner)
+                return true
+            default:
+                return false
             }
-            continuation.onTermination = { _ in task.cancel() }
+        case let .refund(owner):
+            switch status.kind {
+            case "funds_recovered":
+                await OfframpSession.shared.settleRefund(owner, as: .spent)
+                return true
+            case "failed":
+                await settleRefundFailure(owner: owner)
+                return true
+            default:
+                return false
+            }
+        }
+    }
+
+    /// Cancellation before a cold flow emits is the only no-status path that may release a claim,
+    /// and only when the durable checkpoint also proves nothing started. Once any status was seen,
+    /// a missing checkpoint could be terminal cleanup, so the disposition remains unknown.
+    func finishInterrupted(receivedStatus: Bool) async {
+        switch self {
+        case let .scanAndPay(owner):
+            do {
+                let pending = try await OfframpSession.shared.pendingScanAndPayCommitmentForSettlement()
+                await OfframpSession.shared.settleScanAndPay(
+                    owner,
+                    as: pending == nil && !receivedStatus ? .available : .unknown
+                )
+            } catch {
+                await OfframpSession.shared.settleScanAndPay(owner, as: .unknown)
+            }
+        case let .refund(owner):
+            do {
+                let pending = try await OfframpSession.shared.pendingRefundCommitmentForSettlement()
+                await OfframpSession.shared.settleRefund(
+                    owner,
+                    as: pending == nil && !receivedStatus ? .available : .unknown
+                )
+            } catch {
+                await OfframpSession.shared.settleRefund(owner, as: .unknown)
+            }
+        }
+    }
+
+    private func settleScanFailure(
+        _ status: OfframpProgressModel,
+        owner: BaseUSDCReservationLedger.Owner
+    ) async {
+        let escrowedSteps = [
+            "WAITING_FOR_PAYMENT_DETAILS",
+            "ENCRYPTING_UPI",
+            "SENDING_UPI",
+            "WAITING_FOR_COMPLETION"
+        ]
+        if escrowedSteps.contains(status.step) {
+            await OfframpSession.shared.settleScanAndPay(owner, as: .spent)
+            return
+        }
+        do {
+            let pending = try await OfframpSession.shared.pendingScanAndPayCommitmentForSettlement()
+            await OfframpSession.shared.settleScanAndPay(owner, as: pending == nil ? .available : .unknown)
+        } catch {
+            await OfframpSession.shared.settleScanAndPay(owner, as: .unknown)
+        }
+    }
+
+    private func settleRefundFailure(owner: BaseUSDCReservationLedger.Owner) async {
+        do {
+            let pending = try await OfframpSession.shared.pendingRefundCommitmentForSettlement()
+            await OfframpSession.shared.settleRefund(owner, as: pending == nil ? .available : .unknown)
+        } catch {
+            await OfframpSession.shared.settleRefund(owner, as: .unknown)
         }
     }
 }

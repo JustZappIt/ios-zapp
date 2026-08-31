@@ -23,7 +23,6 @@ extension Root {
                 .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
                 .onramp(.delegate(.close)),
-                .offramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
                 .walletBackupCoordFlow(.backToHomeTapped),
                 .torSetup(.backToHomeTapped),
@@ -282,7 +281,9 @@ extension Root {
                     guard
                         isSoftwareWallet,
                         case let .peerCashOut(destinationCode) = userStoredPreferences.p2pRail() ?? .default,
-                        try await peerCashOut.capabilities().isAvailable
+                        let capabilities = try? await peerCashOut.capabilities(),
+                        capabilities.isAvailable,
+                        capabilities.destination(code: destinationCode) != nil
                     else {
                         return await send(.openScanAndPay)
                     }
@@ -292,12 +293,18 @@ extension Root {
                 }
 
             case .openScanAndPay:
+                state.offrampActivityReturn = nil
+                state.peerCashOutActivityReturn = nil
                 state.offrampState = .initial(page: .amount, corridorContext: .payment)
+                state.offrampOrigin = .pay
                 state.path = .offramp
                 return .none
 
             case let .openPeerCashOut(destinationCode):
+                state.offrampActivityReturn = nil
+                state.peerCashOutActivityReturn = nil
                 state.peerCashOutState = PeerCashOut.State(destinationCode: destinationCode)
+                state.peerCashOutOrigin = .pay
                 state.path = .peerCashOut
                 return .none
 
@@ -305,34 +312,93 @@ extension Root {
                 // authentication; a cash-out never starts one behind the user's back.
             case .peerCashOut(.delegate(.topUp)):
                 state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.offrampOrigin = .peerCashOut
                 state.path = .offramp
                 return .send(.offramp(.addFundsTapped))
 
-            case .peerCashOut(.delegate(.close)),
-                 .p2pPaymentMethod(.delegate(.close)),
-                 .p2pActivity(.delegate(.close)):
+            case .peerCashOut(.delegate(.close)):
+                state.path = state.peerCashOutOrigin == .activity ? .p2pActivity : nil
+                return .none
+
+            case .p2pPaymentMethod(.delegate(.close)):
                 state.path = nil
                 return .none
 
-            case let .p2pActivity(.delegate(.openPeerAttempt(attemptID))):
+            case .offramp(.delegate(.close)):
+                switch state.offrampOrigin {
+                case .pay:
+                    state.path = nil
+                case .peerCashOut:
+                    state.path = .peerCashOut
+                case .activity:
+                    if let activityReturn = state.offrampActivityReturn {
+                        state.offrampState = activityReturn.state
+                        state.offrampOrigin = activityReturn.origin
+                    }
+                    state.path = .p2pActivity
+                }
+                return .none
+
+            case .p2pActivity(.delegate(.close)):
+                if state.p2pActivityOrigin == .offramp {
+                    if let activityReturn = state.offrampActivityReturn {
+                        state.offrampState = activityReturn.state
+                        state.offrampOrigin = activityReturn.origin
+                    }
+                    if let activityReturn = state.peerCashOutActivityReturn {
+                        state.peerCashOutState = activityReturn.state
+                        state.peerCashOutOrigin = activityReturn.origin
+                    }
+                    state.path = .offramp
+                } else {
+                    state.path = nil
+                }
+                state.offrampActivityReturn = nil
+                state.peerCashOutActivityReturn = nil
+                return .none
+
+            case let .p2pActivity(.delegate(.openPeerAttempt(attemptID, destinationCode))):
+                state.peerCashOutState = PeerCashOut.State(destinationCode: destinationCode)
                 state.peerCashOutState.progress = PeerCashOutProgress.State(attemptID: attemptID)
+                state.peerCashOutOrigin = .activity
                 state.path = .peerCashOut
                 return .none
 
-            case let .p2pActivity(.delegate(.openPeerOrder(depositID))):
+            case let .p2pActivity(.delegate(.openPeerOrder(depositID, destinationCode))):
+                state.peerCashOutState = PeerCashOut.State(destinationCode: destinationCode ?? "")
                 state.peerCashOutState.order = PeerOrderDetail.State(depositID: depositID)
+                state.peerCashOutOrigin = .activity
                 state.path = .peerCashOut
+                return .none
+
+            case .peerCashOut(.progress(.delegate(.close))) where state.peerCashOutOrigin == .activity:
+                if let activityReturn = state.peerCashOutActivityReturn {
+                    state.peerCashOutState = activityReturn.state
+                    state.peerCashOutOrigin = activityReturn.origin
+                }
+                state.path = .p2pActivity
+                return .none
+
+            case .peerCashOut(.order(.delegate(.close)))
+                where state.peerCashOutOrigin == .activity && state.peerCashOutState.progress == nil:
+                if let activityReturn = state.peerCashOutActivityReturn {
+                    state.peerCashOutState = activityReturn.state
+                    state.peerCashOutOrigin = activityReturn.origin
+                }
+                state.path = .p2pActivity
                 return .none
 
                 // The p2p.me recovery actions stay in the off-ramp, which already owns their
                 // progress stream; the activity feed only routes into them.
             case let .p2pActivity(.delegate(.recoverScanAndPayOrder(orderID))):
                 state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.offrampOrigin = .activity
                 state.path = .offramp
                 return .send(.offramp(.recoverTapped(orderID)))
 
             case .p2pActivity(.delegate(.refundToZec)):
                 state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.offrampOrigin = .activity
                 state.path = .offramp
                 return .send(.offramp(.refundTapped))
 
@@ -786,8 +852,29 @@ extension Root {
                 state.path = .p2pPaymentMethod
                 return .none
 
-            case .zappTabs(.p2pTransactionsTapped), .offramp(.delegate(.openActivity)):
+            case .zappTabs(.p2pTransactionsTapped):
                 state.p2pActivityState = .initial
+                state.p2pActivityOrigin = .tabs
+                state.offrampActivityReturn = nil
+                state.peerCashOutActivityReturn = nil
+                state.path = .p2pActivity
+                return .none
+
+            case .offramp(.delegate(.openActivity)):
+                state.offrampActivityReturn = Root.State.OfframpActivityReturn(
+                    state: state.offrampState,
+                    origin: state.offrampOrigin
+                )
+                if state.offrampOrigin == .peerCashOut {
+                    state.peerCashOutActivityReturn = Root.State.PeerCashOutActivityReturn(
+                        state: state.peerCashOutState,
+                        origin: state.peerCashOutOrigin
+                    )
+                } else {
+                    state.peerCashOutActivityReturn = nil
+                }
+                state.p2pActivityState = .initial
+                state.p2pActivityOrigin = .offramp
                 state.path = .p2pActivity
                 return .none
 
@@ -1012,6 +1099,7 @@ extension Root {
                 // page and loads the account behind it.
             case .sendCoordFlow(.topUpRequested):
                 state.offrampState = .initial(page: .amount, corridorContext: .settings)
+                state.offrampOrigin = .pay
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 state.path = .offramp

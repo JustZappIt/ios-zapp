@@ -87,21 +87,29 @@ extension OnrampClient: DependencyKey {
                 try await OfframpSession.shared.onrampClient().recipientAddress()
             },
             quote: { fiatMicros, currencyCode in
-                let native = try await OfframpSession.shared.onrampClient().quote(
+                let generation = try await OfframpSession.shared.generationToken()
+                let client = try await OfframpSession.shared.onrampClient()
+                try await OfframpSession.shared.validateGeneration(generation)
+                let native = try await client.quote(
                     fiatMicros: fiatMicros,
                     currencyCode: currencyCode
                 )
+                try await OfframpSession.shared.validateGeneration(generation)
                 let model = OnrampQuoteModel(native)
-                authorization.authorizeQuote(native, model: model)
+                authorization.authorizeQuote(native, model: model, generation: generation)
                 return model
             },
             estimateToZec: { accountAddress, usdcMicros in
-                let native = try await OfframpSession.shared.onrampClient().estimateToZec(
+                let generation = try await OfframpSession.shared.generationToken()
+                let client = try await OfframpSession.shared.onrampClient()
+                try await OfframpSession.shared.validateGeneration(generation)
+                let native = try await client.estimateToZec(
                     accountAddress: accountAddress,
                     usdcMicros: usdcMicros
                 )
+                try await OfframpSession.shared.validateGeneration(generation)
                 let model = OnrampZecEstimateModel(native)
-                authorization.authorizeEstimate(native, model: model)
+                authorization.authorizeEstimate(native, model: model, generation: generation)
                 return model
             },
             start: { quote, destination, estimate in
@@ -110,47 +118,53 @@ extension OnrampClient: DependencyKey {
                 guard let values = authorization.consume(quote: quote, estimate: estimate) else {
                     throw OnrampClientError.staleQuote
                 }
-                let flow = try await OfframpSession.shared.onrampClient().start(
+                return try await OfframpSession.shared.startOnrampOrder(
                     quote: values.quote,
                     destination: destination.rawValue,
-                    zecEstimate: values.estimate
+                    estimate: values.estimate,
+                    expectedGeneration: values.generation
                 )
-                return flow.onrampStream()
             },
             confirmPaid: {
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OnrampClientError.authenticationCancelled }
-                return try await OfframpSession.shared.onrampClient().confirmPaid().onrampStream()
+                return try await OfframpSession.shared.confirmOnrampPaid(expectedGeneration: generation)
             },
             resume: {
-                try await OfframpSession.shared.onrampClient().resume().onrampStream()
+                let generation = try await OfframpSession.shared.generationToken()
+                return try await OfframpSession.shared.resumeOnrampOrder(expectedGeneration: generation)
             },
             cancel: {
-                try await OfframpSession.shared.onrampClient().cancel().onrampStream()
+                let generation = try await OfframpSession.shared.generationToken()
+                return try await OfframpSession.shared.cancelOnrampOrder(expectedGeneration: generation)
             },
             deliverToZec: { orderID, recipient, usdcMicros in
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OnrampClientError.authenticationCancelled }
-                let flow = try await OfframpSession.shared.onrampClient().deliverToZec(
-                    orderId: orderID,
+                return try await OfframpSession.shared.deliverOnrampToZec(
+                    orderID: orderID,
                     recipient: recipient,
-                    usdcMicros: usdcMicros
+                    usdcMicros: usdcMicros,
+                    expectedGeneration: generation
                 )
-                return flow.onrampDeliveryStream()
             },
             resumeDelivery: {
-                try await OfframpSession.shared.onrampClient().resumeDelivery().onrampDeliveryStream()
+                let generation = try await OfframpSession.shared.generationToken()
+                return try await OfframpSession.shared.resumeOnrampDelivery(expectedGeneration: generation)
             },
             retryDelivery: {
+                let generation = try await OfframpSession.shared.generationToken()
                 @Dependency(\.localAuthentication) var authentication
                 guard await authentication.authenticate() else { throw OnrampClientError.authenticationCancelled }
-                return try await OfframpSession.shared.onrampClient().retryDelivery().onrampDeliveryStream()
+                return try await OfframpSession.shared.retryOnrampDelivery(expectedGeneration: generation)
             },
             checkpoint: {
                 try await OfframpSession.shared.onrampClient().checkpoint().map(OnrampCheckpointModel.init)
             },
             clearCheckpoint: {
-                try await OfframpSession.shared.onrampClient().clearCheckpoint()
+                try await OfframpSession.shared.clearOnrampCheckpoint()
             },
             declaredAmountDisagrees: { currencyCode, status in
                 guard let instruction = status.instruction,
@@ -178,36 +192,38 @@ extension OnrampClient: DependencyKey {
 
 private final class OnrampQuoteAuthorization: @unchecked Sendable {
     private let lock = NSLock()
-    private var quote: (model: OnrampQuoteModel, native: AppleOnrampQuote)?
-    private var estimate: (model: OnrampZecEstimateModel, native: AppleOnrampZecEstimate)?
+    private var quote: (model: OnrampQuoteModel, native: AppleOnrampQuote, generation: Int)?
+    private var estimate: (model: OnrampZecEstimateModel, native: AppleOnrampZecEstimate, generation: Int)?
 
-    func authorizeQuote(_ native: AppleOnrampQuote, model: OnrampQuoteModel) {
+    func authorizeQuote(_ native: AppleOnrampQuote, model: OnrampQuoteModel, generation: Int) {
         lock.withLock {
-            quote = (model, native)
+            quote = (model, native, generation)
             estimate = nil
         }
     }
 
-    func authorizeEstimate(_ native: AppleOnrampZecEstimate, model: OnrampZecEstimateModel) {
-        lock.withLock { estimate = (model, native) }
+    func authorizeEstimate(_ native: AppleOnrampZecEstimate, model: OnrampZecEstimateModel, generation: Int) {
+        lock.withLock { estimate = (model, native, generation) }
     }
 
     func consume(
         quote model: OnrampQuoteModel,
         estimate estimateModel: OnrampZecEstimateModel?
-    ) -> (quote: AppleOnrampQuote, estimate: AppleOnrampZecEstimate?)? {
+    ) -> (quote: AppleOnrampQuote, estimate: AppleOnrampZecEstimate?, generation: Int)? {
         lock.withLock {
             guard let quote, quote.model == model else { return nil }
             let nativeEstimate: AppleOnrampZecEstimate?
             if let estimateModel {
-                guard let estimate, estimate.model == estimateModel else { return nil }
+                guard let estimate,
+                      estimate.model == estimateModel,
+                      estimate.generation == quote.generation else { return nil }
                 nativeEstimate = estimate.native
             } else {
                 nativeEstimate = nil
             }
             self.quote = nil
             self.estimate = nil
-            return (quote.native, nativeEstimate)
+            return (quote.native, nativeEstimate, quote.generation)
         }
     }
 
@@ -260,7 +276,7 @@ private extension OnrampZecEstimateModel {
     }
 }
 
-private extension OnrampStatusModel {
+extension OnrampStatusModel {
     init(_ value: AppleOnrampStatus) throws {
         guard let kind = Kind(rawValue: value.kind) else {
             throw OnrampClientError.invalidFrameworkValue("status kind")
@@ -306,7 +322,7 @@ private extension OnrampStatusModel {
     }
 }
 
-private extension OnrampDeliveryModel {
+extension OnrampDeliveryModel {
     init(_ value: AppleOnrampDeliveryStatus) throws {
         guard let kind = Kind(rawValue: value.kind) else {
             throw OnrampClientError.invalidFrameworkValue("delivery status kind")
@@ -353,42 +369,58 @@ private extension OnrampDeliveryCheckpointModel {
     }
 }
 
-/// A value the framework emits but this build cannot read is a real failure, not the end of the
-/// stream: finishing quietly would let the reducer treat an interrupted order as a completed one.
-private extension SkieSwiftFlow where T == AppleOnrampStatus {
-    func onrampStream() -> OnrampStatusStream {
-        OnrampStatusStream { continuation in
-            let task = Task {
-                do {
-                    for await status in self {
-                        guard !Task.isCancelled else { break }
-                        continuation.yield(try OnrampStatusModel(status))
-                    }
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
+enum OnrampReservation: Sendable {
+    case delivery(BaseUSDCReservationLedger.Owner)
+
+    func record(_ status: OnrampDeliveryModel) async -> Bool {
+        let owner: BaseUSDCReservationLedger.Owner
+        switch self { case let .delivery(value): owner = value }
+        // Funds location is stronger than the presentation kind. `awaitingZec` already follows an
+        // exact Base receipt, and KMP intentionally stops reporting a pending Base commitment at
+        // that point; settle it now so a screen close cannot strand an owner that resume cannot map.
+        switch status.fundsLocation {
+        case .nearIntent, .zcashWallet:
+            await OfframpSession.shared.settleOnrampDelivery(owner, as: .spent)
+            return true
+        case .baseRefundConfirmed:
+            await OfframpSession.shared.settleOnrampDelivery(owner, as: .available)
+            return true
+        case .baseAccount, .recipientMismatch, .transferAmbiguous, .unknown, nil:
+            break
+        }
+        switch status.kind {
+        case .delivered:
+            await OfframpSession.shared.settleOnrampDelivery(owner, as: .spent)
+            return true
+        case .refundedToBase:
+            await OfframpSession.shared.settleOnrampDelivery(owner, as: .available)
+            return true
+        case .failed:
+            switch status.fundsLocation {
+            case .baseAccount, .recipientMismatch, .baseRefundConfirmed:
+                await OfframpSession.shared.settleOnrampDelivery(owner, as: .available)
+            case .nearIntent, .zcashWallet:
+                await OfframpSession.shared.settleOnrampDelivery(owner, as: .spent)
+            case .transferAmbiguous, .unknown, nil:
+                await OfframpSession.shared.settleOnrampDelivery(owner, as: .unknown)
             }
-            continuation.onTermination = { _ in task.cancel() }
+            return true
+        case .preparing, .submitting, .awaitingZec:
+            return false
         }
     }
-}
 
-private extension SkieSwiftFlow where T == AppleOnrampDeliveryStatus {
-    func onrampDeliveryStream() -> OnrampDeliveryStream {
-        OnrampDeliveryStream { continuation in
-            let task = Task {
-                do {
-                    for await status in self {
-                        guard !Task.isCancelled else { break }
-                        continuation.yield(try OnrampDeliveryModel(status))
-                    }
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-            continuation.onTermination = { _ in task.cancel() }
+    func finishInterrupted(receivedStatus: Bool) async {
+        let owner: BaseUSDCReservationLedger.Owner
+        switch self { case let .delivery(value): owner = value }
+        do {
+            let pending = try await OfframpSession.shared.pendingOnrampCommitmentForSettlement()
+            await OfframpSession.shared.settleOnrampDelivery(
+                owner,
+                as: pending == nil && !receivedStatus ? .available : .unknown
+            )
+        } catch {
+            await OfframpSession.shared.settleOnrampDelivery(owner, as: .unknown)
         }
     }
 }

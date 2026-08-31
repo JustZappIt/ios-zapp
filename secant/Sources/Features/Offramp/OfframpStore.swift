@@ -153,6 +153,7 @@ struct Offramp {
     private enum CancelID {
         case operation
         case request
+        case refundPreview
         case topUpValidation
     }
 
@@ -543,14 +544,19 @@ struct Offramp {
                         // The single gate every refund passes through, so the check holds whichever
                         // screen started it. A Peer cash-out that has not escrowed its amount yet
                         // and a refund would both spend the same Base USDC.
-                        if try await peerCashOut.spendableBalance().committed != nil {
+                        switch try await peerCashOut.spendableBalance() {
+                        case .ready(_, committed: .zero):
+                            break
+                        case .ready:
                             return await send(.loadFailed(String(localizable: .p2pActivityRefundBlockedByPeer)))
+                        case .loading, .unavailable:
+                            return await send(.loadFailed(String(localizable: .peerFormErrorBalanceUnavailable)))
                         }
                         await send(.refundPreviewLoaded(try await offramp.previewRefund()))
                     }
                     catch { await send(.loadFailed(error.localizedDescription)) }
                 }
-                .cancellable(id: CancelID.request, cancelInFlight: true)
+                .cancellable(id: CancelID.refundPreview, cancelInFlight: true)
 
             case .refundPreviewLoaded(let preview):
                 state.bridgePreview = preview
@@ -642,7 +648,9 @@ struct Offramp {
                 return .merge(
                     .cancel(id: CancelID.operation),
                     .cancel(id: CancelID.request),
-                    .run { _ in await offramp.invalidateSession() }
+                    .cancel(id: CancelID.refundPreview),
+                    .cancel(id: CancelID.topUpValidation),
+                    .run { _ in await offramp.resetScreen() }
                 )
 
             case .backTapped:

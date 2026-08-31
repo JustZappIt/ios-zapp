@@ -14,6 +14,11 @@ struct PeerCashOutProgress {
 
         var run: PeerRun?
         var transactionURL: URL?
+        var startupErrorMessage: String?
+        var isLoading = true
+        /// Cancellation does not guarantee a foreign async call stops. Results are accepted only
+        /// while they belong to the currently visible subscription.
+        var observationGeneration = 0
 
         var latest: PeerProgress? { run?.latest }
         var failure: PeerFailure? { run?.failure }
@@ -23,7 +28,9 @@ struct PeerCashOutProgress {
         var steps: [ZappOfframpStepItem] { PeerProgressSteps.build(from: run) }
 
         var title: String {
-            if failure != nil { return String(localizable: .peerProgressTitleFailed) }
+            if failure != nil || startupErrorMessage != nil {
+                return String(localizable: .peerProgressTitleFailed)
+            }
             guard let order = latest?.order else { return String(localizable: .peerProgressTitleSetup) }
             return order.buyerLegs.contains(where: \.holdsFunds)
                 ? String(localizable: .peerProgressTitleBuyerPaying)
@@ -63,8 +70,10 @@ struct PeerCashOutProgress {
 
     enum Action: Equatable {
         case onAppear
-        case runnerStateChanged(PeerRunnerState)
-        case transactionURLResolved(URL?)
+        case onDisappear
+        case runnerStateChanged(PeerRunnerState, generation: Int)
+        case startupFailed(String, generation: Int)
+        case transactionURLResolved(URL?, generation: Int)
         case retryTapped
         case viewOrderTapped
         case backTapped
@@ -81,35 +90,69 @@ struct PeerCashOutProgress {
 
     private enum CancelID {
         case runner
+        case transactionURL
     }
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                state.observationGeneration &+= 1
+                state.startupErrorMessage = nil
+                state.isLoading = state.run == nil
                 let attemptID = state.attemptID
+                let generation = state.observationGeneration
                 return .run { send in
                     // Idempotent: a no-op while the attempt is already running, and the cold-start
                     // recovery path when the process died with the order unfinished. It only ever
                     // resolves what was already broadcast, which is why it does not authenticate.
-                    try await peerCashOut.recoverCashOut(attemptID)
-                    for await runnerState in try await peerCashOut.runnerState() {
-                        await send(.runnerStateChanged(runnerState))
+                    do {
+                        try await peerCashOut.recoverCashOut(attemptID)
+                        for await runnerState in try await peerCashOut.runnerState() {
+                            await send(.runnerStateChanged(runnerState, generation: generation))
+                        }
+                    } catch {
+                        guard !Task.isCancelled else { return }
+                        await send(.startupFailed(
+                            String(localizable: .peerFailureGeneric),
+                            generation: generation
+                        ))
                     }
                 }
                 .cancellable(id: CancelID.runner, cancelInFlight: true)
 
-            case let .runnerStateChanged(runnerState):
+            case .onDisappear:
+                state.observationGeneration &+= 1
+                return .merge(
+                    .cancel(id: CancelID.runner),
+                    .cancel(id: CancelID.transactionURL)
+                )
+
+            case let .runnerStateChanged(runnerState, generation):
+                guard generation == state.observationGeneration else { return .none }
+                state.isLoading = false
+                state.startupErrorMessage = nil
                 state.run = runnerState.run(id: state.attemptID)
                 guard let hash = state.failure?.recoveryTransactionHash, state.transactionURL == nil else {
                     return .none
                 }
                 return .run { send in
-                    await send(.transactionURLResolved(try await peerCashOut.transactionURL(hash)))
+                    await send(.transactionURLResolved(
+                        try await peerCashOut.transactionURL(hash),
+                        generation: generation
+                    ))
                 } catch: { _, _ in
                 }
+                .cancellable(id: CancelID.transactionURL, cancelInFlight: true)
 
-            case let .transactionURLResolved(url):
+            case let .startupFailed(message, generation):
+                guard generation == state.observationGeneration else { return .none }
+                state.isLoading = false
+                state.startupErrorMessage = message
+                return .none
+
+            case let .transactionURLResolved(url, generation):
+                guard generation == state.observationGeneration else { return .none }
                 state.transactionURL = url
                 return .none
 

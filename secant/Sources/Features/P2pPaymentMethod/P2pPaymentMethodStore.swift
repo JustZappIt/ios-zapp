@@ -24,6 +24,8 @@ struct P2pPaymentMethod {
         var isSoftwareWallet = true
         var selected: P2pRail = .default
         var isLoading = false
+        var isPeerLoading = false
+        var isScanAndPayLoading = false
         var errorMessage: String?
 
         var canSelectPeer: Bool { isPeerAvailable && isSoftwareWallet }
@@ -31,8 +33,11 @@ struct P2pPaymentMethod {
 
     enum Action: Equatable {
         case onAppear
-        case loaded(corridors: [OfframpCorridor], destinations: [PeerDestination], isPeerAvailable: Bool)
-        case loadFailed(String)
+        case onDisappear
+        case peerLoaded(destinations: [PeerDestination], isAvailable: Bool)
+        case peerLoadFailed(String)
+        case scanAndPayLoaded([OfframpCorridor])
+        case scanAndPayLoadFailed(String)
         case railTapped(P2pRail)
         case backTapped
         case delegate(Delegate)
@@ -47,6 +52,11 @@ struct P2pPaymentMethod {
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.userStoredPreferences) var userStoredPreferences
 
+    private enum CancelID {
+        case peer
+        case scanAndPay
+    }
+
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
@@ -55,30 +65,58 @@ struct P2pPaymentMethod {
                 state.isSoftwareWallet = selectedAccount?.vendor == .zcash
                 state.selected = userStoredPreferences.p2pRail() ?? .default
                 state.isLoading = true
+                state.isPeerLoading = true
+                state.isScanAndPayLoading = true
                 state.errorMessage = nil
-                return .run { send in
-                    // The Peer capability read never throws on an unavailable build: it answers
-                    // "not available" so the rails can be listed as such rather than vanishing.
-                    let capabilities = try await peerCashOut.capabilities()
-                    let corridors = try await offramp.corridors()
-                    await send(.loaded(
-                        corridors: corridors,
-                        destinations: capabilities.destinations,
-                        isPeerAvailable: capabilities.isAvailable
-                    ))
-                } catch: { error, send in
-                    await send(.loadFailed(error.localizedDescription))
-                }
+                return .merge(
+                    .run { send in
+                        // The Peer capability read never throws on an unavailable build: it answers
+                        // "not available" so the rails can be listed as such rather than vanishing.
+                        let capabilities = try await peerCashOut.capabilities()
+                        await send(.peerLoaded(
+                            destinations: capabilities.destinations,
+                            isAvailable: capabilities.isAvailable
+                        ))
+                    } catch: { error, send in
+                        await send(.peerLoadFailed(error.localizedDescription))
+                    }
+                    .cancellable(id: CancelID.peer, cancelInFlight: true),
+                    .run { send in
+                        await send(.scanAndPayLoaded(try await offramp.corridors()))
+                    } catch: { error, send in
+                        await send(.scanAndPayLoadFailed(error.localizedDescription))
+                    }
+                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true)
+                )
 
-            case let .loaded(corridors, destinations, isPeerAvailable):
-                state.isLoading = false
-                state.corridors = corridors
+            case .onDisappear:
+                return .merge(
+                    .cancel(id: CancelID.peer),
+                    .cancel(id: CancelID.scanAndPay)
+                )
+
+            case let .peerLoaded(destinations, isPeerAvailable):
                 state.destinations = destinations
                 state.isPeerAvailable = isPeerAvailable
+                state.isPeerLoading = false
+                state.isLoading = state.isScanAndPayLoading
                 return .none
 
-            case let .loadFailed(message):
-                state.isLoading = false
+            case let .peerLoadFailed(message):
+                state.isPeerLoading = false
+                state.isLoading = state.isScanAndPayLoading
+                state.errorMessage = message
+                return .none
+
+            case let .scanAndPayLoaded(corridors):
+                state.corridors = corridors
+                state.isScanAndPayLoading = false
+                state.isLoading = state.isPeerLoading
+                return .none
+
+            case let .scanAndPayLoadFailed(message):
+                state.isScanAndPayLoading = false
+                state.isLoading = state.isPeerLoading
                 state.errorMessage = message
                 return .none
 

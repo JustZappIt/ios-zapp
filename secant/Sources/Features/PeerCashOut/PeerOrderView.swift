@@ -51,6 +51,7 @@ struct PeerOrderView: View {
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
         }
     }
 

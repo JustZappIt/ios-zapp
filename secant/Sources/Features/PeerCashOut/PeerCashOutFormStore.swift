@@ -116,11 +116,12 @@ struct PeerCashOutForm {
 
     enum Action: Equatable {
         case onAppear
+        case onDisappear
         case capabilitiesLoaded(PeerCapabilities, storedHandle: String?)
         case balanceLoaded(PeerSpendableBalance)
         case ordersLoaded([PeerOrder])
         case marketLoaded(rate: PeerRate?, market: PeerMarketReading?)
-        case handleChecked(PeerHandleCheck)
+        case handleChecked(destinationCode: String, rawInput: String, check: PeerHandleCheck)
         case runnerStateChanged(PeerRunnerState)
         case amountChanged(String)
         case handleChanged(String)
@@ -169,6 +170,16 @@ struct PeerCashOutForm {
                     .cancellable(id: CancelID.runner, cancelInFlight: true)
                 )
 
+            case .onDisappear:
+                // The wallet-lifetime runner keeps driving attempts. This screen owns only these
+                // observations and debounced reads, so dismissal must not let `.empty` from a later
+                // wallet reset trigger fresh session-backed requests through an invisible form.
+                return .merge(
+                    .cancel(id: CancelID.runner),
+                    .cancel(id: CancelID.handle),
+                    .cancel(id: CancelID.market)
+                )
+
             case let .capabilitiesLoaded(capabilities, storedHandle):
                 state.recommendedMinimum = capabilities.recommendedMinimum
                 state.destination = capabilities.destination(code: state.destinationCode)
@@ -193,7 +204,10 @@ struct PeerCashOutForm {
                 state.market = market
                 return .none
 
-            case let .handleChecked(check):
+            case let .handleChecked(destinationCode, rawInput, check):
+                guard destinationCode == state.destinationCode, rawInput == state.handleInput else {
+                    return .none
+                }
                 state.handleCheck = check
                 return .none
 
@@ -210,6 +224,10 @@ struct PeerCashOutForm {
 
             case let .handleChanged(value):
                 state.handleInput = value
+                // A normalized handle authorizes the irreversible escrow recipient. Invalidate it
+                // in the same reducer turn as the edit so the debounce cannot leave the previous
+                // recipient submit-ready, and accept only the response keyed to this exact input.
+                state.handleCheck = nil
                 state.errorMessage = nil
                 return checkHandle(state.destinationCode, value)
 
@@ -298,7 +316,8 @@ struct PeerCashOutForm {
     private func checkHandle(_ destinationCode: String, _ raw: String) -> Effect<Action> {
         .run { send in
             try await continuousClock.sleep(for: .milliseconds(200))
-            await send(.handleChecked(try await peerCashOut.normalizeHandle(destinationCode, raw)))
+            let check = try await peerCashOut.normalizeHandle(destinationCode, raw)
+            await send(.handleChecked(destinationCode: destinationCode, rawInput: raw, check: check))
         } catch: { _, _ in
         }
         .cancellable(id: CancelID.handle, cancelInFlight: true)

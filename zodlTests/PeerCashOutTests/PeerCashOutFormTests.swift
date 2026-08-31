@@ -146,6 +146,66 @@ struct PeerCashOutFormTests {
         #expect(draft?.currencyCodes == ["EUR"])
     }
 
+    /// Editing an already validated handle must close the submission gate immediately. Otherwise
+    /// the user can type a new recipient and tap continue during the debounce while the old
+    /// recipient remains normalized and submit-ready.
+    @Test func editingAValidatedHandleThenImmediatelySubmittingCannotPayThePreviousRecipient() async {
+        var state = form(available: "100000000")
+        state.amountInput = "20"
+        state.handleInput = "alice"
+        state.handleCheck = PeerHandleCheck(normalized: "alice", changedWhatWasTyped: false, validatesLive: true)
+
+        let clock = TestClock()
+        let started = LockIsolated<PeerCashOutDraft?>(nil)
+        let bobCheck = PeerHandleCheck(normalized: "bob", changedWhatWasTyped: false, validatesLive: true)
+        let store = await TestStore(initialState: state) { PeerCashOutForm() } withDependencies: {
+            $0.continuousClock = clock
+            $0.peerCashOut.normalizeHandle = { destinationCode, rawInput in
+                #expect(destinationCode == "revolut")
+                #expect(rawInput == "bob")
+                return bobCheck
+            }
+            $0.peerCashOut.startCashOut = { draft in
+                started.setValue(draft)
+                return "0123456789abcdef0123456789abcdef"
+            }
+        }
+
+        await store.send(.handleChanged("bob")) {
+            $0.handleInput = "bob"
+            $0.handleCheck = nil
+        }
+        await store.send(.continueTapped)
+
+        #expect(started.value == nil)
+
+        await clock.advance(by: .milliseconds(200))
+        await store.receive(.handleChecked(destinationCode: "revolut", rawInput: "bob", check: bobCheck)) {
+            $0.handleCheck = bobCheck
+        }
+    }
+
+    /// Cancellation is not an identity boundary: a dependency can finish after cancellation. A
+    /// response for a prior raw value or destination must not validate the currently displayed one.
+    @MainActor @Test func aLateHandleCheckCannotValidateDifferentDisplayedInput() async {
+        var state = form(available: "100000000")
+        state.handleInput = "bob"
+        state.handleCheck = nil
+
+        let aliceCheck = PeerHandleCheck(normalized: "alice", changedWhatWasTyped: false, validatesLive: true)
+        let store = await TestStore(initialState: state) { PeerCashOutForm() }
+
+        await store.send(
+            .handleChecked(destinationCode: "revolut", rawInput: "alice", check: aliceCheck)
+        )
+        await store.send(
+            .handleChecked(destinationCode: "venmo", rawInput: "bob", check: aliceCheck)
+        )
+
+        #expect(store.state.handleCheck == nil)
+        #expect(!store.state.canSubmit)
+    }
+
     private func form(
         available: String?,
         committed: String = "0",

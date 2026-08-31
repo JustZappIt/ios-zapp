@@ -33,7 +33,7 @@ struct P2pActivityView: View {
                                 .padding(.bottom, 12)
                         }
 
-                        if store.entries.isEmpty && !store.isLoading {
+                        if store.showsEmptyHistory {
                             Text(String(localizable: .p2pActivityEmpty))
                                 .zappFont(.body, style: ZappColors.textMuted)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -53,6 +53,7 @@ struct P2pActivityView: View {
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
         }
     }
 
@@ -88,6 +89,9 @@ struct P2pActivityView: View {
                         // coins, so the button is withheld with the reason rather than failing later.
                         Text(String(localizable: .p2pActivityRefundBlockedByPeer))
                             .zappFont(.caption, style: ZappColors.textMuted)
+                    } else if store.isRefundReadinessUnavailable {
+                        Text(String(localizable: .offrampHistoryBalanceUnavailable))
+                            .zappFont(.caption, style: ZappColors.textMuted)
                     }
                 }
             }
@@ -110,8 +114,9 @@ struct P2pActivityView: View {
                 subtitle: PeerDestination.displayName(for: run.destinationCode),
                 status: String(localizable: .p2pActivityAttemptInProgress),
                 statusVariant: .accent,
-                date: run.startedAt
-            ) { store.send(.entryTapped(entry)) }
+                date: run.startedAt,
+                action: { store.send(.entryTapped(entry)) }
+            )
 
         case let .peerOrder(order):
             entryRow(
@@ -120,21 +125,35 @@ struct P2pActivityView: View {
                     ?? String(localizable: .p2pActivityFilterPeer),
                 status: order.phase.label,
                 statusVariant: order.isFinished ? .muted : .accent,
-                date: order.lastActivityAt ?? order.openedAt
-            ) { store.send(.entryTapped(entry)) }
+                date: order.lastActivityAt ?? order.openedAt,
+                action: { store.send(.entryTapped(entry)) }
+            )
 
         case let .scanAndPay(item):
-            entryRow(
-                title: "\(item.fiatDisplay) \(item.currencyCode)",
-                subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
-                status: item.status.capitalized,
-                statusVariant: .muted,
-                date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
-                actionTitle: item.canRecoverEscrow ? String(localizable: .p2pActivityRecover) : nil
-            ) { store.send(.entryTapped(entry)) }
+            if item.canRecoverEscrow {
+                entryRow(
+                    title: "\(item.fiatDisplay) \(item.currencyCode)",
+                    subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
+                    status: item.status.capitalized,
+                    statusVariant: .muted,
+                    date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
+                    actionTitle: String(localizable: .p2pActivityRecover),
+                    action: { store.send(.entryTapped(entry)) }
+                )
+            } else {
+                entryRow(
+                    title: "\(item.fiatDisplay) \(item.currencyCode)",
+                    subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
+                    status: item.status.capitalized,
+                    statusVariant: .muted,
+                    date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
+                    action: nil
+                )
+            }
         }
     }
 
+    @ViewBuilder
     private func entryRow(
         title: String,
         subtitle: String,
@@ -142,7 +161,39 @@ struct P2pActivityView: View {
         statusVariant: ZappChipVariant,
         date: Date?,
         actionTitle: String? = nil,
-        action: @escaping () -> Void
+        action: (() -> Void)?
+    ) -> some View {
+        if let action {
+            Button(action: action) {
+                entryRowContent(
+                    title: title,
+                    subtitle: subtitle,
+                    status: status,
+                    statusVariant: statusVariant,
+                    date: date,
+                    actionTitle: actionTitle
+                )
+            }
+            .buttonStyle(.zappPress)
+        } else {
+            entryRowContent(
+                title: title,
+                subtitle: subtitle,
+                status: status,
+                statusVariant: statusVariant,
+                date: date,
+                actionTitle: actionTitle
+            )
+        }
+    }
+
+    private func entryRowContent(
+        title: String,
+        subtitle: String,
+        status: String,
+        statusVariant: ZappChipVariant,
+        date: Date?,
+        actionTitle: String?
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -161,13 +212,13 @@ struct P2pActivityView: View {
             }
 
             if let actionTitle {
-                ZappButton(title: actionTitle, variant: .ghost, action: action)
+                Text(actionTitle)
+                    .zappFont(.buttonSmall, style: ZappColors.accentText)
             }
         }
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
         .contentShape(Rectangle())
-        .onTapGesture(perform: action)
     }
 
     private var selectedFilterIndex: Int {

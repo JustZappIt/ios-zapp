@@ -60,7 +60,10 @@ struct P2pActivityTests {
     @Test func refundIsBlockedWhileACashOutStillHoldsUnescrowedFunds() {
         var state = P2pActivity.State.initial
         state.account = account(canRefundToZec: true)
-        state.peerCommitted = UsdcAmount(micros: "20000000")
+        state.spendable = .ready(
+            balance: UsdcAmount(micros: "20000000") ?? .zero,
+            committed: UsdcAmount(micros: "20000000") ?? .zero
+        )
 
         #expect(!state.offersRefund)
         #expect(state.isRefundBlockedByPeer)
@@ -69,7 +72,7 @@ struct P2pActivityTests {
     @Test func refundIsOfferedOnceNothingIsCommitted() {
         var state = P2pActivity.State.initial
         state.account = account(canRefundToZec: true)
-        state.peerCommitted = nil
+        state.spendable = .ready(balance: UsdcAmount(micros: "20000000") ?? .zero, committed: .zero)
 
         #expect(state.offersRefund)
         #expect(!state.isRefundBlockedByPeer)
@@ -80,10 +83,52 @@ struct P2pActivityTests {
     @Test func anAccountWithNothingToRefundExplainsNoBlock() {
         var state = P2pActivity.State.initial
         state.account = account(canRefundToZec: false)
-        state.peerCommitted = UsdcAmount(micros: "20000000")
+        state.spendable = .ready(
+            balance: UsdcAmount(micros: "20000000") ?? .zero,
+            committed: UsdcAmount(micros: "20000000") ?? .zero
+        )
 
         #expect(!state.offersRefund)
         #expect(!state.isRefundBlockedByPeer)
+    }
+
+    @Test func unreadableReservationStateNeverEnablesRefund() {
+        var state = P2pActivity.State.initial
+        state.account = account(canRefundToZec: true)
+        state.spendable = .unavailable
+
+        #expect(!state.offersRefund)
+        #expect(!state.isRefundBlockedByPeer)
+        #expect(state.isRefundReadinessUnavailable)
+    }
+
+    @Test func aFailedSourceDoesNotTurnNoRowsIntoEmptyHistory() {
+        var state = P2pActivity.State.initial
+        state.peerSource = .loaded
+        state.scanAndPaySource = .failed("offline")
+
+        #expect(state.entries.isEmpty)
+        #expect(!state.showsEmptyHistory)
+
+        state.scanAndPaySource = .loaded
+        #expect(state.showsEmptyHistory)
+    }
+
+    @MainActor
+    @Test func scanAndPayFailurePreservesLastKnownFinancialRows() async {
+        let existing = history(id: "known", at: 100)
+        var state = P2pActivity.State.initial
+        state.scanAndPayHistory = [existing]
+        state.scanAndPaySource = .loading
+        let store = TestStore(initialState: state) { P2pActivity() }
+
+        await store.send(.scanAndPayLoadFailed("Indexer unavailable")) {
+            $0.scanAndPaySource = .failed("Indexer unavailable")
+            $0.errorMessage = "Indexer unavailable"
+        }
+
+        #expect(store.state.scanAndPayHistory == [existing])
+        #expect(store.state.entries.map(\.id) == ["p2pme:known"])
     }
 
     /// A filter control over a list with only one product in it is noise.

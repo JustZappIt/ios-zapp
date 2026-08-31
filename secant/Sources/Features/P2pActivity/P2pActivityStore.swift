@@ -48,6 +48,13 @@ struct P2pActivity {
     struct State: Equatable {
         static let initial = State()
 
+        enum SourceLoadState: Equatable, Sendable {
+            case idle
+            case loading
+            case loaded
+            case failed(String)
+        }
+
         enum Filter: String, Equatable, Sendable, CaseIterable {
             case all
             case peer
@@ -59,13 +66,15 @@ struct P2pActivity {
         var peerOrders: [PeerOrder] = []
         var unindexedRuns: [PeerRun] = []
         var scanAndPayHistory: [OfframpHistoryModel] = []
-        /// USDC promised to Peer attempts that have not escrowed it yet. While this is positive a
-        /// refund and a pending `createDeposit` would spend the same coins.
-        var peerCommitted: UsdcAmount?
+        /// Only an explicit readable zero permits a refund. Loading and unavailable are security
+        /// answers, not aliases for "nothing committed".
+        var spendable: PeerSpendableBalance = .loading
         var isPeerAvailable = false
         var isLoading = false
         var isAddressCopied = false
         var errorMessage: String?
+        var peerSource = SourceLoadState.idle
+        var scanAndPaySource = SourceLoadState.idle
 
         var entries: [P2pActivityEntry] {
             let all = unindexedRuns.map(P2pActivityEntry.peerAttempt)
@@ -82,9 +91,29 @@ struct P2pActivity {
 
         /// Offered only where the whole balance is genuinely free. A cash-out mid-flight is the one
         /// case where the balance is visible but already spoken for.
-        var offersRefund: Bool { account?.canRefundToZec == true && peerCommitted == nil }
+        var offersRefund: Bool {
+            guard account?.canRefundToZec == true else { return false }
+            guard case .ready(_, committed: .zero) = spendable else { return false }
+            return true
+        }
 
-        var isRefundBlockedByPeer: Bool { account?.canRefundToZec == true && peerCommitted != nil }
+        var isRefundBlockedByPeer: Bool {
+            guard account?.canRefundToZec == true else { return false }
+            guard case let .ready(_, committed) = spendable else { return false }
+            return committed.isPositive
+        }
+
+        var isRefundReadinessUnavailable: Bool {
+            guard account?.canRefundToZec == true else { return false }
+            guard case .ready = spendable else { return true }
+            return false
+        }
+
+        /// An outage is not an empty financial history. Both sources must have answered
+        /// successfully before the screen can conclude there is no activity.
+        var showsEmptyHistory: Bool {
+            entries.isEmpty && peerSource == .loaded && scanAndPaySource == .loaded
+        }
 
         /// Only worth a filter control once both products have something in the list.
         var showsFilters: Bool {
@@ -94,9 +123,12 @@ struct P2pActivity {
 
     enum Action: Equatable {
         case onAppear
+        case onDisappear
         case accountLoaded(OfframpAccountModel?)
-        case peerLoaded(orders: [PeerOrder], committed: UsdcAmount?, isAvailable: Bool)
+        case peerLoaded(orders: [PeerOrder], spendable: PeerSpendableBalance, isAvailable: Bool)
+        case peerLoadFailed(String)
         case scanAndPayLoaded([OfframpHistoryModel])
+        case scanAndPayLoadFailed(String)
         case runnerStateChanged(PeerRunnerState)
         case loadFailed(String)
         case filterTapped(State.Filter)
@@ -110,8 +142,8 @@ struct P2pActivity {
         @CasePathable
         enum Delegate: Equatable {
             case close
-            case openPeerAttempt(attemptID: String)
-            case openPeerOrder(depositID: String)
+            case openPeerAttempt(attemptID: String, destinationCode: String)
+            case openPeerOrder(depositID: String, destinationCode: String?)
             case recoverScanAndPayOrder(orderID: String)
             case refundToZec
         }
@@ -123,6 +155,9 @@ struct P2pActivity {
     @Dependency(\.continuousClock) var continuousClock
 
     private enum CancelID {
+        case account
+        case peer
+        case scanAndPay
         case runner
         case copyReset
     }
@@ -131,15 +166,23 @@ struct P2pActivity {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                state.isLoading = true
+                state.isLoading = state.entries.isEmpty
                 state.errorMessage = nil
+                state.peerSource = .loading
+                state.scanAndPaySource = .loading
                 return .merge(
                     .run { send in
-                        // Independent reads: one rail being unreachable must not empty the other's
-                        // half of the list.
-                        await send(.accountLoaded(try? await offramp.accountSummary()))
-                        await send(.scanAndPayLoaded((try? await offramp.history()) ?? []))
-                    },
+                        await send(.accountLoaded(try await offramp.accountSummary()))
+                    } catch: { _, send in
+                        await send(.accountLoaded(nil))
+                    }
+                    .cancellable(id: CancelID.account, cancelInFlight: true),
+                    .run { send in
+                        await send(.scanAndPayLoaded(try await offramp.history()))
+                    } catch: { error, send in
+                        await send(.scanAndPayLoadFailed(error.localizedDescription))
+                    }
+                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true),
                     loadPeer(),
                     .run { send in
                         for await runnerState in try await peerCashOut.runnerState() {
@@ -151,19 +194,44 @@ struct P2pActivity {
                     .cancellable(id: CancelID.runner, cancelInFlight: true)
                 )
 
+            case .onDisappear:
+                return .merge(
+                    .cancel(id: CancelID.account),
+                    .cancel(id: CancelID.peer),
+                    .cancel(id: CancelID.scanAndPay),
+                    .cancel(id: CancelID.runner),
+                    .cancel(id: CancelID.copyReset)
+                )
+
             case let .accountLoaded(account):
                 state.account = account
-                state.isLoading = false
                 return .none
 
-            case let .peerLoaded(orders, committed, isAvailable):
+            case let .peerLoaded(orders, spendable, isAvailable):
                 state.peerOrders = orders
-                state.peerCommitted = committed
+                state.spendable = spendable
                 state.isPeerAvailable = isAvailable
+                state.peerSource = .loaded
+                state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
+                return .none
+
+            case let .peerLoadFailed(message):
+                state.peerSource = .failed(message)
+                state.spendable = .unavailable
+                state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
+                state.errorMessage = message
                 return .none
 
             case let .scanAndPayLoaded(history):
                 state.scanAndPayHistory = history
+                state.scanAndPaySource = .loaded
+                state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
+                return .none
+
+            case let .scanAndPayLoadFailed(message):
+                state.scanAndPaySource = .failed(message)
+                state.isLoading = state.peerSource == .loading || state.scanAndPaySource == .loading
+                state.errorMessage = message
                 return .none
 
             case let .runnerStateChanged(runnerState):
@@ -198,9 +266,12 @@ struct P2pActivity {
             case let .entryTapped(entry):
                 switch entry {
                 case let .peerAttempt(run):
-                    return .send(.delegate(.openPeerAttempt(attemptID: run.id)))
+                    return .send(.delegate(.openPeerAttempt(attemptID: run.id, destinationCode: run.destinationCode)))
                 case let .peerOrder(order):
-                    return .send(.delegate(.openPeerOrder(depositID: order.depositID)))
+                    return .send(.delegate(.openPeerOrder(
+                        depositID: order.depositID,
+                        destinationCode: order.destinationCode
+                    )))
                 case let .scanAndPay(item):
                     guard item.canRecoverEscrow else { return .none }
                     return .send(.delegate(.recoverScanAndPayOrder(orderID: item.id)))
@@ -225,14 +296,15 @@ struct P2pActivity {
         .run { send in
             let capabilities = try await peerCashOut.capabilities()
             guard capabilities.isAvailable else {
-                return await send(.peerLoaded(orders: [], committed: nil, isAvailable: false))
+                return await send(.peerLoaded(orders: [], spendable: .unavailable, isAvailable: false))
             }
             let orders = try await peerCashOut.orderHistory()
-            let committed = try? await peerCashOut.spendableBalance().committed
-            await send(.peerLoaded(orders: orders, committed: committed, isAvailable: true))
-        } catch: { _, send in
-            await send(.peerLoaded(orders: [], committed: nil, isAvailable: false))
+            let spendable = try await peerCashOut.spendableBalance()
+            await send(.peerLoaded(orders: orders, spendable: spendable, isAvailable: true))
+        } catch: { error, send in
+            await send(.peerLoadFailed(error.localizedDescription))
         }
+        .cancellable(id: CancelID.peer, cancelInFlight: true)
     }
 }
 

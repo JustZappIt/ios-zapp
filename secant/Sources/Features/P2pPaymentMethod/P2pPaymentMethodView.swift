@@ -33,6 +33,7 @@ struct P2pPaymentMethodView: View {
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
         }
     }
 
@@ -91,35 +92,15 @@ struct P2pPaymentMethodView: View {
         isEnabled: Bool
     ) -> some View {
         let isSelected = store.selected == rail
-        return Button { store.send(.railTapped(rail)) } label: {
-            HStack(spacing: 14) {
-                if let leading {
-                    Text(leading)
-                        .font(.system(size: 25))
-                        .frame(width: 30, height: 20)
-                }
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title).zappFont(.rowTitle, style: isEnabled ? ZappColors.text : ZappColors.textSubtle)
-                    Text(subtitle).zappFont(.caption, style: ZappColors.textMuted)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                if isSelected {
-                    Asset.Assets.Icons.checkSolid.image
-                        .zImage(width: 18, height: 18, style: ZappColors.accentText)
-                        .frame(width: 18, height: 20)
-                }
-            }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 12)
-            // 44pt is the HIG floor, and these rows carry two lines of type that grows.
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-            .contentShape(Rectangle())
+        let displayedTitle = [leading, title].compactMap { $0 }.joined(separator: " ")
+        return ZappSelectionRow(
+            title: displayedTitle,
+            subtitle: subtitle,
+            isSelected: isSelected,
+            isEnabled: isEnabled
+        ) {
+            store.send(.railTapped(rail))
         }
-        .buttonStyle(.plain)
-        .disabled(!isEnabled)
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private func unavailableNote(_ text: String) -> some View {

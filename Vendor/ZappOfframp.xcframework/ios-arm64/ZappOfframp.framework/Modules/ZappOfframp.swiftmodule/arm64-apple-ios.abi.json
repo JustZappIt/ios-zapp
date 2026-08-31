@@ -30201,6 +30201,16 @@
         ]
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
         "kind": "Function",
         "name": "skie",
         "printedName": "skie(_:)",
@@ -57880,6 +57890,120 @@
         "children": [
           {
             "kind": "Var",
+            "name": "invalidRequest",
+            "printedName": "invalidRequest",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(ZappOfframp.PeerErrorCode.Type) -> ZappOfframp.PeerErrorCode",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "PeerErrorCode",
+                    "printedName": "ZappOfframp.PeerErrorCode",
+                    "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "ZappOfframp.PeerErrorCode.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "PeerErrorCode",
+                        "printedName": "ZappOfframp.PeerErrorCode",
+                        "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11ZappOfframp13PeerErrorCodeO14invalidRequestyA2CmF",
+            "mangledName": "$s11ZappOfframp13PeerErrorCodeO14invalidRequestyA2CmF",
+            "moduleName": "ZappOfframp",
+            "fixedbinaryorder": 0
+          },
+          {
+            "kind": "Var",
+            "name": "initializationFailed",
+            "printedName": "initializationFailed",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(ZappOfframp.PeerErrorCode.Type) -> ZappOfframp.PeerErrorCode",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "PeerErrorCode",
+                    "printedName": "ZappOfframp.PeerErrorCode",
+                    "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "ZappOfframp.PeerErrorCode.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "PeerErrorCode",
+                        "printedName": "ZappOfframp.PeerErrorCode",
+                        "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11ZappOfframp13PeerErrorCodeO20initializationFailedyA2CmF",
+            "mangledName": "$s11ZappOfframp13PeerErrorCodeO20initializationFailedyA2CmF",
+            "moduleName": "ZappOfframp",
+            "fixedbinaryorder": 1
+          },
+          {
+            "kind": "Var",
+            "name": "recoveryActionUnsafe",
+            "printedName": "recoveryActionUnsafe",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(ZappOfframp.PeerErrorCode.Type) -> ZappOfframp.PeerErrorCode",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "PeerErrorCode",
+                    "printedName": "ZappOfframp.PeerErrorCode",
+                    "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "ZappOfframp.PeerErrorCode.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "PeerErrorCode",
+                        "printedName": "ZappOfframp.PeerErrorCode",
+                        "usr": "s:11ZappOfframp13PeerErrorCodeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11ZappOfframp13PeerErrorCodeO20recoveryActionUnsafeyA2CmF",
+            "mangledName": "$s11ZappOfframp13PeerErrorCodeO20recoveryActionUnsafeyA2CmF",
+            "moduleName": "ZappOfframp",
+            "fixedbinaryorder": 2
+          },
+          {
+            "kind": "Var",
             "name": "unsupportedPlatform",
             "printedName": "unsupportedPlatform",
             "children": [
@@ -57914,7 +58038,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO19unsupportedPlatformyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO19unsupportedPlatformyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 0
+            "fixedbinaryorder": 3
           },
           {
             "kind": "Var",
@@ -57952,7 +58076,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO27unsupportedPlatformCurrencyyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO27unsupportedPlatformCurrencyyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 1
+            "fixedbinaryorder": 4
           },
           {
             "kind": "Var",
@@ -57990,7 +58114,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO23payeeRegistrationFailedyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO23payeeRegistrationFailedyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 2
+            "fixedbinaryorder": 5
           },
           {
             "kind": "Var",
@@ -58028,7 +58152,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO23payeeNotFoundOnPlatformyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO23payeeNotFoundOnPlatformyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 3
+            "fixedbinaryorder": 6
           },
           {
             "kind": "Var",
@@ -58066,7 +58190,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO18curatorUnavailableyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO18curatorUnavailableyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 4
+            "fixedbinaryorder": 7
           },
           {
             "kind": "Var",
@@ -58104,7 +58228,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO24insufficientTokenBalanceyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO24insufficientTokenBalanceyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 5
+            "fixedbinaryorder": 8
           },
           {
             "kind": "Var",
@@ -58142,7 +58266,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO23depositResolutionFailedyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO23depositResolutionFailedyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 6
+            "fixedbinaryorder": 9
           },
           {
             "kind": "Var",
@@ -58180,7 +58304,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO17transactionFailedyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO17transactionFailedyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 7
+            "fixedbinaryorder": 10
           },
           {
             "kind": "Var",
@@ -58218,7 +58342,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO28transactionSubmissionUnknownyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO28transactionSubmissionUnknownyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 8
+            "fixedbinaryorder": 11
           },
           {
             "kind": "Var",
@@ -58256,7 +58380,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO24transactionStatusUnknownyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO24transactionStatusUnknownyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 9
+            "fixedbinaryorder": 12
           },
           {
             "kind": "Var",
@@ -58294,7 +58418,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO13orderNotFoundyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO13orderNotFoundyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 10
+            "fixedbinaryorder": 13
           },
           {
             "kind": "Var",
@@ -58332,7 +58456,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO18indexerUnavailableyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO18indexerUnavailableyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 11
+            "fixedbinaryorder": 14
           },
           {
             "kind": "Var",
@@ -58370,7 +58494,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO16invalidDepositIdyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO16invalidDepositIdyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 12
+            "fixedbinaryorder": 15
           },
           {
             "kind": "Var",
@@ -58408,7 +58532,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO17nothingToWithdrawyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO17nothingToWithdrawyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 13
+            "fixedbinaryorder": 16
           },
           {
             "kind": "Var",
@@ -58446,7 +58570,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO28activeIntentBlocksWithdrawalyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO28activeIntentBlocksWithdrawalyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 14
+            "fixedbinaryorder": 17
           },
           {
             "kind": "Var",
@@ -58484,7 +58608,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO26insufficientAvailableFundsyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO26insufficientAvailableFundsyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 15
+            "fixedbinaryorder": 18
           },
           {
             "kind": "Var",
@@ -58522,7 +58646,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO19fundingBridgeFailedyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO19fundingBridgeFailedyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 16
+            "fixedbinaryorder": 19
           },
           {
             "kind": "Var",
@@ -58560,7 +58684,7 @@
             "usr": "s:11ZappOfframp13PeerErrorCodeO23recoveryStateUnreadableyA2CmF",
             "mangledName": "$s11ZappOfframp13PeerErrorCodeO23recoveryStateUnreadableyA2CmF",
             "moduleName": "ZappOfframp",
-            "fixedbinaryorder": 17
+            "fixedbinaryorder": 20
           },
           {
             "kind": "Var",
@@ -64788,6 +64912,93 @@
       },
       {
         "kind": "TypeDecl",
+        "name": "KotlinSuspendFunction1",
+        "printedName": "KotlinSuspendFunction1",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "invoke",
+            "printedName": "invoke(p1:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So33ZappOfframpKotlinSuspendFunction1P0aB0E6invoke2p1ypSgAF_tYaKF",
+            "mangledName": "$sSo33ZappOfframpKotlinSuspendFunction1P0aB0E6invoke2p1ypSgAF_tYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.KotlinSuspendFunction1>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.KotlinSuspendFunction1>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction1",
+        "moduleName": "ZappOfframp",
+        "genericSig": "<τ_0_0 : ZappOfframp.KotlinFunction>",
+        "sugared_genericSig": "<Self : ZappOfframp.KotlinFunction>",
+        "objc_name": "ZappOfframpKotlinSuspendFunction1",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
         "name": "TxSubmitter",
         "printedName": "TxSubmitter",
         "children": [
@@ -64832,8 +65043,115 @@
           },
           {
             "kind": "Function",
+            "name": "receiptIfIncluded",
+            "printedName": "receiptIfIncluded(txHash:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "ZappOfframp.TransactionReceipt?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "TransactionReceipt",
+                    "printedName": "ZappOfframp.TransactionReceipt",
+                    "usr": "c:objc(cs)ZappOfframpTransactionReceipt"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "TxHash",
+                "printedName": "ZappOfframp.TxHash",
+                "usr": "c:objc(cs)ZappOfframpTxHash"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So22ZappOfframpTxSubmitterP0aB0E17receiptIfIncluded6txHashSo0aB18TransactionReceiptCSgSo0abcI0C_tYaKF",
+            "mangledName": "$sSo22ZappOfframpTxSubmitterP0aB0E17receiptIfIncluded6txHashSo0aB18TransactionReceiptCSgSo0abcI0C_tYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.TxSubmitter>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.TxSubmitter>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "restorePendingTransaction",
+            "printedName": "restorePendingTransaction(hash:nonce:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "ZappOfframp.TxHash?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "TxHash",
+                    "printedName": "ZappOfframp.TxHash",
+                    "usr": "c:objc(cs)ZappOfframpTxHash"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "ZappOfframp.BigInteger?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "BigInteger",
+                    "printedName": "ZappOfframp.BigInteger",
+                    "usr": "c:objc(cs)ZappOfframpBigInteger"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So22ZappOfframpTxSubmitterP0aB0E25restorePendingTransaction4hash5nonceySo0abC4HashCSg_So0aB10BigIntegerCSgtYaKF",
+            "mangledName": "$sSo22ZappOfframpTxSubmitterP0aB0E25restorePendingTransaction4hash5nonceySo0abC4HashCSg_So0aB10BigIntegerCSgtYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.TxSubmitter>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.TxSubmitter>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
             "name": "sendTransaction",
-            "printedName": "sendTransaction(to:value:data:)",
+            "printedName": "sendTransaction(to:value:data:beforeBroadcast:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -64857,11 +65175,17 @@
                 "name": "KotlinByteArray",
                 "printedName": "ZappOfframp.KotlinByteArray",
                 "usr": "c:objc(cs)ZappOfframpKotlinByteArray"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "KotlinSuspendFunction1",
+                "printedName": "any ZappOfframp.KotlinSuspendFunction1",
+                "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction1"
               }
             ],
             "declKind": "Func",
-            "usr": "s:So22ZappOfframpTxSubmitterP0aB0E15sendTransaction2to5value4dataSo0abC4HashCSo0aB7AddressC_ypSo0aB15KotlinByteArrayCtYaKF",
-            "mangledName": "$sSo22ZappOfframpTxSubmitterP0aB0E15sendTransaction2to5value4dataSo0abC4HashCSo0aB7AddressC_ypSo0aB15KotlinByteArrayCtYaKF",
+            "usr": "s:So22ZappOfframpTxSubmitterP0aB0E15sendTransaction2to5value4data15beforeBroadcastSo0abC4HashCSo0aB7AddressC_ypSo0aB15KotlinByteArrayCSo0abN16SuspendFunction1_ptYaKF",
+            "mangledName": "$sSo22ZappOfframpTxSubmitterP0aB0E15sendTransaction2to5value4data15beforeBroadcastSo0abC4HashCSo0aB7AddressC_ypSo0aB15KotlinByteArrayCSo0abN16SuspendFunction1_ptYaKF",
             "moduleName": "ZappOfframp",
             "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.TxSubmitter>",
             "sugared_genericSig": "<Self where Self : ZappOfframp.TxSubmitter>",
@@ -65038,6 +65362,211 @@
         "genericSig": "<τ_0_0 : AnyObject>",
         "sugared_genericSig": "<Self : AnyObject>",
         "objc_name": "ZappOfframpKotlinx_coroutines_coreFlowCollector",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AllowanceTransactionGuard",
+        "printedName": "AllowanceTransactionGuard",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "withApprovalAndSpend",
+            "printedName": "withApprovalAndSpend(block:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "KotlinSuspendFunction0",
+                "printedName": "any ZappOfframp.KotlinSuspendFunction0",
+                "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction0"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So36ZappOfframpAllowanceTransactionGuardC0aB0E20withApprovalAndSpend5blockypSgSo0aB22KotlinSuspendFunction0_p_tYaKF",
+            "mangledName": "$sSo36ZappOfframpAllowanceTransactionGuardC0aB0E20withApprovalAndSpend5blockypSgSo0aB22KotlinSuspendFunction0_p_tYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:objc(cs)ZappOfframpAllowanceTransactionGuard",
+        "moduleName": "ZappOfframp",
+        "objc_name": "ZappOfframpAllowanceTransactionGuard",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "superclassUsr": "c:objc(cs)ZappOfframpBase",
+        "isExternal": true,
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ZappOfframp.KotlinBase",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "KotlinSuspendFunction0",
+        "printedName": "KotlinSuspendFunction0",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "invoke",
+            "printedName": "invoke()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Any?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ProtocolComposition",
+                    "printedName": "Any"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So33ZappOfframpKotlinSuspendFunction0P0aB0E6invokeypSgyYaKF",
+            "mangledName": "$sSo33ZappOfframpKotlinSuspendFunction0P0aB0E6invokeypSgyYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.KotlinSuspendFunction0>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.KotlinSuspendFunction0>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction0",
+        "moduleName": "ZappOfframp",
+        "genericSig": "<τ_0_0 : ZappOfframp.KotlinFunction>",
+        "sugared_genericSig": "<Self : ZappOfframp.KotlinFunction>",
+        "objc_name": "ZappOfframpKotlinSuspendFunction0",
         "declAttributes": [
           "ObjC",
           "Dynamic"
@@ -66123,6 +66652,84 @@
           },
           {
             "kind": "Function",
+            "name": "pendingBaseCommitmentMicros",
+            "printedName": "pendingBaseCommitmentMicros()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E27pendingBaseCommitmentMicrosSSSgyYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E27pendingBaseCommitmentMicrosSSSgyYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "pendingRefundCommitmentMicros",
+            "printedName": "pendingRefundCommitmentMicros()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So016ZappOfframpAppleB6ClientC0aB0E29pendingRefundCommitmentMicrosSSSgyYaKF",
+            "mangledName": "$sSo016ZappOfframpAppleB6ClientC0aB0E29pendingRefundCommitmentMicrosSSSgyYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
             "name": "quote",
             "printedName": "quote(currencyCode:fiatAmount:)",
             "children": [
@@ -66708,6 +67315,45 @@
             "declKind": "Func",
             "usr": "s:So28ZappOfframpAppleOnrampClientC0aB0E6limits12currencyCodeSo0abcD6LimitsCSS_tYaKF",
             "mangledName": "$sSo28ZappOfframpAppleOnrampClientC0aB0E6limits12currencyCodeSo0abcD6LimitsCSS_tYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "pendingBaseCommitmentMicros",
+            "printedName": "pendingBaseCommitmentMicros()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So28ZappOfframpAppleOnrampClientC0aB0E27pendingBaseCommitmentMicrosSSSgyYaKF",
+            "mangledName": "$sSo28ZappOfframpAppleOnrampClientC0aB0E27pendingBaseCommitmentMicrosSSSgyYaKF",
             "moduleName": "ZappOfframp",
             "intro_Macosx": "10.15",
             "intro_iOS": "13",
@@ -67974,93 +68620,6 @@
         "genericSig": "<τ_0_0 : AnyObject>",
         "sugared_genericSig": "<Self : AnyObject>",
         "objc_name": "ZappOfframpOfframpFunding",
-        "declAttributes": [
-          "ObjC",
-          "Dynamic"
-        ],
-        "isExternal": true,
-        "conformances": [
-          {
-            "kind": "Conformance",
-            "name": "Escapable",
-            "printedName": "Escapable",
-            "usr": "s:s9EscapableP",
-            "mangledName": "$ss9EscapableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Copyable",
-            "printedName": "Copyable",
-            "usr": "s:s8CopyableP",
-            "mangledName": "$ss8CopyableP"
-          }
-        ]
-      },
-      {
-        "kind": "TypeDecl",
-        "name": "KotlinSuspendFunction1",
-        "printedName": "KotlinSuspendFunction1",
-        "children": [
-          {
-            "kind": "Function",
-            "name": "invoke",
-            "printedName": "invoke(p1:)",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Any?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "ProtocolComposition",
-                    "printedName": "Any"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Any?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "ProtocolComposition",
-                    "printedName": "Any"
-                  }
-                ],
-                "usr": "s:Sq"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:So33ZappOfframpKotlinSuspendFunction1P0aB0E6invoke2p1ypSgAF_tYaKF",
-            "mangledName": "$sSo33ZappOfframpKotlinSuspendFunction1P0aB0E6invoke2p1ypSgAF_tYaKF",
-            "moduleName": "ZappOfframp",
-            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.KotlinSuspendFunction1>",
-            "sugared_genericSig": "<Self where Self : ZappOfframp.KotlinSuspendFunction1>",
-            "intro_Macosx": "10.15",
-            "intro_iOS": "13",
-            "intro_tvOS": "13",
-            "intro_watchOS": "6",
-            "declAttributes": [
-              "AccessControl",
-              "Available",
-              "Available",
-              "Available",
-              "Available"
-            ],
-            "isFromExtension": true,
-            "throwing": true,
-            "funcSelfKind": "NonMutating"
-          }
-        ],
-        "declKind": "Protocol",
-        "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction1",
-        "moduleName": "ZappOfframp",
-        "genericSig": "<τ_0_0 : ZappOfframp.KotlinFunction>",
-        "sugared_genericSig": "<Self : ZappOfframp.KotlinFunction>",
-        "objc_name": "ZappOfframpKotlinSuspendFunction1",
         "declAttributes": [
           "ObjC",
           "Dynamic"
@@ -69451,80 +70010,6 @@
         "genericSig": "<τ_0_0 : AnyObject>",
         "sugared_genericSig": "<Self : AnyObject>",
         "objc_name": "ZappOfframpOnrampUsdcBalanceReader",
-        "declAttributes": [
-          "ObjC",
-          "Dynamic"
-        ],
-        "isExternal": true,
-        "conformances": [
-          {
-            "kind": "Conformance",
-            "name": "Escapable",
-            "printedName": "Escapable",
-            "usr": "s:s9EscapableP",
-            "mangledName": "$ss9EscapableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Copyable",
-            "printedName": "Copyable",
-            "usr": "s:s8CopyableP",
-            "mangledName": "$ss8CopyableP"
-          }
-        ]
-      },
-      {
-        "kind": "TypeDecl",
-        "name": "KotlinSuspendFunction0",
-        "printedName": "KotlinSuspendFunction0",
-        "children": [
-          {
-            "kind": "Function",
-            "name": "invoke",
-            "printedName": "invoke()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Any?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "ProtocolComposition",
-                    "printedName": "Any"
-                  }
-                ],
-                "usr": "s:Sq"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:So33ZappOfframpKotlinSuspendFunction0P0aB0E6invokeypSgyYaKF",
-            "mangledName": "$sSo33ZappOfframpKotlinSuspendFunction0P0aB0E6invokeypSgyYaKF",
-            "moduleName": "ZappOfframp",
-            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.KotlinSuspendFunction0>",
-            "sugared_genericSig": "<Self where Self : ZappOfframp.KotlinSuspendFunction0>",
-            "intro_Macosx": "10.15",
-            "intro_iOS": "13",
-            "intro_tvOS": "13",
-            "intro_watchOS": "6",
-            "declAttributes": [
-              "AccessControl",
-              "Available",
-              "Available",
-              "Available",
-              "Available"
-            ],
-            "isFromExtension": true,
-            "throwing": true,
-            "funcSelfKind": "NonMutating"
-          }
-        ],
-        "declKind": "Protocol",
-        "usr": "c:objc(pl)ZappOfframpKotlinSuspendFunction0",
-        "moduleName": "ZappOfframp",
-        "genericSig": "<τ_0_0 : ZappOfframp.KotlinFunction>",
-        "sugared_genericSig": "<Self : ZappOfframp.KotlinFunction>",
-        "objc_name": "ZappOfframpKotlinSuspendFunction0",
         "declAttributes": [
           "ObjC",
           "Dynamic"
@@ -72117,6 +72602,45 @@
             "declKind": "Func",
             "usr": "s:So34ZappOfframpPeerCashOutOrchestratorP0aB0E9allOrdersSaySo0abC13OrderSnapshotCGyYaKF",
             "mangledName": "$sSo34ZappOfframpPeerCashOutOrchestratorP0aB0E9allOrdersSaySo0abC13OrderSnapshotCGyYaKF",
+            "moduleName": "ZappOfframp",
+            "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.PeerCashOutOrchestrator>",
+            "sugared_genericSig": "<Self where Self : ZappOfframp.PeerCashOutOrchestrator>",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "resolveCheckpoint",
+            "printedName": "resolveCheckpoint(checkpoint:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "PeerDepositId",
+                "printedName": "ZappOfframp.PeerDepositId",
+                "usr": "c:objc(cs)ZappOfframpPeerDepositId"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "PeerCashOutCheckpoint",
+                "printedName": "ZappOfframp.PeerCashOutCheckpoint",
+                "usr": "c:objc(cs)ZappOfframpPeerCashOutCheckpoint"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So34ZappOfframpPeerCashOutOrchestratorP0aB0E17resolveCheckpoint10checkpointSo0abC9DepositIdCSo0abcdeH0C_tYaKF",
+            "mangledName": "$sSo34ZappOfframpPeerCashOutOrchestratorP0aB0E17resolveCheckpoint10checkpointSo0abC9DepositIdCSo0abcdeH0C_tYaKF",
             "moduleName": "ZappOfframp",
             "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.PeerCashOutOrchestrator>",
             "sugared_genericSig": "<Self where Self : ZappOfframp.PeerCashOutOrchestrator>",

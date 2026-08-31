@@ -24,6 +24,8 @@ struct PeerCashOutProgressView: View {
 
                         if let failure = store.failure {
                             failureCard(failure)
+                        } else if let message = store.startupErrorMessage {
+                            startupFailureCard(message)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,7 +43,17 @@ struct PeerCashOutProgressView: View {
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
         }
+    }
+
+    private func startupFailureCard(_ message: String) -> some View {
+        Text(message)
+            .zappFont(.body, style: ZappColors.text)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(ZappColors.dangerSoft.color(colorScheme))
+            .overlay(Rectangle().strokeBorder(ZappColors.danger.color(colorScheme), lineWidth: 1))
     }
 
     private func failureCard(_ failure: PeerFailure) -> some View {

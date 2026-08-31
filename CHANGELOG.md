@@ -99,6 +99,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [ZAPP-4] P2P payments and cash-outs now reserve one shared Base balance across every active or recoverable operation, reject stale recipient checks and wallet sessions, and recover by exact on-chain submission identity. Closing a screen no longer cancels unrelated cash-outs, concurrent rails cannot overwrite each other's recovery data or allowances, and temporary provider outages no longer appear as an empty activity history.
 - [PORTFOLIO-CHART] Wallets with completed sends now reconcile their history correctly instead of hiding the balance chart.
 - [PORTFOLIO-CHART] Wallet birthday estimates now remain usable on compact displays, and PIN entry is larger and easier to read across iPhone sizes.
 - [MOB-1678] Sending, and shielding transparent funds, no longer fail with an internal error when the transaction Zapp just built has not yet appeared in the wallet's history view. The transaction is now read back for broadcast from the wallet store directly, so a send that used to stop with a "transaction not found" failure simply goes out. Fixed in the updated Zcash SDK.

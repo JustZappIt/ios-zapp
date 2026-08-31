@@ -46,6 +46,32 @@ struct Root {
             case walletBackup
         }
 
+        enum P2pActivityOrigin: Equatable {
+            case tabs
+            case offramp
+        }
+
+        enum PeerCashOutOrigin: Equatable {
+            case pay
+            case activity
+        }
+
+        enum OfframpOrigin: Equatable {
+            case pay
+            case peerCashOut
+            case activity
+        }
+
+        struct OfframpActivityReturn: Equatable {
+            let state: Offramp.State
+            let origin: OfframpOrigin
+        }
+
+        struct PeerCashOutActivityReturn: Equatable {
+            let state: PeerCashOut.State
+            let origin: PeerCashOutOrigin
+        }
+
         /// Android's `ChatSendContextProvider.ChatSendContext`. `requestId` is set only when the
         /// send was started by paying a payment request — it is what the posted receipt quotes so
         /// the requester's bubble can flip to Paid.
@@ -202,11 +228,16 @@ struct Root {
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
+        var offrampActivityReturn: OfframpActivityReturn?
         var p2pActivityState = P2pActivity.State.initial
+        var p2pActivityOrigin = P2pActivityOrigin.tabs
         var p2pPaymentMethodState = P2pPaymentMethod.State.initial
         /// Built when a cash-out is opened, because it is scoped to one destination and carries the
         /// screens pushed on top of it.
         var peerCashOutState = PeerCashOut.State(destinationCode: "revolut")
+        var peerCashOutActivityReturn: PeerCashOutActivityReturn?
+        var peerCashOutOrigin = PeerCashOutOrigin.pay
+        var offrampOrigin = OfframpOrigin.pay
         var receiveState = Receive.State.initial
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
