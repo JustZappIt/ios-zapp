@@ -67,6 +67,20 @@ private extension RootView {
         WithPerceptionTracking {
             Group {
                 switch store.destinationState.destination {
+                case .giftClaim:
+                    NavigationView {
+                        GiftClaimView(
+                            store: store.scope(
+                                state: \.giftClaimState,
+                                action: \.giftClaim
+                            )
+                        )
+                    }
+                    .navigationViewStyle(.stack)
+                    .overlayedWithSplash(store.splashAppeared) {
+                        store.send(.splashRemovalRequested)
+                    }
+
                 case .deeplinkWarning:
                     NavigationView {
                         DeeplinkWarningView(
@@ -197,6 +211,24 @@ private extension RootView {
                                     store: store.scope(
                                         state: \.offrampState,
                                         action: \.offramp
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .giftCard {
+                                GiftCardView(
+                                    store: store.scope(
+                                        state: \.giftCardState,
+                                        action: \.giftCard
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .giftCardList {
+                                GiftCardListView(
+                                    store: store.scope(
+                                        state: \.giftCardListState,
+                                        action: \.giftCardList
                                     )
                                 )
                                 .transition(.move(edge: .trailing))

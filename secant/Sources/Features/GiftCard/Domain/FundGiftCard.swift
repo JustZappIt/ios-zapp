@@ -10,7 +10,7 @@ import Foundation
 ///
 /// The sender pays `networkFee` *and* `claimFeeReserve` on top of the card amount, so the
 /// recipient nets exactly what the card says.
-struct GiftFundingQuote {
+struct GiftFundingQuote: Equatable {
     let card: StoredGiftCard
     let proposal: Proposal
     let claimFeeReserve: Zatoshi

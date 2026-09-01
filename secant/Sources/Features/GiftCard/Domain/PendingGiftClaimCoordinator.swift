@@ -32,7 +32,7 @@ extension PendingGiftClaimCoordinatorClient: DependencyKey {
         let gate = KeyedAsyncLock()
         return Self(
             resumeNext: {
-                try? await gate.withLock("resume") {
+                let token: String?? = try? await gate.withLock("resume") {
                     @Dependency(\.pendingGiftLinks) var pendingGiftLinks
                     @Dependency(\.receivedGiftStorage) var receivedGiftStorage
                     await ConfirmGiftClaim().reconcile()
@@ -44,7 +44,8 @@ extension PendingGiftClaimCoordinatorClient: DependencyKey {
                         case .accepted(let token) = pendingGiftLinks.put(link)
                     else { return nil }
                     return token
-                } ?? nil
+                }
+                return token.flatMap { $0 }
             }
         )
     }

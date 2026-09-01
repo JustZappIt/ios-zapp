@@ -105,7 +105,7 @@ private struct GiftClaimEngine {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     private func claimFrom(_ synchronizer: SDKSynchronizer, request: GiftClaimRequest) async throws -> GiftClaimOutcome {
         // Same bound as inspect, and for the same reason: the scan that follows is deliberately
         // unbounded — a legitimate claim runs for minutes and the screen offers Stop — but a
@@ -306,85 +306,6 @@ private struct GiftClaimEngine {
         return .awaitingFunding
     }
 
-    // MARK: - Inspect
-
-    func inspect(_ request: GiftInspectRequest, aliasSuffix: String) async throws -> GiftCardHoldings {
-        let synchronizer = try await open(
-            payload: request.payload,
-            networkType: request.networkType,
-            endpoint: request.endpoint,
-            aliasSuffix: aliasSuffix
-        )
-        let holdings: GiftCardHoldings
-        do {
-            try await awaitReachable(synchronizer)
-            try await awaitSynced(synchronizer, onProgress: request.onProgress)
-            holdings = try await readHoldings(synchronizer, payload: request.payload, fundingTxid: request.fundingTxid)
-            await shutdown(synchronizer)
-        } catch {
-            await shutdown(synchronizer)
-            throw error
-        }
-        if holdings.isCollected && holdings.isEmpty {
-            try? deleteWallet(aliasSuffix: aliasSuffix)
-        }
-        return holdings
-    }
-
-    func inspectFinalization(_ request: GiftFinalizeInspectRequest, aliasSuffix: String) async throws -> GiftClaimFinalization {
-        let synchronizer = try await open(
-            payload: request.payload,
-            networkType: request.networkType,
-            endpoint: request.endpoint,
-            aliasSuffix: aliasSuffix
-        )
-        do {
-            try await awaitReachable(synchronizer)
-            try await awaitSynced(synchronizer, onProgress: { _ in })
-            guard let account = try await synchronizer.listAccounts().first else {
-                throw GiftClaimEngineFailure()
-            }
-            let balances = try await synchronizer.getAccountsBalances()
-            guard let balance = balances[account.id] else { throw GiftClaimEngineFailure() }
-            guard let rawAmount = Int64(request.payload.amountZatoshi) else { throw GiftClaimEngineFailure() }
-            let residual = balance.shieldedTotal()
-            let transactions = try await synchronizer.allTransactions()
-            let hasFinalSpend = transactions.contains { $0.isFinalClaimSpend(of: Zatoshi(rawAmount)) }
-            await shutdown(synchronizer)
-            return GiftClaimFinalization(
-                canSettle: hasFinalSpend && residual <= Self.maxAbandonedResidual,
-                residual: residual
-            )
-        } catch {
-            await shutdown(synchronizer)
-            throw error
-        }
-    }
-
-    private func readHoldings(
-        _ synchronizer: SDKSynchronizer,
-        payload: GiftLinkPayload,
-        fundingTxid: String
-    ) async throws -> GiftCardHoldings {
-        guard let account = try await synchronizer.listAccounts().first else {
-            throw GiftClaimEngineFailure()
-        }
-        let balances = try await synchronizer.getAccountsBalances()
-        guard let balance = balances[account.id] else { throw GiftClaimEngineFailure() }
-        guard let rawAmount = Int64(payload.amountZatoshi) else { throw GiftClaimEngineFailure() }
-        let amount = Zatoshi(rawAmount)
-        let transactions = try await synchronizer.allTransactions()
-        return GiftCardHoldings(
-            available: balance.shieldedSpendableValue,
-            total: balance.shieldedTotal(),
-            hasFundingArrived: transactions.contains {
-                $0.minedHeight != nil && $0.rawID.toHexStringTxId() == fundingTxid
-            },
-            hasFinalClaimSpend: transactions.contains { $0.isFinalClaimSpend(of: amount) },
-            hasPendingClaimSpend: transactions.contains { $0.isPendingClaimSpend(of: amount) }
-        )
-    }
-
     // MARK: - Engine plumbing
 
     private func open(
@@ -538,8 +459,95 @@ private struct GiftClaimEngine {
         }.value
     }
 
-    // MARK: - Files
+}
 
+// MARK: - Inspect
+
+extension GiftClaimEngine {
+    // MARK: - Inspect
+
+    func inspect(_ request: GiftInspectRequest, aliasSuffix: String) async throws -> GiftCardHoldings {
+        let synchronizer = try await open(
+            payload: request.payload,
+            networkType: request.networkType,
+            endpoint: request.endpoint,
+            aliasSuffix: aliasSuffix
+        )
+        let holdings: GiftCardHoldings
+        do {
+            try await awaitReachable(synchronizer)
+            try await awaitSynced(synchronizer, onProgress: request.onProgress)
+            holdings = try await readHoldings(synchronizer, payload: request.payload, fundingTxid: request.fundingTxid)
+            await shutdown(synchronizer)
+        } catch {
+            await shutdown(synchronizer)
+            throw error
+        }
+        if holdings.isCollected && holdings.isEmpty {
+            try? deleteWallet(aliasSuffix: aliasSuffix)
+        }
+        return holdings
+    }
+
+    func inspectFinalization(_ request: GiftFinalizeInspectRequest, aliasSuffix: String) async throws -> GiftClaimFinalization {
+        let synchronizer = try await open(
+            payload: request.payload,
+            networkType: request.networkType,
+            endpoint: request.endpoint,
+            aliasSuffix: aliasSuffix
+        )
+        do {
+            try await awaitReachable(synchronizer)
+            try await awaitSynced(synchronizer, onProgress: { _ in })
+            guard let account = try await synchronizer.listAccounts().first else {
+                throw GiftClaimEngineFailure()
+            }
+            let balances = try await synchronizer.getAccountsBalances()
+            guard let balance = balances[account.id] else { throw GiftClaimEngineFailure() }
+            guard let rawAmount = Int64(request.payload.amountZatoshi) else { throw GiftClaimEngineFailure() }
+            let residual = balance.shieldedTotal()
+            let transactions = try await synchronizer.allTransactions()
+            let hasFinalSpend = transactions.contains { $0.isFinalClaimSpend(of: Zatoshi(rawAmount)) }
+            await shutdown(synchronizer)
+            return GiftClaimFinalization(
+                canSettle: hasFinalSpend && residual <= Self.maxAbandonedResidual,
+                residual: residual
+            )
+        } catch {
+            await shutdown(synchronizer)
+            throw error
+        }
+    }
+
+    private func readHoldings(
+        _ synchronizer: SDKSynchronizer,
+        payload: GiftLinkPayload,
+        fundingTxid: String
+    ) async throws -> GiftCardHoldings {
+        guard let account = try await synchronizer.listAccounts().first else {
+            throw GiftClaimEngineFailure()
+        }
+        let balances = try await synchronizer.getAccountsBalances()
+        guard let balance = balances[account.id] else { throw GiftClaimEngineFailure() }
+        guard let rawAmount = Int64(payload.amountZatoshi) else { throw GiftClaimEngineFailure() }
+        let amount = Zatoshi(rawAmount)
+        let transactions = try await synchronizer.allTransactions()
+        return GiftCardHoldings(
+            available: balance.shieldedSpendableValue,
+            total: balance.shieldedTotal(),
+            hasFundingArrived: transactions.contains {
+                $0.minedHeight != nil && $0.rawID.toHexStringTxId() == fundingTxid
+            },
+            hasFinalClaimSpend: transactions.contains { $0.isFinalClaimSpend(of: amount) },
+            hasPendingClaimSpend: transactions.contains { $0.isPendingClaimSpend(of: amount) }
+        )
+    }
+
+}
+
+// MARK: - Files
+
+extension GiftClaimEngine {
     private func giftClaimsRoot() throws -> URL {
         let root = databaseFiles.documentsDirectory().appendingPathComponent(Layout.root)
         let fileManager = FileManager.default
@@ -580,8 +588,14 @@ private struct GiftClaimEngine {
         let fileManager = FileManager.default
         let network = ZcashNetworkBuilder.network(for: networkType)
         let pairs = [
-            (databaseFiles.spendParamsURLFor(network), Self.aliasRewritten(dir.appendingPathComponent(Layout.spendParams), aliasSuffix: aliasSuffix)),
-            (databaseFiles.outputParamsURLFor(network), Self.aliasRewritten(dir.appendingPathComponent(Layout.outputParams), aliasSuffix: aliasSuffix))
+            (
+                databaseFiles.spendParamsURLFor(network),
+                Self.aliasRewritten(dir.appendingPathComponent(Layout.spendParams), aliasSuffix: aliasSuffix)
+            ),
+            (
+                databaseFiles.outputParamsURLFor(network),
+                Self.aliasRewritten(dir.appendingPathComponent(Layout.outputParams), aliasSuffix: aliasSuffix)
+            )
         ]
         for (source, target) in pairs {
             guard fileManager.fileExists(atPath: source.path), !fileManager.fileExists(atPath: target.path) else { continue }

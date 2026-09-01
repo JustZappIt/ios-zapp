@@ -85,7 +85,7 @@ struct ConfirmGiftCardFunding {
         var watches: [GiftFundingWatch] = []
         let cards = (try? await giftCardStorage.getAll()) ?? []
         for snapshot in cards where snapshot.needsFundingReconciliation {
-            let watch: GiftFundingWatch? = try? await giftFundingOperationLock.withLock(snapshot.id) {
+            let watch: GiftFundingWatch?? = try? await giftFundingOperationLock.withLock(snapshot.id) {
                 guard
                     let card = try? await giftCardStorage.get(snapshot.id),
                     card.needsFundingReconciliation
@@ -101,8 +101,8 @@ struct ConfirmGiftCardFunding {
                     let txid = after.fundingTxid
                 else { return nil }
                 return GiftFundingWatch(cardId: card.id, fundingTxid: txid)
-            } ?? nil
-            if let watch, !watches.contains(watch) {
+            }
+            if let watch = watch.flatMap({ $0 }), !watches.contains(watch) {
                 watches.append(watch)
             }
         }

@@ -849,6 +849,57 @@ extension Root {
                 state.path = .p2pPaymentMethod
                 return .none
 
+            case .home(.giftTapped):
+                state.giftCardState = GiftCard.State()
+                state.path = .giftCard
+                return .none
+
+            case .zappTabs(.giftCardListTapped):
+                state.giftCardListState = GiftCardList.State()
+                state.path = .giftCardList
+                return .none
+
+            case .giftCard(.delegate(.exitFlow)), .giftCardList(.delegate(.exitFlow)):
+                state.path = nil
+                return .none
+
+            case .giftCard(.delegate(.openSavedCards)):
+                state.giftCardListState = GiftCardList.State()
+                state.path = .giftCardList
+                return .none
+
+            case .giftClaim(.delegate(.dismiss)):
+                return .send(.destination(.updateDestination(.home)))
+
+            case .giftClaim(.delegate(.routeToOnboarding)):
+                return .send(.destination(.updateDestination(.onboarding)))
+
+            case .giftStartupSweep:
+                return .merge(
+                    .run { _ in
+                        await ConfirmGiftCardFunding().reconcileAndObserve()
+                    },
+                    .send(.giftResumePendingClaim),
+                    .run { _ in
+                        @Dependency(\.giftProvingParams) var giftProvingParams
+                        await giftProvingParams.prefetch()
+                    }
+                )
+
+            case .giftResumePendingClaim:
+                // Skipped while the claim screen is already up — two screens would race one card.
+                guard state.destinationState.destination != .giftClaim else { return .none }
+                return .run { send in
+                    @Dependency(\.pendingGiftClaimCoordinator) var pendingGiftClaimCoordinator
+                    if let token = await pendingGiftClaimCoordinator.resumeNext() {
+                        await send(.giftClaimResumed(token))
+                    }
+                }
+
+            case .giftClaimResumed(let token):
+                state.giftClaimState = GiftClaim.State(token: token)
+                return .send(.destination(.updateDestination(.giftClaim)))
+
             case .zappTabs(.p2pTransactionsTapped):
                 state.p2pActivityState = .initial
                 state.p2pActivityOrigin = .tabs
