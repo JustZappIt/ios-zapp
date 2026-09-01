@@ -393,14 +393,6 @@ extension Root {
                 state.path = .p2pActivity
                 return .none
 
-                // The p2p.me recovery actions stay in the off-ramp, which already owns their
-                // progress stream; the activity feed only routes into them.
-            case let .p2pActivity(.delegate(.recoverScanAndPayOrder(orderID))):
-                state.offrampState = .initial(page: .amount, corridorContext: .settings)
-                state.offrampOrigin = .activity
-                state.path = .offramp
-                return .send(.offramp(.recoverTapped(orderID)))
-
             case .p2pActivity(.delegate(.refundToZec)):
                 state.offrampState = .initial(page: .amount, corridorContext: .settings)
                 state.offrampOrigin = .activity

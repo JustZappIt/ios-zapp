@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 import Foundation
+import SwiftUI
 
 /// Localized copy for the protocol's stable codes. Kotlin exports codes, never display strings, so
 /// this is the single place they become words — one mapping rather than one per screen, because
 /// three surfaces describe the same order and a copy that drifted between them would be read as
 /// three different states.
 extension PeerDestination {
-    /// The rail's own product name. Unbranded by design: the asset catalogue carries no approved
-    /// Revolut, Zelle, Chime or Monzo mark, and a substitute glyph would be worse than none.
+    /// The rail's own product name.
     static func displayName(for code: String) -> String {
         switch code {
         case "revolut": return String(localizable: .peerDestinationRevolut)
@@ -31,8 +31,21 @@ extension PeerDestination {
         }
     }
 
+    /// The rail's mark, ported from Android. Nil for a rail this build has no art for, which the
+    /// row renders without rather than substituting a glyph.
+    static func logo(for code: String) -> Image? {
+        switch code {
+        case "revolut": return Asset.Assets.Icons.railRevolut.image
+        case "zelle": return Asset.Assets.Icons.railZelle.image
+        case "chime": return Asset.Assets.Icons.railChime.image
+        case "monzo": return Asset.Assets.Icons.railMonzo.image
+        default: return nil
+        }
+    }
+
     var displayName: String { Self.displayName(for: code) }
     var handleHint: String { Self.handleHint(for: code) }
+    var logo: Image? { Self.logo(for: code) }
     var currencyCodes: [String] { currencies.map(\.code) }
 }
 

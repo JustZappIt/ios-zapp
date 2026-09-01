@@ -22,13 +22,21 @@ struct P2pPaymentMethod {
         /// not expose. The rails are shown as unavailable rather than hidden, so the absence is
         /// explained rather than mysterious.
         var isSoftwareWallet = true
+        /// What the rows show. Only `saveTapped` writes it to preferences.
         var selected: P2pRail = .default
+        /// What preferences hold, so the button knows whether anything changed.
+        var saved: P2pRail = .default
         var isLoading = false
         var isPeerLoading = false
         var isScanAndPayLoading = false
         var errorMessage: String?
+        /// Shown in the info sheet, which is where the explainers live now.
+        var baseAddress: String?
+        var isAddressCopied = false
 
         var canSelectPeer: Bool { isPeerAvailable && isSoftwareWallet }
+
+        var canSave: Bool { selected != saved }
     }
 
     enum Action: Equatable {
@@ -38,7 +46,11 @@ struct P2pPaymentMethod {
         case peerLoadFailed(String)
         case scanAndPayLoaded([OfframpCorridor])
         case scanAndPayLoadFailed(String)
+        case accountLoaded(String?)
         case railTapped(P2pRail)
+        case saveTapped
+        case copyAddressTapped
+        case addressCopyReset
         case backTapped
         case delegate(Delegate)
 
@@ -51,10 +63,14 @@ struct P2pPaymentMethod {
     @Dependency(\.offramp) var offramp
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.userStoredPreferences) var userStoredPreferences
+    @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.continuousClock) var continuousClock
 
     private enum CancelID {
         case peer
         case scanAndPay
+        case account
+        case copyReset
     }
 
     var body: some Reducer<State, Action> {
@@ -63,7 +79,8 @@ struct P2pPaymentMethod {
             case .onAppear:
                 @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
                 state.isSoftwareWallet = selectedAccount?.vendor == .zcash
-                state.selected = userStoredPreferences.p2pRail() ?? .default
+                state.saved = userStoredPreferences.p2pRail() ?? .default
+                state.selected = state.saved
                 state.isLoading = true
                 state.isPeerLoading = true
                 state.isScanAndPayLoading = true
@@ -86,14 +103,26 @@ struct P2pPaymentMethod {
                     } catch: { error, send in
                         await send(.scanAndPayLoadFailed(error.localizedDescription))
                     }
-                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true)
+                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true),
+                    .run { send in
+                        await send(.accountLoaded(try await offramp.accountSummary().address))
+                    } catch: { _, send in
+                        await send(.accountLoaded(nil))
+                    }
+                    .cancellable(id: CancelID.account, cancelInFlight: true)
                 )
 
             case .onDisappear:
                 return .merge(
                     .cancel(id: CancelID.peer),
-                    .cancel(id: CancelID.scanAndPay)
+                    .cancel(id: CancelID.scanAndPay),
+                    .cancel(id: CancelID.account),
+                    .cancel(id: CancelID.copyReset)
                 )
+
+            case let .accountLoaded(address):
+                state.baseAddress = address
+                return .none
 
             case let .peerLoaded(destinations, isPeerAvailable):
                 state.destinations = destinations
@@ -123,9 +152,28 @@ struct P2pPaymentMethod {
             case let .railTapped(rail):
                 guard rail.provider != .peer || state.canSelectPeer else { return .none }
                 state.selected = rail
-                // Written on the tap rather than behind a Save: there is nothing to review, and a
-                // selection the user can see but the app has not stored is the confusing state.
-                userStoredPreferences.setP2pRail(rail)
+                return .none
+
+            // Saving leaves, as `onSaveClick` does on Android. Staying put with a greyed-out button
+            // gives the tap no visible outcome.
+            case .saveTapped:
+                guard state.canSave else { return .none }
+                userStoredPreferences.setP2pRail(state.selected)
+                state.saved = state.selected
+                return .send(.delegate(.close))
+
+            case .copyAddressTapped:
+                guard let address = state.baseAddress else { return .none }
+                pasteboard.setString(RedactableString(address))
+                state.isAddressCopied = true
+                return .run { send in
+                    try await continuousClock.sleep(for: .seconds(2))
+                    await send(.addressCopyReset)
+                }
+                .cancellable(id: CancelID.copyReset, cancelInFlight: true)
+
+            case .addressCopyReset:
+                state.isAddressCopied = false
                 return .none
 
             case .backTapped:

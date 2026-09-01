@@ -33326,6 +33326,74 @@
         }
       }
     },
+    "p2p.payment.method.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save selection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar selección"
+          }
+        }
+      }
+    },
+    "p2p.payment.method.info.accessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How P2P payments work"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funcionan los pagos P2P"
+          }
+        }
+      }
+    },
+    "p2p.payment.method.info.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How this works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona"
+          }
+        }
+      }
+    },
+    "p2p.payment.method.info.base.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Base wallet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu billetera Base"
+          }
+        }
+      }
+    },
     "p2p.payment.method.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33343,23 +33411,6 @@
         }
       }
     },
-    "p2p.payment.method.cash.out.group" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CASH OUT TO FIAT"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "COBRAR EN MONEDA LOCAL"
-          }
-        }
-      }
-    },
     "p2p.payment.method.cash.out.explainer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33373,23 +33424,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ofrece tus USDC a compradores y te pagan en tu propia cuenta. Tú recibes dinero."
-          }
-        }
-      }
-    },
-    "p2p.payment.method.scan.and.pay.group" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SCAN AND PAY A MERCHANT"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ESCANEAR Y PAGAR A UN COMERCIO"
           }
         }
       }
@@ -33662,6 +33696,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IMPORTE A OFRECER"
+          }
+        }
+      }
+    },
+    "peer.form.balance.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disponible"
+          }
+        }
+      }
+    },
+    "peer.form.info.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How cash out works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona el retiro"
+          }
+        }
+      }
+    },
+    "peer.form.info.accessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How cash out works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona el retiro"
+          }
+        }
+      }
+    },
+    "peer.form.info.dismiss" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
           }
         }
       }
@@ -33961,13 +34063,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offer at least %@ USDC — smaller orders are hidden from buyers."
+            "value" : "Offer at least %@ USDC."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ofrece al menos %@ USDC: las órdenes más pequeñas quedan ocultas para los compradores."
+            "value" : "Ofrece al menos %@ USDC."
           }
         }
       }
@@ -35213,6 +35315,74 @@
         }
       }
     },
+    "p2p.provider.peer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer"
+          }
+        }
+      }
+    },
+    "p2p.provider.p2pme" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p2p.me"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p2p.me"
+          }
+        }
+      }
+    },
+    "p2p.activity.type.cash.out" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash out · %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro · %@"
+          }
+        }
+      }
+    },
+    "p2p.activity.type.cash.out.unknown.rail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash out"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro"
+          }
+        }
+      }
+    },
     "p2p.activity.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -35243,23 +35413,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Todo"
-          }
-        }
-      }
-    },
-    "p2p.activity.filter.peer" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cash out"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cobros"
           }
         }
       }
@@ -35298,23 +35451,6 @@
         }
       }
     },
-    "p2p.activity.base.address" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Base account"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu cuenta de Base"
-          }
-        }
-      }
-    },
     "p2p.activity.attempt.in.progress" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -35328,23 +35464,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creándose"
-          }
-        }
-      }
-    },
-    "p2p.activity.recover" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Get funds back to ZEC"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recuperar los fondos en ZEC"
           }
         }
       }
