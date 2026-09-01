@@ -478,7 +478,11 @@ private extension RootView {
                             tokenName: tokenName
                         )
                     }
-                    .animation(.easeInOut(duration: 0.3), value: store.path)
+                    // Only home-to-screen and back animate. Every branch below enters and leaves by
+                    // the trailing edge, so animating a screen-to-screen change slid the outgoing
+                    // one off to the right while the incoming came from the right — which reads as
+                    // the back gesture playing on a forward push.
+                    .animation(.easeInOut(duration: 0.3), value: store.path == nil)
                     .background(homeWidthReader)
                     .onPreferenceChange(SwipeBackProgressKey.self) { swipeBackProgress = $0 }
                     .overlayedWithSplash(store.splashAppeared) {
