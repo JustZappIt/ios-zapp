@@ -16,14 +16,9 @@ struct PeerCashOutFormView: View {
                 ZappScreenHeader(
                     title: String(localizable: .peerFormTitle(PeerDestination.displayName(for: store.destinationCode)))
                 ) {
-                    Button { isInfoPresented = true } label: {
-                        Asset.Assets.infoCircle.image
-                            .zImage(width: 20, height: 20, style: ZappColors.text)
-                            .frame(width: 32, height: 32)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.zappPress)
-                    .accessibilityLabel(String(localizable: .peerFormInfoAccessibility))
+                    ZappInfoButton(
+                        accessibilityLabel: String(localizable: .peerFormInfoAccessibility)
+                    ) { isInfoPresented = true }
                 }
 
                 GeometryReader { geometry in

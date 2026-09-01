@@ -30,6 +30,9 @@ struct P2pPaymentMethod {
         var isPeerLoading = false
         var isScanAndPayLoading = false
         var errorMessage: String?
+        /// Shown in the info sheet, which is where the explainers live now.
+        var baseAddress: String?
+        var isAddressCopied = false
 
         var canSelectPeer: Bool { isPeerAvailable && isSoftwareWallet }
 
@@ -43,8 +46,11 @@ struct P2pPaymentMethod {
         case peerLoadFailed(String)
         case scanAndPayLoaded([OfframpCorridor])
         case scanAndPayLoadFailed(String)
+        case accountLoaded(String?)
         case railTapped(P2pRail)
         case saveTapped
+        case copyAddressTapped
+        case addressCopyReset
         case backTapped
         case delegate(Delegate)
 
@@ -57,10 +63,14 @@ struct P2pPaymentMethod {
     @Dependency(\.offramp) var offramp
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.userStoredPreferences) var userStoredPreferences
+    @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.continuousClock) var continuousClock
 
     private enum CancelID {
         case peer
         case scanAndPay
+        case account
+        case copyReset
     }
 
     var body: some Reducer<State, Action> {
@@ -93,14 +103,26 @@ struct P2pPaymentMethod {
                     } catch: { error, send in
                         await send(.scanAndPayLoadFailed(error.localizedDescription))
                     }
-                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true)
+                    .cancellable(id: CancelID.scanAndPay, cancelInFlight: true),
+                    .run { send in
+                        await send(.accountLoaded(try await offramp.accountSummary().address))
+                    } catch: { _, send in
+                        await send(.accountLoaded(nil))
+                    }
+                    .cancellable(id: CancelID.account, cancelInFlight: true)
                 )
 
             case .onDisappear:
                 return .merge(
                     .cancel(id: CancelID.peer),
-                    .cancel(id: CancelID.scanAndPay)
+                    .cancel(id: CancelID.scanAndPay),
+                    .cancel(id: CancelID.account),
+                    .cancel(id: CancelID.copyReset)
                 )
+
+            case let .accountLoaded(address):
+                state.baseAddress = address
+                return .none
 
             case let .peerLoaded(destinations, isPeerAvailable):
                 state.destinations = destinations
@@ -136,6 +158,20 @@ struct P2pPaymentMethod {
                 guard state.canSave else { return .none }
                 userStoredPreferences.setP2pRail(state.selected)
                 state.saved = state.selected
+                return .none
+
+            case .copyAddressTapped:
+                guard let address = state.baseAddress else { return .none }
+                pasteboard.setString(RedactableString(address))
+                state.isAddressCopied = true
+                return .run { send in
+                    try await continuousClock.sleep(for: .seconds(2))
+                    await send(.addressCopyReset)
+                }
+                .cancellable(id: CancelID.copyReset, cancelInFlight: true)
+
+            case .addressCopyReset:
+                state.isAddressCopied = false
                 return .none
 
             case .backTapped:

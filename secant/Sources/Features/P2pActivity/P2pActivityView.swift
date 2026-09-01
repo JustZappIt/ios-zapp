@@ -8,14 +8,21 @@ struct P2pActivityView: View {
 
     @Perception.Bindable var store: StoreOf<P2pActivity>
 
+    private enum Layout {
+        static let gutter: CGFloat = 14
+        static let cardSpacing: CGFloat = 12
+        static let logoHeight: CGFloat = 12
+        static let logoOpacity: Double = 0.7
+    }
+
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZappScreenHeader(title: String(localizable: .p2pActivityTitle))
 
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        accountSummary.padding(.bottom, 16)
+                    LazyVStack(alignment: .leading, spacing: Layout.cardSpacing) {
+                        balanceCard
 
                         if store.showsFilters {
                             ZappSegmentedSelector(
@@ -24,28 +31,27 @@ struct P2pActivityView: View {
                             ) { index in
                                 store.send(.filterTapped(P2pActivity.State.Filter.allCases[index]))
                             }
-                            .padding(.bottom, 16)
                         }
 
                         if let error = store.errorMessage {
                             Text(error)
-                                .zappFont(.caption, style: ZappColors.danger)
-                                .padding(.bottom, 12)
+                                .zappFont(.body, style: ZappColors.danger)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
                         if store.showsEmptyHistory {
                             Text(String(localizable: .p2pActivityEmpty))
                                 .zappFont(.body, style: ZappColors.textMuted)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 24)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 32)
                         }
 
                         ForEach(store.entries) { entry in
-                            row(entry)
-                            ZappRowDivider(inset: false)
+                            entryCard(entry)
                         }
                     }
-                    .padding(18)
+                    .padding(.horizontal, Layout.gutter)
+                    .padding(.top, 16)
                     .padding(.bottom, 40)
                 }
 
@@ -57,170 +63,172 @@ struct P2pActivityView: View {
         }
     }
 
+    /// Balance, the refund control and the account in one card, as `BalanceCard` has it on Android.
     @ViewBuilder
-    private var accountSummary: some View {
+    private var balanceCard: some View {
         if let account = store.account {
-            VStack(alignment: .leading, spacing: 12) {
-                ZappBorderedCard {
-                    ZappSummaryRow(
-                        label: String(localizable: .p2pActivityBaseAddress),
-                        value: account.address
-                    )
-                    ZappButton(
-                        title: store.isAddressCopied
-                            ? String(localizable: .newChatCopied)
-                            : String(localizable: .offrampAccountCopy),
-                        variant: .ghost
-                    ) { store.send(.copyAddressTapped) }
-                }
+            ZappBorderedCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(String(localizable: .offrampHistoryBalance))
+                        .zappFont(.eyebrow, style: ZappColors.textMuted)
 
-                ZappBorderedCard {
-                    ZappSummaryRow(
-                        label: String(localizable: .offrampHistoryBalance),
-                        value: account.balanceDisplay.map { String(localizable: .peerUsdcAmount($0)) } ?? "—"
-                    )
+                    HStack(alignment: .center, spacing: 12) {
+                        Text(account.balanceDisplay.map { String(localizable: .peerUsdcAmount($0)) } ?? "—")
+                            .zappFont(.display, style: ZappColors.text)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                    if store.offersRefund {
-                        ZappButton(title: String(localizable: .offrampHistoryRefund), variant: .ghost) {
-                            store.send(.refundTapped)
+                        if store.offersRefund {
+                            ZappCompactButton(title: String(localizable: .offrampHistoryRefund)) {
+                                store.send(.refundTapped)
+                            }
                         }
-                    } else if store.isRefundBlockedByPeer {
-                        // A refund and a cash-out that has not escrowed yet would spend the same
-                        // coins, so the button is withheld with the reason rather than failing later.
-                        Text(String(localizable: .p2pActivityRefundBlockedByPeer))
-                            .zappFont(.caption, style: ZappColors.textMuted)
-                    } else if store.isRefundReadinessUnavailable {
-                        Text(String(localizable: .offrampHistoryBalanceUnavailable))
-                            .zappFont(.caption, style: ZappColors.textMuted)
                     }
+
+                    if let notice = refundNotice {
+                        Text(notice)
+                            .zappFont(.caption, style: ZappColors.textMuted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    accountRow(account.address)
                 }
             }
         } else if store.isLoading {
-            ProgressView()
-                .tint(ZappColors.accent.color(colorScheme))
-                .frame(maxWidth: .infinity)
-        } else {
-            Text(String(localizable: .offrampHistoryBalanceUnavailable))
-                .zappFont(.caption, style: ZappColors.textMuted)
+            ZappBorderedCard {
+                ProgressView()
+                    .tint(ZappColors.accent.color(colorScheme))
+                    .frame(maxWidth: .infinity)
+            }
         }
     }
 
-    @ViewBuilder
-    private func row(_ entry: P2pActivityEntry) -> some View {
+    private func accountRow(_ address: String) -> some View {
+        HStack(spacing: 8) {
+            Text(String(localizable: .p2pActivityBaseAddress))
+                .zappFont(.caption, style: ZappColors.textSubtle)
+
+            Spacer(minLength: 8)
+
+            Text(address)
+                .zappFont(.mono, style: ZappColors.text)
+                .lineLimit(1)
+                .truncationMode(.middle)
+
+            ZappCopyIconButton(
+                isCopied: store.isAddressCopied,
+                accessibilityLabel: String(localizable: .offrampAccountCopy)
+            ) {
+                store.send(.copyAddressTapped)
+            }
+        }
+    }
+
+    /// Why the refund is not on offer, when the balance itself is readable.
+    private var refundNotice: String? {
+        if store.isRefundBlockedByPeer { return String(localizable: .p2pActivityRefundBlockedByPeer) }
+        if store.isRefundReadinessUnavailable { return String(localizable: .offrampHistoryBalanceUnavailable) }
+        return nil
+    }
+
+    private func presentation(for entry: P2pActivityEntry) -> EntryPresentation {
         switch entry {
         case let .peerAttempt(run):
-            entryRow(
-                title: String(localizable: .peerUsdcAmount(run.amount.display)),
-                subtitle: PeerDestination.displayName(for: run.destinationCode),
-                status: String(localizable: .p2pActivityAttemptInProgress),
-                statusVariant: .accent,
-                date: run.startedAt,
-                action: { store.send(.entryTapped(entry)) }
+            let rail = PeerDestination.displayName(for: run.destinationCode)
+            return EntryPresentation(
+                logo: PeerDestination.logo(for: run.destinationCode),
+                type: "\(String(localizable: .p2pActivityFilterPeer)) · \(rail)",
+                status: run.failure == nil
+                    ? String(localizable: .p2pActivityAttemptInProgress)
+                    : String(localizable: .peerProgressTitleFailed),
+                statusVariant: run.failure == nil ? .accent : .danger,
+                amount: String(localizable: .peerUsdcAmount(run.amount.display)),
+                secondary: run.currencyCodes.joined(separator: ", "),
+                date: run.startedAt
             )
 
         case let .peerOrder(order):
-            entryRow(
-                title: String(localizable: .peerUsdcAmount(order.gross.display)),
-                subtitle: order.destinationCode.map(PeerDestination.displayName(for:))
+            let rail = order.destinationCode.map(PeerDestination.displayName(for:))
+            return EntryPresentation(
+                logo: order.destinationCode.flatMap(PeerDestination.logo(for:)),
+                type: rail.map { "\(String(localizable: .p2pActivityFilterPeer)) · \($0)" }
                     ?? String(localizable: .p2pActivityFilterPeer),
                 status: order.phase.label,
                 statusVariant: order.isFinished ? .muted : .accent,
-                date: order.lastActivityAt ?? order.openedAt,
-                action: { store.send(.entryTapped(entry)) }
+                amount: String(localizable: .peerUsdcAmount(order.gross.display)),
+                secondary: order.currencyCodes.joined(separator: ", "),
+                date: order.lastActivityAt ?? order.openedAt
             )
 
         case let .scanAndPay(item):
             // Recovering an escrow sweeps the Base account, so it is withheld under the same
             // conditions as a refund rather than offered and refused on the next screen.
-            if item.canRecoverEscrow && store.offersEscrowRecovery {
-                entryRow(
-                    title: "\(item.fiatDisplay) \(item.currencyCode)",
-                    subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
-                    status: item.status.capitalized,
-                    statusVariant: .muted,
-                    date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
-                    actionTitle: String(localizable: .p2pActivityRecover),
-                    action: { store.send(.entryTapped(entry)) }
-                )
-            } else {
-                entryRow(
-                    title: "\(item.fiatDisplay) \(item.currencyCode)",
-                    subtitle: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
-                    status: item.status.capitalized,
-                    statusVariant: .muted,
-                    date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
-                    action: nil
-                )
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func entryRow(
-        title: String,
-        subtitle: String,
-        status: String,
-        statusVariant: ZappChipVariant,
-        date: Date?,
-        actionTitle: String? = nil,
-        action: (() -> Void)?
-    ) -> some View {
-        if let action {
-            Button(action: action) {
-                entryRowContent(
-                    title: title,
-                    subtitle: subtitle,
-                    status: status,
-                    statusVariant: statusVariant,
-                    date: date,
-                    actionTitle: actionTitle
-                )
-            }
-            .buttonStyle(.zappPress)
-        } else {
-            entryRowContent(
-                title: title,
-                subtitle: subtitle,
-                status: status,
-                statusVariant: statusVariant,
-                date: date,
-                actionTitle: actionTitle
+            let canRecover = item.canRecoverEscrow && store.offersEscrowRecovery
+            return EntryPresentation(
+                logo: Asset.Assets.Icons.providerP2pMe.image,
+                type: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
+                status: item.status.capitalized,
+                statusVariant: .muted,
+                amount: String(localizable: .peerUsdcAmount(item.usdcDisplay)),
+                secondary: "\(item.fiatDisplay) \(item.currencyCode)",
+                date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
+                actionTitle: canRecover ? String(localizable: .p2pActivityRecover) : nil,
+                isTappable: canRecover
             )
         }
     }
 
-    private func entryRowContent(
-        title: String,
-        subtitle: String,
-        status: String,
-        statusVariant: ZappChipVariant,
-        date: Date?,
-        actionTitle: String?
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title).zappFont(.rowTitle, style: ZappColors.text)
-                    Text(subtitle).zappFont(.caption, style: ZappColors.textMuted)
+    @ViewBuilder
+    private func entryCard(_ entry: P2pActivityEntry) -> some View {
+        let model = presentation(for: entry)
+        let content = ZappBorderedCard {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    if let logo = model.logo {
+                        logo
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: Layout.logoHeight)
+                            .opacity(Layout.logoOpacity)
+                    }
+
+                    Text(model.type)
+                        .zappFont(.eyebrow, style: ZappColors.textMuted)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    ZappStatusChip(text: model.status, variant: model.statusVariant)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
 
-                ZappStatusChip(text: status, variant: statusVariant)
-            }
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
+                    Text(model.amount)
+                        .zappFont(.sectionTitle, style: ZappColors.text)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-            if let date {
-                Text(date.formatted(date: .abbreviated, time: .shortened))
-                    .zappFont(.caption, style: ZappColors.textSubtle)
-            }
+                    if let secondary = model.secondary, !secondary.isEmpty {
+                        Text(secondary)
+                            .zappFont(.body, style: ZappColors.textMuted)
+                    }
+                }
 
-            if let actionTitle {
-                Text(actionTitle)
-                    .zappFont(.buttonSmall, style: ZappColors.accentText)
+                if let date = model.date {
+                    Text(date.formatted(date: .abbreviated, time: .shortened))
+                        .zappFont(.caption, style: ZappColors.textSubtle)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+
+                if let actionTitle = model.actionTitle {
+                    Text(actionTitle)
+                        .zappFont(.buttonSmall, style: ZappColors.accentText)
+                }
             }
         }
-        .padding(.vertical, 14)
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        .contentShape(Rectangle())
+
+        if model.isTappable {
+            Button { store.send(.entryTapped(entry)) } label: { content }
+                .buttonStyle(.zappPress)
+        } else {
+            content
+        }
     }
 
     private var selectedFilterIndex: Int {
@@ -228,9 +236,24 @@ struct P2pActivityView: View {
     }
 }
 
+/// One row's rendering, so the card builder takes a model rather than nine arguments.
+private struct EntryPresentation {
+    let logo: Image?
+    let type: String
+    let status: String
+    let statusVariant: ZappChipVariant
+    let amount: String
+    var secondary: String?
+    var date: Date?
+    var actionTitle: String?
+    var isTappable = true
+}
+
 private extension OfframpHistoryModel {
     /// The subgraph reports fiat in the currency's own 6-decimal unit, the same as USDC.
     var fiatDisplay: String { UsdcAmount(micros: fiatMicros)?.display ?? fiatMicros }
+
+    var usdcDisplay: String { UsdcAmount(micros: usdcMicros)?.display ?? usdcMicros }
 }
 
 #Preview {
