@@ -13,9 +13,14 @@ struct ZappSegmentedSelector: View {
         static let spacing: CGFloat = 2
         static let cellMinHeight: CGFloat = 20
         static let hitSlop: CGFloat = 12
+        static let logoHeight: CGFloat = 13
+        static let unselectedLogoOpacity: Double = 0.45
     }
 
     let options: [String]
+    /// A mark drawn in place of the label, keyed by index. The label stays as the accessibility
+    /// name, so a logo segment is still announced.
+    var logos: [Int: Image] = [:]
     let selectedIndex: Int
     let onSelect: (Int) -> Void
 
@@ -40,16 +45,27 @@ struct ZappSegmentedSelector: View {
         return Button {
             onSelect(index)
         } label: {
-            Text(option)
-                .zappFont(.caption, style: isSelected ? ZappColors.text : ZappColors.textMuted)
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: Constants.cellMinHeight)
-                .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
-                .padding(.vertical, Constants.hitSlop)
-                .contentShape(Rectangle())
-                .padding(.vertical, -Constants.hitSlop)
+            Group {
+                if let logo = logos[index] {
+                    logo
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: Constants.logoHeight)
+                        .opacity(isSelected ? 1 : Constants.unselectedLogoOpacity)
+                } else {
+                    Text(option)
+                        .zappFont(.caption, style: isSelected ? ZappColors.text : ZappColors.textMuted)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: Constants.cellMinHeight)
+            .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
+            .padding(.vertical, Constants.hitSlop)
+            .contentShape(Rectangle())
+            .padding(.vertical, -Constants.hitSlop)
         }
         .buttonStyle(.zappPress)
+        .accessibilityLabel(option)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }

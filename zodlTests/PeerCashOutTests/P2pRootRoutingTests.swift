@@ -75,14 +75,14 @@ struct P2pRootRoutingTests {
         }
     }
 
-    @Test func activityRecoveryOfframpReturnsToActivity() {
+    @Test func activityRefundOfframpReturnsToActivity() {
         withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
             var state = Root.State.initial
             state.path = .p2pActivity
 
-            reduce(&state, .p2pActivity(.delegate(.recoverScanAndPayOrder(orderID: "42"))))
+            reduce(&state, .p2pActivity(.delegate(.refundToZec)))
             #expect(state.path == .offramp)
             #expect(state.offrampOrigin == .activity)
 
@@ -91,7 +91,7 @@ struct P2pRootRoutingTests {
         }
     }
 
-    @Test func activityRecoveryDoesNotReplaceItsOriginatingOfframpState() {
+    @Test func activityRefundDoesNotReplaceItsOriginatingOfframpState() {
         withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
@@ -101,7 +101,7 @@ struct P2pRootRoutingTests {
             state.offrampState.selectedCurrencyCode = "INR"
 
             reduce(&state, .offramp(.delegate(.openActivity)))
-            reduce(&state, .p2pActivity(.delegate(.recoverScanAndPayOrder(orderID: "42"))))
+            reduce(&state, .p2pActivity(.delegate(.refundToZec)))
             reduce(&state, .offramp(.delegate(.close)))
             #expect(state.path == .p2pActivity)
 

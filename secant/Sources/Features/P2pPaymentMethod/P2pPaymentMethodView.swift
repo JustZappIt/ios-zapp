@@ -53,8 +53,9 @@ struct P2pPaymentMethodView: View {
     /// to expect, so it is the group they read rather than the one they scroll past.
     private var cashOutGroup: some View {
         ZappSettingsGroup(
-            title: String(localizable: .p2pPaymentMethodCashOutGroup),
-            titleLogo: Asset.Assets.Icons.providerPeer.image
+            title: "",
+            titleLogo: Asset.Assets.Icons.providerPeer.image,
+            titleLogoLabel: String(localizable: .p2pProviderPeer)
         ) {
             // Why the rails are dimmed, on the rows it applies to. The chip Android shows here is a
             // per-method liquidity flag, which is a different fact and would read as "not shipped".
@@ -70,7 +71,9 @@ struct P2pPaymentMethodView: View {
                 if index > 0 || unavailableReason != nil { ZappRowDivider(inset: false) }
                 selectableRow(
                     title: destination.displayName,
-                    subtitle: destination.defaultCurrencyCodes.joined(separator: ", "),
+                    // Every currency the rail takes, truncated by the row rather than pre-trimmed:
+                    // "and 8 more" tells the user less than the codes themselves do.
+                    subtitle: destination.currencyCodes.joined(separator: ", "),
                     logo: destination.logo,
                     rail: .peerCashOut(destinationCode: destination.code),
                     isEnabled: store.canSelectPeer
@@ -81,8 +84,9 @@ struct P2pPaymentMethodView: View {
 
     private var scanAndPayGroup: some View {
         ZappSettingsGroup(
-            title: String(localizable: .p2pPaymentMethodScanAndPayGroup),
-            titleLogo: Asset.Assets.Icons.providerP2pMe.image
+            title: "",
+            titleLogo: Asset.Assets.Icons.providerP2pMe.image,
+            titleLogoLabel: String(localizable: .p2pProviderP2pme)
         ) {
             if store.isScanAndPayLoading {
                 groupPlaceholder(String(localizable: .peerFormBalancePending))
@@ -130,6 +134,7 @@ struct P2pPaymentMethodView: View {
             title: title,
             subtitle: subtitle,
             logo: logo,
+            subtitleLineLimit: 1,
             isSelected: store.selected == rail,
             isEnabled: isEnabled
         ) {
@@ -157,7 +162,6 @@ struct P2pPaymentMethodView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(24)
         .zappInfoSheet { isInfoPresented = false }
     }
 

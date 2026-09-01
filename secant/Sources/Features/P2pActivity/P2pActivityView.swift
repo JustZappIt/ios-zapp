@@ -8,6 +8,8 @@ struct P2pActivityView: View {
 
     @Perception.Bindable var store: StoreOf<P2pActivity>
 
+    @State private var isInfoPresented = false
+
     private enum Layout {
         static let gutter: CGFloat = 14
         static let cardSpacing: CGFloat = 12
@@ -18,7 +20,11 @@ struct P2pActivityView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                ZappScreenHeader(title: String(localizable: .p2pActivityTitle))
+                ZappScreenHeader(title: String(localizable: .p2pActivityTitle)) {
+                    ZappInfoButton(
+                        accessibilityLabel: String(localizable: .p2pPaymentMethodInfoAccessibility)
+                    ) { isInfoPresented = true }
+                }
 
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: Layout.cardSpacing) {
@@ -27,6 +33,7 @@ struct P2pActivityView: View {
                         if store.showsFilters {
                             ZappSegmentedSelector(
                                 options: P2pActivity.State.Filter.allCases.map(\.label),
+                                logos: filterLogos,
                                 selectedIndex: selectedFilterIndex
                             ) { index in
                                 store.send(.filterTapped(P2pActivity.State.Filter.allCases[index]))
@@ -58,6 +65,7 @@ struct P2pActivityView: View {
                 ZappBottomActionBar(onBack: { store.send(.backTapped) })
             }
             .applyScreenBackground()
+            .sheet(isPresented: $isInfoPresented) { infoSheet }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
         }
@@ -72,18 +80,21 @@ struct P2pActivityView: View {
                     Text(String(localizable: .offrampHistoryBalance))
                         .zappFont(.eyebrow, style: ZappColors.textMuted)
 
-                    HStack(alignment: .center, spacing: 12) {
-                        Text(account.balanceDisplay.map { String(localizable: .peerUsdcAmount($0)) } ?? "—")
-                            .zappFont(.display, style: ZappColors.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(account.balanceDisplay.map { String(localizable: .peerUsdcAmount($0)) } ?? "—")
+                        .zappFont(.displaySecondary, style: ZappColors.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        if store.offersRefund {
-                            ZappCompactButton(title: String(localizable: .offrampHistoryRefund)) {
-                                store.send(.refundTapped)
-                            }
+                    if store.offersRefund {
+                        ZappCompactButton(
+                            title: String(localizable: .offrampHistoryRefund),
+                            variant: .primary
+                        ) {
+                            store.send(.refundTapped)
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 8)
                     }
 
                     if let notice = refundNotice {
@@ -91,8 +102,6 @@ struct P2pActivityView: View {
                             .zappFont(.caption, style: ZappColors.textMuted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    accountRow(account.address)
                 }
             }
         } else {
@@ -112,25 +121,38 @@ struct P2pActivityView: View {
         }
     }
 
-    private func accountRow(_ address: String) -> some View {
-        HStack(spacing: 8) {
-            Text(String(localizable: .p2pActivityBaseAddress))
-                .zappFont(.caption, style: ZappColors.textSubtle)
+    /// The account lives behind the header rather than in the card: it is reference material, not
+    /// something read on every visit.
+    private var infoSheet: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(String(localizable: .p2pPaymentMethodInfoTitle))
+                .zappFont(.sectionTitle, style: ZappColors.text)
 
-            Spacer(minLength: 8)
+            if let address = store.account?.address {
+                ZappBorderedCard {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(String(localizable: .p2pPaymentMethodInfoBaseLabel))
+                            .zappFont(.caption, style: ZappColors.textMuted)
 
-            Text(address)
-                .zappFont(.mono, style: ZappColors.text)
-                .lineLimit(1)
-                .truncationMode(.middle)
+                        HStack(spacing: 8) {
+                            Text(address)
+                                .zappFont(.mono, style: ZappColors.text)
+                                .lineLimit(2)
+                                .frame(maxWidth: .infinity, alignment: .leading)
 
-            ZappCopyIconButton(
-                isCopied: store.isAddressCopied,
-                accessibilityLabel: String(localizable: .offrampAccountCopy)
-            ) {
-                store.send(.copyAddressTapped)
+                            ZappCopyIconButton(
+                                isCopied: store.isAddressCopied,
+                                accessibilityLabel: String(localizable: .offrampAccountCopy)
+                            ) {
+                                store.send(.copyAddressTapped)
+                            }
+                        }
+                    }
+                }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .zappInfoSheet { isInfoPresented = false }
     }
 
     /// Why the refund is not on offer, when the balance itself is readable.
@@ -143,10 +165,10 @@ struct P2pActivityView: View {
     private func presentation(for entry: P2pActivityEntry) -> EntryPresentation {
         switch entry {
         case let .peerAttempt(run):
-            let rail = PeerDestination.displayName(for: run.destinationCode)
             return EntryPresentation(
+                providerLogo: Asset.Assets.Icons.providerPeer.image,
                 logo: PeerDestination.logo(for: run.destinationCode),
-                type: "\(String(localizable: .p2pActivityFilterPeer)) · \(rail)",
+                type: PeerDestination.displayName(for: run.destinationCode),
                 status: run.failure == nil
                     ? String(localizable: .p2pActivityAttemptInProgress)
                     : String(localizable: .peerProgressTitleFailed),
@@ -157,11 +179,11 @@ struct P2pActivityView: View {
             )
 
         case let .peerOrder(order):
-            let rail = order.destinationCode.map(PeerDestination.displayName(for:))
             return EntryPresentation(
+                providerLogo: Asset.Assets.Icons.providerPeer.image,
                 logo: order.destinationCode.flatMap(PeerDestination.logo(for:)),
-                type: rail.map { "\(String(localizable: .p2pActivityFilterPeer)) · \($0)" }
-                    ?? String(localizable: .p2pActivityFilterPeer),
+                type: order.destinationCode.map(PeerDestination.displayName(for:))
+                    ?? String(localizable: .p2pProviderPeer),
                 status: order.phase.label,
                 statusVariant: order.isFinished ? .muted : .accent,
                 amount: String(localizable: .peerUsdcAmount(order.gross.display)),
@@ -170,19 +192,16 @@ struct P2pActivityView: View {
             )
 
         case let .scanAndPay(item):
-            // Recovering an escrow sweeps the Base account, so it is withheld under the same
-            // conditions as a refund rather than offered and refused on the next screen.
-            let canRecover = item.canRecoverEscrow && store.offersEscrowRecovery
             return EntryPresentation(
-                logo: Asset.Assets.Icons.providerP2pMe.image,
+                providerLogo: Asset.Assets.Icons.providerP2pMe.image,
+                logo: nil,
                 type: item.type?.label ?? String(localizable: .p2pActivityFilterScanAndPay),
                 status: item.status.capitalized,
                 statusVariant: .muted,
                 amount: String(localizable: .peerUsdcAmount(item.usdcDisplay)),
                 secondary: "\(item.fiatDisplay) \(item.currencyCode)",
                 date: item.completedAt ?? item.cancelledAt ?? item.placedAt,
-                actionTitle: canRecover ? String(localizable: .p2pActivityRecover) : nil,
-                isTappable: canRecover
+                isTappable: false
             )
         }
     }
@@ -193,8 +212,8 @@ struct P2pActivityView: View {
         let content = ZappBorderedCard {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    if let logo = model.logo {
-                        logo
+                    ForEach(Array([model.providerLogo, model.logo].compactMap { $0 }.enumerated()), id: \.offset) { _, mark in
+                        mark
                             .resizable()
                             .scaledToFit()
                             .frame(height: Layout.logoHeight)
@@ -226,10 +245,6 @@ struct P2pActivityView: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
 
-                if let actionTitle = model.actionTitle {
-                    Text(actionTitle)
-                        .zappFont(.buttonSmall, style: ZappColors.accentText)
-                }
             }
         }
 
@@ -244,10 +259,26 @@ struct P2pActivityView: View {
     private var selectedFilterIndex: Int {
         P2pActivity.State.Filter.allCases.firstIndex(of: store.filter) ?? 0
     }
+
+    /// The provider segments carry their mark; "All" has none and keeps its label.
+    private var filterLogos: [Int: Image] {
+        var marks: [Int: Image] = [:]
+        for (index, filter) in P2pActivity.State.Filter.allCases.enumerated() {
+            switch filter {
+            case .all: continue
+            case .peer: marks[index] = Asset.Assets.Icons.providerPeer.image
+            case .scanAndPay: marks[index] = Asset.Assets.Icons.providerP2pMe.image
+            }
+        }
+        return marks
+    }
 }
 
 /// One row's rendering, so the card builder takes a model rather than nine arguments.
 private struct EntryPresentation {
+    /// The provider first, then the rail it settled on: a Revolut mark alone does not say which
+    /// product opened the order.
+    let providerLogo: Image?
     let logo: Image?
     let type: String
     let status: String
@@ -255,7 +286,6 @@ private struct EntryPresentation {
     let amount: String
     var secondary: String?
     var date: Date?
-    var actionTitle: String?
     var isTappable = true
 }
 

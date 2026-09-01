@@ -120,14 +120,6 @@ struct P2pActivity {
             return false
         }
 
-        /// Recovering a cancelled order's escrow sweeps the whole Base account exactly as a refund
-        /// does, so it is offered under exactly the same conditions. Ungated it lands on a progress
-        /// screen carrying the amount form's "you can offer up to" refusal instead.
-        var offersEscrowRecovery: Bool {
-            guard case .ready(_, committed: .zero) = spendable else { return false }
-            return true
-        }
-
         /// An outage is not an empty financial history. Both sources must have answered
         /// successfully before the screen can conclude there is no activity.
         var showsEmptyHistory: Bool {
@@ -164,7 +156,6 @@ struct P2pActivity {
             case close
             case openPeerAttempt(attemptID: String, destinationCode: String)
             case openPeerOrder(depositID: String, destinationCode: String?)
-            case recoverScanAndPayOrder(orderID: String)
             case refundToZec
         }
     }
@@ -312,9 +303,10 @@ struct P2pActivity {
                         depositID: order.depositID,
                         destinationCode: order.destinationCode
                     )))
-                case let .scanAndPay(item):
-                    guard item.canRecoverEscrow, state.offersEscrowRecovery else { return .none }
-                    return .send(.delegate(.recoverScanAndPayOrder(orderID: item.id)))
+                // A finished p2p.me order has nothing to open and nothing to undo: cancelling
+                // already returned its USDC to Base, which the balance card's refund moves.
+                case .scanAndPay:
+                    return .none
                 }
 
             case .refundTapped:
@@ -370,11 +362,13 @@ extension P2pActivity.State.Filter {
         }
     }
 
+    /// Named for the provider, not the action, so the two rails read the same way here as they do
+    /// in payment method and on Android.
     var label: String {
         switch self {
         case .all: return String(localizable: .p2pActivityFilterAll)
-        case .peer: return String(localizable: .p2pActivityFilterPeer)
-        case .scanAndPay: return String(localizable: .p2pActivityFilterScanAndPay)
+        case .peer: return String(localizable: .p2pProviderPeer)
+        case .scanAndPay: return String(localizable: .p2pProviderP2pme)
         }
     }
 }

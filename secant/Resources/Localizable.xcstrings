@@ -34114,13 +34114,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offer at least %@ USDC — smaller orders are hidden from buyers."
+            "value" : "Offer at least %@ USDC."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ofrece al menos %@ USDC: las órdenes más pequeñas quedan ocultas para los compradores."
+            "value" : "Ofrece al menos %@ USDC."
           }
         }
       }
@@ -35362,6 +35362,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu cuenta de Base es %@."
+          }
+        }
+      }
+    },
+    "p2p.provider.peer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer"
+          }
+        }
+      }
+    },
+    "p2p.provider.p2pme" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p2p.me"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "p2p.me"
           }
         }
       }

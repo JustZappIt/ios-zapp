@@ -17,6 +17,7 @@ struct ZappRow<Trailing: View>: View {
     var iconBackground: ZappColors = .surfaceAlt
     /// Drawn in its own colours, unlike `icon`, which takes the row's tint.
     var logo: Image?
+    var subtitleLineLimit = 2
     var titleColor: ZappColors = .text
     var action: (() -> Void)?
 
@@ -31,6 +32,7 @@ struct ZappRow<Trailing: View>: View {
         iconTint: ZappColors = .text,
         iconBackground: ZappColors = .surfaceAlt,
         logo: Image? = nil,
+        subtitleLineLimit: Int = 2,
         titleColor: ZappColors = .text,
         @ViewBuilder trailing: () -> Trailing,
         action: (() -> Void)? = nil
@@ -41,6 +43,7 @@ struct ZappRow<Trailing: View>: View {
         self.iconTint = iconTint
         self.iconBackground = iconBackground
         self.logo = logo
+        self.subtitleLineLimit = subtitleLineLimit
         self.titleColor = titleColor
         self.action = action
         self.trailing = trailing()
@@ -77,7 +80,8 @@ struct ZappRow<Trailing: View>: View {
                 if let subtitle {
                     Text(subtitle)
                         .zappFont(.rowSubtitle, style: ZappColors.textMuted)
-                        .lineLimit(2)
+                        .lineLimit(subtitleLineLimit)
+                        .truncationMode(.tail)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -152,6 +156,7 @@ struct ZappSelectionRow: View {
     var logo: Image?
     /// Stands in for the check on a rail that cannot be picked yet.
     var trailingChip: String?
+    var subtitleLineLimit = 2
     let isSelected: Bool
     var isEnabled = true
     let action: () -> Void
@@ -161,6 +166,7 @@ struct ZappSelectionRow: View {
             title: title,
             subtitle: subtitle,
             logo: logo,
+            subtitleLineLimit: subtitleLineLimit,
             titleColor: titleColor,
             trailing: {
                 if let trailingChip {

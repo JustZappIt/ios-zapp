@@ -216,7 +216,6 @@ struct PeerCashOutFormView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(24)
         .zappInfoSheet { isInfoPresented = false }
     }
 

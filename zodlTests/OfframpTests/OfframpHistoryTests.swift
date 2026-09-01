@@ -21,12 +21,6 @@ struct OfframpHistoryTests {
         #expect(history(orderType: "FUTURE_TYPE").type == nil)
     }
 
-    @Test func cancelledBuyNeverOffersEscrowRecovery() {
-        #expect(!history(orderType: "BUY").canRecoverEscrow)
-        #expect(history(orderType: "PAY").canRecoverEscrow)
-        #expect(history(orderType: "SELL").canRecoverEscrow)
-    }
-
     @Test func custodialBuyWithoutCounterpartyHandleRemainsRenderable() {
         let item = history(orderType: "BUY", paymentAddress: nil)
 

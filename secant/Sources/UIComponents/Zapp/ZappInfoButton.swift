@@ -29,12 +29,17 @@ extension View {
     /// Scrolls, and offers `.large`: explainer copy grows with translation and with Dynamic Type,
     /// and a fixed-height sheet clips it exactly the way the pinned-to-the-page version did.
     func zappInfoSheet(onDismiss: @escaping () -> Void) -> some View {
-        VStack(spacing: 0) {
-            ScrollView { self }
+        ScrollView {
+            VStack(spacing: 20) {
+                self
 
-            ZappButton(title: String(localizable: .peerFormInfoDismiss), action: onDismiss)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                // In the flow rather than pinned to the sheet: pinning leaves a band of empty
+                // space under short copy, which is most of these sheets.
+                ZappButton(title: String(localizable: .peerFormInfoDismiss), action: onDismiss)
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 32)
         }
         .applyScreenBackground()
         .presentationDetents([.medium, .large])

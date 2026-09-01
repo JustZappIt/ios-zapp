@@ -72,7 +72,6 @@ struct OfframpHistoryModel: Equatable, Identifiable, Sendable {
     let fixedFeeMicros: String?
 
     var type: OfframpHistoryOrderType? { OfframpHistoryOrderType(rawValue: orderType.uppercased()) }
-    var canRecoverEscrow: Bool { status.uppercased() == "CANCELLED" && type != .buy }
 }
 
 enum OfframpHistoryOrderType: String, Equatable, Sendable {

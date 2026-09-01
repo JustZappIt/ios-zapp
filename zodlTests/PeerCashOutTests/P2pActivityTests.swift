@@ -101,20 +101,6 @@ struct P2pActivityTests {
         #expect(store.state.offersRefund)
     }
 
-    /// Recovering an escrow sweeps the Base account exactly as a refund does, so an unfinished
-    /// cash-out blocks it too — otherwise it lands on a progress screen showing the amount form's
-    /// "you can offer up to" refusal.
-    @MainActor
-    @Test func escrowRecoveryIsWithheldWhileACashOutHoldsUnescrowedFunds() async {
-        var state = P2pActivity.State.initial
-        state.spendable = .ready(balance: usdc("20000000"), committed: usdc("20000000"))
-        let entry = P2pActivityEntry.scanAndPay(history(id: "a", at: 100, status: "CANCELLED"))
-        let store = TestStore(initialState: state) { P2pActivity() }
-
-        #expect(!store.state.offersEscrowRecovery)
-        await store.send(.entryTapped(entry))
-    }
-
     /// A refund and a Peer `createDeposit` that has not landed would spend the same Base USDC, so
     /// the action is withheld with a reason rather than failing after the user commits to it.
     @Test func refundIsBlockedWhileACashOutStillHoldsUnescrowedFunds() {
@@ -204,15 +190,15 @@ struct P2pActivityTests {
         #expect(!state.showsFilters)
     }
 
-    /// The p2p.me recovery action stays in the off-ramp, which already owns its progress stream.
-    @Test func aRecoverableScanAndPayOrderRoutesIntoTheOffRamp() async {
+    /// Cancelling already returned the order's USDC to Base, so there is no per-order recovery to
+    /// offer — moving that balance to ZEC is the balance card's refund.
+    @Test func aCancelledScanAndPayOrderDoesNotNavigate() async {
         var state = P2pActivity.State.initial
         state.spendable = .ready(balance: usdc("20000000"), committed: .zero)
         let entry = P2pActivityEntry.scanAndPay(history(id: "a", at: 100, status: "CANCELLED"))
         let store = await TestStore(initialState: state) { P2pActivity() }
 
         await store.send(.entryTapped(entry))
-        await store.receive(\.delegate.recoverScanAndPayOrder)
     }
 
     @Test func acompletedScanAndPayOrderHasNothingToRecoverAndDoesNotNavigate() async {
