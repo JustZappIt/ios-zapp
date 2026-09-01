@@ -154,8 +154,6 @@ struct ZappSelectionRow: View {
     let title: String
     var subtitle: String?
     var logo: Image?
-    /// Stands in for the check on a rail that cannot be picked yet.
-    var trailingChip: String?
     var subtitleLineLimit = 2
     let isSelected: Bool
     var isEnabled = true
@@ -169,9 +167,7 @@ struct ZappSelectionRow: View {
             subtitleLineLimit: subtitleLineLimit,
             titleColor: titleColor,
             trailing: {
-                if let trailingChip {
-                    ZappStatusChip(text: trailingChip, variant: .muted)
-                } else if isEnabled && isSelected {
+                if isEnabled && isSelected {
                     Asset.Assets.Icons.checkSolid.image
                         .zImage(
                             width: ZappRowConstants.trailingIconSize,
