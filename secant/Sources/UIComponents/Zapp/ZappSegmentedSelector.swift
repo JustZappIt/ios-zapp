@@ -13,8 +13,9 @@ struct ZappSegmentedSelector: View {
         static let spacing: CGFloat = 2
         static let cellMinHeight: CGFloat = 20
         static let hitSlop: CGFloat = 12
-        static let logoHeight: CGFloat = 13
-        static let unselectedLogoOpacity: Double = 0.45
+        static let logoHeight: CGFloat = 16
+        /// Desaturated rather than faded: a yellow wordmark at low alpha on white disappears.
+        static let unselectedLogoOpacity: Double = 0.75
     }
 
     let options: [String]
@@ -51,6 +52,7 @@ struct ZappSegmentedSelector: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: Constants.logoHeight)
+                        .grayscale(isSelected ? 0 : 1)
                         .opacity(isSelected ? 1 : Constants.unselectedLogoOpacity)
                 } else {
                     Text(option)

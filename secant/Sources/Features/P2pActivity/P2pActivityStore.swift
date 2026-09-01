@@ -73,6 +73,9 @@ struct P2pActivity {
         var spendable: PeerSpendableBalance = .loading
         var isPeerAvailable = false
         var isLoading = false
+        /// Tracked separately: the account RPC and the two history reads finish in any order, and
+        /// without this the card calls the balance unavailable while the read is still in flight.
+        var isAccountLoading = false
         var isAddressCopied = false
         var errorMessage: String?
         var peerSource = SourceLoadState.idle
@@ -179,6 +182,7 @@ struct P2pActivity {
             switch action {
             case .onAppear:
                 state.isLoading = state.entries.isEmpty
+                state.isAccountLoading = true
                 state.errorMessage = nil
                 state.peerSource = .loading
                 state.scanAndPaySource = .loading
@@ -219,6 +223,7 @@ struct P2pActivity {
 
             case let .accountLoaded(account):
                 state.account = account
+                state.isAccountLoading = false
                 return .none
 
             case let .peerLoaded(orders, isAvailable):

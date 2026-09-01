@@ -191,6 +191,9 @@ struct P2pPaymentMethodView: View {
     /// The account reason first: it is the more specific of the two and the only one the user can
     /// act on.
     private var unavailableReason: String? {
+        // Nothing is known until the capability read lands, and `isPeerAvailable` starts false —
+        // so without this the screen opens by announcing that cash-out does not exist here.
+        guard !store.isPeerLoading else { return nil }
         if !store.isSoftwareWallet {
             return String(localizable: .p2pPaymentMethodPeerHardwareWallet)
         }

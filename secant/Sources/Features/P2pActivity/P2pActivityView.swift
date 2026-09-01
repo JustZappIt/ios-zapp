@@ -106,7 +106,7 @@ struct P2pActivityView: View {
             }
         } else {
             ZappBorderedCard {
-                if store.isLoading {
+                if store.isAccountLoading {
                     ProgressView()
                         .tint(ZappColors.accent.color(colorScheme))
                         .frame(maxWidth: .infinity)
@@ -168,7 +168,9 @@ struct P2pActivityView: View {
             return EntryPresentation(
                 providerLogo: Asset.Assets.Icons.providerPeer.image,
                 logo: PeerDestination.logo(for: run.destinationCode),
-                type: PeerDestination.displayName(for: run.destinationCode),
+                type: String(localizable: .p2pActivityTypeCashOut(
+                    PeerDestination.displayName(for: run.destinationCode)
+                )),
                 status: run.failure == nil
                     ? String(localizable: .p2pActivityAttemptInProgress)
                     : String(localizable: .peerProgressTitleFailed),
@@ -182,8 +184,9 @@ struct P2pActivityView: View {
             return EntryPresentation(
                 providerLogo: Asset.Assets.Icons.providerPeer.image,
                 logo: order.destinationCode.flatMap(PeerDestination.logo(for:)),
-                type: order.destinationCode.map(PeerDestination.displayName(for:))
-                    ?? String(localizable: .p2pProviderPeer),
+                type: order.destinationCode
+                    .map { String(localizable: .p2pActivityTypeCashOut(PeerDestination.displayName(for: $0))) }
+                    ?? String(localizable: .p2pActivityTypeCashOutUnknownRail),
                 status: order.phase.label,
                 statusVariant: order.isFinished ? .muted : .accent,
                 amount: String(localizable: .peerUsdcAmount(order.gross.display)),
@@ -212,12 +215,13 @@ struct P2pActivityView: View {
         let content = ZappBorderedCard {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
+                    // Full opacity: the Peer wordmark runs to #FFE600, which on a white surface is
+                    // already near the floor of legibility without dimming it further.
                     ForEach(Array([model.providerLogo, model.logo].compactMap { $0 }.enumerated()), id: \.offset) { _, mark in
                         mark
                             .resizable()
                             .scaledToFit()
                             .frame(height: Layout.logoHeight)
-                            .opacity(Layout.logoOpacity)
                     }
 
                     Text(model.type)

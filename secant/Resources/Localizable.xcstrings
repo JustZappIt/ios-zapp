@@ -35349,6 +35349,40 @@
         }
       }
     },
+    "p2p.activity.type.cash.out" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash out · %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro · %@"
+          }
+        }
+      }
+    },
+    "p2p.activity.type.cash.out.unknown.rail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash out"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro"
+          }
+        }
+      }
+    },
     "p2p.activity.title" : {
       "extractionState" : "manual",
       "localizations" : {
