@@ -240,6 +240,9 @@ struct Root {
         /// The explicit "delete anyway" override for the gift reset guard. The screen's warning
         /// is UX; the use-case refusal is the invariant, and only this flag lifts it.
         var allowGiftDataLoss = false
+        /// Set once the guard has actually run and passed for this attempt, so the backstop on
+        /// `.resetZashi` does not re-read the store for a request that already cleared it.
+        var hasClearedGiftResetGuard = false
         var giftCardState = GiftCard.State()
         var giftCardListState = GiftCardList.State()
         var giftClaimState = GiftClaim.State()
@@ -457,6 +460,7 @@ struct Root {
         case giftResumePendingClaim
         case giftClaimResumed(String)
         case giftResetBlocked(Bool)
+        case giftResetGuardCleared
         case giftResetGuardPassed
         case giftResetGuardReviewTapped
         case giftResetGuardDeleteAnywayTapped(Bool)
@@ -1060,6 +1064,25 @@ extension AlertState where Action == Root.Action {
             ButtonState(action: .giftResetGuardReviewTapped) {
                 TextState(String(localizable: .deleteWalletGiftCardsReview))
             }
+            ButtonState(role: .destructive, action: .giftResetGuardDeleteAnywayTapped(areMetadataPreserved)) {
+                TextState(String(localizable: .deleteWalletGiftCardsDeleteAnyway))
+            }
+            ButtonState(role: .cancel, action: .initialization(.resetZashiRequestCanceled)) {
+                TextState(String(localizable: .giftCardRetryCancel))
+            }
+        } message: {
+            TextState(String(localizable: .deleteWalletGiftCardsMessage))
+        }
+    }
+
+    /// The same refusal, minus Review, for the destructive paths that can raise it from outside
+    /// the home destination — a failed initialization, or onboarding meeting an existing wallet.
+    /// The deck renders inside `.home`, so offering Review there would dismiss the alert and go
+    /// nowhere; the refusal itself is what has to hold.
+    static func unsettledGiftsWithoutReview(_ areMetadataPreserved: Bool) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .deleteWalletGiftCardsTitle))
+        } actions: {
             ButtonState(role: .destructive, action: .giftResetGuardDeleteAnywayTapped(areMetadataPreserved)) {
                 TextState(String(localizable: .deleteWalletGiftCardsDeleteAnyway))
             }

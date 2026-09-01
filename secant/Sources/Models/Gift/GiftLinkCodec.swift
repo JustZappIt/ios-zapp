@@ -179,7 +179,14 @@ enum GiftLinkCodec {
         let normalized = payload.normalized()
         try validateShape(normalized)
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
+        // `.sortedKeys` is load-bearing, not tidiness. `JSONEncoder` does not otherwise promise a
+        // key order, so the same card could encode to two different links within one process —
+        // both valid and both decoding identically, but not the same string. A card whose link is
+        // rebuilt from storage on every share must hand out the same one every time, and anything
+        // that compares links as text would stop recognising its own. Key order is not part of the
+        // wire contract: JSON objects are unordered and Android's decode is a key-set check, so
+        // cross-platform fixtures have to compare decoded payloads rather than bytes.
+        encoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
         let body = base64URLEncode(try encoder.encode(normalized))
         return "\(scheme)://\(giftLinkHost)\(linkPath)#\(fragmentPrefix)\(body)"
     }

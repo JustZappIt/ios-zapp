@@ -74,9 +74,10 @@ struct CheckGiftCardClaimed {
                 return .unknown
             }
         }
-        if holdings.isEmpty && !holdings.hasFundingArrived {
-            // Deliberately not recorded via recordChecked: that field claims the card still held
-            // its funds, and here nothing has arrived yet.
+        if holdings.isEmpty {
+            // Deliberately not recorded via recordChecked: that field asserts the card still held
+            // its funds, and an empty wallet is the one reading that cannot support it — whether
+            // the funding never arrived or a claim already moved it out.
             return .fundingPending
         }
         try? await giftCardStorage.recordChecked(cardId, GiftLinkCodec.instantString(from: date.now()))

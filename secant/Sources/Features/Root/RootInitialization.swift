@@ -1409,6 +1409,7 @@ extension Root {
                 }
 
             case .giftResetGuardPassed:
+                state.hasClearedGiftResetGuard = true
                 return .merge(
                     .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
@@ -1422,7 +1423,12 @@ extension Root {
                 )
 
             case .giftResetBlocked(let areMetadataPreserved):
-                state.alert = AlertState.unsettledGifts(areMetadataPreserved)
+                // Review pushes onto the home path stack, which only renders under the `.home`
+                // destination. The alerts that reach the wipe from onboarding or a failed init
+                // get the variant without it rather than a button that dismisses and does nothing.
+                state.alert = state.destinationState.destination == .home
+                    ? AlertState.unsettledGifts(areMetadataPreserved)
+                    : AlertState.unsettledGiftsWithoutReview(areMetadataPreserved)
                 return .none
 
             case .giftResetGuardReviewTapped:
@@ -1445,6 +1451,7 @@ extension Root {
             case .initialization(.resetZashiRequestCanceled):
                 state.alert = nil
                 state.allowGiftDataLoss = false
+                state.hasClearedGiftResetGuard = false
                 for (id, element) in zip(state.settingsState.path.ids, state.settingsState.path) {
                     if element.is(\.resetZashi) {
                         return .send(.settings(.path(.element(id: id, action: .resetZashi(.deleteCanceled)))))
@@ -1452,7 +1459,28 @@ extension Root {
                 }
                 return .none
 
+            case .giftResetGuardCleared:
+                state.hasClearedGiftResetGuard = true
+                return .send(.initialization(.resetZashi))
+
             case .initialization(.resetZashi):
+                // The guard belongs on the use path, not on one screen's action: this wipe
+                // deletes the only copy of every unshared card's bearer seed, and there is no
+                // reclaim. `.resetZashiRequest` refuses earlier so the teardown below never
+                // starts, but `walletStateFailed`, `differentSeed` and `existingWallet` dispatch
+                // this action directly, and a guard that covers one destructive path and not
+                // another is the same bug with extra steps.
+                guard state.hasClearedGiftResetGuard || state.allowGiftDataLoss else {
+                    return .run { [areMetadataPreserved = state.areMetadataPreserved] send in
+                        do {
+                            try await EnsureNoUnsharedGiftFunds()()
+                        } catch {
+                            await send(.giftResetBlocked(areMetadataPreserved))
+                            return
+                        }
+                        await send(.giftResetGuardCleared)
+                    }
+                }
                 guard let wipePublisher = sdkSynchronizer.wipe() else {
                     return .send(.resetZashiSDKFailed)
                 }
@@ -1658,6 +1686,10 @@ extension Root {
                     )
                 }
                 state.maxResetZashiSDKAttempts = ResetZashiConstants.maxResetZashiSDKAttempts
+                // The attempt is over, so both overrides expire with it. Left set, a "delete
+                // anyway" that then failed would silently wave the next reset past the guard.
+                state.allowGiftDataLoss = false
+                state.hasClearedGiftResetGuard = false
                 for element in state.settingsState.path {
                     if case .resetZashi(var resetZashiState) = element {
                         resetZashiState.isProcessing = false

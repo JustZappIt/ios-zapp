@@ -218,12 +218,23 @@ struct FundGiftCard {
         let spendingKey: UnifiedSpendingKey
         do {
             let accounts = try await sdkSynchronizer.walletAccounts()
-            let owner = accounts.first { $0.id.giftStorageKey == current.sourceAccountUuid }
+            // Refuse rather than guess, on both halves. Falling back to account 0 would sign the
+            // funding transaction with a key the proposal was not built against — and the card
+            // records which account owns it precisely so a retry cannot drift to another one. A
+            // missing `zip32AccountIndex` is an account with no locally derivable key at all,
+            // which is the hardware wallet `CreateGiftCard` already refuses to mint for. Both
+            // checks sit before the durable marker, so refusing here stays safe to retry.
+            guard
+                let owner = accounts.first(where: { $0.id.giftStorageKey == current.sourceAccountUuid }),
+                let accountIndex = owner.zip32AccountIndex
+            else {
+                throw GiftFundingError.proposalFailed
+            }
             let storedWallet = try walletStorage.exportWallet()
             let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
             spendingKey = try derivationTool.deriveSpendingKey(
                 seedBytes,
-                owner?.zip32AccountIndex ?? Zip32AccountIndex(0),
+                accountIndex,
                 zcashSDKEnvironment.network().networkType
             )
         } catch {

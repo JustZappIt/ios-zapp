@@ -195,13 +195,16 @@ private struct GiftClaimEngine {
                 memo: nil
             )
         } catch {
-            // Detected by pre-arithmetic, never by error-string matching: the amount is there but
-            // the fee cannot be covered on top of it. Waiting does not fix a short card, so this
-            // must not schedule the wait-and-recheck path.
-            if available >= requested {
-                return .underfunded(available: available)
+            // Classified by arithmetic rather than by error-string matching, but the test has to
+            // be one a healthy card can pass: `available >= requested` is already guaranteed by
+            // the checks above, so testing that would report every proposal failure — a dropped
+            // connection included — as a permanently short card, and `underfunded` is the one
+            // outcome that deliberately offers no re-check. The real condition is the documented
+            // one: the amount is on the card and the fee on top of it is not.
+            guard available.amount - requested.amount < FundGiftCard.claimFeeReserve.amount else {
+                throw error
             }
-            throw error
+            return .underfunded(available: available)
         }
 
         // Spendable top-ups go to the recipient; only fee-reserve dust may be abandoned.

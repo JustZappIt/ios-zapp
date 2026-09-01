@@ -143,29 +143,12 @@ struct GiftCardList {
         case confirmWatch
     }
 
-    /// Held outside `State`: the quote carries the card's mnemonic, and only the confirm action
-    /// needs it back.
-    private final class RetryBox: @unchecked Sendable {
-        private let lock = NSLock()
-        private var quote: GiftFundingQuote?
-
-        func put(_ quote: GiftFundingQuote?) {
-            lock.lock()
-            defer { lock.unlock() }
-            self.quote = quote
-        }
-
-        func take() -> GiftFundingQuote? {
-            lock.lock()
-            defer { lock.unlock() }
-            return quote
-        }
-    }
-
-    private let retryBox = RetryBox()
-
     @Dependency(\.date) var date
     @Dependency(\.giftCardStorage) var giftCardStorage
+    /// The priced quote, held outside `State` because it carries the card's mnemonic. A
+    /// dependency and not a property on this reducer: `Root.body` is recomputed per action, so a
+    /// stored box would be a new one by the time confirm arrives.
+    @Dependency(\.giftRetryQuote) var retryBox
     @Dependency(\.localAuthentication) var localAuthentication
     @Dependency(\.pasteboard) var pasteboard
 

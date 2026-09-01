@@ -76,6 +76,17 @@ extension Root {
                 return .none
 
             case .giftLinkReceived(let raw):
+                // A claim already on screen is never interrupted, the same rule
+                // `.giftResumePendingClaim` holds. Its scan is still running and its effects
+                // still land on `giftClaimState`, so replacing that state would show one card's
+                // result under another card's identity — and because the destination never
+                // changes, the view's `onDisappear` teardown never fires, leaving the first link
+                // leased in the intake store with nothing able to release it.
+                //
+                // The link is deliberately not consumed here: leaving it untouched means tapping
+                // it again once this claim closes works normally. Android stacks a second route
+                // instead, which a single claim destination cannot do without a claim stack.
+                guard state.destinationState.destination != .giftClaim else { return .none }
                 switch pendingGiftLinks.put(raw) {
                 case .accepted(let token):
                     state.giftClaimState = GiftClaim.State(token: token)

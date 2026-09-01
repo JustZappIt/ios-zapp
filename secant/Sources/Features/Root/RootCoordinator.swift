@@ -869,7 +869,12 @@ extension Root {
                 return .none
 
             case .giftClaim(.delegate(.dismiss)):
-                return .send(.destination(.updateDestination(.home)))
+                // The claim screen opens without a wallet — that is what its needs-wallet stage
+                // is for — and home over an uninitialized wallet is tab chrome with no route
+                // back until the next foreground happens to re-run initialization.
+                let hasWallet = state.appInitializationState != .keysMissing
+                    && state.appInitializationState != .uninitialized
+                return .send(.destination(.updateDestination(hasWallet ? .home : .onboarding)))
 
             case .giftClaim(.delegate(.routeToOnboarding)):
                 return .send(.destination(.updateDestination(.onboarding)))
