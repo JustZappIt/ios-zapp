@@ -56,11 +56,21 @@ struct P2pPaymentMethodView: View {
             title: String(localizable: .p2pPaymentMethodCashOutGroup),
             titleLogo: Asset.Assets.Icons.providerPeer.image
         ) {
+            // Why the rails are dimmed, on the rows it applies to. The chip Android shows here is a
+            // per-method liquidity flag, which is a different fact and would read as "not shipped".
+            if let reason = unavailableReason {
+                groupNote(reason)
+            }
+
+            if store.isPeerLoading {
+                groupPlaceholder(String(localizable: .peerFormBalancePending))
+            }
+
             ForEach(Array(store.destinations.enumerated()), id: \.element.id) { index, destination in
-                if index > 0 { ZappRowDivider(inset: true) }
+                if index > 0 || unavailableReason != nil { ZappRowDivider(inset: false) }
                 selectableRow(
                     title: destination.displayName,
-                    subtitle: destination.currencyCodes.joined(separator: " · "),
+                    subtitle: destination.defaultCurrencyCodes.joined(separator: ", "),
                     logo: destination.logo,
                     rail: .peerCashOut(destinationCode: destination.code),
                     isEnabled: store.canSelectPeer
@@ -74,8 +84,12 @@ struct P2pPaymentMethodView: View {
             title: String(localizable: .p2pPaymentMethodScanAndPayGroup),
             titleLogo: Asset.Assets.Icons.providerP2pMe.image
         ) {
+            if store.isScanAndPayLoading {
+                groupPlaceholder(String(localizable: .peerFormBalancePending))
+            }
+
             ForEach(Array(store.corridors.enumerated()), id: \.element.id) { index, corridor in
-                if index > 0 { ZappRowDivider(inset: true) }
+                if index > 0 { ZappRowDivider(inset: false) }
                 selectableRow(
                     title: "\(corridor.flag) \(corridor.countryName)",
                     subtitle: "\(corridor.paymentRail) · \(corridor.currencyCode)",
@@ -84,6 +98,25 @@ struct P2pPaymentMethodView: View {
                 )
             }
         }
+    }
+
+    /// A group with no rows still draws its border, so an empty one has to say why it is empty.
+    private func groupPlaceholder(_ text: String) -> some View {
+        Text(text)
+            .zappFont(.caption, style: ZappColors.textMuted)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 14)
+    }
+
+    private func groupNote(_ text: String) -> some View {
+        Text(text)
+            .zappFont(.caption, style: ZappColors.accentText)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .background(ZappColors.accentSoft.color(colorScheme))
     }
 
     private func selectableRow(
@@ -97,7 +130,6 @@ struct P2pPaymentMethodView: View {
             title: title,
             subtitle: subtitle,
             logo: logo,
-            trailingChip: isEnabled ? nil : String(localizable: .p2pPaymentMethodComingSoon),
             isSelected: store.selected == rail,
             isEnabled: isEnabled
         ) {
@@ -120,29 +152,13 @@ struct P2pPaymentMethodView: View {
                 .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if !store.canSelectPeer, let note = unavailableReason {
-                Text(note)
-                    .zappFont(.caption, style: ZappColors.accentText)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(10)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(ZappColors.accentSoft.color(colorScheme))
-            }
-
             if let address = store.baseAddress {
                 baseAddressCard(address)
-            }
-
-            Spacer()
-
-            ZappButton(title: String(localizable: .peerFormInfoDismiss)) {
-                isInfoPresented = false
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(24)
-        .applyScreenBackground()
-        .presentationDetents([.medium, .large])
+        .zappInfoSheet { isInfoPresented = false }
     }
 
     private func baseAddressCard(_ address: String) -> some View {

@@ -154,11 +154,13 @@ struct P2pPaymentMethod {
                 state.selected = rail
                 return .none
 
+            // Saving leaves, as `onSaveClick` does on Android. Staying put with a greyed-out button
+            // gives the tap no visible outcome.
             case .saveTapped:
                 guard state.canSave else { return .none }
                 userStoredPreferences.setP2pRail(state.selected)
                 state.saved = state.selected
-                return .none
+                return .send(.delegate(.close))
 
             case .copyAddressTapped:
                 guard let address = state.baseAddress else { return .none }

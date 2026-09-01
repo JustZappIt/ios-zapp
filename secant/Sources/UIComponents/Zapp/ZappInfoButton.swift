@@ -25,6 +25,22 @@ struct ZappInfoButton: View {
     }
 }
 
+extension View {
+    /// Scrolls, and offers `.large`: explainer copy grows with translation and with Dynamic Type,
+    /// and a fixed-height sheet clips it exactly the way the pinned-to-the-page version did.
+    func zappInfoSheet(onDismiss: @escaping () -> Void) -> some View {
+        VStack(spacing: 0) {
+            ScrollView { self }
+
+            ZappButton(title: String(localizable: .peerFormInfoDismiss), action: onDismiss)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+        }
+        .applyScreenBackground()
+        .presentationDetents([.medium, .large])
+    }
+}
+
 #Preview {
     ZappScreenHeader(title: "Payment method") {
         ZappInfoButton(accessibilityLabel: "How this works") { }

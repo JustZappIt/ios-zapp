@@ -214,21 +214,10 @@ struct PeerCashOutFormView: View {
             Text(String(localizable: .peerFormTerms))
                 .zappFont(.body, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
-
-            Text(String(localizable: .peerFormRateDisclosure))
-                .zappFont(.body, style: ZappColors.textMuted)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer()
-
-            ZappButton(title: String(localizable: .peerFormInfoDismiss)) {
-                isInfoPresented = false
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(24)
-        .applyScreenBackground()
-        .presentationDetents([.medium])
+        .zappInfoSheet { isInfoPresented = false }
     }
 
     private var topUpButton: some View {

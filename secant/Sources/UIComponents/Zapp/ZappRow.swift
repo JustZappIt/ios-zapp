@@ -103,7 +103,8 @@ private enum ZappRowConstants {
     static let logoHeight: CGFloat = 20
     static let trailingIconSize: CGFloat = 18
     static let dividerHeight: CGFloat = 1
-    /// Clears the icon box and the gap after it, so an inset divider starts under the title.
+    /// Clears the icon box and the gap after it, so an inset divider starts under the title. Rows
+    /// with a logo or no leading element start their title further left and want `inset: false`.
     static let dividerInsetLeading: CGFloat = 68
 }
 

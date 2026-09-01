@@ -75,6 +75,8 @@ struct P2pActivityView: View {
                     HStack(alignment: .center, spacing: 12) {
                         Text(account.balanceDisplay.map { String(localizable: .peerUsdcAmount($0)) } ?? "—")
                             .zappFont(.display, style: ZappColors.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         if store.offersRefund {
@@ -93,11 +95,19 @@ struct P2pActivityView: View {
                     accountRow(account.address)
                 }
             }
-        } else if store.isLoading {
+        } else {
             ZappBorderedCard {
-                ProgressView()
-                    .tint(ZappColors.accent.color(colorScheme))
-                    .frame(maxWidth: .infinity)
+                if store.isLoading {
+                    ProgressView()
+                        .tint(ZappColors.accent.color(colorScheme))
+                        .frame(maxWidth: .infinity)
+                } else {
+                    // An unreadable account is said out loud. Dropping the card takes the address
+                    // and the refund control off screen with nothing explaining their absence.
+                    Text(String(localizable: .offrampHistoryBalanceUnavailable))
+                        .zappFont(.body, style: ZappColors.danger)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
         }
     }
