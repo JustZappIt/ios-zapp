@@ -55,7 +55,6 @@ struct ZappTabs {
         case chatContactsTapped
         case chatProfileTapped
         case chooseServerTapped
-        case giftCardListTapped
         case localCurrencyTapped
         case onlineStatusTapped
         case portfolioChartTapped
@@ -82,7 +81,7 @@ struct ZappTabs {
                 return .none
 
             case .allSettingsTapped, .appLockTapped, .chatContactsTapped, .chatProfileTapped, .chooseServerTapped,
-            .giftCardListTapped, .localCurrencyTapped, .onlineStatusTapped, .p2pPaymentMethodTapped, .p2pTransactionsTapped,
+            .localCurrencyTapped, .onlineStatusTapped, .p2pPaymentMethodTapped, .p2pTransactionsTapped,
             .portfolioChartTapped, .readReceiptsTapped, .torTapped:
                 return .none
             }

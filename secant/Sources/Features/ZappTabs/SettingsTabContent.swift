@@ -163,18 +163,6 @@ struct SettingsTabContent: View {
 
                         ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
                             ZappRow(
-                                title: String(localizable: .settingsGiftCards),
-                                subtitle: String(localizable: .giftCardListSubtitle),
-                                icon: Image(systemName: "gift"),
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.giftCardListTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
                                 title: String(localizable: .settingsYouLocalCurrencyTitle),
                                 subtitle: String(localizable: .settingsYouLocalCurrencySubtitle),
                                 icon: Asset.Assets.Icons.currencyDollar.image,

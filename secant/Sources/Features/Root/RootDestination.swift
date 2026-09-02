@@ -17,7 +17,6 @@ extension Root {
     struct DestinationState {
         enum Destination {
             case deeplinkWarning
-            case giftClaim
             case notEnoughFreeSpace
             case onboarding
             case osStatusError
@@ -64,41 +63,11 @@ extension Root {
                 return .none
 
             case .destination(.deeplink(let url)):
-                // Gift links first, before the blanket ZIP-321 warning: the host check is all the
-                // routing needs — full validation is the codec's, on the claim screen.
-                if url.host()?.lowercased() == GiftLinkCodec.giftLinkHost {
-                    return .send(.giftLinkReceived(url.absoluteString))
-                }
                 if let _ = uriParser.checkRP(url.absoluteString, zcashSDKEnvironment.network().networkType) {
                     // The deeplink is some zip321, we ignore it and let users know in a warning screen
                     return .send(.destination(.updateDestination(.deeplinkWarning)))
                 }
                 return .none
-
-            case .giftLinkReceived(let raw):
-                // A claim already on screen is never interrupted, the same rule
-                // `.giftResumePendingClaim` holds. Its scan is still running and its effects
-                // still land on `giftClaimState`, so replacing that state would show one card's
-                // result under another card's identity — and because the destination never
-                // changes, the view's `onDisappear` teardown never fires, leaving the first link
-                // leased in the intake store with nothing able to release it.
-                //
-                // The link is deliberately not consumed here: leaving it untouched means tapping
-                // it again once this claim closes works normally. Android stacks a second route
-                // instead, which a single claim destination cannot do without a claim stack.
-                guard state.destinationState.destination != .giftClaim else { return .none }
-                switch pendingGiftLinks.put(raw) {
-                case .accepted(let token):
-                    state.giftClaimState = GiftClaim.State(token: token)
-                    return .send(.destination(.updateDestination(.giftClaim)))
-                case .alreadyPending:
-                    // Its claim is already on its way in.
-                    return .none
-                case .refused:
-                    // The tap must still land somewhere; the screen shows the unavailable copy.
-                    state.giftClaimState = GiftClaim.State(token: nil)
-                    return .send(.destination(.updateDestination(.giftClaim)))
-                }
 
             case .destination(.deeplinkHome):
                 return .none
@@ -127,8 +96,7 @@ extension Root {
             case .splashFinished:
                 state.splashAppeared = true
                 state.$lastAuthenticationTimestamp.withLock { $0 = Int(Date().timeIntervalSince1970) }
-                // Foreground alone is not unlock: the claim screen re-arms its effects here.
-                return .send(.giftClaim(.unlocked))
+                return .none
 
             case .flexaOnTransactionRequest(let transaction):
                 guard let transaction else {

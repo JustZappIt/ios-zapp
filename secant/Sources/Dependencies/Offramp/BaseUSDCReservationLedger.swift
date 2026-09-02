@@ -155,14 +155,9 @@ actor BaseUSDCReservationLedger {
             try claim(owner, amount: amount, rawBalance: rawBalance)
             return
         }
-        // Deliberately not restricted to a restored placeholder. A delivery interrupted in this
-        // same process — stream cancelled, screen closed mid-flight — settles `.unknown`, which
-        // retains its reservation with `wasRestored` false; the flow that owned it is dead, but
-        // the commitment it stands for is the same one this call is about to take over. Requiring
-        // `wasRestored` refused exactly that case, and the caller's only alternative was to claim
-        // a second time against a balance the first claim is already counted in.
         guard matches.count == 1,
               let recovered = matches.first,
+              recovered.value.wasRestored,
               recovered.value.amount == amount,
               committed <= rawBalance else {
             throw ClaimError.recoveryUnavailable
@@ -290,18 +285,7 @@ actor BaseUSDCReservationLedger {
             let confirmed = entries.filter { $0.value.isConfirmedDebit }
             guard !confirmed.isEmpty else { continue }
             let totalConfirmed = UsdcAmount.sum(confirmed.map { $0.value.amount })
-            // An exclusive claim reserves the whole account, so its threshold is exactly zero and
-            // the general test below degenerates into "the balance must be zero" — which the dust
-            // a sweep leaves behind, or any transfer landing afterwards, falsifies permanently.
-            // The owner would never retire and `spendable` would stay `.unavailable` for every
-            // rail for the rest of the process. What proves an exclusive debit is that the
-            // balance fell below its baseline at all; whatever arrives after that is new money
-            // the exclusive owner never had a claim on.
-            let isExclusiveDebit = exclusiveOwner.map { owner in confirmed.contains { $0.key == owner } } ?? false
-            let debitIsObserved = isExclusiveDebit
-                ? rawBalance < baseline
-                : rawBalance <= baseline.subtractingClampedToZero(totalConfirmed)
-            guard debitIsObserved else { continue }
+            guard rawBalance <= baseline.subtractingClampedToZero(totalConfirmed) else { continue }
 
             for (owner, _) in confirmed {
                 reservations[owner] = nil

@@ -302,17 +302,6 @@ struct SDKSynchronizerClient: Sendable {
     /// Manual -> the selected server). See `selectedSubmissionEndpoints`.
     var createAndSubmitProposedTransactions: @Sendable (Proposal, UnifiedSpendingKey) async throws -> CreateProposedTransactionsResult
     var proposeShielding: @Sendable (AccountUUID, Zatoshi, Memo, TransparentAddress?) async throws -> Proposal?
-
-    // Gift custody readers — SDK-state truth, the display model deliberately bypassed: the app's
-    // `TransactionState` calls a sent transaction non-pending the moment it has a mined height,
-    // and that display reading must never decide custody (gift-cards.md §5.1). No other callers.
-    var getTransactionOverviews: @Sendable () async throws -> [ZcashTransaction.Overview]
-    var getOverviewRecipients: @Sendable (ZcashTransaction.Overview) async -> [TransactionRecipient] = { _ in [] }
-    /// Split-phase broadcast for gift funding: local creation and network submission are separate
-    /// durable phases so the funding txid can be recorded between them. The same broadcaster calls
-    /// `createAndSubmitProposedTransactions` makes, split.
-    var createProposedTransactionsWithoutSubmit: @Sendable (Proposal, UnifiedSpendingKey) async throws -> [CreatedTransaction]
-    var submitCreatedTransactionsForGift: @Sendable ([CreatedTransaction]) async throws -> CreateProposedTransactionsResult
     
     var isSeedRelevantToAnyDerivedAccount: @Sendable ([UInt8]) async throws -> Bool
     

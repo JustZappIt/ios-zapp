@@ -88,7 +88,6 @@ struct Home {
         case onAppear
         case onDisappear
         case payTapped
-        case giftTapped
         case payWithNearTapped
         case presentKeystoneWeb
         case rateTooltipTapped
@@ -230,12 +229,6 @@ struct Home {
                 return .none
 
             case .payWithNearTapped:
-                state.moreRequest = false
-                state.payRequest = false
-                return .none
-
-            case .giftTapped:
-                // Intercepted by Root, which routes to the create flow.
                 state.moreRequest = false
                 state.payRequest = false
                 return .none

@@ -106,18 +106,6 @@ extension WalletStorageClient: DependencyKey {
             },
             exportVotingHotkey: { accountId in
                 try walletStorage.exportVotingHotkey(accountId: accountId)
-            },
-            importGiftCards: { cards in
-                try walletStorage.importGiftCards(cards)
-            },
-            exportGiftCards: {
-                try walletStorage.exportGiftCards()
-            },
-            importReceivedGifts: { gifts in
-                try walletStorage.importReceivedGifts(gifts)
-            },
-            exportReceivedGifts: {
-                try walletStorage.exportReceivedGifts()
             }
         )
     }

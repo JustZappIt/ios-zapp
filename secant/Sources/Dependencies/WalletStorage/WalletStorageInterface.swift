@@ -120,11 +120,4 @@ struct WalletStorageClient {
     /// voter identities), instead of being linkable via a shared hotkey.
     var importVotingHotkey: @Sendable (_ storedSecret: Data, _ accountId: AccountUUID) throws -> Void
     var exportVotingHotkey: @Sendable (_ accountId: AccountUUID) throws -> StoredVotingHotkey
-
-    /// Gift-card custody blobs. Export returns `[]` only when the key is absent; a present but
-    /// unreadable blob throws `GiftStoreCorrupt` and must never be treated as empty.
-    var importGiftCards: @Sendable ([StoredGiftCard]) throws -> Void
-    var exportGiftCards: @Sendable () throws -> [StoredGiftCard]
-    var importReceivedGifts: @Sendable ([ReceivedGift]) throws -> Void
-    var exportReceivedGifts: @Sendable () throws -> [ReceivedGift]
 }

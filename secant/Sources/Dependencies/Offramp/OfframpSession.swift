@@ -735,14 +735,6 @@ actor OfframpSession {
             guard let amount = UsdcAmount(micros: micros), amount.isPositive else {
                 throw BaseUSDCReservationLedger.ClaimError.recoveryUnavailable
             }
-            // Before the write, not after it. This actor can be suspended across the await above
-            // while `invalidate()` bumps the generation and resets the ledger, and the restore
-            // below would then insert the previous wallet's commitment into the new wallet's
-            // freshly reset books. Validating afterwards aborts the call but leaves that phantom
-            // reservation behind, depressing the new wallet's available balance — and since the
-            // recovery operation id embeds the old generation, the next hydration can find a
-            // mismatched sole match and wedge the ledger with `recoveryUnavailable`.
-            try validateGeneration(expectedGeneration)
             let owner = try await baseUSDCReservations.restoreOrFindOnrampDelivery(
                 .onrampDelivery(operationID: recoveryOperationID(for: expectedGeneration)),
                 amount: amount
@@ -775,11 +767,7 @@ actor OfframpSession {
         }
         let rawBalance = try await currentRawBaseBalance(generation: expectedGeneration)
         let owner = BaseUSDCReservationLedger.Owner.onrampDelivery(operationID: UUID().uuidString)
-        // A retry takes over the interrupted attempt's commitment rather than stacking a second
-        // one on top of it. A plain `claim` computes availability as balance minus committed,
-        // and the commitment being retried is still in that total, so a delivery interrupted
-        // without a terminal status made "Try conversion again" fail with `insufficientAvailable`.
-        try await baseUSDCReservations.activateOnrampDelivery(owner, amount: amount, rawBalance: rawBalance)
+        try await baseUSDCReservations.claim(owner, amount: amount, rawBalance: rawBalance)
         do {
             try validateGeneration(expectedGeneration)
             let flow = try await performTracked(generation: expectedGeneration) {
