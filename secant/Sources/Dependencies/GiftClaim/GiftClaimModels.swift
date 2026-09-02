@@ -8,8 +8,6 @@ import Foundation
 /// because the policy fields are internal and nothing on the `Initializer` accepts one.
 let giftRequiredConfirmations = 10
 
-/// How far a claim has got, for a progress screen that would otherwise sit on a blank spinner.
-///
 /// `fraction` must come from the SDK, never from these heights: the restore path snaps the
 /// birthday down to a bundled checkpoint, so a height-derived fraction is negative for the whole
 /// scan and then snaps to 100%.
@@ -19,7 +17,6 @@ struct GiftClaimProgress: Equatable, Sendable {
     let tipHeight: BlockHeight?
 }
 
-/// What a minted card's own wallet holds right now, and whether it ever held anything.
 struct GiftCardHoldings: Equatable, Sendable {
     let available: Zatoshi
     let total: Zatoshi
@@ -35,28 +32,22 @@ struct GiftCardHoldings: Equatable, Sendable {
     /// A submitted/mined claim that can still expire or reorg.
     var hasPendingClaimSpend = false
 
-    /// Nothing left in the card wallet.
     var isEmpty: Bool { total == .zero }
 
-    /// The funding arrived and a claim spend reached SDK finality.
     var isCollected: Bool { hasFundingArrived && hasFinalClaimSpend }
 }
 
-/// Whether recipient-side finality may discard the retry secret and isolated database.
 struct GiftClaimFinalization: Equatable, Sendable {
     let canSettle: Bool
     let residual: Zatoshi
 }
 
-/// Durable evidence that an outgoing card-wallet spend was submitted by this recipient.
 struct GiftClaimResumeEvidence: Equatable, Sendable {
     let claimTxIds: Set<String>
     let submissionWasAttempted: Bool
 }
 
-/// What the card's own wallet turned out to hold.
 enum GiftClaimOutcome: Equatable, Sendable {
-    /// The funds are now on their way to the recipient's wallet.
     case claimed(amount: Zatoshi, txIds: [String])
 
     /// The money is there but not yet spendable — ten confirmations, roughly 12.5 minutes on
@@ -71,14 +62,10 @@ enum GiftClaimOutcome: Equatable, Sendable {
     /// A claim spend exists, but this wallet has no durable evidence that it submitted it.
     case alreadyClaimed
 
-    /// The card holds its amount but cannot also cover the fee to move it, so no transfer can be
-    /// proposed over it.
-    ///
-    /// Distinct from `notYetSpendable` because waiting does not fix it. A card minted here is
-    /// funded with the amount *plus* the claim-fee reserve precisely so this cannot happen;
-    /// reaching it means the card came from something that does not reserve the fee, or that
-    /// ZIP 317 now asks for more than the reserve covers. The funds are untouched and the card's
-    /// wallet is retained.
+    /// The card cannot cover the fee to move its own amount. Distinct from `notYetSpendable`
+    /// because waiting does not fix it: a card minted here is funded with the amount *plus* the
+    /// claim-fee reserve, so reaching this means the card came from something that does not
+    /// reserve the fee, or ZIP 317 now asks for more than the reserve covers.
     case underfunded(available: Zatoshi)
 
     /// The broadcast did not unambiguously succeed. The isolated database is retained — erasing on
@@ -110,8 +97,6 @@ enum GiftOutgoingClaimDisposition: Equatable {
     case alreadyClaimed
 }
 
-/// Pure classification of the outgoing spends found in a card's own history.
-///
 /// The size filter feeding these sets matters: the address is public, so a stranger's dust spend
 /// must be neither claim evidence nor collection evidence.
 func classifyOutgoingGiftClaim(
@@ -128,17 +113,15 @@ func classifyOutgoingGiftClaim(
 }
 
 extension ZcashTransaction.Overview {
-    /// The value a send moved, as a positive figure — `value` is negative for sends.
+    /// `value` is negative for sends.
     var absoluteValue: Zatoshi {
         Zatoshi(abs(value.amount))
     }
 
-    /// A spend of at least the card amount at the SDK's full confirmation threshold.
     func isFinalClaimSpend(of amount: Zatoshi) -> Bool {
         isSentTransaction && absoluteValue >= amount && state == .confirmed
     }
 
-    /// A spend of at least the card amount, submitted or mined but not yet final.
     func isPendingClaimSpend(of amount: Zatoshi) -> Bool {
         isSentTransaction && absoluteValue >= amount && state == .pending
     }
@@ -165,8 +148,7 @@ struct GiftScanStallTracker {
         self.furthestFraction = fraction
     }
 
-    /// Called once per poll interval. Returns true when the scan has made no progress for the
-    /// whole window and will never reach synced on its own.
+    /// Called once per poll interval. True means the scan will never reach synced on its own.
     mutating func poll(height: Int64?, fraction: Float) -> Bool {
         let height = height ?? .min
         if height > furthestHeight || fraction > furthestFraction {

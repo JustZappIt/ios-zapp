@@ -5,11 +5,7 @@ import Foundation
 @preconcurrency import ZcashLightClientKit
 
 /// Drives the create-a-gift-card flow: enter an amount, review what it costs, fund it, share it.
-///
-/// One ordering carries the whole feature. Minting, persisting and encoding the link all happen in
-/// prepare, entirely before submit moves any money — a record that will not encode is a card whose
-/// funds nobody could ever reach, and there is no reclaim, so it has to be caught while the money
-/// is still in the sender's wallet.
+/// The stage order mirrors `FundGiftCard`'s prepare/submit split, which is load-bearing.
 @Reducer
 struct GiftCard {
     /// Where the sender is in the flow. The order is the order they travel in; `unavailable` is
@@ -45,6 +41,8 @@ struct GiftCard {
         case authenticationFailed
         /// Broadcast outcome unknown. The copy must not invite a retry.
         case submitUncertain
+        /// The link left the device but the hand-off did not record, so the card still blocks the
+        /// wallet reset.
         case shareFailed
     }
 
@@ -71,7 +69,6 @@ struct GiftCard {
         /// Whether the ready card can still be handed off, re-checked from storage on every
         /// mutation. False flips `ready` to `unavailable` — claimed meanwhile, or store refused.
         var isReadyCardHandable = true
-        /// Non-nil presents the share sheet with the full link.
         var shareLink: String?
         var spendableBalanceText: String?
         @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
@@ -157,7 +154,9 @@ struct GiftCard {
         case funded(String)
         case fundingFailed(FlowError)
         case fundTapped
+        case handOffReady(String)
         case handOffRefused
+        case handOffUnrecorded
         case onAppear
         case openSavedCardsTapped
         case prepared(GiftFundingQuote, PreparedInputs)
@@ -348,11 +347,15 @@ struct GiftCard {
                     // Re-read the custody record immediately before its bearer link can leave the
                     // device; the stored record rebuilds the link.
                     if let handOff = await ShareGiftLink().currentHandOff(cardId: cardId) {
-                        await send(.binding(.set(\.shareLink, handOff.link)))
+                        await send(.handOffReady(handOff.link))
                     } else {
                         await send(.handOffRefused)
                     }
                 }
+
+            case .handOffReady(let link):
+                state.shareLink = link
+                return .none
 
             case .handOffRefused:
                 state.isReadyCardHandable = false
@@ -361,11 +364,18 @@ struct GiftCard {
             case .shareFinished(let completed):
                 state.shareLink = nil
                 guard completed, let cardId = state.quote?.card.id else { return .none }
-                return .run { _ in
-                    // Best-effort: the link is already out, so failing to record must not read as
-                    // a failed share.
-                    await ShareGiftLink().markHandedOut(cardId: cardId)
+                return .run { send in
+                    // The link is out either way, so this is not a failed share — but an
+                    // unrecorded hand-off keeps blocking the wallet reset, and only the sender
+                    // can clear it by sharing again.
+                    let recorded = await ShareGiftLink().markHandedOut(cardId: cardId)
+                    guard !recorded else { return }
+                    await send(.handOffUnrecorded)
                 }
+
+            case .handOffUnrecorded:
+                state.error = .shareFailed
+                return .none
 
             case .backTapped:
                 switch state.visibleStage {

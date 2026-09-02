@@ -78,8 +78,8 @@ struct GiftCardList {
         let isExpired: Bool
         let lastCheckedAtText: String?
         let isLastCheckRecent: Bool
-        let check: CheckControl
-        let funding: FundingControl
+        var check: CheckControl
+        var funding: FundingControl
         let canHandOff: Bool
     }
 
@@ -127,6 +127,7 @@ struct GiftCardList {
         case retryFailed(ListError)
         case retryPriced(RetryReview, GiftFundingQuote)
         case retryTapped(String)
+        case shareFailed
         case shareFinished(Bool)
         case shareTapped(String)
 
@@ -145,9 +146,7 @@ struct GiftCardList {
 
     @Dependency(\.date) var date
     @Dependency(\.giftCardStorage) var giftCardStorage
-    /// The priced quote, held outside `State` because it carries the card's mnemonic. A
-    /// dependency and not a property on this reducer: `Root.body` is recomputed per action, so a
-    /// stored box would be a new one by the time confirm arrives.
+    /// A dependency rather than a stored property; see `GiftRetryQuoteStore`.
     @Dependency(\.giftRetryQuote) var retryBox
     @Dependency(\.localAuthentication) var localAuthentication
     @Dependency(\.pasteboard) var pasteboard
@@ -265,7 +264,9 @@ struct GiftCardList {
                     // Clipboard is an affirmative act that reports no outcome; treating a copied
                     // link as private would block wallet deletion over a card genuinely given
                     // away.
-                    await ShareGiftLink().markHandedOut(cardId: cardId)
+                    if await !ShareGiftLink().markHandedOut(cardId: cardId) {
+                        await send(.shareFailed)
+                    }
                 }
 
             case let .linkRebuilt(cardId, link):
@@ -277,13 +278,20 @@ struct GiftCardList {
                 state.error = .linkFailed
                 return .none
 
+            case .shareFailed:
+                // Not the share failing — the record of it, which is what releases the reset guard.
+                state.error = .shareFailed
+                return .none
+
             case .shareFinished(let completed):
                 let cardId = state.shareCardId
                 state.shareLink = nil
                 state.shareCardId = nil
                 guard completed, let cardId else { return .none }
-                return .run { _ in
-                    await ShareGiftLink().markHandedOut(cardId: cardId)
+                return .run { send in
+                    if await !ShareGiftLink().markHandedOut(cardId: cardId) {
+                        await send(.shareFailed)
+                    }
                 }
 
             case .retryTapped(let cardId):
@@ -403,8 +411,8 @@ struct GiftCardList {
 }
 
 extension GiftCardList {
-    /// Maps the store's records into display rows: drafts nothing was ever sent to are invisible
-    /// (mint artefacts), unshared-funds first, then newest.
+    /// Drafts nothing was ever sent to are invisible (mint artefacts); unshared-funds first, then
+    /// newest.
     static func items(from cards: [StoredGiftCard], conversion: CurrencyConversion?) -> [Item] {
         cards
             .filter { $0.hasFundingHistory }
@@ -412,7 +420,14 @@ extension GiftCardList {
                 if lhs.isUnsharedFunds != rhs.isUnsharedFunds {
                     return lhs.isUnsharedFunds
                 }
-                return lhs.createdAt > rhs.createdAt
+                // Compared as instants, not strings: records written before `instantString` carried
+                // milliseconds lack the fractional part, and `.` sorts below `Z`.
+                let lhsDate = GiftLinkCodec.parseInstant(lhs.createdAt) ?? .distantPast
+                let rhsDate = GiftLinkCodec.parseInstant(rhs.createdAt) ?? .distantPast
+                if lhsDate != rhsDate {
+                    return lhsDate > rhsDate
+                }
+                return lhs.id < rhs.id
             }
             .map { card in
                 let status = listStatus(of: card)
@@ -448,46 +463,33 @@ extension GiftCardList {
             }
     }
 
-    /// Re-applies the transient checking/retrying overlays onto the stored rows.
+    /// Strips the previous overlay first — every caller but `.cardsUpdated` passes rows this
+    /// already decorated, and folding over its own output is how a finished check stays running
+    /// forever.
     private static func decorated(_ items: [Item], state: State) -> [Item] {
         items.map { item in
-            var check = item.check
-            switch item.check {
-            case .hidden:
-                break
-            case .running, .ready, .blocked:
-                if item.id == state.checkingId {
-                    check = .running(fraction: state.checkFraction)
-                } else if case .blocked(.noTransaction) = item.check {
-                    check = .blocked(.noTransaction)
-                } else if state.checkingId != nil {
-                    check = .blocked(.anotherRunning)
-                } else if case .blocked(.anotherRunning) = item.check {
-                    check = .ready
-                }
-            }
-            var funding = item.funding
-            if item.funding != .hidden {
-                funding = item.id == state.retryingId ? .running : .ready
-            }
             var next = item
-            next = Item(
-                id: item.id,
-                amountText: item.amountText,
-                fiatText: item.fiatText,
-                tier: item.tier,
-                createdAtText: item.createdAtText,
-                message: item.message,
-                status: item.status,
-                expiryText: item.expiryText,
-                isExpired: item.isExpired,
-                lastCheckedAtText: item.lastCheckedAtText,
-                isLastCheckRecent: item.isLastCheckRecent,
-                check: check,
-                funding: funding,
-                canHandOff: item.canHandOff
-            )
+            next.check = baseCheckControl(of: item.check)
+            if next.check == .ready, let checkingId = state.checkingId {
+                next.check = item.id == checkingId
+                    ? .running(fraction: state.checkFraction)
+                    : .blocked(.anotherRunning)
+            }
+            if item.funding != .hidden {
+                next.funding = item.id == state.retryingId ? .running : .ready
+            }
             return next
+        }
+    }
+
+    /// The overlay only ever replaces `.ready`, so it peels back off: `.hidden` and
+    /// `.blocked(.noTransaction)` are the record's own answer, anything else started as `.ready`.
+    private static func baseCheckControl(of check: CheckControl) -> CheckControl {
+        switch check {
+        case .hidden, .blocked(.noTransaction):
+            return check
+        case .ready, .running, .blocked(.anotherRunning):
+            return .ready
         }
     }
 

@@ -98,6 +98,7 @@ struct GiftClaim {
         case recheckTicked
         case retryTapped
         case stopScanTapped
+        case submitStarted
         case teardown
         case unlocked
         case verdictArrived(GiftBirthdayVerdict)
@@ -202,8 +203,8 @@ struct GiftClaim {
                 return .none
 
             case .claimTapped:
-                // A bearer seed must not scan behind the lock screen — held as an invariant, not
-                // a fact about the view tree.
+                // A bearer seed must not scan behind the lock screen. `isForeground` is what
+                // enforces that today; nothing sets `isLocked`, so that conjunct is inert.
                 guard !state.isClaiming, state.isForeground, !state.isLocked else { return .none }
                 guard let payload = state.payload, let cardAddress = state.cardAddress else { return .none }
                 state.stage = .claiming
@@ -218,9 +219,14 @@ struct GiftClaim {
                             cardAddress: cardAddress,
                             onProgress: { progress in
                                 Task { await send(.progressUpdated(progress)) }
-                            }
+                            },
+                            // Fires past the receipt marker, where the tail is shielded and there
+                            // is nothing left to stop.
+                            onSubmitStarted: { await send(.submitStarted) }
                         )
-                        await send(.claimFinished(outcome))
+                        // Unstructured: the shielded tail outlives a cancelled effect, which drops
+                        // every `send` it makes.
+                        await Task { await send(.claimFinished(outcome)) }.value
                     } catch is CancellationError {
                         // The recipient stopped the scan; the datasource discarded the unstarted
                         // receipt on its way out.
@@ -232,6 +238,10 @@ struct GiftClaim {
 
             case .progressUpdated(let progress):
                 state.progress = progress
+                return .none
+
+            case .submitStarted:
+                state.canStopClaim = false
                 return .none
 
             case .claimFinished(let outcome):
@@ -280,7 +290,6 @@ struct GiftClaim {
                 state.isClaiming = false
                 state.canStopClaim = false
                 state.error = error
-                // While our txids are in flight, every fallback re-enters claim-confirming.
                 state.stage = state.inFlightTxids.isEmpty ? .preview : .claimConfirming
                 return .none
 
@@ -419,11 +428,11 @@ extension GiftClaim {
         .cancellable(id: CancelId.verdict, cancelInFlight: true)
     }
 
-    /// Two effects: one completes as the finality signal, one streams the confirmation count.
-    /// Arming compares awaited txids by cancel-in-flight, so a replacement claim displaces a
-    /// dead watch.
+    /// Foreground-only. Two effects: one completes as the finality signal, one streams the
+    /// confirmation count. Arming compares awaited txids by cancel-in-flight, so a replacement
+    /// claim displaces a dead watch.
     private func armConfirming(_ state: inout State) -> Effect<Action> {
-        guard let address = state.cardAddress, !state.inFlightTxids.isEmpty else { return .none }
+        guard state.isForeground, let address = state.cardAddress, !state.inFlightTxids.isEmpty else { return .none }
         let txids = state.inFlightTxids
         return .merge(
             .run { send in
@@ -440,8 +449,7 @@ extension GiftClaim {
         )
     }
 
-    /// Foreground-only, 45 seconds: the wait re-checks itself; a Try-again here would frame a
-    /// wait as a dead end.
+    /// Foreground-only, 45 seconds.
     private func recheckTimer() -> Effect<Action> {
         .run { send in
             try await mainQueue.sleep(for: .seconds(45))

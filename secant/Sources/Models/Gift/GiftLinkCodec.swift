@@ -236,8 +236,8 @@ enum GiftLinkCodec {
             : .needsConsent(blocksToScan: chainTip - birthdayHeight)
     }
 
-    /// Accepts both second and fractional-second precision, so a peer's `Instant.toString()`
-    /// parses either way.
+    /// Accepts both second and fractional-second precision, so a peer's `Instant.toString()` and
+    /// records written before `instantString` carried milliseconds both parse.
     static func parseInstant(_ value: String) -> Date? {
         let standard = ISO8601DateFormatter()
         if let date = standard.date(from: value) { return date }
@@ -246,8 +246,12 @@ enum GiftLinkCodec {
         return fractional.date(from: value)
     }
 
+    /// Millisecond precision, like Android's `Instant.toString()`: readers tell a new attempt from
+    /// a repeat by string inequality, and whole seconds would merge two writes inside one second.
     static func instantString(from date: Date) -> String {
-        ISO8601DateFormatter().string(from: date)
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.string(from: date)
     }
 
     /// The link's payload bytes: every check that this URI is one of ours, then the base64 body.

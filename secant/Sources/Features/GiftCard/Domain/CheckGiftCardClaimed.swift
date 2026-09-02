@@ -34,7 +34,6 @@ struct CheckGiftCardClaimed {
         onProgress: @escaping @Sendable (GiftClaimProgress) -> Void
     ) async -> GiftCardCheckResult {
         guard let card = try? await giftCardStorage.get(cardId) else { return .unknown }
-        // Never scan an unfunded card: nothing was ever sent, so there is nothing to look for.
         guard let fundingTxid = card.fundingTxid else { return .notFunded }
 
         let holdings: GiftCardHoldings

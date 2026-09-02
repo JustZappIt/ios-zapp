@@ -4,9 +4,9 @@ import ComposableArchitecture
 import Foundation
 @preconcurrency import ZcashLightClientKit
 
-/// What funding a card costs, priced against a real proposal. `card` is already persisted when
-/// this exists, and `link` already encodes — a record that will not encode is a card nobody could
-/// ever claim, and it must be caught while the money is still in the sender's wallet.
+/// `card` is already persisted when this exists, and `link` already encodes — a record that will
+/// not encode is a card nobody could ever claim, and it must be caught while the money is still in
+/// the sender's wallet.
 ///
 /// The sender pays `networkFee` *and* `claimFeeReserve` on top of the card amount, so the
 /// recipient nets exactly what the card says.
@@ -19,7 +19,6 @@ struct GiftFundingQuote: Equatable {
 
     var cardAmount: Zatoshi { Zatoshi(card.amountZatoshi) }
 
-    /// What leaves the sender's balance: the card, the recipient's future claim fee, and this fee.
     var total: Zatoshi { Zatoshi(card.amountZatoshi + claimFeeReserve.amount + networkFee.amount) }
 }
 
@@ -39,8 +38,6 @@ enum GiftFundingError: Error, Equatable {
     case submitUncertain
 }
 
-/// Moves money onto a minted gift card.
-///
 /// Split in two on purpose: `prepare` mints, persists and prices without spending, so the review
 /// screen can show real numbers, and `submit` is the only call that moves money. The order is
 /// load-bearing and must not be collapsed — the keychain record holds the only copy of the
@@ -65,8 +62,6 @@ struct FundGiftCard {
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
-    /// Mints a card — or re-prices `existing` — and builds its funding proposal.
-    ///
     /// Pass `existing` for a card the sender minted but backed out of reviewing; without it, every
     /// trip through the review screen strands another unfunded draft. One already carrying a
     /// funding attempt is refused outright.
@@ -76,10 +71,9 @@ struct FundGiftCard {
         expiresAt: Date? = nil,
         existing: StoredGiftCard? = nil
     ) async throws -> GiftFundingQuote {
-        // Re-read rather than trust the copy handed in. The caller's is a snapshot held across a
-        // screen the sender can leave and come back to, so it can be stale in both directions:
-        // the record may have been superseded by a later mint and no longer exist, and — the half
-        // that costs money — it may have picked up a funding attempt that this copy does not show.
+        // The caller's copy is a snapshot held across a screen the sender can leave and come back
+        // to. It may have been superseded by a later mint, or — the half that costs money — have
+        // picked up a funding attempt since.
         var current: StoredGiftCard?
         if let existing {
             current = try await giftCardStorage.get(existing.id)
@@ -96,9 +90,8 @@ struct FundGiftCard {
             throw GiftFundingError.submitUncertain
         }
         if let current, current.amountZatoshi != amount.amount {
-            // Repricing an existing address is never permission to silently change what its
-            // bearer link promises. A retry funds the exact same card; changing the value mints a
-            // new one.
+            // A retry funds the exact same card; changing the value mints a new one, because the
+            // amount is what the bearer link promises.
             throw GiftFundingError.proposalFailed
         }
 
@@ -168,8 +161,7 @@ struct FundGiftCard {
             throw GiftFundingError.insufficientFunds
         }
 
-        // Encode before any money can move: a link the codec would refuse to decode is a card
-        // whose funds nobody can ever reach.
+        // Encode before any money can move; see `GiftFundingQuote`.
         guard let link = try? GiftLinkCodec.encode(card.toLinkPayload()) else {
             throw GiftFundingError.proposalFailed
         }
@@ -183,18 +175,13 @@ struct FundGiftCard {
         )
     }
 
-    /// Broadcasts the quote's funding transaction and records the txid against the card.
-    ///
     /// The card stays a draft afterwards: `recordFundingSubmitted` claims only that a transaction
-    /// exists, not that it mined. Advancing it to funded is `ConfirmGiftCardFunding`'s job, once
-    /// there is a block behind it.
+    /// exists, not that it mined. Advancing it to funded is `ConfirmGiftCardFunding`'s job.
     ///
     /// The durable start marker divides this method: before it, failures are `proposalFailed`;
     /// from it onwards — creation and storage writes included — `submitUncertain`. The SDK's
     /// background resubmitter can broadcast a locally-created transaction before the app
     /// explicitly submits it, and can retry one after a server rejection.
-    ///
-    /// - Returns: the funding txid.
     func submit(_ quote: GiftFundingQuote) async throws -> String {
         try await giftFundingOperationLock.withLock(quote.card.id) {
             try await submitLocked(quote)
@@ -222,8 +209,7 @@ struct FundGiftCard {
             // funding transaction with a key the proposal was not built against — and the card
             // records which account owns it precisely so a retry cannot drift to another one. A
             // missing `zip32AccountIndex` is an account with no locally derivable key at all,
-            // which is the hardware wallet `CreateGiftCard` already refuses to mint for. Both
-            // checks sit before the durable marker, so refusing here stays safe to retry.
+            // which is the hardware wallet `CreateGiftCard` already refuses to mint for.
             guard
                 let owner = accounts.first(where: { $0.id.giftStorageKey == current.sourceAccountUuid }),
                 let accountIndex = owner.zip32AccountIndex
@@ -241,10 +227,8 @@ struct FundGiftCard {
             throw GiftFundingError.proposalFailed
         }
 
-        // The SDK may resubmit a transaction merely because it exists in the wallet database,
-        // even before submit is called. Persist the unresolved gate before creation so no crash
-        // or storage failure can leave an auto-broadcast transaction behind an "unfunded" card
-        // that is later discarded or funded again.
+        // The durable gate, persisted before creation so no crash or storage failure can leave an
+        // auto-broadcast transaction behind an "unfunded" card that is later funded again.
         do {
             try await giftCardStorage.setFundingAttemptedAt(quote.card.id, GiftLinkCodec.instantString(from: date.now()))
         } catch {

@@ -201,10 +201,15 @@ struct ConfirmGiftCardFunding {
         }?.state
     }
 
-    /// Every send from the account to the card's address, from a snapshot the caller has already
-    /// gated on `.upToDate`. Nil when the overviews cannot be read — unresolved, never "absent".
+    /// Every send from the account to the card's address, or nil — unresolved, never "absent" —
+    /// when the account no longer resolves, the overviews cannot be read, or the caller's
+    /// `.upToDate` gate did not hold for the whole read.
     private func sendCandidates(to address: String, accountKey: String) async -> [SendCandidate]? {
-        guard let overviews = try? await sdkSynchronizer.getTransactionOverviews() else { return nil }
+        guard
+            let accounts = try? await sdkSynchronizer.walletAccounts(),
+            accounts.contains(where: { $0.id.giftStorageKey == accountKey }),
+            let overviews = try? await sdkSynchronizer.getTransactionOverviews()
+        else { return nil }
         var candidates: [SendCandidate] = []
         for overview in overviews
         where overview.accountUUID.giftStorageKey == accountKey && overview.isSentTransaction {
@@ -219,6 +224,9 @@ struct ConfirmGiftCardFunding {
                 candidates.append(SendCandidate(txid: overview.rawID.toHexStringTxId(), state: overview.state))
             }
         }
+        // `Overview.state` is stamped against the chain tip, not the scanned height: a read that
+        // outlives `.upToDate` can call an unscanned transaction expired and authorize a respend.
+        guard sdkSynchronizer.latestState().syncStatus == .upToDate else { return nil }
         return candidates
     }
 

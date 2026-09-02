@@ -5,10 +5,9 @@ import ComposableArchitecture
 import Foundation
 @preconcurrency import ZcashLightClientKit
 
-/// A link checked as far as it can be without touching the network — which is everything the card
-/// says about itself. What it costs to claim needs the chain tip, so that is `birthdayVerdict`,
-/// asked for separately: a recipient must see what they were sent while the wallet is still
-/// finding the chain, not a spinner.
+/// A link checked as far as it can be without touching the network. Anything needing the chain tip
+/// is `birthdayVerdict`, asked for separately so a recipient sees what they were sent while the
+/// wallet is still finding the chain.
 struct GiftClaimPreview: Equatable {
     let payload: GiftLinkPayload
     /// Derived from the link's mnemonic; the link itself does not carry it.
@@ -19,9 +18,6 @@ struct GiftClaimPreview: Equatable {
     /// funds, or a previous scan proved another holder emptied it. Either way this is the answer
     /// to a link opened twice, and one no amount of scanning can improve on.
     var collected: GiftClaimOutcome?
-    /// The transactions of a claim this wallet has already broadcast and that has not reached
-    /// finality yet.
-    ///
     /// Neither "claimed" nor "unclaimed": the money is on its way and the only thing left is
     /// confirmations, which a rescan cannot hurry. Without this the link opened during that
     /// window answers as an untouched card and offers to claim it all over again.
@@ -37,8 +33,6 @@ struct GiftClaimNotReady: Error, Equatable {}
 /// Receipt state could not be read, so absence cannot be asserted safely.
 struct GiftReceiptStoreUnreadable: Error, Equatable {}
 
-/// Turns a gift link into money in this wallet.
-///
 /// Split so that everything checkable offline happens in `preview`, before a single block is
 /// downloaded — a tampered or wrong-network link must never get as far as starting a scan, and the
 /// recipient must be able to see what a card is worth before deciding whether to scan for it.
@@ -55,12 +49,10 @@ struct ClaimGiftCard {
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
-    /// Parses and validates the link. Touches neither the network nor the chain, so it returns as
-    /// fast as the link can be decoded and the card can go on screen straight away.
+    /// Touches neither the network nor the chain, so the card can go on screen straight away.
     ///
     /// - Throws: `GiftLinkError` with the specific check that failed;
-    ///   `GiftReceiptStoreUnreadable` when the receipt store will not read — absence cannot be
-    ///   asserted from a store that will not read.
+    ///   `GiftReceiptStoreUnreadable` — absence cannot be asserted from a store that will not read.
     func preview(_ uri: String) async throws -> GiftClaimPreview {
         // The network is a build flavor on iOS, readable before onboarding — a gift link must be
         // judged on a device with no wallet.
@@ -96,8 +88,7 @@ struct ClaimGiftCard {
     /// What the recipient still has to agree to — a long foreground scan is their decision, not
     /// something to spring on them.
     ///
-    /// - Throws: `GiftClaimNotReady` while the chain tip is still unknown. The card is already on
-    ///   screen and correct by then, so this is a wait to be retried, never a verdict on the gift.
+    /// - Throws: `GiftClaimNotReady` while the chain tip is still unknown.
     func birthdayVerdict(_ payload: GiftLinkPayload) async throws -> GiftBirthdayVerdict {
         // Wait rather than fail: on the cold start a link produces, the tip is zero for a second
         // or two, and a one-shot read would reject every link opened from a chat.
@@ -115,24 +106,29 @@ struct ClaimGiftCard {
         return try GiftLinkCodec.evaluateBirthday(payload.birthdayHeight, chainTip: Int64(tip))
     }
 
-    /// Syncs the card's own wallet and moves its funds here.
-    ///
     /// Claims at least the advertised amount and sweeps spendable top-ups to the same destination.
     /// Fee-reserve dust is the only value that may be intentionally abandoned at final cleanup.
     func callAsFunction(
         payload: GiftLinkPayload,
         cardAddress: String,
-        onProgress: @escaping @Sendable (GiftClaimProgress) -> Void
+        onProgress: @escaping @Sendable (GiftClaimProgress) -> Void,
+        onSubmitStarted: @escaping @Sendable () async -> Void = {}
     ) async throws -> GiftClaimOutcome {
         try await giftClaimOperationLock.withLock(cardAddress) {
-            try await claimLocked(payload: payload, cardAddress: cardAddress, onProgress: onProgress)
+            try await claimLocked(
+                payload: payload,
+                cardAddress: cardAddress,
+                onProgress: onProgress,
+                onSubmitStarted: onSubmitStarted
+            )
         }
     }
 
     private func claimLocked(
         payload: GiftLinkPayload,
         cardAddress: String,
-        onProgress: @escaping @Sendable (GiftClaimProgress) -> Void
+        onProgress: @escaping @Sendable (GiftClaimProgress) -> Void,
+        onSubmitStarted: @escaping @Sendable () async -> Void
     ) async throws -> GiftClaimOutcome {
         // Read before writing. The distinction between our interrupted submission and a second
         // holder's spend exists only in this preexisting record; manufacturing a prepared receipt
@@ -168,8 +164,7 @@ struct ClaimGiftCard {
             message: payload.message,
             claimLink: payload
         )
-        // The receipt is written before the scan, so one exists for every card this wallet merely
-        // looked at; the discard below releases it when the scan creates nothing.
+        // Written before the scan; `recordOutcome`'s discard releases it when nothing was created.
         try await receivedGiftStorage.record(prepared)
 
         let resumeEvidence = GiftClaimResumeEvidence(
@@ -188,12 +183,13 @@ struct ClaimGiftCard {
             recipientAddress: recipient,
             resumeEvidence: resumeEvidence,
             onBeforeSubmit: {
-                // The irreversible boundary: if this write fails the engine must never enter its
-                // shielded create-and-submit section.
+                // `onSubmitStarted` fires only once the marker is durable, so a failed write
+                // never tells the caller a submit began.
                 var marked = prepared
                 marked.claimTxids = []
                 marked.claimSubmissionAttemptedAt = GiftLinkCodec.instantString(from: date.now())
                 try await receivedGiftStorage.record(marked)
+                await onSubmitStarted()
             },
             onProgress: onProgress
         )
@@ -202,10 +198,9 @@ struct ClaimGiftCard {
         do {
             outcome = try await giftClaim.claim(request)
         } catch is CancellationError {
-            // A cancelled scan never reaches a verdict, so the discard below never runs — and an
-            // abandoned scan's receipt is otherwise indistinguishable from an interrupted claim
-            // forever: it reopens the claim screen on every foreground and blocks every reset. A
-            // no-op past the submission marker, so it can never drop recovery material.
+            // A cancelled scan never reaches a verdict, so `recordOutcome`'s discard never runs
+            // and the receipt written before the scan would be left behind for good. A no-op past
+            // the submission marker, so it can never drop recovery material.
             await Task {
                 try? await receivedGiftStorage.discardUnstarted(cardAddress)
             }.value
@@ -216,12 +211,7 @@ struct ClaimGiftCard {
         return outcome
     }
 
-    /// Writes down what the claim turned out to be, on a path the caller's cancellation cannot
-    /// skip.
-    ///
-    /// Three outcomes and three different obligations: a foreign final spend is terminal and
-    /// retires the link, a broadcast of ours attaches its txids, and a verdict that created
-    /// nothing releases the receipt written before the scan.
+    /// Runs on a path the caller's cancellation cannot skip.
     private func recordOutcome(
         _ outcome: GiftClaimOutcome,
         payload: GiftLinkPayload,
@@ -260,10 +250,9 @@ struct ClaimGiftCard {
                     ?? GiftLinkCodec.instantString(from: date.now())
                 try? await receivedGiftStorage.record(record)
             } else {
-                // The scan reached a verdict and nothing was created. The receipt written before
-                // the scan holds no recovery material — only a copy of a link the sender still
-                // has — and left behind it reopens this screen on every foreground and refuses
-                // every wallet reset, for a gift that was never taken.
+                // The scan reached a verdict and nothing was created, so the receipt written
+                // before it holds no recovery material — only a copy of a link the sender still
+                // has — and would otherwise accumulate for every card this wallet merely read.
                 try? await receivedGiftStorage.discardUnstarted(cardAddress)
             }
         }.value
@@ -280,12 +269,8 @@ struct ClaimGiftCard {
 }
 
 extension ReceivedGift {
-    /// The terminal answer this receipt already holds, or nil when it holds none yet.
-    ///
-    /// A foreign final spend answers whether or not the settle write that follows it landed. Our
-    /// own claim answers only once settled: unsettled means the broadcast reached the mempool and
-    /// nothing has confirmed it — such a claim can still expire unmined, so calling it collected
-    /// retires a retryable claim over funds still sitting on the card.
+    /// Our own claim answers only once settled: an unsettled broadcast can still expire unmined,
+    /// and calling it collected retires a retryable claim over funds still on the card.
     var settledOutcome: GiftClaimOutcome? {
         if isClaimedElsewhere { return .alreadyClaimed }
         if isSettled && !claimTxids.isEmpty { return .claimed(amount: Zatoshi(amountZatoshi), txIds: claimTxids) }

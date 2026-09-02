@@ -3,8 +3,6 @@
 import ComposableArchitecture
 import Foundation
 
-/// Hands a gift link out and records that it left the device.
-///
 /// Opening the share sheet is not the hand-off, and the whole design turns on that. The record of
 /// a hand-off releases the reset guard, and the reset wipes the only copy of an unshared card's
 /// seed. A sender who opened the sheet and changed their mind would otherwise be left with a card
@@ -16,9 +14,8 @@ struct ShareGiftLink {
     @Dependency(\.date) var date
     @Dependency(\.giftCardStorage) var giftCardStorage
 
-    /// Re-reads the card from storage immediately before handing its link out, and rebuilds the
-    /// link from the record — never a cached string. Nil when the card can no longer be handed
-    /// off; the caller flips to its unavailable state rather than sharing.
+    /// Rebuilds the link from a freshly-read record, never from a cached string. Nil when the card
+    /// can no longer be handed off; the caller flips to its unavailable state rather than sharing.
     func currentHandOff(cardId: String) async -> (card: StoredGiftCard, link: String)? {
         guard
             let card = try? await giftCardStorage.get(cardId),
@@ -28,9 +25,6 @@ struct ShareGiftLink {
         return (card, link)
     }
 
-    /// Records that the link left the device — a completed share sheet, or the clipboard, which is
-    /// an affirmative act reporting no outcome of its own.
-    ///
     /// Best-effort by design: the link is already out, so failing to record that must not read as
     /// a failed share. Callers that can tell the sender the record failed should — an unmarked
     /// card keeps blocking the wallet reset, and doing that silently is how the guard turns into a
@@ -47,9 +41,8 @@ struct ShareGiftLink {
 }
 
 extension StoredGiftCard {
-    /// Sharing is refused only for a claimed card and for one nothing was ever sent to. A card
-    /// whose broadcast outcome was never seen stays shareable: its money may be gone, and then the
-    /// link is the only route to it.
+    /// The same weak guard as `GiftCardLedger.markShared`, so the UI never offers a hand-off the
+    /// ledger will refuse to record.
     var canBeHandedOff: Bool {
         status != .claimed && hasFundingAttempt
     }

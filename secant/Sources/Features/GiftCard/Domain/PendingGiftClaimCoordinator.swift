@@ -14,9 +14,8 @@ extension DependencyValues {
 /// the claim screen is already up (two screens would race one card).
 @DependencyClient
 struct PendingGiftClaimCoordinatorClient {
-    /// Reconciles finished claims first, then registers the link of one claim that still has
-    /// recovery work left and returns its intake token — nil when none, refused, or already
-    /// pending.
+    /// Reconciles finished claims first, so a claim that confirmed while the app was away is not
+    /// reopened. Nil when there is nothing to resume, or the intake store refused.
     ///
     /// Scoped to receipts that actually started a claim (`isUnsettledClaim`). A receipt is
     /// written before the scan, so an unscoped sweep would also reopen the screen for every card

@@ -38,11 +38,9 @@ struct ReceivedGift: Codable, Equatable {
     var claimLink: GiftLinkPayload?
     /// Durable cleanup checkpoint written before the isolated database is deleted.
     var isFinalized: Bool
-    /// A scan found somebody else's final spend of this card, so there is nothing here to collect.
-    ///
-    /// Separate from `claimTxids`, which records only what *this* wallet submitted: a card emptied
-    /// by another holder leaves that list empty forever, and without this flag the answer would
-    /// have to be rediscovered by a full rescan every time the link is opened again.
+    /// A scan found somebody else's final spend of this card. Separate from `claimTxids`, which
+    /// records only what *this* wallet submitted, so without this flag the answer would have to be
+    /// rediscovered by a full rescan every time the link is opened again.
     var isClaimedElsewhere: Bool
 
     init(
@@ -96,15 +94,10 @@ struct ReceivedGift: Codable, Equatable {
         claimLink == nil
     }
 
-    /// Whether this wallet ever crossed the boundary into creating a claim transaction for this
-    /// card.
-    ///
-    /// A receipt is written before the scan starts, so one exists for every card this wallet
-    /// merely *looked* at — an unfunded card, a card whose funding has not confirmed, a card
-    /// another holder is mid-claim on. None of those hold recovery material: nothing was created,
-    /// so there is nothing to recover, and the link inside is a copy of one the sender still holds
-    /// and can send again. Only past this boundary is a receipt custody, and only then may it keep
-    /// a screen reopening or a wallet undeletable.
+    /// The custody boundary. A receipt is written before the scan starts, so one exists for every
+    /// card this wallet merely *looked* at, and none of those hold recovery material: nothing was
+    /// created, and the link inside is a copy of one the sender still holds. Only past this
+    /// boundary may a receipt keep a screen reopening or a wallet undeletable.
     var hasClaimAttempt: Bool {
         claimSubmissionAttemptedAt != nil || !claimTxids.isEmpty
     }
@@ -164,7 +157,7 @@ extension Array where Element == ReceivedGift {
         return [merged] + filter { $0.address != gift.address }
     }
 
-    /// Drops the link for `address`. One-way, and a no-op if absent.
+    /// One-way, and a no-op if absent.
     func settling(_ address: String) -> [ReceivedGift] {
         map { gift in
             guard gift.address == address else { return gift }
@@ -183,8 +176,6 @@ extension Array where Element == ReceivedGift {
         }
     }
 
-    /// Records that another holder emptied `address`. One-way, and a no-op if absent.
-    ///
     /// Its own transition rather than part of `recording` because it is written after `settling`,
     /// and a settled receipt deliberately refuses further merges.
     func markingClaimedElsewhere(_ address: String) -> [ReceivedGift] {
@@ -196,13 +187,9 @@ extension Array where Element == ReceivedGift {
         }
     }
 
-    /// Drops the receipt for `address` when this wallet never started a claim against it.
-    ///
     /// The only discard over this store, and the one that cannot lose anything: `hasClaimAttempt`
     /// is false exactly when no transaction was created and none was broadcast, so the record
-    /// describes a card this wallet read and nothing more. Left behind, such a record is
-    /// indistinguishable from an interrupted claim — it reopens the claim screen on every
-    /// foreground and refuses every destructive action, for a gift that was never taken.
+    /// describes a card this wallet read and nothing more.
     ///
     /// Deliberately narrow. A settled receipt is history, a foreign-claim receipt is a terminal
     /// answer worth keeping so the link need not be rescanned, and anything past the boundary is

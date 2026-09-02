@@ -10,31 +10,18 @@ struct GiftCardTransitionError: Error, Equatable {
 /// The transition rules over the stored card list, kept pure so every one of them is directly
 /// testable and so the storage client is nothing but an actor and a write.
 ///
-/// The invariants, each of which is money:
-///
-///  - Status only ever advances. A card that regresses is a card the UI stops accounting for.
-///  - A card is never recorded `funded` without a funding txid.
-///  - A card is never recorded settled without evidence its funding reached the card.
-///  - A mutation never drops a record or rewrites its key material.
-///
 /// The status is a *delivery* ordinal, not a description of the money: funding submitted but not
 /// yet mined is `draft` carrying a `fundingTxid`. That is what lets a sender share in the ~75
-/// seconds before the funding mines without the record claiming it has. The confirmation itself
-/// lives off the enum, in `fundingMinedAt`, and every caller that needs to know whether the money
-/// is really on the card asks `isFundingMined`.
+/// seconds before the funding mines without the record claiming it has.
 enum GiftCardLedger {
-    /// Persists a freshly minted card. Callers must complete this *before* submitting funding: a
-    /// crash in between otherwise loses the ephemeral seed, and with it the money, permanently.
+    /// Callers must complete this *before* submitting funding: a crash in between otherwise loses
+    /// the ephemeral seed, and with it the money, permanently.
     ///
     /// Minting supersedes any `isAbandonedDraft` already on file, which is the only discard in
-    /// this ledger and the only one that can be: a draft with no funding attempt is a record of an
-    /// address no transaction was ever sent to. Without it every edited amount leaves one behind
-    /// for good — a store that only grows, holding key material that unlocks nothing, in the
-    /// single blob each mutation reads and rewrites.
-    ///
-    /// Tied to minting rather than run on a timer on purpose. A sweep would have to decide when a
-    /// draft is old enough to be dead, and getting that wrong is unrecoverable; here the answer is
-    /// structural, and the store's actor makes the read-and-replace atomic.
+    /// this ledger and the only one that can be. Without it every edited amount leaves one behind
+    /// for good, in the single blob each mutation reads and rewrites. Tied to minting rather than
+    /// run on a timer because a sweep would have to decide when a draft is old enough to be dead,
+    /// and getting that wrong is unrecoverable.
     static func add(_ cards: [StoredGiftCard], card: StoredGiftCard) throws -> [StoredGiftCard] {
         try ensure(!cards.contains { $0.id == card.id }, "Gift card \(card.id) already exists")
         try ensure(card.status == .draft, "A new gift card starts as draft")
@@ -43,11 +30,9 @@ enum GiftCardLedger {
         return cards.filter { !$0.isAbandonedDraft } + [card]
     }
 
-    /// Marks that the SDK funding pipeline is about to be started.
-    ///
-    /// This is what makes the SDK boundary crash-safe. It is written before local creation because
-    /// the SDK's background resubmitter may automatically submit any outgoing transaction stored
-    /// in its database, even when the app has not called submit yet.
+    /// Written before local creation because the SDK's background resubmitter may automatically
+    /// submit any outgoing transaction stored in its database, even when the app has not called
+    /// submit yet. This is what makes the SDK boundary crash-safe.
     static func setFundingAttemptedAt(_ cards: [StoredGiftCard], id: String, at: String) throws -> [StoredGiftCard] {
         try cards.replacing(id) { card in
             try ensure(!card.hasFundingAttempt, "Gift card \(id) funding was already started")
@@ -63,7 +48,6 @@ enum GiftCardLedger {
         }
     }
 
-    /// Attaches the txid created after `setFundingAttemptedAt` established the durable gate.
     static func recordFundingCreated(
         _ cards: [StoredGiftCard],
         id: String,
@@ -87,8 +71,7 @@ enum GiftCardLedger {
         }
     }
 
-    /// Records the txid of a submitted funding transaction, leaving the card `draft` until it
-    /// mines. Idempotent for the same txid, so a retried submit is not an error.
+    /// Leaves the card `draft` until it mines. Idempotent for the same txid.
     static func recordFundingSubmitted(
         _ cards: [StoredGiftCard],
         id: String,
@@ -114,8 +97,8 @@ enum GiftCardLedger {
         }
     }
 
-    /// Resolves an attempt whose transaction was never created, after a fully-synced wallet read.
-    /// The history record keeps a shared card visible while clearing the double-funding gate.
+    /// Only legitimate after a fully-synced wallet read. The history record keeps a shared card
+    /// visible while clearing the double-funding gate.
     static func markFundingNotCreated(_ cards: [StoredGiftCard], id: String, at: String) throws -> [StoredGiftCard] {
         try cards.replacing(id) { card in
             if case .retryable(let lastFailure) = card.fundingLifecycle, lastFailure.reason == .noTransaction {
@@ -131,11 +114,9 @@ enum GiftCardLedger {
         }
     }
 
-    /// Resolves every expired transaction belonging to the current attempt.
-    ///
-    /// Keeping all ids matters after repeated recovery: an old expired row must never be selected
-    /// as the active transaction of a later attempt merely because it still targets the same
-    /// address.
+    /// Keeps every expired id, not just the newest: after repeated recovery an old expired row
+    /// must never be selected as the active transaction of a later attempt merely because it still
+    /// targets the same address.
     static func markFundingExpired(
         _ cards: [StoredGiftCard],
         id: String,
@@ -162,8 +143,8 @@ enum GiftCardLedger {
         }
     }
 
-    /// Archives expired candidates and attaches the single still-live transaction atomically.
-    /// This is recovery for a process death between SDK creation and recording the new txid.
+    /// Recovery for a process death between SDK creation and recording the new txid. Archiving and
+    /// attaching must land in one write.
     static func replaceExpiredFunding(
         _ cards: [StoredGiftCard],
         id: String,
@@ -200,10 +181,6 @@ enum GiftCardLedger {
         }
     }
 
-    /// Marks a card funded once its transaction has mined. The txid guard is the point: a card
-    /// recorded as funded with no transaction behind it is one the sender believes exists and the
-    /// recipient cannot claim.
-    ///
     /// Also records `fundingMinedAt`, which is the half that survives a card already past
     /// `funded`. First observation wins — the field is when the funding was *seen* to have mined,
     /// and a second sweep over the same transaction is not a new event.
@@ -234,14 +211,11 @@ enum GiftCardLedger {
         }
     }
 
-    /// Marks the link as handed out. Requires only that a broadcast was *started*, not that
-    /// funding has mined or that the submission outcome was observed.
-    ///
-    /// The weakest of the three guards, deliberately. A card whose broadcast outcome was never
-    /// seen has to be shareable too: its money may already have gone, and then the link is the
-    /// only route to it. Refusing that would leave a card the UI offers to hand out and the ledger
-    /// will not record — permanently unshareable, permanently blocking the reset guard. What stays
-    /// forbidden is the one case that hands out a link to an address nothing was ever sent to.
+    /// The weakest of the three guards, deliberately: a broadcast merely *started* is enough. A
+    /// card whose outcome was never seen has to be shareable too, because its money may already
+    /// have gone and then the link is the only route to it. Refusing that would leave a card the
+    /// UI offers to hand out and the ledger will not record — permanently unshareable, permanently
+    /// blocking the reset guard.
     static func markShared(_ cards: [StoredGiftCard], id: String, at: String) throws -> [StoredGiftCard] {
         try cards.replacing(id) { card in
             try ensure(card.hasFundingAttempt, "Gift card \(id) has not been funded yet")
@@ -249,7 +223,6 @@ enum GiftCardLedger {
         }
     }
 
-    /// Records that the card was scanned and still held its funds. No status change: nothing moved.
     static func recordChecked(_ cards: [StoredGiftCard], id: String, at: String) throws -> [StoredGiftCard] {
         try cards.replacing(id) { card in
             var next = card
@@ -259,8 +232,7 @@ enum GiftCardLedger {
         }
     }
 
-    /// Marks a card collected after its funding and finalized claim spend are observed. The
-    /// observation also backfills `fundingMinedAt`.
+    /// Backfills `fundingMinedAt`: a finalized claim spend is itself proof the funding mined.
     static func markClaimed(_ cards: [StoredGiftCard], id: String, at: String) throws -> [StoredGiftCard] {
         try cards.replacing(id) { card in
             try ensure(card.fundingTxid != nil, "Gift card \(id) has not been funded yet")
@@ -271,8 +243,8 @@ enum GiftCardLedger {
     }
 
     /// Whether `accountUuid` — or any account, when it is nil — still owns funds that only this
-    /// device knows how to reach. Blocks deleting the account, and with a nil `accountUuid` blocks
-    /// the wallet wipe, which clears them all.
+    /// device knows how to reach. Production only ever asks the nil question, to guard the paths
+    /// that destroy the gift keychain records; the per-account filter is exercised by tests.
     static func hasUnsharedFunds(_ cards: [StoredGiftCard], accountUuid: String? = nil) -> Bool {
         cards.contains { $0.isUnsharedFunds && (accountUuid == nil || $0.sourceAccountUuid == accountUuid) }
     }

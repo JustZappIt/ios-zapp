@@ -10,20 +10,15 @@ struct GiftRecordInvariantViolation: Error, Equatable {
 }
 
 /// Lifecycle of a locally minted card. Raw-value order is the only legal direction of travel.
-///
-/// `GiftCardLedger` advances a card by taking the maximum of its current and target status, so
-/// regression is unrepresentable rather than merely checked — and a card that regressed is a card
-/// the UI stops accounting for.
 enum GiftCardStatus: Int, Codable, Equatable, Comparable {
     /// Key material generated and persisted; nothing on chain yet.
     case draft = 0
 
     /// The funding transaction has mined. Never set without a txid.
     ///
-    /// A card can reach `shared` without passing through here — sharing is legal from the moment
-    /// there is a broadcast — and the status only climbs, so a later confirmation cannot write
-    /// this rank back. Hence `StoredGiftCard.fundingMinedAt`: this rank says how far the card has
-    /// got, that field says whether the money is on it, and a collection check turns on the second.
+    /// Not the test for "the money is on the card": sharing is legal from the first broadcast and
+    /// the status only climbs, so a card shared before its funding mined never takes this rank.
+    /// Collection checks ask `StoredGiftCard.isFundingMined` instead.
     case funded = 1
 
     /// The link has been handed to the share sheet at least once.
@@ -48,9 +43,8 @@ enum GiftFundingFailureReason: String, Codable, Equatable {
 
 /// Durable evidence for a funding attempt that can no longer put money on the card.
 ///
-/// Failed transaction ids are retained rather than overwritten by a retry. Reconciliation can then
-/// distinguish the new active transaction from every expired predecessor, even after several
-/// retries or a process restart.
+/// Failed transaction ids are retained rather than overwritten by a retry, so reconciliation can
+/// tell the new active transaction from every expired predecessor.
 struct GiftFundingFailure: Codable, Equatable {
     enum CodingKeys: String, CodingKey, CaseIterable {
         case reason
@@ -94,10 +88,8 @@ struct GiftFundingFailure: Codable, Equatable {
 }
 
 /// The mutually-exclusive funding state derived from the backward-compatible persisted fields.
-///
-/// `StoredGiftCard.status` describes delivery of the bearer link, not the transaction. Keeping the
-/// transaction lifecycle typed here prevents a shared card whose transaction expired from looking
-/// funded merely because `shared` sorts after `funded`.
+/// Typed separately from `StoredGiftCard.status`, which tracks delivery of the link rather than
+/// the transaction.
 enum GiftFundingLifecycle: Equatable {
     case neverStarted
     case attempting(attemptedAt: String)
@@ -112,7 +104,7 @@ enum GiftFundingLifecycle: Equatable {
 /// Custody-critical: the ephemeral seed is random rather than derived from the wallet seed and
 /// there is no reclaim, so for an unshared card this record is the only recovery path. `network`
 /// and `birthdayHeight` are stored rather than used once at creation because re-sharing rebuilds
-/// the link from here, and both are required fields of `GiftLinkPayload`.
+/// the link from here.
 ///
 /// Fields are mutable so the ledger's transitions can copy-and-amend, but every mutation must go
 /// through `GiftCardLedger` and end in `validate()` — the invariants are money.
@@ -152,11 +144,9 @@ struct StoredGiftCard: Codable, Equatable {
     let expiresAt: String?
     let message: String?
     var fundingTxid: String?
-    /// When `fundingTxid` was created and attached after the durable funding-start marker.
-    ///
-    /// Nil on records written before this phase existed. A legacy record with a txid is therefore
-    /// interpreted as submitted, while a new record with both fields can distinguish local
-    /// creation from money that may have left the sender's wallet.
+    /// When `fundingTxid` was created and attached after the durable funding-start marker. Nil on
+    /// records written before this phase existed, which is what makes a legacy record carrying a
+    /// txid read as submitted rather than merely created.
     var fundingCreatedAt: String?
     /// Set before the SDK creates the funding transaction and cleared once submission is known.
     /// The SDK's background resubmitter can broadcast a locally-created outgoing transaction on
@@ -166,9 +156,6 @@ struct StoredGiftCard: Codable, Equatable {
     /// A clean lightwalletd acceptance. Nil while submission is unresolved or not yet attempted.
     var fundingSubmittedAt: String?
     /// When the funding transaction was first observed with a block behind it.
-    ///
-    /// Orthogonal to `status` on purpose: that enum only climbs, so a card shared before its
-    /// funding mined has nowhere left to record the confirmation. See `isFundingMined`.
     var fundingMinedAt: String?
     /// When the card's own wallet was last scanned and found to still hold its funds. Only a
     /// conclusive look sets it, so it is evidence rather than a record of having tried.
@@ -262,8 +249,8 @@ struct StoredGiftCard: Codable, Equatable {
         return .neverStarted
     }
 
-    /// The SDK funding pipeline is active or completed. A terminal failed attempt is deliberately
-    /// excluded: only `GiftFundingLifecycle.retryable` may start another transaction.
+    /// A terminal failed attempt is deliberately excluded: only `GiftFundingLifecycle.retryable`
+    /// may start another transaction.
     var hasFundingAttempt: Bool {
         switch fundingLifecycle {
         case .attempting, .created, .submitted, .mined:
@@ -288,29 +275,26 @@ struct StoredGiftCard: Codable, Equatable {
         fundingSubmittedAt != nil || (fundingTxid != nil && fundingCreatedAt == nil)
     }
 
-    /// A mint whose funding pipeline never crossed its durable start marker.
-    ///
     /// The one state in which discarding a record discards nothing: funding writes
-    /// `fundingAttemptedAt` before asking the SDK to create a transaction. "No funding attempt" is
-    /// therefore a durable statement that no transaction can later be submitted or resubmitted.
+    /// `fundingAttemptedAt` before asking the SDK to create a transaction, so "no funding attempt"
+    /// is a durable statement that no transaction can later be submitted or resubmitted.
     var isAbandonedDraft: Bool {
         status == .draft && !hasFundingHistory
     }
 
     /// The funding is known to have mined, so the card really does hold its money.
     ///
-    /// `GiftCardStatus.shared` is deliberately not evidence — a sender may share between submit
-    /// and mining. Records written before `fundingMinedAt` existed fall back to the ranks that
-    /// could only have come from a confirmation, so a shared one reads as unconfirmed and gets
-    /// picked up by the next reconciliation: one extra lookup, never a wrong answer.
+    /// The status fallbacks are for records written before `fundingMinedAt` existed; they are the
+    /// only ranks that could have come from a confirmation. A pre-`fundingMinedAt` shared card
+    /// therefore reads as unconfirmed and gets picked up by the next reconciliation: one extra
+    /// lookup, never a wrong answer.
     var isFundingMined: Bool {
         fundingMinedAt != nil || status == .funded || status == .claimed
     }
 
-    /// Money has left the sender's wallet — or may have — and the link has not left the device, so
-    /// this record is the only route back to it. A txid rather than `funded` because a submitted
-    /// transaction is already spent, and `fundingAttemptedAt` too because a broadcast nobody saw
-    /// the end of has to be assumed to have landed.
+    /// This record is the only route back to money that may already have left the sender's wallet.
+    /// Keyed on the attempt rather than on `funded` because a broadcast nobody saw the end of has
+    /// to be assumed to have landed.
     var isUnsharedFunds: Bool {
         hasFundingAttempt && status < .shared
     }
@@ -342,8 +326,6 @@ extension StoredGiftCard: CustomStringConvertible, CustomDebugStringConvertible 
 }
 
 extension StoredGiftCard {
-    /// Rebuilds the shareable payload. The record is the source of truth for the link, not the
-    /// reverse.
     func toLinkPayload() -> GiftLinkPayload {
         GiftLinkPayload(
             version: GiftLinkCodec.version,

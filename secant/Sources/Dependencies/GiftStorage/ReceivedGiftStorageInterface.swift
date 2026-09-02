@@ -16,20 +16,13 @@ extension DependencyValues {
 @DependencyClient
 struct ReceivedGiftStorageClient {
     var getAll: @Sendable () async throws -> [ReceivedGift]
-    /// Idempotent and monotonic per card.
     var record: @Sendable (ReceivedGift) async throws -> Void
-    /// Drops the retained bearer secret for the address, its claim now being final.
-    ///
     /// Only claim confirmation should call this, and only on evidence: a receipt settled early is
     /// a gift that cannot be retried if its claim never mines.
     var settle: @Sendable (_ address: String) async throws -> Void
-    /// Durable cleanup checkpoint, written before the isolated database is deleted.
     var markFinalized: @Sendable (_ address: String) async throws -> Void
-    /// Records that another holder emptied this card, so re-opening the link need not rescan.
     var markClaimedElsewhere: @Sendable (_ address: String) async throws -> Void
-    /// Removes a receipt for a card this wallet read but never claimed. A no-op on anything that
-    /// created a transaction, was claimed elsewhere, or has already settled — and skips the write
-    /// entirely when nothing changed, because it runs on every inconclusive look.
+    /// Skips the write entirely when nothing changed, because it runs on every inconclusive look.
     var discardUnstarted: @Sendable (_ address: String) async throws -> Void
     /// True when any receipt still holds custody-critical retry material. Scoped to receipts that
     /// actually started a claim: a receipt is written before the scan, so "unsettled" alone would

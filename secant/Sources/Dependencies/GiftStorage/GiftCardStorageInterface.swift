@@ -20,19 +20,12 @@ extension DependencyValues {
 struct GiftCardStorageClient {
     var getAll: @Sendable () async throws -> [StoredGiftCard]
     var get: @Sendable (_ id: String) async throws -> StoredGiftCard?
-    /// Persists a freshly minted card. Must complete before its funding transaction is submitted.
     var add: @Sendable (StoredGiftCard) async throws -> Void
-    /// Flags funding before SDK transaction creation. Submitted/funded transitions clear it.
     var setFundingAttemptedAt: @Sendable (_ id: String, _ at: String) async throws -> Void
-    /// Stores the txid created after the durable funding-start marker.
     var recordFundingCreated: @Sendable (_ id: String, _ fundingTxid: String, _ at: String) async throws -> Void
-    /// Records a submitted funding txid. The card stays a draft until the transaction mines.
     var recordFundingSubmitted: @Sendable (_ id: String, _ fundingTxid: String, _ at: String) async throws -> Void
-    /// Clears a start marker only after a fully-synced wallet proves creation never happened.
     var markFundingNotCreated: @Sendable (_ id: String, _ at: String) async throws -> Void
-    /// Archives terminal transaction ids and makes the same card safe to fund again.
     var markFundingExpired: @Sendable (_ id: String, _ fundingTxids: Set<String>, _ at: String) async throws -> Void
-    /// Replaces expired candidates with the single still-live transaction in one atomic write.
     var replaceExpiredFunding: @Sendable (
         _ id: String,
         _ expiredFundingTxids: Set<String>,
@@ -41,13 +34,11 @@ struct GiftCardStorageClient {
     ) async throws -> Void
     var markFunded: @Sendable (_ id: String, _ fundingTxid: String, _ at: String) async throws -> Void
     var markShared: @Sendable (_ id: String, _ at: String) async throws -> Void
-    /// Records that the card's own wallet was scanned and still held its funds.
     var recordChecked: @Sendable (_ id: String, _ at: String) async throws -> Void
-    /// Records that the card's funding and a finalized claim spend were observed.
     var markClaimed: @Sendable (_ id: String, _ at: String) async throws -> Void
     /// True while `accountUuid` — or any account, when nil — owns funded cards whose links were
-    /// never shared. Blocks deleting that account, and blocks the wallet wipe, which clears this
-    /// whole store.
+    /// never shared. `EnsureNoUnsharedGiftFunds` is the only production caller and always passes
+    /// nil, blocking the wallet wipe that clears this whole store.
     var hasUnsharedFunds: @Sendable (_ accountUuid: String?) async throws -> Bool
     /// Emits the current list on subscribe and after every mutation.
     var observe: @Sendable () -> AsyncStream<[StoredGiftCard]> = { .finished }

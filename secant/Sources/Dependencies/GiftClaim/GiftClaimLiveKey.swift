@@ -195,13 +195,13 @@ private struct GiftClaimEngine {
                 memo: nil
             )
         } catch {
-            // Classified by arithmetic rather than by error-string matching, but the test has to
-            // be one a healthy card can pass: `available >= requested` is already guaranteed by
-            // the checks above, so testing that would report every proposal failure — a dropped
-            // connection included — as a permanently short card, and `underfunded` is the one
-            // outcome that deliberately offers no re-check. The real condition is the documented
-            // one: the amount is on the card and the fee on top of it is not.
-            guard available.amount - requested.amount < FundGiftCard.claimFeeReserve.amount else {
+            // Classified by arithmetic rather than by error-string matching, on the documented
+            // condition: the amount is on the card and the fee on top of it is not. The bound
+            // includes the reserve — a card minted here leaves exactly that behind, which is the
+            // case this outcome exists for. Not `available >= requested`, which the checks above
+            // already guarantee: that would report every proposal failure as a permanently short
+            // card, and `underfunded` is the one outcome that deliberately offers no re-check.
+            guard available.amount - requested.amount <= FundGiftCard.claimFeeReserve.amount else {
                 throw error
             }
             return .underfunded(available: available)
@@ -222,7 +222,6 @@ private struct GiftClaimEngine {
         // Derived before the irreversible boundary, so a derivation failure aborts cleanly.
         let spendingKey = try giftKey.deriveSpendingKey(request.payload.mnemonic, request.networkType)
 
-        // The receipt marker. A throw here aborts before anything irreversible.
         try await request.onBeforeSubmit()
 
         // The shielded tail: cancelling between submitting and returning leaves nobody knowing
@@ -467,8 +466,6 @@ private struct GiftClaimEngine {
 // MARK: - Inspect
 
 extension GiftClaimEngine {
-    // MARK: - Inspect
-
     func inspect(_ request: GiftInspectRequest, aliasSuffix: String) async throws -> GiftCardHoldings {
         let synchronizer = try await open(
             payload: request.payload,
