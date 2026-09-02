@@ -35,6 +35,13 @@ struct WalletStorage {
         static let zcashStoredVotingHotkey = "zcashStoredVotingHotkey"
         static let zcashStoredZodlAnnouncementFlag = "zcashStoredZodlAnnouncementFlag"
 
+        /// Gift-card custody blobs. Never version these names: a bumped key reads back absent,
+        /// indistinguishable from "no cards", orphaning every stored bearer seed. Additive Codable
+        /// fields with defaults are the supported change; anything else needs a migration that
+        /// reads the old key and writes the new one.
+        static let zcashStoredGiftCards = "gift_cards_v1"
+        static let zcashStoredReceivedGifts = "received_gifts_v1"
+
         /// Versioning of the stored data
         static let zcashKeychainVersion = 1
         /// Independent from `zcashKeychainVersion`: voting hotkeys have their own storage
@@ -209,6 +216,10 @@ struct WalletStorage {
             try? deleteData(forKey: key)
         }
         try? deleteData(forKey: Constants.zcashStoredVotingHotkey)
+        // Gift custody: callers must run EnsureNoUnsharedGiftFunds first — these blobs are the
+        // only recovery path for an unshared card's bearer seed.
+        try? deleteData(forKey: Constants.zcashStoredGiftCards)
+        try? deleteData(forKey: Constants.zcashStoredReceivedGifts)
     }
     
     func importAddressBookEncryptionKeys(_ keys: AddressBookEncryptionKeys) throws {
@@ -549,8 +560,58 @@ struct WalletStorage {
         return hotkey
     }
 
+    // MARK: - Gift cards
+
+    /// Both gift stores decode strictly (`GiftStoreCoding`): corrupt is a thrown `GiftStoreCorrupt`
+    /// and never an empty list, because absence and unreadability are different answers and only
+    /// one of them permits overwriting the blob.
+
+    func importGiftCards(_ cards: [StoredGiftCard]) throws {
+        let data = try GiftStoreCoding.encodeGiftCards(cards)
+        do {
+            try setData(data, forKey: Constants.zcashStoredGiftCards)
+        } catch KeychainError.duplicate {
+            try updateData(data, forKey: Constants.zcashStoredGiftCards)
+        } catch {
+            throw WalletStorageError.storageError(error)
+        }
+    }
+
+    func exportGiftCards() throws -> [StoredGiftCard] {
+        let reqData: Data?
+        do {
+            reqData = try data(forKey: Constants.zcashStoredGiftCards)
+        } catch KeychainError.noDataFound {
+            return []
+        }
+        guard let reqData else { return [] }
+        return try GiftStoreCoding.decodeGiftCards(reqData)
+    }
+
+    func importReceivedGifts(_ gifts: [ReceivedGift]) throws {
+        let data = try GiftStoreCoding.encodeReceivedGifts(gifts)
+        do {
+            try setData(data, forKey: Constants.zcashStoredReceivedGifts)
+        } catch KeychainError.duplicate {
+            try updateData(data, forKey: Constants.zcashStoredReceivedGifts)
+        } catch {
+            throw WalletStorageError.storageError(error)
+        }
+    }
+
+    func exportReceivedGifts() throws -> [ReceivedGift] {
+        let reqData: Data?
+        do {
+            reqData = try data(forKey: Constants.zcashStoredReceivedGifts)
+        } catch KeychainError.noDataFound {
+            return []
+        }
+        guard let reqData else { return [] }
+        return try GiftStoreCoding.decodeReceivedGifts(reqData)
+    }
+
     // MARK: - Wallet Storage Codable & Query helpers
-    
+
     func decode<T: Decodable>(json: Data, as clazz: T.Type) throws -> T? {
         do {
             let decoder = JSONDecoder()
