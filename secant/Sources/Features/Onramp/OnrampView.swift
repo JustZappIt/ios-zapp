@@ -56,10 +56,8 @@ struct OnrampView: View {
         }
     }
 
-    /// A bare spinner, as Android's `LoadingContent` has it. This used to carry
-    /// `onrampProgressSubtitleWorking` — "Zapp is working through your order. Keep this screen
-    /// open." — which belongs to an order already in flight. Opening the screen placed no order,
-    /// so it told the user something alarming and untrue.
+    /// A bare spinner, as Android's `LoadingContent` has it. The subtitle this used to carry
+    /// belongs to an order already in flight; opening the screen places none.
     var loading: some View {
         ProgressView()
             .tint(ZappColors.accent.color(colorScheme))

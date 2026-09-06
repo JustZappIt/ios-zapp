@@ -9,15 +9,14 @@ import SwiftUI
 /// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
 /// App lock routes into the existing `SecuritySettings` feature (verify current PIN/bio, then
-/// change PIN / switch auth method), matching Android's Security group. Read receipts, online
-/// status and background alerts are one `chatSettings` row, as Android gathers them.
+/// change PIN / switch auth method), matching Android's Security group.
 ///
 /// `allSettings` is iOS's route to the address book, advanced settings, about,
 /// feedback and voting. Keeping it here preserves those working surfaces without
 /// editing upstream's Settings reducer.
 ///
-/// The groups are separate properties rather than one `body`: as a single expression the six of
-/// them exceed the SwiftUI type-checker's budget and the file stops compiling.
+/// The groups are separate properties because six of them in one `body` exceeds the SwiftUI
+/// type-checker's budget.
 struct SettingsTabContent: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -126,10 +125,7 @@ struct SettingsTabContent: View {
 
     @ViewBuilder private var privacyGroup: some View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
-            // One door to the three chat preferences, as on Android: read
-            // receipts, online status and background alerts were three separate
-            // entries here, which buried Tor between them and made a short list
-            // read as a long one.
+            // One door to the three chat preferences, as on Android.
             ZappRow(
                 title: String(localizable: .settingsYouChatSettingsTitle),
                 subtitle: String(localizable: .settingsYouChatSettingsSubtitle),

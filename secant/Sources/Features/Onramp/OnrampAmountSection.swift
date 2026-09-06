@@ -9,14 +9,11 @@ import SwiftUI
 /// The amount step and its confirmation, mirroring Android's `OnrampAmountSection.kt`.
 extension OnrampView {
     enum Constants {
-        /// Matched to `ZappButton`'s 52pt so the destination row stands level with the controls
-        /// above and below it instead of reading as a thin strip between them.
+        /// Close to `ZappButton`'s 52pt so the row stands level with the controls around it.
         static let destinationCellHeight: CGFloat = 46
     }
 
-    /// Ordered as Android's `AmountContent`: say what this is, take the amount, then qualify it.
-    /// The account address is deliberately absent — it lives behind the header's info button
-    /// (`infoAccountBlock`), because it is reference material, not part of choosing an amount.
+    /// Ordered as Android's `AmountContent`. The account address lives in the info sheet.
     var amount: some View {
         VStack(alignment: .leading, spacing: 18) {
             intro
@@ -69,8 +66,7 @@ extension OnrampView {
         }
     }
 
-    /// Marks beside the labels, as Android's `DestinationSelector` has them: the choice is between
-    /// two tokens, and the logos read faster than the words.
+    /// Marks beside the labels, as Android's `DestinationSelector` has them.
     var destinationSelector: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(String(localizable: .onrampDestinationLabel))
@@ -89,8 +85,7 @@ extension OnrampView {
         }
     }
 
-    /// The balance rides the amount field, where Android puts it: it is the number the amount is
-    /// measured against, not a card of its own.
+    /// On the amount field, where Android puts it.
     var heroBalance: ZappFieldBalance? {
         guard let balance = store.baseBalance else { return nil }
         return ZappFieldBalance(
@@ -99,16 +94,13 @@ extension OnrampView {
         )
     }
 
-    /// Trailing-aligned and compact, as on Android: an escape hatch for funds already sitting on
-    /// Base, not a second call to action competing with the dock's primary.
+    /// Trailing-aligned and compact, as on Android: an escape hatch, not a second CTA.
     @ViewBuilder
     var sendToZecAction: some View {
         if store.baseBalance != nil, store.baseRefundState != .hidden {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 0) {
                     Spacer(minLength: 0)
-                    // Accent-outlined rather than a plain ghost: it moves real money, so it should
-                    // read as an action. Not a filled primary — that is the dock's.
                     ZappCompactButton(
                         title: store.baseRefundState == .inProgress
                             ? String(localizable: .onrampSendToZecInProgress)

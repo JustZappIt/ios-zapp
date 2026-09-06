@@ -6,8 +6,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The header's info sheet and the two confirmation sheets, mirroring Android's
-/// `OnrampInfoSection.kt`. The account detail lives here rather than on the page.
+/// The info and confirmation sheets, mirroring Android's `OnrampInfoSection.kt`.
 extension OnrampView {
     var infoSheet: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -37,8 +36,7 @@ extension OnrampView {
         .padding(.bottom, 24)
     }
 
-    /// Three steps either way, as Android lists them — the Zcash path swaps the merchant
-    /// confirmation for the conversion rather than stacking a fourth.
+    /// Three steps either way, as Android lists them.
     var infoSteps: [String] {
         store.destination == .zcash
             ? [
@@ -66,8 +64,7 @@ extension OnrampView {
         }
     }
 
-    /// The account reads as reference material, so it sits here rather than on the page — the
-    /// same filing Android uses (`OnrampDestinationInfo`, "shown inside the existing sheet").
+    /// Filed here rather than on the page, as Android's `OnrampDestinationInfo` is.
     func infoAccountBlock(_ address: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text((store.destination == .zcash
@@ -146,8 +143,7 @@ extension OnrampView {
             ZappButton(title: cancelTitle, variant: .ghost, action: cancel)
         }
         .padding(.horizontal, 24)
-        // The drag indicator is an overlay on iOS, not a laid-out handle as on Android, so the
-        // sheet's first line sits under it unless the content insets itself.
+        // The drag indicator is an overlay on iOS, so content must inset itself.
         .padding(.top, 24)
         .padding(.bottom, 24)
     }

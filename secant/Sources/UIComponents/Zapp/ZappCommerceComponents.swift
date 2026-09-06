@@ -90,8 +90,7 @@ struct ZappExplorerLink: View {
     }
 }
 
-/// The balance shown beside an amount field, as Android's `ZappFieldBalance` carries it: a caption
-/// naming the balance and the figure itself, kept as two pieces so the field can stack them.
+/// The balance beside an amount field, as Android's `ZappFieldBalance` carries it.
 struct ZappFieldBalance: Equatable {
     let label: String
     let amount: String
@@ -108,8 +107,7 @@ struct ZappAmountHero: View {
     let onChange: @Sendable (String) -> Void
 
     var body: some View {
-        // Two columns rather than three stacked rows: the field on the left, the balance stacked
-        // on the right. Reads as a pair of labelled figures and keeps the box two rows tall.
+        // Two columns rather than three stacked rows, so the box stays two rows tall.
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(label).zappFont(.caption, style: ZappColors.textMuted)
