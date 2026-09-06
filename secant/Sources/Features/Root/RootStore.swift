@@ -20,6 +20,7 @@ struct Root {
             case chatProfile
             case chatReadReceipts
             case chatRoom
+            case chatSettings
             case chatWalletAddress
             case groupInfo
             case newChat
@@ -299,7 +300,7 @@ struct Root {
                  .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
-                 .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
+                 .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress, .groupInfo,
                  .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:

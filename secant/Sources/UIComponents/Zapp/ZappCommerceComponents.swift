@@ -90,29 +90,51 @@ struct ZappExplorerLink: View {
     }
 }
 
+/// The balance shown beside an amount field, as Android's `ZappFieldBalance` carries it: a caption
+/// naming the balance and the figure itself, kept as two pieces so the field can stack them.
+struct ZappFieldBalance: Equatable {
+    let label: String
+    let amount: String
+}
+
 struct ZappAmountHero: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let label: String
     let symbol: String
     let amount: String
-    let balance: String?
+    let balance: ZappFieldBalance?
     let isEnabled: Bool
     let onChange: @Sendable (String) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label).zappFont(.caption, style: ZappColors.textMuted)
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(symbol).zappFont(.screenTitle, style: ZappColors.textMuted)
-                TextField("", text: Binding(get: { amount }, set: onChange))
-                    .keyboardType(.decimalPad)
-                    .zappFont(.screenTitle, style: ZappColors.text)
-                    .disabled(!isEnabled)
-                    .accessibilityLabel(label)
+        // Two columns rather than three stacked rows: the field on the left, the balance stacked
+        // on the right. Reads as a pair of labelled figures and keeps the box two rows tall.
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(label).zappFont(.caption, style: ZappColors.textMuted)
+
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(symbol).zappFont(.screenTitle, style: ZappColors.textMuted)
+                    TextField("", text: Binding(get: { amount }, set: onChange))
+                        .keyboardType(.decimalPad)
+                        .zappFont(.screenTitle, style: ZappColors.text)
+                        .disabled(!isEnabled)
+                        .accessibilityLabel(label)
+                }
             }
+
             if let balance {
-                Text(balance).zappFont(.caption, style: ZappColors.textMuted)
+                Spacer(minLength: 8)
+
+                VStack(alignment: .trailing, spacing: 8) {
+                    Text(balance.label).zappFont(.caption, style: ZappColors.textMuted)
+                    Text(balance.amount).zappFont(.rowTitle, style: ZappColors.text)
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityElement(children: .combine)
             }
         }
         .padding(16)

@@ -33,6 +33,16 @@ import Testing
         }
     }
 
+    /// Read receipts, online status and background alerts were three rows on the You tab; they are
+    /// one row now, and it has to land on the screen that gathers them.
+    @Test func theYouTabChatSettingsRowOpensChatSettings() {
+        withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            #expect(route(from: nil, .zappTabs(.chatSettingsTapped)).path == .chatSettings)
+        }
+    }
+
     @Test func theWalletAddressRowPushesTheAddressScreen() {
         withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()

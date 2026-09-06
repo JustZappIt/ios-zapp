@@ -9,14 +9,15 @@ import SwiftUI
 /// The You tab, mirroring the grouping of Android main's `SettingsTabContent.kt`.
 ///
 /// App lock routes into the existing `SecuritySettings` feature (verify current PIN/bio, then
-/// change PIN / switch auth method), matching Android's Security group. Android's Background
-/// delivery row is deliberately absent because push/background delivery is not available on iOS
-/// yet. Read receipts and online status open staged detail screens, matching Android without
-/// duplicating them in Profile.
+/// change PIN / switch auth method), matching Android's Security group. Read receipts, online
+/// status and background alerts are one `chatSettings` row, as Android gathers them.
 ///
 /// `allSettings` is iOS's route to the address book, advanced settings, about,
 /// feedback and voting. Keeping it here preserves those working surfaces without
 /// editing upstream's Settings reducer.
+///
+/// The groups are separate properties rather than one `body`: as a single expression the six of
+/// them exceed the SwiftUI type-checker's budget and the file stops compiling.
 struct SettingsTabContent: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -47,167 +48,19 @@ struct SettingsTabContent: View {
                             )
                         }
 
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
-                            ZappRow(
-                                title: String(localizable: .settingsYouContactsTitle),
-                                subtitle: String(localizable: .settingsYouContactsSubtitleNew),
-                                icon: Asset.Assets.Icons.userPlus.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.chatContactsTapped)
-                            }
-                        }
+                        peopleGroup
 
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupSecurity)) {
-                            ZappRow(
-                                title: String(localizable: .settingsYouProfileIdentityTitle),
-                                subtitle: String(localizable: .settingsYouProfileIdentitySubtitle),
-                                icon: Asset.Assets.Icons.user.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.chatProfileTapped)
-                            }
+                        securityGroup
 
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsYouAppLockTitle),
-                                subtitle: String(localizable: .settingsYouAppLockSubtitle),
-                                icon: Asset.Assets.Icons.lockLocked.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.appLockTapped)
-                            }
-                        }
-
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
-                            ZappToggleRow(
-                                title: String(
-                                    localized: "chat.notifications.background.title",
-                                    defaultValue: "Background chat alerts"
-                                ),
-                                subtitle: String(
-                                    localized: "chat.notifications.background.subtitle",
-                                    defaultValue: "Get a private alert when a direct message arrives"
-                                ),
-                                icon: Asset.Assets.Icons.messageChat.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft,
-                                isOn: chatProfileStore.backgroundNotificationsEnabled,
-                                isEnabled: !chatProfileStore.isBackgroundNotificationsBusy
-                            ) {
-                                chatProfileStore.send(.backgroundNotificationsToggled)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsYouTorTitle),
-                                subtitle: String(localizable: .settingsYouTorSubtitle),
-                                icon: Asset.Assets.shield.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.torTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .chatProfileReadReceipts),
-                                subtitle: String(localizable: .chatProfileReadReceiptsHint),
-                                icon: Asset.Assets.Icons.checkSolid.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) { store.send(.readReceiptsTapped) }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .chatProfilePresence),
-                                subtitle: String(localizable: .chatProfilePresenceHint),
-                                icon: Asset.Assets.Icons.user.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) { store.send(.onlineStatusTapped) }
-                        }
+                        privacyGroup
 
                         // iOS keeps the "P2P transactions" history row (Appendix B, iOS-only)
                         // alongside Android's payment-method row in this group.
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupP2p)) {
-                            ZappRow(
-                                title: String(localizable: .settingsYouP2pPaymentMethodTitle),
-                                subtitle: String(localizable: .settingsYouP2pPaymentMethodSubtitle),
-                                icon: Asset.Assets.Icons.pay.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.p2pPaymentMethodTapped)
-                            }
+                        p2pGroup
 
-                            ZappRowDivider(inset: true)
+                        walletGroup
 
-                            ZappRow(
-                                title: String(localizable: .settingsYouP2pTransactionsTitle),
-                                subtitle: String(localizable: .settingsYouP2pTransactionsSubtitle),
-                                icon: Asset.Assets.Icons.noTransactions.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.p2pTransactionsTapped)
-                            }
-                        }
-
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
-                            ZappRow(
-                                title: String(localizable: .settingsYouLocalCurrencyTitle),
-                                subtitle: String(localizable: .settingsYouLocalCurrencySubtitle),
-                                icon: Asset.Assets.Icons.currencyDollar.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.localCurrencyTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsPortfolioChartTitle),
-                                subtitle: String(localizable: .settingsPortfolioChartSubtitle),
-                                icon: Asset.Assets.Icons.currencyDollar.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.portfolioChartTapped)
-                            }
-
-                            ZappRowDivider(inset: true)
-
-                            ZappRow(
-                                title: String(localizable: .settingsYouServerTitle),
-                                subtitle: String(localizable: .settingsYouServerSubtitle),
-                                icon: Asset.Assets.Icons.server.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.chooseServerTapped)
-                            }
-                        }
-
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
-                            ZappRow(
-                                title: String(localizable: .settingsYouAllSettingsTitle),
-                                subtitle: String(localizable: .settingsYouAllSettingsSubtitle),
-                                icon: Asset.Assets.Icons.settings.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.allSettingsTapped)
-                            }
-                        }
+                        moreGroup
                     }
                     .padding(.bottom, ZappNavBar.clearance)
                     .zappScrollShadowSource()
@@ -227,6 +80,154 @@ struct SettingsTabContent: View {
                 ZappButton(title: copyKeyTitle, leadingIcon: copyKeyIcon) {
                     chatProfileStore.send(.copyPublicKeyTapped)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder private var peopleGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPeople)) {
+            ZappRow(
+                title: String(localizable: .settingsYouContactsTitle),
+                subtitle: String(localizable: .settingsYouContactsSubtitleNew),
+                icon: Asset.Assets.Icons.userPlus.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.chatContactsTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private var securityGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupSecurity)) {
+            ZappRow(
+                title: String(localizable: .settingsYouProfileIdentityTitle),
+                subtitle: String(localizable: .settingsYouProfileIdentitySubtitle),
+                icon: Asset.Assets.Icons.user.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.chatProfileTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsYouAppLockTitle),
+                subtitle: String(localizable: .settingsYouAppLockSubtitle),
+                icon: Asset.Assets.Icons.lockLocked.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.appLockTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private var privacyGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
+            // One door to the three chat preferences, as on Android: read
+            // receipts, online status and background alerts were three separate
+            // entries here, which buried Tor between them and made a short list
+            // read as a long one.
+            ZappRow(
+                title: String(localizable: .settingsYouChatSettingsTitle),
+                subtitle: String(localizable: .settingsYouChatSettingsSubtitle),
+                icon: Asset.Assets.Icons.messageChat.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.chatSettingsTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsYouTorTitle),
+                subtitle: String(localizable: .settingsYouTorSubtitle),
+                icon: Asset.Assets.shield.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.torTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private var p2pGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupP2p)) {
+            ZappRow(
+                title: String(localizable: .settingsYouP2pPaymentMethodTitle),
+                subtitle: String(localizable: .settingsYouP2pPaymentMethodSubtitle),
+                icon: Asset.Assets.Icons.pay.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.p2pPaymentMethodTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsYouP2pTransactionsTitle),
+                subtitle: String(localizable: .settingsYouP2pTransactionsSubtitle),
+                icon: Asset.Assets.Icons.noTransactions.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.p2pTransactionsTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private var walletGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
+            ZappRow(
+                title: String(localizable: .settingsYouLocalCurrencyTitle),
+                subtitle: String(localizable: .settingsYouLocalCurrencySubtitle),
+                icon: Asset.Assets.Icons.currencyDollar.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.localCurrencyTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsPortfolioChartTitle),
+                subtitle: String(localizable: .settingsPortfolioChartSubtitle),
+                icon: Asset.Assets.Icons.currencyDollar.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.portfolioChartTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsYouServerTitle),
+                subtitle: String(localizable: .settingsYouServerSubtitle),
+                icon: Asset.Assets.Icons.server.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.chooseServerTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private var moreGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
+            ZappRow(
+                title: String(localizable: .settingsYouAllSettingsTitle),
+                subtitle: String(localizable: .settingsYouAllSettingsSubtitle),
+                icon: Asset.Assets.Icons.settings.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.allSettingsTapped)
             }
         }
     }

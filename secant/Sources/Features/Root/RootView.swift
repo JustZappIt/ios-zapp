@@ -393,6 +393,17 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .chatSettings {
+                                ChatSettingsView(
+                                    store: store.scope(
+                                        state: \.chatProfileState,
+                                        action: \.chatProfile
+                                    )
+                                ) {
+                                    store.send(.backToHomeFromChatPrivacyTapped)
+                                }
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .chatReadReceipts {
                                 ChatPrivacySettingView(
                                     store: store.scope(
