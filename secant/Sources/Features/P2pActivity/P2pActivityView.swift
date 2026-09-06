@@ -4,6 +4,12 @@ import ComposableArchitecture
 import SwiftUI
 
 struct P2pActivityView: View {
+    private enum Constants {
+        static let balanceGap: CGFloat = 6
+        static let actionGap: CGFloat = 16
+        static let noticeGap: CGFloat = 12
+    }
+
     @Environment(\.colorScheme) private var colorScheme
 
     @Perception.Bindable var store: StoreOf<P2pActivity>
@@ -75,8 +81,11 @@ struct P2pActivityView: View {
     @ViewBuilder
     private var balanceCard: some View {
         if let account = store.account {
+            // Value above, action below, parted by a rule that spans the card. The action used to
+            // be a shrink-wrapped button centred inside this left-aligned stack, so it lined up
+            // with neither the balance above it nor the card's own edges.
             ZappBorderedCard {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(String(localizable: .offrampHistoryBalance))
                         .zappFont(.eyebrow, style: ZappColors.textMuted)
 
@@ -85,22 +94,28 @@ struct P2pActivityView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, Constants.balanceGap)
 
                     if store.offersRefund {
-                        ZappCompactButton(
+                        Rectangle()
+                            .fill(ZappColors.border.color(colorScheme))
+                            .frame(height: 1)
+                            .padding(.top, Constants.actionGap)
+
+                        ZappButton(
                             title: String(localizable: .offrampHistoryRefund),
                             variant: .primary
                         ) {
                             store.send(.refundTapped)
                         }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 8)
+                        .padding(.top, Constants.actionGap)
                     }
 
                     if let notice = refundNotice {
                         Text(notice)
                             .zappFont(.caption, style: ZappColors.textMuted)
                             .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, Constants.noticeGap)
                     }
                 }
             }

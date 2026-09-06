@@ -5,7 +5,9 @@ import Foundation
 extension Onramp {
     enum Action: Equatable {
         case onAppear
-        case loaded(OnrampLimitsModel, String, OnrampCheckpointModel?, Bool, OfframpAccountModel?)
+        case loaded(OnrampLimitsModel, String, OnrampCheckpointModel?, Bool)
+        /// Arrives on its own, after the page is already up — see `.onAppear`.
+        case accountSummaryLoaded(OfframpAccountModel?)
         case loadFailed(String)
         case resumeLoadedCheckpoint(OnrampCheckpointModel)
         case amountChanged(String)

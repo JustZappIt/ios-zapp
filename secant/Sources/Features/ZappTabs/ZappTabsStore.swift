@@ -54,6 +54,7 @@ struct ZappTabs {
         case appLockTapped
         case chatContactsTapped
         case chatProfileTapped
+        case chatSettingsTapped
         case chooseServerTapped
         case giftCardListTapped
         case localCurrencyTapped
@@ -81,9 +82,9 @@ struct ZappTabs {
                 state.hideNavPill = isFullscreen
                 return .none
 
-            case .allSettingsTapped, .appLockTapped, .chatContactsTapped, .chatProfileTapped, .chooseServerTapped,
-            .giftCardListTapped, .localCurrencyTapped, .onlineStatusTapped, .p2pPaymentMethodTapped, .p2pTransactionsTapped,
-            .portfolioChartTapped, .readReceiptsTapped, .torTapped:
+            case .allSettingsTapped, .appLockTapped, .chatContactsTapped, .chatProfileTapped, .chatSettingsTapped,
+            .chooseServerTapped, .giftCardListTapped, .localCurrencyTapped, .onlineStatusTapped,
+            .p2pPaymentMethodTapped, .p2pTransactionsTapped, .portfolioChartTapped, .readReceiptsTapped, .torTapped:
                 return .none
             }
         }

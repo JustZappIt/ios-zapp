@@ -55,6 +55,12 @@
     "%@%%" : {
 
     },
+    "chatNotifications.backgroundSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Get a private alert when a direct message arrives"}},"es":{"stringUnit":{"state":"translated","value":"Recibe una alerta privada cuando llegue un mensaje directo"}}}},
+    "chatNotifications.backgroundTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Background chat alerts"}},"es":{"stringUnit":{"state":"translated","value":"Alertas de chat en segundo plano"}}}},
+    "chatSettings.sectionDelivery" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Delivery"}},"es":{"stringUnit":{"state":"translated","value":"Entrega"}}}},
+    "chatSettings.title" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
+    "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status and alerts"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea y alertas"}}}},
+    "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
     "~%@ %@" : {
       "localizations" : {
         "en" : {
@@ -33215,6 +33221,7 @@
     "onramp.info.zcash.note" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zapp never holds your money. If the conversion cannot start or is refunded, your USDC stays on Base."}},"es":{"stringUnit":{"state":"translated","value":"Zapp nunca custodia tu dinero. Si la conversión no puede comenzar o se reembolsa, tus USDC permanecen en Base."}}}},
     "onramp.info.zcash.step.convert" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zapp converts it to shielded ZEC."}},"es":{"stringUnit":{"state":"translated","value":"Zapp los convierte a ZEC protegido."}}}},
     "onramp.info.zcash.step.settle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"USDC arrives in your self-custodial Base account."}},"es":{"stringUnit":{"state":"translated","value":"Los USDC llegan a tu cuenta de Base de autocustodia."}}}},
+    "onramp.limits.label" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Limits"}},"es":{"stringUnit":{"state":"translated","value":"L\u00edmites"}}}},
     "onramp.orderID.label" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Order ID"}},"es":{"stringUnit":{"state":"translated","value":"ID de orden"}}}},
     "onramp.paid.confirm.action" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Yes, I have paid"}},"es":{"stringUnit":{"state":"translated","value":"Sí, ya he pagado"}}}},
     "onramp.paid.confirm.body" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Confirming tells the merchant to release your USDC. Only continue if your payment app shows the transfer succeeded."}},"es":{"stringUnit":{"state":"translated","value":"Al confirmar, indicas al comerciante que libere tus USDC. Continúa solo si tu aplicación de pagos muestra que la transferencia se completó."}}}},

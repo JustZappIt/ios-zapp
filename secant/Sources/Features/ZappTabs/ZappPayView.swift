@@ -245,8 +245,11 @@ struct ZappPayView: View {
 
     private var speedDialActions: [ZappSpeedDialAction] {
         var actions = [
+            // Android's `PayActionSpeedDial` uses Storefront here, and the shopping bag is this
+            // catalogue's nearest equivalent. It also removes a real ambiguity: the old `pay`
+            // glyph is an arrow entering a circle, which read as "send" right beside Send.
             ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.pay.image,
+                    icon: Asset.Assets.Icons.shoppingBag.image,
                     label: String(localizable: .zappPayFabPay)
                 ) {
                     store.send(.payWithNearTapped)
@@ -257,8 +260,9 @@ struct ZappPayView: View {
                 ) {
                     store.send(.sendTapped)
                 },
+                // The catalogue's exact counterpart to Android's `Icons.Default.SwapHoriz`.
                 ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.swap.image,
+                    icon: Asset.Assets.Icons.switchHorizontal.image,
                     label: String(localizable: .zappPayFabSwap)
                 ) {
                     store.send(.swapWithNearTapped)

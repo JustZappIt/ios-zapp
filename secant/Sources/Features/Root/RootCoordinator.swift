@@ -931,6 +931,10 @@ extension Root {
                 state.path = .p2pActivity
                 return .none
 
+            case .zappTabs(.chatSettingsTapped):
+                state.path = .chatSettings
+                return .none
+
             case .zappTabs(.readReceiptsTapped):
                 state.path = .chatReadReceipts
                 return .none
