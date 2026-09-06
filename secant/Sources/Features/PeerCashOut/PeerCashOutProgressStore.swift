@@ -169,10 +169,12 @@ struct PeerCashOutProgress {
                 return .run { _ in
                     try await peerCashOut.retryCashOut(attemptID)
                 } catch: { error, send in
-                    // A refused authentication leaves the attempt exactly as it was and needs no
-                    // words. A refused admission does: the balance this attempt was going to
-                    // re-offer has been promised to something else since it failed.
-                    guard !(error is PeerCashOutClientError) else { return }
+                    // Only a refused authentication is silent: it leaves the attempt exactly as
+                    // it was and the user made the choice, so there is nothing to report. Every
+                    // other `PeerCashOutClientError` carries a message the user needs — an
+                    // unreadable Base balance surfaces here as `.unavailable`, and swallowing it
+                    // left the button inert with no spinner, no message and no state change.
+                    if error as? PeerCashOutClientError == .authenticationCancelled { return }
                     await send(.retryFailed(error.localizedDescription, generation: generation))
                 }
 

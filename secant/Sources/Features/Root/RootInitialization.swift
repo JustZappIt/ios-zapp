@@ -156,10 +156,13 @@ extension Root {
                 // as well as at background, because an inactive-without-background cycle never
                 // runs the background boundary at all.
                 state.didScheduleStartFailureRetry = false
+                let giftResume: Effect<Root.Action> = state.appInitializationState == .initialized
+                    ? .send(.giftResumePendingClaim)
+                    : .none
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
-                    return .merge(migrationTickEffect, migrationCheck, .send(.initialization(.initialSetups)))
+                    return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.initialSetups)))
                 } else {
-                    return .merge(migrationTickEffect, migrationCheck, .send(.initialization(.retryStart)))
+                    return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.retryStart)))
                 }
                 
             case .initialization(.appDelegate(.migrationNotificationTapped(let accountUUID, let isTorFailure))):
@@ -235,6 +238,7 @@ extension Root {
                 state.didScheduleStartFailureRetry = false
                 // `.retryStart` rebuilds these subscriptions after foregrounding.
                 return .merge(
+                    .send(.giftClaim(.backgrounded)),
                     .cancel(id: state.CancelStateId),
                     .cancel(id: state.CancelTransactionsStateId),
                     .cancel(id: state.CancelEventId),
@@ -1289,6 +1293,8 @@ extension Root {
                     // worklet cannot boot before the wallet exists. This action
                     // fires on both the new-wallet and existing-wallet paths.
                     .send(.observeZappMessaging),
+                    // Gift custody: reconcile funding, reopen unsettled claims, prefetch params.
+                    .send(.giftStartupSweep),
                     // MOB-1466: the OTHER start/restart site — a completed launch is just as much
                     // "the app is now open" as a foreground re-entry is. See `willEnterForeground`'s
                     // identical call for the "the open breaks the loop's sleep" rationale.
@@ -1373,11 +1379,13 @@ extension Root {
 
                 state.appInitializationState = .initialized
                 let isAtDeeplinkWarningScreen = state.destinationState.destination == .deeplinkWarning
+                // A claim opened from a cold start must not be yanked to home mid-preview.
+                let isAtGiftClaimScreen = state.destinationState.destination == .giftClaim
 
                 return .run { send in
                     // Delay the splash overlay dismissal
                     try await mainQueue.sleep(for: .seconds(0.5))
-                    if !isAtDeeplinkWarningScreen {
+                    if !isAtDeeplinkWarningScreen && !isAtGiftClaimScreen {
                         await send(.destination(.updateDestination(Root.DestinationState.Destination.home)))
                     }
                 }
@@ -1385,6 +1393,23 @@ extension Root {
                 
             case .initialization(.resetZashiRequest(let areMetadataPreserved)):
                 state.areMetadataPreserved = areMetadataPreserved
+                // Gift custody guard on the use path itself, not just the screen: the reset wipes
+                // the only copy of every unshared card's seed and every unsettled claim's link.
+                // An unreadable store blocks too — guessing "empty" wrong destroys money.
+                return .run { [allowGiftDataLoss = state.allowGiftDataLoss] send in
+                    if !allowGiftDataLoss {
+                        do {
+                            try await EnsureNoUnsharedGiftFunds()()
+                        } catch {
+                            await send(.giftResetBlocked(areMetadataPreserved))
+                            return
+                        }
+                    }
+                    await send(.giftResetGuardPassed)
+                }
+
+            case .giftResetGuardPassed:
+                state.hasClearedGiftResetGuard = true
                 return .merge(
                     .send(.onramp(.cancelAll)),
                     .send(.offramp(.cancelAll)),
@@ -1396,9 +1421,21 @@ extension Root {
                         await send(.initialization(.resetZashi))
                     }
                 )
-                
-            case .initialization(.resetZashiRequestCanceled):
+
+            case .giftResetBlocked(let areMetadataPreserved):
+                // Review pushes onto the home path stack, which only renders under the `.home`
+                // destination. The alerts that reach the wipe from onboarding or a failed init
+                // get the variant without it rather than a button that dismisses and does nothing.
+                state.alert = state.destinationState.destination == .home
+                    ? AlertState.unsettledGifts(areMetadataPreserved)
+                    : AlertState.unsettledGiftsWithoutReview(areMetadataPreserved)
+                return .none
+
+            case .giftResetGuardReviewTapped:
                 state.alert = nil
+                state.giftCardListState = GiftCardList.State()
+                state.path = .giftCardList
+                // Unstick the reset screen's spinner the same way a cancel does.
                 for (id, element) in zip(state.settingsState.path.ids, state.settingsState.path) {
                     if element.is(\.resetZashi) {
                         return .send(.settings(.path(.element(id: id, action: .resetZashi(.deleteCanceled)))))
@@ -1406,7 +1443,44 @@ extension Root {
                 }
                 return .none
 
+            case .giftResetGuardDeleteAnywayTapped(let areMetadataPreserved):
+                state.alert = nil
+                state.allowGiftDataLoss = true
+                return .send(.initialization(.resetZashiRequest(areMetadataPreserved)))
+                
+            case .initialization(.resetZashiRequestCanceled):
+                state.alert = nil
+                state.allowGiftDataLoss = false
+                state.hasClearedGiftResetGuard = false
+                for (id, element) in zip(state.settingsState.path.ids, state.settingsState.path) {
+                    if element.is(\.resetZashi) {
+                        return .send(.settings(.path(.element(id: id, action: .resetZashi(.deleteCanceled)))))
+                    }
+                }
+                return .none
+
+            case .giftResetGuardCleared:
+                state.hasClearedGiftResetGuard = true
+                return .send(.initialization(.resetZashi))
+
             case .initialization(.resetZashi):
+                // The guard belongs on the use path, not on one screen's action: this wipe
+                // deletes the only copy of every unshared card's bearer seed, and there is no
+                // reclaim. `.resetZashiRequest` refuses earlier so the teardown below never
+                // starts, but `walletStateFailed`, `differentSeed` and `existingWallet` dispatch
+                // this action directly, and a guard that covers one destructive path and not
+                // another is the same bug with extra steps.
+                guard state.hasClearedGiftResetGuard || state.allowGiftDataLoss else {
+                    return .run { [areMetadataPreserved = state.areMetadataPreserved] send in
+                        do {
+                            try await EnsureNoUnsharedGiftFunds()()
+                        } catch {
+                            await send(.giftResetBlocked(areMetadataPreserved))
+                            return
+                        }
+                        await send(.giftResetGuardCleared)
+                    }
+                }
                 guard let wipePublisher = sdkSynchronizer.wipe() else {
                     return .send(.resetZashiSDKFailed)
                 }
@@ -1612,6 +1686,10 @@ extension Root {
                     )
                 }
                 state.maxResetZashiSDKAttempts = ResetZashiConstants.maxResetZashiSDKAttempts
+                // The attempt is over, so both overrides expire with it. Left set, a "delete
+                // anyway" that then failed would silently wave the next reset past the guard.
+                state.allowGiftDataLoss = false
+                state.hasClearedGiftResetGuard = false
                 for element in state.settingsState.path {
                     if case .resetZashi(var resetZashiState) = element {
                         resetZashiState.isProcessing = false
@@ -1623,10 +1701,21 @@ extension Root {
 
             case .phraseDisplay(.finishedTapped), .onboarding(.newWalletSuccessfullyCreated):
                 state.destinationState.destination = .home
-                if state.isStaleWalletHealedAlertPending {
-                    return presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId)
+                // A recipient who tapped a link before having a wallet deferred it on the way to
+                // onboarding; the wallet now exists, so their claim comes back.
+                let resumeDeferredGift: Effect<Root.Action> = .run { send in
+                    @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+                    if let token = pendingGiftLinks.resumeDeferred() {
+                        await send(.giftClaimResumed(token))
+                    }
                 }
-                return .none
+                if state.isStaleWalletHealedAlertPending {
+                    return .merge(
+                        presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId),
+                        resumeDeferredGift
+                    )
+                }
+                return resumeDeferredGift
 
             case .onboarding(.createNewWalletTapped):
                 if state.appInitializationState == .keysMissing {

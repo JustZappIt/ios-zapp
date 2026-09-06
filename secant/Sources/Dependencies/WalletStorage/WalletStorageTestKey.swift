@@ -42,6 +42,10 @@ extension WalletStorageClient {
         exportPINHash: { nil },
         removePINHash: { },
         importVotingHotkey: { _, _ in },
-        exportVotingHotkey: { _ in .init(storedSecret: .init(Data()), version: 0) }
+        exportVotingHotkey: { _ in .init(storedSecret: .init(Data()), version: 0) },
+        importGiftCards: { _ in },
+        exportGiftCards: { [] },
+        importReceivedGifts: { _ in },
+        exportReceivedGifts: { [] }
     )
 }

@@ -319,6 +319,34 @@ extension SDKSynchronizerClient: DependencyKey {
                     transparentReceiver: transparentReceiver
                 )
             },
+            getTransactionOverviews: {
+                try await synchronizer.allTransactions()
+            },
+            getOverviewRecipients: { overview in
+                await synchronizer.getRecipients(for: overview)
+            },
+            createProposedTransactionsWithoutSubmit: { proposal, spendingKey in
+                try await synchronizer.broadcaster.createProposedTransactions(
+                    proposal: proposal,
+                    spendingKey: spendingKey
+                )
+            },
+            submitCreatedTransactionsForGift: { transactions in
+                @Dependency(\.transactionGuard) var transactionGuard
+                return try await transactionGuard.withSubmission {
+                    await Self.submitCreatedTransactions(
+                        transactions,
+                        logPrefix: "[GiftFund]",
+                        userStoredPreferences: userStoredPreferences,
+                        zcashSDKEnvironment: zcashSDKEnvironment,
+                        submit: { createdTransactions, endpoints in
+                            await Self.submitTransactionsIndividually(createdTransactions, to: endpoints) { transaction, endpoints in
+                                await synchronizer.broadcaster.submit(transaction: transaction, to: endpoints)
+                            }
+                        }
+                    )
+                }
+            },
             isSeedRelevantToAnyDerivedAccount: { seed in
                 try await synchronizer.isSeedRelevantToAnyDerivedAccount(seed: seed)
             },

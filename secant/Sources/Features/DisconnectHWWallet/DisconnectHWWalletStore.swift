@@ -78,6 +78,21 @@ struct DisconnectHWWallet {
                     return .none
                 }
                 return .run { send in
+                    // Gift custody: refuse while any unsettled claim is pinned to this account.
+                    // Unlike a reset this path offers no "anyway" — it has no way to proceed —
+                    // which is exactly why the check scopes to claims that actually started; an
+                    // unscoped receipt would make the account undisconnectable forever. An
+                    // unreadable store blocks for the same reason the reset guard blocks.
+                    @Dependency(\.receivedGiftStorage) var receivedGiftStorage
+                    let accountKey = keystoneAccount.giftStorageKey
+                    let receipts = try? await receivedGiftStorage.getAll()
+                    let holdsUnsettledClaim = receipts?.contains {
+                        $0.isUnsettledClaim && $0.destinationAccountUuid == accountKey
+                    } ?? true
+                    if holdsUnsettledClaim {
+                        await send(.disconnectFailed(String(localizable: .deleteWalletGiftCardsMessage)))
+                        return
+                    }
                     do {
                         try await sdkSynchronizer.deleteAccount(keystoneAccount)
                         await send(.disconnectFinished)

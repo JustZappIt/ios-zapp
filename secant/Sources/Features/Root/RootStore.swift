@@ -21,6 +21,8 @@ struct Root {
             case chatReadReceipts
             case chatRoom
             case chatWalletAddress
+            case giftCard
+            case giftCardList
             case groupInfo
             case newChat
             case onramp
@@ -235,6 +237,15 @@ struct Root {
         /// Built when a cash-out is opened, because it is scoped to one destination and carries the
         /// screens pushed on top of it.
         var peerCashOutState = PeerCashOut.State(destinationCode: "revolut")
+        /// The explicit "delete anyway" override for the gift reset guard. The screen's warning
+        /// is UX; the use-case refusal is the invariant, and only this flag lifts it.
+        var allowGiftDataLoss = false
+        /// Set once the guard has actually run and passed for this attempt, so the backstop on
+        /// `.resetZashi` does not re-read the store for a request that already cleared it.
+        var hasClearedGiftResetGuard = false
+        var giftCardState = GiftCard.State()
+        var giftCardListState = GiftCardList.State()
+        var giftClaimState = GiftClaim.State()
         var peerCashOutActivityReturn: PeerCashOutActivityReturn?
         var peerCashOutOrigin = PeerCashOutOrigin.pay
         var offrampOrigin = OfframpOrigin.pay
@@ -297,6 +308,9 @@ struct Root {
             // classifies it identically.
             case .migrationCoordFlow, .onramp, .offramp, .peerCashOut, .sendCoordFlow, .scanCoordFlow,
                  .swapAndPayCoordFlow, .transactionsCoordFlow:
+                return true
+            // Both gift screens can put bearer material on screen, and the create flow broadcasts.
+            case .giftCard, .giftCardList:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatWalletAddress, .groupInfo,
@@ -438,6 +452,18 @@ struct Root {
         case p2pActivity(P2pActivity.Action)
         case p2pPaymentMethod(P2pPaymentMethod.Action)
         case peerCashOut(PeerCashOut.Action)
+        case giftCard(GiftCard.Action)
+        case giftCardList(GiftCardList.Action)
+        case giftClaim(GiftClaim.Action)
+        case giftLinkReceived(String)
+        case giftStartupSweep
+        case giftResumePendingClaim
+        case giftClaimResumed(String)
+        case giftResetBlocked(Bool)
+        case giftResetGuardCleared
+        case giftResetGuardPassed
+        case giftResetGuardReviewTapped
+        case giftResetGuardDeleteAnywayTapped(Bool)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -531,6 +557,7 @@ struct Root {
     @Dependency(\.swapAndPay) var swapAndPay
     @Dependency(\.autoServerSelection) var autoServerSelection
     @Dependency(\.uriParser) var uriParser
+    @Dependency(\.pendingGiftLinks) var pendingGiftLinks
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
@@ -662,6 +689,18 @@ struct Root {
 
         Scope(state: \.peerCashOutState, action: \.peerCashOut) {
             PeerCashOut()
+        }
+
+        Scope(state: \.giftCardState, action: \.giftCard) {
+            GiftCard()
+        }
+
+        Scope(state: \.giftCardListState, action: \.giftCardList) {
+            GiftCardList()
+        }
+
+        Scope(state: \.giftClaimState, action: \.giftClaim) {
+            GiftClaim()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {
@@ -1018,6 +1057,43 @@ extension Root {
 // MARK: Alerts
 
 extension AlertState where Action == Root.Action {
+    static func unsettledGifts(_ areMetadataPreserved: Bool) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .deleteWalletGiftCardsTitle))
+        } actions: {
+            ButtonState(action: .giftResetGuardReviewTapped) {
+                TextState(String(localizable: .deleteWalletGiftCardsReview))
+            }
+            ButtonState(role: .destructive, action: .giftResetGuardDeleteAnywayTapped(areMetadataPreserved)) {
+                TextState(String(localizable: .deleteWalletGiftCardsDeleteAnyway))
+            }
+            ButtonState(role: .cancel, action: .initialization(.resetZashiRequestCanceled)) {
+                TextState(String(localizable: .giftCardRetryCancel))
+            }
+        } message: {
+            TextState(String(localizable: .deleteWalletGiftCardsMessage))
+        }
+    }
+
+    /// The same refusal, minus Review, for the destructive paths that can raise it from outside
+    /// the home destination — a failed initialization, or onboarding meeting an existing wallet.
+    /// The deck renders inside `.home`, so offering Review there would dismiss the alert and go
+    /// nowhere; the refusal itself is what has to hold.
+    static func unsettledGiftsWithoutReview(_ areMetadataPreserved: Bool) -> AlertState {
+        AlertState {
+            TextState(String(localizable: .deleteWalletGiftCardsTitle))
+        } actions: {
+            ButtonState(role: .destructive, action: .giftResetGuardDeleteAnywayTapped(areMetadataPreserved)) {
+                TextState(String(localizable: .deleteWalletGiftCardsDeleteAnyway))
+            }
+            ButtonState(role: .cancel, action: .initialization(.resetZashiRequestCanceled)) {
+                TextState(String(localizable: .giftCardRetryCancel))
+            }
+        } message: {
+            TextState(String(localizable: .deleteWalletGiftCardsMessage))
+        }
+    }
+
     static func cantLoadSeedPhrase() -> AlertState {
         AlertState {
             TextState(String(localizable: .rootInitializationAlertFailedTitle))

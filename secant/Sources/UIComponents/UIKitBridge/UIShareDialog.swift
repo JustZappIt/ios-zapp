@@ -139,13 +139,21 @@ class UIShareDialog: UIView {
 }
 
 extension UIShareDialog {
-    func doInitialSetup(activityItems: [Any], completion: @escaping () -> Void, onDismiss: (() -> Void)? = nil) {
+    func doInitialSetup(
+        activityItems: [Any],
+        completion: @escaping () -> Void,
+        onDismiss: (() -> Void)? = nil,
+        onOutcome: ((Bool) -> Void)? = nil
+    ) {
         DispatchQueue.main.async {
             let activityVC = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
 
-            if let onDismiss {
-                activityVC.completionWithItemsHandler = { _, _, _, _ in
-                    onDismiss()
+            if onDismiss != nil || onOutcome != nil {
+                // `completed` distinguishes a share the user actually performed from a cancelled
+                // sheet — the gift flow marks a bearer link handed out only on the former.
+                activityVC.completionWithItemsHandler = { _, completed, _, _ in
+                    onOutcome?(completed)
+                    onDismiss?()
                 }
             }
 
@@ -168,16 +176,25 @@ struct UIShareDialogView: UIViewRepresentable {
     /// Called when the share sheet is closed, both on completed share and on cancel.
     /// Use it to clean up shared artifacts (e.g. temporary files).
     let onDismiss: (() -> Void)?
+    /// Called when the share sheet closes, with whether the user actually completed a share.
+    /// A cancelled sheet reports false — the gift flow leaves its card unmarked on that path.
+    let onOutcome: ((Bool) -> Void)?
 
-    init(activityItems: [Any], completion: @escaping () -> Void, onDismiss: (() -> Void)? = nil) {
+    init(
+        activityItems: [Any],
+        completion: @escaping () -> Void,
+        onDismiss: (() -> Void)? = nil,
+        onOutcome: ((Bool) -> Void)? = nil
+    ) {
         self.activityItems = activityItems
         self.completion = completion
         self.onDismiss = onDismiss
+        self.onOutcome = onOutcome
     }
 
     func makeUIView(context: UIViewRepresentableContext<UIShareDialogView>) -> UIShareDialog {
         let view = UIShareDialog()
-        view.doInitialSetup(activityItems: activityItems, completion: completion, onDismiss: onDismiss)
+        view.doInitialSetup(activityItems: activityItems, completion: completion, onDismiss: onDismiss, onOutcome: onOutcome)
         return view
     }
     
