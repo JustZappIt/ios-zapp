@@ -81,9 +81,8 @@ struct P2pActivityView: View {
     @ViewBuilder
     private var balanceCard: some View {
         if let account = store.account {
-            // Value above, action below, parted by a rule that spans the card. The action used to
-            // be a shrink-wrapped button centred inside this left-aligned stack, so it lined up
-            // with neither the balance above it nor the card's own edges.
+            // Value above, action below, parted by a rule. The action was previously
+            // shrink-wrapped and centred, so it aligned to nothing.
             ZappBorderedCard {
                 VStack(alignment: .leading, spacing: 0) {
                     Text(String(localizable: .offrampHistoryBalance))

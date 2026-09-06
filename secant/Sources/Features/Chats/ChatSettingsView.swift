@@ -6,12 +6,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The three chat preferences gathered on one screen, as Android's `ChatSettingsView` gathers
-/// them: privacy (read receipts, online status) above delivery (background alerts).
-///
-/// Android stages the edits behind a Save button. iOS applies each toggle immediately, which is
-/// what every other toggle in this app does and what the platform's own Settings do — the reducer
-/// already holds the optimistic value and a per-setting busy flag, so there is nothing to stage.
+/// The three chat preferences on one screen, as Android's `ChatSettingsView` gathers them.
+/// Android stages edits behind a Save button; iOS applies each toggle immediately, as every
+/// other toggle here does.
 struct ChatSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
 

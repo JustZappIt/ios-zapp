@@ -24,12 +24,10 @@ struct ZappSegmentedSelector: View {
     /// A mark drawn in place of the label, keyed by index. The label stays as the accessibility
     /// name, so a logo segment is still announced.
     var logos: [Int: Image] = [:]
-    /// A mark drawn *beside* the label, keyed by index — Android's `ZappSegment.icon` with
-    /// `iconStandsForLabel = false`. Distinct from `logos`, which replace the label outright.
+    /// A mark drawn *beside* the label, unlike `logos`, which replace it.
     var icons: [Int: Image] = [:]
-    /// Visible cell height. The default is the compact size the chart-period and auth-method
-    /// selectors want; a selector standing in a column of 52pt controls passes a taller one so it
-    /// reads as part of the same stack rather than a stray strip.
+    /// Visible cell height. The default is the compact size; taller for selectors that sit in a
+    /// column of 52pt controls.
     var cellMinHeight: CGFloat = Constants.cellMinHeight
     let selectedIndex: Int
     let onSelect: (Int) -> Void

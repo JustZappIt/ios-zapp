@@ -173,11 +173,8 @@ struct Onramp {
                 state.page = .loading
                 state.errorMessage = nil
                 let currency = state.currencyCode
-                // Two lanes, because only the first decides which page to show. The Base account
-                // summary is an on-chain read and the slowest of these calls; blocking the whole
-                // screen on it left the user watching a spinner for seconds. Android never did —
-                // it collects the balance as its own flow (`OnrampVM` line 133) and lets it land
-                // whenever it lands.
+                // Two lanes: only the first decides which page to show. The account summary is
+                // an on-chain read, and Android does not block on it either.
                 return .merge(
                     .run { send in
                         do {
@@ -202,8 +199,7 @@ struct Onramp {
                     .cancellable(id: CancelID.account, cancelInFlight: true)
                 )
 
-            // The balance and the refund control fill in when this lands. Everything here is
-            // additive to a page that is already on screen, so it never moves the user.
+            // Additive to a page that is already on screen.
             case .accountSummaryLoaded(let account):
                 state.accountExplorerURL = account?.explorerURL
                 state.baseBalance = account?.balanceDisplay

@@ -165,10 +165,8 @@ struct Offramp {
                 state.isLoading = true
                 state.errorMessage = nil
                 let page = state.page
-                // The balance is its own lane. It used to run sequentially inside the block below
-                // and share its `catch`, which meant a failed on-chain read reported as a failed
-                // PAGE load — an error banner over a screen whose corridors had arrived fine — and
-                // could not start until the corridors returned. Same split Onramp uses.
+                // Its own lane: sharing the corridors' `catch` reported a failed balance read
+                // as a failed page load. Same split Onramp uses.
                 return .merge(
                     .run { send in
                         do {
@@ -189,9 +187,7 @@ struct Offramp {
                         guard page == .corridors || page == .amount || page == .topUp else { return }
                         await send(.accountLoaded(try await offramp.accountSummary()))
                     } catch: { _, _ in
-                        // Swallowed on purpose: the corridors already put the page on screen, so a
-                        // balance that cannot be read leaves the balance blank rather than banner
-                        // an error over a working page.
+                        // Swallowed: the page is already on screen, so leave the balance blank.
                     }
                     .cancellable(id: CancelID.account, cancelInFlight: true)
                 )
