@@ -28,6 +28,7 @@ struct GiftProvingParamsClient {
 
 extension GiftProvingParamsClient: DependencyKey {
     static let liveValue = GiftProvingParamsClient.live()
+    static let testValue = Self(prefetch: {})
 
     static func live() -> Self {
         let runner = GiftParamsPrefetchRunner()

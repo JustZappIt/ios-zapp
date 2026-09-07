@@ -157,6 +157,9 @@ private struct UnifiedSendContent: View {
                     .trackKeyboardVisibility($keyboardVisible)
                     .onAppear {
                         sendStore.send(.onAppear)
+                        // The store-less balance header replaced upstream's WalletBalancesView, which
+                        // started the child's balance subscription from its own onAppear.
+                        sendStore.send(.walletBalances(.onAppear))
                         swapStore.send(.onAppear)
                         if sendStore.requestsAddressFocus {
                             isAddressFocused = true
@@ -165,6 +168,7 @@ private struct UnifiedSendContent: View {
                     }
                     .onDisappear {
                         sendStore.send(.onDisapear)
+                        sendStore.send(.walletBalances(.onDisappear))
                         swapStore.send(.onDisappear)
                     }
                 }

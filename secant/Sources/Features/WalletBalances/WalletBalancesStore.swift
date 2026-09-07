@@ -46,7 +46,7 @@ struct WalletBalances {
         }
 
         var isProcessingZeroAvailableBalance: Bool {
-            if shieldedBalance.amount == 0 && transparentBalance.amount > autoShieldingThreshold.amount {
+            if shieldedBalance.amount == 0 && ShieldingProcessorClient.isShieldable(balance: transparentBalance, threshold: autoShieldingThreshold) {
                 return false
             }
 

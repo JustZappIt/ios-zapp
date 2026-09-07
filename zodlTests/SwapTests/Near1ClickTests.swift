@@ -117,15 +117,23 @@ import Foundation
         #expect(!ids.contains("nep141:doge.omft.near"))
     }
 
-    @Test func curatedKeepsNativeZecAndDropsWrappedZec() {
+    @Test func curatedKeepsNativeZecAndTokenZecAndDropsOtherWrappedZec() {
         let kept = Near1Click.curated([
             // native ZEC — the swap-to-ZEC representation, must survive
             swapAsset(assetId: Near1Click.Constants.nearZecAssetId, token: "ZEC", chain: "zec"),
+            // ZEC on Solana — supported as a swap target, must survive
+            swapAsset(assetId: "1cs_v1:sol:spl:A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS", token: "ZEC", chain: "sol"),
+            // ZEC on NEAR — supported as a swap target, must survive
+            swapAsset(assetId: "1cs_v1:near:nep141:zec.omft.near", token: "ZEC", chain: "near"),
             // wrapped ZEC on another chain — same symbol, different assetId, must drop
-            swapAsset(assetId: "1cs_v1:sol:spl:A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS", token: "ZEC", chain: "sol")
+            // (upstream uses a Starknet 0x…64-hex id here, which trips the repo's secret scan)
+            swapAsset(assetId: "1cs_v1:tron:trc20:TWrappedZecNotOnTheCuratedList", token: "ZEC", chain: "tron")
         ])
-        #expect(kept.count == 1)
-        #expect(kept.first?.assetId == Near1Click.Constants.nearZecAssetId)
+        let ids = kept.map(\.assetId)
+        #expect(kept.count == 3)
+        #expect(ids.contains(Near1Click.Constants.nearZecAssetId))
+        #expect(ids.contains("1cs_v1:sol:spl:A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS"))
+        #expect(ids.contains("1cs_v1:near:nep141:zec.omft.near"))
     }
 
     @Test func curatedPreservesEverySupportedAsset() {

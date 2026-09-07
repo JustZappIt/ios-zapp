@@ -13,11 +13,14 @@ enum AccessibilityID {
     }
 
     enum Home {
+        static let syncComplete = "home.syncComplete"
+        static let syncPending = "home.syncPending"
         static let receiveButton = "home.receiveButton"
         static let sendButton = "home.sendButton"
         static let payButton = "home.payButton"
         static let swapButton = "home.swapButton"
         static let moreButton = "home.moreButton"
+        static let totalBalanceButton = "home.totalBalanceButton"
     }
 
     enum MoreSheet {
@@ -28,11 +31,16 @@ enum AccessibilityID {
         static let addressBook = "settings.addressBook"
     }
 
+    enum AdvancedSettings {
+        static let exportPrivateData = "advancedSettings.exportPrivateData"
+    }
+
     enum SendForm {
         static let addToContactsButton = "sendForm.addToContactsButton"
         static let scanButton = "sendForm.scanButton"
         static let reviewButton = "sendForm.reviewButton"
         static let zcashAddressField = "sendForm.zcashAddressField"
+        static let maxButton = "sendForm.maxButton"
     }
 
     enum SendConfirmation {
@@ -47,12 +55,14 @@ enum AccessibilityID {
     enum CrossPayForm {
         static let assetSelectButton = "crossPayForm.assetSelectButton"
         static let reviewButton = "crossPayForm.reviewButton"
+        static let maxButton = "crossPayForm.maxButton"
     }
 
     enum SwapForm {
         static let assetSelectButton = "swapForm.assetSelectButton"
         static let changeModeButton = "swapForm.changeModeButton"
         static let reviewButton = "swapForm.reviewButton"
+        static let maxButton = "swapForm.maxButton"
     }
 
     enum AddressBook {

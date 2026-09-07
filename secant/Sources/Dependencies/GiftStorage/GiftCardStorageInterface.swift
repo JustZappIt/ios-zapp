@@ -47,6 +47,26 @@ struct GiftCardStorageClient {
 extension GiftCardStorageClient: DependencyKey {
     static let liveValue: GiftCardStorageClient = .live(walletStorage: .liveValue)
 
+    /// An inert, empty store. Root's startup sweep and the wipe guard read it in every test, and
+    /// the live value would reach the keychain.
+    static let testValue = Self(
+        getAll: { [] },
+        get: { _ in nil },
+        add: { _ in },
+        setFundingAttemptedAt: { _, _ in },
+        recordFundingCreated: { _, _, _ in },
+        recordFundingSubmitted: { _, _, _ in },
+        markFundingNotCreated: { _, _ in },
+        markFundingExpired: { _, _, _ in },
+        replaceExpiredFunding: { _, _, _, _ in },
+        markFunded: { _, _, _ in },
+        markShared: { _, _ in },
+        recordChecked: { _, _ in },
+        markClaimed: { _, _ in },
+        hasUnsharedFunds: { _ in false },
+        observe: { .finished }
+    )
+
     static func live(walletStorage: WalletStorageClient) -> Self {
         let store = GiftStoreActor<StoredGiftCard>(
             read: { try walletStorage.exportGiftCards() },

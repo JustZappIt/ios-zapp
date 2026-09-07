@@ -207,4 +207,23 @@ final class RootAutoServerGatingTests: XCTestCase {
         XCTAssertFalse(candidate.isExpired(now: benchmarkedAt.addingTimeInterval(14 * 60)))
         XCTAssertTrue(candidate.isExpired(now: benchmarkedAt.addingTimeInterval(15 * 60)))
     }
+
+    @MainActor
+    func testDeferredCandidateKeepsOriginalBenchmarkTimestamp() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = Root.State.initial
+            state.path = .sendCoordFlow
+            let endpoint = LightWalletEndpoint(address: "zec.rocks", port: 443, secure: true, streamingCallTimeoutInMillis: 0)
+            let benchmarkedAt = Date(timeIntervalSince1970: 1_000_000)
+            let store = TestStore(initialState: state) { Root() }
+            store.exhaustivity = .off
+
+            await store.send(.autoServerCandidateReady(endpoint, benchmarkedAt))
+
+            XCTAssertEqual(store.state.pendingServerCandidate?.benchmarkedAt, benchmarkedAt)
+            XCTAssertEqual(store.state.pendingServerCandidate?.endpoint.host, endpoint.host)
+        }
+    }
 }

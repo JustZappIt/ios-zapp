@@ -59,7 +59,9 @@ actor ServerHealthTracker {
     /// so the periodic background probe respects the current Tor preference.
     func initialize(serverURLs: [String], fetcher: @escaping ProbeFetcher) async {
         // Replace server map (preserving nothing from prior config)
-        servers = Dictionary(uniqueKeysWithValues: serverURLs.map { ($0, ServerState()) })
+        // The config layer rejects duplicate URLs (`VotingServiceConfig.validate`),
+        // but building the map must never be able to trap on them regardless.
+        servers = Dictionary(serverURLs.map { ($0, ServerState()) }, uniquingKeysWith: { first, _ in first })
         probeFetcher = fetcher
 
         // Fire parallel probes so we know who's healthy before the first vote
