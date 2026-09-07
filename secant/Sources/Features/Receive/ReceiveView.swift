@@ -18,6 +18,9 @@ struct ReceiveView: View {
         static let actionIconSize: CGFloat = 20
         static let qrMaxSize: CGFloat = 300
         static let copyButtonSize: CGFloat = 40
+        static let tipBarHeight: CGFloat = 36
+        static let explainerIconSize: CGFloat = 20
+        static let explainerIconBox: CGFloat = 40
     }
 
     /// One switcher segment. A single address is the source for display, QR, copy, share, and request.
@@ -65,7 +68,13 @@ struct ReceiveView: View {
 
     private var content: some View {
         VStack(spacing: 0) {
-            ZappScreenHeader(title: String(localizable: .tabsReceiveZec))
+            ZappScreenHeader(title: String(localizable: .tabsReceiveZec)) {
+                // Android keeps the address-type explainer behind an info action; the Zapp
+                // rewrite had dropped the entry point and left only the one-line tip.
+                ZappInfoButton(accessibilityLabel: String(localizable: .receiveHelpInfoAccessibility)) {
+                    store.send(.infoTapped(selectedSegment?.isShielded ?? true))
+                }
+            }
 
             if let segment = selectedSegment {
                 ScrollView {
@@ -99,15 +108,21 @@ struct ReceiveView: View {
                             copyIconButton(segment)
                         }
 
+                        // Android's Swiss tip block: eyebrow over the one-line rule.
                         HStack(alignment: .top, spacing: Design.Spacing._md) {
                             Rectangle()
                                 .fill(ZappColors.accent.color(colorScheme))
-                                .frame(width: 3, height: 36)
+                                .frame(width: 3, height: Constants.tipBarHeight)
 
-                            Text(localizable: .receiveWarning)
-                                .zappFont(.caption, style: ZappColors.textMuted)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+                                Text(String(localizable: .receiveTipLabel))
+                                    .zappFont(.eyebrow, style: ZappColors.textSubtle)
+
+                                Text(localizable: .receiveWarning)
+                                    .zappFont(.caption, style: ZappColors.textMuted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .padding(.horizontal, Design.Spacing._3xl)
@@ -144,6 +159,10 @@ struct ReceiveView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
         .onAppear { store.send(.updateCurrentFocus(.uaAddress)) }
+        // Mounted here, not on the NavigationStack, which already owns the Request fullScreenCover.
+        .sheet(isPresented: explainerBinding) {
+            WithPerceptionTracking { explainerSheet }
+        }
         .zashiBack(
             primaryAction: {
                 if let segment = selectedSegment {
@@ -214,6 +233,64 @@ struct ReceiveView: View {
         let all = segments
 
         return all.indices.contains(selectedIndex) ? all[selectedIndex] : all.first
+    }
+
+    /// `.infoTapped` toggles, so a swipe-down and the sheet's own button both send it once.
+    private var explainerBinding: Binding<Bool> {
+        Binding(
+            get: { store.isAddressExplainerPresented },
+            set: { isPresented in
+                if !isPresented && store.isAddressExplainerPresented {
+                    store.send(.infoTapped(store.isExplainerForShielded))
+                }
+            }
+        )
+    }
+
+    /// Android's `ShieldedAddressInfoScreen` / `TransparentAddressInfoScreen`: icon, title, four
+    /// bullets, one dismiss button.
+    private var explainerSheet: some View {
+        let isShielded = store.isExplainerForShielded
+        let bullets: [String] = isShielded
+            ? [
+                String(localizable: .receiveHelpShieldedDesc1),
+                String(localizable: .receiveHelpShieldedDesc2),
+                String(localizable: .receiveHelpShieldedDesc3),
+                String(localizable: .receiveHelpShieldedDesc4)
+            ]
+            : [
+                String(localizable: .receiveHelpTransparentDesc1),
+                String(localizable: .receiveHelpTransparentDesc2),
+                String(localizable: .receiveHelpTransparentDesc3),
+                String(localizable: .receiveHelpTransparentDesc4)
+            ]
+
+        return VStack(alignment: .leading, spacing: Design.Spacing._lg) {
+            (isShielded ? Asset.Assets.Icons.shieldTickFilled.image : Asset.Assets.Icons.shieldOff.image)
+                .zImage(width: Constants.explainerIconSize, height: Constants.explainerIconSize, style: ZappColors.accentText)
+                .frame(width: Constants.explainerIconBox, height: Constants.explainerIconBox)
+                .background(ZappColors.accentSoft.color(colorScheme))
+
+            Text(isShielded
+                ? String(localizable: .receiveHelpShieldedTitle)
+                : String(localizable: .receiveHelpTransparentTitle)
+            )
+            .zappFont(.sectionTitle, style: ZappColors.text)
+            .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(bullets, id: \.self) { bullet in
+                HStack(alignment: .top, spacing: Design.Spacing._md) {
+                    Text(verbatim: "•")
+                        .zappFont(.body, style: ZappColors.textMuted)
+
+                    Text(bullet)
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .zappInfoSheet { store.send(.infoTapped(isShielded)) }
     }
 
     private func copyIconButton(_ segment: AddressSegment) -> some View {

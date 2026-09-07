@@ -61,6 +61,8 @@ struct CurrencyConversionSetupView: View {
                 .padding(.vertical, Design.Spacing._lg)
                 // Currency remains selectable before conversion is enabled.
                 .opacity(store.currentSettingsOption == .optIn ? 1 : 0.5)
+
+                torNote
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -266,8 +268,34 @@ struct CurrencyConversionSetupView: View {
             .padding(.bottom, Design.Spacing._3xl)
 
             currencyPickerSection()
+
+            // Android stacks Skip above Enable in the footer; here the dock holds Enable, so the
+            // decline sits directly above it. Skip persists the opt-out — Back alone never does.
+            ZappButton(title: String(localizable: .currencyConversionSkipBtn), variant: .ghost) {
+                store.send(.skipTapped)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, Design.Spacing._2xl)
         }
         .screenHorizontalPadding()
+    }
+
+    /// Android's settings footer note: what Tor Protection being on or off means for this feature.
+    private var torNote: some View {
+        HStack(alignment: .top, spacing: Design.Spacing._md) {
+            Asset.Assets.infoOutline.image
+                .zImage(width: 16, height: 16, style: ZappColors.textMuted)
+
+            Text(store.isTorOn
+                ? String(localizable: .currencyConversionTorOnInfo)
+                : String(localizable: .currencyConversionTorOffInfo)
+            )
+            .zappFont(.caption, style: ZappColors.textMuted)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 18)
+        .padding(.bottom, Design.Spacing._lg)
     }
  
     private func learnMoreFooter() -> some View {
