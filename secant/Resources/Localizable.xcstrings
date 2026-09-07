@@ -22074,6 +22074,23 @@
         }
       }
     },
+    "receive.help.infoAccessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About this address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de esta dirección"
+          }
+        }
+      }
+    },
     "receive.help.shielded.desc1" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -22292,6 +22309,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dirección Sapling de Zcash"
+          }
+        }
+      }
+    },
+    "receive.tipLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TIP"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONSEJO"
           }
         }
       }
