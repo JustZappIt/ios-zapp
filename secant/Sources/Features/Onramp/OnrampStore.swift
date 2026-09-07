@@ -153,6 +153,7 @@ struct Onramp {
 
     enum CancelID {
         case load
+        case account
         case quote
         case driver
         case countdown
@@ -172,32 +173,42 @@ struct Onramp {
                 state.page = .loading
                 state.errorMessage = nil
                 let currency = state.currencyCode
-                return .run { send in
-                    do {
-                        async let limits = onramp.limits(currency)
-                        async let recipient = onramp.recipientAddress()
-                        async let checkpoint = onramp.checkpoint()
-                        async let canDeliver = onramp.canDeliverToZec()
-                        async let account = try? offramp.accountSummary()
-                        await send(.loaded(
-                            try await limits,
-                            try await recipient,
-                            try await checkpoint,
-                            try await canDeliver,
-                            await account
-                        ))
-                    } catch {
-                        await send(.loadFailed(error.localizedDescription))
+                // Two lanes: only the first decides which page to show. The account summary is
+                // an on-chain read, and Android does not block on it either.
+                return .merge(
+                    .run { send in
+                        do {
+                            async let limits = onramp.limits(currency)
+                            async let recipient = onramp.recipientAddress()
+                            async let checkpoint = onramp.checkpoint()
+                            async let canDeliver = onramp.canDeliverToZec()
+                            await send(.loaded(
+                                try await limits,
+                                try await recipient,
+                                try await checkpoint,
+                                try await canDeliver
+                            ))
+                        } catch {
+                            await send(.loadFailed(error.localizedDescription))
+                        }
                     }
-                }
-                .cancellable(id: CancelID.load, cancelInFlight: true)
+                    .cancellable(id: CancelID.load, cancelInFlight: true),
+                    .run { send in
+                        await send(.accountSummaryLoaded(try? await offramp.accountSummary()))
+                    }
+                    .cancellable(id: CancelID.account, cancelInFlight: true)
+                )
 
-            case let .loaded(limits, recipient, checkpoint, canDeliver, account):
-                state.limits = limits
-                state.accountAddress = recipient
+            // Additive to a page that is already on screen.
+            case .accountSummaryLoaded(let account):
                 state.accountExplorerURL = account?.explorerURL
                 state.baseBalance = account?.balanceDisplay
                 state.baseRefundState = Self.baseRefundState(account)
+                return .none
+
+            case let .loaded(limits, recipient, checkpoint, canDeliver):
+                state.limits = limits
+                state.accountAddress = recipient
                 state.isZecDestinationEnabled = canDeliver
                 if !canDeliver { state.destination = .base }
                 if let checkpoint {

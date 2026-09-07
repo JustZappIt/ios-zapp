@@ -90,10 +90,14 @@ struct ZappBalanceChart: View {
     var body: some View {
         Group {
             switch state {
+            // `EmptyView` produces no render node, so `.task(id:)` below never fires and the
+            // chart can never retry itself out of an invisible state.
             case .hidden:
-                EmptyView()
+                Color.clear.frame(height: 0)
             case .loading:
-                content { loadingChart }
+                // No skeleton: the balance sits above, and a reload keeps what is drawn, so a
+                // period tap never lands here.
+                Color.clear.frame(height: 0)
             case .data(let data):
                 content {
                     fiatDelta(data)
@@ -119,6 +123,8 @@ struct ZappBalanceChart: View {
                 content { emptyChart }
             }
         }
+        // Keyed on renderability, not state: refreshes redraw without cross-fading every tick.
+        .animation(ZappMotion.content, value: state.isRenderable)
         .task(id: taskID) {
             await loadState()
         }
@@ -139,13 +145,6 @@ struct ZappBalanceChart: View {
                 onSelect: { period = ZappBalanceChartPeriod(rawValue: $0) ?? .week }
             )
         }
-    }
-
-    private var loadingChart: some View {
-        Rectangle()
-            .fill(ZappColors.surfaceAlt.color(colorScheme))
-            .frame(height: 140)
-            .accessibilityHidden(true)
     }
 
     private var emptyChart: some View {
@@ -225,7 +224,10 @@ struct ZappBalanceChart: View {
 
         let history = balanceHistory()
         guard case .reconciled(let points, let balance) = history else {
-            hide(.historyInconsistent)
+            // Transient: the deltas and `confirmedBalance` settle at different moments, so they
+            // disagree mid-sync. Hold for the next revision rather than hiding.
+            if !state.isRenderable { state = .loading }
+            LoggerProxy.warn("[ZappBalanceChart] history not reconciled — holding for the next update")
             return
         }
         guard balance.amount > 0 else {
@@ -250,6 +252,10 @@ struct ZappBalanceChart: View {
         let completedDate = latestCompletedUtcDate(now: now)
         let initialRange = standardizedPriceRange(period: period, completedDate: completedDate)
         guard let initialSeries = await consumePrices(range: initialRange, currency: selectedCurrency, history: history, now: now) else {
+            // A cancelled task is about to be replaced; an exhausted stream is not.
+            if !Task.isCancelled, !state.isRenderable {
+                hide(.priceSeriesUnavailable)
+            }
             return
         }
 

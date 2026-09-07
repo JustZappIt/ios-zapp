@@ -153,6 +153,7 @@ struct Offramp {
     private enum CancelID {
         case operation
         case request
+        case account
         case refundPreview
         case topUpValidation
     }
@@ -164,24 +165,32 @@ struct Offramp {
                 state.isLoading = true
                 state.errorMessage = nil
                 let page = state.page
-                return .run { send in
-                    do {
-                        async let corridors = offramp.corridors()
-                        async let checkpointCurrency = offramp.checkpointCurrencyCode()
-                        async let topUpCheckpoint = offramp.topUpCheckpointMicros()
-                        await send(.loadedCorridors(
-                            try await corridors,
-                            try await checkpointCurrency,
-                            try await topUpCheckpoint
-                        ))
-                        if page == .corridors || page == .amount || page == .topUp {
-                            await send(.accountLoaded(try await offramp.accountSummary()))
+                // Its own lane: sharing the corridors' `catch` reported a failed balance read
+                // as a failed page load. Same split Onramp uses.
+                return .merge(
+                    .run { send in
+                        do {
+                            async let corridors = offramp.corridors()
+                            async let checkpointCurrency = offramp.checkpointCurrencyCode()
+                            async let topUpCheckpoint = offramp.topUpCheckpointMicros()
+                            await send(.loadedCorridors(
+                                try await corridors,
+                                try await checkpointCurrency,
+                                try await topUpCheckpoint
+                            ))
+                        } catch {
+                            await send(.loadFailed(error.localizedDescription))
                         }
-                    } catch {
-                        await send(.loadFailed(error.localizedDescription))
                     }
-                }
-                .cancellable(id: CancelID.request, cancelInFlight: true)
+                    .cancellable(id: CancelID.request, cancelInFlight: true),
+                    .run { send in
+                        guard page == .corridors || page == .amount || page == .topUp else { return }
+                        await send(.accountLoaded(try await offramp.accountSummary()))
+                    } catch: { _, _ in
+                        // Swallowed: the page is already on screen, so leave the balance blank.
+                    }
+                    .cancellable(id: CancelID.account, cancelInFlight: true)
+                )
 
             case let .loadedCorridors(corridors, checkpointCurrency, topUpCheckpoint):
                 state.corridors = corridors
