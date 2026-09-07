@@ -26,6 +26,7 @@ struct PendingGiftClaimCoordinatorClient {
 
 extension PendingGiftClaimCoordinatorClient: DependencyKey {
     static let liveValue = PendingGiftClaimCoordinatorClient.live()
+    static let testValue = Self(resumeNext: { nil })
 
     static func live() -> Self {
         let gate = KeyedAsyncLock()

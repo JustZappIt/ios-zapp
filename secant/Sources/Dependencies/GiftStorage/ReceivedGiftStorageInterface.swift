@@ -34,6 +34,17 @@ struct ReceivedGiftStorageClient {
 extension ReceivedGiftStorageClient: DependencyKey {
     static let liveValue: ReceivedGiftStorageClient = .live(walletStorage: .liveValue)
 
+    /// An inert, empty store — see `GiftCardStorageClient.testValue`.
+    static let testValue = Self(
+        getAll: { [] },
+        record: { _ in },
+        settle: { _ in },
+        markFinalized: { _ in },
+        markClaimedElsewhere: { _ in },
+        discardUnstarted: { _ in },
+        hasUnsettledClaims: { false }
+    )
+
     static func live(walletStorage: WalletStorageClient) -> Self {
         let store = GiftStoreActor<ReceivedGift>(
             read: { try walletStorage.exportReceivedGifts() },

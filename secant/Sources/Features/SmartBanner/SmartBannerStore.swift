@@ -295,10 +295,15 @@ struct SmartBanner {
                 
             case .onDisappear:
                 // __LD2 TESTED
+                // CancelShieldingProcessorId is deliberately NOT cancelled here: a shield started
+                // from the Balances sheet on a pushed screen (Send/Pay flow) reaches its terminal
+                // state while Home is covered, and the terminal outcomes are one-shot — the
+                // subject resets to `.unknown` right after, so a resubscribe on the next appear
+                // would never see them. The onAppear subscription uses cancelInFlight, so
+                // re-appearing replaces rather than duplicates the stream.
                 return .merge(
                     .cancel(id: state.CancelNetworkMonitorId),
                     .cancel(id: state.CancelStateStreamId),
-                    .cancel(id: state.CancelShieldingProcessorId),
                     // A post-restore migration repoll armed just before leaving Home must not keep
                     // running off-lifecycle — it would otherwise fire its `bannerVariant` hydration
                     // up to 120s after the screen is gone, and — with `CancelStateStreamId` also
@@ -320,7 +325,7 @@ struct SmartBanner {
                 return .none
                 
             case .shieldingProcessorStateChanged(let shieldingProcessorState):
-                if shieldingProcessorState == .succeeded {
+                if shieldingProcessorState == .succeeded || shieldingProcessorState == .nothingToShield {
                     state.transparentBalance = .zero
                 }
                 state.isShielding = shieldingProcessorState == .requested
@@ -328,7 +333,7 @@ struct SmartBanner {
                     var hideEverything = false
                     if case .proposal = shieldingProcessorState {
                         hideEverything = true
-                    } else if shieldingProcessorState == .succeeded {
+                    } else if shieldingProcessorState == .succeeded || shieldingProcessorState == .nothingToShield {
                         hideEverything = true
                     }
                     if hideEverything {
@@ -885,7 +890,7 @@ struct SmartBanner {
                 }
                 return .run { [remindMeShieldedPhaseCounter = state.remindMeShieldedPhaseCounter] send in
                     if let accountBalance = try? await sdkSynchronizer.getAccountsBalances()[account.id],
-                       accountBalance.unshielded >= zcashSDKEnvironment.shieldingThreshold() {
+                       ShieldingProcessorClient.isShieldable(balance: accountBalance.unshielded, threshold: zcashSDKEnvironment.shieldingThreshold()) {
                         await send(.transparentBalanceUpdated(accountBalance.unshielded))
                         
                         if let shieldedReminder = walletStorage.exportShieldingReminder(account.vendor.name()) {
@@ -956,7 +961,7 @@ struct SmartBanner {
                 guard let priorityContentRequested = state.priorityContentRequested else {
                     return .none
                 }
-                if let priorityContent = state.priorityContent, priorityContentRequested.rawValue >= priorityContent.rawValue {
+                if let priorityContent = state.priorityContent, priorityContentRequested.rank >= priorityContent.rank {
                     return .none
                 }
                 if state.isOpen {
@@ -1378,7 +1383,7 @@ struct SmartBanner {
 
             if let account = state.selectedWalletAccount, let accountBalance = latestState.data.accountsBalances[account.id] {
                 if state.priorityContent == .priority7 {
-                    if accountBalance.unshielded > zcashSDKEnvironment.shieldingThreshold() {
+                    if ShieldingProcessorClient.isShieldable(balance: accountBalance.unshielded, threshold: zcashSDKEnvironment.shieldingThreshold()) {
                         return .send(.transparentBalanceUpdated(accountBalance.unshielded))
                     } else {
                         return .merge(
@@ -1386,7 +1391,8 @@ struct SmartBanner {
                             .send(.closeSheetTapped)
                         )
                     }
-                } else if state.transparentBalance < zcashSDKEnvironment.shieldingThreshold() && accountBalance.unshielded > zcashSDKEnvironment.shieldingThreshold() {
+                } else if !ShieldingProcessorClient.isShieldable(balance: state.transparentBalance, threshold: zcashSDKEnvironment.shieldingThreshold())
+                    && ShieldingProcessorClient.isShieldable(balance: accountBalance.unshielded, threshold: zcashSDKEnvironment.shieldingThreshold()) {
                     return .merge(
                         .send(.transparentBalanceUpdated(accountBalance.unshielded)),
                         .send(.triggerPriority(.priority7))

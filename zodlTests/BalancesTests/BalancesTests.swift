@@ -158,12 +158,12 @@ import ComposableArchitecture
 
         await store.send(.updateBalance(balance))
 
-        #expect(store.state.changePending == Zatoshi(90))               // 10 + 30 + 50
-        #expect(store.state.pendingTransactions == Zatoshi(120))        // 20 + 40 + 60
-        #expect(store.state.shieldedBalance == Zatoshi(600))            // 100 + 200 + 300
-        #expect(store.state.transparentBalance == Zatoshi(5))           // unshielded
+        #expect(store.state.changePending == Zatoshi(90))              // 10 + 30 + 50
+        #expect(store.state.pendingTransactions == Zatoshi(120))       // 20 + 40 + 60
+        #expect(store.state.shieldedBalance == Zatoshi(600))           // 100 + 200 + 300
+        #expect(store.state.transparentBalance == Zatoshi(5))          // unshielded
         #expect(store.state.shieldedWithPendingBalance == Zatoshi(810)) // 130 + 270 + 410 totals
-        #expect(store.state.totalBalance == Zatoshi(816))               // 810 + 5 + 1 awaiting
+        #expect(store.state.totalBalance == Zatoshi(816))              // 810 + 5 + 1 awaiting
         #expect(store.state.spendability == .something)
     }
 
@@ -180,6 +180,17 @@ import ComposableArchitecture
         store.exhaustivity = .off
 
         await store.send(.shieldingProcessorStateChanged(.succeeded)) {
+            $0.isShielding = false
+        }
+        // No selected account, so the refresh request is a no-op effect.
+        await store.receive(\.updateBalancesOnAppear)
+    }
+
+    @MainActor @Test func shieldingProcessorNothingToShieldClearsShieldingAndRefreshes() async {
+        let store = TestStore(initialState: state(isShielding: true)) { Balances() }
+        store.exhaustivity = .off
+
+        await store.send(.shieldingProcessorStateChanged(.nothingToShield)) {
             $0.isShielding = false
         }
         // No selected account, so the refresh request is a no-op effect.

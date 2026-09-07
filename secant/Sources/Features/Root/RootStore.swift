@@ -484,7 +484,7 @@ struct Root {
         case backToHomeFromChatPrivacyTapped
         case backToHomeFromServerSwitchTapped
         case refreshAutomaticServer
-        case autoServerCandidateReady(LightWalletEndpoint)
+        case autoServerCandidateReady(LightWalletEndpoint, Date)
 
         // Transactions
         case observeTransactions
@@ -816,7 +816,7 @@ struct Root {
                     return .none
                 }
                 LoggerProxy.event("[AutoServerSelection] Applying deferred candidate after flow exit")
-                return .send(.autoServerCandidateReady(pending.endpoint))
+                return .send(.autoServerCandidateReady(pending.endpoint, pending.benchmarkedAt))
             }
     }
 
@@ -873,16 +873,16 @@ struct Root {
                 guard state.bgTask == nil, !state.isServerSetupVisible else { return .none }
                 return .run { send in
                     if let best = await autoServerSelection.findBestServer() {
-                        await send(.autoServerCandidateReady(best))
+                        await send(.autoServerCandidateReady(best, date.now()))
                     }
                 }
                 .cancellable(id: state.automaticServerRefreshCancelId, cancelInFlight: true)
 
-            case .autoServerCandidateReady(let candidate):
+            case .autoServerCandidateReady(let candidate, let benchmarkedAt):
                 guard state.canApplyAutoServerSwitch else {
                     state.pendingServerCandidate = State.PendingServerCandidate(
                         endpoint: candidate,
-                        benchmarkedAt: date.now()
+                        benchmarkedAt: benchmarkedAt
                     )
                     let hardGates = "bgTask: \(state.bgTask != nil), serverSetup: \(state.isServerSetupVisible)"
                     let gates = "\(hardGates), sensitiveFlow: \(state.isSensitiveFlowActive)"
@@ -1243,6 +1243,14 @@ extension AlertState where Action == Root.Action {
         }
     }
     
+    static func shieldFundsNothingToShield() -> AlertState {
+        AlertState {
+            TextState(String(localizable: .shieldFundsNothingToShieldTitle))
+        } message: {
+            TextState(String(localizable: .shieldFundsNothingToShieldMessage))
+        }
+    }
+
     static func shieldFundsGrpc() -> AlertState {
         AlertState {
             TextState(String(localizable: .shieldFundsErrorTitle))

@@ -8,6 +8,9 @@ import Foundation
 
 extension GiftClaimClient: DependencyKey {
     static let liveValue = GiftClaimClient.live()
+    /// Never the live engine under test — it runs an isolated synchronizer. Unimplemented, so a
+    /// path that reaches it without an override fails loudly instead of syncing.
+    static let testValue = Self()
 
     static func live() -> Self {
         // The SDK has no in-process alias guard, so this per-alias lock is the only thing

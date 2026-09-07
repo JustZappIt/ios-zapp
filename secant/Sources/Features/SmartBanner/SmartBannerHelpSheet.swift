@@ -321,10 +321,10 @@ extension SmartBannerView {
             .fixedSize(horizontal: false, vertical: true)
 
             ZashiButton(
-                String(localizable: .smartBannerHelpShieldNotNow),
+                store.remindMeShieldedText,
                 type: .ghost
             ) {
-                store.send(.closeSheetTapped)
+                store.send(.remindMeLaterTapped(.priority7))
             }
             .padding(.bottom, 12)
 

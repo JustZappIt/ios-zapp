@@ -99,10 +99,17 @@ struct SendFormView: View {
                     .trackKeyboardVisibility($keyboardVisible)
                     .onAppear {
                         store.send(.onAppear)
+                        // The store-less balance header replaced upstream's WalletBalancesView, which
+                        // started the child's balance subscription from its own onAppear.
+                        store.send(.walletBalances(.onAppear))
                         if store.requestsAddressFocus {
                             isAddressFocused = true
                             store.send(.requestsAddressFocusResolved)
                         }
+                    }
+                    .onDisappear {
+                        store.send(.onDisapear)
+                        store.send(.walletBalances(.onDisappear))
                     }
                 }
             }
