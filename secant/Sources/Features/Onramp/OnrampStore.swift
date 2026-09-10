@@ -202,7 +202,7 @@ struct Onramp {
             // Additive to a page that is already on screen.
             case .accountSummaryLoaded(let account):
                 state.accountExplorerURL = account?.explorerURL
-                state.baseBalance = account?.balanceDisplay
+                state.baseBalance = account?.balanceDisplay.map(UsdcAmount.displayBalance)
                 state.baseRefundState = Self.baseRefundState(account)
                 return .none
 

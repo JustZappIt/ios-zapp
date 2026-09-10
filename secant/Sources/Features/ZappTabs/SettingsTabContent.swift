@@ -181,7 +181,7 @@ struct SettingsTabContent: View {
             ZappRow(
                 title: String(localizable: .settingsGiftCards),
                 subtitle: String(localizable: .giftCardListSubtitle),
-                icon: Image(systemName: "gift"),
+                icon: Asset.Assets.Icons.giftCard.image,
                 iconTint: .accentText,
                 iconBackground: .accentSoft
             ) {

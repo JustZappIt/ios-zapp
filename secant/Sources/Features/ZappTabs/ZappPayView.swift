@@ -268,7 +268,7 @@ struct ZappPayView: View {
                 },
                 ZappSpeedDialAction(
                     // No gift asset exists in the catalogue yet; the SF Symbol is the decision.
-                    icon: Image(systemName: "gift"),
+                    icon: Asset.Assets.Icons.giftCard.image,
                     label: String(localizable: .giftCardSpeedDial)
                 ) {
                     store.send(.giftTapped)

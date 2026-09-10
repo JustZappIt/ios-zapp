@@ -36,6 +36,38 @@ struct UsdcAmount: Equatable, Comparable, Sendable {
         micros = (value * Self.microsPerUnit).rounded(.down)
     }
 
+    /// How a USDC balance reads on screen: `0` for nothing, two decimals for ordinary amounts,
+    /// and full precision only when there is something below the cent to show.
+    ///
+    /// The six-decimal wire form is right for arithmetic and wrong for a balance line — "0.000000"
+    /// is noise. The shared Kotlin client asks for `toDisplayString(stripTrailingZeros = true)`,
+    /// but `BigDecimal.stripTrailingZeros()` returns `0E-6` for zero, which renders straight back
+    /// as "0.000000", so the trim has to happen here regardless.
+    ///
+    ///     0.000000 -> "0"        4.500000 -> "4.50"
+    ///     4.000000 -> "4.00"     0.000123 -> "0.000123"
+    static func displayBalance(_ display: String) -> String {
+        guard let value = Decimal(string: display) else { return display }
+        guard value != 0 else { return "0" }
+
+        var trimmed = display
+        if trimmed.contains(".") {
+            while trimmed.hasSuffix("0") { trimmed.removeLast() }
+            if trimmed.hasSuffix(".") { trimmed.removeLast() }
+        }
+
+        // Padding rather than reformatting: the wire value is exact and a round-trip through a
+        // formatter is a chance to lose a digit off a balance.
+        let fractionDigits = trimmed.split(separator: ".", maxSplits: 1).count > 1
+            ? trimmed.split(separator: ".", maxSplits: 1)[1].count
+            : 0
+        switch fractionDigits {
+        case 0: return "\(trimmed).00"
+        case 1: return "\(trimmed)0"
+        default: return trimmed
+        }
+    }
+
     var microsString: String { NSDecimalNumber(decimal: micros).stringValue }
 
     var whole: Decimal { micros / Self.microsPerUnit }

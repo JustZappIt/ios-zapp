@@ -54,8 +54,6 @@ struct NewChatView: View {
                         } else {
                             contacts
                         }
-
-                        shareMyKeyRow
                     }
                     .padding(.horizontal, Design.Spacing._lg)
                     .padding(.top, Design.Spacing._lg)
@@ -280,21 +278,6 @@ struct NewChatView: View {
                 .zappFont(.body, style: ZappColors.textMuted)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-
-            HStack(alignment: .top, spacing: Design.Spacing._lg) {
-                Rectangle()
-                    .fill(ZappColors.accent.color(colorScheme))
-                    .frame(width: Constants.calloutMarkSize, height: Constants.calloutMarkSize)
-
-                Text(String(localizable: .newChatPrivacyCallout))
-                    .zappFont(.body, style: ZappColors.accentText)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 0)
-            }
-            .padding(Design.Spacing._xl)
-            .frame(maxWidth: .infinity)
-            .background(ZappColors.accentSoft.color(colorScheme))
         }
         .frame(maxWidth: .infinity)
         .padding(.top, Design.Spacing._xl)
@@ -342,47 +325,11 @@ struct NewChatView: View {
             .padding(.leading, NewChatContactRow.dividerInset)
     }
 
-    /// Chat is symmetric: the peer needs our key just as much as we need theirs. Kept to a
-    /// single row here — the scannable code lives in the sheet, not dumped on the screen.
-    private var shareMyKeyRow: some View {
-        Button {
-            store.send(.shareMyKeyTapped)
-        } label: {
-            HStack(spacing: Design.Spacing._lg) {
-                Asset.Assets.Icons.qr.image
-                    .zImage(width: Constants.cardIconSize, height: Constants.cardIconSize, style: ZappColors.text)
-
-                VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
-                    Text(String(localizable: .newChatYourKey))
-                        .zappFont(.rowTitle, style: ZappColors.text)
-
-                    Text(String(localizable: .newChatYourKeyHint))
-                        .zappFont(.caption, style: ZappColors.textMuted)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Asset.Assets.Icons.arrowRight.image
-                    .zImage(width: Constants.fieldIconSize, height: Constants.fieldIconSize, style: ZappColors.textMuted)
-            }
-            .padding(Design.Spacing._xl)
-            .frame(maxWidth: .infinity)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
-            .overlay {
-                Rectangle()
-                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.zappPress)
-        .padding(.top, Design.Spacing._md)
-    }
-
     private enum Constants {
         static let fieldIconSize: CGFloat = 18
         static let cardIconSize: CGFloat = 20
         static let emptyIconSize: CGFloat = 40
         static let emptyIconBox: CGFloat = 96
-        static let calloutMarkSize: CGFloat = 8
     }
 }
 
