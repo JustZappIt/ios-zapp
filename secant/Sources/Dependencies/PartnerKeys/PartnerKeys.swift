@@ -22,6 +22,8 @@ struct PartnerKeys {
         static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
         static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
         static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
+        static let reclaimAppId = "reclaimAppId"
+        static let reclaimAppSecret = "reclaimAppSecret"
         static let klipyKey = "klipyKey"
 #if DEBUG
         static let testSeed = "testSeed"
@@ -70,6 +72,19 @@ struct PartnerKeys {
 
     static var p2pSponsorshipPolicyId: String? {
         PartnerKeys.value(for: Constants.p2pSponsorshipPolicyId)
+    }
+
+    /// The Reclaim application's own Ethereum address, and its private key. Both ship in the
+    /// binary deliberately: an extracted secret cannot forge a proof — Reclaim's attestors sign
+    /// those — and cannot farm reputation, because the proof still binds to the smart account that
+    /// submits it. Optional on purpose; a build without them is one that cannot verify, not one
+    /// that cannot run.
+    static var reclaimAppId: String? {
+        PartnerKeys.value(for: Constants.reclaimAppId)
+    }
+
+    static var reclaimAppSecret: String? {
+        PartnerKeys.value(for: Constants.reclaimAppSecret)
     }
 
     static var klipyKey: String? {

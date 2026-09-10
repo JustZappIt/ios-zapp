@@ -7,7 +7,10 @@
 #
 # REQUIRED_KEYS contains enabled production integrations that cannot use a
 # built-in default. Flexa is intentionally excluded because it is not enabled
-# in Zapp; its optional keys remain supported by PartnerKeys.swift.
+# in Zapp; its optional keys remain supported by PartnerKeys.swift. So are
+# reclaimAppId / reclaimAppSecret: without them the verification driver reports
+# NotConfigured, which is a build that cannot verify rather than one that
+# cannot run.
 
 # Run only during Product -> Archive. Xcode sets ACTION=install for archive
 # builds; normal build / Run set ACTION=build.

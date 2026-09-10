@@ -404,6 +404,49 @@ extension Root {
                 state.path = .onramp
                 return .none
 
+                // MARK: - Reputation
+
+            case .onramp(.delegate(.openReputation)):
+                state.reputationState = .initial(currencyCode: state.onrampState.currencyCode)
+                state.path = .reputation
+                return .none
+
+            case let .reputation(.delegate(.buy(currencyCode))):
+                // Straight to the amount screen rather than back through the routing that sent
+                // 0-RP users here — and to the one they came from, so a half-typed amount survives
+                // the detour. Only a different corridor is worth a fresh screen.
+                if state.onrampState.currencyCode != currencyCode {
+                    state.onrampState = .initial(currencyCode: currencyCode)
+                }
+                state.path = .onramp
+                return .none
+
+            case let .reputation(.delegate(.raiseLimit(currencyCode))):
+                state.increaseReputationState = .initial(currencyCode: currencyCode)
+                state.path = .increaseReputation
+                return .none
+
+            case .reputation(.delegate(.close)):
+                state.path = .onramp
+                return .none
+
+            case .increaseReputation(.delegate(.close)):
+                state.path = .reputation
+                return .none
+
+            case let .reclaimReturnReceived(args):
+                // A live run owns its own poller, so the return link must be a no-op. Only a run
+                // that no longer exists — the app was killed in the Verifier — needs rebuilding
+                // from the callback's fields.
+                guard !state.increaseReputationState.isRunLive else { return .none }
+                state.increaseReputationState = .initial(
+                    currencyCode: args.currencyCode,
+                    resumeSessionID: args.sessionID,
+                    resumePlatformID: args.platformID
+                )
+                state.path = .increaseReputation
+                return .none
+
             case .home(.transactionList(.transactionTapped(let txId))):
                 state.transactionsCoordFlowState = .initial
                 state.transactionsCoordFlowState.transactionToOpen = txId

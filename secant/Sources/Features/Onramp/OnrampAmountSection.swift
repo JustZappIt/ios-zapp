@@ -40,7 +40,16 @@ extension OnrampView {
                     if let limits = limitsText {
                         ZappSummaryRow(label: String(localizable: .onrampLimitsLabel), value: limits)
                     }
-                    ZappSummaryRow(label: String(localizable: .onrampDailyLimitLabel), value: dailyLimitText)
+                    // The number is reputation-derived, so the only useful explanation is the
+                    // screen that raises it.
+                    ZappSummaryRow(
+                        label: String(localizable: .onrampDailyLimitLabel),
+                        value: dailyLimitText,
+                        info: ZappSummaryRowInfo(
+                            accessibilityLabel: String(localizable: .onrampDailyLimitInfo),
+                            action: { store.send(.limitInfoTapped) }
+                        )
+                    )
                     ZappSummaryRow(label: String(localizable: .onrampPaymentRailLabel), value: store.paymentRail)
                 }
             }

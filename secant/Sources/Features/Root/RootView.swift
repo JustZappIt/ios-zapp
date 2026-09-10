@@ -269,6 +269,24 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .reputation {
+                                ReputationView(
+                                    store: store.scope(
+                                        state: \.reputationState,
+                                        action: \.reputation
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .increaseReputation {
+                                IncreaseReputationView(
+                                    store: store.scope(
+                                        state: \.increaseReputationState,
+                                        action: \.increaseReputation
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .scanCoordFlow {
                                 // FIXME: missing back button
                                 // TODO: this is no longer connected in the UI, it was under `scan` button

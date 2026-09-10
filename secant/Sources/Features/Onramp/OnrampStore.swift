@@ -609,6 +609,9 @@ struct Onramp {
                 state.errorMessage = nil
                 return statusEffect { try await onramp.resume() }
 
+            case .limitInfoTapped:
+                return .send(.delegate(.openReputation))
+
             case .infoTapped:
                 state.isInfoPresented = true
                 return .none
