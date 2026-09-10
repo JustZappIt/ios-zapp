@@ -22,7 +22,10 @@ struct ZappScreenHeader<Left: View, Right: View>: View {
         title: String,
         subtitle: String? = nil,
         onTitleTap: (() -> Void)? = nil,
-        containerColor: ZappColors = .surface,
+        // Screens put the header on the screen background, not on a raised surface. Thirteen
+        // call sites had already overridden this to .bg one at a time; the other 37 inherited a
+        // header a shade off their own body (Buy ZEC most visibly). No call site wants .surface.
+        containerColor: ZappColors = .bg,
         titleStyle: ZappTextStyle = .screenTitle,
         @ViewBuilder left: () -> Left,
         @ViewBuilder right: () -> Right

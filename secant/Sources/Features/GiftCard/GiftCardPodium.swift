@@ -128,7 +128,7 @@ struct GiftCardPodium: View {
 
                 face(showsBack: showsBack, radians: radians)
                     .rotation3DEffect(
-                        .degrees(angle + (showsBack ? 180 : 0)),
+                        .degrees(angle),
                         axis: (x: 0, y: 1, z: 0),
                         perspective: 0.6
                     )
@@ -146,13 +146,19 @@ struct GiftCardPodium: View {
         ZStack {
             RoundedRectangle(cornerRadius: Self.corner)
                 .fill(stock.face)
-            GiftCardFlare(stock: stock, corner: Self.corner, isReverse: showsBack)
-                .clipShape(RoundedRectangle(cornerRadius: Self.corner))
-            if showsBack {
-                backContent
-            } else {
-                frontContent
+            // Everything printed on the card. Turning the face to the reverse mirrors whatever
+            // it contains, so the printing is un-mirrored once, here. The fill, the light
+            // gradient and the sheen stay outside: they are symmetric, or already track the turn.
+            ZStack {
+                GiftCardFlare(stock: stock, corner: Self.corner, isReverse: showsBack)
+                    .clipShape(RoundedRectangle(cornerRadius: Self.corner))
+                if showsBack {
+                    backContent
+                } else {
+                    frontContent
+                }
             }
+            .rotation3DEffect(.degrees(showsBack ? 180 : 0), axis: (x: 0, y: 1, z: 0))
             // The light catching the face: a horizontal gradient whose bright side swaps with the
             // turn and whose intensity rises as the face goes glancing.
             let glancing = abs(sin(radians))
@@ -220,8 +226,6 @@ struct GiftCardPodium: View {
                     .zappFont(.eyebrow, color: stock.inkFaint)
             }
         }
-        // The back is rendered through an extra 180° turn, so its content needs the mirror fix.
-        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

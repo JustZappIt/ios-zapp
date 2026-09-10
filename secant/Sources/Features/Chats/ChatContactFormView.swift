@@ -14,6 +14,9 @@ struct ChatContactFormView: View {
         static let closeIconSize: CGFloat = 20
         static let scanIconSize: CGFloat = 20
         static let disclosureIconSize: CGFloat = 12
+        static let validKeyIconSize: CGFloat = 14
+        static let keyHeadLength = 10
+        static let keyTailLength = 6
     }
 
     @Perception.Bindable var store: StoreOf<ChatContactForm>
@@ -73,27 +76,20 @@ struct ChatContactFormView: View {
     }
 
     private var nameField: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .chatContactsNameLabel))
-
-            TextField(
-                String(localizable: .chatContactsNamePlaceholder),
-                text: Binding(
-                    get: { store.name },
-                    set: { store.send(.nameChanged($0)) }
-                )
-            )
-            .zappFont(.body, style: ZappColors.text)
-            .autocorrectionDisabled()
-            .padding(Design.Spacing._md)
-            .background(ZappColors.surfaceInput.color(colorScheme))
+        ZappInputField(
+            placeholder: String(localizable: .chatContactsNamePlaceholder),
+            text: Binding(
+                get: { store.name },
+                set: { store.send(.nameChanged($0)) }
+            ),
+            accessibilityLabel: String(localizable: .chatContactsNameLabel)
+        ) {
+            ZappInputFieldGlyph(icon: Asset.Assets.Icons.user.image)
         }
     }
 
     private var keyField: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .chatContactsKeyLabel))
-
             if store.isKeyLocked {
                 Text(store.publicKey)
                     .zappFont(.mono, style: ZappColors.textMuted)
@@ -102,27 +98,28 @@ struct ChatContactFormView: View {
                     .padding(Design.Spacing._md)
                     .background(ZappColors.surfaceAlt.color(colorScheme))
             } else {
-                HStack(spacing: 0) {
-                    TextField(
-                        String(localizable: .newChatPeerPlaceholder),
-                        text: Binding(
-                            get: { store.publicKey },
-                            set: { store.send(.publicKeyChanged($0)) }
-                        ),
-                        axis: .vertical
-                    )
-                    .zappFont(.mono, style: ZappColors.text)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .lineLimit(2, reservesSpace: true)
-                    .padding(Design.Spacing._md)
+                ZappInputField(
+                    placeholder: String(localizable: .newChatPeerPlaceholder),
+                    text: Binding(
+                        get: { store.publicKey },
+                        set: { store.send(.publicKeyChanged($0)) }
+                    ),
+                    isVerbatim: true,
+                    accessibilityLabel: String(localizable: .chatContactsKeyLabel),
+                    leading: { ZappInputFieldGlyph(icon: Asset.Assets.Icons.key.image) },
+                    trailing: {
+                        ZappInputFieldAction(
+                            icon: Asset.Assets.Icons.scan.image,
+                            accessibilityLabel: String(localizable: .chatContactsScanKey)
+                        ) {
+                            store.send(.scanTapped(.publicKey))
+                        }
+                    }
+                )
 
-                    scanButton(
-                        target: .publicKey,
-                        accessibilityLabel: String(localizable: .chatContactsScanKey)
-                    )
+                if store.isValidKey {
+                    validKeyRow
                 }
-                .background(ZappColors.surfaceInput.color(colorScheme))
             }
 
             if store.showsInvalidKeyHint {
@@ -139,35 +136,60 @@ struct ChatContactFormView: View {
 
     private var addressField: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .chatContactsAddressLabel))
-
-            HStack(spacing: 0) {
-                TextField(
-                    String(localizable: .chatContactsAddressPlaceholder),
-                    text: Binding(
-                        get: { store.address },
-                        set: { store.send(.addressChanged($0)) }
-                    ),
-                    axis: .vertical
-                )
-                .zappFont(.mono, style: ZappColors.text)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .lineLimit(2, reservesSpace: true)
-                .padding(Design.Spacing._md)
-
-                scanButton(
-                    target: .address,
-                    accessibilityLabel: String(localizable: .chatContactsScanAddress)
-                )
-            }
-            .background(ZappColors.surfaceInput.color(colorScheme))
+            ZappInputField(
+                placeholder: String(localizable: .chatContactsAddressPlaceholder),
+                text: Binding(
+                    get: { store.address },
+                    set: { store.send(.addressChanged($0)) }
+                ),
+                isVerbatim: true,
+                accessibilityLabel: String(localizable: .chatContactsAddressLabel),
+                leading: { ZappInputFieldGlyph(icon: Asset.Assets.Icons.connectWallet.image) },
+                trailing: {
+                    ZappInputFieldAction(
+                        icon: Asset.Assets.Icons.scan.image,
+                        accessibilityLabel: String(localizable: .chatContactsScanAddress)
+                    ) {
+                        store.send(.scanTapped(.address))
+                    }
+                }
+            )
 
             if !store.isValidAddress {
                 Text(String(localizable: .chatContactsInvalidAddress))
                     .zappFont(.caption, style: ZappColors.danger)
             }
         }
+    }
+
+    /// Android confirms a good key in place rather than only rejecting a bad one
+    /// (`AddChatContactSheet.kt:143-168`): the key, abbreviated, on a soft success ground.
+    private var validKeyRow: some View {
+        HStack(spacing: Design.Spacing._md) {
+            Asset.Assets.Icons.checkVerified.image
+                .zImage(
+                    width: Constants.validKeyIconSize,
+                    height: Constants.validKeyIconSize,
+                    style: ZappColors.success
+                )
+
+            Text(abbreviatedKey)
+                .zappFont(.chip, style: ZappColors.success)
+                .lineLimit(1)
+                .truncationMode(.middle)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, Design.Spacing._lg)
+        .padding(.vertical, Design.Spacing._md)
+        .frame(maxWidth: .infinity)
+        .background(ZappColors.successSoft.color(colorScheme))
+    }
+
+    private var abbreviatedKey: String {
+        let key = store.publicKey
+        guard key.count > Constants.keyHeadLength + Constants.keyTailLength else { return key }
+        return "\(key.prefix(Constants.keyHeadLength))…\(key.suffix(Constants.keyTailLength))"
     }
 
     private var buttons: some View {

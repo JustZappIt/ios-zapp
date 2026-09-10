@@ -38,7 +38,17 @@ struct ChatProfileView: View {
                             ZappValueCard(
                                 value: store.publicKey,
                                 label: String(localizable: .chatProfilePublicKey)
-                            )
+                            ) {
+                                // Matches the wallet-address card, which has carried an in-card
+                                // copy since it shipped. Shares the bottom bar's copy action, so
+                                // both show the copied tick together.
+                                ZappCopyIconButton(
+                                    isCopied: store.didCopy,
+                                    accessibilityLabel: String(localizable: .chatProfileCopyPublicKey)
+                                ) {
+                                    store.send(.copyPublicKeyTapped)
+                                }
+                            }
                         }
 
                         identityGroup

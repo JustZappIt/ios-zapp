@@ -11,8 +11,10 @@ struct ZappSegmentedSelector: View {
     private enum Constants {
         static let inset: CGFloat = 3
         static let spacing: CGFloat = 2
-        static let cellMinHeight: CGFloat = 20
-        static let hitSlop: CGFloat = 12
+        /// Android's selector sets its cells to that platform's 48dp minimum touch target
+        /// (`ZappSegmentedSelector.kt:110`); 44pt is the iOS equivalent per the HIG. The old 20
+        /// left a hairline bar that only reached a tappable size through invisible hit slop.
+        static let cellMinHeight: CGFloat = 44
         static let logoHeight: CGFloat = 16
         static let iconSize: CGFloat = 16
         static let iconGap: CGFloat = 6
@@ -68,9 +70,7 @@ struct ZappSegmentedSelector: View {
             .frame(maxWidth: .infinity)
             .frame(minHeight: cellMinHeight)
             .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
-            .padding(.vertical, Constants.hitSlop)
             .contentShape(Rectangle())
-            .padding(.vertical, -Constants.hitSlop)
         }
         .buttonStyle(.zappPress)
         .accessibilityLabel(option)

@@ -202,7 +202,9 @@ struct GiftCardView: View {
             }
 
             TextField(String(localizable: .giftCardMessagePlaceholder), text: $store.message, axis: .vertical)
-                .lineLimit(2...4)
+                // Starts at one line and grows to four. It opens empty and is optional, so
+                // reserving two lines up front left a tall box under a mostly-unused field.
+                .lineLimit(1...4)
                 .textFieldStyle(.plain)
                 .zappFont(.rowTitle, style: ZappColors.text)
                 .padding(.horizontal, 12)

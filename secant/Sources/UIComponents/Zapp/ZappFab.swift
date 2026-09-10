@@ -24,7 +24,11 @@ struct ZappFab: View {
                 .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.onAccent)
                 .frame(width: Constants.size, height: Constants.size)
                 .background(ZappColors.accent.color(colorScheme))
-                .shadow(color: ZappColors.shadow.color(colorScheme), radius: 4, y: 2)
+                // The shadow token is meant to be scaled by its caller: it is 8% black in light
+                // but 50% in dark, and used raw that reads as a dark hue around the square rather
+                // than a lift. 0.14 matches ZappPillNavBar's fully-lifted value, so the FAB and the
+                // pill it sits above agree. Android's is Compose `elevation = 4.dp`, similarly soft.
+                .shadow(color: ZappColors.shadow.color(colorScheme).opacity(0.14), radius: 4, y: 2)
         }
         .buttonStyle(.zappPress)
         .accessibilityLabel(accessibilityLabel)
