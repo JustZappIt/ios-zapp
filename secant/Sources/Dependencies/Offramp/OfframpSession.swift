@@ -933,14 +933,10 @@ actor OfframpSession {
         return try trackReclaimFlow(flow, generation: expectedGeneration)
     }
 
-    /// Both act on the live client only. Building the rail from a UI callback would be a rail
-    /// nothing is running against, and `markVerifierOpened` on a fresh one is a no-op anyway.
+    /// Acts on the live client only. Building the rail from a UI callback would be a rail nothing
+    /// is running against, and `markVerifierOpened` on a fresh one is a no-op anyway.
     func markReclaimVerifierOpened() {
         reputation?.markVerifierOpened()
-    }
-
-    func cancelReclaimVerification() {
-        reputation?.cancel()
     }
 
     /// Registered as state-writing work: the submit step broadcasts a sponsored UserOperation, so

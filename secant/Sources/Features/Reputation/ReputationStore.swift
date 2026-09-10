@@ -64,7 +64,7 @@ struct Reputation {
         var buyLimitText: String? {
             guard let summary else { return nil }
             return summary.canBuy
-                ? String(localizable: .reputationAmountUsd(Reputation.usd(summary.buyLimitMicros)))
+                ? String(localizable: .reputationAmountUsd(ReputationCopy.usd(summary.buyLimitMicros)))
                 : String(localizable: .reputationLimitLocked)
         }
 

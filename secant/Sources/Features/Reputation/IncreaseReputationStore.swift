@@ -80,7 +80,7 @@ struct IncreaseReputation {
         case platformTapped(String)
         case statusReceived(ReclaimStatusModel)
         case runEnded
-        case verifierOpened(Bool)
+        case verifierOpened(platformID: String, accepted: Bool)
         case cancelRunTapped
         case dismissRunTapped
         case doneTapped
@@ -132,9 +132,8 @@ struct IncreaseReputation {
                 return .none
 
             case let .platformTapped(platformID):
-                // Verified rows stay listed and inert, and a second tap while a run is live is
-                // ignored: a second session leaves the user proving their account against a link
-                // nobody is polling.
+                // A second tap while a run is live would mint a session over the one the user
+                // is already proving against, and only the second is polled.
                 guard state.run == nil,
                       let platform = state.platforms.first(where: { $0.id == platformID }),
                       !platform.isVerified else { return .none }
@@ -149,25 +148,26 @@ struct IncreaseReputation {
                 // Leaving the run mid-stage would strand the screen on a spinner.
                 guard state.isRunLive else { return .none }
                 state.run?.stage = .failed
-                state.run?.errorMessage = Reputation.failureMessage(.network)
+                state.run?.errorMessage = ReputationCopy.failureMessage(.network)
                 return .none
 
-            case let .verifierOpened(accepted):
-                // ☠ Only a *successful* open stops the re-minting. Marking it on the tap freezes a
-                // link that is dead by the time it is opened; a refused open leaves the session
-                // being refreshed, which is what the next tap needs.
-                guard accepted else { return .none }
+            case let .verifierOpened(platformID, accepted):
+                // ☠ Only a *successful* open stops the re-minting, and only for the run that is
+                // still on screen. A refused open leaves the session being refreshed, which is
+                // what the next tap needs; a callback outliving its own run would mark the run
+                // after it as opened before the user has left, and that one's link then ages out
+                // unwatched.
+                guard accepted, state.run?.platformID == platformID else { return .none }
                 return .run { _ in await reputation.markVerifierOpened() }
 
             case .cancelRunTapped, .dismissRunTapped:
                 // Cancelling leaves the Reclaim session to expire on its own. It is never
-                // surfaced later as an error — the user chose to stop.
+                // surfaced later as an error — the user chose to stop. Cancelling the effect is
+                // the whole teardown: it unwinds the Kotlin collection, which frees the run lock
+                // and forgets the launch signal.
                 state.run = nil
                 state.lastActiveStage = .ready
-                return .merge(
-                    .cancel(id: CancelID.run),
-                    .run { _ in await reputation.cancel() }
-                )
+                return .cancel(id: CancelID.run)
 
             case .doneTapped:
                 return .send(.delegate(.close))
@@ -261,7 +261,7 @@ struct IncreaseReputation {
             state.platforms = visiblePlatforms(summary, currencyCode: state.currencyCode)
         case let .failed(failure):
             state.run?.stage = .failed
-            state.run?.errorMessage = Reputation.failureMessage(failure)
+            state.run?.errorMessage = ReputationCopy.failureMessage(failure)
         }
     }
 

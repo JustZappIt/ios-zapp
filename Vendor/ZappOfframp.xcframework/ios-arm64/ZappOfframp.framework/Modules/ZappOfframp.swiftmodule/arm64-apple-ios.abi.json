@@ -73694,37 +73694,6 @@
         "children": [
           {
             "kind": "Function",
-            "name": "accountAddress",
-            "printedName": "accountAddress()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:So32ZappOfframpAppleReputationClientC0aB0E14accountAddressSSyYaKF",
-            "mangledName": "$sSo32ZappOfframpAppleReputationClientC0aB0E14accountAddressSSyYaKF",
-            "moduleName": "ZappOfframp",
-            "intro_Macosx": "10.15",
-            "intro_iOS": "13",
-            "intro_tvOS": "13",
-            "intro_watchOS": "6",
-            "declAttributes": [
-              "AccessControl",
-              "Available",
-              "Available",
-              "Available",
-              "Available"
-            ],
-            "isFromExtension": true,
-            "throwing": true,
-            "funcSelfKind": "NonMutating"
-          },
-          {
-            "kind": "Function",
             "name": "summary",
             "printedName": "summary(currencyCode:)",
             "children": [

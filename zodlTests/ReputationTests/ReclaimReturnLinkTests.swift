@@ -2,6 +2,7 @@
 
 import Foundation
 import Testing
+import ZappOfframp
 @testable import zodl_internal
 
 /// The three fields a Reclaim callback carries are untrusted routing hints, never proof. They still
@@ -69,6 +70,25 @@ struct ReclaimReturnLinkTests {
     @Test func theRegisteredReturnUrlCarriesItsOwnHost() {
         #expect(ReclaimReturnLink.url == "zcash://reclaim-return")
         #expect(URL(string: ReclaimReturnLink.url)?.host() == ReclaimReturnLink.host)
+    }
+
+    /// ☠ The URL is composed by the framework, not by us: `ReclaimSessionMinter` sends
+    /// `ReclaimReturn.url(...)` as the session's `redirectUrl`. Parsing our own fixture would pass
+    /// against a wire format that no longer exists, and the only symptom in the field is a user
+    /// coming back from the Verifier to nothing at all.
+    @Test func theFrameworksOwnRedirectParsesBack() throws {
+        let composed = ReclaimReturn.shared.url(
+            baseUrl: ReclaimReturnLink.url,
+            sessionId: "abc-123_XYZ",
+            platform: SocialPlatform.linkedIn,
+            currency: CurrencyCode.inr
+        )
+        let returned = try #require(URL(string: composed))
+        let args = try #require(ReclaimReturnLink.resumeArgs(from: returned))
+
+        #expect(args.sessionID == "abc-123_XYZ")
+        #expect(args.platformID == SocialPlatform.linkedIn.name)
+        #expect(args.currencyCode == CurrencyCode.inr.code)
     }
 
     private func url(session: String, platform: String, currency: String) throws -> URL {

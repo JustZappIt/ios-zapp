@@ -107,7 +107,7 @@ struct IncreaseReputationView: View {
                     .zappFont(.rowSubtitle, style: ZappColors.accentText)
 
                 if let gain = platform.limitGainMicros {
-                    Text(String(localizable: .increaseReputationLimitGain(Reputation.usd(gain))))
+                    Text(String(localizable: .increaseReputationLimitGain(ReputationCopy.usd(gain))))
                         .zappFont(.caption, style: ZappColors.textMuted)
                 }
             }
@@ -121,7 +121,7 @@ struct IncreaseReputationView: View {
                 ZappSuccessHeader(
                     title: String(localizable: .increaseReputationDone(run.name)),
                     subtitle: run.newBuyLimitMicros.map {
-                        String(localizable: .increaseReputationNewLimit(Reputation.usd($0)))
+                        String(localizable: .increaseReputationNewLimit(ReputationCopy.usd($0)))
                     } ?? ""
                 )
 
@@ -189,16 +189,16 @@ struct IncreaseReputationView: View {
 
     /// The one thing only the view can do. iOS resolves the share link to the Reclaim Verifier when
     /// it is installed and to Safari otherwise, which is the same deferred deep link Android gets —
-    /// so one open is enough, and there is no `market://` equivalent to fall back to.
-    ///
-    /// Whether it actually opened is what the reducer needs: the session is re-minted every four
-    /// minutes until the user has genuinely left, and a refused open must leave that running.
+    /// so one open is enough, and there is no `market://` equivalent to fall back to. Whether it
+    /// actually opened is what `.verifierOpened` needs.
     private func openVerifier(_ run: IncreaseReputation.State.Run) {
         guard let raw = run.launchURL, let url = URL(string: raw) else {
-            store.send(.verifierOpened(false))
+            store.send(.verifierOpened(platformID: run.platformID, accepted: false))
             return
         }
-        openURL(url) { accepted in store.send(.verifierOpened(accepted)) }
+        openURL(url) { accepted in
+            store.send(.verifierOpened(platformID: run.platformID, accepted: accepted))
+        }
     }
 
     private func message(for run: IncreaseReputation.State.Run) -> String {
