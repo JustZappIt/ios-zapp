@@ -20,7 +20,6 @@ struct ReputationStoreTests {
         }
 
         #expect(store.state.primaryAction == .retry)
-        // Still lets them into the verification list: the read failure is ours, not theirs.
         #expect(store.state.isRaiseLimitVisible)
     }
 
@@ -96,7 +95,7 @@ struct ReputationStoreTests {
     }
 
     /// Terminal: verifying will not change it, so the screen offers nothing to press.
-    @MainActor @Test func aBlacklistedWalletIsOfferedNoActionAtAll() async {
+    @MainActor @Test func aBlockedWalletIsOfferedNoActionAtAll() async {
         let store = await TestStore(initialState: .initial(currencyCode: "INR")) { Reputation() } withDependencies: {
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", isBlocked: true) }
         }

@@ -3,6 +3,7 @@
 import ComposableArchitecture
 import Foundation
 import Testing
+import ZappOfframp
 @testable import zodl_internal
 
 /// The run one row starts, and the three things about it that are invisible on screen: which step
@@ -43,8 +44,6 @@ struct IncreaseReputationStoreTests {
         #expect(brl.state.platforms.contains { $0.id == "Binance" })
     }
 
-    /// Verified rows stay listed and inert: hiding one reads as a bug, and nothing else in the app
-    /// tells the user that account is already spent.
     @MainActor @Test func tappingAVerifiedRowStartsNothing() async {
         var state = IncreaseReputation.State.initial(currencyCode: "INR")
         state.isLoading = false
@@ -135,18 +134,26 @@ struct IncreaseReputationStoreTests {
         #expect(store.state.run?.errorMessage != String(localizable: .increaseReputationErrorNetwork))
     }
 
+    /// ☠ The driver's failures cross as `ReclaimFailure.name` and are matched by raw value. A
+    /// rename on either side is not a compile error on either side: every case would fall to
+    /// `.unknown`, and all nine sentences — `alreadyVerifiedElsewhere`, which is permanent,
+    /// included — would collapse into "couldn't reach the network, try again in a moment".
+    @Test func everyDriverFailureIsNamedOnThisSideToo() {
+        for failure in ReclaimFailure.allCases {
+            #expect(ReclaimFailureModel(rawValue: failure.name) != nil, "unmapped: \(failure.name)")
+        }
+    }
+
     @Test func everyFailureKeepsASentenceOfItsOwn() {
         let messages = [
             ReclaimFailureModel.notConfigured, .criteriaNotMet, .proofGenerationFailed, .sessionExpired,
             .alreadyVerifiedElsewhere, .addressMismatch, .verificationRejected, .sponsorshipUnavailable, .busy
-        ].map(Reputation.failureMessage)
+        ].map(ReputationCopy.failureMessage)
 
         #expect(Set(messages).count == messages.count)
         #expect(!messages.contains(String(localizable: .increaseReputationErrorNetwork)))
     }
 
-    /// A second live session leaves the user proving their account against a link nobody is
-    /// polling, and the failure arrives ten minutes later wearing the wrong name.
     @MainActor @Test func aSecondRowTappedWhileARunIsLiveIsIgnored() async {
         let started = LockIsolated<[String]>([])
         var state = IncreaseReputation.State.initial(currencyCode: "INR")
@@ -173,10 +180,7 @@ struct IncreaseReputationStoreTests {
     /// Cancelling leaves the Reclaim session to expire on its own, and never surfaces later as an
     /// error — the user chose to stop.
     @MainActor @Test func cancellingClearsTheRunWithoutReportingAFailure() async {
-        let cancelled = LockIsolated(false)
-        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")]) {
-            $0.reputation.cancel = { cancelled.setValue(true) }
-        }
+        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")])
         store.exhaustivity = .off
 
         await store.send(.platformTapped("LinkedIn"))
@@ -185,27 +189,49 @@ struct IncreaseReputationStoreTests {
         await store.finish()
 
         #expect(store.state.run == nil)
-        #expect(cancelled.value)
     }
 
     // MARK: - Leaving for the Verifier
 
-    /// ☠ Only a *successful* open stops the re-minting. Marking it on the tap freezes a link that
-    /// is dead by the time it is opened.
     @MainActor @Test func theSessionIsHeldOpenUntilTheVerifierActuallyOpened() async {
         let marked = LockIsolated(0)
-        let store = await TestStore(initialState: .initial(currencyCode: "INR")) { IncreaseReputation() }
-            withDependencies: {
-                $0.reputation.markVerifierOpened = { marked.withValue { $0 += 1 } }
-            }
+        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")]) {
+            $0.reputation.markVerifierOpened = { marked.withValue { $0 += 1 } }
+        }
+        store.exhaustivity = .off
 
-        await store.send(.verifierOpened(false))
+        await store.send(.platformTapped("LinkedIn"))
+        await store.receive(\.statusReceived)
+
+        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: false))
         await store.finish()
         #expect(marked.value == 0)
 
-        await store.send(.verifierOpened(true))
+        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: true))
         await store.finish()
         #expect(marked.value == 1)
+    }
+
+    /// A launch callback can outlive the run that started it. Marking the run after it as opened
+    /// would stop that one re-minting before the user has left, and its link then ages out while
+    /// nobody watches the session it names.
+    @MainActor @Test func aCallbackFromAnAbandonedRunNeverMarksTheRunAfterIt() async {
+        let marked = LockIsolated(0)
+        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")]) {
+            $0.reputation.markVerifierOpened = { marked.withValue { $0 += 1 } }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.platformTapped("LinkedIn"))
+        await store.receive(\.statusReceived)
+        await store.send(.cancelRunTapped)
+        await store.send(.platformTapped("GitHub"))
+        await store.receive(\.statusReceived)
+
+        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: true))
+        await store.finish()
+
+        #expect(marked.value == 0)
     }
 
     // MARK: - The return link
@@ -277,11 +303,11 @@ struct IncreaseReputationStoreTests {
 
     @MainActor private func listStore(currencyCode: String = "INR") async -> TestStoreOf<IncreaseReputation> {
         await TestStore(initialState: .initial(currencyCode: currencyCode)) { IncreaseReputation() }
-            withDependencies: {
-                $0.reputation.summary = { _ in
-                    ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0")
-                }
+        withDependencies: {
+            $0.reputation.summary = { _ in
+                ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0")
             }
+        }
     }
 
     @MainActor private func runStore(

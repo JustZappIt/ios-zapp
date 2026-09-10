@@ -2,7 +2,9 @@
 
 import Foundation
 
-extension Reputation {
+/// What both reputation screens render, kept off either reducer: the increase screen uses all of
+/// it and owns none of it.
+enum ReputationCopy {
     /// Micro-USDC as the exchange's own dollars, trailing zeros stripped — Android's
     /// `Usdc6.toDisplayString(stripTrailingZeros = true)`.
     static func usd(_ micros: String) -> String {
@@ -10,9 +12,7 @@ extension Reputation {
         return NSDecimalNumber(decimal: decimal / 1_000_000).stringValue
     }
 
-    /// One sentence per failure. None of them is "something went wrong": the three reverts that
-    /// mean "one account, one wallet" already collapse into `alreadyVerifiedElsewhere` in the
-    /// driver, and collapsing any further would leave the user with nothing to act on.
+    /// One sentence per case of `ReclaimFailureModel`, which is where the rule is written down.
     static func failureMessage(_ failure: ReclaimFailureModel) -> String {
         switch failure {
         case .notConfigured: return String(localizable: .increaseReputationErrorUnavailable)

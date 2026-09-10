@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 import Foundation
+@preconcurrency import ZappOfframp
 
 /// Where the Reclaim Verifier sends the user when a verification finishes.
 ///
@@ -23,9 +24,13 @@ enum ReclaimReturnLink {
     /// The same string Android registers, so one return URL serves both platforms.
     static let url = "\(scheme)://\(host)"
 
-    static let sessionIDQuery = "sessionId"
-    static let platformQuery = "socialPlatform"
-    static let currencyQuery = "currency"
+    /// Read from the framework, which is what composes the redirect: `ReclaimSessionMinter` sends
+    /// `ReclaimReturn.url(...)` as the session's `redirectUrl`. Retyping the keys here would let a
+    /// rename in `offramp-lib` arrive with the next vendor as a return link that parses to nothing
+    /// and a user whose verification silently goes nowhere.
+    static let sessionIDQuery = ReclaimReturn.shared.SESSION_ID_QUERY
+    static let platformQuery = ReclaimReturn.shared.PLATFORM_QUERY
+    static let currencyQuery = ReclaimReturn.shared.CURRENCY_QUERY
 
     struct ResumeArgs: Equatable {
         let sessionID: String

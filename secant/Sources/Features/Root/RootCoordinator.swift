@@ -435,15 +435,21 @@ extension Root {
                 return .none
 
             case let .reclaimReturnReceived(args):
-                // A live run owns its own poller, so the return link must be a no-op. Only a run
-                // that no longer exists — the app was killed in the Verifier — needs rebuilding
-                // from the callback's fields.
-                guard !state.increaseReputationState.isRunLive else { return .none }
+                // Only a run the process lost is rebuilt from the callback. A screen already on
+                // `.increaseReputation` keeps whatever it is showing, live run or not: replacing
+                // its state does not remount the view, so nothing would consume the resume fields
+                // and the screen would sit on a spinner it has no way out of. Android draws the
+                // same line at `onCreate` vs `onNewIntent`.
+                guard state.path != .increaseReputation,
+                      !state.increaseReputationState.isRunLive else { return .none }
                 state.increaseReputationState = .initial(
                     currencyCode: args.currencyCode,
                     resumeSessionID: args.sessionID,
                     resumePlatformID: args.platformID
                 )
+                // Finishing the run lands on Reputation, so it has to read the corridor the
+                // callback named rather than whatever the last Buy screen left behind.
+                state.reputationState = .initial(currencyCode: args.currencyCode)
                 state.path = .increaseReputation
                 return .none
 

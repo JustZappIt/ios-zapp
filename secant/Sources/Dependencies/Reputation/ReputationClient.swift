@@ -24,10 +24,7 @@ struct ReputationClient {
         _ currencyCode: String,
         _ sessionID: String
     ) async throws -> ReclaimStatusStream
-    /// Stops the re-minting. Sent only once `UIApplication.open` has reported success — marking it
-    /// on the tap freezes a link that is dead by the time it is opened.
     var markVerifierOpened: @Sendable () async -> Void
-    var cancel: @Sendable () async -> Void
 }
 
 extension ReputationClient: DependencyKey {
@@ -59,9 +56,6 @@ extension ReputationClient: DependencyKey {
             },
             markVerifierOpened: {
                 await OfframpSession.shared.markReclaimVerifierOpened()
-            },
-            cancel: {
-                await OfframpSession.shared.cancelReclaimVerification()
             }
         )
     }
