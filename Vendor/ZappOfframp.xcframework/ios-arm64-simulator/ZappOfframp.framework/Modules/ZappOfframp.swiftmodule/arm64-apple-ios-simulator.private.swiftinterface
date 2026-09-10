@@ -137,6 +137,8 @@ public enum Skie {
   }
   public typealias org_jetbrains_kotlinx__kotlinx_io_core = ZappOfframp.Skie.KotlinxIoCore
   public enum OfframpLib {
+    public enum AppleReclaimStatus {
+    }
     public enum FundingOutcome {
     }
     public enum OnrampPaymentInstruction {
@@ -667,6 +669,16 @@ extension ZappOfframp.ApplePeerCashOutClient {
 extension ZappOfframp.ApplePeerCashOutClient.Companion {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
   public func create(account: ZappOfframp.AppleBaseAccount, storage: any ZappOfframp.ApplePeerCashOutStorage) async throws -> ZappOfframp.ApplePeerCashOutClient
+}
+extension ZappOfframp.AppleReputationClient {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func accountAddress() async throws -> Swift.String
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func summary(currencyCode: Swift.String) async throws -> ZappOfframp.AppleReputationSummary
+}
+extension ZappOfframp.AppleReputationClient.Companion {
+  @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
+  public func create(account: ZappOfframp.AppleBaseAccount, reclaimAppId: Swift.String, reclaimAppSecret: Swift.String, reclaimReturnUrl: Swift.String) async throws -> ZappOfframp.AppleReputationClient
 }
 extension ZappOfframp.OfframpFunding {
   @available(iOS 13, macOS 10.15, watchOS 6, tvOS 13, *)
@@ -2760,6 +2772,23 @@ extension ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult {
 }
 public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed where __Sealed : ZappOfframp.Skie_SuspendResult
 @_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.RuntimeKotlin.Skie_SuspendResult.__Sealed? where __Sealed : ZappOfframp.Skie_SuspendResult
+extension ZappOfframp.Skie.OfframpLib.AppleReclaimStatus {
+  @frozen public enum __Sealed : Swift.Hashable {
+    case done(ZappOfframp.AppleReclaimStatus.Done)
+    case failed(ZappOfframp.AppleReclaimStatus.Failed)
+    case preparing(ZappOfframp.AppleReclaimStatus.Preparing)
+    case ready(ZappOfframp.AppleReclaimStatus.Ready)
+    case submitting(ZappOfframp.AppleReclaimStatus.Submitting)
+    case verifying(ZappOfframp.AppleReclaimStatus.Verifying)
+    public static func == (a: ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed, b: ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+public func onEnum<__Sealed>(of sealed: __Sealed) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed where __Sealed : ZappOfframp.AppleReclaimStatus
+@_disfavoredOverload public func onEnum<__Sealed>(of sealed: __Sealed?) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed? where __Sealed : ZappOfframp.AppleReclaimStatus
 extension ZappOfframp.Skie.OfframpLib.FundingOutcome {
   @frozen public enum __Sealed : Swift.Hashable {
     case alreadyFunded(ZappOfframp.FundingOutcomeAlreadyFunded)

@@ -25,6 +25,7 @@ struct Root {
             case giftCard
             case giftCardList
             case groupInfo
+            case increaseReputation
             case newChat
             case onramp
             case offramp
@@ -35,6 +36,7 @@ struct Root {
             case portfolioChartSetup
             case migrationCoordFlow
             case receive
+            case reputation
             case requestZecCoordFlow
             case scanCoordFlow
             case securitySettings
@@ -230,6 +232,8 @@ struct Root {
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
+        var reputationState = Reputation.State.initial(currencyCode: "INR")
+        var increaseReputationState = IncreaseReputation.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
         var offrampActivityReturn: OfframpActivityReturn?
         var p2pActivityState = P2pActivity.State.initial
@@ -307,8 +311,10 @@ struct Root {
             // the manual lane broadcasts a real send-max transaction from inside it, and an
             // automatic server switch mid-broadcast is exactly what must not happen. #1930
             // classifies it identically.
-            case .migrationCoordFlow, .onramp, .offramp, .peerCashOut, .sendCoordFlow, .scanCoordFlow,
-                 .swapAndPayCoordFlow, .transactionsCoordFlow:
+            // `.increaseReputation` broadcasts a sponsored UserOperation to write the proof, and
+            // `.reputation` is the screen it is reached from, so both classify with `.onramp`.
+            case .increaseReputation, .migrationCoordFlow, .onramp, .offramp, .peerCashOut, .reputation,
+                 .sendCoordFlow, .scanCoordFlow, .swapAndPayCoordFlow, .transactionsCoordFlow:
                 return true
             // Both gift screens can put bearer material on screen, and the create flow broadcasts.
             case .giftCard, .giftCardList:
@@ -447,6 +453,8 @@ struct Root {
         case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
         case onramp(Onramp.Action)
+        case reputation(Reputation.Action)
+        case increaseReputation(IncreaseReputation.Action)
         case offramp(Offramp.Action)
         case openPeerCashOut(destinationCode: String)
         case openScanAndPay
@@ -465,6 +473,7 @@ struct Root {
         case giftResetGuardPassed
         case giftResetGuardReviewTapped
         case giftResetGuardDeleteAnywayTapped(Bool)
+        case reclaimReturnReceived(ReclaimReturnLink.ResumeArgs)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -678,6 +687,14 @@ struct Root {
 
         Scope(state: \.onrampState, action: \.onramp) {
             Onramp()
+        }
+
+        Scope(state: \.reputationState, action: \.reputation) {
+            Reputation()
+        }
+
+        Scope(state: \.increaseReputationState, action: \.increaseReputation) {
+            IncreaseReputation()
         }
 
         Scope(state: \.p2pActivityState, action: \.p2pActivity) {

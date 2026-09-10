@@ -64,10 +64,12 @@ actor OfframpSession {
     private var offramp: OfframpRail?
     private var onramp: OnrampRail?
     private var peer: ApplePeerCashOutClient?
+    private var reputation: AppleReputationClient?
     private var accountTask: Task<AppleBaseAccount, Error>?
     private var offrampTask: Task<OfframpRail, Error>?
     private var onrampTask: Task<OnrampRail, Error>?
     private var peerTask: Task<ApplePeerCashOutClient, Error>?
+    private var reputationTask: Task<AppleReputationClient, Error>?
     private var reservationHydrationTask: Task<Void, Error>?
     private var reservationsHydratedGeneration: Int?
     private var stateWritingFlowTasks: [UUID: Task<Void, Never>] = [:]
@@ -123,6 +125,31 @@ actor OfframpSession {
         return try await value(of: task) { if self.peerTask == task { self.peerTask = nil } }
     }
 
+    func reputationClient() async throws -> AppleReputationClient {
+        await waitUntilActive()
+        let baseSnapshot = try await baseAccountSnapshot()
+        try validateGeneration(baseSnapshot.generation)
+        if let reputationTask { return try await reputationTask.value }
+
+        let generation = baseSnapshot.generation
+        // Blank credentials are admitted deliberately: the driver reports NotConfigured, which the
+        // screen renders as a sentence. Refusing to build the rail would take the list down too.
+        let appID = PartnerKeys.reclaimAppId ?? ""
+        let appSecret = PartnerKeys.reclaimAppSecret ?? ""
+        let task = Task {
+            let built = try await AppleReputationClient.companion.create(
+                account: baseSnapshot.account,
+                reclaimAppId: appID,
+                reclaimAppSecret: appSecret,
+                reclaimReturnUrl: ReclaimReturnLink.url
+            )
+            guard self.adopt(built, generation: generation) else { throw CancellationError() }
+            return built
+        }
+        reputationTask = task
+        return try await value(of: task) { if self.reputationTask == task { self.reputationTask = nil } }
+    }
+
     /// Releases everything this session adopted. A build still in flight is cancelled and releases
     /// itself when `adopt` turns it away, so nothing is ever torn down twice.
     ///
@@ -141,6 +168,7 @@ actor OfframpSession {
         let offrampTask = self.offrampTask
         let onrampTask = self.onrampTask
         let peerTask = self.peerTask
+        let reputationTask = self.reputationTask
         let reservationHydrationTask = self.reservationHydrationTask
         let stateWritingFlowTasks = Array(self.stateWritingFlowTasks.values)
         let stateWritingOperations = Array(self.stateWritingOperations.values)
@@ -148,6 +176,7 @@ actor OfframpSession {
         self.offrampTask = nil
         self.onrampTask = nil
         self.peerTask = nil
+        self.reputationTask = nil
         self.reservationHydrationTask = nil
         reservationsHydratedGeneration = nil
         self.stateWritingFlowTasks.removeAll()
@@ -157,6 +186,7 @@ actor OfframpSession {
         offrampTask?.cancel()
         onrampTask?.cancel()
         peerTask?.cancel()
+        reputationTask?.cancel()
         reservationHydrationTask?.cancel()
         stateWritingFlowTasks.forEach { $0.cancel() }
         stateWritingOperations.forEach { $0.cancel() }
@@ -165,6 +195,7 @@ actor OfframpSession {
         if let offrampTask { _ = await offrampTask.result }
         if let onrampTask { _ = await onrampTask.result }
         if let peerTask { _ = await peerTask.result }
+        if let reputationTask { _ = await reputationTask.result }
         if let reservationHydrationTask { _ = await reservationHydrationTask.result }
         for task in stateWritingFlowTasks { _ = await task.result }
         for operation in stateWritingOperations { await operation.wait() }
@@ -177,6 +208,9 @@ actor OfframpSession {
         onramp = nil
         offramp = nil
         peer = nil
+        // It owns no storage and no gateway, so there is nothing to release — but dropping it is
+        // what stops a verification running against the previous account's submitter.
+        reputation = nil
         // The account holds the HTTP client and the Base owner key every rail borrows, so it is last.
         account?.close()
         account = nil
@@ -874,6 +908,65 @@ actor OfframpSession {
         return stream
     }
 
+    func verifyReclaimPlatform(
+        platformID: String,
+        currencyCode: String,
+        expectedGeneration: Int
+    ) async throws -> ReclaimStatusStream {
+        guard expectedGeneration == generation else { throw CancellationError() }
+        let client = try await reputationClient()
+        try validateGeneration(expectedGeneration)
+        let flow = client.verify(platformId: platformID, currencyCode: currencyCode)
+        return try trackReclaimFlow(flow, generation: expectedGeneration)
+    }
+
+    func resumeReclaimVerification(
+        platformID: String,
+        currencyCode: String,
+        sessionID: String,
+        expectedGeneration: Int
+    ) async throws -> ReclaimStatusStream {
+        guard expectedGeneration == generation else { throw CancellationError() }
+        let client = try await reputationClient()
+        try validateGeneration(expectedGeneration)
+        let flow = client.resume(platformId: platformID, currencyCode: currencyCode, sessionId: sessionID)
+        return try trackReclaimFlow(flow, generation: expectedGeneration)
+    }
+
+    /// Both act on the live client only. Building the rail from a UI callback would be a rail
+    /// nothing is running against, and `markVerifierOpened` on a fresh one is a no-op anyway.
+    func markReclaimVerifierOpened() {
+        reputation?.markVerifierOpened()
+    }
+
+    func cancelReclaimVerification() {
+        reputation?.cancel()
+    }
+
+    /// Registered as state-writing work: the submit step broadcasts a sponsored UserOperation, so
+    /// an invalidation has to join it rather than merely cancel it.
+    func trackReclaimFlow(
+        _ flow: SkieSwiftFlow<AppleReclaimStatus>,
+        generation expectedGeneration: Int
+    ) throws -> ReclaimStatusStream {
+        try validateGeneration(expectedGeneration)
+        let id = UUID()
+        var capturedContinuation: ReclaimStatusStream.Continuation?
+        let stream = ReclaimStatusStream { continuation in capturedContinuation = continuation }
+        guard let continuation = capturedContinuation else { return stream }
+        let task = Task { [weak self] in
+            for await status in flow {
+                guard !Task.isCancelled else { break }
+                continuation.yield(ReclaimStatusModel(status))
+            }
+            continuation.finish()
+            await self?.stateWritingFlowFinished(id: id)
+        }
+        stateWritingFlowTasks[id] = task
+        continuation.onTermination = { _ in task.cancel() }
+        return stream
+    }
+
     func trackOnrampDeliveryFlow(
         _ flow: SkieSwiftFlow<AppleOnrampDeliveryStatus>,
         reservation: OnrampReservation?,
@@ -973,6 +1066,13 @@ actor OfframpSession {
     private func adopt(_ built: ApplePeerCashOutClient, generation: Int) -> Bool {
         guard generation == self.generation, !isInvalidating else { return false }
         peer = built
+        return true
+    }
+
+    /// Borrows the account the same way Peer does, and likewise needs no release.
+    private func adopt(_ built: AppleReputationClient, generation: Int) -> Bool {
+        guard generation == self.generation, !isInvalidating else { return false }
+        reputation = built
         return true
     }
 
