@@ -8,6 +8,58 @@ import Testing
 /// What the screen may say about a number it did not compute. The limit is the Diamond's, a read
 /// failure is ours rather than the user's, and a locked limit is a word rather than a rendered $0.
 struct ReputationStoreTests {
+    @MainActor @Test func leavingDuringARefreshDoesNotBlockTheNextVisit() async {
+        let responses = AsyncStream<ReputationSummaryModel>.makeStream()
+        let started = AsyncStream<Void>.makeStream()
+        var starts = started.stream.makeAsyncIterator()
+        let calls = LockIsolated(0)
+        var state = Reputation.State.initial(currencyCode: "INR")
+        state.content = .ready(ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0"))
+        let store = TestStore(initialState: state) { Reputation() } withDependencies: {
+            $0.reputation.summary = { _ in
+                calls.withValue { $0 += 1 }
+                if calls.value == 1 {
+                    started.continuation.yield(())
+                    for await response in responses.stream { return response }
+                    throw CancellationError()
+                }
+                return ReputationFixtures.summary(canBuy: true, buyLimitMicros: "200000000")
+            }
+        }
+        let refresh = await store.send(.onAppear) { $0.isLoading = true }
+        await starts.next()
+        await store.send(.onDisappear) { $0.isLoading = false }
+        await refresh.finish()
+        await store.send(.onAppear) { $0.isLoading = true }
+        await store.receive(\.summaryLoaded) {
+            $0.isLoading = false
+            $0.content = .ready(ReputationFixtures.summary(canBuy: true, buyLimitMicros: "200000000"))
+        }
+        #expect(calls.value == 2)
+        #expect(store.state.primaryAction == .buy)
+    }
+
+    @MainActor @Test func openingVerificationCancelsAnInFlightRefresh() async {
+        let responses = AsyncStream<ReputationSummaryModel>.makeStream()
+        let started = AsyncStream<Void>.makeStream()
+        var starts = started.stream.makeAsyncIterator()
+        var state = Reputation.State.initial(currencyCode: "INR")
+        state.content = .ready(ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0"))
+        let store = TestStore(initialState: state) { Reputation() } withDependencies: {
+            $0.reputation.summary = { _ in
+                started.continuation.yield(())
+                for await response in responses.stream { return response }
+                throw CancellationError()
+            }
+        }
+        let refresh = await store.send(.onAppear) { $0.isLoading = true }
+        await starts.next()
+        await store.send(.raiseLimitTapped) { $0.isLoading = false }
+        await store.receive(\.delegate.raiseLimit)
+        await refresh.finish()
+        #expect(!store.state.isLoading)
+    }
+
     @MainActor @Test func aFirstLoadThatFailsSaysSoRatherThanShowingAZeroedSummary() async {
         let store = await TestStore(initialState: .initial(currencyCode: "INR")) { Reputation() } withDependencies: {
             $0.reputation.summary = { _ in throw Failure.unreachable }

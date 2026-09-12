@@ -31,6 +31,7 @@ struct ReputationView: View {
             }
             .applyScreenBackground()
             .task { await store.send(.onAppear).finish() }
+            .onDisappear { store.send(.onDisappear) }
             .sheet(isPresented: infoBinding) {
                 ReputationInfoSheet { store.send(.infoDismissed) }
             }

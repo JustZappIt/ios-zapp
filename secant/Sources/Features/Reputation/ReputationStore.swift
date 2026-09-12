@@ -81,6 +81,7 @@ struct Reputation {
 
     enum Action: Equatable {
         case onAppear
+        case onDisappear
         case summaryLoaded(ReputationSummaryModel)
         case loadFailed
         case retryTapped
@@ -134,10 +135,12 @@ struct Reputation {
                 return .none
 
             case .buyTapped:
-                return .send(.delegate(.buy(currencyCode: state.currencyCode)))
+                state.isLoading = false
+                return .merge(.cancel(id: CancelID.load), .send(.delegate(.buy(currencyCode: state.currencyCode))))
 
             case .raiseLimitTapped:
-                return .send(.delegate(.raiseLimit(currencyCode: state.currencyCode)))
+                state.isLoading = false
+                return .merge(.cancel(id: CancelID.load), .send(.delegate(.raiseLimit(currencyCode: state.currencyCode))))
 
             case .infoTapped:
                 state.isInfoPresented = true
@@ -148,7 +151,14 @@ struct Reputation {
                 return .none
 
             case .backTapped:
+                state.isLoading = false
                 return .merge(.cancel(id: CancelID.load), .send(.delegate(.close)))
+
+            case .onDisappear:
+                // SwiftUI cancels .task, and TCA deliberately does not send loadFailed for
+                // cancellation. Clear the latch as well so the next visit can read again.
+                state.isLoading = false
+                return .cancel(id: CancelID.load)
 
             case .delegate:
                 return .none

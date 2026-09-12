@@ -233,6 +233,11 @@ struct Root {
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
         var reputationState = Reputation.State.initial(currencyCode: "INR")
+        var reputationReturnPath: Path?
+        var buyReputationRequestID: UUID?
+        /// A return URL can rebuild a lost run only during launch. Once Home has appeared or
+        /// the process has backgrounded, return URLs only bring the existing process forward.
+        var canRecoverReclaimOnLaunch = true
         var increaseReputationState = IncreaseReputation.State.initial(currencyCode: "INR")
         var offrampState = Offramp.State.initial()
         var offrampActivityReturn: OfframpActivityReturn?
@@ -474,6 +479,7 @@ struct Root {
         case giftResetGuardReviewTapped
         case giftResetGuardDeleteAnywayTapped(Bool)
         case reclaimReturnReceived(ReclaimReturnLink.ResumeArgs)
+        case buyReputationLoaded(requestID: UUID, currencyCode: String, accountID: [UInt8]?, summary: ReputationSummaryModel?)
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
@@ -560,8 +566,10 @@ struct Root {
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.numberFormatter) var numberFormatter
     @Dependency(\.offramp) var offramp
+    @Dependency(\.onramp) var onramp
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.pasteboard) var pasteboard
+    @Dependency(\.reputation) var reputation
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.shieldingProcessor) var shieldingProcessor
     @Dependency(\.swapAndPay) var swapAndPay
@@ -571,6 +579,7 @@ struct Root {
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
+    @Dependency(\.uuid) var uuid
     #if VOTING_ENABLED
     @Dependency(\.votingMetadata) var votingMetadata
     #endif

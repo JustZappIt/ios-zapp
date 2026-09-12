@@ -400,13 +400,42 @@ extension Root {
                 return .send(.offramp(.refundTapped))
 
             case .home(.buyTapped):
-                state.onrampState = .initial(currencyCode: state.offrampState.selectedCurrencyCode)
-                state.path = .onramp
+                guard state.path == nil, state.buyReputationRequestID == nil else { return .none }
+                state.canRecoverReclaimOnLaunch = false
+                let currencyCode = state.offrampState.selectedCurrencyCode
+                let accountID = state.selectedWalletAccount?.id.id
+                let requestID = uuid()
+                state.buyReputationRequestID = requestID
+                return .run { send in
+                    // As on Android, an unreadable chain lets Buy proceed; the amount screen
+                    // still quotes against the exchange's limits before placing an order.
+                    let summary = onramp.isConfigured() ? try? await reputation.summary(currencyCode: currencyCode) : nil
+                    await send(.buyReputationLoaded(
+                        requestID: requestID, currencyCode: currencyCode, accountID: accountID, summary: summary
+                    ))
+                }
+
+            case let .buyReputationLoaded(requestID, currencyCode, accountID, summary):
+                guard state.buyReputationRequestID == requestID else { return .none }
+                state.buyReputationRequestID = nil
+                // A read must not navigate over another screen or carry the old wallet's
+                // reputation into a newly selected account.
+                guard state.path == nil, state.selectedWalletAccount?.id.id == accountID else { return .none }
+                state.onrampState = .initial(currencyCode: currencyCode)
+                if let summary, !summary.canBuy || summary.isBlocked {
+                    state.reputationReturnPath = nil
+                    state.reputationState = .initial(currencyCode: currencyCode)
+                    state.reputationState.content = summary.isBlocked ? .blocked : .ready(summary)
+                    state.path = .reputation
+                } else {
+                    state.path = .onramp
+                }
                 return .none
 
                 // MARK: - Reputation
 
             case .onramp(.delegate(.openReputation)):
+                state.reputationReturnPath = .onramp
                 state.reputationState = .initial(currencyCode: state.onrampState.currencyCode)
                 state.path = .reputation
                 return .none
@@ -422,12 +451,13 @@ extension Root {
                 return .none
 
             case let .reputation(.delegate(.raiseLimit(currencyCode))):
+                state.canRecoverReclaimOnLaunch = false
                 state.increaseReputationState = .initial(currencyCode: currencyCode)
                 state.path = .increaseReputation
                 return .none
 
             case .reputation(.delegate(.close)):
-                state.path = .onramp
+                state.path = state.reputationReturnPath
                 return .none
 
             case .increaseReputation(.delegate(.close)):
@@ -435,11 +465,12 @@ extension Root {
                 return .none
 
             case let .reclaimReturnReceived(args):
-                // Only a run the process lost is rebuilt from the callback. A screen already on
-                // `.increaseReputation` keeps whatever it is showing, live run or not: replacing
-                // its state does not remount the view, so nothing would consume the resume fields
-                // and the screen would sit on a spinner it has no way out of. Android draws the
-                // same line at `onCreate` vs `onNewIntent`.
+                // Consume the launch opportunity once. Navigation state alone cannot tell a
+                // cold launch from a late callback for a run this process canceled or completed.
+                guard state.canRecoverReclaimOnLaunch else { return .none }
+                state.canRecoverReclaimOnLaunch = false
+                // Replacing a mounted verification view would not restart its .task, leaving
+                // the resume fields unconsumed. Its current run must retain ownership instead.
                 guard state.path != .increaseReputation,
                       !state.increaseReputationState.isRunLive else { return .none }
                 state.increaseReputationState = .initial(
@@ -450,7 +481,12 @@ extension Root {
                 // Finishing the run lands on Reputation, so it has to read the corridor the
                 // callback named rather than whatever the last Buy screen left behind.
                 state.reputationState = .initial(currencyCode: args.currencyCode)
+                state.reputationReturnPath = nil
                 state.path = .increaseReputation
+                return .none
+
+            case .home(.onAppear), .initialization(.appDelegate(.didEnterBackground)):
+                state.canRecoverReclaimOnLaunch = false
                 return .none
 
             case .home(.transactionList(.transactionTapped(let txId))):
