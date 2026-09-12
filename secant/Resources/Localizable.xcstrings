@@ -2121,6 +2121,61 @@
         }
       }
     },
+    "chatContacts.form.details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact details"
+          }
+        }
+      }
+    },
+    "chatContacts.form.payments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ZEC address"
+          }
+        }
+      }
+    },
+    "chatContacts.form.paymentsHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Add a wallet address to send ZEC to this contact."
+          }
+        }
+      }
+    },
+    "chatContacts.form.preview" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New contact"
+          }
+        }
+      }
+    },
+    "chatContacts.form.intro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A name you know. A private way to connect."
+          }
+        }
+      }
+    },
     "chatContacts.invalidAddress" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -21569,13 +21624,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your messages\nand money."
+            "value" : "Your money\nand messages."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus mensajes\ny tu dinero."
+            "value" : "Tu dinero\ny tus mensajes."
           }
         }
       }
@@ -21603,13 +21658,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I already use Zapp"
+            "value" : "I already have a wallet"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ya uso Zapp"
+            "value" : "Ya tengo una billetera"
           }
         }
       }
@@ -32979,6 +33034,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blindado"
+          }
+        }
+      }
+    },
+    "zappPay.hideBalances" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide balances"
+          }
+        }
+      }
+    },
+    "zappPay.showBalances" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show balances"
           }
         }
       }

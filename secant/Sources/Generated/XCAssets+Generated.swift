@@ -345,6 +345,7 @@ public enum Asset {
     public static let surroundedShield = ImageAsset(name: "surroundedShield")
     public static let tooltip = ImageAsset(name: "tooltip")
     public static let zappLogo = ImageAsset(name: "zappLogo")
+    public static let zappWelcomeLogo = ImageAsset(name: "zappWelcomeLogo")
     public static let zashiTitle = ImageAsset(name: "zashiTitle")
     public static let zcashZecLogo = ImageAsset(name: "zcashZecLogo")
   }

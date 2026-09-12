@@ -23,7 +23,6 @@ struct ZappBalanceCard: View {
         /// same trick Android plays by folding the card's leading padding into the row.
         static let labelHitSlop: CGFloat = 15
         static let heroMinimumScale: CGFloat = 22 / 52
-        static let heroTickerDuration: TimeInterval = 0.24
 
         static let hero = ZappTextStyle(weight: .black, size: 52, lineHeight: 52, tracking: -3)
         static let heroFraction = ZappTextStyle(weight: .bold, size: 26, lineHeight: 32, tracking: -1)
@@ -57,8 +56,7 @@ struct ZappBalanceCard: View {
 
                 // Removed, not redacted, while balances are masked: the chart leaks exact values
                 // three ways — the delta row, the scrub readout, and the VoiceOver value — and the
-                // rest of this card already drops value-bearing content outright under the toggle
-                // rather than starring it out.
+                // balance text switches to masked values under the same shared preference.
                 if totalBalance.amount > 0, !isSensitiveContentHidden {
                     ZappBalanceChart(
                         transactions: transactions,
@@ -101,58 +99,88 @@ struct ZappBalanceCard: View {
         .accessibilityIdentifier(PoolBalancesSheet.Accessibility.openButton)
     }
 
-    @ViewBuilder private var amount: some View {
-        // Android only makes the figure tappable when there is a fiat rate to flip to.
+    private var amount: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 0) {
+                currencyButton { primaryAmount }
+
+                if fiat == nil {
+                    visibilityButton
+                }
+            }
+
+            if let fiat {
+                HStack(spacing: 0) {
+                    currencyButton {
+                        scrambledText(
+                            showZecAsPrimary ? "\(fiat.whole)\(fiat.fraction)" : "\(zecText) \(tokenName)",
+                            hidden: showZecAsPrimary ? hiddenBalance : "\(hiddenBalance) \(tokenName)"
+                        )
+                        .zappFont(.caption, style: ZappColors.textMuted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    }
+                    visibilityButton
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func currencyButton<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         if fiat != nil {
             Button(action: onToggleBalanceDisplay) {
-                amountStack
-                    .contentShape(Rectangle())
+                content().contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         } else {
-            amountStack
+            content()
         }
     }
 
-    private var amountStack: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            primaryAmount
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            if let fiat, !isSensitiveContentHidden {
-                Text(showZecAsPrimary ? "\(fiat.whole)\(fiat.fraction)" : "\(zecText) \(tokenName)")
-                    .zappFont(.caption, style: ZappColors.textMuted)
-            }
+    private var visibilityButton: some View {
+        ZappInputFieldAction(
+            icon: isSensitiveContentHidden ? Asset.Assets.eyeOff.image : Asset.Assets.eyeOn.image,
+            accessibilityLabel: String(localizable: isSensitiveContentHidden ? .zappPayShowBalances : .zappPayHideBalances)
+        ) {
+            $isSensitiveContentHidden.withLock { $0.toggle() }
         }
+        .accessibilityIdentifier("pay.balanceVisibility")
     }
 
     @ViewBuilder private var primaryAmount: some View {
-        if let fiat, !showZecAsPrimary, !isSensitiveContentHidden {
+        if let fiat, !showZecAsPrimary {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Text(fiat.whole)
+                scrambledText(fiat.whole)
                     .zappFont(Constants.hero, style: ZappColors.text)
-                    .contentTransition(.numericText())
 
-                Text(fiat.fraction)
+                scrambledText(fiat.fraction, hidden: "")
                     .zappFont(Constants.heroFraction, style: ZappColors.textMuted)
-                    .contentTransition(.numericText())
             }
             .lineLimit(1)
             .minimumScaleFactor(Constants.heroMinimumScale)
-            .animation(.easeOut(duration: Constants.heroTickerDuration), value: fiat.whole)
         } else {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(zecText)
+                scrambledText(zecText)
                     .zappFont(Constants.hero, style: ZappColors.text)
                     .lineLimit(1)
                     .minimumScaleFactor(Constants.heroMinimumScale)
-                    .contentTransition(.numericText())
-                    .animation(.easeOut(duration: Constants.heroTickerDuration), value: zecText)
 
                 Text(tokenName)
                     .zappFont(Constants.ticker, style: ZappColors.textMuted)
             }
         }
+    }
+
+    private var hiddenBalance: String { String(localizable: .generalHideBalancesMost) }
+
+    private func scrambledText(_ clear: String, hidden: String? = nil) -> some View {
+        ZappScrambledBalanceText(
+            clearText: clear,
+            hiddenText: hidden ?? hiddenBalance,
+            isHidden: isSensitiveContentHidden
+        )
     }
 
     private var breakdown: some View {
@@ -200,7 +228,7 @@ struct ZappBalanceCard: View {
     }
 
     private var zecText: String {
-        hidable(totalBalance.decimalString())
+        totalBalance.decimalString()
     }
 
     private var fiat: (whole: String, fraction: String)? {

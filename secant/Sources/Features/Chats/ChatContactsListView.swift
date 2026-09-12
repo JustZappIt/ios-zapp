@@ -15,11 +15,7 @@ struct ChatContactsListView: View {
         WithPerceptionTracking {
             ZStack(alignment: .bottomTrailing) {
                 VStack(spacing: 0) {
-                    ZappScreenHeader(title: String(localizable: .chatContactsTitle)) {
-                        ZappBackButton { store.send(.backToHomeTapped) }
-                    } right: {
-                        EmptyView()
-                    }
+                    ZappScreenHeader(title: String(localizable: .chatContactsTitle))
 
                     if store.contacts.isEmpty {
                         emptyState
@@ -35,11 +31,14 @@ struct ChatContactsListView: View {
                     store.send(.addTapped)
                 }
                 .padding(.trailing, Design.Spacing._2xl)
-                .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+                .padding(.bottom, Design.Spacing._lg)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
-            .zappSwipeBack { store.send(.backToHomeTapped) }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                ZappBottomActionBar(onBack: { store.send(.backToHomeTapped) })
+            }
+            .zappSwipeBack(isEnabled: store.form == nil) { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .sheet(item: $store.scope(state: \.form, action: \.form)) { formStore in
                 // A sheet's content closure escapes: reads inside it only register with TCA's

@@ -179,7 +179,6 @@ private extension RootView {
                                         store.scope(
                                             state: \.receiveState,
                                             action: \.receive),
-                                    networkType: networkType,
                                     tokenName: tokenName
                                 )
                                 .transition(.move(edge: .trailing))

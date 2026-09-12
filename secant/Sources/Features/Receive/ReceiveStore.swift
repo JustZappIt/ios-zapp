@@ -20,7 +20,6 @@ struct Receive {
     @ObservableState
     struct State {
         enum AddressType {
-            case saplingAddress
             case tAddress
             case uaAddress
         }
@@ -38,10 +37,6 @@ struct Receive {
 
         var unifiedAddress: String {
             selectedWalletAccount?.privateUnifiedAddress ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
-        }
-
-        var saplingAddress: String {
-            selectedWalletAccount?.saplingAddress ?? String(localizable: .receiveErrorCantExtractSaplingAddress)
         }
 
         var transparentAddress: String {

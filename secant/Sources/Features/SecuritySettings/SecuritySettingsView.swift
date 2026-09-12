@@ -9,6 +9,7 @@ import SwiftUI
 struct SecuritySettingsView: View {
     @Environment(\.colorScheme)
     private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Perception.Bindable var store: StoreOf<SecuritySettings>
 
     var body: some View {
@@ -69,28 +70,29 @@ struct SecuritySettingsView: View {
 
             ScrollView {
                 VStack(spacing: 0) {
-                    Text(store.selectedMethod == .pin ? "✱" : "◎")
-                        .zappFont(.display, style: ZappColors.accentText)
-                        .frame(width: 84, height: 84)
-                        .background(ZappColors.accentSoft.color(colorScheme))
-                        .padding(.top, 32)
+                    methodContent { method in
+                        VStack(spacing: 16) {
+                            Text(method == .pin ? "✱" : "◎")
+                                .zappFont(.display, style: ZappColors.accentText)
+                                .frame(width: 84, height: 84)
+                                .background(ZappColors.accentSoft.color(colorScheme))
 
-                    Text(
-                        localizable: store.selectedMethod == .pin
-                            ? .appLockPINDescription
-                            : .appLockBiometricDescription
-                    )
-                    .zappFont(.body, style: ZappColors.textMuted)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                            Text(localizable: method == .pin ? .appLockPINDescription : .appLockBiometricDescription)
+                                .zappFont(.body, style: ZappColors.textMuted)
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                     .padding(.horizontal, 28)
-                    .padding(.top, 16)
+                    .padding(.top, 32)
 
                     ZappSegmentedSelector(
                         options: [
                             String(localizable: .appLockPINOption),
                             String(localizable: .appLockBiometricOption)
                         ],
+                        cellMinHeight: 48,
+                        usesAccentSelection: true,
                         selectedIndex: store.selectedMethod == .pin ? 0 : 1
                     ) { index in
                         store.send(.selectedMethodChanged(index == 0 ? .pin : .biometric))
@@ -105,18 +107,20 @@ struct SecuritySettingsView: View {
                         .padding(.top, 28)
                         .padding(.bottom, 8)
 
-                    ZappRow(
-                        title: store.selectedMethod == .pin
-                            ? String(localizable: .appLockChangePIN)
-                            : String(localizable: .appLockReenrollBiometric),
-                        subtitle: store.selectedMethod == .pin
-                            ? String(localizable: .appLockChangePINSubtitle)
-                            : String(localizable: .appLockReenrollBiometricSubtitle),
-                        icon: Asset.Assets.Icons.authKey.image,
-                        iconTint: .accentText,
-                        iconBackground: .accentSoft
-                    ) {
-                        store.send(.saveTapped)
+                    methodContent { method in
+                        ZappRow(
+                            title: method == .pin
+                                ? String(localizable: .appLockChangePIN)
+                                : String(localizable: .appLockReenrollBiometric),
+                            subtitle: method == .pin
+                                ? String(localizable: .appLockChangePINSubtitle)
+                                : String(localizable: .appLockReenrollBiometricSubtitle),
+                            icon: Asset.Assets.Icons.authKey.image,
+                            iconTint: .accentText,
+                            iconBackground: .accentSoft
+                        ) {
+                            store.send(.saveTapped)
+                        }
                     }
                     .background(ZappColors.surface.color(colorScheme))
                     .overlay {
@@ -146,7 +150,9 @@ struct SecuritySettingsView: View {
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
                 ZappButton(
                     title: String(localizable: .appLockSaveChanges),
-                    isEnabled: store.selectedMethod != .biometric || store.isBiometricAvailable
+                    isEnabled: store.selectedMethod != store.currentMethod
+                        && !store.isProcessing
+                        && (store.selectedMethod != .biometric || store.isBiometricAvailable)
                 ) {
                     store.send(.saveTapped)
                 }
@@ -154,6 +160,24 @@ struct SecuritySettingsView: View {
         }
         .background(ZappColors.bg.color(colorScheme))
         .navigationBarBackButtonHidden(true)
+    }
+
+    /// Both variants participate in layout so changing methods cannot move the selector or rows.
+    /// Only the selected variant is interactive or announced by VoiceOver.
+    private func methodContent<Content: View>(
+        @ViewBuilder content: (AppAuthenticationMethod) -> Content
+    ) -> some View {
+        ZStack(alignment: .top) {
+            content(.pin)
+                .opacity(store.selectedMethod == .pin ? 1 : 0)
+                .allowsHitTesting(store.selectedMethod == .pin)
+                .accessibilityHidden(store.selectedMethod != .pin)
+            content(.biometric)
+                .opacity(store.selectedMethod == .biometric ? 1 : 0)
+                .allowsHitTesting(store.selectedMethod == .biometric)
+                .accessibilityHidden(store.selectedMethod != .biometric)
+        }
+        .animation(reduceMotion ? nil : ZappMotion.content, value: store.selectedMethod)
     }
 
     private var biometricEnrollment: some View {
