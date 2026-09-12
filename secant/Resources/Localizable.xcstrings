@@ -21624,13 +21624,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your messages\nand money."
+            "value" : "Your money\nand messages."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus mensajes\ny tu dinero."
+            "value" : "Tu dinero\ny tus mensajes."
           }
         }
       }
@@ -21658,13 +21658,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I already use Zapp"
+            "value" : "I already have a wallet"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ya uso Zapp"
+            "value" : "Ya tengo una billetera"
           }
         }
       }

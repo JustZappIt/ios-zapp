@@ -320,32 +320,30 @@ private struct ZappWelcomeGateView: View {
                 }
             }
 
-            VStack(spacing: 8) {
-                ZappButton(title: String(localizable: .onboardingWelcomeGetStarted)) {
-                    onGetStarted()
-                }
+            // Share the inset dock used by the other onboarding steps so all four border
+            // corners stay inside the safe area, clear of the display's rounded corners.
+            ZappOnboardingPrimaryDock {
+                VStack(spacing: 8) {
+                    ZappButton(title: String(localizable: .onboardingWelcomeGetStarted)) {
+                        onGetStarted()
+                    }
 
-                ZappButton(
-                    title: String(localizable: .onboardingWelcomeRestore),
-                    variant: .ghost
-                ) {
-                    onRestoreExisting()
-                }
-                .accessibilityIdentifier(AccessibilityID.Onboarding.restoreWallet)
+                    ZappButton(
+                        title: String(localizable: .onboardingWelcomeRestore),
+                        variant: .ghost
+                    ) {
+                        onRestoreExisting()
+                    }
+                    .accessibilityIdentifier(AccessibilityID.Onboarding.restoreWallet)
 
-                Text(localizable: .onboardingWelcomeTerms)
-                    .zappFont(.groupLabel, style: ZappColors.textSubtle)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 4)
-            }
-            .padding(.horizontal, 28)
-            .padding(.top, 16)
-            .padding(.bottom, 24)
-            .background(ZappColors.surface.color(colorScheme))
-            .overlay {
-                Rectangle()
-                    .strokeBorder(ZappColors.text.color(colorScheme), lineWidth: 1)
+                    Text(localizable: .onboardingWelcomeTerms)
+                        .zappFont(.groupLabel, style: ZappColors.textSubtle)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
+                }
+                .padding(.top, 4)
+                .padding(.bottom, 12)
             }
         }
         .background(ZappColors.bg.color(colorScheme))
