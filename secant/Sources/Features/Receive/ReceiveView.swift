@@ -8,7 +8,6 @@
 import SwiftUI
 import ComposableArchitecture
 import UIKit
-@preconcurrency import ZcashLightClientKit
 
 struct ReceiveView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -32,14 +31,12 @@ struct ReceiveView: View {
     }
 
     @Perception.Bindable var store: StoreOf<Receive>
-    let networkType: NetworkType
     let tokenName: String
 
     @State private var copyConfirmed = false
 
-    init(store: StoreOf<Receive>, networkType: NetworkType, tokenName: String) {
+    init(store: StoreOf<Receive>, tokenName: String) {
         self.store = store
-        self.networkType = networkType
         self.tokenName = tokenName
     }
 
@@ -207,19 +204,6 @@ struct ReceiveView: View {
                     isShielded: false
                 )
             )
-
-            #if DEBUG
-            if networkType == .testnet {
-                result.append(
-                    AddressSegment(
-                        focus: .saplingAddress,
-                        label: String(localizable: .receiveSaplingAddress),
-                        address: store.saplingAddress,
-                        isShielded: true
-                    )
-                )
-            }
-            #endif
         }
 
         return result
@@ -356,7 +340,7 @@ private struct ReceiveAddressQRCode: View {
 
 #Preview {
     NavigationView {
-        ReceiveView(store: Receive.placeholder, networkType: .testnet, tokenName: "ZEC")
+        ReceiveView(store: Receive.placeholder, tokenName: "ZEC")
     }
 }
 

@@ -103,6 +103,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Reworked the New chat screen around starting a one-to-one chat. Back and the main button now share the standard bottom action bar, and that button offers to scan a QR code until there is someone to start with. Pasting a public key no longer prints the same 64 characters twice: the key becomes a single recipient card you can clear in one tap. With no contacts saved yet, the screen explains what to do instead of showing an empty list, searching with no matches says so, and your own key is a compact row that opens a scannable code rather than a wall of text. Group chats are unchanged and still start from "New group".
 
 ### Removed
+- [RECEIVE] Receive ZEC no longer offers a separate Sapling address in testnet builds; use Shielded or Transparent.
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
