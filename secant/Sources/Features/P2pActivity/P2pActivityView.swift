@@ -71,6 +71,7 @@ struct P2pActivityView: View {
                 ZappBottomActionBar(onBack: { store.send(.backTapped) })
             }
             .applyScreenBackground()
+            .zappSwipeBack { store.send(.backTapped) }
             .sheet(isPresented: $isInfoPresented) { infoSheet }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
