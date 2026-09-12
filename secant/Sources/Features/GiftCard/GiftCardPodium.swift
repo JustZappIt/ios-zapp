@@ -22,13 +22,10 @@ struct GiftCardPodium: View {
     /// A change while still plays one full extra turn — the tier-crossing flourish.
     var flourishKey = 0
 
-    private static let corner: CGFloat = 16
-    private static let maxWidth: CGFloat = 420
     /// One turn every nine seconds while in flight.
     private static let turnDegreesPerSecond = 40.0
     private static let bobPeriod = 2.6
     private static let bobTravel: CGFloat = 6
-    private static let slabThickness: CGFloat = 6
 
     @State private var restingAngle = 0.0
     @State private var turnStart: Date?
@@ -37,24 +34,31 @@ struct GiftCardPodium: View {
 
     var body: some View {
         VStack(spacing: Design.Spacing._lg) {
-            if isTurning {
-                TimelineView(.animation(minimumInterval: 1.0 / 40.0)) { timeline in
-                    let elapsed = timeline.date.timeIntervalSince(turnStart ?? timeline.date)
-                    let angle = (restingAngle + elapsed * Self.turnDegreesPerSecond)
-                        .truncatingRemainder(dividingBy: 360)
-                    let bob = sin(elapsed * 2 * .pi / Self.bobPeriod) * Self.bobTravel
-                    slabCard(angle: angle, bob: bob)
-                        .onChange(of: angle) { lastObservedTurnAngle = $0 }
-                }
-            } else {
-                slabCard(angle: restingAngle, bob: 0)
-                    .onTapGesture {
-                        // Still cards flip on a tap; the nearest-face maths keeps a card that
-                        // settled at 180 flipping back to 0 rather than winding on to 360.
-                        withAnimation(.spring(response: 0.6, dampingFraction: 0.78)) {
-                            restingAngle = restingAngle < 90 ? 180 : 0
-                        }
+            // Keep the slab's identity when free turning stops so its presentation angle can
+            // settle to the nearest face instead of replacing the animated view with a new one.
+            TimelineView(.animation(minimumInterval: 1.0 / 40.0, paused: !isTurning)) { timeline in
+                let elapsed = timeline.date.timeIntervalSince(turnStart ?? timeline.date)
+                let angle = isTurning
+                    ? (restingAngle + elapsed * Self.turnDegreesPerSecond).truncatingRemainder(dividingBy: 360)
+                    : restingAngle
+                let bob = isTurning ? sin(elapsed * 2 * .pi / Self.bobPeriod) * Self.bobTravel : 0
+                GiftCardSlab(
+                    stock: stock,
+                    amountText: amountText,
+                    fiatText: fiatText,
+                    fiatOnFace: fiatOnFace,
+                    message: message,
+                    caption: caption,
+                    angle: angle,
+                    bob: bob
+                )
+                .onChange(of: angle) { if isTurning { lastObservedTurnAngle = $0 } }
+                .onTapGesture {
+                    guard !isTurning else { return }
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.78)) {
+                        restingAngle += 180
                     }
+                }
             }
         }
         .onAppear {
@@ -70,31 +74,56 @@ struct GiftCardPodium: View {
                 restingAngle = landed
                 let nearest = (landed / 180).rounded() * 180
                 withAnimation(.spring(response: 0.7, dampingFraction: 0.78)) {
-                    restingAngle = nearest.truncatingRemainder(dividingBy: 360)
+                    restingAngle = nearest
                 }
             }
         }
         .onChange(of: flourishKey) { _ in
             guard hasAppeared, !isTurning else { return }
-            let from = restingAngle
+            // Use an absolute target, like Android's half-turn counter. A delayed angle reset
+            // can interrupt a newer flip and peel the printing away from the card mid-animation.
             withAnimation(.spring(response: 1.1, dampingFraction: 0.85)) {
-                restingAngle = from + 360
-            }
-            // Wind the angle back down so a screen left open does not accumulate turns.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                var transaction = Transaction()
-                transaction.disablesAnimations = true
-                withTransaction(transaction) {
-                    restingAngle = from.truncatingRemainder(dividingBy: 360)
-                }
+                restingAngle += 360
             }
         }
+    }
+}
+
+/// Every rendered part follows one interpolated angle, including which side carries the printing.
+/// Computing the face in the parent's body used the target angle while SwiftUI was still rotating
+/// the slab, so the lettering performed a separate half turn in front of the moving card.
+private struct GiftCardSlab: View, Animatable {
+    private static let corner: CGFloat = 16
+    private static let maxWidth: CGFloat = 420
+    private static let slabThickness: CGFloat = 6
+
+    let stock: ZappGiftCardStock
+    let amountText: String
+    let fiatText: String?
+    let fiatOnFace: Bool
+    let message: String?
+    let caption: String?
+    var angle: Double
+    var bob: CGFloat
+
+    nonisolated var animatableData: AnimatablePair<Double, CGFloat> {
+        get { AnimatablePair(angle, bob) }
+        set {
+            angle = newValue.first
+            bob = newValue.second
+        }
+    }
+
+    var body: some View {
+        slabCard(angle: angle, bob: bob)
+            // The enclosing Animatable view owns interpolation. Geometry, lighting and the
+            // reverse-side correction must render its current frame without new child tweens.
+            .transaction { $0.animation = nil }
     }
 
     private func slabCard(angle: Double, bob: CGFloat) -> some View {
         let radians = angle * .pi / 180
-        let showsBack = abs(cos(radians)) < 0 ? false : (angle.truncatingRemainder(dividingBy: 360) > 90
-            && angle.truncatingRemainder(dividingBy: 360) < 270)
+        let showsBack = GiftCardOrientation.showsBack(at: angle)
         return GeometryReader { proxy in
             let width = proxy.size.width
             ZStack {
@@ -127,6 +156,7 @@ struct GiftCardPodium: View {
                 }
 
                 face(showsBack: showsBack, radians: radians)
+                    .compositingGroup()
                     .rotation3DEffect(
                         .degrees(angle),
                         axis: (x: 0, y: 1, z: 0),
@@ -227,5 +257,13 @@ struct GiftCardPodium: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Normalizing also covers a spring overshooting zero and flourishes making multiple turns.
+enum GiftCardOrientation {
+    static func showsBack(at angle: Double) -> Bool {
+        let facing = (angle.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+        return facing >= 90 && facing <= 270
     }
 }

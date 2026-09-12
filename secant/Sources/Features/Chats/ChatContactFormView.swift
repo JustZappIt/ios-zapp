@@ -10,10 +10,6 @@ struct ChatContactFormView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private enum Constants {
-        static let closeTouchTarget: CGFloat = 48
-        static let closeIconSize: CGFloat = 20
-        static let scanIconSize: CGFloat = 20
-        static let disclosureIconSize: CGFloat = 12
         static let validKeyIconSize: CGFloat = 14
         static let keyHeadLength = 10
         static let keyTailLength = 6
@@ -24,31 +20,57 @@ struct ChatContactFormView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
-                ZappScreenHeader(title: title) {
-                    closeButton
-                }
+                ZappScreenHeader(title: title)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-                        nameField
-                        keyField
-                        addressField
-                        additionalAddresses
+                    VStack(spacing: 0) {
+                        contactPreview
+                            .padding(.horizontal, 14)
+                            .padding(.top, Design.Spacing._lg)
+
+                        ZappSettingsGroup(title: String(localizable: .chatContactsFormDetails)) {
+                            VStack(alignment: .leading, spacing: Design.Spacing._xl) {
+                                labeledField(String(localizable: .chatContactsNameLabel)) { nameField }
+                                labeledField(String(localizable: .chatContactsKeyLabel)) { keyField }
+                            }
+                            .padding(Design.Spacing._lg)
+                        }
+
+                        ZappSettingsGroup(title: String(localizable: .chatContactsFormPayments)) {
+                            VStack(alignment: .leading, spacing: Design.Spacing._xl) {
+                                Text(localizable: .chatContactsFormPaymentsHint)
+                                    .zappFont(.caption, style: ZappColors.textMuted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                labeledField(String(localizable: .chatContactsAddressLabel)) { addressField }
+                            }
+                            .padding(Design.Spacing._lg)
+                        }
 
                         if store.isBlocked {
                             Text(String(localizable: .chatContactsBlockedNotice))
                                 .zappFont(.caption, style: ZappColors.danger)
+                                .padding(Design.Spacing._lg)
                         }
 
-                        buttons
+                        if store.canBlock || store.isEditing {
+                            buttons
+                                .padding(.horizontal, 14)
+                                .padding(.top, Design.Spacing._md)
+                        }
                     }
-                    .padding(.horizontal, Design.Spacing._lg)
-                    .padding(.top, Design.Spacing._lg)
-                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+                    .padding(.bottom, Design.Spacing._lg)
+                }
+                .scrollDismissesKeyboard(.interactively)
+
+                ZappBottomActionBar(onBack: { store.send(.closeTapped) }) {
+                    ZappButton(title: String(localizable: .chatContactsSave), isEnabled: store.canSave) {
+                        store.send(.saveTapped)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack(isEnabled: store.scan == nil && store.alert == nil) { store.send(.closeTapped) }
             .onAppear { store.send(.onAppear) }
             .alert($store.scope(state: \.alert, action: \.alert))
             .sheet(item: $store.scope(state: \.scan, action: \.scan)) { scanStore in
@@ -57,22 +79,34 @@ struct ChatContactFormView: View {
         }
     }
 
+    private var contactPreview: some View {
+        ZappRow(
+            title: store.trimmedName.isEmpty ? String(localizable: .chatContactsFormPreview) : store.trimmedName,
+            subtitle: store.isValidKey ? abbreviatedKey : String(localizable: .chatContactsFormIntro),
+            icon: Asset.Assets.Icons.user.image,
+            iconTint: .accentText,
+            iconBackground: .accentSoft,
+            trailing: { EmptyView() }
+        )
+        .background(ZappColors.surface.color(colorScheme))
+        .overlay(alignment: .leading) {
+            Rectangle()
+                .fill(ZappColors.accent.color(colorScheme))
+                .frame(width: 3)
+        }
+    }
+
+    private func labeledField<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._sm) {
+            ZappSectionLabel(text: label)
+            content()
+        }
+    }
+
     private var title: String {
         store.isEditing
             ? String(localizable: .chatContactsEdit)
             : String(localizable: .chatContactsAdd)
-    }
-
-    private var closeButton: some View {
-        Button {
-            store.send(.closeTapped)
-        } label: {
-            Asset.Assets.Icons.xClose.image
-                .zImage(width: Constants.closeIconSize, height: Constants.closeIconSize, style: ZappColors.text)
-                .frame(width: Constants.closeTouchTarget, height: Constants.closeTouchTarget)
-        }
-        .buttonStyle(.zappPress)
-        .accessibilityLabel(String(localizable: .generalClose))
     }
 
     private var nameField: some View {
@@ -194,11 +228,6 @@ struct ChatContactFormView: View {
 
     private var buttons: some View {
         VStack(spacing: Design.Spacing._md) {
-            ZappButton(title: String(localizable: .chatContactsSave), isEnabled: store.canSave) {
-                store.send(.saveTapped)
-            }
-            .frame(maxWidth: .infinity)
-
             if store.canBlock {
                 ZappButton(title: blockTitle, variant: .secondary) {
                     store.send(.blockTapped)
@@ -219,104 +248,6 @@ struct ChatContactFormView: View {
         store.isBlocked
             ? String(localizable: .chatContactsUnblock)
             : String(localizable: .chatContactsBlock)
-    }
-}
-
-// MARK: - Additional addresses
-
-private extension ChatContactFormView {
-    /// Android's `WalletAddressesSection`: collapsed by default, three typed fields, each with
-    /// its own scan icon that routes the result back to that field.
-    var additionalAddresses: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._md) {
-            Button {
-                store.send(.additionalAddressesToggled)
-            } label: {
-                HStack(spacing: Design.Spacing._xs) {
-                    ZappSectionLabel(text: String(localizable: .chatContactsAdditionalAddresses))
-
-                    Spacer()
-
-                    (store.showsAdditionalAddresses
-                        ? Asset.Assets.chevronUp.image
-                        : Asset.Assets.chevronDown.image)
-                        .zImage(
-                            width: Constants.disclosureIconSize,
-                            height: Constants.disclosureIconSize,
-                            style: ZappColors.textMuted
-                        )
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.zappPress)
-
-            if store.showsAdditionalAddresses {
-                typedAddressField(
-                    label: String(localizable: .chatContactsAddrTransparent),
-                    placeholder: String(localizable: .chatContactsAddrTransparentHint),
-                    text: Binding(
-                        get: { store.transparentAddress },
-                        set: { store.send(.transparentAddressChanged($0)) }
-                    ),
-                    target: .transparent
-                )
-
-                typedAddressField(
-                    label: String(localizable: .chatContactsAddrEvm),
-                    placeholder: String(localizable: .chatContactsAddrEvmHint),
-                    text: Binding(
-                        get: { store.evmAddress },
-                        set: { store.send(.evmAddressChanged($0)) }
-                    ),
-                    target: .evm
-                )
-
-                typedAddressField(
-                    label: String(localizable: .chatContactsAddrSolana),
-                    placeholder: String(localizable: .chatContactsAddrSolanaHint),
-                    text: Binding(
-                        get: { store.solanaAddress },
-                        set: { store.send(.solanaAddressChanged($0)) }
-                    ),
-                    target: .solana
-                )
-            }
-        }
-    }
-
-    func typedAddressField(
-        label: String,
-        placeholder: String,
-        text: Binding<String>,
-        target: ChatContactForm.ScanTarget
-    ) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: label)
-
-            HStack(spacing: 0) {
-                TextField(placeholder, text: text, axis: .vertical)
-                    .zappFont(.mono, style: ZappColors.text)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .lineLimit(2, reservesSpace: true)
-                    .padding(Design.Spacing._md)
-
-                scanButton(target: target, accessibilityLabel: String(localizable: .chatContactsScanAddress))
-            }
-            .background(ZappColors.surfaceInput.color(colorScheme))
-        }
-    }
-
-    func scanButton(target: ChatContactForm.ScanTarget, accessibilityLabel: String) -> some View {
-        Button {
-            store.send(.scanTapped(target))
-        } label: {
-            Asset.Assets.Icons.scan.image
-                .zImage(width: Constants.scanIconSize, height: Constants.scanIconSize, style: ZappColors.textMuted)
-                .frame(width: Constants.closeTouchTarget, height: Constants.closeTouchTarget)
-        }
-        .buttonStyle(.zappPress)
-        .accessibilityLabel(accessibilityLabel)
     }
 }
 

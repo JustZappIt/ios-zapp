@@ -205,7 +205,7 @@ struct SettingsTabContent: View {
             ZappRow(
                 title: String(localizable: .settingsPortfolioChartTitle),
                 subtitle: String(localizable: .settingsPortfolioChartSubtitle),
-                icon: Asset.Assets.Icons.currencyDollar.image,
+                icon: Asset.Assets.Icons.layersThree.image,
                 iconTint: .accentText,
                 iconBackground: .accentSoft
             ) {

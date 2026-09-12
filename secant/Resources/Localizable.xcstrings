@@ -2121,6 +2121,61 @@
         }
       }
     },
+    "chatContacts.form.details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact details"
+          }
+        }
+      }
+    },
+    "chatContacts.form.payments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ZEC address"
+          }
+        }
+      }
+    },
+    "chatContacts.form.paymentsHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Add a wallet address to send ZEC to this contact."
+          }
+        }
+      }
+    },
+    "chatContacts.form.preview" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New contact"
+          }
+        }
+      }
+    },
+    "chatContacts.form.intro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A name you know. A private way to connect."
+          }
+        }
+      }
+    },
     "chatContacts.invalidAddress" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32979,6 +33034,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blindado"
+          }
+        }
+      }
+    },
+    "zappPay.hideBalances" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide balances"
+          }
+        }
+      }
+    },
+    "zappPay.showBalances" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show balances"
           }
         }
       }

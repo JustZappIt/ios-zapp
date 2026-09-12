@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ZappSegmentedSelector: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private enum Constants {
         static let inset: CGFloat = 3
@@ -20,6 +21,7 @@ struct ZappSegmentedSelector: View {
         static let iconGap: CGFloat = 6
         /// Desaturated rather than faded: a yellow wordmark at low alpha on white disappears.
         static let unselectedLogoOpacity: Double = 0.75
+        static let accentLabel = ZappTextStyle(weight: .black, size: 12, lineHeight: 16)
     }
 
     let options: [String]
@@ -31,6 +33,8 @@ struct ZappSegmentedSelector: View {
     /// Visible cell height. The default is the compact size; taller for selectors that sit in a
     /// column of 52pt controls.
     var cellMinHeight: CGFloat = Constants.cellMinHeight
+    /// App Lock uses Android's accent-filled selection rather than the neutral currency tabs.
+    var usesAccentSelection = false
     let selectedIndex: Int
     let onSelect: (Int) -> Void
 
@@ -38,6 +42,19 @@ struct ZappSegmentedSelector: View {
         HStack(spacing: Constants.spacing) {
             ForEach(Array(options.enumerated()), id: \.offset) { index, option in
                 cell(index, option)
+            }
+        }
+        .background {
+            if usesAccentSelection && !options.isEmpty {
+                GeometryReader { proxy in
+                    let cellWidth = (proxy.size.width - Constants.spacing * CGFloat(options.count - 1)) / CGFloat(options.count)
+                    Rectangle()
+                        .fill(selectedBackground.color(colorScheme))
+                        .frame(width: cellWidth)
+                        .offset(x: CGFloat(selectedIndex) * (cellWidth + Constants.spacing))
+                        .animation(reduceMotion ? nil : ZappMotion.content, value: selectedIndex)
+                }
+                .allowsHitTesting(false)
             }
         }
         .padding(Constants.inset)
@@ -69,7 +86,7 @@ struct ZappSegmentedSelector: View {
             }
             .frame(maxWidth: .infinity)
             .frame(minHeight: cellMinHeight)
-            .background(isSelected ? ZappColors.bg.color(colorScheme) : .clear)
+            .background(isSelected && !usesAccentSelection ? selectedBackground.color(colorScheme) : .clear)
             .contentShape(Rectangle())
         }
         .buttonStyle(.zappPress)
@@ -88,9 +105,15 @@ struct ZappSegmentedSelector: View {
 
     private func label(_ option: String, isSelected: Bool) -> some View {
         Text(option)
-            .zappFont(.caption, style: isSelected ? ZappColors.text : ZappColors.textMuted)
+            .zappFont(
+                usesAccentSelection ? Constants.accentLabel : .caption,
+                style: isSelected ? selectedForeground : ZappColors.textMuted
+            )
             .lineLimit(1)
     }
+
+    private var selectedBackground: ZappColors { usesAccentSelection ? .accent : .bg }
+    private var selectedForeground: ZappColors { usesAccentSelection ? .onAccent : .text }
 }
 
 #Preview {
