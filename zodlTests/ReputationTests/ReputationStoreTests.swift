@@ -212,11 +212,12 @@ enum ReputationFixtures {
         buyLimitMicros: String,
         isAtCeiling: Bool = false,
         isBlocked: Bool = false,
+        points: String = "100",
         platforms: [ReputationPlatformModel] = ReputationFixtures.platforms
     ) -> ReputationSummaryModel {
         ReputationSummaryModel(
             currencyCode: "INR",
-            points: "100",
+            points: points,
             isBlocked: isBlocked,
             canBuy: canBuy,
             isAtCeiling: isAtCeiling,

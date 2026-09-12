@@ -10,6 +10,8 @@ import ComposableArchitecture
 @preconcurrency import ZcashLightClientKit
 
 extension Root {
+    private enum ReputationCancelID { case buyCheck }
+
     func coordinatorReduce() -> Reduce<Root.State, Root.Action> {
         Reduce { state, action in
             switch action {
@@ -400,39 +402,78 @@ extension Root {
                 return .send(.offramp(.refundTapped))
 
             case .home(.buyTapped):
-                guard state.path == nil, state.buyReputationRequestID == nil else { return .none }
+                guard state.path == nil else { return .none }
                 state.canRecoverReclaimOnLaunch = false
                 let currencyCode = state.offrampState.selectedCurrencyCode
+                state.onrampState = .initial(currencyCode: currencyCode)
+                guard onramp.isConfigured() else {
+                    state.path = .onramp
+                    return .none
+                }
+                // Mount the loading screen immediately. Failing a reputation read must never
+                // silently send a first-time, zero-RP wallet past verification into Buy.
+                state.reputationReturnPath = nil
+                state.reputationState = .initial(currencyCode: currencyCode, isBuyEntry: true)
+                state.path = .reputation
+                return .none
+
+            case .reputation(.delegate(.checkBuy)):
+                guard state.path == .reputation, state.reputationState.isBuyEntry,
+                      state.buyReputationRequestID == nil else { return .none }
+                let currencyCode = state.reputationState.currencyCode
                 let accountID = state.selectedWalletAccount?.id.id
                 let requestID = uuid()
                 state.buyReputationRequestID = requestID
                 return .run { send in
-                    // As on Android, an unreadable chain lets Buy proceed; the amount screen
-                    // still quotes against the exchange's limits before placing an order.
-                    let summary = onramp.isConfigured() ? try? await reputation.summary(currencyCode: currencyCode) : nil
+                    // A purchase already in progress must remain recoverable even if the wallet
+                    // is now blocked or its limit changed. A failed checkpoint read is unknown,
+                    // not "no purchase": keep the retry screen in that case as well.
+                    let hasCheckpoint: Bool
+                    let summary: ReputationSummaryModel?
+                    do {
+                        hasCheckpoint = try await onramp.checkpoint() != nil
+                        summary = hasCheckpoint ? nil : try await reputation.summary(currencyCode: currencyCode)
+                    } catch {
+                        await send(.buyReputationLoaded(
+                            requestID: requestID, currencyCode: currencyCode, accountID: accountID,
+                            hasCheckpoint: false, summary: nil
+                        ))
+                        return
+                    }
                     await send(.buyReputationLoaded(
-                        requestID: requestID, currencyCode: currencyCode, accountID: accountID, summary: summary
+                        requestID: requestID, currencyCode: currencyCode, accountID: accountID,
+                        hasCheckpoint: hasCheckpoint, summary: summary
                     ))
                 }
+                .cancellable(id: ReputationCancelID.buyCheck, cancelInFlight: true)
 
-            case let .buyReputationLoaded(requestID, currencyCode, accountID, summary):
+            case let .buyReputationLoaded(requestID, currencyCode, accountID, hasCheckpoint, summary):
                 guard state.buyReputationRequestID == requestID else { return .none }
                 state.buyReputationRequestID = nil
                 // A read must not navigate over another screen or carry the old wallet's
                 // reputation into a newly selected account.
-                guard state.path == nil, state.selectedWalletAccount?.id.id == accountID else { return .none }
-                state.onrampState = .initial(currencyCode: currencyCode)
-                if let summary, !summary.canBuy || summary.isBlocked {
-                    state.reputationReturnPath = nil
-                    state.reputationState = .initial(currencyCode: currencyCode)
-                    state.reputationState.content = summary.isBlocked ? .blocked : .ready(summary)
-                    state.path = .reputation
-                } else {
+                guard state.path == .reputation, state.reputationState.isBuyEntry else { return .none }
+                state.reputationState.isLoading = false
+                guard state.selectedWalletAccount?.id.id == accountID else {
+                    state.reputationState.content = .unreadable
+                    return .none
+                }
+                if hasCheckpoint || summary?.canStartBuy == true {
                     state.path = .onramp
+                } else if let summary {
+                    state.reputationState.content = summary.isBlocked ? .blocked : .ready(summary)
+                } else {
+                    state.reputationState.content = .unreadable
                 }
                 return .none
 
                 // MARK: - Reputation
+
+            case .onramp(.delegate(.restartBuy)):
+                state.reputationReturnPath = nil
+                state.reputationState = .initial(currencyCode: state.onrampState.currencyCode, isBuyEntry: true)
+                state.path = .reputation
+                return .none
 
             case .onramp(.delegate(.openReputation)):
                 state.reputationReturnPath = .onramp
@@ -451,14 +492,20 @@ extension Root {
                 return .none
 
             case let .reputation(.delegate(.raiseLimit(currencyCode))):
+                state.buyReputationRequestID = nil
                 state.canRecoverReclaimOnLaunch = false
                 state.increaseReputationState = .initial(currencyCode: currencyCode)
                 state.path = .increaseReputation
-                return .none
+                return .cancel(id: ReputationCancelID.buyCheck)
 
             case .reputation(.delegate(.close)):
+                state.buyReputationRequestID = nil
                 state.path = state.reputationReturnPath
-                return .none
+                return .cancel(id: ReputationCancelID.buyCheck)
+
+            case .reputation(.onDisappear):
+                state.buyReputationRequestID = nil
+                return .cancel(id: ReputationCancelID.buyCheck)
 
             case .increaseReputation(.delegate(.close)):
                 state.path = .reputation
@@ -467,6 +514,7 @@ extension Root {
             case let .reclaimReturnReceived(args):
                 // Consume the launch opportunity once. Navigation state alone cannot tell a
                 // cold launch from a late callback for a run this process canceled or completed.
+                // This only presents a confirmation: the URL cannot authorize a proof submission.
                 guard state.canRecoverReclaimOnLaunch else { return .none }
                 state.canRecoverReclaimOnLaunch = false
                 // Replacing a mounted verification view would not restart its .task, leaving

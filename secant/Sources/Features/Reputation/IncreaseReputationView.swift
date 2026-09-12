@@ -21,7 +21,9 @@ struct IncreaseReputationView: View {
 
                 ScrollView {
                     Group {
-                        if let run = store.run {
+                        if store.requiresResumeConfirmation {
+                            resumeConfirmation
+                        } else if let run = store.run {
                             runBody(run)
                         } else if store.isLoading {
                             ProgressView()
@@ -47,6 +49,17 @@ struct IncreaseReputationView: View {
 
     private var infoBinding: Binding<Bool> {
         Binding(get: { store.isInfoPresented }, set: { if !$0 { store.send(.infoDismissed) } })
+    }
+
+    private var resumeConfirmation: some View {
+        VStack(alignment: .leading, spacing: ReputationLayout.sectionGap) {
+            Text(String(localizable: .increaseReputationResumeTitle(store.resumePlatformID ?? "")))
+                .zappFont(.sectionTitle, style: ZappColors.text)
+            ReputationNotice(text: String(localizable: .increaseReputationResumeBody))
+            Text(String(localizable: .reputationInfoPrivacy))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     private var listBody: some View {
@@ -161,7 +174,9 @@ struct IncreaseReputationView: View {
 
     private var bottomDock: some View {
         ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-            if store.run != nil || store.canRetryLoad {
+            if store.requiresResumeConfirmation {
+                ZappButton(title: String(localizable: .increaseReputationResumeConfirm)) { store.send(.resumeConfirmed) }
+            } else if store.run != nil || store.canRetryLoad {
                 primaryButton
             }
         }
@@ -193,11 +208,11 @@ struct IncreaseReputationView: View {
     /// actually opened is what `.verifierOpened` needs.
     private func openVerifier(_ run: IncreaseReputation.State.Run) {
         guard let raw = run.launchURL, let url = URL(string: raw) else {
-            store.send(.verifierOpened(platformID: run.platformID, accepted: false))
+            store.send(.verifierOpened(runID: run.id, accepted: false))
             return
         }
         openURL(url) { accepted in
-            store.send(.verifierOpened(platformID: run.platformID, accepted: accepted))
+            store.send(.verifierOpened(runID: run.id, accepted: accepted))
         }
     }
 

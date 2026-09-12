@@ -65,6 +65,7 @@ actor OfframpSession {
     private var onramp: OnrampRail?
     private var peer: ApplePeerCashOutClient?
     private var reputation: AppleReputationClient?
+    private var reclaimRunID: UUID?
     private var accountTask: Task<AppleBaseAccount, Error>?
     private var offrampTask: Task<OfframpRail, Error>?
     private var onrampTask: Task<OnrampRail, Error>?
@@ -211,6 +212,7 @@ actor OfframpSession {
         // It owns no storage and no gateway, so there is nothing to release — but dropping it is
         // what stops a verification running against the previous account's submitter.
         reputation = nil
+        reclaimRunID = nil
         // The account holds the HTTP client and the Base owner key every rail borrows, so it is last.
         account?.close()
         account = nil
@@ -911,31 +913,36 @@ actor OfframpSession {
     func verifyReclaimPlatform(
         platformID: String,
         currencyCode: String,
+        runID: UUID,
         expectedGeneration: Int
     ) async throws -> ReclaimStatusStream {
         guard expectedGeneration == generation else { throw CancellationError() }
         let client = try await reputationClient()
         try validateGeneration(expectedGeneration)
         let flow = client.verify(platformId: platformID, currencyCode: currencyCode)
-        return try trackReclaimFlow(flow, generation: expectedGeneration)
+        return try trackReclaimFlow(flow, runID: runID, generation: expectedGeneration)
     }
 
     func resumeReclaimVerification(
         platformID: String,
         currencyCode: String,
         sessionID: String,
+        runID: UUID,
         expectedGeneration: Int
     ) async throws -> ReclaimStatusStream {
         guard expectedGeneration == generation else { throw CancellationError() }
         let client = try await reputationClient()
         try validateGeneration(expectedGeneration)
         let flow = client.resume(platformId: platformID, currencyCode: currencyCode, sessionId: sessionID)
-        return try trackReclaimFlow(flow, generation: expectedGeneration)
+        return try trackReclaimFlow(flow, runID: runID, generation: expectedGeneration)
     }
 
     /// Acts on the live client only. Building the rail from a UI callback would be a rail nothing
     /// is running against, and `markVerifierOpened` on a fresh one is a no-op anyway.
-    func markReclaimVerifierOpened() {
+    func markReclaimVerifierOpened(runID: UUID) {
+        // Recheck ownership here, after the actor hop. Even a callback accepted by the reducer
+        // can arrive after cancellation, a wallet change, or another run taking ownership.
+        guard reclaimRunID == runID else { return }
         reputation?.markVerifierOpened()
     }
 
@@ -943,10 +950,18 @@ actor OfframpSession {
     /// an invalidation has to join it rather than merely cancel it.
     func trackReclaimFlow(
         _ flow: SkieSwiftFlow<AppleReclaimStatus>,
+        runID: UUID,
         generation expectedGeneration: Int
     ) throws -> ReclaimStatusStream {
         try validateGeneration(expectedGeneration)
-        let id = UUID()
+        guard reclaimRunID == nil else {
+            return ReclaimStatusStream {
+                $0.yield(.failed(.busy))
+                $0.finish()
+            }
+        }
+        let id = runID
+        reclaimRunID = id
         var capturedContinuation: ReclaimStatusStream.Continuation?
         let stream = ReclaimStatusStream { continuation in capturedContinuation = continuation }
         guard let continuation = capturedContinuation else { return stream }
@@ -1006,6 +1021,7 @@ actor OfframpSession {
     }
 
     private func stateWritingFlowFinished(id: UUID) {
+        if reclaimRunID == id { reclaimRunID = nil }
         stateWritingFlowTasks[id] = nil
     }
 

@@ -31,6 +31,8 @@ struct Reputation {
         var content: Content = .loading
         var isInfoPresented = false
         var isLoading = false
+        /// Buy entry checks durable purchase recovery before applying the new-purchase gate.
+        var isBuyEntry = false
 
         var summary: ReputationSummaryModel? {
             guard case let .ready(summary) = content else { return nil }
@@ -44,7 +46,7 @@ struct Reputation {
             switch content {
             case .loading, .blocked: return nil
             case .unreadable: return .retry
-            case let .ready(summary): return summary.canBuy ? .buy : .verifyToBuy
+            case let .ready(summary): return summary.canStartBuy ? .buy : .verifyToBuy
             }
         }
 
@@ -55,7 +57,7 @@ struct Reputation {
             switch content {
             case .loading, .blocked: return false
             case .unreadable: return true
-            case let .ready(summary): return summary.canBuy && !summary.isAtCeiling
+            case let .ready(summary): return summary.canStartBuy && !summary.isAtCeiling
             }
         }
 
@@ -63,20 +65,22 @@ struct Reputation {
         /// locked — never a rendered "$0", which reads as a bug rather than as a gate.
         var buyLimitText: String? {
             guard let summary else { return nil }
-            return summary.canBuy
+            return summary.canStartBuy
                 ? String(localizable: .reputationAmountUsd(ReputationCopy.usd(summary.buyLimitMicros)))
                 : String(localizable: .reputationLimitLocked)
         }
 
         var buyLimitCaption: String? {
             guard let summary else { return nil }
-            if !summary.canBuy { return String(localizable: .reputationLimitLockedCaption) }
+            if !summary.canStartBuy { return String(localizable: .reputationLimitLockedCaption) }
             return summary.isAtCeiling
                 ? String(localizable: .reputationLimitCaptionAtCeiling)
                 : String(localizable: .reputationLimitCaption)
         }
 
-        static func initial(currencyCode: String) -> State { State(currencyCode: currencyCode) }
+        static func initial(currencyCode: String, isBuyEntry: Bool = false) -> State {
+            State(currencyCode: currencyCode, isBuyEntry: isBuyEntry)
+        }
     }
 
     enum Action: Equatable {
@@ -95,6 +99,7 @@ struct Reputation {
         @CasePathable
         enum Delegate: Equatable {
             case close
+            case checkBuy
             case buy(currencyCode: String)
             case raiseLimit(currencyCode: String)
         }
@@ -114,6 +119,7 @@ struct Reputation {
                 guard !state.isLoading else { return .none }
                 state.isLoading = true
                 if state.summary == nil { state.content = .loading }
+                if state.isBuyEntry { return .send(.delegate(.checkBuy)) }
                 let currencyCode = state.currencyCode
                 return .run { send in
                     await send(.summaryLoaded(try await reputation.summary(currencyCode: currencyCode)))
@@ -135,10 +141,12 @@ struct Reputation {
                 return .none
 
             case .buyTapped:
+                guard state.summary?.canStartBuy == true else { return .none }
                 state.isLoading = false
                 return .merge(.cancel(id: CancelID.load), .send(.delegate(.buy(currencyCode: state.currencyCode))))
 
             case .raiseLimitTapped:
+                guard state.content != .blocked else { return .none }
                 state.isLoading = false
                 return .merge(.cancel(id: CancelID.load), .send(.delegate(.raiseLimit(currencyCode: state.currencyCode))))
 

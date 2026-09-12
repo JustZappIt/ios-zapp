@@ -50,7 +50,8 @@ struct IncreaseReputationStoreTests {
         state.platforms = [ReputationFixtures.platform(id: "LinkedIn", award: "100", gain: nil, isVerified: true)]
 
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
-            $0.reputation.verify = { _, _ in Issue.record("a verified row minted a session"); throw Failure.wrong }
+            $0.uuid = .incrementing
+            $0.reputation.verify = { _, _, _ in Issue.record("a verified row minted a session"); throw Failure.wrong }
         }
 
         await store.send(.platformTapped("LinkedIn"))
@@ -86,6 +87,7 @@ struct IncreaseReputationStoreTests {
         }
         await store.receive(\.statusReceived) {
             $0.run?.stage = .done
+            $0.summaryRevision = 1
             $0.run?.newPoints = "100"
             $0.run?.newBuyLimitMicros = "200000000"
         }
@@ -161,7 +163,8 @@ struct IncreaseReputationStoreTests {
         state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
 
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
-            $0.reputation.verify = { platformID, _ in
+            $0.uuid = .incrementing
+            $0.reputation.verify = { platformID, _, _ in
                 started.withValue { $0.append(platformID) }
                 return ReclaimStatusStream { $0.yield(.preparing) }
             }
@@ -193,45 +196,60 @@ struct IncreaseReputationStoreTests {
 
     // MARK: - Leaving for the Verifier
 
-    @MainActor @Test func theSessionIsHeldOpenUntilTheVerifierActuallyOpened() async {
-        let marked = LockIsolated(0)
-        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")]) {
-            $0.reputation.markVerifierOpened = { marked.withValue { $0 += 1 } }
-        }
-        store.exhaustivity = .off
-
+    @MainActor @Test func theSessionIsHeldOpenUntilTheVerifierActuallyOpened() async throws {
+        let marked = LockIsolated<[UUID]>([])
+        let store = await liveRunStore(marked: marked)
         await store.send(.platformTapped("LinkedIn"))
         await store.receive(\.statusReceived)
+        let id = try #require(store.state.run?.id)
 
-        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: false))
+        let refused = await store.send(.verifierOpened(runID: id, accepted: false))
+        await refused.finish()
+        #expect(marked.value.isEmpty)
+        let accepted = await store.send(.verifierOpened(runID: id, accepted: true))
+        await accepted.finish()
+        #expect(marked.value == [id])
+        await store.send(.cancelRunTapped)
         await store.finish()
-        #expect(marked.value == 0)
-
-        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: true))
-        await store.finish()
-        #expect(marked.value == 1)
     }
 
-    /// A launch callback can outlive the run that started it. Marking the run after it as opened
-    /// would stop that one re-minting before the user has left, and its link then ages out while
-    /// nobody watches the session it names.
-    @MainActor @Test func aCallbackFromAnAbandonedRunNeverMarksTheRunAfterIt() async {
-        let marked = LockIsolated(0)
-        let store = await runStore(statuses: [.ready(requestURL: "https://example.test/link")]) {
-            $0.reputation.markVerifierOpened = { marked.withValue { $0 += 1 } }
-        }
-        store.exhaustivity = .off
-
+    /// Retrying the same platform must be distinct from the run whose open callback is delayed.
+    @MainActor @Test(arguments: ["LinkedIn", "GitHub"])
+    func abandonedCallbacksAndStatusesCannotAffectTheNextRun(nextPlatform: String) async throws {
+        let marked = LockIsolated<[UUID]>([])
+        let store = await liveRunStore(marked: marked)
         await store.send(.platformTapped("LinkedIn"))
         await store.receive(\.statusReceived)
+        let oldID = try #require(store.state.run?.id)
         await store.send(.cancelRunTapped)
-        await store.send(.platformTapped("GitHub"))
+        await store.send(.platformTapped(nextPlatform))
         await store.receive(\.statusReceived)
+        let newID = try #require(store.state.run?.id)
+        #expect(newID != oldID)
 
-        await store.send(.verifierOpened(platformID: "LinkedIn", accepted: true))
+        let stale = await store.send(.verifierOpened(runID: oldID, accepted: true))
+        await stale.finish()
+        await store.send(.statusReceived(runID: oldID, status: .failed(.network)))
+        await store.send(.runEnded(runID: oldID))
+        #expect(marked.value.isEmpty)
+        #expect(store.state.run?.id == newID)
+        #expect(store.state.run?.stage == .ready)
+        let current = await store.send(.verifierOpened(runID: newID, accepted: true))
+        await current.finish()
+        #expect(marked.value == [newID])
+        await store.send(.cancelRunTapped)
         await store.finish()
+    }
 
-        #expect(marked.value == 0)
+    @MainActor private func liveRunStore(marked: LockIsolated<[UUID]>) async -> TestStoreOf<IncreaseReputation> {
+        let store = await runStore(statuses: []) {
+            $0.reputation.verify = { _, _, _ in
+                ReclaimStatusStream { $0.yield(.ready(requestURL: "https://example.test/link")) }
+            }
+            $0.reputation.markVerifierOpened = { id in marked.withValue { $0.append(id) } }
+        }
+        store.exhaustivity = .off
+        return store
     }
 
     // MARK: - The return link
@@ -246,8 +264,9 @@ struct IncreaseReputationStoreTests {
         )
         state.isLoading = false
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
-            $0.reputation.resume = { _, _, _ in
+            $0.reputation.resume = { _, _, _, _ in
                 ReclaimStatusStream { continuation in
                     continuation.yield(.failed(.sessionExpired))
                     continuation.finish()
@@ -257,6 +276,7 @@ struct IncreaseReputationStoreTests {
         store.exhaustivity = .off
 
         await store.send(.onAppear)
+        await store.send(.resumeConfirmed)
         await store.receive(\.statusReceived)
         await store.receive(\.runEnded)
         await store.finish()
@@ -268,7 +288,7 @@ struct IncreaseReputationStoreTests {
 
     /// A cold start has lost the poller, so the callback's session id is what rebuilds it. It picks
     /// up at `verifying` — the user has already been and come back.
-    @MainActor @Test func aColdStartResumesTheSessionTheReturnLinkNamed() async {
+    @MainActor @Test func aColdStartRequiresConfirmationBeforeResumingTheSession() async {
         let resumed = LockIsolated<String?>(nil)
         let state = IncreaseReputation.State.initial(
             currencyCode: "INR",
@@ -276,8 +296,9 @@ struct IncreaseReputationStoreTests {
             resumePlatformID: "LinkedIn"
         )
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
-            $0.reputation.resume = { _, _, sessionID in
+            $0.reputation.resume = { _, _, sessionID, _ in
                 resumed.setValue(sessionID)
                 return ReclaimStatusStream { $0.finish() }
             }
@@ -287,10 +308,59 @@ struct IncreaseReputationStoreTests {
         await store.send(.onAppear)
         await store.finish()
 
+        #expect(resumed.value == nil)
+        #expect(store.state.requiresResumeConfirmation)
+        await store.send(.resumeConfirmed)
+        await store.finish()
         #expect(resumed.value == "session-1")
         // Consumed exactly once, so a re-appearance cannot enqueue the same session again.
         #expect(store.state.resumeSessionID == nil)
         #expect(store.state.resumePlatformID == nil)
+    }
+
+    @MainActor @Test func rejectingAColdReturnNeverResumesIt() async {
+        let state = IncreaseReputation.State.initial(currencyCode: "INR", resumeSessionID: "foreign-session", resumePlatformID: "LinkedIn")
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
+            $0.reputation.resume = { _, _, _, _ in
+                Issue.record("A return URL must not authorize a verification")
+                return ReclaimStatusStream { $0.finish() }
+            }
+        }
+        store.exhaustivity = .off
+        await store.send(.onAppear)
+        await store.finish()
+        #expect(store.state.requiresResumeConfirmation)
+        await store.send(.backTapped)
+        await store.receive(\.delegate.close)
+        await store.send(.resumeConfirmed)
+        await store.finish()
+        #expect(!store.state.requiresResumeConfirmation)
+        #expect(store.state.run == nil)
+    }
+
+    @MainActor @Test func aCompletedVerificationSupersedesOlderSummaryResponses() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "INR")
+        state.run = run(stage: .submitting)
+        let verified = ReputationFixtures.platform(id: "LinkedIn", award: "100", gain: nil, isVerified: true)
+        let current = ReputationFixtures.summary(canBuy: true, buyLimitMicros: "200000000", platforms: [verified])
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.reputation.verify = { _, _, _ in
+                Issue.record("The successfully verified account must stay inert")
+                return ReclaimStatusStream { $0.finish() }
+            }
+        }
+        store.exhaustivity = .off
+        await store.send(.statusReceived(runID: UUID(0), status: .done(current)))
+        await store.send(.dismissRunTapped)
+        // Model a response that was already queued when the successful write canceled its read.
+        await store.send(.summaryLoaded(ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0"), revision: 0))
+        await store.send(.loadFailed(revision: 0))
+        #expect(store.state.platforms == [verified])
+        #expect(!store.state.isLoading)
+        #expect(store.state.errorMessage == nil)
+        await store.send(.platformTapped("LinkedIn"))
+        #expect(store.state.run == nil)
     }
 
     // MARK: - Helpers
@@ -298,7 +368,7 @@ struct IncreaseReputationStoreTests {
     private enum Failure: Error { case wrong }
 
     private func run(stage: IncreaseReputation.State.Stage) -> IncreaseReputation.State.Run {
-        IncreaseReputation.State.Run(platformID: "LinkedIn", name: "LinkedIn", stage: stage)
+        IncreaseReputation.State.Run(id: UUID(0), platformID: "LinkedIn", name: "LinkedIn", stage: stage)
     }
 
     @MainActor private func listStore(currencyCode: String = "INR") async -> TestStoreOf<IncreaseReputation> {
@@ -319,7 +389,8 @@ struct IncreaseReputationStoreTests {
         state.isLoading = false
         state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
         return await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
-            $0.reputation.verify = { _, _ in
+            $0.uuid = .incrementing
+            $0.reputation.verify = { _, _, _ in
                 ReclaimStatusStream { continuation in
                     statuses.forEach { continuation.yield($0) }
                     continuation.finish()

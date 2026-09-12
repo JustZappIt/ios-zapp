@@ -22,6 +22,7 @@ struct IncreaseReputation {
         }
 
         struct Run: Equatable {
+            let id: UUID
             let platformID: String
             /// The brand's own spelling. A cold-start resume opens before the list has loaded, so
             /// it starts as the routing key and is corrected the moment the read lands.
@@ -44,9 +45,13 @@ struct IncreaseReputation {
         var isInfoPresented = false
         /// So a failure marks the step it failed *on* rather than the first one.
         var lastActiveStage: Stage = .ready
-        /// Carried by the return link on a cold start, and consumed exactly once.
+        /// External routing hints. They cannot start a write until the user confirms the resume.
         var resumeSessionID: String?
         var resumePlatformID: String?
+        /// A completed write supersedes any summary read started before it.
+        var summaryRevision = 0
+
+        var requiresResumeConfirmation: Bool { resumeSessionID != nil && resumePlatformID != nil }
 
         var isRunLive: Bool {
             guard let run else { return false }
@@ -74,13 +79,14 @@ struct IncreaseReputation {
 
     enum Action: Equatable {
         case onAppear
-        case summaryLoaded(ReputationSummaryModel)
-        case loadFailed
+        case summaryLoaded(ReputationSummaryModel, revision: Int)
+        case loadFailed(revision: Int)
         case retryLoadTapped
         case platformTapped(String)
-        case statusReceived(ReclaimStatusModel)
-        case runEnded
-        case verifierOpened(platformID: String, accepted: Bool)
+        case statusReceived(runID: UUID, status: ReclaimStatusModel)
+        case runEnded(runID: UUID)
+        case verifierOpened(runID: UUID, accepted: Bool)
+        case resumeConfirmed
         case cancelRunTapped
         case dismissRunTapped
         case doneTapped
@@ -96,6 +102,7 @@ struct IncreaseReputation {
     }
 
     @Dependency(\.reputation) var reputation
+    @Dependency(\.uuid) var uuid
 
     private enum CancelID {
         case load
@@ -106,18 +113,24 @@ struct IncreaseReputation {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                var effects: [Effect<Action>] = [load(state)]
-                if let sessionID = state.resumeSessionID, let platformID = state.resumePlatformID {
-                    state.resumeSessionID = nil
-                    state.resumePlatformID = nil
-                    effects.append(startRun(&state, platformID: platformID, sessionID: sessionID))
-                }
-                return .merge(effects)
-
-            case .retryLoadTapped:
                 return load(state)
 
-            case let .summaryLoaded(summary):
+            case .resumeConfirmed:
+                // The URL alone is not consent: anyone can mint a session whose context names
+                // this wallet. Only this explicit action permits polling and submitting its proof.
+                guard state.run == nil,
+                      let sessionID = state.resumeSessionID, let platformID = state.resumePlatformID else { return .none }
+                state.resumeSessionID = nil
+                state.resumePlatformID = nil
+                return startRun(&state, platformID: platformID, sessionID: sessionID)
+
+            case .retryLoadTapped:
+                state.isLoading = true
+                state.errorMessage = nil
+                return load(state)
+
+            case let .summaryLoaded(summary, revision):
+                guard revision == state.summaryRevision else { return .none }
                 state.isLoading = false
                 state.errorMessage = nil
                 state.platforms = visiblePlatforms(summary, currencyCode: state.currencyCode)
@@ -126,7 +139,8 @@ struct IncreaseReputation {
                 }
                 return .none
 
-            case .loadFailed:
+            case let .loadFailed(revision):
+                guard revision == state.summaryRevision else { return .none }
                 state.isLoading = false
                 state.errorMessage = String(localizable: .reputationUnreadableBody)
                 return .none
@@ -134,31 +148,33 @@ struct IncreaseReputation {
             case let .platformTapped(platformID):
                 // A second tap while a run is live would mint a session over the one the user
                 // is already proving against, and only the second is polled.
-                guard state.run == nil,
+                guard state.run == nil, !state.requiresResumeConfirmation,
                       let platform = state.platforms.first(where: { $0.id == platformID }),
                       !platform.isVerified else { return .none }
                 return startRun(&state, platformID: platformID, sessionID: nil)
 
-            case let .statusReceived(status):
+            case let .statusReceived(runID, status):
+                guard state.run?.id == runID else { return .none }
                 apply(status, to: &state)
+                if case .done = status { return .cancel(id: CancelID.load) }
                 return .none
 
-            case .runEnded:
+            case let .runEnded(runID):
                 // The stream can end without a terminal status when the session is torn down.
                 // Leaving the run mid-stage would strand the screen on a spinner.
-                guard state.isRunLive else { return .none }
+                guard state.run?.id == runID, state.isRunLive else { return .none }
                 state.run?.stage = .failed
                 state.run?.errorMessage = ReputationCopy.failureMessage(.network)
                 return .none
 
-            case let .verifierOpened(platformID, accepted):
+            case let .verifierOpened(runID, accepted):
                 // ☠ Only a *successful* open stops the re-minting, and only for the run that is
                 // still on screen. A refused open leaves the session being refreshed, which is
                 // what the next tap needs; a callback outliving its own run would mark the run
                 // after it as opened before the user has left, and that one's link then ages out
                 // unwatched.
-                guard accepted, state.run?.platformID == platformID else { return .none }
-                return .run { _ in await reputation.markVerifierOpened() }
+                guard accepted, state.run?.id == runID, state.run?.stage == .ready else { return .none }
+                return .run { _ in await reputation.markVerifierOpened(runID: runID) }
 
             case .cancelRunTapped, .dismissRunTapped:
                 // Cancelling leaves the Reclaim session to expire on its own. It is never
@@ -184,6 +200,8 @@ struct IncreaseReputation {
                 // Back closes the run first, exactly as Android does: the run took the body over
                 // in place, so it is what the user means by back.
                 if state.run != nil { return .send(.dismissRunTapped) }
+                state.resumeSessionID = nil
+                state.resumePlatformID = nil
                 return .merge(
                     .cancel(id: CancelID.load),
                     .cancel(id: CancelID.run),
@@ -198,10 +216,11 @@ struct IncreaseReputation {
 
     private func load(_ state: State) -> Effect<Action> {
         let currencyCode = state.currencyCode
+        let revision = state.summaryRevision
         return .run { send in
-            await send(.summaryLoaded(try await reputation.summary(currencyCode: currencyCode)))
+            await send(.summaryLoaded(try await reputation.summary(currencyCode: currencyCode), revision: revision))
         } catch: { _, send in
-            await send(.loadFailed)
+            await send(.loadFailed(revision: revision))
         }
         .cancellable(id: CancelID.load, cancelInFlight: true)
     }
@@ -211,8 +230,10 @@ struct IncreaseReputation {
     /// A resume opens at `verifying`, and counts opening the Verifier as done: the user has
     /// already been and come back, so a failure here must not mark the step they clearly completed.
     private func startRun(_ state: inout State, platformID: String, sessionID: String?) -> Effect<Action> {
+        let runID = uuid()
         state.lastActiveStage = sessionID == nil ? .ready : .verifying
         state.run = State.Run(
+            id: runID,
             platformID: platformID,
             name: state.platforms.first { $0.id == platformID }?.name ?? platformID,
             stage: sessionID == nil ? .preparing : .verifying
@@ -224,17 +245,18 @@ struct IncreaseReputation {
                 statuses = try await reputation.resume(
                     platformID: platformID,
                     currencyCode: currencyCode,
-                    sessionID: sessionID
+                    sessionID: sessionID,
+                    runID: runID
                 )
             } else {
-                statuses = try await reputation.verify(platformID: platformID, currencyCode: currencyCode)
+                statuses = try await reputation.verify(platformID: platformID, currencyCode: currencyCode, runID: runID)
             }
             for try await status in statuses {
-                await send(.statusReceived(status))
+                await send(.statusReceived(runID: runID, status: status))
             }
-            await send(.runEnded)
+            await send(.runEnded(runID: runID))
         } catch: { _, send in
-            await send(.statusReceived(.failed(.network)))
+            await send(.statusReceived(runID: runID, status: .failed(.network)))
         }
         .cancellable(id: CancelID.run, cancelInFlight: true)
     }
@@ -255,6 +277,9 @@ struct IncreaseReputation {
             state.run?.stage = .submitting
             state.lastActiveStage = .submitting
         case let .done(summary):
+            state.summaryRevision += 1
+            state.isLoading = false
+            state.errorMessage = nil
             state.run?.stage = .done
             state.run?.newPoints = summary.points
             state.run?.newBuyLimitMicros = summary.buyLimitMicros

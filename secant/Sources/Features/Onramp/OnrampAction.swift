@@ -56,6 +56,7 @@ extension Onramp {
 
         enum Delegate: Equatable {
             case close
+            case restartBuy
             /// The limit is reputation-derived, so the only useful explanation is the screen that
             /// raises it.
             case openReputation

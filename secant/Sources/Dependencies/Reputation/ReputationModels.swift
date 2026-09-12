@@ -20,6 +20,13 @@ struct ReputationSummaryModel: Equatable, Sendable {
     let platforms: [ReputationPlatformModel]
 
     var verified: [ReputationPlatformModel] { platforms.filter(\.isVerified) }
+
+    /// A new wallet must verify before starting a purchase, even if a corridor reports a
+    /// positive default limit. An unreadable points value cannot establish eligibility either.
+    var canStartBuy: Bool {
+        guard let value = Decimal(string: points), value > .zero else { return false }
+        return canBuy && !isBlocked
+    }
 }
 
 struct ReputationPlatformModel: Equatable, Sendable, Identifiable {

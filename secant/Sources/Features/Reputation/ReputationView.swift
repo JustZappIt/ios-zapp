@@ -93,7 +93,7 @@ struct ReputationView: View {
                 ZappSectionLabel(text: String(localizable: .reputationBuyLimit))
 
                 Text(store.buyLimitText ?? "")
-                    .zappFont(.display, style: summary.canBuy ? ZappColors.text : ZappColors.textMuted)
+                    .zappFont(.display, style: summary.canStartBuy ? ZappColors.text : ZappColors.textMuted)
                     .padding(.top, ReputationLayout.heroLabelGap)
 
                 Text(store.buyLimitCaption ?? "")

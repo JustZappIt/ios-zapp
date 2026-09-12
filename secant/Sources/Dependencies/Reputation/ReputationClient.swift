@@ -18,13 +18,14 @@ typealias ReclaimStatusStream = AsyncThrowingStream<ReclaimStatusModel, Error>
 @DependencyClient
 struct ReputationClient {
     var summary: @Sendable (_ currencyCode: String) async throws -> ReputationSummaryModel
-    var verify: @Sendable (_ platformID: String, _ currencyCode: String) async throws -> ReclaimStatusStream
+    var verify: @Sendable (_ platformID: String, _ currencyCode: String, _ runID: UUID) async throws -> ReclaimStatusStream
     var resume: @Sendable (
         _ platformID: String,
         _ currencyCode: String,
-        _ sessionID: String
+        _ sessionID: String,
+        _ runID: UUID
     ) async throws -> ReclaimStatusStream
-    var markVerifierOpened: @Sendable () async -> Void
+    var markVerifierOpened: @Sendable (_ runID: UUID) async -> Void
 }
 
 extension ReputationClient: DependencyKey {
@@ -37,25 +38,27 @@ extension ReputationClient: DependencyKey {
                     try await OfframpSession.shared.reputationClient().summary(currencyCode: currencyCode)
                 )
             },
-            verify: { platformID, currencyCode in
+            verify: { platformID, currencyCode, runID in
                 let generation = try await OfframpSession.shared.generationToken()
                 return try await OfframpSession.shared.verifyReclaimPlatform(
                     platformID: platformID,
                     currencyCode: currencyCode,
+                    runID: runID,
                     expectedGeneration: generation
                 )
             },
-            resume: { platformID, currencyCode, sessionID in
+            resume: { platformID, currencyCode, sessionID, runID in
                 let generation = try await OfframpSession.shared.generationToken()
                 return try await OfframpSession.shared.resumeReclaimVerification(
                     platformID: platformID,
                     currencyCode: currencyCode,
                     sessionID: sessionID,
+                    runID: runID,
                     expectedGeneration: generation
                 )
             },
-            markVerifierOpened: {
-                await OfframpSession.shared.markReclaimVerifierOpened()
+            markVerifierOpened: { runID in
+                await OfframpSession.shared.markReclaimVerifierOpened(runID: runID)
             }
         )
     }

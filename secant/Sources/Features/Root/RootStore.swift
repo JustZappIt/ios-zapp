@@ -479,7 +479,9 @@ struct Root {
         case giftResetGuardReviewTapped
         case giftResetGuardDeleteAnywayTapped(Bool)
         case reclaimReturnReceived(ReclaimReturnLink.ResumeArgs)
-        case buyReputationLoaded(requestID: UUID, currencyCode: String, accountID: [UInt8]?, summary: ReputationSummaryModel?)
+        case buyReputationLoaded(
+            requestID: UUID, currencyCode: String, accountID: [UInt8]?, hasCheckpoint: Bool, summary: ReputationSummaryModel?
+        )
         case receive(Receive.Action)
         case requestZecCoordFlow(RequestZecCoordFlow.Action)
         case scanCoordFlow(ScanCoordFlow.Action)
