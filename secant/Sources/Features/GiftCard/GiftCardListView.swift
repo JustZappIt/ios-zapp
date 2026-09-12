@@ -43,6 +43,7 @@ struct GiftCardListView: View {
                 ZappBottomActionBar(onBack: { store.send(.backTapped) }) { EmptyView() }
             }
             .applyScreenBackground()
+            .zappSwipeBack { store.send(.backTapped) }
             .sheet(
                 isPresented: Binding(
                     get: { store.retryReview != nil },

@@ -131,6 +131,9 @@ struct SettingsView: View {
                 .background(ZappColors.bg.color(colorScheme))
                 .zashiBack() { store.send(.backToHomeTapped) }
                 .screenTitle(String(localizable: .settingsTitle))
+                // Move the entire stack, including its opaque background and title, on return to You.
+                // Scope this opt-out to the root so pushed destinations retain their own gestures.
+                .environment(\.zappSwipeBackEnabled, false)
             } destination: { store in
                 switch store.case {
                 case let .about(store):
@@ -184,6 +187,7 @@ struct SettingsView: View {
                 }
             }
             .background(ZappColors.bg.color(colorScheme))
+            .zappSwipeBack(isEnabled: store.path.isEmpty) { store.send(.backToHomeTapped) }
             .zashiSheet(isPresented: $store.isInRecoverFundsMode) {
                 recoverFundsSheetContent()
             }

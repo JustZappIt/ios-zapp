@@ -55,6 +55,18 @@ struct ZashiBackModifier<PrimaryAction: View>: ViewModifier {
     }
 }
 
+private struct ZappSwipeBackEnabledKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// A navigation container can own its root's swipe while retaining the root's back dock.
+    var zappSwipeBackEnabled: Bool {
+        get { self[ZappSwipeBackEnabledKey.self] }
+        set { self[ZappSwipeBackEnabledKey.self] = newValue }
+    }
+}
+
 /// Live back-swipe progress (0...1), reported up to `RootView` so it can parallax the screen behind.
 struct SwipeBackProgressKey: PreferenceKey {
     static let defaultValue: CGFloat = 0
@@ -93,6 +105,7 @@ private struct ZappInteractiveBackModifier: ViewModifier {
     }
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.zappSwipeBackEnabled) private var isSwipeBackEnabled
 
     @State private var containerWidth: CGFloat = 0
     @State private var horizontalOffset: CGFloat = 0
@@ -164,6 +177,7 @@ private struct ZappInteractiveBackModifier: ViewModifier {
 
     private func beginsBackSwipe(_ value: DragGesture.Value) -> Bool {
         isEnabled
+            && isSwipeBackEnabled
             && value.startLocation.x <= Constants.edgeWidth
             && value.translation.width > 0
             && abs(value.translation.width) > abs(value.translation.height)
