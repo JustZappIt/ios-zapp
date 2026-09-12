@@ -323,50 +323,42 @@ private extension RootView {
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             } else if path == .currencyConversionSetup {
-                                NavigationStack {
-                                    CurrencyConversionSetupView(
-                                        store:
-                                            store.scope(
-                                                state: \.currencyConversionSetupState,
-                                                action: \.currencyConversionSetup)
-                                    )
-                                }
+                                CurrencyConversionSetupView(
+                                    store:
+                                        store.scope(
+                                            state: \.currencyConversionSetupState,
+                                            action: \.currencyConversionSetup)
+                                )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             } else if path == .torSetup {
-                                NavigationStack {
-                                    TorSetupView(
-                                        store:
-                                            store.scope(
-                                                state: \.torSetupState,
-                                                action: \.torSetup)
-                                    )
-                                }
+                                TorSetupView(
+                                    store:
+                                        store.scope(
+                                            state: \.torSetupState,
+                                            action: \.torSetup)
+                                )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             } else if path == .portfolioChartSetup {
-                                NavigationStack {
-                                    PortfolioChartSetupView(
-                                        store:
-                                            store.scope(
-                                                state: \.portfolioChartSetupState,
-                                                action: \.portfolioChartSetup
-                                            )
-                                    )
-                                }
+                                PortfolioChartSetupView(
+                                    store:
+                                        store.scope(
+                                            state: \.portfolioChartSetupState,
+                                            action: \.portfolioChartSetup
+                                        )
+                                )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             } else if path == .serverSwitch {
-                                NavigationStack {
-                                    ServerSetupView(
-                                        store:
-                                            store.scope(
-                                                state: \.serverSetupState,
-                                                action: \.serverSetup
-                                            )
-                                    ) {
-                                        store.send(.backToHomeFromServerSwitchTapped)
-                                    }
+                                ServerSetupView(
+                                    store:
+                                        store.scope(
+                                            state: \.serverSetupState,
+                                            action: \.serverSetup
+                                        )
+                                ) {
+                                    store.send(.backToHomeFromServerSwitchTapped)
                                 }
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
@@ -489,14 +481,12 @@ private extension RootView {
                                     .zIndex(2)
                                 }
                             } else if path == .securitySettings {
-                                NavigationStack {
-                                    SecuritySettingsView(
-                                        store: store.scope(
-                                            state: \.securitySettingsState,
-                                            action: \.securitySettings
-                                        )
+                                SecuritySettingsView(
+                                    store: store.scope(
+                                        state: \.securitySettingsState,
+                                        action: \.securitySettings
                                     )
-                                }
+                                )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             } else if path == .groupInfo {

@@ -100,6 +100,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [ZAPP-1] Swiping back from You settings now reveals the screen underneath, including All Settings. App Lock, P2P Payment Method, P2P Transactions, and Gift Cards now support the same left-edge back gesture.
 - [ZAPP-4] P2P payments and cash-outs now reserve one shared Base balance across every active or recoverable operation, reject stale recipient checks and wallet sessions, and recover by exact on-chain submission identity. Closing a screen no longer cancels unrelated cash-outs, concurrent rails cannot overwrite each other's recovery data or allowances, and temporary provider outages no longer appear as an empty activity history.
 - [PORTFOLIO-CHART] Wallets with completed sends now reconcile their history correctly instead of hiding the balance chart.
 - [PORTFOLIO-CHART] Wallet birthday estimates now remain usable on compact displays, and PIN entry is larger and easier to read across iPhone sizes.

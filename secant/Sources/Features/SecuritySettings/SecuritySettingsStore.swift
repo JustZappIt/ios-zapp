@@ -8,13 +8,13 @@ import Foundation
 
 @Reducer
 struct SecuritySettings {
-    enum PINIntent: Equatable {
+    enum PINIntent: Hashable {
         case change
         case switchFromBiometric
         case switchToBiometric
     }
 
-    enum Screen: Equatable {
+    enum Screen: Hashable {
         case createPIN(PINIntent)
         case enrollBiometric
         case menu

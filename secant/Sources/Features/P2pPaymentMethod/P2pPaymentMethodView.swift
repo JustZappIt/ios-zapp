@@ -43,6 +43,7 @@ struct P2pPaymentMethodView: View {
                 }
             }
             .applyScreenBackground()
+            .zappSwipeBack { store.send(.backTapped) }
             .sheet(isPresented: $isInfoPresented) { infoSheet }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }

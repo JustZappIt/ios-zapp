@@ -13,37 +13,51 @@ struct SecuritySettingsView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            Group {
-                switch store.screen {
-                case .menu:
-                    menu
-                case .verifyPIN:
-                    AppPINEntryView(
-                        title: String(localizable: .appLockPINVerifyTitle),
-                        subtitle: String(localizable: .appLockPINVerifySubtitle),
-                        errorMessage: store.errorMessage,
-                        digitCount: store.pin.count,
-                        isInputEnabled: !store.isProcessing && store.lockoutSeconds == 0,
-                        onBack: { store.send(.backTapped) },
-                        onKey: { store.send(.pinKeyTapped($0)) }
-                    )
-                case .createPIN:
-                    AppPINEntryView(
-                        title: store.firstPIN.isEmpty
-                            ? String(localizable: .appLockPINNewTitle)
-                            : String(localizable: .onboardingPINConfirmTitle),
-                        subtitle: store.firstPIN.isEmpty
-                            ? String(localizable: .appLockPINNewSubtitle)
-                            : String(localizable: .appLockPINNewConfirmSubtitle),
-                        errorMessage: store.errorMessage,
-                        digitCount: store.pin.count,
-                        isInputEnabled: !store.isProcessing,
-                        onBack: { store.send(.backTapped) },
-                        onKey: { store.send(.pinKeyTapped($0)) }
-                    )
-                case .enrollBiometric:
-                    biometricEnrollment
+            ZStack {
+                // Keep the menu underneath PIN/biometric steps so a partial back swipe reveals
+                // the actual destination. Only the visible layer may handle a back gesture.
+                menu
+                    .zappSwipeBack(isEnabled: store.screen == .menu && !store.isProcessing) {
+                        store.send(.backTapped)
+                    }
+                    .allowsHitTesting(store.screen == .menu)
+                    .accessibilityHidden(store.screen != .menu)
+
+                Group {
+                    switch store.screen {
+                    case .menu:
+                        EmptyView()
+                    case .verifyPIN:
+                        AppPINEntryView(
+                            title: String(localizable: .appLockPINVerifyTitle),
+                            subtitle: String(localizable: .appLockPINVerifySubtitle),
+                            errorMessage: store.errorMessage,
+                            digitCount: store.pin.count,
+                            isInputEnabled: !store.isProcessing && store.lockoutSeconds == 0,
+                            onBack: { store.send(.backTapped) },
+                            onKey: { store.send(.pinKeyTapped($0)) }
+                        )
+                    case .createPIN:
+                        AppPINEntryView(
+                            title: store.firstPIN.isEmpty
+                                ? String(localizable: .appLockPINNewTitle)
+                                : String(localizable: .onboardingPINConfirmTitle),
+                            subtitle: store.firstPIN.isEmpty
+                                ? String(localizable: .appLockPINNewSubtitle)
+                                : String(localizable: .appLockPINNewConfirmSubtitle),
+                            errorMessage: store.errorMessage,
+                            digitCount: store.pin.count,
+                            isInputEnabled: !store.isProcessing,
+                            onBack: { store.send(.backTapped) },
+                            onKey: { store.send(.pinKeyTapped($0)) }
+                        )
+                    case .enrollBiometric:
+                        biometricEnrollment
+                    }
                 }
+                .zappSwipeBack(isEnabled: store.screen != .menu && !store.isProcessing) { store.send(.backTapped) }
+                // A completed swipe leaves its layer off-screen; the next step needs fresh drag state.
+                .id(store.screen)
             }
             .onAppear { store.send(.onAppear) }
         }
