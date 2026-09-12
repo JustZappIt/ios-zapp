@@ -47,12 +47,19 @@ extension Onramp {
         case paymentTicked(Int)
         case paymentWindowExpired(String)
         case recheckOrderTapped
+        case limitInfoTapped
         case infoTapped
         case infoDismissed
         case backTapped
         case cancelAll
         case delegate(Delegate)
 
-        enum Delegate: Equatable { case close }
+        enum Delegate: Equatable {
+            case close
+            case restartBuy
+            /// The limit is reputation-derived, so the only useful explanation is the screen that
+            /// raises it.
+            case openReputation
+        }
     }
 }

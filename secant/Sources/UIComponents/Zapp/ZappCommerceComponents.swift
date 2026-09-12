@@ -2,13 +2,53 @@
 
 import SwiftUI
 
+/// A tappable explanation for a row's number. One type rather than two optional parameters: a
+/// handler without a label ships an unlabelled button, and the pair is only ever correct together.
+struct ZappSummaryRowInfo {
+    let accessibilityLabel: String
+    let action: () -> Void
+}
+
 struct ZappSummaryRow: View {
+    private enum Constants {
+        /// Small enough to sit on a caption line; the tap target is the overflow below.
+        static let infoIconSize: CGFloat = 14
+        static let infoTouchTarget: CGFloat = 44
+        static let infoTouchInset: CGFloat = -(infoTouchTarget - infoIconSize) / 2
+        static let labelIconGap: CGFloat = 2
+    }
+
     let label: String
     let value: String
+    /// Set only where the row's number is one the user can act on — the tap has to lead somewhere,
+    /// or the icon is a promise the row does not keep.
+    var info: ZappSummaryRowInfo?
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(label).zappFont(.caption, style: ZappColors.textMuted)
+            HStack(alignment: .firstTextBaseline, spacing: Constants.labelIconGap) {
+                Text(label).zappFont(.caption, style: ZappColors.textMuted)
+
+                if let info {
+                    Button(action: info.action) {
+                        Asset.Assets.infoCircle.image
+                            .zImage(
+                                width: Constants.infoIconSize,
+                                height: Constants.infoIconSize,
+                                style: ZappColors.textMuted
+                            )
+                            // The row is a caption line, so the icon stays small and the 44pt
+                            // target overflows it rather than setting the row's height.
+                            .contentShape(
+                                Rectangle()
+                                    .size(width: Constants.infoTouchTarget, height: Constants.infoTouchTarget)
+                                    .offset(x: Constants.infoTouchInset, y: Constants.infoTouchInset)
+                            )
+                    }
+                    .buttonStyle(.zappPress)
+                    .accessibilityLabel(info.accessibilityLabel)
+                }
+            }
             Spacer(minLength: 8)
             Text(value)
                 .zappFont(.body, style: ZappColors.text)

@@ -64,7 +64,14 @@ extension Root {
                 return .none
 
             case .destination(.deeplink(let url)):
-                // Gift links first, before the blanket ZIP-321 warning: the host check is all the
+                // The Reclaim return first, matching Android's ordering. Its three fields are
+                // untrusted routing hints, never proof: the driver fetches the signed proof from
+                // Reclaim and the contract verifies it.
+                if url.host()?.lowercased() == ReclaimReturnLink.host {
+                    guard let args = ReclaimReturnLink.resumeArgs(from: url) else { return .none }
+                    return .send(.reclaimReturnReceived(args))
+                }
+                // Gift links next, before the blanket ZIP-321 warning: the host check is all the
                 // routing needs — full validation is the codec's, on the claim screen.
                 if url.host()?.lowercased() == GiftLinkCodec.giftLinkHost {
                     return .send(.giftLinkReceived(url.absoluteString))

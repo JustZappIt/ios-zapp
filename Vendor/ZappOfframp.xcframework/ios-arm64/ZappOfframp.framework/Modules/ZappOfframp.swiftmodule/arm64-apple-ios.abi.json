@@ -7221,6 +7221,485 @@
             "children": [
               {
                 "kind": "TypeDecl",
+                "name": "AppleReclaimStatus",
+                "printedName": "AppleReclaimStatus",
+                "children": [
+                  {
+                    "kind": "TypeDecl",
+                    "name": "__Sealed",
+                    "printedName": "__Sealed",
+                    "children": [
+                      {
+                        "kind": "Var",
+                        "name": "done",
+                        "printedName": "done",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Done) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Done) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Done",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Done",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusDone"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO4doneyAISo0abefG4DoneCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO4doneyAISo0abefG4DoneCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 0
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "failed",
+                        "printedName": "failed",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Failed) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Failed) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Failed",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Failed",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusFailed"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO6failedyAISo0abefG6FailedCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO6failedyAISo0abefG6FailedCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 1
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "preparing",
+                        "printedName": "preparing",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Preparing) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Preparing) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Preparing",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Preparing",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusPreparing"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9preparingyAISo0abefG9PreparingCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9preparingyAISo0abefG9PreparingCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 2
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "ready",
+                        "printedName": "ready",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Ready) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Ready) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Ready",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Ready",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusReady"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO5readyyAISo0abefG5ReadyCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO5readyyAISo0abefG5ReadyCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 3
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "submitting",
+                        "printedName": "submitting",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Submitting) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Submitting) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Submitting",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Submitting",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusSubmitting"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO10submittingyAISo0abefG10SubmittingCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO10submittingyAISo0abefG10SubmittingCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 4
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "verifying",
+                        "printedName": "verifying",
+                        "children": [
+                          {
+                            "kind": "TypeFunc",
+                            "name": "Function",
+                            "printedName": "(ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type) -> (ZappOfframp.AppleReclaimStatus.Verifying) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "children": [
+                              {
+                                "kind": "TypeFunc",
+                                "name": "Function",
+                                "printedName": "(ZappOfframp.AppleReclaimStatus.Verifying) -> ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  },
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "Verifying",
+                                    "printedName": "ZappOfframp.AppleReclaimStatus.Verifying",
+                                    "usr": "c:objc(cs)ZappOfframpAppleReclaimStatusVerifying"
+                                  }
+                                ]
+                              },
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Metatype",
+                                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed.Type",
+                                "children": [
+                                  {
+                                    "kind": "TypeNominal",
+                                    "name": "__Sealed",
+                                    "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "declKind": "EnumElement",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9verifyingyAISo0abefG9VerifyingCcAImF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9verifyingyAISo0abefG9VerifyingCcAImF",
+                        "moduleName": "ZappOfframp",
+                        "fixedbinaryorder": 5
+                      },
+                      {
+                        "kind": "Var",
+                        "name": "hashValue",
+                        "printedName": "hashValue",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Int",
+                            "printedName": "Swift.Int",
+                            "usr": "s:Si"
+                          }
+                        ],
+                        "declKind": "Var",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9hashValueSivp",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9hashValueSivp",
+                        "moduleName": "ZappOfframp",
+                        "implicit": true,
+                        "accessors": [
+                          {
+                            "kind": "Accessor",
+                            "name": "Get",
+                            "printedName": "Get()",
+                            "children": [
+                              {
+                                "kind": "TypeNominal",
+                                "name": "Int",
+                                "printedName": "Swift.Int",
+                                "usr": "s:Si"
+                              }
+                            ],
+                            "declKind": "Accessor",
+                            "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9hashValueSivg",
+                            "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO9hashValueSivg",
+                            "moduleName": "ZappOfframp",
+                            "implicit": true,
+                            "accessorKind": "get"
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Function",
+                        "name": "hash",
+                        "printedName": "hash(into:)",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Hasher",
+                            "printedName": "Swift.Hasher",
+                            "paramValueOwnership": "InOut",
+                            "usr": "s:s6HasherV"
+                          }
+                        ],
+                        "declKind": "Func",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO4hash4intoys6HasherVz_tF",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO4hash4intoys6HasherVz_tF",
+                        "moduleName": "ZappOfframp",
+                        "implicit": true,
+                        "funcSelfKind": "NonMutating"
+                      },
+                      {
+                        "kind": "Function",
+                        "name": "==",
+                        "printedName": "==(_:_:)",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Bool",
+                            "printedName": "Swift.Bool",
+                            "usr": "s:Sb"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "__Sealed",
+                            "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "__Sealed",
+                            "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                            "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+                          }
+                        ],
+                        "declKind": "Func",
+                        "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO2eeoiySbAI_AItFZ",
+                        "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO2eeoiySbAI_AItFZ",
+                        "moduleName": "ZappOfframp",
+                        "static": true,
+                        "implicit": true,
+                        "funcSelfKind": "NonMutating"
+                      }
+                    ],
+                    "declKind": "Enum",
+                    "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO",
+                    "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO",
+                    "moduleName": "ZappOfframp",
+                    "declAttributes": [
+                      "AccessControl",
+                      "Frozen"
+                    ],
+                    "isFromExtension": true,
+                    "isEnumExhaustive": true,
+                    "conformances": [
+                      {
+                        "kind": "Conformance",
+                        "name": "Copyable",
+                        "printedName": "Copyable",
+                        "usr": "s:s8CopyableP",
+                        "mangledName": "$ss8CopyableP"
+                      },
+                      {
+                        "kind": "Conformance",
+                        "name": "Escapable",
+                        "printedName": "Escapable",
+                        "usr": "s:s9EscapableP",
+                        "mangledName": "$ss9EscapableP"
+                      },
+                      {
+                        "kind": "Conformance",
+                        "name": "Hashable",
+                        "printedName": "Hashable",
+                        "usr": "s:SH",
+                        "mangledName": "$sSH"
+                      },
+                      {
+                        "kind": "Conformance",
+                        "name": "Equatable",
+                        "printedName": "Equatable",
+                        "usr": "s:SQ",
+                        "mangledName": "$sSQ"
+                      }
+                    ]
+                  }
+                ],
+                "declKind": "Enum",
+                "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO",
+                "mangledName": "$s11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO",
+                "moduleName": "ZappOfframp",
+                "declAttributes": [
+                  "AccessControl"
+                ],
+                "conformances": [
+                  {
+                    "kind": "Conformance",
+                    "name": "Copyable",
+                    "printedName": "Copyable",
+                    "usr": "s:s8CopyableP",
+                    "mangledName": "$ss8CopyableP"
+                  },
+                  {
+                    "kind": "Conformance",
+                    "name": "Escapable",
+                    "printedName": "Escapable",
+                    "usr": "s:s9EscapableP",
+                    "mangledName": "$ss9EscapableP"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeDecl",
                 "name": "FundingOutcome",
                 "printedName": "FundingOutcome",
                 "children": [
@@ -31485,6 +31964,26 @@
           "AccessControl"
         ],
         "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
       },
       {
         "kind": "Import",
@@ -65139,6 +65638,89 @@
           {
             "kind": "TypeNominal",
             "name": "__Sealed",
+            "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+            "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "GenericTypeParam",
+            "printedName": "τ_0_0"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:11ZappOfframp6onEnum2ofAA4SkieO0B3LibO18AppleReclaimStatusO8__SealedOx_tSo0abhiJ0CRbzlF",
+        "mangledName": "$s11ZappOfframp6onEnum2ofAA4SkieO0B3LibO18AppleReclaimStatusO8__SealedOx_tSo0abhiJ0CRbzlF",
+        "moduleName": "ZappOfframp",
+        "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.AppleReclaimStatus>",
+        "sugared_genericSig": "<__Sealed where __Sealed : ZappOfframp.AppleReclaimStatus>",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Function",
+        "name": "onEnum",
+        "printedName": "onEnum(of:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "__Sealed",
+                "printedName": "ZappOfframp.Skie.OfframpLib.AppleReclaimStatus.__Sealed",
+                "usr": "s:11ZappOfframp4SkieO0B3LibO18AppleReclaimStatusO8__SealedO"
+              }
+            ],
+            "usr": "s:Sq"
+          },
+          {
+            "kind": "TypeNominal",
+            "name": "Optional",
+            "printedName": "τ_0_0?",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "τ_0_0"
+              }
+            ],
+            "usr": "s:Sq"
+          }
+        ],
+        "declKind": "Func",
+        "usr": "s:11ZappOfframp6onEnum2ofAA4SkieO0B3LibO18AppleReclaimStatusO8__SealedOSgxSg_tSo0abhiJ0CRbzlF",
+        "mangledName": "$s11ZappOfframp6onEnum2ofAA4SkieO0B3LibO18AppleReclaimStatusO8__SealedOSgxSg_tSo0abhiJ0CRbzlF",
+        "moduleName": "ZappOfframp",
+        "genericSig": "<τ_0_0 where τ_0_0 : ZappOfframp.AppleReclaimStatus>",
+        "sugared_genericSig": "<__Sealed where __Sealed : ZappOfframp.AppleReclaimStatus>",
+        "declAttributes": [
+          "AccessControl",
+          "DisfavoredOverload"
+        ],
+        "funcSelfKind": "NonMutating"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "ZappOfframp",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Function",
+        "name": "onEnum",
+        "printedName": "onEnum(of:)",
+        "children": [
+          {
+            "kind": "TypeNominal",
+            "name": "__Sealed",
             "printedName": "ZappOfframp.Skie.OfframpLib.FundingOutcome.__Sealed",
             "usr": "s:11ZappOfframp4SkieO0B3LibO14FundingOutcomeO8__SealedO"
           },
@@ -73027,6 +73609,273 @@
         "usr": "c:objc(cs)ZappOfframpApplePeerCashOutClientCompanion",
         "moduleName": "ZappOfframp",
         "objc_name": "ZappOfframpApplePeerCashOutClientCompanion",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "isFromExtension": true,
+        "superclassUsr": "c:objc(cs)ZappOfframpBase",
+        "isExternal": true,
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ZappOfframp.KotlinBase",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AppleReputationClient",
+        "printedName": "AppleReputationClient",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "summary",
+            "printedName": "summary(currencyCode:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AppleReputationSummary",
+                "printedName": "ZappOfframp.AppleReputationSummary",
+                "usr": "c:objc(cs)ZappOfframpAppleReputationSummary"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So32ZappOfframpAppleReputationClientC0aB0E7summary12currencyCodeSo0abcD7SummaryCSS_tYaKF",
+            "mangledName": "$sSo32ZappOfframpAppleReputationClientC0aB0E7summary12currencyCodeSo0abcD7SummaryCSS_tYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:objc(cs)ZappOfframpAppleReputationClient",
+        "moduleName": "ZappOfframp",
+        "objc_name": "ZappOfframpAppleReputationClient",
+        "declAttributes": [
+          "ObjC",
+          "Dynamic"
+        ],
+        "superclassUsr": "c:objc(cs)ZappOfframpBase",
+        "isExternal": true,
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "ZappOfframp.KotlinBase",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Companion",
+        "printedName": "Companion",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "create",
+            "printedName": "create(account:reclaimAppId:reclaimAppSecret:reclaimReturnUrl:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AppleReputationClient",
+                "printedName": "ZappOfframp.AppleReputationClient",
+                "usr": "c:objc(cs)ZappOfframpAppleReputationClient"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AppleBaseAccount",
+                "printedName": "ZappOfframp.AppleBaseAccount",
+                "usr": "c:objc(cs)ZappOfframpAppleBaseAccount"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:So41ZappOfframpAppleReputationClientCompanionC0aB0E6create7account12reclaimAppId0iJ6Secret0I9ReturnUrlSo0abcdE0CSo0abC11BaseAccountC_S3StYaKF",
+            "mangledName": "$sSo41ZappOfframpAppleReputationClientCompanionC0aB0E6create7account12reclaimAppId0iJ6Secret0I9ReturnUrlSo0abcdE0CSo0abC11BaseAccountC_S3StYaKF",
+            "moduleName": "ZappOfframp",
+            "intro_Macosx": "10.15",
+            "intro_iOS": "13",
+            "intro_tvOS": "13",
+            "intro_watchOS": "6",
+            "declAttributes": [
+              "AccessControl",
+              "Available",
+              "Available",
+              "Available",
+              "Available"
+            ],
+            "isFromExtension": true,
+            "throwing": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:objc(cs)ZappOfframpAppleReputationClientCompanion",
+        "moduleName": "ZappOfframp",
+        "objc_name": "ZappOfframpAppleReputationClientCompanion",
         "declAttributes": [
           "ObjC",
           "Dynamic"

@@ -465,8 +465,12 @@ struct Onramp {
                 return .merge(
                     cancelEffects(),
                     .run { send in
-                        do { try await onramp.clearCheckpoint(); await send(.onAppear) }
-                        catch { await send(.loadFailed(error.localizedDescription)) }
+                        do {
+                            try await onramp.clearCheckpoint()
+                            // Recovery bypasses the gate only for the saved purchase. Starting
+                            // another order must check reputation again after that purchase ends.
+                            await send(.delegate(.restartBuy))
+                        } catch { await send(.loadFailed(error.localizedDescription)) }
                     }
                 )
 
@@ -608,6 +612,9 @@ struct Onramp {
                 state.isRecheckingOrder = true
                 state.errorMessage = nil
                 return statusEffect { try await onramp.resume() }
+
+            case .limitInfoTapped:
+                return .send(.delegate(.openReputation))
 
             case .infoTapped:
                 state.isInfoPresented = true
