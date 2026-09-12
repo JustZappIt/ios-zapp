@@ -62,7 +62,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
-- [ONBOARDING] The welcome screen leads with your money and messages, labels wallet import as “I already have a wallet,” and keeps its button-panel border clear of rounded display corners.
+- [ONBOARDING] The welcome screen uses the Zapp logo as a crisp vector, leads with your money and messages, labels wallet import as “I already have a wallet,” and keeps its button-panel border clear of rounded display corners.
 - [PORTFOLIO-CHART] Portfolio Chart now uses a distinct stacked-layers icon in You settings.
 - [CONTACTS] Add Contact now has a contact preview, clearly labeled details, a single ZEC address field, and Save and Back actions at the bottom. Contacts also places Back at the bottom, with no duplicate top navigation.
 - [APP-LOCK] The PIN/Biometric selector is taller, with a sliding orange highlight and a steady layout as descriptions fade between methods. Save Changes stays disabled until you select a different method.

@@ -278,10 +278,11 @@ private struct ZappWelcomeGateView: View {
                         Spacer(minLength: 24)
 
                         HStack(spacing: 12) {
-                            Text("Z")
-                                .zappFont(.displaySecondary, style: ZappColors.onAccent)
+                            Asset.Assets.zappWelcomeLogo.image
+                                .resizable()
+                                .scaledToFit()
                                 .frame(width: 40, height: 40)
-                                .background(ZappColors.accent.color(colorScheme))
+                                .accessibilityHidden(true)
 
                             Text("Zapp")
                                 .zappFont(.screenTitle, style: ZappColors.text)
