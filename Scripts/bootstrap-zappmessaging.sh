@@ -29,14 +29,10 @@ else
   echo "    Not switching branches for you — check out the pin yourself if they differ."
 fi
 
-# `link` + `build` = `npm run setup` minus its leading `npm install`. Both halves
-# are required: worklet.bundle names every addon by exact version, so `link` alone
+# `link` + `build` = `npm run setup` with `npm ci` in place of its leading
+# `npm install`, so the install matches the lockfile exactly. Both halves are
+# required: worklet.bundle names every addon by exact version, so `link` alone
 # fails at RUNTIME with "No addon registered", never at build time.
-#
-# `npm install` is skipped on purpose. `npm ci` already installed exactly the
-# lockfile, and the SDK's committed package-lock.json is missing an `engines` block
-# that `npm install` writes back, dirtying the checkout and tripping
-# Scripts/validate-zappmessaging-artifacts.sh. Drop this once the SDK repins its lock.
 echo "==> assembling the 15 addon xcframeworks + packing worklet.bundle"
 ( cd "$SIBLING" && npm ci && npm run link && npm run build )
 
