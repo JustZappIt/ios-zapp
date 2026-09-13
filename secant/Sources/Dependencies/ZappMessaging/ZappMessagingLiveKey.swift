@@ -704,9 +704,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
             }
             .store(in: &cancellables)
 
-        // The SDK currently mirrors the core's transfer event into both its transfer and
-        // download publishers. Subscribe once so every core update reaches the UI once.
-        sdk.mediaTransferProgress
+        sdk.mediaDownloadProgress
             .receive(on: mainQueue)
             .sink { [weak self] progress in self?.mediaProgressSubject.send(progress) }
             .store(in: &cancellables)
@@ -804,6 +802,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     }
 
     private func recordFailure(_ operation: ZappMessagingOperation, _ error: Error) {
+        // An SDK call awaited by a cancelled task now throws immediately instead of
+        // waiting out the IPC timeout. The caller went away; there is nothing to report.
+        guard !(error is CancellationError) else { return }
         let nsError = error as NSError
         recordFailure(operation, code: ZappMessagingFailureCode(error: error), message: nsError.localizedDescription)
     }
