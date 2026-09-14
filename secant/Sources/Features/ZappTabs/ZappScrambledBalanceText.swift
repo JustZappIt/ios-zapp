@@ -32,12 +32,15 @@ enum ZappBalanceScramble {
 
 /// Only visibility changes scramble; initial rendering and live balance updates settle immediately.
 /// The task identity cancels old frames on rapid taps, currency changes, and disappearance.
+///
+/// Deliberately not gated on `accessibilityReduceMotion` — swapping glyphs in place is not the
+/// vestibular motion it suppresses, and gating it killed the effect outright. That setting still
+/// suppresses the one real movement here, the numeric tween on a balance change.
 struct ZappScrambledBalanceText: View {
     private struct Input: Equatable {
         let clear: String
         let hidden: String
         let isHidden: Bool
-        let reduceMotion: Bool
     }
 
     @Environment(\.accessibilityReduceMotion)
@@ -64,14 +67,14 @@ struct ZappScrambledBalanceText: View {
             // Never announce transient glyphs or a partly masked amount as hidden content.
             .accessibilityLabel(settledText)
             .transaction {
-                if isHidden || frame != nil || reduceMotion { $0.animation = nil }
+                if isHidden || frame != nil || isTransitionPending { $0.animation = nil }
             }
             .task(id: input) {
                 let visibilityChanged = previousHidden != isHidden
                 previousHidden = isHidden
                 frame = nil
                 animationInput = input
-                guard visibilityChanged, !reduceMotion else { return }
+                guard visibilityChanged else { return }
 
                 for index in 0..<ZappBalanceScramble.frameCount {
                     guard !Task.isCancelled else { return }
@@ -87,14 +90,22 @@ struct ZappScrambledBalanceText: View {
     }
 
     private var input: Input {
-        Input(clear: clearText, hidden: hiddenText, isHidden: isHidden, reduceMotion: reduceMotion)
+        Input(clear: clearText, hidden: hiddenText, isHidden: isHidden)
     }
 
     private var settledText: String { isHidden ? hiddenText : clearText }
 
+    private var isTransitionPending: Bool { previousHidden != isHidden }
+
     private var displayedText: String {
+        // `.task` starts a tick after the render that changed its id, so the flip's own frame has
+        // no scramble frame yet; settling here makes the whole animation read as a snap.
+        if isTransitionPending {
+            return ZappBalanceScramble.frame(clearText, index: 0, revealing: !isHidden)
+        }
+
         // New inputs must never reuse a frame from an old value or visibility state.
-        guard animationInput == input, let frame, !reduceMotion else { return settledText }
+        guard animationInput == input, let frame else { return settledText }
         return ZappBalanceScramble.frame(clearText, index: frame, revealing: !isHidden)
     }
 }

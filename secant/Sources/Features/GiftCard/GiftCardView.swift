@@ -5,8 +5,14 @@ import SwiftUI
 @preconcurrency import ZcashLightClientKit
 
 struct GiftCardView: View {
+    private enum Field: Hashable {
+        case amount
+        case message
+    }
+
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
+    @FocusState private var focusedField: Field?
 
     @Perception.Bindable var store: StoreOf<GiftCard>
 
@@ -143,6 +149,7 @@ struct GiftCardView: View {
                     .zappFont(.displaySecondary, style: ZappColors.textMuted)
 
                 TextField("0", text: $store.amountInput)
+                    .focused($focusedField, equals: .amount)
                     .keyboardType(.decimalPad)
                     .textFieldStyle(.plain)
                     .zappFont(.display, style: ZappColors.text)
@@ -158,6 +165,7 @@ struct GiftCardView: View {
                 }
             }
             .padding(.vertical, 4)
+            .zappFieldTapTarget($focusedField, equals: .amount)
 
             Rectangle()
                 .fill(
@@ -202,6 +210,7 @@ struct GiftCardView: View {
             }
 
             TextField(String(localizable: .giftCardMessagePlaceholder), text: $store.message, axis: .vertical)
+                .focused($focusedField, equals: .message)
                 // Starts at one line and grows to four. It opens empty and is optional, so
                 // reserving two lines up front left a tall box under a mostly-unused field.
                 .lineLimit(1...4)
@@ -220,6 +229,7 @@ struct GiftCardView: View {
                     )
                 )
                 .accessibilityLabel(String(localizable: .giftCardMessageLabel))
+                .zappFieldTapTarget($focusedField, equals: .message)
 
             if store.isMessageTooLong {
                 Text(String(localizable: .giftCardMessageErrorTooLong))

@@ -4,7 +4,13 @@ import ComposableArchitecture
 import SwiftUI
 
 struct OfframpView: View {
+    private enum Field: Hashable {
+        case fiatAmount
+        case topUpAmount
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var focusedField: Field?
     @Perception.Bindable var store: StoreOf<Offramp>
     @State private var isPaymentInfoPresented = false
     @State private var isTopUpInfoPresented = false
@@ -258,12 +264,14 @@ struct OfframpView: View {
                     get: { store.fiatAmount },
                     set: { store.send(.fiatAmountChanged($0)) }
                 ))
+                .focused($focusedField, equals: .fiatAmount)
                 .keyboardType(.decimalPad)
                 .textFieldStyle(.plain)
                 .multilineTextAlignment(.leading)
                 .zappFont(amountStyle, style: ZappColors.text)
             }
             .padding(.vertical, 4)
+            .zappFieldTapTarget($focusedField, equals: .fiatAmount)
 
             Rectangle()
                 .fill(store.errorMessage == nil
@@ -364,12 +372,14 @@ struct OfframpView: View {
                                 : "USDC")
                                 .zappFont(amountStyle, style: ZappColors.text)
                             TextField("0", text: topUpAmountBinding)
+                                .focused($focusedField, equals: .topUpAmount)
                                 .keyboardType(.decimalPad)
                                 .textFieldStyle(.plain)
                                 .multilineTextAlignment(.leading)
                                 .zappFont(amountStyle, style: ZappColors.text)
                         }
                         .padding(.vertical, 4)
+                        .zappFieldTapTarget($focusedField, equals: .topUpAmount)
 
                         Rectangle()
                             .fill(store.isTopUpAmountInsufficient

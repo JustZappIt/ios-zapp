@@ -11,6 +11,7 @@ import ComposableArchitecture
 
 struct TransactionsManagerView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isSearchFocused: Bool
 
     enum Constants {
         static let horizontalPadding: CGFloat = 18
@@ -153,6 +154,7 @@ struct TransactionsManagerView: View {
                 }
 
                 TextField("", text: $store.searchTerm)
+                    .focused($isSearchFocused)
                     .zappFont(.body, style: ZappColors.text)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
@@ -175,6 +177,7 @@ struct TransactionsManagerView: View {
             Rectangle()
                 .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         }
+        .zappFieldTapTarget($isSearchFocused)
     }
 
     @ViewBuilder func filterButton() -> some View {

@@ -406,7 +406,6 @@ private struct ChatRoomInputRow: View {
 
     private enum Constants {
         static let inputHorizontalPadding: CGFloat = 12
-        /// 8, not 10: 28pt of GIF button plus 16 keeps the box on the same 44 as before.
         static let inputVerticalPadding: CGFloat = 8
         static let sendIconSize: CGFloat = 24
         static let minHeight: CGFloat = 44
@@ -496,6 +495,9 @@ private struct ChatRoomInputRow: View {
                 .disabled(!isMediaEnabled)
                 .opacity(isMediaEnabled ? 1 : Constants.disabledOpacity)
                 .accessibilityLabel(String(localizable: .chatRoomSendGif))
+                // The glyph's tap target is taller than a line of text; left to set the
+                // bottom-aligned row's height it drags the whole box down. Overflow is fine.
+                .frame(height: ChatComposerTextView.lineHeight)
             }
         }
         .padding(.horizontal, Constants.inputHorizontalPadding)

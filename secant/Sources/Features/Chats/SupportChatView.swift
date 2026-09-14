@@ -357,6 +357,7 @@ private struct SupportComposer: View {
                 .padding(.vertical, Constants.inputVerticalPadding)
                 .frame(minHeight: Constants.minHeight)
                 .background(ZappColors.surfaceInput.color(colorScheme))
+                .zappFieldTapTarget(isFocused)
 
             Button(action: onSend) {
                 Text(String(localizable: .chatRoomSend))

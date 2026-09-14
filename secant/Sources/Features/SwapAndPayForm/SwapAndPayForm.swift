@@ -124,6 +124,7 @@ struct SwapAndPayForm: View {
             .padding(Design.Spacing._md)
             .frame(minHeight: Constants.addressMinHeight)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($isAddressFocused)
             .id(InputID.addressBookHint)
             .anchorPreference(
                 key: UnknownAddressPreferenceKey.self,

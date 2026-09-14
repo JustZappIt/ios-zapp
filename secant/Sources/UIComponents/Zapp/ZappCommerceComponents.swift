@@ -138,6 +138,7 @@ struct ZappFieldBalance: Equatable {
 
 struct ZappAmountHero: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isAmountFocused: Bool
 
     let label: String
     let symbol: String
@@ -155,6 +156,7 @@ struct ZappAmountHero: View {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(symbol).zappFont(.screenTitle, style: ZappColors.textMuted)
                     TextField("", text: Binding(get: { amount }, set: onChange))
+                        .focused($isAmountFocused)
                         .keyboardType(.decimalPad)
                         .zappFont(.screenTitle, style: ZappColors.text)
                         .disabled(!isEnabled)
@@ -178,5 +180,6 @@ struct ZappAmountHero: View {
         .padding(16)
         .background(ZappColors.surface.color(colorScheme))
         .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
+        .zappFieldTapTarget($isAmountFocused)
     }
 }

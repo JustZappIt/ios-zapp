@@ -25,6 +25,7 @@ enum ZappInputFieldConstants {
 
 struct ZappInputField<Leading: View, Trailing: View>: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isFocused: Bool
 
     private typealias Constants = ZappInputFieldConstants
 
@@ -61,6 +62,7 @@ struct ZappInputField<Leading: View, Trailing: View>: View {
                 lineWidth: text.isEmpty ? Constants.emptyBorderWidth : Constants.filledBorderWidth
             )
         }
+        .zappFieldTapTarget($isFocused)
     }
 
     /// The placeholder is drawn rather than handed to `TextField`, which offers no token-level
@@ -75,6 +77,7 @@ struct ZappInputField<Leading: View, Trailing: View>: View {
             }
 
             TextField("", text: $text)
+                .focused($isFocused)
                 .textFieldStyle(.plain)
                 .zappFont(isVerbatim ? .mono : .body, style: ZappColors.text)
                 .tint(ZappColors.accent.color(colorScheme))

@@ -8,6 +8,7 @@ import SwiftUI
 
 struct GroupInfoView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isNameFocused: Bool
 
     @Perception.Bindable var store: StoreOf<GroupInfo>
 
@@ -100,10 +101,12 @@ struct GroupInfoView: View {
                     set: { store.send(.nameDraftChanged($0)) }
                 )
             )
+            .focused($isNameFocused)
             .zappFont(.body, style: ZappColors.text)
             .autocorrectionDisabled()
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($isNameFocused)
 
             HStack(spacing: Design.Spacing._md) {
                 ZappButton(title: String(localizable: .generalCancel), variant: .ghost) {

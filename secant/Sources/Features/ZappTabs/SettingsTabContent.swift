@@ -11,14 +11,11 @@ import SwiftUI
 /// App lock routes into the existing `SecuritySettings` feature (verify current PIN/bio, then
 /// change PIN / switch auth method), matching Android's Security group.
 ///
-/// `allSettings` is iOS's route to the address book, advanced settings, about,
-/// feedback and voting. Keeping it here preserves those working surfaces without
-/// editing upstream's Settings reducer.
-///
-/// The groups are separate properties because six of them in one `body` exceeds the SwiftUI
+/// The groups are separate properties because five of them in one `body` exceeds the SwiftUI
 /// type-checker's budget.
 struct SettingsTabContent: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Dependency(\.appVersion) private var appVersion
 
     @Perception.Bindable var store: StoreOf<ZappTabs>
     @Perception.Bindable var chatProfileStore: StoreOf<ChatProfile>
@@ -27,6 +24,12 @@ struct SettingsTabContent: View {
     var displayName: String?
 
     @State private var enlargedPublicKey: String?
+
+    private enum Constants {
+        static let logoSize: CGFloat = 41
+        static let wordmarkWidth: CGFloat = 73
+        static let wordmarkHeight: CGFloat = 20
+    }
 
     var body: some View {
         WithPerceptionTracking {
@@ -59,12 +62,13 @@ struct SettingsTabContent: View {
 
                         walletGroup
 
-                        moreGroup
+                        footer
                     }
                     .padding(.bottom, ZappNavBar.clearance)
                     .zappScrollShadowSource()
                 }
-                .zappScrollEdges()
+                // Bottom only: this tab's header is opaque, so a top ramp just hazes the profile code.
+                .zappScrollEdges([.bottom])
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
@@ -226,18 +230,38 @@ struct SettingsTabContent: View {
         }
     }
 
-    @ViewBuilder private var moreGroup: some View {
-        ZappSettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
-            ZappRow(
-                title: String(localizable: .settingsYouAllSettingsTitle),
-                subtitle: String(localizable: .settingsYouAllSettingsSubtitle),
-                icon: Asset.Assets.Icons.settings.image,
-                iconTint: .accentText,
-                iconBackground: .accentSoft
-            ) {
-                store.send(.allSettingsTapped)
-            }
+    // Hidden, not deleted: Android's You tab has no "All settings" door. `.allSettingsTapped`
+    // and its Root route stay wired, so uncommenting restores it.
+    // @ViewBuilder private var moreGroup: some View {
+    //     ZappSettingsGroup(title: String(localizable: .settingsYouGroupMore)) {
+    //         ZappRow(
+    //             title: String(localizable: .settingsYouAllSettingsTitle),
+    //             subtitle: String(localizable: .settingsYouAllSettingsSubtitle),
+    //             icon: Asset.Assets.Icons.settings.image,
+    //             iconTint: .accentText,
+    //             iconBackground: .accentSoft
+    //         ) {
+    //             store.send(.allSettingsTapped)
+    //         }
+    //     }
+    // }
+
+    private var footer: some View {
+        VStack(spacing: 0) {
+            Asset.Assets.zashiLogo.image
+                .zImage(width: Constants.logoSize, height: Constants.logoSize, style: ZappColors.text)
+                .padding(.bottom, Design.Spacing._sm)
+
+            Asset.Assets.zashiTitle.image
+                .zImage(width: Constants.wordmarkWidth, height: Constants.wordmarkHeight, style: ZappColors.text)
+                .padding(.bottom, Design.Spacing._xl)
+
+            Text(localizable: .settingsVersion(appVersion.appVersion(), appVersion.appBuild()))
+                .zappFont(.caption, style: ZappColors.textSubtle)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.top, Design.Spacing._4xl)
+        .accessibilityElement(children: .combine)
     }
 
     private var copyKeyTitle: String {

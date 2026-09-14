@@ -58,6 +58,7 @@ struct MessageEditorView: View {
                         .padding(.bottom, 10)
                         .colorBackground(Design.Inputs.Default.bg.color(colorScheme))
                         .cornerRadius(0)
+                        .zappFieldTapTarget($isFocused)
                         .overlay {
                             if store.text.isEmpty {
                                 HStack {

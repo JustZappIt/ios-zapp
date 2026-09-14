@@ -38,6 +38,7 @@ struct AddressBookContactView: View {
                         isMono: true
                     )
                     .focused($isAddressFocused)
+                    .zappFieldTapTarget($isAddressFocused)
                     .accessibilityIdentifier(AccessibilityID.AddressBookContact.walletAddressField)
 
                     field(
@@ -48,6 +49,7 @@ struct AddressBookContactView: View {
                         isMono: false
                     )
                     .focused($isNameFocused)
+                    .zappFieldTapTarget($isNameFocused)
                     .accessibilityIdentifier(AccessibilityID.AddressBookContact.contactNameField)
 
                     if store.context != .send || store.isEditingContactWithChain {

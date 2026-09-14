@@ -11,6 +11,7 @@ import ComposableArchitecture
 
 struct ServerSetupView: View {
     @Environment(\.colorScheme) var colorScheme
+    @FocusState private var isCustomServerFocused: Bool
 
     var customDismiss: (() -> Void)? = nil
 
@@ -140,6 +141,7 @@ struct ServerSetupView: View {
                         String(localizable: .serverSetupPlaceholder),
                         text: $store.customServer
                     )
+                    .focused($isCustomServerFocused)
                     .zappFont(.mono, style: ZappColors.text)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -150,6 +152,7 @@ struct ServerSetupView: View {
                         Rectangle()
                             .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
                     )
+                    .zappFieldTapTarget($isCustomServerFocused)
                     .padding(.horizontal, Design.Spacing._2xl)
                     .padding(.bottom, Design.Spacing._md)
                 }

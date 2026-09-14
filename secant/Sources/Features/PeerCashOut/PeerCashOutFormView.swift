@@ -4,7 +4,13 @@ import ComposableArchitecture
 import SwiftUI
 
 struct PeerCashOutFormView: View {
+    private enum Field: Hashable {
+        case amount
+        case handle
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var focusedField: Field?
 
     @Perception.Bindable var store: StoreOf<PeerCashOutForm>
 
@@ -70,6 +76,7 @@ struct PeerCashOutFormView: View {
                     get: { store.amountInput },
                     set: { store.send(.amountChanged($0)) }
                 ))
+                .focused($focusedField, equals: .amount)
                 .keyboardType(.decimalPad)
                 .textFieldStyle(.plain)
                 .zappFont(.display, style: ZappColors.text)
@@ -78,6 +85,7 @@ struct PeerCashOutFormView: View {
                 balanceReadout
             }
             .padding(.vertical, 4)
+            .zappFieldTapTarget($focusedField, equals: .amount)
 
             Rectangle()
                 .fill(
@@ -134,6 +142,7 @@ struct PeerCashOutFormView: View {
                 get: { store.handleInput },
                 set: { store.send(.handleChanged($0)) }
             ))
+            .focused($focusedField, equals: .handle)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .textFieldStyle(.plain)
@@ -151,6 +160,7 @@ struct PeerCashOutFormView: View {
                 )
             )
             .accessibilityLabel(String(localizable: .peerFormHandleLabel))
+            .zappFieldTapTarget($focusedField, equals: .handle)
 
             if let error = store.handleError {
                 Text(error).zappFont(.caption, style: ZappColors.danger)

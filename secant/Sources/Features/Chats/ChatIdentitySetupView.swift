@@ -15,6 +15,7 @@ import SwiftUI
 /// floating nav pill never covers the CTA. On `.ready` it renders nothing; Root swaps the tab.
 struct ChatIdentitySetupView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isNameFocused: Bool
 
     private enum Constants {
         static let horizontalPadding: CGFloat = 18
@@ -92,6 +93,7 @@ struct ChatIdentitySetupView: View {
                 set: { store.send(.displayNameChanged($0)) }
             )
         )
+        .focused($isNameFocused)
         .zappFont(.body, style: ZappColors.text)
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled()
@@ -104,6 +106,7 @@ struct ChatIdentitySetupView: View {
             Rectangle()
                 .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         )
+        .zappFieldTapTarget($isNameFocused)
     }
 
     private var failure: some View {

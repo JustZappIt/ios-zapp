@@ -15,6 +15,7 @@ struct ZappSearchField: View {
     }
 
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isFocused: Bool
 
     let placeholder: String
 
@@ -28,6 +29,7 @@ struct ZappSearchField: View {
                 .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.textSubtle)
 
             TextField(placeholder, text: $text)
+                .focused($isFocused)
                 .zappFont(.body, style: ZappColors.text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -52,5 +54,6 @@ struct ZappSearchField: View {
             Rectangle()
                 .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         }
+        .zappFieldTapTarget($isFocused)
     }
 }

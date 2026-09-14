@@ -37,6 +37,7 @@ struct ChatProfileEditNameDialog: View {
             .disabled(editName.isSaving)
             .padding(Design.Spacing._lg)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($isFieldFocused)
 
             Text(String(localizable: .chatProfileDisplayNameHint))
                 .zappFont(.caption, style: ZappColors.textMuted)
