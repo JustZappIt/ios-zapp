@@ -34,6 +34,7 @@ struct ZappSwapAssetPickerSheet: View {
     }
 
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isSearchFocused: Bool
 
     @Perception.Bindable var store: StoreOf<SwapAndPay>
     let zecRow: ZecRow?
@@ -75,6 +76,7 @@ struct ZappSwapAssetPickerSheet: View {
                         .zImage(width: 18, height: 18, style: ZappColors.textMuted)
 
                     TextField(String(localizable: .swapAndPaySearch), text: $store.searchTerm)
+                        .focused($isSearchFocused)
                         .zappFont(.body, style: ZappColors.text)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -91,6 +93,7 @@ struct ZappSwapAssetPickerSheet: View {
                 }
                 .padding(Design.Spacing._lg)
                 .background(ZappColors.surfaceInput.color(colorScheme))
+                .zappFieldTapTarget($isSearchFocused)
                 .padding(.horizontal, Design.Spacing._2xl)
                 .padding(.bottom, Design.Spacing._2xl)
 

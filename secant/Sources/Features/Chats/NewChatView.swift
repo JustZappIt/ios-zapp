@@ -7,7 +7,14 @@ import ComposableArchitecture
 import SwiftUI
 
 struct NewChatView: View {
+    private enum Field: Hashable {
+        case search
+        case name
+        case groupName
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var focusedField: Field?
 
     @Perception.Bindable var store: StoreOf<NewChat>
 
@@ -151,6 +158,7 @@ struct NewChatView: View {
                     set: { store.send(.peerKeyChanged($0)) }
                 )
             )
+            .focused($focusedField, equals: .search)
             .zappFont(.body, style: ZappColors.text)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
@@ -176,6 +184,7 @@ struct NewChatView: View {
                     lineWidth: store.searchInput.isEmpty ? 1 : 2
                 )
         }
+        .zappFieldTapTarget($focusedField, equals: .search)
     }
 
     private var clearButton: some View {
@@ -237,11 +246,13 @@ struct NewChatView: View {
                     set: { store.send(.displayNameChanged($0)) }
                 )
             )
+            .focused($focusedField, equals: .name)
             .zappFont(.body, style: ZappColors.text)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($focusedField, equals: .name)
         }
     }
 
@@ -256,10 +267,12 @@ struct NewChatView: View {
                     set: { store.send(.groupNameChanged($0)) }
                 )
             )
+            .focused($focusedField, equals: .groupName)
             .zappFont(.body, style: ZappColors.text)
             .autocorrectionDisabled()
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($focusedField, equals: .groupName)
         }
     }
 

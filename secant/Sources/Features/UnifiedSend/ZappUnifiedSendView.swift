@@ -301,6 +301,7 @@ private extension UnifiedSendContent {
             }
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($isAddressFocused)
             .id(InputID.addressBookHint)
             .anchorPreference(key: UnknownAddressPreferenceKey.self, value: .bounds) { $0 }
 
@@ -436,6 +437,7 @@ private extension UnifiedSendContent {
                             lineWidth: 1
                         )
                 )
+                .zappFieldTapTarget($isAmountFocused)
 
                 if isAmountSwapAvailable {
                     Button {

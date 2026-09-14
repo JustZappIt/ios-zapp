@@ -3,6 +3,7 @@ import ComposableArchitecture
 
 struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
+    @FocusState private var focusedSheetField: SheetField?
 
     private enum Constants {
         static let logoSize: CGFloat = 41
@@ -252,7 +253,8 @@ struct SettingsView: View {
             sheetField(
                 title: String(localizable: .recoverFundsFieldTitle),
                 placeholder: String(localizable: .recoverFundsPlaceholder),
-                text: $store.addressToRecoverFunds
+                text: $store.addressToRecoverFunds,
+                field: .recoverAddress
             )
             .padding(.bottom, Design.Spacing._4xl)
 
@@ -322,7 +324,8 @@ struct SettingsView: View {
             sheetField(
                 title: String(localizable: .enhanceTransactionFieldTitle),
                 placeholder: String(localizable: .enhanceTransactionPlaceholder),
-                text: $store.txidToEnhance
+                text: $store.txidToEnhance,
+                field: .txid
             )
             .padding(.bottom, Design.Spacing._4xl)
 
@@ -336,21 +339,29 @@ struct SettingsView: View {
         }
     }
 
+    private enum SheetField: Hashable {
+        case recoverAddress
+        case txid
+    }
+
     @ViewBuilder private func sheetField(
         title: String,
         placeholder: String,
-        text: Binding<String>
+        text: Binding<String>,
+        field: SheetField
     ) -> some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             ZappSectionLabel(text: title)
 
             TextField(placeholder, text: text, axis: .vertical)
+                .focused($focusedSheetField, equals: field)
                 .zappFont(.mono, style: ZappColors.text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .lineLimit(2, reservesSpace: true)
                 .padding(Design.Spacing._lg)
                 .background(ZappColors.surfaceInput.color(colorScheme))
+                .zappFieldTapTarget($focusedSheetField, equals: field)
         }
     }
 }

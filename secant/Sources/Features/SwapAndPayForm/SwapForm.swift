@@ -354,6 +354,7 @@ extension SwapAndPayForm {
                     lineWidth: 1
                 )
         )
+        .zappFieldTapTarget($isAmountFocused)
     }
 
     @ViewBuilder private func switchInputButton(_ colorScheme: ColorScheme) -> some View {

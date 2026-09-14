@@ -16,7 +16,14 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ChatSplitBillSheet: View {
+    private enum Field: Hashable {
+        case total
+        case share(String)
+        case memo
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var focusedField: Field?
 
     private enum Constants {
         static let shareFieldWidth: CGFloat = 150
@@ -75,6 +82,7 @@ struct ChatSplitBillSheet: View {
                         set: { store.send(.splitTotalChanged($0)) }
                     )
                 )
+                .focused($focusedField, equals: .total)
                 .zappFont(.body, style: ZappColors.text)
                 .keyboardType(.decimalPad)
 
@@ -82,6 +90,7 @@ struct ChatSplitBillSheet: View {
             }
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($focusedField, equals: .total)
 
             if let equivalent {
                 Text(String(localizable: .chatSplitEquivalent(equivalent)))
@@ -110,6 +119,7 @@ struct ChatSplitBillSheet: View {
                                 set: { store.send(.splitShareChanged(publicKey: participant.publicKey, text: $0)) }
                             )
                         )
+                        .focused($focusedField, equals: .share(participant.publicKey))
                         .zappFont(.body, style: ZappColors.text)
                         .keyboardType(.decimalPad)
 
@@ -118,6 +128,7 @@ struct ChatSplitBillSheet: View {
                     .padding(Design.Spacing._md)
                     .background(ZappColors.surfaceInput.color(colorScheme))
                     .frame(width: Constants.shareFieldWidth)
+                    .zappFieldTapTarget($focusedField, equals: .share(participant.publicKey))
                 }
             }
         }
@@ -133,10 +144,12 @@ struct ChatSplitBillSheet: View {
                 ),
                 axis: .vertical
             )
+            .focused($focusedField, equals: .memo)
             .zappFont(.body, style: ZappColors.text)
             .lineLimit(1...3)
             .padding(Design.Spacing._md)
             .background(ZappColors.surfaceInput.color(colorScheme))
+            .zappFieldTapTarget($focusedField, equals: .memo)
         }
     }
 

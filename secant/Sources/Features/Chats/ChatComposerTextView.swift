@@ -90,6 +90,8 @@ struct ChatComposerTextView: UIViewRepresentable {
         }
     }
 
+    static var lineHeight: CGFloat { font.lineHeight }
+
     private static var font: UIFont {
         UIFont(name: FontFamily.Inter.regular.name, size: ZappTextStyle.body.size)
             ?? .systemFont(ofSize: ZappTextStyle.body.size)

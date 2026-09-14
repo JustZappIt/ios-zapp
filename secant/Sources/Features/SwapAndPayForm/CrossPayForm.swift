@@ -201,6 +201,7 @@ extension SwapAndPayForm {
                     lineWidth: 1
                 )
         )
+        .zappFieldTapTarget(focus)
     }
 
     @ViewBuilder private func payZecRow(_ colorScheme: ColorScheme) -> some View {

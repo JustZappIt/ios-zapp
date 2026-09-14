@@ -62,6 +62,9 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [ONBOARDING] Choose a username now looks like the rest of onboarding — progress bar, part numbering, hero heading — and the handle is the focus of the screen, typed large over a rule that turns orange once the name is valid, with a live character count.
+- [YOU] The You tab ends with the Zapp logo and version, and no longer lists All settings.
+- [SUPPORT] Zapp Support conversations now address a new support account.
 - [ONBOARDING] The welcome screen uses the Zapp logo as a crisp vector, leads with your money and messages, labels wallet import as “I already have a wallet,” and keeps its button-panel border clear of rounded display corners.
 - [PORTFOLIO-CHART] Portfolio Chart now uses a distinct stacked-layers icon in You settings.
 - [CONTACTS] Add Contact now has a contact preview, clearly labeled details, a single ZEC address field, and Save and Back actions at the bottom. Contacts also places Back at the bottom, with no duplicate top navigation.
@@ -107,6 +110,10 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [INPUTS] Tapping anywhere inside a text field's box now puts the cursor in it. Only the line of text itself used to respond, so taps on the surrounding padding — most of the box — did nothing, and fields felt like they only worked in the middle. Affects every form in the app, including Choose a username, send and swap amounts and addresses, contacts, search fields, gift card messages, cash-out, and the support composer.
+- [BALANCE-PRIVACY] The balance scrambling animation now plays for everyone. It was skipped entirely when Reduce Motion was turned on, so hiding or revealing your balance just snapped.
+- [CHATS] Text in the message box now sits on the centre line of the box instead of slightly below it.
+- [YOU] The profile QR code is no longer washed out along its top edge.
 - [ZPACKET] The ZEC amount stays attached to its Zpacket card during flips, flourishes, and settling animations.
 - [CONTACTS] Swipe from the left edge to go back from the Add or Edit Contact sheet.
 - [P2P] First-time buyers with no reputation now reach verification, and a failed limit check offers a retry instead of skipping verification. Existing purchases remain recoverable if buying becomes restricted. Returning verification links require confirmation before linking an account, privacy disclosures explain public proof data, and retries keep the correct session and verified status.

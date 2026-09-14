@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ZashiTextField<PrefixContent, InputReplacementContent, AccessoryContent>: View where PrefixContent: View, InputReplacementContent: View, AccessoryContent: View {
     @Environment(\.colorScheme) private var colorScheme
+    @FocusState private var isBoxFocused: Bool
 
     let addressFont: Bool
     var text: Binding<String>
@@ -93,6 +94,7 @@ struct ZashiTextField<PrefixContent, InputReplacementContent, AccessoryContent>:
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .accentColor(Asset.Colors.primary.color)
+                    .focused($isBoxFocused)
                     if let inputAccessibilityIdentifier {
                         field.accessibilityIdentifier(inputAccessibilityIdentifier)
                     } else {
@@ -118,6 +120,7 @@ struct ZashiTextField<PrefixContent, InputReplacementContent, AccessoryContent>:
             }
             .padding(.vertical, (inputReplacementView is EmptyView || inputReplacementView == nil) ? 12 : 8)
             .padding(.horizontal, 12)
+            .zappFieldTapTarget($isBoxFocused)
             .background(
                 RoundedRectangle(cornerRadius: Design.Radius._lg)
                     .fill(Design.Inputs.Default.bg.color(colorScheme))

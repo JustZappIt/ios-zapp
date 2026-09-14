@@ -48,9 +48,10 @@ enum SupportCategory: String, CaseIterable, Equatable, Sendable {
 }
 
 enum SupportChatConstants {
-    /// The Zapp support agent's Ed25519 public key. Identical to Android's
-    /// `SupportChatConstants.SUPPORT_PUBLIC_KEY` — the two platforms must address the same agent.
-    static let supportPublicKey = "20dae657c99f8504b4ce052a39b2a6bf3b54023cb56ee2245d9904e4ee0f0c48"
+    /// The Zapp support agent's Ed25519 public key. Android's
+    /// `SupportChatConstants.SUPPORT_PUBLIC_KEY` must be moved to match: a ticket addresses whatever
+    /// key its platform holds, so the two diverging sends iOS and Android users to different agents.
+    static let supportPublicKey = "81569106f5847498229b00103bd300ac2f4c93c8234e7e2c27c8de5a9b5574bf"
 
     /// Prefix set on every support-ticket conversation's display name. It is sent over the wire as
     /// part of the group invite so it lands on both peers; the support agent's device depends on

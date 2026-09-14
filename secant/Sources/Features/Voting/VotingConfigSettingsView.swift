@@ -499,6 +499,7 @@ private var bottomBar: some View {
                         }
                     }
             }
+            .zappFieldTapTarget($focusedSourceField, equals: focusField)
 
             if let error {
                 Text(error)

@@ -32,6 +32,7 @@ extension TransactionDetailsView {
                         Rectangle()
                             .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
                     }
+                    .zappFieldTapTarget($isAnnotationFocused)
                     .overlay(alignment: .topLeading) {
                         if store.annotationToInput.isEmpty {
                             Text(localizable: .annotationPlaceholder)
