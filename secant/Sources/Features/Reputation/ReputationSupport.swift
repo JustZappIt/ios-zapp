@@ -27,4 +27,17 @@ enum ReputationCopy {
         case .network, .unknown: return String(localizable: .increaseReputationErrorNetwork)
         }
     }
+
+    static func livenessFailureMessage(_ failure: LivenessFailureModel) -> String {
+        switch failure {
+        case .notConfigured: return String(localizable: .increaseReputationLivenessErrorUnavailable)
+        case .notLive: return String(localizable: .increaseReputationLivenessErrorNotLive)
+        case .alreadyClaimed: return String(localizable: .increaseReputationLivenessErrorAlreadyClaimed)
+        case .expired: return String(localizable: .increaseReputationLivenessErrorExpired)
+        case .rejected: return String(localizable: .increaseReputationLivenessErrorRejected)
+        case .sponsorshipUnavailable: return String(localizable: .increaseReputationErrorGas)
+        case .busy: return String(localizable: .increaseReputationErrorBusy)
+        case .cancelled, .network, .unknown: return String(localizable: .increaseReputationErrorNetwork)
+        }
+    }
 }

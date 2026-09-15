@@ -363,20 +363,278 @@ struct IncreaseReputationStoreTests {
         #expect(store.state.run == nil)
     }
 
+    // MARK: - The selfie check
+
+    @MainActor @Test func theSelfieRowFollowsTheStanding() async {
+        let unverified = LivenessStandingModel(isVerified: false, limitMicros: "0", tierCapMicros: "20000000")
+        let store = await listStore(liveness: unverified)
+        await store.send(.onAppear)
+        await store.receive(\.summaryLoaded) {
+            $0.isLoading = false
+            $0.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
+            $0.liveness = unverified
+        }
+
+        let mainnet = await listStore(liveness: nil)
+        await mainnet.send(.onAppear)
+        await mainnet.receive(\.summaryLoaded) {
+            $0.isLoading = false
+            $0.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
+        }
+        #expect(mainnet.state.liveness == nil)
+    }
+
+    @MainActor @Test func aSelfieRunFollowsTheTapNotTheDriverIntoVerifying() async throws {
+        let verified = LivenessStandingModel(isVerified: true, limitMicros: "20000000", tierCapMicros: "20000000")
+        let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
+        let nonces = LockIsolated<[String]>([])
+        let store = await selfieStore { currency, nonce, _ in
+            #expect(currency == "INR")
+            nonces.withValue { $0.append(nonce) }
+            return statuses.stream
+        }
+
+        await store.send(.selfieTapped) {
+            $0.run = selfieRun(stage: .preparing)
+        }
+        statuses.continuation.yield(.ready(widgetURL: "https://liveness.invalid/w/abc", expiresInSeconds: 600))
+        await store.receive(\.livenessStatusReceived) {
+            $0.run?.stage = .ready
+            $0.run?.launchURL = "https://liveness.invalid/w/abc"
+        }
+        // The driver says verifying at once; the screen does not follow until the browser opened.
+        statuses.continuation.yield(.verifying)
+        await store.receive(\.livenessStatusReceived)
+        #expect(store.state.run?.stage == .ready)
+
+        let id = try #require(store.state.run?.id)
+        await store.send(.verifierOpened(runID: id, accepted: false))
+        await store.send(.verifierOpened(runID: id, accepted: true)) {
+            $0.run?.isWidgetOpened = true
+            $0.run?.stage = .verifying
+            $0.lastActiveStage = .verifying
+        }
+
+        statuses.continuation.yield(.submitting)
+        await store.receive(\.livenessStatusReceived) {
+            $0.run?.stage = .submitting
+            $0.lastActiveStage = .submitting
+        }
+        statuses.continuation.yield(.done(verified))
+        await store.receive(\.livenessStatusReceived) {
+            $0.run?.stage = .done
+            $0.run?.newBuyLimitMicros = "20000000"
+            $0.summaryRevision = 1
+            $0.liveness = verified
+        }
+        statuses.continuation.finish()
+        await store.receive(\.runEnded)
+
+        #expect(nonces.value.count == 1)
+        #expect(store.state.steps.allSatisfy { $0.status == .completed })
+        #expect(store.state.steps.map(\.label).first == String(localizable: .increaseReputationLivenessStepOpen))
+    }
+
+    @MainActor @Test func aReturnWhileTheSelfieRunIsLiveIsDeliveredToIt() async {
+        let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
+        let delivered = LockIsolated<[LivenessReturnModel]>([])
+        let store = await selfieStore(verify: { _, _, _ in statuses.stream }) {
+            $0.liveness.deliverReturn = { ret in
+                delivered.withValue { $0.append(ret) }
+                return true
+            }
+            $0.liveness.resume = { _, _ in
+                Issue.record("a live run must take its own return, never a resume")
+                return LivenessStatusStream { $0.finish() }
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.selfieTapped)
+        statuses.continuation.yield(.ready(widgetURL: "https://liveness.invalid/w/abc", expiresInSeconds: 600))
+        await store.receive(\.livenessStatusReceived)
+
+        let ret = LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")
+        await store.send(.livenessReturnReceived(ret))
+        await store.finish()
+        #expect(delivered.value == [ret])
+
+        statuses.continuation.finish()
+        await store.receive(\.runEnded)
+    }
+
+    /// Opening the browser counts as done on a resume, so a failure lands on the selfie step.
+    @MainActor @Test func aReturnWithNoLiveRunIsResumed() async {
+        let resumed = LockIsolated<[LivenessReturnModel]>([])
+        let store = await selfieStore(verify: { _, _, _ in LivenessStatusStream { $0.finish() } }) {
+            $0.liveness.resume = { ret, _ in
+                resumed.withValue { $0.append(ret) }
+                return LivenessStatusStream { continuation in
+                    continuation.yield(.verifying)
+                    continuation.yield(.failed(.notLive))
+                    continuation.finish()
+                }
+            }
+        }
+        store.exhaustivity = .off
+
+        let ret = LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")
+        await store.send(.livenessReturnReceived(ret))
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.runEnded)
+
+        #expect(resumed.value == [ret])
+        #expect(store.state.run?.isSelfie == true)
+        #expect(store.state.run?.errorMessage == String(localizable: .increaseReputationLivenessErrorNotLive))
+        let steps = store.state.steps
+        #expect(steps[0].status == .completed)
+        #expect(steps[1].status == .failed)
+    }
+
+    @MainActor @Test func aReturnWhileAReclaimRunOwnsTheScreenIsIgnored() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "INR")
+        state.isLoading = false
+        state.run = run(stage: .verifying)
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.deliverReturn = { _ in Issue.record("delivered over a Reclaim run"); return false }
+            $0.liveness.resume = { _, _ in
+                Issue.record("resumed over a Reclaim run")
+                return LivenessStatusStream { $0.finish() }
+            }
+        }
+
+        await store.send(.livenessReturnReceived(LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")))
+        #expect(store.state.run?.platformID == "LinkedIn")
+    }
+
+    @MainActor @Test func cancellingInTheWidgetClearsTheRunQuietly() async {
+        let store = await selfieStore { _, _, _ in
+            LivenessStatusStream { continuation in
+                continuation.yield(.ready(widgetURL: "https://liveness.invalid/w/abc", expiresInSeconds: 600))
+                continuation.yield(.failed(.cancelled))
+                continuation.finish()
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.selfieTapped)
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.runEnded)
+
+        #expect(store.state.run == nil)
+        #expect(store.state.errorMessage == nil)
+    }
+
+    @MainActor @Test func aColdStartResumesTheReturnItWasRebuiltFromExactlyOnce() async {
+        let resumed = LockIsolated(0)
+        let ret = LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")
+        let state = IncreaseReputation.State.initial(currencyCode: "INR", resumeLivenessReturn: ret)
+        let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
+            $0.reputation.summary = { _ in
+                ReputationFixtures.summary(
+                    canBuy: false,
+                    buyLimitMicros: "0",
+                    liveness: LivenessStandingModel(isVerified: false, limitMicros: "0", tierCapMicros: "20000000")
+                )
+            }
+            $0.liveness.resume = { _, _ in
+                resumed.withValue { $0 += 1 }
+                return LivenessStatusStream { $0.finish() }
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.onAppear)
+        await store.finish()
+        #expect(resumed.value == 1)
+        #expect(store.state.resumeLivenessReturn == nil)
+        #expect(store.state.run?.isSelfie == true)
+        await store.send(.onAppear)
+        await store.finish()
+        #expect(resumed.value == 1)
+    }
+
+    /// A return that no run could take is dropped, not kept for a later appearance to replay spent.
+    @MainActor @Test func aReturnARunCannotTakeIsClearedRatherThanKept() async {
+        var state = IncreaseReputation.State.initial(
+            currencyCode: "INR",
+            resumeLivenessReturn: LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")
+        )
+        state.run = run(stage: .verifying)
+        let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
+            $0.liveness.resume = { _, _ in
+                Issue.record("a return must never be resumed over a live run")
+                return LivenessStatusStream { $0.finish() }
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.onAppear)
+        #expect(store.state.resumeLivenessReturn == nil)
+        await store.send(.dismissRunTapped)
+        await store.send(.onAppear)
+        await store.finish()
+        #expect(store.state.run == nil)
+    }
+
+    @MainActor @Test func tappingAVerifiedSelfieRowStartsNothing() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "INR")
+        state.isLoading = false
+        state.liveness = LivenessStandingModel(isVerified: true, limitMicros: "20000000", tierCapMicros: "20000000")
+        let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.verify = { _, _, _ in Issue.record("a verified row opened a session"); throw Failure.wrong }
+        }
+
+        await store.send(.selfieTapped)
+        #expect(store.state.run == nil)
+    }
+
     // MARK: - Helpers
 
     private enum Failure: Error { case wrong }
 
     private func run(stage: IncreaseReputation.State.Stage) -> IncreaseReputation.State.Run {
-        IncreaseReputation.State.Run(id: UUID(0), platformID: "LinkedIn", name: "LinkedIn", stage: stage)
+        IncreaseReputation.State.Run(id: UUID(0), kind: .social(platformID: "LinkedIn"), name: "LinkedIn", stage: stage)
     }
 
-    @MainActor private func listStore(currencyCode: String = "INR") async -> TestStoreOf<IncreaseReputation> {
+    private func selfieRun(stage: IncreaseReputation.State.Stage) -> IncreaseReputation.State.Run {
+        IncreaseReputation.State.Run(
+            id: UUID(0),
+            kind: .selfie,
+            name: String(localizable: .increaseReputationLivenessRow),
+            stage: stage
+        )
+    }
+
+    @MainActor private func listStore(
+        currencyCode: String = "INR",
+        liveness: LivenessStandingModel? = nil
+    ) async -> TestStoreOf<IncreaseReputation> {
         await TestStore(initialState: .initial(currencyCode: currencyCode)) { IncreaseReputation() }
         withDependencies: {
             $0.reputation.summary = { _ in
-                ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0")
+                ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", liveness: liveness)
             }
+        }
+    }
+
+    /// A loaded INR list with an unverified selfie row, and `verify` wired to the given stream.
+    @MainActor private func selfieStore(
+        verify: @escaping @Sendable (String, String, UUID) async throws -> LivenessStatusStream,
+        extra: @escaping (inout DependencyValues) -> Void = { _ in }
+    ) async -> TestStoreOf<IncreaseReputation> {
+        var state = IncreaseReputation.State.initial(currencyCode: "INR")
+        state.isLoading = false
+        state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
+        state.liveness = LivenessStandingModel(isVerified: false, limitMicros: "0", tierCapMicros: "20000000")
+        return await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
+            $0.liveness.verify = verify
+            extra(&$0)
         }
     }
 

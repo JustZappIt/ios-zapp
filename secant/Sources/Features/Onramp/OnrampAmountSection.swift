@@ -40,14 +40,26 @@ extension OnrampView {
                     if let limits = limitsText {
                         ZappSummaryRow(label: String(localizable: .onrampLimitsLabel), value: limits)
                     }
-                    ZappSummaryRow(
-                        label: String(localizable: .onrampDailyLimitLabel),
-                        value: dailyLimitText,
-                        info: ZappSummaryRowInfo(
-                            accessibilityLabel: String(localizable: .onrampDailyLimitInfo),
-                            action: { store.send(.limitInfoTapped) }
+                    if let value = store.transactionLimitMicros {
+                        ZappSummaryRow(
+                            label: String(localizable: .onrampTransactionLimitLabel),
+                            value: "\(store.currencySymbol)\(Onramp.displayMicros(value))",
+                            info: ZappSummaryRowInfo(
+                                accessibilityLabel: String(localizable: .onrampTransactionLimitInfo),
+                                action: { store.send(.limitInfoTapped) }
+                            )
                         )
-                    )
+                    }
+                    if let value = store.dailyLimitMicros {
+                        ZappSummaryRow(
+                            label: String(localizable: .onrampDailyLimitLabel),
+                            value: "\(store.currencySymbol)\(Onramp.displayMicros(value))",
+                            info: ZappSummaryRowInfo(
+                                accessibilityLabel: String(localizable: .onrampDailyLimitInfo),
+                                action: { store.send(.limitInfoTapped) }
+                            )
+                        )
+                    }
                     ZappSummaryRow(label: String(localizable: .onrampPaymentRailLabel), value: store.paymentRail)
                 }
             }
@@ -192,11 +204,6 @@ extension OnrampView {
         let minimum = Onramp.displayMicros(limits.minimumFiatMicros)
         let maximum = Onramp.displayMicros(limits.maximumFiatMicros)
         return "\(store.currencySymbol)\(minimum)–\(store.currencySymbol)\(maximum)"
-    }
-
-    var dailyLimitText: String {
-        guard let value = store.limits?.dailyFiatMicros else { return String(localizable: .onrampBaseBalanceUnavailable) }
-        return "\(store.currencySymbol)\(Onramp.displayMicros(value))"
     }
 
     func receiveQuoteText(_ quote: OnrampQuoteModel) -> String {

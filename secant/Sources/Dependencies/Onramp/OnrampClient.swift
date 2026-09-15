@@ -15,13 +15,22 @@ enum OnrampClientError: LocalizedError, Equatable {
     case authenticationCancelled
     case staleQuote
     case invalidFrameworkValue(String)
+    /// The driver refused the amount at quote time; the amount screen shows the code's sentence.
+    case quoteRefused(OnrampFailureCodeModel)
 
     var errorDescription: String? {
         switch self {
         case .authenticationCancelled: return String(localizable: .onrampErrorAuthenticationCancelled)
         case .staleQuote: return String(localizable: .onrampErrorStaleQuote)
         case .invalidFrameworkValue: return String(localizable: .onrampErrorProgress)
+        case let .quoteRefused(code): return Onramp.failureMessage(code)
         }
+    }
+
+    static func quoteRefusal(from error: Error) -> Error {
+        guard let exception = (error as NSError).kotlinException as? OnrampException,
+              let code = OnrampFailureCodeModel(rawValue: exception.code.name) else { return error }
+        return quoteRefused(code)
     }
 }
 
@@ -73,10 +82,7 @@ extension OnrampClient: DependencyKey {
     static func live() -> Self {
         let authorization = OnrampQuoteAuthorization()
         return Self(
-            isConfigured: {
-                guard let value = PartnerKeys.p2pOnrampBaseUrl else { return false }
-                return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            },
+            isConfigured: { PartnerKeys.isOnrampConfigured },
             canDeliverToZec: {
                 try await OfframpSession.shared.onrampClient().canDeliverToZec
             },
@@ -90,10 +96,12 @@ extension OnrampClient: DependencyKey {
                 let generation = try await OfframpSession.shared.generationToken()
                 let client = try await OfframpSession.shared.onrampClient()
                 try await OfframpSession.shared.validateGeneration(generation)
-                let native = try await client.quote(
-                    fiatMicros: fiatMicros,
-                    currencyCode: currencyCode
-                )
+                let native: AppleOnrampQuote
+                do {
+                    native = try await client.quote(fiatMicros: fiatMicros, currencyCode: currencyCode)
+                } catch {
+                    throw OnrampClientError.quoteRefusal(from: error)
+                }
                 try await OfframpSession.shared.validateGeneration(generation)
                 let model = OnrampQuoteModel(native)
                 authorization.authorizeQuote(native, model: model, generation: generation)
@@ -311,6 +319,7 @@ extension OnrampStatusModel {
             id: value.id,
             orderID: value.orderId,
             failureCode: value.failureCode.flatMap(OnrampFailureCodeModel.init(rawValue:)),
+            failureDetail: value.failureDetail,
             instruction: instruction,
             fiatMicros: value.fiatMicros,
             netUsdcMicros: value.netUsdcMicros,

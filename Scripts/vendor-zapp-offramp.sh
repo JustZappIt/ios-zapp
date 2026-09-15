@@ -47,6 +47,7 @@ REQUIRED_CLASSES=(
   ZappOfframpApplePeerAttempt
   ZappOfframpApplePeerCashOutRequest
   ZappOfframpAppleReputationClient
+  ZappOfframpAppleLivenessClient
 )
 
 # Protocol constants compiled into the binary as UTF-16 string literals. They prove the rails are

@@ -22,23 +22,41 @@ struct IncreaseReputation {
         }
 
         struct Run: Equatable {
+            enum Kind: Equatable {
+                case social(platformID: String)
+                case selfie
+            }
+
             let id: UUID
-            let platformID: String
+            let kind: Kind
             /// The brand's own spelling. A cold-start resume opens before the list has loaded, so
             /// it starts as the routing key and is corrected the moment the read lands.
             var name: String
             var stage: Stage
-            /// Where the Verifier lives for this session. Nil until Reclaim has minted one.
+            /// Where the Verifier, or the selfie widget, lives for this session. Nil until minted.
             var launchURL: String?
             var errorMessage: String?
             /// Set only at `.done`: what the chain says now, not what we predicted.
             var newPoints: String?
             var newBuyLimitMicros: String?
+            /// Selfie runs only; set by the tap, not by the driver.
+            var isWidgetOpened = false
+
+            var platformID: String? {
+                guard case let .social(platformID) = kind else { return nil }
+                return platformID
+            }
+
+            var isSelfie: Bool { kind == .selfie }
+
+            var isAwaitingReturn: Bool { isSelfie && (stage == .ready || stage == .verifying) }
         }
 
         var currencyCode: String
         var isLoading = true
         var platforms: [ReputationPlatformModel] = []
+        /// Nil where no integrator is deployed; the row does not render.
+        var liveness: LivenessStandingModel?
         /// Non-nil once a row is tapped: the run takes over the body, in place, with no new route.
         var run: Run?
         var errorMessage: String?
@@ -48,6 +66,8 @@ struct IncreaseReputation {
         /// External routing hints. They cannot start a write until the user confirms the resume.
         var resumeSessionID: String?
         var resumePlatformID: String?
+        /// A widget redirect that arrived with no screen mounted; consumed on the first appearance.
+        var resumeLivenessReturn: LivenessReturnModel?
         /// A completed write supersedes any summary read started before it.
         var summaryRevision = 0
 
@@ -61,18 +81,20 @@ struct IncreaseReputation {
         var canRetryLoad: Bool { errorMessage != nil && run == nil }
 
         var steps: [ZappOfframpStepItem] {
-            IncreaseReputation.steps(stage: run?.stage, lastActiveStage: lastActiveStage)
+            IncreaseReputation.steps(stage: run?.stage, lastActiveStage: lastActiveStage, isSelfie: run?.isSelfie == true)
         }
 
         static func initial(
             currencyCode: String,
             resumeSessionID: String? = nil,
-            resumePlatformID: String? = nil
+            resumePlatformID: String? = nil,
+            resumeLivenessReturn: LivenessReturnModel? = nil
         ) -> State {
             State(
                 currencyCode: currencyCode,
                 resumeSessionID: resumeSessionID,
-                resumePlatformID: resumePlatformID
+                resumePlatformID: resumePlatformID,
+                resumeLivenessReturn: resumeLivenessReturn
             )
         }
     }
@@ -83,7 +105,10 @@ struct IncreaseReputation {
         case loadFailed(revision: Int)
         case retryLoadTapped
         case platformTapped(String)
+        case selfieTapped
         case statusReceived(runID: UUID, status: ReclaimStatusModel)
+        case livenessStatusReceived(runID: UUID, status: LivenessStatusModel)
+        case livenessReturnReceived(LivenessReturnModel)
         case runEnded(runID: UUID)
         case verifierOpened(runID: UUID, accepted: Bool)
         case resumeConfirmed
@@ -102,9 +127,10 @@ struct IncreaseReputation {
     }
 
     @Dependency(\.reputation) var reputation
+    @Dependency(\.liveness) var liveness
     @Dependency(\.uuid) var uuid
 
-    private enum CancelID {
+    enum CancelID {
         case load
         case run
     }
@@ -113,6 +139,12 @@ struct IncreaseReputation {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                // Cleared whether or not a run can take it: a return left here would replay a spent code.
+                let ret = state.resumeLivenessReturn
+                state.resumeLivenessReturn = nil
+                if let ret, state.run == nil {
+                    return .merge(load(state), startSelfieResume(&state, ret))
+                }
                 return load(state)
 
             case .resumeConfirmed:
@@ -134,6 +166,7 @@ struct IncreaseReputation {
                 state.isLoading = false
                 state.errorMessage = nil
                 state.platforms = visiblePlatforms(summary, currencyCode: state.currencyCode)
+                state.liveness = summary.liveness
                 if let name = summary.platforms.first(where: { $0.id == state.run?.platformID })?.name {
                     state.run?.name = name
                 }
@@ -153,11 +186,30 @@ struct IncreaseReputation {
                       !platform.isVerified else { return .none }
                 return startRun(&state, platformID: platformID, sessionID: nil)
 
+            case .selfieTapped:
+                guard state.run == nil, !state.requiresResumeConfirmation,
+                      let liveness = state.liveness, !liveness.isVerified else { return .none }
+                return startSelfieRun(&state)
+
             case let .statusReceived(runID, status):
                 guard state.run?.id == runID else { return .none }
                 apply(status, to: &state)
                 if case .done = status { return .cancel(id: CancelID.load) }
                 return .none
+
+            case let .livenessStatusReceived(runID, status):
+                guard state.run?.id == runID else { return .none }
+                apply(status, to: &state)
+                if case .done = status { return .cancel(id: CancelID.load) }
+                return .none
+
+            case let .livenessReturnReceived(ret):
+                if let run = state.run, run.isAwaitingReturn {
+                    // Fire and forget: the run's own stream reports what the code was worth.
+                    return .run { _ in _ = try await liveness.deliverReturn(ret) } catch: { _, _ in }
+                }
+                guard state.run == nil, !state.requiresResumeConfirmation else { return .none }
+                return startSelfieResume(&state, ret)
 
             case let .runEnded(runID):
                 // The stream can end without a terminal status when the session is torn down.
@@ -173,14 +225,22 @@ struct IncreaseReputation {
                 // what the next tap needs; a callback outliving its own run would mark the run
                 // after it as opened before the user has left, and that one's link then ages out
                 // unwatched.
-                guard accepted, state.run?.id == runID, state.run?.stage == .ready else { return .none }
-                return .run { _ in await reputation.markVerifierOpened(runID: runID) }
+                guard accepted, let run = state.run, run.id == runID, run.stage == .ready else { return .none }
+                switch run.kind {
+                case .social:
+                    return .run { _ in await reputation.markVerifierOpened(runID: runID) }
+                case .selfie:
+                    state.run?.isWidgetOpened = true
+                    state.run?.stage = .verifying
+                    state.lastActiveStage = .verifying
+                    return .none
+                }
 
             case .cancelRunTapped, .dismissRunTapped:
-                // Cancelling leaves the Reclaim session to expire on its own. It is never
-                // surfaced later as an error — the user chose to stop. Cancelling the effect is
-                // the whole teardown: it unwinds the Kotlin collection, which frees the run lock
-                // and forgets the launch signal.
+                // Cancelling leaves the Reclaim session, or the widget session, to expire on its
+                // own. It is never surfaced later as an error — the user chose to stop.
+                // Cancelling the effect is the whole teardown: it unwinds the Kotlin collection,
+                // which frees the run lock and forgets the launch or return signal.
                 state.run = nil
                 state.lastActiveStage = .ready
                 return .cancel(id: CancelID.run)
@@ -202,6 +262,7 @@ struct IncreaseReputation {
                 if state.run != nil { return .send(.dismissRunTapped) }
                 state.resumeSessionID = nil
                 state.resumePlatformID = nil
+                state.resumeLivenessReturn = nil
                 return .merge(
                     .cancel(id: CancelID.load),
                     .cancel(id: CancelID.run),
@@ -211,126 +272,6 @@ struct IncreaseReputation {
             case .delegate:
                 return .none
             }
-        }
-    }
-
-    private func load(_ state: State) -> Effect<Action> {
-        let currencyCode = state.currencyCode
-        let revision = state.summaryRevision
-        return .run { send in
-            await send(.summaryLoaded(try await reputation.summary(currencyCode: currencyCode), revision: revision))
-        } catch: { _, send in
-            await send(.loadFailed(revision: revision))
-        }
-        .cancellable(id: CancelID.load, cancelInFlight: true)
-    }
-
-    /// `sessionID` non-nil resumes the session the return link named; nil mints a fresh one.
-    ///
-    /// A resume opens at `verifying`, and counts opening the Verifier as done: the user has
-    /// already been and come back, so a failure here must not mark the step they clearly completed.
-    private func startRun(_ state: inout State, platformID: String, sessionID: String?) -> Effect<Action> {
-        let runID = uuid()
-        state.lastActiveStage = sessionID == nil ? .ready : .verifying
-        state.run = State.Run(
-            id: runID,
-            platformID: platformID,
-            name: state.platforms.first { $0.id == platformID }?.name ?? platformID,
-            stage: sessionID == nil ? .preparing : .verifying
-        )
-        let currencyCode = state.currencyCode
-        return .run { send in
-            let statuses: ReclaimStatusStream
-            if let sessionID {
-                statuses = try await reputation.resume(
-                    platformID: platformID,
-                    currencyCode: currencyCode,
-                    sessionID: sessionID,
-                    runID: runID
-                )
-            } else {
-                statuses = try await reputation.verify(platformID: platformID, currencyCode: currencyCode, runID: runID)
-            }
-            for try await status in statuses {
-                await send(.statusReceived(runID: runID, status: status))
-            }
-            await send(.runEnded(runID: runID))
-        } catch: { _, send in
-            await send(.statusReceived(runID: runID, status: .failed(.network)))
-        }
-        .cancellable(id: CancelID.run, cancelInFlight: true)
-    }
-
-    private func apply(_ status: ReclaimStatusModel, to state: inout State) {
-        guard state.run != nil else { return }
-        switch status {
-        case .preparing:
-            state.run?.stage = .preparing
-        case let .ready(requestURL):
-            state.run?.stage = .ready
-            state.run?.launchURL = requestURL
-            state.lastActiveStage = .ready
-        case .verifying:
-            state.run?.stage = .verifying
-            state.lastActiveStage = .verifying
-        case .submitting:
-            state.run?.stage = .submitting
-            state.lastActiveStage = .submitting
-        case let .done(summary):
-            state.summaryRevision += 1
-            state.isLoading = false
-            state.errorMessage = nil
-            state.run?.stage = .done
-            state.run?.newPoints = summary.points
-            state.run?.newBuyLimitMicros = summary.buyLimitMicros
-            state.platforms = visiblePlatforms(summary, currencyCode: state.currencyCode)
-        case let .failed(failure):
-            state.run?.stage = .failed
-            state.run?.errorMessage = ReputationCopy.failureMessage(failure)
-        }
-    }
-
-    /// p2p.me's own client hides Binance in India, so an INR user who tried it would meet a
-    /// failure we could have predicted. The corridor is the country signal we actually have — the
-    /// user is buying with rupees — and it beats a device locale, which says where the phone was
-    /// set up. The facade returns every platform; the rule belongs beside the currency it depends on.
-    private func visiblePlatforms(
-        _ summary: ReputationSummaryModel,
-        currencyCode: String
-    ) -> [ReputationPlatformModel] {
-        guard currencyCode.caseInsensitiveCompare(ReputationCorridor.inr) == .orderedSame else {
-            return summary.platforms
-        }
-        return summary.platforms.filter { $0.id != SocialPlatformID.binance }
-    }
-
-    /// The first active indicator starts only once the user has left Zapp to begin verification.
-    static func steps(stage: State.Stage?, lastActiveStage: State.Stage) -> [ZappOfframpStepItem] {
-        let order: [State.Stage] = [.ready, .verifying, .submitting]
-        let labels = [
-            String(localizable: .increaseReputationStepOpen),
-            String(localizable: .increaseReputationStepProve),
-            String(localizable: .increaseReputationStepSave)
-        ]
-        let reached: Int
-        switch stage {
-        case .preparing, .ready, nil: reached = -1
-        case .done: reached = order.count
-        case .failed: reached = order.firstIndex(of: lastActiveStage) ?? -1
-        case let .some(active): reached = order.firstIndex(of: active) ?? -1
-        }
-        return labels.enumerated().map { index, label in
-            let status: ZappOfframpStepStatus
-            if stage == .failed && index == reached {
-                status = .failed
-            } else if index < reached {
-                status = .completed
-            } else if index == reached {
-                status = .inProgress
-            } else {
-                status = .pending
-            }
-            return ZappOfframpStepItem(id: label, label: label, detail: nil, status: status)
         }
     }
 }

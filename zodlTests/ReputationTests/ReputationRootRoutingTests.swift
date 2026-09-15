@@ -145,6 +145,59 @@ struct ReputationRootRoutingTests {
         #expect(store.state.increaseReputationState.resumeSessionID == nil)
     }
 
+    @Test func aLivenessReturnWithNoScreenRebuildsItFromTheCorridorInState() async {
+        let store = makeStore { _ in throw Failure.network }
+        await store.send(.livenessReturnReceived(Self.livenessReturn))
+        #expect(store.state.path == .increaseReputation)
+        #expect(store.state.increaseReputationState.currencyCode == "BRL")
+        #expect(store.state.increaseReputationState.resumeLivenessReturn == Self.livenessReturn)
+        #expect(store.state.reputationState.currencyCode == "BRL")
+        #expect(!store.state.canRecoverReclaimOnLaunch)
+    }
+
+    @Test func aLivenessReturnOverTheMountedScreenIsForwardedNotRebuilt() async {
+        let delivered = LockIsolated(0)
+        let store = makeStore(
+            configure: { state in
+                state.path = .increaseReputation
+                state.increaseReputationState = .initial(currencyCode: "INR")
+                state.increaseReputationState.run = IncreaseReputation.State.Run(
+                    id: UUID(0),
+                    kind: .selfie,
+                    name: "Selfie check",
+                    stage: .verifying,
+                    isWidgetOpened: true
+                )
+            },
+            extra: {
+                $0.liveness.deliverReturn = { _ in
+                    delivered.withValue { $0 += 1 }
+                    return true
+                }
+            }
+        ) { _ in throw Failure.network }
+        await store.send(.livenessReturnReceived(Self.livenessReturn))
+        await store.receive(\.increaseReputation.livenessReturnReceived)
+        await store.finish()
+        #expect(delivered.value == 1)
+        #expect(store.state.increaseReputationState.currencyCode == "INR")
+        #expect(store.state.increaseReputationState.resumeLivenessReturn == nil)
+    }
+
+    @Test func aLivenessReturnNamingNoCorridorOrArrivingOverAnotherFlowIsDropped() async {
+        let store = makeStore { _ in throw Failure.network }
+        await store.send(.livenessReturnReceived(LivenessReturnModel(code: "one-time", error: nil, state: nil)))
+        #expect(store.state.path == nil)
+
+        await store.send(.onramp(.delegate(.openReputation)))
+        await store.send(.reputation(.delegate(.raiseLimit(currencyCode: "BRL"))))
+        await store.send(.increaseReputation(.delegate(.close)))
+        await store.send(.reputation(.delegate(.close)))
+        #expect(store.state.path == .onramp)
+        await store.send(.livenessReturnReceived(Self.livenessReturn))
+        #expect(store.state.path == .onramp)
+    }
+
     @Test func backgroundingBeforeHomeStillClosesLaunchRecovery() async {
         let store = makeStore { _ in throw Failure.network }
         await store.send(.initialization(.appDelegate(.didEnterBackground)))
@@ -153,9 +206,8 @@ struct ReputationRootRoutingTests {
         #expect(store.state.increaseReputationState.resumeSessionID == nil)
     }
 
-    @Test(arguments: [false, true])
-    func aFirstTimeZeroReputationWalletMustVerifyEvenWithADefaultLimit(canBuy: Bool) async {
-        let summary = ReputationFixtures.summary(canBuy: canBuy, buyLimitMicros: "100000000", points: "0")
+    @Test func aWalletTheChainSizesAtZeroMustVerify() async {
+        let summary = ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", points: "0")
         let store = makeStore { _ in summary }
         await store.send(.home(.buyTapped))
         #expect(store.state.path == .reputation)
@@ -171,6 +223,21 @@ struct ReputationRootRoutingTests {
         await store.send(.increaseReputation(.onAppear))
         await store.receive(\.increaseReputation.summaryLoaded)
         #expect(store.state.increaseReputationState.platforms.contains { $0.id == "LinkedIn" && !$0.isVerified })
+    }
+
+    @Test func aSelfieVerifiedWalletWithNoPointsOpensBuy() async {
+        let summary = ReputationFixtures.summary(
+            canBuy: true,
+            buyLimitMicros: "0",
+            points: "0",
+            shownLimitMicros: "20000000",
+            isLimitFromCheckout: true,
+            isSelfieAvailable: true
+        )
+        let store = makeStore { _ in summary }
+        await openBuy(store)
+        await store.receive(\.buyReputationLoaded)
+        #expect(store.state.path == .onramp)
     }
 
     @Test func retryChecksAgainInsteadOfBypassingVerification() async {
@@ -243,7 +310,7 @@ struct ReputationRootRoutingTests {
         await store.receive(\.buyReputationLoaded)
         #expect(store.state.path == .onramp)
         let cancelled = OnrampStatusModel(
-            kind: .cancelled, phase: .cancelled, id: "old-purchase", orderID: "42", failureCode: nil, instruction: nil,
+            kind: .cancelled, phase: .cancelled, id: "old-purchase", orderID: "42", failureCode: nil, failureDetail: nil, instruction: nil,
             fiatMicros: "100000000", netUsdcMicros: nil, recipientAddress: nil, paidTransactionHash: nil, expiresAt: nil, isTerminal: true
         )
         await store.send(.onramp(.statusReceived(cancelled)))
@@ -281,10 +348,12 @@ struct ReputationRootRoutingTests {
     }
 
     private static let resume = ReclaimReturnLink.ResumeArgs(sessionID: "session-123", platformID: "GitHub", currencyCode: "BRL")
+    private static let livenessReturn = LivenessReturnModel(code: "one-time", error: nil, state: "0f1e2d3c.BRL")
     private enum Failure: Error { case network }
 
     private func makeStore(
         checkpoint: OnrampCheckpointModel? = nil,
+        configure: (inout Root.State) -> Void = { _ in },
         extra: (inout DependencyValues) -> Void = { _ in },
         summary: @escaping @Sendable (String) async throws -> ReputationSummaryModel
     ) -> TestStore<Root.State, Root.Action> {
@@ -293,6 +362,7 @@ struct ReputationRootRoutingTests {
         } operation: {
             var state = Root.State.initial
             state.offrampState.selectedCurrencyCode = "BRL"
+            configure(&state)
             let store = TestStore(initialState: state) {
                 CombineReducers {
                     Scope<Root.State, Root.Action, Reputation>(state: \.reputationState, action: \.reputation) { Reputation() }

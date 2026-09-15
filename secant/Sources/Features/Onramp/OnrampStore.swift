@@ -82,8 +82,31 @@ struct Onramp {
             progress.map(\.isTerminal) ?? true
         }
 
+        /// Nothing on screen is live any more, so Back returns to amount entry rather than leaving
+        /// Buy ZEC. A payment page the app refuses to let the user pay is not settled: the order
+        /// is still accepted on chain with the merchant's USDC behind it, so Back keeps its
+        /// checkpoint and only the labelled Start over gives it up.
+        var isSettled: Bool {
+            switch page {
+            case .completion, .refundedToBase: return true
+            case .progress: return isOrderResolved && progress != nil
+            default: return false
+            }
+        }
+
         var canRetryDelivery: Bool {
             delivery?.kind == .failed && delivery?.retryable == true && delivery?.fundsLocation == .baseAccount
+        }
+
+        /// The per-order ceiling stands in when the rail reports no daily figure, as the direct rail never does.
+        var transactionLimitMicros: String? {
+            guard let limits, Onramp.isZeroMicros(limits.dailyFiatMicros) else { return nil }
+            return limits.maximumFiatMicros
+        }
+
+        var dailyLimitMicros: String? {
+            guard let limits, !Onramp.isZeroMicros(limits.dailyFiatMicros) else { return nil }
+            return limits.dailyFiatMicros
         }
 
         var canContinue: Bool {
@@ -372,7 +395,7 @@ struct Onramp {
                     state.paymentInstruction = nil
                     state.paymentSecondsRemaining = nil
                     state.isPaidConfirmationPresented = false
-                    state.errorMessage = Self.failureMessage(status.failureCode)
+                    state.errorMessage = Self.failureMessage(status)
                     return .cancel(id: CancelID.countdown)
 
                 default:
@@ -415,6 +438,7 @@ struct Onramp {
                     id: previous?.id,
                     orderID: orderID,
                     failureCode: .networkUnavailable,
+                    failureDetail: nil,
                     instruction: previous?.instruction,
                     fiatMicros: previous?.fiatMicros,
                     netUsdcMicros: previous?.netUsdcMicros,
@@ -636,6 +660,8 @@ struct Onramp {
                     state.errorMessage = nil
                     return .merge(.cancel(id: CancelID.quote), .cancel(id: CancelID.countdown))
                 }
+                // A finished order: Back offers another purchase before Home, by the Start over path.
+                if state.isSettled { return .send(.retryTapped) }
                 return .send(.delegate(.close))
 
             case .cancelAll:

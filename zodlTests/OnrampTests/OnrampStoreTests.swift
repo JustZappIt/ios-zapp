@@ -23,6 +23,81 @@ struct OnrampStoreTests {
         }
     }
 
+    /// Back on a finished order takes the start-over path: the checkpoint goes and the gate is checked again.
+    @Test(arguments: [Onramp.Page.completion, .refundedToBase])
+    func backFromAFinishedOrderStartsOverRatherThanLeaving(page: Onramp.Page) async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = page
+        state.progress = completed()
+        let clears = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.clearCheckpoint = { clears.withValue { $0 += 1 } }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.backTapped)
+        await store.receive(.retryTapped)
+        await store.receive(.delegate(.restartBuy))
+        #expect(clears.value == 1)
+        #expect(store.state.page == .loading)
+    }
+
+    @Test func backFromACancelledOrderStartsOver() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .progress
+        state.progress = OnrampStatusModel(
+            kind: .cancelled, phase: .cancelled, id: "743", orderID: "743", failureCode: nil, failureDetail: nil,
+            instruction: nil, fiatMicros: nil, netUsdcMicros: nil, recipientAddress: nil, paidTransactionHash: nil,
+            expiresAt: nil, isTerminal: true
+        )
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.clearCheckpoint = { }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.backTapped)
+        await store.receive(.retryTapped)
+        await store.receive(.delegate(.restartBuy))
+    }
+
+    @Test func backFromALiveOrderLeavesWithTheCheckpointIntact() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .progress
+        state.progress = OnrampStatusModel(
+            kind: .awaitingMerchant, phase: .awaitingMerchant, id: "743", orderID: "743", failureCode: nil,
+            failureDetail: nil, instruction: nil, fiatMicros: nil, netUsdcMicros: nil, recipientAddress: nil,
+            paidTransactionHash: nil, expiresAt: nil, isTerminal: false
+        )
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.clearCheckpoint = { Issue.record("a live order must keep its checkpoint") }
+        }
+
+        await store.send(.backTapped)
+        await store.receive(.delegate(.close))
+        #expect(!store.state.isSettled)
+    }
+
+    /// The dock offers Start over there, but that is a labelled button; Back is a reflex, and the
+    /// order behind it is still accepted on chain with the merchant's USDC escrowed.
+    @Test func backFromAPaymentTheAppRefusesToLetTheUserMakeKeepsTheOrder() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .payment
+        state.paymentSecondsRemaining = 0
+        state.progress = OnrampStatusModel(
+            kind: .awaitingPayment, phase: .awaitingPayment, id: "743", orderID: "743", failureCode: nil,
+            failureDetail: nil, instruction: .plain(address: "merchant"), fiatMicros: "100000000", netUsdcMicros: nil,
+            recipientAddress: nil, paidTransactionHash: nil, expiresAt: nil, isTerminal: false
+        )
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.clearCheckpoint = { Issue.record("a closed payment window must not discard the checkpoint") }
+        }
+
+        #expect(!store.state.isPayable)
+        #expect(!store.state.isSettled)
+        await store.send(.backTapped)
+        await store.receive(.delegate(.close))
+    }
+
     @Test func aSecondPlacementTapCannotSendAnotherOrder() async {
         var state = Onramp.State.initial(currencyCode: "INR")
         state.page = .confirmation
@@ -75,6 +150,96 @@ struct OnrampStoreTests {
         #expect(resumes.value == 1)
     }
 
+    @Test func aRefusedQuoteStaysOnTheAmountPageWithTheCodesOwnSentence() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .amount
+        state.amount = "1500"
+        state.limits = OnrampLimitsModel(
+            enabled: true,
+            currencyCode: "INR",
+            minimumFiatMicros: "106860000",
+            maximumFiatMicros: "2035400000",
+            dailyFiatMicros: "0"
+        )
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.quote = { _, _ in throw OnrampClientError.quoteRefused(.dailyLimitExceeded) }
+        }
+
+        await store.send(.continueTapped) {
+            $0.isRequestingQuote = true
+        }
+        await store.receive(.quoteFailed(String(localizable: .onrampErrorDailyLimit))) {
+            $0.isRequestingQuote = false
+            $0.errorMessage = String(localizable: .onrampErrorDailyLimit)
+        }
+        #expect(store.state.page == .amount)
+        #expect(store.state.quote == nil)
+    }
+
+    @Test func aRefusalTheServiceExplainedShowsItsOwnSentence() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .progress
+        let store = TestStore(initialState: state) { Onramp() }
+        let refused = OnrampStatusModel(
+            kind: .failed,
+            phase: .placing,
+            id: nil,
+            orderID: nil,
+            failureCode: .screeningRejected,
+            failureDetail: "new accounts cannot place buy orders at this time",
+            instruction: nil,
+            fiatMicros: nil,
+            netUsdcMicros: nil,
+            recipientAddress: nil,
+            paidTransactionHash: nil,
+            expiresAt: nil,
+            isTerminal: true
+        )
+
+        await store.send(.statusReceived(refused)) {
+            $0.progress = refused
+            $0.errorMessage = "new accounts cannot place buy orders at this time"
+        }
+    }
+
+    @Test func aPendingSettlementResumesTheOrderRatherThanStartingOver() async {
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.page = .progress
+        state.errorMessage = String(localizable: .onrampErrorSettlementPending)
+        state.progress = OnrampStatusModel(
+            kind: .failed,
+            phase: .awaitingSettlement,
+            id: "731906",
+            orderID: "731906",
+            failureCode: .settlementPending,
+            failureDetail: nil,
+            instruction: nil,
+            fiatMicros: "100000000",
+            netUsdcMicros: "1190000",
+            recipientAddress: "0x1234",
+            paidTransactionHash: "0xpaid",
+            expiresAt: nil,
+            isTerminal: true
+        )
+        let resumes = LockIsolated(0)
+        let clears = LockIsolated(0)
+        let store = TestStore(initialState: state) { Onramp() } withDependencies: {
+            $0.onramp.resume = {
+                resumes.withValue { $0 += 1 }
+                return OnrampStatusStream { $0.finish() }
+            }
+            $0.onramp.clearCheckpoint = { clears.withValue { $0 += 1 } }
+        }
+
+        await store.send(.retryTapped) {
+            $0.errorMessage = nil
+        }
+        await store.receive(.statusStreamFinished)
+
+        #expect(resumes.value == 1)
+        #expect(clears.value == 0)
+    }
+
     @Test func transientFailureResumesWithoutClearingCheckpoint() async {
         var state = Onramp.State.initial(currencyCode: "INR")
         state.page = .progress
@@ -85,6 +250,7 @@ struct OnrampStoreTests {
             id: "request-1",
             orderID: "order-1",
             failureCode: .networkUnavailable,
+            failureDetail: nil,
             instruction: nil,
             fiatMicros: "100000000",
             netUsdcMicros: "1190000",
@@ -128,6 +294,7 @@ struct OnrampStoreTests {
             id: "request-1",
             orderID: "659007",
             failureCode: nil,
+            failureDetail: nil,
             instruction: nil,
             fiatMicros: "100000000",
             netUsdcMicros: "1190000",
@@ -202,6 +369,7 @@ struct OnrampStoreTests {
             id: "request-1",
             orderID: "order-1",
             failureCode: nil,
+            failureDetail: nil,
             instruction: .plain(address: "merchant"),
             fiatMicros: "100000000",
             netUsdcMicros: nil,
@@ -369,6 +537,14 @@ struct OnrampStoreTests {
             bridgeDepositAddress: nil,
             isTerminal: isTerminal,
             isSuccess: isSuccess
+        )
+    }
+
+    private func completed() -> OnrampStatusModel {
+        OnrampStatusModel(
+            kind: .completed, phase: .completed, id: "743", orderID: "743", failureCode: nil, failureDetail: nil,
+            instruction: nil, fiatMicros: "100000000", netUsdcMicros: "1190000", recipientAddress: "0x1234",
+            paidTransactionHash: nil, expiresAt: nil, isTerminal: true
         )
     }
 

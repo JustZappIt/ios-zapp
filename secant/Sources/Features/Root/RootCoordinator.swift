@@ -533,6 +533,22 @@ extension Root {
                 state.path = .increaseReputation
                 return .none
 
+            case let .livenessReturnReceived(ret):
+                if state.path == .increaseReputation {
+                    return .send(.increaseReputation(.livenessReturnReceived(ret)))
+                }
+                // Rebuilt from the corridor in `state` with no confirmation, unlike the Reclaim
+                // link: the service only redeems a code for the wallet that opened its session.
+                // Over another flow the return is dropped rather than replacing that flow's state.
+                guard let currencyCode = ReputationCorridor.match(ret.currencyCode),
+                      state.path == nil || state.path == .reputation else { return .none }
+                state.canRecoverReclaimOnLaunch = false
+                state.increaseReputationState = .initial(currencyCode: currencyCode, resumeLivenessReturn: ret)
+                state.reputationState = .initial(currencyCode: currencyCode)
+                state.reputationReturnPath = nil
+                state.path = .increaseReputation
+                return .none
+
             case .home(.onAppear), .initialization(.appDelegate(.didEnterBackground)):
                 state.canRecoverReclaimOnLaunch = false
                 return .none

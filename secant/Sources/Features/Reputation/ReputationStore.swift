@@ -7,7 +7,8 @@ import Foundation
 ///
 /// Nothing here is cached: a completed buy credits reputation, so a value stored from the last
 /// visit is stale in exactly the moment the user is most likely to look. Nothing here is computed
-/// either — the limits come from the Diamond, which is the only place the effective number exists.
+/// either — the limits come from the Diamond and from Zapp's integrator, the only places the
+/// effective numbers exist.
 @Reducer
 struct Reputation {
     @ObservableState
@@ -61,18 +62,23 @@ struct Reputation {
             }
         }
 
-        /// The Diamond's own number, or the single word that stands in for it while buying is
+        /// The chain's own number, or the single word that stands in for it while buying is
         /// locked — never a rendered "$0", which reads as a bug rather than as a gate.
         var buyLimitText: String? {
             guard let summary else { return nil }
             return summary.canStartBuy
-                ? String(localizable: .reputationAmountUsd(ReputationCopy.usd(summary.buyLimitMicros)))
+                ? String(localizable: .reputationAmountUsd(ReputationCopy.usd(summary.shownLimitMicros)))
                 : String(localizable: .reputationLimitLocked)
         }
 
         var buyLimitCaption: String? {
             guard let summary else { return nil }
-            if !summary.canStartBuy { return String(localizable: .reputationLimitLockedCaption) }
+            if !summary.canStartBuy {
+                return summary.isSelfieAvailable
+                    ? String(localizable: .reputationLimitLockedCaptionSelfie)
+                    : String(localizable: .reputationLimitLockedCaption)
+            }
+            if summary.isLimitFromCheckout { return String(localizable: .reputationLimitCaptionCheckout) }
             return summary.isAtCeiling
                 ? String(localizable: .reputationLimitCaptionAtCeiling)
                 : String(localizable: .reputationLimitCaption)

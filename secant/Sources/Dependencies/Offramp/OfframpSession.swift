@@ -66,11 +66,14 @@ actor OfframpSession {
     private var peer: ApplePeerCashOutClient?
     private var reputation: AppleReputationClient?
     private var reclaimRunID: UUID?
+    private var liveness: AppleLivenessClient?
+    private var livenessRunID: UUID?
     private var accountTask: Task<AppleBaseAccount, Error>?
     private var offrampTask: Task<OfframpRail, Error>?
     private var onrampTask: Task<OnrampRail, Error>?
     private var peerTask: Task<ApplePeerCashOutClient, Error>?
     private var reputationTask: Task<AppleReputationClient, Error>?
+    private var livenessTask: Task<AppleLivenessClient, Error>?
     private var reservationHydrationTask: Task<Void, Error>?
     private var reservationsHydratedGeneration: Int?
     private var stateWritingFlowTasks: [UUID: Task<Void, Never>] = [:]
@@ -151,6 +154,35 @@ actor OfframpSession {
         return try await value(of: task) { if self.reputationTask == task { self.reputationTask = nil } }
     }
 
+    func livenessClient() async throws -> AppleLivenessClient {
+        await waitUntilActive()
+        let baseSnapshot = try await baseAccountSnapshot()
+        try validateGeneration(baseSnapshot.generation)
+        if let livenessTask { return try await livenessTask.value }
+
+        let generation = baseSnapshot.generation
+        // Blank keys are admitted, as the Reclaim credentials are: the driver reports NotConfigured.
+        let apiURL = PartnerKeys.livenessApiUrl ?? ""
+        let apiKey = PartnerKeys.livenessApiKey ?? ""
+        let tenant = PartnerKeys.livenessTenant ?? ""
+        let task = Task {
+            let built = try AppleLivenessClient.companion.create(
+                account: baseSnapshot.account,
+                apiUrl: apiURL,
+                apiKey: apiKey,
+                tenant: tenant,
+                returnUrl: LivenessReturnLink.url,
+                onUnrecognisedRevert: { selector in
+                    LoggerProxy.warn("submitLivenessAttestation reverted with an unmapped selector: \(selector)")
+                }
+            )
+            guard self.adopt(built, generation: generation) else { throw CancellationError() }
+            return built
+        }
+        livenessTask = task
+        return try await value(of: task) { if self.livenessTask == task { self.livenessTask = nil } }
+    }
+
     /// Releases everything this session adopted. A build still in flight is cancelled and releases
     /// itself when `adopt` turns it away, so nothing is ever torn down twice.
     ///
@@ -170,6 +202,7 @@ actor OfframpSession {
         let onrampTask = self.onrampTask
         let peerTask = self.peerTask
         let reputationTask = self.reputationTask
+        let livenessTask = self.livenessTask
         let reservationHydrationTask = self.reservationHydrationTask
         let stateWritingFlowTasks = Array(self.stateWritingFlowTasks.values)
         let stateWritingOperations = Array(self.stateWritingOperations.values)
@@ -178,6 +211,7 @@ actor OfframpSession {
         self.onrampTask = nil
         self.peerTask = nil
         self.reputationTask = nil
+        self.livenessTask = nil
         self.reservationHydrationTask = nil
         reservationsHydratedGeneration = nil
         self.stateWritingFlowTasks.removeAll()
@@ -188,6 +222,7 @@ actor OfframpSession {
         onrampTask?.cancel()
         peerTask?.cancel()
         reputationTask?.cancel()
+        livenessTask?.cancel()
         reservationHydrationTask?.cancel()
         stateWritingFlowTasks.forEach { $0.cancel() }
         stateWritingOperations.forEach { $0.cancel() }
@@ -197,6 +232,7 @@ actor OfframpSession {
         if let onrampTask { _ = await onrampTask.result }
         if let peerTask { _ = await peerTask.result }
         if let reputationTask { _ = await reputationTask.result }
+        if let livenessTask { _ = await livenessTask.result }
         if let reservationHydrationTask { _ = await reservationHydrationTask.result }
         for task in stateWritingFlowTasks { _ = await task.result }
         for operation in stateWritingOperations { await operation.wait() }
@@ -213,6 +249,8 @@ actor OfframpSession {
         // what stops a verification running against the previous account's submitter.
         reputation = nil
         reclaimRunID = nil
+        liveness = nil
+        livenessRunID = nil
         // The account holds the HTTP client and the Base owner key every rail borrows, so it is last.
         account?.close()
         account = nil
@@ -249,8 +287,7 @@ actor OfframpSession {
                 task = reservationHydrationTask
             } else {
                 let onrampClient: AppleOnrampClient?
-                if let baseURL = PartnerKeys.p2pOnrampBaseUrl,
-                   !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if PartnerKeys.isOnrampConfigured {
                     onrampClient = try await onrampRail().client
                     try requireActive()
                     guard startedIn == generation else { throw CancellationError() }
@@ -978,6 +1015,66 @@ actor OfframpSession {
         return stream
     }
 
+    func verifyLiveness(
+        currencyCode: String,
+        nonce: String,
+        runID: UUID,
+        expectedGeneration: Int
+    ) async throws -> LivenessStatusStream {
+        guard expectedGeneration == generation else { throw CancellationError() }
+        let client = try await livenessClient()
+        try validateGeneration(expectedGeneration)
+        return try trackLivenessFlow(client.verify(currencyCode: currencyCode, nonce: nonce), runID: runID, generation: expectedGeneration)
+    }
+
+    func resumeLiveness(
+        _ ret: LivenessReturnModel,
+        runID: UUID,
+        expectedGeneration: Int
+    ) async throws -> LivenessStatusStream {
+        guard expectedGeneration == generation else { throw CancellationError() }
+        let client = try await livenessClient()
+        try validateGeneration(expectedGeneration)
+        let flow = client.resume(code: ret.code, error: ret.error, state: ret.state)
+        return try trackLivenessFlow(flow, runID: runID, generation: expectedGeneration)
+    }
+
+    func deliverLivenessReturn(_ ret: LivenessReturnModel) -> Bool {
+        guard livenessRunID != nil, let liveness else { return false }
+        return liveness.deliverReturn(code: ret.code, error: ret.error, state: ret.state)
+    }
+
+    /// State-writing work, as the Reclaim run is: the submit step broadcasts a sponsored UserOperation.
+    func trackLivenessFlow(
+        _ flow: SkieSwiftFlow<AppleLivenessStatus>,
+        runID: UUID,
+        generation expectedGeneration: Int
+    ) throws -> LivenessStatusStream {
+        try validateGeneration(expectedGeneration)
+        guard livenessRunID == nil else {
+            return LivenessStatusStream {
+                $0.yield(.failed(.busy))
+                $0.finish()
+            }
+        }
+        let id = runID
+        livenessRunID = id
+        var capturedContinuation: LivenessStatusStream.Continuation?
+        let stream = LivenessStatusStream { continuation in capturedContinuation = continuation }
+        guard let continuation = capturedContinuation else { return stream }
+        let task = Task { [weak self] in
+            for await status in flow {
+                guard !Task.isCancelled else { break }
+                continuation.yield(LivenessStatusModel(status))
+            }
+            continuation.finish()
+            await self?.stateWritingFlowFinished(id: id)
+        }
+        stateWritingFlowTasks[id] = task
+        continuation.onTermination = { _ in task.cancel() }
+        return stream
+    }
+
     func trackOnrampDeliveryFlow(
         _ flow: SkieSwiftFlow<AppleOnrampDeliveryStatus>,
         reservation: OnrampReservation?,
@@ -1022,6 +1119,7 @@ actor OfframpSession {
 
     private func stateWritingFlowFinished(id: UUID) {
         if reclaimRunID == id { reclaimRunID = nil }
+        if livenessRunID == id { livenessRunID = nil }
         stateWritingFlowTasks[id] = nil
     }
 
@@ -1088,6 +1186,12 @@ actor OfframpSession {
         return true
     }
 
+    private func adopt(_ built: AppleLivenessClient, generation: Int) -> Bool {
+        guard generation == self.generation, !isInvalidating else { return false }
+        liveness = built
+        return true
+    }
+
     private func baseAccountSnapshot() async throws -> (account: AppleBaseAccount, generation: Int) {
         let account = try await baseAccount()
         try requireActive()
@@ -1132,7 +1236,7 @@ actor OfframpSession {
                 seedPhrase: seedPhrase,
                 pimlicoApiKey: pimlicoKey,
                 rpcUrl: isTestnet ? nil : PartnerKeys.p2pRpcBaseMainnet,
-                subgraphUrl: isTestnet ? nil : PartnerKeys.p2pSubgraphMainnet,
+                subgraphUrl: isTestnet ? PartnerKeys.p2pSubgraphSepolia : PartnerKeys.p2pSubgraphMainnet,
                 sponsorshipPolicyId: PartnerKeys.p2pSponsorshipPolicyId
             )
             guard self.adopt(built, generation: generation) else {
@@ -1205,10 +1309,14 @@ actor OfframpSession {
         guard let wallet = selectedAccount else {
             throw OfframpClientError.configuration("Select a wallet account before buying ZEC.")
         }
-        guard let baseURL = PartnerKeys.p2pOnrampBaseUrl, !baseURL.isEmpty else {
+        guard PartnerKeys.isOnrampConfigured,
+              let screeningApiUrl = PartnerKeys.p2pScreeningApiUrl,
+              let screeningKey = PartnerKeys.p2pScreeningKey else {
             throw OfframpClientError.configuration("P2P buying is not configured in PartnerKeys.plist.")
         }
         let storage = try OnrampEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
+        // One relay identity per wallet: the key lives in the off-ramp's file, shared as Peer shares it.
+        let relayStorage = try OfframpEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
         let gateway: OnrampZecSwapGateway? = environment.network().networkType == .testnet ? nil : OnrampZecSwapGateway(
             account: wallet,
             swapAndPay: swapAndPay,
@@ -1219,12 +1327,22 @@ actor OfframpSession {
             let built = OnrampRail(
                 client: try await AppleOnrampClient.companion.create(
                     account: baseSnapshot.account,
-                    onrampBaseUrl: baseURL,
                     storage: storage,
+                    relayStorage: relayStorage,
                     deviceSignals: OnrampDeviceSignals(),
-                    onrampAppId: "zapp",
+                    screeningApiUrl: screeningApiUrl,
+                    screeningKeyHex: screeningKey,
                     swapGateway: gateway,
-                    useFakeDeliveryDriver: false
+                    useFakeDeliveryDriver: false,
+                    onUnrecognisedRevert: { revert in
+                        LoggerProxy.warn("BUY reverted with no mapping — reporting it as upstream: \(revert)")
+                    },
+                    onLinkFailed: { reason in
+                        LoggerProxy.warn("Screening record never linked to its order: \(reason)")
+                    },
+                    onScreeningUnavailable: { reason in
+                        LoggerProxy.warn("Screening record never filed for its order: \(reason)")
+                    }
                 ),
                 gateway: gateway
             )

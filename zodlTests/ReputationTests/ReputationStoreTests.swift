@@ -128,6 +128,59 @@ struct ReputationStoreTests {
         #expect(store.state.isRaiseLimitVisible)
     }
 
+    @MainActor @Test func aSelfieWalletShowsTheCheckoutLimitAndNamesItsSource() async {
+        let summary = ReputationFixtures.summary(
+            canBuy: true,
+            buyLimitMicros: "0",
+            points: "0",
+            shownLimitMicros: "20000000",
+            isLimitFromCheckout: true,
+            isSelfieAvailable: true
+        )
+        let store = await TestStore(initialState: .initial(currencyCode: "INR")) { Reputation() } withDependencies: {
+            $0.reputation.summary = { _ in summary }
+        }
+
+        await store.send(.onAppear) { $0.isLoading = true }
+        await store.receive(\.summaryLoaded) {
+            $0.isLoading = false
+            $0.content = .ready(summary)
+        }
+
+        #expect(store.state.buyLimitText == String(localizable: .reputationAmountUsd("20")))
+        #expect(store.state.buyLimitCaption == String(localizable: .reputationLimitCaptionCheckout))
+        #expect(store.state.primaryAction == .buy)
+        // Verifying an account raises the Diamond's limit, which this wallet has yet to touch.
+        #expect(store.state.isRaiseLimitVisible)
+    }
+
+    @MainActor @Test func aLockedWalletHearsAboutTheSelfieOnlyWhereOneExists() async {
+        let withSelfie = ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", isSelfieAvailable: true)
+        let store = await TestStore(initialState: .initial(currencyCode: "INR")) { Reputation() } withDependencies: {
+            $0.reputation.summary = { _ in withSelfie }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.onAppear)
+        await store.receive(\.summaryLoaded)
+
+        #expect(store.state.buyLimitCaption == String(localizable: .reputationLimitLockedCaptionSelfie))
+        #expect(store.state.primaryAction == .verifyToBuy)
+    }
+
+    @MainActor @Test func aBlockedSelfieWalletIsStillBlocked() async {
+        let summary = ReputationFixtures.summary(
+            canBuy: true,
+            buyLimitMicros: "0",
+            isBlocked: true,
+            points: "0",
+            shownLimitMicros: "20000000",
+            isLimitFromCheckout: true,
+            isSelfieAvailable: true
+        )
+        #expect(!summary.canStartBuy)
+    }
+
     /// At the ceiling a further verification buys nothing, so the offer is withdrawn and the
     /// caption says why.
     @MainActor @Test func atTheCeilingNothingIsOfferedBeyondBuying() async {
@@ -213,6 +266,10 @@ enum ReputationFixtures {
         isAtCeiling: Bool = false,
         isBlocked: Bool = false,
         points: String = "100",
+        shownLimitMicros: String? = nil,
+        isLimitFromCheckout: Bool = false,
+        isSelfieAvailable: Bool = false,
+        liveness: LivenessStandingModel? = nil,
         platforms: [ReputationPlatformModel] = ReputationFixtures.platforms
     ) -> ReputationSummaryModel {
         ReputationSummaryModel(
@@ -223,6 +280,10 @@ enum ReputationFixtures {
             isAtCeiling: isAtCeiling,
             buyLimitMicros: buyLimitMicros,
             maxBuyLimitMicros: "400000000",
+            shownLimitMicros: shownLimitMicros ?? buyLimitMicros,
+            isLimitFromCheckout: isLimitFromCheckout,
+            isSelfieAvailable: isSelfieAvailable,
+            liveness: liveness,
             platforms: platforms
         )
     }

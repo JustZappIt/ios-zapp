@@ -71,6 +71,10 @@ extension Root {
                     guard let args = ReclaimReturnLink.resumeArgs(from: url) else { return .none }
                     return .send(.reclaimReturnReceived(args))
                 }
+                if url.host()?.lowercased() == LivenessReturnLink.host {
+                    guard let ret = LivenessReturnLink.returnModel(from: url) else { return .none }
+                    return .send(.livenessReturnReceived(ret))
+                }
                 // Gift links next, before the blanket ZIP-321 warning: the host check is all the
                 // routing needs — full validation is the codec's, on the claim screen.
                 if url.host()?.lowercased() == GiftLinkCodec.giftLinkHost {

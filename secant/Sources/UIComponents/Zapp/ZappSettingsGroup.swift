@@ -13,6 +13,8 @@ struct ZappSettingsGroup<Content: View>: View {
     var titleLogo: Image?
     /// Read out in place of the title when the header is the logo alone.
     var titleLogoLabel: String?
+    /// A muted caption under the box, as Android's `footer`.
+    var footer: String?
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -48,8 +50,22 @@ struct ZappSettingsGroup<Content: View>: View {
             )
             .padding(.horizontal, 14)
 
+            if let footer {
+                Text(footer)
+                    .zappFont(.caption, style: ZappColors.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, ZappSettingsGroupLayout.textGutter)
+                    .padding(.top, Design.Spacing._md)
+            }
+
             Spacer()
                 .frame(height: Design.Spacing._md)
         }
     }
+}
+
+private enum ZappSettingsGroupLayout {
+    /// The header's text gutter, so the footer lines up with the title.
+    static let textGutter: CGFloat = 18
 }

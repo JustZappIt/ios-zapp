@@ -18,12 +18,17 @@ struct PartnerKeys {
         static let cmcKey = "cmcKey"
         static let nearFeeDepositAddress = "nearFeeDepositAddress"
         static let p2pPimlicoApiKey = "p2pPimlicoApiKey"
-        static let p2pOnrampBaseUrl = "p2pOnrampBaseUrl"
+        static let p2pScreeningApiUrl = "p2pScreeningApiUrl"
+        static let p2pScreeningKey = "p2pScreeningKey"
         static let p2pRpcBaseMainnet = "p2pRpcBaseMainnet"
         static let p2pSubgraphMainnet = "p2pSubgraphMainnet"
+        static let p2pSubgraphSepolia = "p2pSubgraphSepolia"
         static let p2pSponsorshipPolicyId = "p2pSponsorshipPolicyId"
         static let reclaimAppId = "reclaimAppId"
         static let reclaimAppSecret = "reclaimAppSecret"
+        static let livenessApiUrl = "livenessApiUrl"
+        static let livenessApiKey = "livenessApiKey"
+        static let livenessTenant = "livenessTenant"
         static let klipyKey = "klipyKey"
 #if DEBUG
         static let testSeed = "testSeed"
@@ -58,8 +63,20 @@ struct PartnerKeys {
         PartnerKeys.value(for: Constants.p2pPimlicoApiKey)
     }
 
-    static var p2pOnrampBaseUrl: String? {
-        PartnerKeys.value(for: Constants.p2pOnrampBaseUrl)
+    /// P2P's screening intake and its shared key. Without both, Buy is closed rather than placing
+    /// orders that never fill.
+    static var p2pScreeningApiUrl: String? {
+        PartnerKeys.value(for: Constants.p2pScreeningApiUrl)
+    }
+
+    static var p2pScreeningKey: String? {
+        PartnerKeys.value(for: Constants.p2pScreeningKey)
+    }
+
+    static var isOnrampConfigured: Bool {
+        guard let url = p2pScreeningApiUrl, let key = p2pScreeningKey else { return false }
+        return !url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     static var p2pRpcBaseMainnet: String? {
@@ -68,6 +85,11 @@ struct PartnerKeys {
 
     static var p2pSubgraphMainnet: String? {
         PartnerKeys.value(for: Constants.p2pSubgraphMainnet)
+    }
+
+    /// Optional: the framework's Sepolia default currently resolves to a deleted deployment.
+    static var p2pSubgraphSepolia: String? {
+        PartnerKeys.value(for: Constants.p2pSubgraphSepolia)
     }
 
     static var p2pSponsorshipPolicyId: String? {
@@ -85,6 +107,20 @@ struct PartnerKeys {
 
     static var reclaimAppSecret: String? {
         PartnerKeys.value(for: Constants.reclaimAppSecret)
+    }
+
+    /// Ships in the binary on the Reclaim credentials' reasoning: an extracted key can open a
+    /// widget session but cannot mint an attestation. Optional, like them.
+    static var livenessApiUrl: String? {
+        PartnerKeys.value(for: Constants.livenessApiUrl)
+    }
+
+    static var livenessApiKey: String? {
+        PartnerKeys.value(for: Constants.livenessApiKey)
+    }
+
+    static var livenessTenant: String? {
+        PartnerKeys.value(for: Constants.livenessTenant)
     }
 
     static var klipyKey: String? {

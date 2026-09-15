@@ -82,7 +82,34 @@ struct IncreaseReputationView: View {
                     }
                 }
             }
+
+            if let liveness = store.liveness {
+                ZappSettingsGroup(
+                    title: String(localizable: .increaseReputationLivenessGroup),
+                    footer: String(localizable: .increaseReputationLivenessFooter)
+                ) {
+                    selfieRow(liveness)
+                }
+            }
         }
+    }
+
+    /// The reward is dollars rather than RP: the selfie unlocks a limit, not points.
+    private func selfieRow(_ liveness: LivenessStandingModel) -> some View {
+        ZappRow(
+            title: String(localizable: .increaseReputationLivenessRow),
+            subtitle: String(localizable: .increaseReputationLivenessSubtitle),
+            titleColor: liveness.isVerified ? .textMuted : .text,
+            trailing: {
+                if liveness.isVerified {
+                    verifiedTrailing(String(localizable: .reputationAmountUsd(ReputationCopy.usd(liveness.limitMicros))))
+                } else {
+                    Text(String(localizable: .increaseReputationLivenessReward(ReputationCopy.usd(liveness.tierCapMicros))))
+                        .zappFont(.rowSubtitle, style: ZappColors.accentText)
+                }
+            },
+            action: liveness.isVerified ? nil : { store.send(.selfieTapped) }
+        )
     }
 
     /// Verified rows stay listed and inert: hiding one reads as a bug, and nothing else in the app
@@ -102,16 +129,7 @@ struct IncreaseReputationView: View {
     @ViewBuilder
     private func platformTrailing(_ platform: ReputationPlatformModel) -> some View {
         if platform.isVerified {
-            HStack(spacing: ReputationLayout.rowTrailingGap) {
-                Asset.Assets.check.image
-                    .zImage(size: IncreaseReputationLayout.checkSize, style: ZappColors.success)
-                // Says the state, not just the reward: a bare "50 RP" beside a tick reads as an
-                // offer rather than as points already banked.
-                Text(String(localizable: .increaseReputationVerifiedReward(
-                    String(localizable: .reputationRpAmount(platform.awardPoints))
-                )))
-                .zappFont(.rowSubtitle, style: ZappColors.success)
-            }
+            verifiedTrailing(String(localizable: .reputationRpAmount(platform.awardPoints)))
         } else {
             // Two lines, right-aligned: what the account is worth in points, and what that is
             // worth in dollars of limit. The second is the one people actually decide on.
@@ -127,12 +145,25 @@ struct IncreaseReputationView: View {
         }
     }
 
+    /// Says the state, not just the reward: a bare "50 RP" beside a tick reads as an offer rather
+    /// than as points already banked.
+    private func verifiedTrailing(_ reward: String) -> some View {
+        HStack(spacing: ReputationLayout.rowTrailingGap) {
+            Asset.Assets.check.image
+                .zImage(size: IncreaseReputationLayout.checkSize, style: ZappColors.success)
+            Text(String(localizable: .increaseReputationVerifiedReward(reward)))
+                .zappFont(.rowSubtitle, style: ZappColors.success)
+        }
+    }
+
     @ViewBuilder
     private func runBody(_ run: IncreaseReputation.State.Run) -> some View {
         VStack(alignment: .leading, spacing: ReputationLayout.sectionGap) {
             if run.stage == .done {
                 ZappSuccessHeader(
-                    title: String(localizable: .increaseReputationDone(run.name)),
+                    title: run.isSelfie
+                        ? String(localizable: .increaseReputationLivenessDone)
+                        : String(localizable: .increaseReputationDone(run.name)),
                     subtitle: run.newBuyLimitMicros.map {
                         String(localizable: .increaseReputationNewLimit(ReputationCopy.usd($0)))
                     } ?? ""
@@ -152,7 +183,9 @@ struct IncreaseReputationView: View {
                 // ☠ iOS suspends the poller the moment the app backgrounds, and the session's ten
                 // minutes keep running. Saying so is what stops a spent budget reading as a bug.
                 if run.stage == .verifying {
-                    ReputationNotice(text: String(localizable: .increaseReputationWaitingHelp))
+                    ReputationNotice(text: run.isSelfie
+                        ? String(localizable: .increaseReputationLivenessWaitingHelp)
+                        : String(localizable: .increaseReputationWaitingHelp))
                 }
             }
 
@@ -187,9 +220,9 @@ struct IncreaseReputationView: View {
         if let run = store.run {
             switch run.stage {
             case .preparing, .verifying:
-                ZappButton(title: String(localizable: .increaseReputationOpen), isEnabled: false) { }
+                ZappButton(title: openTitle(for: run), isEnabled: false) { }
             case .ready:
-                ZappButton(title: String(localizable: .increaseReputationOpen)) { openVerifier(run) }
+                ZappButton(title: openTitle(for: run)) { openVerifier(run) }
             case .submitting:
                 ZappButton(title: String(localizable: .increaseReputationSavingAction), isEnabled: false) { }
             case .done:
@@ -200,6 +233,12 @@ struct IncreaseReputationView: View {
         } else {
             ZappButton(title: String(localizable: .reputationRetry)) { store.send(.retryLoadTapped) }
         }
+    }
+
+    private func openTitle(for run: IncreaseReputation.State.Run) -> String {
+        run.isSelfie
+            ? String(localizable: .increaseReputationLivenessOpen)
+            : String(localizable: .increaseReputationOpen)
     }
 
     /// The one thing only the view can do. iOS resolves the share link to the Reclaim Verifier when
@@ -217,13 +256,16 @@ struct IncreaseReputationView: View {
     }
 
     private func message(for run: IncreaseReputation.State.Run) -> String {
-        switch run.stage {
-        case .preparing: return String(localizable: .increaseReputationPreparing)
-        case .ready: return String(localizable: .increaseReputationReady(run.name))
-        case .verifying: return String(localizable: .increaseReputationWaiting)
-        case .submitting: return String(localizable: .increaseReputationSaving)
-        case .done: return String(localizable: .increaseReputationDone(run.name))
-        case .failed: return String(localizable: .increaseReputationFailed)
+        switch (run.stage, run.isSelfie) {
+        case (.preparing, _): return String(localizable: .increaseReputationPreparing)
+        case (.ready, false): return String(localizable: .increaseReputationReady(run.name))
+        case (.ready, true): return String(localizable: .increaseReputationLivenessReady)
+        case (.verifying, false): return String(localizable: .increaseReputationWaiting)
+        case (.verifying, true): return String(localizable: .increaseReputationLivenessWaiting)
+        case (.submitting, _): return String(localizable: .increaseReputationSaving)
+        case (.done, false): return String(localizable: .increaseReputationDone(run.name))
+        case (.done, true): return String(localizable: .increaseReputationLivenessDone)
+        case (.failed, _): return String(localizable: .increaseReputationFailed)
         }
     }
 }

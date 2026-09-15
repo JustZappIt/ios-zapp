@@ -280,8 +280,7 @@ struct ZappPayView: View {
                     store.send(.receiveScreenRequested)
                 }
         ]
-        if let baseURL = PartnerKeys.p2pOnrampBaseUrl,
-           !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if PartnerKeys.isOnrampConfigured {
             actions.insert(
                 ZappSpeedDialAction(
                     icon: Asset.Assets.Icons.walletBuy.image,
