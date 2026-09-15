@@ -635,6 +635,8 @@ struct ChatRoom {
                 }
 
             case .messagingStateChanged(let messagingState):
+                guard messagingState != state.messagingState else { return .none }
+
                 state.messagingState = messagingState
                 return .none
 

@@ -261,6 +261,11 @@ struct ChatRoomView: View {
                 ScrollView {
                     LazyVStack(spacing: Design.Spacing._md) {
                         WithPerceptionTracking {
+                            let readReceiptsEnabled = store.messagingState.readReceiptsEnabled
+                            let localPublicKey = store.localPublicKey
+                            let fiatRate = store.chatFiatRate
+                            let paidRequestIds = store.paidRequestIds
+
                             if store.isLoading && store.visibleMessages.isEmpty {
                                 ProgressView()
                                     .tint(ZappColors.accent.color(colorScheme))
@@ -271,7 +276,22 @@ struct ChatRoomView: View {
                             ForEach(items) { item in
                                 switch item {
                                 case .message(let message, _):
-                                    ChatRoomBubbleRow(store: store, message: message)
+                                    // A lazy row is built outside the stack's scope.
+                                    WithPerceptionTracking {
+                                        ChatRoomBubbleRow(
+                                            store: store,
+                                            message: message,
+                                            senderName: store.state.senderName(for: message),
+                                            readReceiptsEnabled: readReceiptsEnabled,
+                                            localPublicKey: localPublicKey,
+                                            fiatRate: fiatRate,
+                                            linkPreview: store.messageLinkPreviews[message.id],
+                                            progress: message.mediaId.flatMap { store.mediaProgress[$0] },
+                                            isPaid: ChatPaymentSettlement.requestId(of: message)
+                                                .map { paidRequestIds.contains($0) } ?? false
+                                        )
+                                        .equatable()
+                                    }
 
                                 case .separator(_, let label):
                                     ChatDateSeparator(label: label)
