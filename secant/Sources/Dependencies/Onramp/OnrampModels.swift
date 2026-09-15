@@ -52,10 +52,15 @@ enum OnrampFailureCodeModel: String, Equatable, Sendable {
     case noMerchant = "NO_MERCHANT"
     case orderExpired = "ORDER_EXPIRED"
     case networkUnavailable = "NETWORK_UNAVAILABLE"
+    case dailyLimitExceeded = "DAILY_LIMIT_EXCEEDED"
+    case volumeLimitExceeded = "VOLUME_LIMIT_EXCEEDED"
+    case userBlocked = "USER_BLACKLISTED"
+    /// Fiat has left the user's account and the merchant's leg is still outstanding: paid, alive.
+    case settlementPending = "SETTLEMENT_PENDING"
     case unknown = "UNKNOWN"
 
     var leavesOrderAlive: Bool {
-        self == .upstreamFailed || self == .operatorUnavailable || self == .networkUnavailable
+        self == .upstreamFailed || self == .operatorUnavailable || self == .networkUnavailable || self == .settlementPending
     }
 }
 
@@ -136,6 +141,8 @@ struct OnrampStatusModel: Equatable, Sendable {
     let id: String?
     let orderID: String?
     let failureCode: OnrampFailureCodeModel?
+    /// The service's own sentence for a refusal, shown in place of the code's; never branched on.
+    let failureDetail: String?
     let instruction: OnrampPaymentInstructionModel?
     let fiatMicros: String?
     let netUsdcMicros: String?

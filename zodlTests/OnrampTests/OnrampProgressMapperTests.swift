@@ -56,6 +56,7 @@ struct OnrampProgressMapperTests {
             id: "request-1",
             orderID: "order-1",
             failureCode: failure,
+            failureDetail: nil,
             instruction: nil,
             fiatMicros: "100000000",
             netUsdcMicros: "1000000",

@@ -479,6 +479,7 @@ struct Root {
         case giftResetGuardReviewTapped
         case giftResetGuardDeleteAnywayTapped(Bool)
         case reclaimReturnReceived(ReclaimReturnLink.ResumeArgs)
+        case livenessReturnReceived(LivenessReturnModel)
         case buyReputationLoaded(
             requestID: UUID, currencyCode: String, accountID: [UInt8]?, hasCheckpoint: Bool, summary: ReputationSummaryModel?
         )

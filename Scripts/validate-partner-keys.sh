@@ -10,7 +10,8 @@
 # in Zapp; its optional keys remain supported by PartnerKeys.swift. So are
 # reclaimAppId / reclaimAppSecret: without them the verification driver reports
 # NotConfigured, which is a build that cannot verify rather than one that
-# cannot run.
+# cannot run. p2pScreeningApiUrl / p2pScreeningKey are required: without them
+# Buy is closed.
 
 # Run only during Product -> Archive. Xcode sets ACTION=install for archive
 # builds; normal build / Run set ACTION=build.
@@ -25,7 +26,7 @@ PLIST="${SRCROOT}/secant/Resources/PartnerKeys.plist"
 
 # Each key must be present, of type String, and non-empty. testSeed is
 # #if DEBUG-only and intentionally excluded from archive validation.
-REQUIRED_KEYS="nearKey cmcKey nearFeeDepositAddress p2pPimlicoApiKey p2pOnrampBaseUrl p2pRpcBaseMainnet p2pSubgraphMainnet"
+REQUIRED_KEYS="nearKey cmcKey nearFeeDepositAddress p2pPimlicoApiKey p2pScreeningApiUrl p2pScreeningKey p2pRpcBaseMainnet p2pSubgraphMainnet"
 
 errors=()
 

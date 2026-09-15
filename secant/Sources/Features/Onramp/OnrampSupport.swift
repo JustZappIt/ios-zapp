@@ -16,6 +16,11 @@ extension Onramp {
         return NSDecimalNumber(decimal: decimal / 1_000_000).stringValue
     }
 
+    /// Unreadable counts as zero.
+    static func isZeroMicros(_ value: String) -> Bool {
+        Decimal(string: value).map { $0 <= 0 } ?? true
+    }
+
     static func withinLimits(_ amount: String, limits: OnrampLimitsModel) -> Bool {
         guard let value = Decimal(string: amount),
               let minimum = Decimal(string: limits.minimumFiatMicros),
@@ -45,9 +50,21 @@ extension Onramp {
             return String(localizable: .onrampErrorBackendUnavailable)
         case .noMerchant: return String(localizable: .onrampErrorNoMerchant)
         case .orderExpired: return String(localizable: .onrampErrorOrderExpired)
+        case .dailyLimitExceeded: return String(localizable: .onrampErrorDailyLimit)
+        case .volumeLimitExceeded: return String(localizable: .onrampErrorVolumeLimit)
+        case .userBlocked: return String(localizable: .onrampErrorUserBlocked)
+        case .settlementPending: return String(localizable: .onrampErrorSettlementPending)
         case .unknown, nil: return String(localizable: .onrampErrorProgress)
         }
     }
+
+    static func failureMessage(_ status: OnrampStatusModel) -> String {
+        let detail = status.failureDetail?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !detail.isEmpty else { return failureMessage(status.failureCode) }
+        return String(detail.prefix(serviceDetailMaxCharacters))
+    }
+
+    static let serviceDetailMaxCharacters = 200
 
     static func deliveryFailureMessage(_ location: OnrampFundsLocationModel?) -> String {
         switch location {

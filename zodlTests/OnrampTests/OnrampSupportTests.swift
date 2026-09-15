@@ -40,4 +40,79 @@ struct OnrampSupportTests {
         #expect(Onramp.baseRefundState(blocked) == .blocked)
         #expect(Onramp.baseRefundState(nil) == .hidden)
     }
+
+    @Test func everyDirectRouteFailureHasItsOwnSentence() {
+        // The rolling caps must not read as "try a smaller amount": nothing passes until the
+        // window rolls over, and a blocked wallet must not be told to verify.
+        #expect(Onramp.failureMessage(.dailyLimitExceeded) == String(localizable: .onrampErrorDailyLimit))
+        #expect(Onramp.failureMessage(.volumeLimitExceeded) == String(localizable: .onrampErrorVolumeLimit))
+        #expect(Onramp.failureMessage(.userBlocked) == String(localizable: .onrampErrorUserBlocked))
+        #expect(Onramp.failureMessage(.settlementPending) == String(localizable: .onrampErrorSettlementPending))
+        #expect(Onramp.failureMessage(.capExceeded) != Onramp.failureMessage(.dailyLimitExceeded))
+    }
+
+    @Test func aPendingSettlementLeavesTheOrderAlive() {
+        // Fiat has left the user's account; dropping the checkpoint here would strand it.
+        #expect(OnrampFailureCodeModel.settlementPending.leavesOrderAlive)
+        #expect(!OnrampFailureCodeModel.dailyLimitExceeded.leavesOrderAlive)
+        #expect(!OnrampFailureCodeModel.userBlocked.leavesOrderAlive)
+    }
+
+    @Test func theServicesOwnSentenceWinsWhenItGaveOne() {
+        let refused = status(code: .screeningRejected, detail: "  new accounts cannot place buy orders at this time \n")
+        #expect(Onramp.failureMessage(refused) == "new accounts cannot place buy orders at this time")
+
+        let blank = status(code: .screeningRejected, detail: "   ")
+        #expect(Onramp.failureMessage(blank) == String(localizable: .onrampErrorScreeningRejected))
+        #expect(Onramp.failureMessage(status(code: .noMerchant, detail: nil)) == String(localizable: .onrampErrorNoMerchant))
+
+        let long = status(code: .screeningRejected, detail: String(repeating: "x", count: 500))
+        #expect(Onramp.failureMessage(long).count == Onramp.serviceDetailMaxCharacters)
+    }
+
+    @Test func theLimitRowFollowsWhatTheRailReports() {
+        // The direct rail reports no daily figure, so the per-order ceiling is the row; a rail
+        // that reports one shows that instead of a per-order figure.
+        var state = Onramp.State.initial(currencyCode: "INR")
+        state.limits = limits(maximum: "2035400000", daily: "0")
+        #expect(state.transactionLimitMicros == "2035400000")
+        #expect(state.dailyLimitMicros == nil)
+
+        state.limits = limits(maximum: "2035400000", daily: "5000000000")
+        #expect(state.transactionLimitMicros == nil)
+        #expect(state.dailyLimitMicros == "5000000000")
+
+        state.limits = nil
+        #expect(state.transactionLimitMicros == nil)
+        #expect(state.dailyLimitMicros == nil)
+        #expect(Onramp.isZeroMicros("garbage"))
+    }
+
+    private func limits(maximum: String, daily: String) -> OnrampLimitsModel {
+        OnrampLimitsModel(
+            enabled: true,
+            currencyCode: "INR",
+            minimumFiatMicros: "106860000",
+            maximumFiatMicros: maximum,
+            dailyFiatMicros: daily
+        )
+    }
+
+    private func status(code: OnrampFailureCodeModel, detail: String?) -> OnrampStatusModel {
+        OnrampStatusModel(
+            kind: .failed,
+            phase: .placing,
+            id: nil,
+            orderID: nil,
+            failureCode: code,
+            failureDetail: detail,
+            instruction: nil,
+            fiatMicros: nil,
+            netUsdcMicros: nil,
+            recipientAddress: nil,
+            paidTransactionHash: nil,
+            expiresAt: nil,
+            isTerminal: true
+        )
+    }
 }
