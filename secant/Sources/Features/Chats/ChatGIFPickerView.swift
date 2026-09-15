@@ -24,9 +24,11 @@ struct ChatGIFPickerView: View {
 
     var body: some View {
         WithPerceptionTracking {
+            let query = store.query
+
             VStack(spacing: Design.Spacing._lg) {
                 header
-                searchField
+                searchField(query: query)
                 results
                 attribution
             }
@@ -56,11 +58,13 @@ struct ChatGIFPickerView: View {
         .padding(.top, Design.Spacing._lg)
     }
 
-    private var searchField: some View {
+    /// The field reads the binding in its own body, outside this view's tracking scope, so it
+    /// gets the value the tracked body already read.
+    private func searchField(query: String) -> some View {
         ZappSearchField(
             placeholder: String(localizable: .chatGifPickerSearchPlaceholder),
             text: Binding(
-                get: { store.query },
+                get: { query },
                 set: { store.send(.queryChanged($0)) }
             ),
             onClear: { store.send(.clearQueryTapped) }

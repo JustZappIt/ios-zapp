@@ -28,11 +28,17 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         chat: ChatPushNotifications.shared
     )
 
+    // The action logger's os_log is compiled out of release builds; the dump and
+    // diff of every Root.State it feeds are not, so the reducer itself is gated.
     let rootStore = StoreOf<Root>(
         initialState: .initial
     ) {
+#if DEBUG
         Root()
             .logging()
+#else
+        Root()
+#endif
     }
 
     func application(

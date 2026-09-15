@@ -19,6 +19,9 @@ struct ChatsListView: View {
 
     var body: some View {
         WithPerceptionTracking {
+            let showsNetworkDetails = store.showsNetworkDetails
+            let showsTermsDialog = store.showsTermsDialog
+
             ZStack(alignment: .bottomTrailing) {
                 VStack(spacing: 0) {
                     ZappScreenHeader(title: String(localizable: .chatListTitle)) {
@@ -50,21 +53,23 @@ struct ChatsListView: View {
             .onDisappear { store.send(.onDisappear) }
             .sheet(
                 isPresented: Binding(
-                    get: { store.showsNetworkDetails },
+                    get: { showsNetworkDetails },
                     set: { if !$0 { store.send(.networkDetailsDismissed) } }
                 )
             ) {
-                ChatNetworkDetailsView(
-                    state: store.messagingState,
-                    details: store.connectionDetails,
-                    isLoading: store.isLoadingNetworkDetails,
-                    onRefresh: { store.send(.networkChipTapped) }
-                )
+                WithPerceptionTracking {
+                    ChatNetworkDetailsView(
+                        state: store.messagingState,
+                        details: store.connectionDetails,
+                        isLoading: store.isLoadingNetworkDetails,
+                        onRefresh: { store.send(.networkChipTapped) }
+                    )
+                }
             }
             // Swiping the sheet away is the analogue of Android's `onDismissRequest`, which declines.
             .sheet(
                 isPresented: Binding(
-                    get: { store.showsTermsDialog },
+                    get: { showsTermsDialog },
                     set: { if !$0 { store.send(.termsDeclined) } }
                 )
             ) {
@@ -101,27 +106,33 @@ struct ChatsListView: View {
                         onLeave: { store.send(.leaveConversationRequested(conversation.id)) },
                         onTap: { store.send(.conversationTapped(conversation.id)) }
                     ) { tap in
-                        ChatConversationRow(
-                            conversation: conversation,
-                            displayName: store.state.displayName(for: conversation),
-                            isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
-                            unreadCount: store.state.messagingState.unreadCount(for: conversation.id),
-                            action: tap
-                        )
-                        // Long-press peeks the conversation before committing to open it
-                        // (Appendix C.1). The peek is built from list data only — no room is
-                        // opened and no message stream is subscribed to.
-                        .contextMenu {
-                            Button(String(localizable: .chatListLeaveAction), role: .destructive) {
-                                store.send(.leaveConversationRequested(conversation.id))
-                            }
-                        } preview: {
-                            ChatConversationPreviewCard(
+                        // Lazy-stack rows and the preview are built outside the body's tracking
+                        // scope, so each reads the store under its own tracking.
+                        WithPerceptionTracking {
+                            ChatConversationRow(
                                 conversation: conversation,
                                 displayName: store.state.displayName(for: conversation),
                                 isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
-                                unreadCount: store.state.messagingState.unreadCount(for: conversation.id)
+                                unreadCount: store.state.messagingState.unreadCount(for: conversation.id),
+                                action: tap
                             )
+                            // Long-press peeks the conversation before committing to open it
+                            // (Appendix C.1). The peek is built from list data only — no room is
+                            // opened and no message stream is subscribed to.
+                            .contextMenu {
+                                Button(String(localizable: .chatListLeaveAction), role: .destructive) {
+                                    store.send(.leaveConversationRequested(conversation.id))
+                                }
+                            } preview: {
+                                WithPerceptionTracking {
+                                    ChatConversationPreviewCard(
+                                        conversation: conversation,
+                                        displayName: store.state.displayName(for: conversation),
+                                        isPeerOnline: store.state.messagingState.isPeerOnline(in: conversation.id),
+                                        unreadCount: store.state.messagingState.unreadCount(for: conversation.id)
+                                    )
+                                }
+                            }
                         }
                     }
 

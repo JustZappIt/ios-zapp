@@ -35,17 +35,20 @@ struct ChatMessageBubble: View {
             if !isFromMe, let senderName {
                 Text(senderName)
                     .zappFont(.chip, style: ZappColors.accent)
-                    .padding(.leading, Design.Spacing._xs)
+                    .padding(.leading, ZappBubbleShape.tailDepth + Design.Spacing._xs)
             }
 
-            if hasQuote {
-                VStack(spacing: 0) {
-                    quote
+            Group {
+                if hasQuote {
+                    VStack(spacing: 0) {
+                        quote
+                        bubble
+                    }
+                } else {
                     bubble
                 }
-            } else {
-                bubble
             }
+            .zappBubble(tail: isFromMe ? .trailing : .leading, fill: bubbleColor)
         }
         .frame(maxWidth: Constants.maxWidth, alignment: isFromMe ? .trailing : .leading)
         .frame(maxWidth: .infinity, alignment: isFromMe ? .trailing : .leading)
@@ -93,7 +96,6 @@ struct ChatMessageBubble: View {
         }
         .padding(Constants.padding)
         .frame(maxWidth: fillWidth, alignment: .leading)
-        .background(bubbleColor)
     }
 
     /// Time, then the tick — always in that order, and the tick is always last so
