@@ -102,6 +102,11 @@ struct ChatRoom {
         /// or the first tick is lost until a cold reload.
         var earlyStatuses: [String: String] = [:]
 
+        /// Persisted id -> the optimistic id it replaced. A row keeps the identity it was born
+        /// with, so reconciling is an in-place update rather than a delete and an insert that
+        /// animate over each other.
+        var rowIds: [String: String] = [:]
+
         var messageReceivedCancelId = UUID()
         var messagingStateCancelId = UUID()
         var messageStatusCancelId = UUID()
@@ -205,6 +210,7 @@ struct ChatRoom {
                 postEntryInboundMessageIds.formIntersection(retainedIds)
                 requestedLinkPreviewMessageIds.formIntersection(retainedIds)
                 messageLinkPreviews = messageLinkPreviews.filter { retainedIds.contains($0.key) }
+                rowIds = rowIds.filter { retainedIds.contains($0.key) }
                 completedMediaIds.formIntersection(retainedMediaIds)
                 mediaProgress = mediaProgress.filter { retainedMediaIds.contains($0.key) }
             }
@@ -243,6 +249,21 @@ struct ChatRoom {
             } else {
                 insert(persisted)
             }
+
+            // A retry re-sends under the previous persisted id, so the row's original identity
+            // travels with it rather than being buried under a stale entry.
+            rowIds[persisted.id] = rowIds.removeValue(forKey: clientId) ?? clientId
+            if let preview = messageLinkPreviews.removeValue(forKey: clientId) {
+                messageLinkPreviews[persisted.id] = preview
+            }
+            if requestedLinkPreviewMessageIds.remove(clientId) != nil {
+                requestedLinkPreviewMessageIds.insert(persisted.id)
+            }
+        }
+
+        /// A preview requested under an optimistic id can land after the row was reconciled.
+        func persistedId(for messageId: String) -> String {
+            rowIds.first(where: { $0.value == messageId })?.key ?? messageId
         }
     }
 
@@ -499,7 +520,7 @@ struct ChatRoom {
             case .messageLinkPreviewLoaded(let messageId, let preview):
                 guard let preview else { return .none }
 
-                state.messageLinkPreviews[messageId] = preview
+                state.messageLinkPreviews[state.persistedId(for: messageId)] = preview
                 return .none
 
             case .sendTapped:

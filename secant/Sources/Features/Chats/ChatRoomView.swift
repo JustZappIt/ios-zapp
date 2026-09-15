@@ -24,6 +24,15 @@ struct ChatRoomView: View {
 
     var body: some View {
         WithPerceptionTracking {
+            // Presentation getters run in the presented view's body, outside this scope.
+            let showsAttachmentSheet = store.showsAttachmentSheet
+            let showsPhotosPicker = store.showsPhotosPicker
+            let pickedItem = store.pickedItem
+            let showsFileImporter = store.showsFileImporter
+            let showsCamera = store.showsCamera
+            let showsNetworkDetails = store.showsNetworkDetails
+            let showsImageViewer = store.imageViewerMessage != nil
+
             VStack(spacing: 0) {
                 ZappScreenHeader(
                     title: store.title,
@@ -92,26 +101,31 @@ struct ChatRoomView: View {
                 // view, and the network-details sheet already owns the screen's slot.
                 .sheet(
                     isPresented: Binding(
-                        get: { store.showsAttachmentSheet },
+                        get: { showsAttachmentSheet },
                         set: { if !$0 { store.send(.attachmentSheetDismissed) } }
                     ),
                     // Only fires once the sheet is fully gone, which is the earliest a picker
                     // can be presented without iOS dropping it.
                     onDismiss: { store.send(.attachmentSheetClosed) }
                 ) {
-                    attachmentSheet
+                    WithPerceptionTracking {
+                        attachmentSheet
+                    }
                 }
                 .photosPicker(
                     isPresented: Binding(
-                        get: { store.showsPhotosPicker },
+                        get: { showsPhotosPicker },
                         set: { if !$0 { store.send(.photosPickerDismissed) } }
                     ),
-                    selection: $store.pickedItem.sending(\.pickedItemChanged),
+                    selection: Binding(
+                        get: { pickedItem },
+                        set: { store.send(.pickedItemChanged($0)) }
+                    ),
                     matching: .images
                 )
                 .fileImporter(
                     isPresented: Binding(
-                        get: { store.showsFileImporter },
+                        get: { showsFileImporter },
                         set: { if !$0 { store.send(.fileImporterDismissed) } }
                     ),
                     // Android's document picker filters on `*/*`; `.item` is the same "anything".
@@ -128,7 +142,7 @@ struct ChatRoomView: View {
                 }
                 .fullScreenCover(
                     isPresented: Binding(
-                        get: { store.showsCamera },
+                        get: { showsCamera },
                         set: { if !$0 { store.send(.cameraDismissed) } }
                     )
                 ) {
@@ -147,28 +161,32 @@ struct ChatRoomView: View {
             .onDisappear { store.send(.onDisappear) }
             .sheet(
                 isPresented: Binding(
-                    get: { store.showsNetworkDetails },
+                    get: { showsNetworkDetails },
                     set: { if !$0 { store.send(.networkDetailsDismissed) } }
                 )
             ) {
-                ChatNetworkDetailsView(
-                    state: store.messagingState,
-                    details: store.connectionDetails,
-                    isLoading: store.isLoadingNetworkDetails,
-                    onRefresh: { store.send(.networkChipTapped) }
-                )
+                WithPerceptionTracking {
+                    ChatNetworkDetailsView(
+                        state: store.messagingState,
+                        details: store.connectionDetails,
+                        isLoading: store.isLoadingNetworkDetails,
+                        onRefresh: { store.send(.networkChipTapped) }
+                    )
+                }
             }
             // Fullscreen rather than a sheet: a photo should own the screen, and the viewer
             // supplies its own dismiss (close button + drag-down).
             .fullScreenCover(
                 isPresented: Binding(
-                    get: { store.imageViewerMessage != nil },
+                    get: { showsImageViewer },
                     set: { if !$0 { store.send(.imageViewerDismissed) } }
                 )
             ) {
-                if let message = store.imageViewerMessage {
-                    ChatImageViewer(message: message) {
-                        store.send(.imageViewerDismissed)
+                WithPerceptionTracking {
+                    if let message = store.imageViewerMessage {
+                        ChatImageViewer(message: message) {
+                            store.send(.imageViewerDismissed)
+                        }
                     }
                 }
             }
@@ -228,70 +246,81 @@ struct ChatRoomView: View {
     private var items: [ChatRoomItem] {
         ChatRoomItem.build(
             from: store.visibleMessages,
-            unreadSeparatorMessageId: store.unreadSeparatorMessageId
+            unreadSeparatorMessageId: store.unreadSeparatorMessageId,
+            rowIds: store.rowIds
         )
     }
 
+    /// The reader's closure and the lazy stack's content are both built outside the body's
+    /// tracking scope, so each takes its own.
     private var messages: some View {
         ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: Design.Spacing._md) {
-                    if store.isLoading && store.visibleMessages.isEmpty {
-                        ProgressView()
-                            .tint(ZappColors.accent.color(colorScheme))
-                            .frame(maxWidth: .infinity)
-                            .padding(Design.Spacing._3xl)
-                    }
+            WithPerceptionTracking {
+                let showsSplitBill = store.splitBill != nil
 
-                    ForEach(items) { item in
-                        switch item {
-                        case .message(let message):
-                            ChatRoomBubbleRow(store: store, message: message)
+                ScrollView {
+                    LazyVStack(spacing: Design.Spacing._md) {
+                        WithPerceptionTracking {
+                            if store.isLoading && store.visibleMessages.isEmpty {
+                                ProgressView()
+                                    .tint(ZappColors.accent.color(colorScheme))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(Design.Spacing._3xl)
+                            }
 
-                        case .separator(_, let label):
-                            ChatDateSeparator(label: label)
+                            ForEach(items) { item in
+                                switch item {
+                                case .message(let message, _):
+                                    ChatRoomBubbleRow(store: store, message: message)
 
-                        case .unread:
-                            ChatDateSeparator(label: String(localizable: .chatRoomUnreadMessages))
+                                case .separator(_, let label):
+                                    ChatDateSeparator(label: label)
+
+                                case .unread:
+                                    ChatDateSeparator(label: String(localizable: .chatRoomUnreadMessages))
+                                }
+                            }
+
+                            Color.clear
+                                .frame(height: 1)
+                                .id(ChatRoomItem.bottomId)
+                                .onAppear { isAtBottom = true }
+                                .onDisappear { isAtBottom = false }
                         }
                     }
-
-                    Color.clear
-                        .frame(height: 1)
-                        .id(ChatRoomItem.bottomId)
-                        .onAppear { isAtBottom = true }
-                        .onDisappear { isAtBottom = false }
+                    .padding(.horizontal, Design.Spacing._xl)
+                    .padding(.bottom, Design.Spacing._md)
                 }
-                .padding(.horizontal, Design.Spacing._xl)
-                .padding(.bottom, Design.Spacing._md)
-            }
-            .scrollDismissesKeyboard(.interactively)
-            .onTapGesture {
-                isComposerFocused = false
-            }
-            // Mounted here because the composer's `.sheet` slot is taken by the attachment menu
-            // and the screen's by the network details.
-            .sheet(
-                isPresented: Binding(
-                    get: { store.splitBill != nil },
-                    set: { if !$0 { store.send(.splitSheetDismissed) } }
-                )
-            ) {
-                if let split = store.splitBill {
-                    ChatSplitBillSheet(store: store, split: split)
-                        .presentationDetents([.medium, .large])
-                        .presentationDragIndicator(.visible)
+                .scrollDismissesKeyboard(.interactively)
+                .onTapGesture {
+                    isComposerFocused = false
                 }
-            }
-            .onAppear {
-                positionOnEntry(proxy)
-            }
-            .onChange(of: items.last?.id) { _ in
-                positionOnNewMessage(proxy)
-            }
-            .onChange(of: isComposerFocused) { isFocused in
-                guard isFocused, !items.isEmpty else { return }
-                scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+                // Mounted here because the composer's `.sheet` slot is taken by the attachment menu
+                // and the screen's by the network details.
+                .sheet(
+                    isPresented: Binding(
+                        get: { showsSplitBill },
+                        set: { if !$0 { store.send(.splitSheetDismissed) } }
+                    )
+                ) {
+                    WithPerceptionTracking {
+                        if let split = store.splitBill {
+                            ChatSplitBillSheet(store: store, split: split)
+                                .presentationDetents([.medium, .large])
+                                .presentationDragIndicator(.visible)
+                        }
+                    }
+                }
+                .onAppear {
+                    positionOnEntry(proxy)
+                }
+                .onChange(of: items.last?.id) { _ in
+                    positionOnNewMessage(proxy)
+                }
+                .onChange(of: isComposerFocused) { isFocused in
+                    guard isFocused, !items.isEmpty else { return }
+                    scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+                }
             }
         }
     }
@@ -354,7 +383,7 @@ struct ChatRoomView: View {
 }
 
 private enum ChatRoomItem: Identifiable, Equatable {
-    case message(ZMMessage)
+    case message(ZMMessage, rowId: String)
     case separator(id: String, label: String)
     case unread(id: String)
 
@@ -362,7 +391,7 @@ private enum ChatRoomItem: Identifiable, Equatable {
 
     var id: String {
         switch self {
-        case .message(let message): return "msg_\(message.id)"
+        case .message(_, let rowId): return "msg_\(rowId)"
         case .separator(let id, _): return id
         case .unread(let id): return id
         }
@@ -372,6 +401,7 @@ private enum ChatRoomItem: Identifiable, Equatable {
     static func build(
         from messages: [ZMMessage],
         unreadSeparatorMessageId: String?,
+        rowIds: [String: String],
         calendar: Calendar = .current
     ) -> [ChatRoomItem] {
         var items: [ChatRoomItem] = []
@@ -394,7 +424,7 @@ private enum ChatRoomItem: Identifiable, Equatable {
                 items.append(.unread(id: "unread_\(message.id)"))
             }
 
-            items.append(.message(message))
+            items.append(.message(message, rowId: rowIds[message.id] ?? message.id))
         }
 
         return items

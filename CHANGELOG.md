@@ -62,6 +62,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [CHATS] Text messages now sit in lightly rounded bubbles with a small tail on the side they came from, level with the last line.
 - [ONBOARDING] Choose a username now looks like the rest of onboarding — progress bar, part numbering, hero heading — and the handle is the focus of the screen, typed large over a rule that turns orange once the name is valid, with a live character count.
 - [YOU] The You tab ends with the Zapp logo and version, and no longer lists All settings.
 - [SUPPORT] Zapp Support conversations now address a new support account.
@@ -110,6 +111,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.
+- [CHATS] The Chats list, the chat room and their sheets (network details, attachments, GIF search) now refresh when their data changes on iOS 16, where a sheet could stay on its spinner or the wrong page.
 - [INPUTS] Tapping anywhere inside a text field's box now puts the cursor in it. Only the line of text itself used to respond, so taps on the surrounding padding — most of the box — did nothing, and fields felt like they only worked in the middle. Affects every form in the app, including Choose a username, send and swap amounts and addresses, contacts, search fields, gift card messages, cash-out, and the support composer.
 - [BALANCE-PRIVACY] The balance scrambling animation now plays for everyone. It was skipped entirely when Reduce Motion was turned on, so hiding or revealing your balance just snapped.
 - [CHATS] Text in the message box now sits on the centre line of the box instead of slightly below it.
