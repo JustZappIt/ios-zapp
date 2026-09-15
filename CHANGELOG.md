@@ -111,6 +111,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.
 - [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.
 - [CHATS] The Chats list, the chat room and their sheets (network details, attachments, GIF search) now refresh when their data changes on iOS 16, where a sheet could stay on its spinner or the wrong page.
 - [INPUTS] Tapping anywhere inside a text field's box now puts the cursor in it. Only the line of text itself used to respond, so taps on the surrounding padding — most of the box — did nothing, and fields felt like they only worked in the middle. Affects every form in the app, including Choose a username, send and swap amounts and addresses, contacts, search fields, gift card messages, cash-out, and the support composer.

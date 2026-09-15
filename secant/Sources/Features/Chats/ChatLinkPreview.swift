@@ -26,6 +26,7 @@ enum ChatLinkPreviewParser {
     static let maxSiteNameLength = 100
 
     private static let webURLPattern = "https?://[^\\s<>]+"
+    private static let webURLRegex = try? NSRegularExpression(pattern: webURLPattern, options: [.caseInsensitive])
     private static let trailingPunctuation = CharacterSet(charactersIn: ".,!?;:)]}")
 
     /// A detected link and where it sits in the text, so the bubble can make exactly that
@@ -40,9 +41,7 @@ enum ChatLinkPreviewParser {
     }
 
     static func detectWebURLs(in text: String) -> [DetectedWebURL] {
-        guard let regex = try? NSRegularExpression(pattern: webURLPattern, options: [.caseInsensitive]) else {
-            return []
-        }
+        guard let regex = webURLRegex else { return [] }
 
         let range = NSRange(text.startIndex..<text.endIndex, in: text)
 

@@ -19,6 +19,8 @@ struct ChatLinkPreviewCard: View {
     let preview: ChatLinkPreview
     var onCancel: (() -> Void)?
 
+    @State private var image: UIImage?
+
     var body: some View {
         HStack(spacing: Design.Spacing._md) {
             Rectangle()
@@ -68,10 +70,22 @@ struct ChatLinkPreviewCard: View {
         .background(ZappColors.surfaceInput.color(colorScheme))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(localizable: .chatRoomLinkPreviewFrom(preview.siteName)))
+        .task(id: preview.imageData) { await load() }
     }
 
-    private var image: UIImage? {
-        preview.imageData.flatMap { ChatMediaImage.downsampled(data: $0, maxPixel: Constants.imageSize * 3) }
+    /// Off the main actor; inline in `body` it re-decoded on every render.
+    private func load() async {
+        let data = preview.imageData
+        let maxPixel = Constants.imageSize * 3
+
+        let decoded = await Task.detached(priority: .userInitiated) {
+            data.flatMap { ChatMediaImage.downsampled(data: $0, maxPixel: maxPixel) }
+        }
+        .value
+
+        guard !Task.isCancelled else { return }
+
+        image = decoded
     }
 }
 

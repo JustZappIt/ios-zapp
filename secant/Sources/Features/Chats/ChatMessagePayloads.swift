@@ -77,7 +77,9 @@ enum ChatMessageKind: Equatable {
 /// failing the whole row.
 enum ChatMessageJSON {
     static func object(_ content: String) -> [String: Any]? {
+        // Only an object satisfies the cast; skip the parser unless the body opens with a brace.
         guard
+            content.first(where: { !$0.isWhitespace }) == "{",
             let data = content.data(using: .utf8),
             let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {
