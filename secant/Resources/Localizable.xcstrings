@@ -26311,6 +26311,23 @@
         }
       }
     },
+    "settingsYou.groupGovernance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Governance"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gobernanza"
+          }
+        }
+      }
+    },
     "settingsYou.groupPeople" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26596,6 +26613,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tor"
+          }
+        }
+      }
+    },
+    "settingsYou.votingSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vote on Zcash governance proposals"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vota en propuestas de gobernanza de Zcash"
+          }
+        }
+      }
+    },
+    "settingsYou.votingTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coinholder Polling"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votación de Titulares"
           }
         }
       }

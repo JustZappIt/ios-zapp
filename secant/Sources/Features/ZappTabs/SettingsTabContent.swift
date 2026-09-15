@@ -56,6 +56,10 @@ struct SettingsTabContent: View {
 
                         privacyGroup
 
+                        #if VOTING_ENABLED
+                        governanceGroup
+                        #endif
+
                         // iOS keeps the "P2P transactions" history row (Appendix B, iOS-only)
                         // alongside Android's payment-method row in this group.
                         p2pGroup
@@ -153,6 +157,22 @@ struct SettingsTabContent: View {
             }
         }
     }
+
+    #if VOTING_ENABLED
+    @ViewBuilder private var governanceGroup: some View {
+        ZappSettingsGroup(title: String(localizable: .settingsYouGroupGovernance)) {
+            ZappRow(
+                title: String(localizable: .settingsYouVotingTitle),
+                subtitle: String(localizable: .settingsYouVotingSubtitle),
+                icon: Asset.Assets.Icons.checkVerified.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.coinholderPollingTapped)
+            }
+        }
+    }
+    #endif
 
     @ViewBuilder private var p2pGroup: some View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupP2p)) {

@@ -56,6 +56,9 @@ struct ZappTabs {
         case chatProfileTapped
         case chatSettingsTapped
         case chooseServerTapped
+        #if VOTING_ENABLED
+        case coinholderPollingTapped
+        #endif
         case giftCardListTapped
         case localCurrencyTapped
         case onlineStatusTapped
@@ -86,6 +89,11 @@ struct ZappTabs {
             .chooseServerTapped, .giftCardListTapped, .localCurrencyTapped, .onlineStatusTapped,
             .p2pPaymentMethodTapped, .p2pTransactionsTapped, .portfolioChartTapped, .readReceiptsTapped, .torTapped:
                 return .none
+
+            #if VOTING_ENABLED
+            case .coinholderPollingTapped:
+                return .none
+            #endif
             }
         }
     }

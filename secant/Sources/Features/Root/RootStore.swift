@@ -48,6 +48,9 @@ struct Root {
             case swapAndPayCoordFlow
             case torSetup
             case transactionsCoordFlow
+            #if VOTING_ENABLED
+            case votingCoordFlow
+            #endif
             case walletBackup
         }
 
@@ -284,6 +287,9 @@ struct Root {
         var signWithKeystoneCoordFlowState = SignWithKeystoneCoordFlow.State.initial
         var swapAndPayCoordFlowState = SwapAndPayCoordFlow.State.initial
         var transactionsCoordFlowState = TransactionsCoordFlow.State.initial
+        #if VOTING_ENABLED
+        var votingCoordFlowState = VotingCoordFlow.State()
+        #endif
         var walletBackupCoordFlowState = WalletBackupCoordFlow.State.initial
         var torSetupState = TorSetup.State.initial
 
@@ -304,14 +310,17 @@ struct Root {
             if signWithKeystoneCoordFlowBinding { return true }
             guard let path else { return false }
             switch path {
-            // The voting flow has no `Path` case of its own — it is presented from inside Settings
-            // (`SettingsStore`'s `@Presents var votingCoordFlow`), so `path` stays `.settings` for its
-            // whole duration. Its broadcasts (submitVoteCommitment / submitDelegation / delegateShares /
-            // getTreeState) must not be interrupted by an automatic server switch, so `.settings` is
-            // classified sensitive to cover them. Do NOT declassify `.settings` while voting lives under
-            // it; if voting ever gets its own `Path` case, move the sensitivity there.
+            // Upstream's Settings can still present the voting flow from inside itself
+            // (`SettingsStore`'s `@Presents var votingCoordFlow`), leaving `path` at `.settings` for
+            // its whole duration, so `.settings` stays classified sensitive to cover those broadcasts
+            // (submitVoteCommitment / submitDelegation / delegateShares / getTreeState). The You tab
+            // opens the same flow through `.votingCoordFlow`, classified below for the same reason.
             case .settings:
                 return true
+            #if VOTING_ENABLED
+            case .votingCoordFlow:
+                return true
+            #endif
             // `.migrationCoordFlow` classifies SENSITIVE for the same reason as `.sendCoordFlow`:
             // the manual lane broadcasts a real send-max transaction from inside it, and an
             // automatic server switch mid-broadcast is exactly what must not happen. #1930
@@ -497,6 +506,9 @@ struct Root {
         case supportTicketList(SupportTicketList.Action)
         case swapAndPayCoordFlow(SwapAndPayCoordFlow.Action)
         case transactionsCoordFlow(TransactionsCoordFlow.Action)
+        #if VOTING_ENABLED
+        case votingCoordFlow(VotingCoordFlow.Action)
+        #endif
         case walletBackupCoordFlow(WalletBackupCoordFlow.Action)
         case torSetup(TorSetup.Action)
         case backToHomeFromChatPrivacyTapped
@@ -771,6 +783,12 @@ struct Root {
         Scope(state: \.transactionsCoordFlowState, action: \.transactionsCoordFlow) {
             TransactionsCoordFlow()
         }
+
+        #if VOTING_ENABLED
+        Scope(state: \.votingCoordFlowState, action: \.votingCoordFlow) {
+            VotingCoordFlow()
+        }
+        #endif
         
         Scope(state: \.walletBackupCoordFlowState, action: \.walletBackupCoordFlow) {
             WalletBackupCoordFlow()

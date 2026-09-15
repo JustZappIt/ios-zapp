@@ -40,8 +40,8 @@ import Foundation
         let snapshot = try #require(captured)
 
         #expect(snapshot.databaseURL.lastPathComponent == "voting.sqlite3")
-        #expect(snapshot.walURL.path == snapshot.databaseURL.path + "-wal")
-        #expect(snapshot.shmURL.path == snapshot.databaseURL.path + "-shm")
+        #expect(snapshot.walURL.path == "\(snapshot.databaseURL.path)-wal")
+        #expect(snapshot.shmURL.path == "\(snapshot.databaseURL.path)-shm")
         #expect(snapshot.markerURL.lastPathComponent == "captured-20260825-163202.txt")
     }
 

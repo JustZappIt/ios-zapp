@@ -74,8 +74,8 @@ enum VotingDatabaseSnapshot {
     ) throws -> Snapshot? {
         let fileManager = FileManager.default
         let source = URL(fileURLWithPath: databasePath)
-        let wal = URL(fileURLWithPath: databasePath + "-wal")
-        let shm = URL(fileURLWithPath: databasePath + "-shm")
+        let wal = URL(fileURLWithPath: "\(databasePath)-wal")
+        let shm = URL(fileURLWithPath: "\(databasePath)-shm")
 
         guard fileManager.fileExists(atPath: source.path) else { return nil }
 
