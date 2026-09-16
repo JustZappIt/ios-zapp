@@ -434,7 +434,7 @@ struct ProposalListView: View {
             }
         }
 
-        return ZashiButton(title, action: action)
+        return ZappButton(title: title, action: action)
     }
 }
 

@@ -1014,11 +1014,12 @@ extension Root {
                 var votingState = VotingCoordFlow.State()
                 votingState.isKeystoneUser = account.vendor == .keystone
                 votingState.walletId = account.id.id.map { String(format: "%02x", $0) }.joined()
-                state.votingCoordFlowState = votingState
+                state.votingCoordFlow = votingState
                 state.path = .votingCoordFlow
                 return .none
 
-            case .votingCoordFlow(.dismissFlow):
+            case .votingCoordFlow(.presented(.dismissFlow)):
+                state.votingCoordFlow = nil
                 state.path = nil
                 return .none
             #endif

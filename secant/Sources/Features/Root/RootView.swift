@@ -517,15 +517,11 @@ private extension RootView {
                                 .zIndex(1)
                             }
                             #if VOTING_ENABLED
-                            if path == .votingCoordFlow {
-                                VotingCoordFlowView(
-                                    store: store.scope(
-                                        state: \.votingCoordFlowState,
-                                        action: \.votingCoordFlow
-                                    )
-                                )
-                                .transition(.move(edge: .trailing))
-                                .zIndex(1)
+                            if path == .votingCoordFlow,
+                               let votingStore = store.scope(state: \.votingCoordFlow, action: \.votingCoordFlow.presented) {
+                                VotingCoordFlowView(store: votingStore)
+                                    .transition(.move(edge: .trailing))
+                                    .zIndex(1)
                             }
                             #endif
                         }

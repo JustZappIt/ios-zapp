@@ -288,7 +288,9 @@ struct Root {
         var swapAndPayCoordFlowState = SwapAndPayCoordFlow.State.initial
         var transactionsCoordFlowState = TransactionsCoordFlow.State.initial
         #if VOTING_ENABLED
-        var votingCoordFlowState = VotingCoordFlow.State()
+        // Optional, like upstream's `SettingsStore` presents it: `ifLet` cancels every in-flight
+        // voting effect when this goes `nil`, which a permanent `Scope` would not.
+        @Presents var votingCoordFlow: VotingCoordFlow.State?
         #endif
         var walletBackupCoordFlowState = WalletBackupCoordFlow.State.initial
         var torSetupState = TorSetup.State.initial
@@ -507,7 +509,7 @@ struct Root {
         case swapAndPayCoordFlow(SwapAndPayCoordFlow.Action)
         case transactionsCoordFlow(TransactionsCoordFlow.Action)
         #if VOTING_ENABLED
-        case votingCoordFlow(VotingCoordFlow.Action)
+        case votingCoordFlow(PresentationAction<VotingCoordFlow.Action>)
         #endif
         case walletBackupCoordFlow(WalletBackupCoordFlow.Action)
         case torSetup(TorSetup.Action)
@@ -783,12 +785,6 @@ struct Root {
         Scope(state: \.transactionsCoordFlowState, action: \.transactionsCoordFlow) {
             TransactionsCoordFlow()
         }
-
-        #if VOTING_ENABLED
-        Scope(state: \.votingCoordFlowState, action: \.votingCoordFlow) {
-            VotingCoordFlow()
-        }
-        #endif
         
         Scope(state: \.walletBackupCoordFlowState, action: \.walletBackupCoordFlow) {
             WalletBackupCoordFlow()
@@ -835,7 +831,14 @@ struct Root {
         
         userMetadataReduce()
 
+        #if VOTING_ENABLED
         coordinatorReduce()
+            .ifLet(\.$votingCoordFlow, action: \.votingCoordFlow) {
+                VotingCoordFlow()
+            }
+        #else
+        coordinatorReduce()
+        #endif
         
         shieldingProcessorReduce()
 
