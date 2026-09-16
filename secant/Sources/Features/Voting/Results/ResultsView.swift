@@ -134,7 +134,7 @@ struct ResultsView: View {
 
         return HStack(spacing: 6) {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Color.black)
                     .frame(width: backdropSize, height: backdropSize)
                 Asset.Assets.zashiLogo.image
@@ -244,7 +244,7 @@ struct ResultsView: View {
         }
         .padding(16)
         .background(Design.Surfaces.bgSecondary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+        .clipShape(Rectangle())
     }
 
     // MARK: - Footer (Voted: <option> · Total: X ZEC)
@@ -327,9 +327,9 @@ struct ResultsView: View {
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 0)
+                    Rectangle()
                         .fill(Design.Surfaces.bgTertiary.color(colorScheme))
-                    RoundedRectangle(cornerRadius: 0)
+                    Rectangle()
                         .fill(fillColor)
                         .frame(width: max(0, geo.size.width * ratio))
                 }

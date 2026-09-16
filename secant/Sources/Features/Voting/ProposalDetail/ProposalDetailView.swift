@@ -254,7 +254,7 @@ struct ProposalDetailView: View {
         } label: {
             HStack(spacing: 12) {
                 ZStack {
-                    Circle()
+                    Rectangle()
                         .fill(Design.Surfaces.bgTertiary.color(colorScheme))
                         .frame(width: 40, height: 40)
                     Asset.Assets.Icons.messageChat.image
@@ -301,20 +301,20 @@ struct ProposalDetailView: View {
         } label: {
             HStack(alignment: .center, spacing: 12) {
                 if isSelected {
-                    Circle()
+                    Rectangle()
                         .fill(Design.Checkboxes.onBg.color(colorScheme))
                         .frame(width: 20, height: 20)
                         .overlay {
-                            Circle()
+                            Rectangle()
                                 .fill(Design.Checkboxes.onFg.color(colorScheme))
                                 .frame(width: 10, height: 10)
                         }
                 } else {
-                    Circle()
+                    Rectangle()
                         .fill(Design.Checkboxes.offBg.color(colorScheme))
                         .frame(width: 20, height: 20)
                         .overlay {
-                            Circle()
+                            Rectangle()
                                 .stroke(Design.Checkboxes.offStroke.color(colorScheme))
                                 .frame(width: 20, height: 20)
                         }

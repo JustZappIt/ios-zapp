@@ -40,9 +40,9 @@ struct TallyingView: View {
                 .padding(Design.Spacing._xl)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Design.Surfaces.bgPrimary.color(colorScheme))
-                .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+                .clipShape(Rectangle())
                 .overlay(
-                    RoundedRectangle(cornerRadius: Design.Radius._2xl)
+                    Rectangle()
                         .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
                 )
 

@@ -16,6 +16,10 @@ private enum VotingChainDisplayURL {
         compactAndFull(for: StaticVotingConfig.bundledPinnedSource)
     }
 
+    static var defaultBundledMirrorCompact: String {
+        compactAndFull(for: StaticVotingConfig.bundledPinnedSourceMirror).compact
+    }
+
     private static func displayString(for url: URL) -> String {
         guard let host = url.host else {
             return url.absoluteString
@@ -72,7 +76,14 @@ struct VotingConfigSettingsView: View {
             .padding(.horizontal, 24)
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteConfigSettingsScreenTitle))
-            .zashiBack { store.send(.dismissTapped) }
+            .zashiBack(
+                primaryAction: {
+                    ZappButton(title: saveTitle, isEnabled: !saveDisabled) {
+                        store.send(.saveTapped)
+                    }
+                },
+                customDismiss: { store.send(.dismissTapped) }
+            )
             .sheet(isPresented: addCustomChainSheetBinding) {
                 addCustomChainSheet
                     .presentationDetents([.large])
@@ -111,6 +122,7 @@ struct VotingConfigSettingsView: View {
         return chainSourceCard(
             name: String(localizable: .coinVoteConfigSettingsBundledName),
             url: pair.compact,
+            mirrorURL: VotingChainDisplayURL.defaultBundledMirrorCompact,
             isDefault: true,
             isSelected: isSelected,
             selectAccessibilityLabel: String(localizable: .coinVoteConfigSettingsAccessibilityDefault),
@@ -127,6 +139,7 @@ struct VotingConfigSettingsView: View {
         return chainSourceCard(
             name: chain.name,
             url: pair.compact,
+            mirrorURL: nil,
             isDefault: false,
             isSelected: isSelected,
             selectAccessibilityLabel: String(localizable: .coinVoteConfigSettingsAccessibilitySelectChain(chain.name)),
@@ -138,6 +151,7 @@ struct VotingConfigSettingsView: View {
     private func chainSourceCard(
         name: String,
         url: String,
+        mirrorURL: String?,
         isDefault: Bool,
         isSelected: Bool,
         selectAccessibilityLabel: String,
@@ -156,6 +170,7 @@ struct VotingConfigSettingsView: View {
             chainSourceCardContent(
                 name: name,
                 url: url,
+                mirrorURL: mirrorURL,
                 isDefault: isDefault,
                 showChevron: onContentTap != nil,
                 contentTap: onContentTap ?? onSelectTap
@@ -166,20 +181,20 @@ struct VotingConfigSettingsView: View {
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
-            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+            Rectangle()
                 .fill(isSelected
                     ? Design.Surfaces.bgPrimary.color(colorScheme)
                     : Design.Surfaces.bgSecondary.color(colorScheme))
         }
         .overlay {
             if isSelected {
-                RoundedRectangle(cornerRadius: Design.Radius._2xl)
+                Rectangle()
                     .stroke(Design.Surfaces.bgAlt.color(colorScheme), lineWidth: 1)
             }
         }
         .overlay {
             if isSelected {
-                RoundedRectangle(cornerRadius: Design.Radius._2xl + 2)
+                Rectangle()
                     .stroke(Design.Utility.Gray._200.color(colorScheme), lineWidth: 2)
                     .padding(-2)
             }
@@ -193,12 +208,13 @@ struct VotingConfigSettingsView: View {
     private func chainSourceCardContent(
         name: String,
         url: String,
+        mirrorURL: String?,
         isDefault: Bool,
         showChevron: Bool,
         contentTap: @escaping () -> Void
     ) -> some View {
         Button(action: contentTap) {
-            chainSourceCardContentRow(name: name, url: url, isDefault: isDefault, showChevron: showChevron)
+            chainSourceCardContentRow(name: name, url: url, mirrorURL: mirrorURL, isDefault: isDefault, showChevron: showChevron)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -207,6 +223,7 @@ struct VotingConfigSettingsView: View {
     private func chainSourceCardContentRow(
         name: String,
         url: String,
+        mirrorURL: String?,
         isDefault: Bool,
         showChevron: Bool
     ) -> some View {
@@ -229,6 +246,14 @@ struct VotingConfigSettingsView: View {
                     .tracking(-0.224)
                     .lineLimit(1)
                     .truncationMode(.tail)
+
+                if let mirrorURL {
+                    Text(String(localizable: .coinVoteConfigSettingsBundledMirrorLabel(mirrorURL)))
+                        .zFont(size: 14, style: Design.Text.tertiary)
+                        .tracking(-0.224)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -246,10 +271,10 @@ struct VotingConfigSettingsView: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background {
-                RoundedRectangle(cornerRadius: Design.Radius._sm)
+                Rectangle()
                     .fill(Design.Utility.Gray._100.color(colorScheme))
                     .overlay {
-                        RoundedRectangle(cornerRadius: Design.Radius._sm)
+                        Rectangle()
                             .stroke(Design.Utility.Gray._200.color(colorScheme), lineWidth: 1)
                     }
             }
@@ -271,16 +296,11 @@ private var bottomBar: some View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
                 .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._xl)
+                    Rectangle()
                         .fill(Design.Inputs.Default.bg.color(colorScheme))
                 }
             }
             .buttonStyle(.plain)
-
-            ZashiButton(saveTitle) {
-                store.send(.saveTapped)
-            }
-            .disabled(saveDisabled)
         }
     }
 
@@ -327,70 +347,49 @@ private var bottomBar: some View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            VStack(spacing: 12) {
-                if isEditing {
-                    ZashiButton(String(localizable: .coinVoteConfigSettingsDelete), type: .destructive1, minHeight: 48) {
-                        if let id = store.editingChainId {
-                            store.send(.customChainDeleteTapped(id))
-                        }
+            if isEditing {
+                ZappButton(title: String(localizable: .coinVoteConfigSettingsDelete), variant: .danger) {
+                    if let id = store.editingChainId {
+                        store.send(.customChainDeleteTapped(id))
                     }
                 }
-
-                ZashiButton(sourceFormSaveTitle(for: mode), minHeight: 48) {
-                    store.send(.saveTapped)
-                }
-                .disabled(saveDisabled)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
-            .padding(.top, 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .applyScreenBackground()
+        .zashiBack(
+            primaryAction: {
+                ZappButton(title: sourceFormSaveTitle(for: mode), isEnabled: !saveDisabled) {
+                    store.send(.saveTapped)
+                }
+            },
+            customDismiss: {
+                switch mode {
+                case .add:
+                    store.send(.addCustomChainButtonTapped)
+                case .edit:
+                    store.send(.cancelChainEditTapped)
+                }
+            }
+        )
         .onAppear {
             focusedSourceField = isEditing ? .editTitle : .addTitle
         }
     }
 
     private func sourceFormToolbar(for mode: SourceFormMode) -> some View {
-        ZStack {
-            HStack {
-                Button {
-                    switch mode {
-                    case .add:
-                        store.send(.addCustomChainButtonTapped)
-                    case .edit:
-                        store.send(.cancelChainEditTapped)
-                    }
-                } label: {
-                    Asset.Assets.buttonCloseX.image
-                        .zImage(size: 20, style: Design.Text.tertiary)
-                        .frame(width: 44, height: 44)
-                        .background {
-                            Circle()
-                                .fill(Design.Btns.Tertiary.bg.color(colorScheme))
-                        }
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localizable: .coinVoteConfigSettingsAccessibilityClose))
-
-                Spacer()
-
-                Color.clear
-                    .frame(width: 44, height: 44)
-            }
-
-            Text(sourceFormToolbarTitle(for: mode))
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Design.Text.primary.color(colorScheme))
-                .tracking(-0.43)
-                .lineLimit(1)
-        }
-        .frame(height: 44)
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-        .padding(.bottom, 12)
-        .frame(maxWidth: .infinity)
+        Text(sourceFormToolbarTitle(for: mode))
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundColor(Design.Text.primary.color(colorScheme))
+            .tracking(-0.43)
+            .lineLimit(1)
+            .frame(height: 44)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 12)
+            .frame(maxWidth: .infinity)
     }
 
     private func sourceFormHeader(for mode: SourceFormMode) -> some View {
@@ -483,17 +482,17 @@ private var bottomBar: some View {
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .background {
-                RoundedRectangle(cornerRadius: Design.Radius._lg)
+                Rectangle()
                     .fill((isFocused || hasError)
                         ? Design.Surfaces.bgPrimary.color(colorScheme)
                         : Design.Inputs.Default.bg.color(colorScheme))
                     .overlay {
-                        RoundedRectangle(cornerRadius: Design.Radius._lg)
+                        Rectangle()
                             .stroke(sourceInputStrokeColor(hasError: hasError, isFocused: isFocused), lineWidth: 1)
                     }
                     .overlay {
                         if isFocused || hasError {
-                            RoundedRectangle(cornerRadius: Design.Radius._lg + 2)
+                            Rectangle()
                                 .stroke(sourceInputFocusRingColor(hasError: hasError), lineWidth: 2)
                                 .padding(-2)
                         }
@@ -528,18 +527,18 @@ private var bottomBar: some View {
 
     private func selectionIndicator(isSelected: Bool) -> some View {
         ZStack {
-            Circle()
+            Rectangle()
                 .fill(isSelected
                     ? Design.Checkboxes.onBg.color(colorScheme)
                     : Design.Checkboxes.offBg.color(colorScheme))
                 .frame(width: 20, height: 20)
 
             if isSelected {
-                Circle()
+                Rectangle()
                     .fill(Design.Checkboxes.onFg.color(colorScheme))
                     .frame(width: 8, height: 8)
             } else {
-                Circle()
+                Rectangle()
                     .stroke(Design.Checkboxes.offStroke.color(colorScheme), lineWidth: 1)
                     .frame(width: 20, height: 20)
             }

@@ -516,6 +516,14 @@ private extension RootView {
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
                             }
+                            #if VOTING_ENABLED
+                            if path == .votingCoordFlow,
+                               let votingStore = store.scope(state: \.votingCoordFlow, action: \.votingCoordFlow.presented) {
+                                VotingCoordFlowView(store: votingStore)
+                                    .transition(.move(edge: .trailing))
+                                    .zIndex(1)
+                            }
+                            #endif
                         }
                     }
                     .popover(isPresented: $store.signWithKeystoneCoordFlowBinding) {

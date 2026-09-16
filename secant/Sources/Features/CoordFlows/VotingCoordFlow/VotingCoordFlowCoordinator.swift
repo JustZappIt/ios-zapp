@@ -353,11 +353,20 @@ extension VotingCoordFlow {
                 case .active:
                     hydratePersistedRoundChoices(&state, roundId: roundId)
 
+                    // MOB-1810: operator health checks start here — in the
+                    // background, at poll entry — instead of blocking the polls
+                    // list load. Their results are advisory ordering input for
+                    // the share-resubmission walk; nothing awaits them.
+                    let startHealthSweep: Effect<Action> = .run { [votingAPI] _ in
+                        await votingAPI.startHealthProbeSweep()
+                    }
+
                     if state.voteRecords[roundId] != nil {
                         // Already submitted — review-mode read-only, no
                         // pipeline needed.
                         state.path.append(.reviewVotes(ReviewVotes.State(roundId: roundId)))
                         return .merge(
+                            startHealthSweep,
                             cancelShareTracking,
                             .cancel(id: cancelNewRoundPollingId),
                             .send(.startRoundStatusPolling(roundId: roundId)),
@@ -372,6 +381,7 @@ extension VotingCoordFlow {
                        cached.bundleCount > 0 {
                         state.path.append(.proposalList(ProposalList.State(roundId: roundId)))
                         return .merge(
+                            startHealthSweep,
                             cancelShareTracking,
                             .cancel(id: cancelNewRoundPollingId),
                             .send(.startRoundStatusPolling(roundId: roundId)),
@@ -385,6 +395,7 @@ extension VotingCoordFlow {
                     // the sheet via `.ineligibleForRound`.
                     state.checkingEligibilityRoundId = roundId
                     return .merge(
+                        startHealthSweep,
                         cancelShareTracking,
                         .cancel(id: cancelNewRoundPollingId),
                         .send(.startRoundStatusPolling(roundId: roundId)),
@@ -427,9 +438,23 @@ extension VotingCoordFlow {
                 } else {
                     statusPolling = .none
                 }
+                // MOB-1810: this entry point lands on the same active-round
+                // review screen as `.roundTapped`'s voted branch, so it needs
+                // the same background health sweep at poll entry — advisory
+                // ordering input for the share-resubmission walk; nothing
+                // awaits it.
+                let startHealthSweep: Effect<Action>
+                if state.allRounds.first(where: { $0.id == roundId })?.session.status == .active {
+                    startHealthSweep = .run { [votingAPI] _ in
+                        await votingAPI.startHealthProbeSweep()
+                    }
+                } else {
+                    startHealthSweep = .none
+                }
                 return .merge(
                     cancelShareTracking,
                     statusPolling,
+                    startHealthSweep,
                     loadSubmittedVotesFromDb(roundId: roundId)
                 )
 
@@ -480,6 +505,16 @@ extension VotingCoordFlow {
             case let .authenticationSucceeded(roundId):
                 return reduceAuthenticationSucceeded(&state, roundId: roundId)
 
+            case let .batchAuthenticationDeclined(roundId):
+                // Only unwind the pre-auth CTA state; a stray decline landing
+                // after work has started must not disturb the pipeline.
+                mutateSession(&state, roundId: roundId) { roundSession in
+                    if case .requested = roundSession.batchSubmissionStatus {
+                        roundSession.batchSubmissionStatus = .idle
+                    }
+                }
+                return .none
+
             case let .startDelegationProof(roundId):
                 return reduceStartDelegationProof(&state, roundId: roundId)
 
@@ -501,10 +536,9 @@ extension VotingCoordFlow {
                     roundSession.isDelegationPrecomputeInFlight = false
                 }
                 if state.pendingBatchSubmission && !state.isKeystoneUser {
-                    state.pendingBatchSubmission = false
-                    mutateSession(&state, roundId: roundId) {
-                        $0.batchSubmissionStatus = .idle
-                    }
+                    // Resume the pending submission. The ticket is consumed by
+                    // `.authenticationSucceeded` itself; resetting the status
+                    // here would flash `.idle` for one action-cycle.
                     return .send(.authenticationSucceeded(roundId: roundId))
                 }
                 return .none
@@ -516,10 +550,8 @@ extension VotingCoordFlow {
                     roundSession.isDelegationPrecomputeInFlight = false
                 }
                 if state.pendingBatchSubmission && !state.isKeystoneUser {
-                    state.pendingBatchSubmission = false
-                    mutateSession(&state, roundId: roundId) {
-                        $0.batchSubmissionStatus = .idle
-                    }
+                    // Same resume/no-reset rule as `.delegationPrecomputeCompleted`;
+                    // the batch effect re-runs delegation inline from cold.
                     return .send(.authenticationSucceeded(roundId: roundId))
                 }
                 return .none
@@ -868,8 +900,10 @@ extension VotingCoordFlow {
                     }
 
                     let heldZatoshi = notes.reduce(UInt64(0)) { $0 + $1.value }
-                    let existingState = try? await votingCrypto.getRoundState(roundId)
-                    let existingBundleCount = (try? await votingCrypto.getBundleCount(roundId)) ?? 0
+                    let (existingState, existingBundleCount) = try await Self.loadExistingRoundSetup(
+                        roundId: roundId,
+                        votingCrypto: votingCrypto
+                    )
                     var preClearKeystoneSignatures: [KeystoneBundleSignatureInfo] = []
                     var resolvedBundleCount: UInt32 = 0
                     var shouldRestoreKeystoneSignatures = isKeystoneUser
@@ -892,7 +926,7 @@ extension VotingCoordFlow {
                             bundleCount: bundleCount,
                             delegationReady: true
                         ))
-                    } else if existingBundleCount > 0 {
+                    } else if Self.shouldResumePersistedRound(existingBundleCount: existingBundleCount) {
                         resolvedBundleCount = existingBundleCount
                         var recoveredBundleCount: UInt32 = 0
                         var recoveredBundleIndices: Set<UInt32> = []
@@ -913,55 +947,53 @@ extension VotingCoordFlow {
                             }
                         }
 
-                        if recoveredBundleCount >= existingBundleCount {
+                        let delegationReady = recoveredBundleCount >= existingBundleCount
+                        if delegationReady {
                             try await votingCrypto.clearRecoveryState(roundId)
                         }
 
-                        if recoveredBundleCount > 0 {
-                            if isKeystoneUser {
-                                await send(.delegationBundlesRecovered(
-                                    roundId: roundId,
-                                    bundleIndices: recoveredBundleIndices
-                                ))
-                            }
-                            let eligibleWeight = Self.votingWeight(for: notes, bundleCount: existingBundleCount)
-                            guard eligibleWeight > 0 else {
-                                await send(.ineligibleForRound(roundId: roundId, heldZatoshi: heldZatoshi))
-                                return
-                            }
-                            await send(.earlyEligibilityConfirmed(roundId: roundId))
-                            await send(.votingWeightLoaded(
+                        if isKeystoneUser, !recoveredBundleIndices.isEmpty {
+                            await send(.delegationBundlesRecovered(
                                 roundId: roundId,
-                                weight: eligibleWeight,
-                                notes: notes,
-                                witnesses: [],
-                                bundleCount: existingBundleCount,
-                                delegationReady: recoveredBundleCount >= existingBundleCount
+                                bundleIndices: recoveredBundleIndices
                             ))
+                        }
+                        let eligibleWeight = Self.votingWeight(for: notes, bundleCount: existingBundleCount)
+                        guard eligibleWeight > 0 else {
+                            await send(.ineligibleForRound(roundId: roundId, heldZatoshi: heldZatoshi))
+                            return
+                        }
+                        await send(.earlyEligibilityConfirmed(roundId: roundId))
+                        let witnesses: [WitnessData]
+                        if delegationReady {
+                            witnesses = []
                         } else {
-                            if isKeystoneUser {
-                                preClearKeystoneSignatures = try await votingCrypto.loadKeystoneBundleSignatures(roundId)
-                            }
-                            guard try await Self.prepareFreshRound(
+                            witnesses = try await Self.completeDeterministicRoundSetup(
                                 roundId: roundId,
-                                session: session,
                                 snapshotHeight: snapshotHeight,
                                 walletDbPath: walletDbPath,
                                 networkId: networkId,
                                 notes: notes,
+                                bundleCount: existingBundleCount,
                                 votingCrypto: votingCrypto,
-                                sdkSynchronizer: sdkSynchronizer,
-                                send: send
-                            ) else { return }
-                            didPrepareFreshRound = true
-                            resolvedBundleCount = (try? await votingCrypto.getBundleCount(roundId)) ?? 0
+                                sdkSynchronizer: sdkSynchronizer
+                            )
                         }
+                        await send(.votingWeightLoaded(
+                            roundId: roundId,
+                            weight: eligibleWeight,
+                            notes: notes,
+                            witnesses: witnesses,
+                            bundleCount: existingBundleCount,
+                            delegationReady: delegationReady
+                        ))
                     } else {
                         if isKeystoneUser {
                             preClearKeystoneSignatures = try await votingCrypto.loadKeystoneBundleSignatures(roundId)
                         }
                         guard try await Self.prepareFreshRound(
                             roundId: roundId,
+                            existingState: existingState,
                             session: session,
                             snapshotHeight: snapshotHeight,
                             walletDbPath: walletDbPath,
@@ -972,7 +1004,7 @@ extension VotingCoordFlow {
                             send: send
                         ) else { return }
                         didPrepareFreshRound = true
-                        resolvedBundleCount = (try? await votingCrypto.getBundleCount(roundId)) ?? 0
+                        resolvedBundleCount = try await votingCrypto.getBundleCount(roundId)
                     }
 
                     // 3. Hotkey: load or generate the per-account hotkey
@@ -1663,9 +1695,20 @@ extension VotingCoordFlow {
         // therefore never iterated by the submission loop, never marked as
         // abstain, never auto-filled.
 
+        // Flip the CTA into its disabled/spinner state before the local-auth
+        // round-trip so the tap registers instantly; `.requested` also makes
+        // re-taps no-ops (`canStartSubmission`), so only one auth effect can
+        // ever be in flight.
+        mutateSession(&state, roundId: roundId) {
+            $0.batchSubmissionStatus = .requested
+        }
+
         if !state.isKeystoneUser && !state.pendingBatchSubmission {
             return .run { [localAuthentication] send in
-                guard await localAuthentication.authenticate() else { return }
+                guard await localAuthentication.authenticate() else {
+                    await send(.batchAuthenticationDeclined(roundId: roundId))
+                    return
+                }
                 await send(.authenticationSucceeded(roundId: roundId))
             }
         }
@@ -1678,7 +1721,18 @@ extension VotingCoordFlow {
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func reduceAuthenticationSucceeded(_ state: inout State, roundId: String) -> Effect<Action> {
         guard let session = state.roundCache[roundId] else { return .none }
-        guard canStartSubmission(session) || isBatchSubmitting(session) else { return .none }
+        // Idempotent entry: a fresh `.requested` tap (or a retryable status)
+        // may start the pipeline, and an in-flight status may only be
+        // re-entered by a resume holding the `pendingBatchSubmission` ticket.
+        // A stray duplicate — a stale auth effect, a double dispatch — falls
+        // through to `.none` instead of restarting (and thereby cancelling)
+        // the in-flight batch effect.
+        let isResume = state.pendingBatchSubmission
+        guard session.batchSubmissionStatus == .requested
+            || canStartSubmission(session)
+            || (isResume && isBatchSubmitting(session))
+        else { return .none }
+        state.pendingBatchSubmission = false
         guard let activeSession = activeSession(in: state, roundId: roundId) else { return .none }
         // Partial ballots are intentional — see `reduceSubmitAllDraftsTapped`.
 
@@ -1775,6 +1829,12 @@ extension VotingCoordFlow {
         }
 
         return .run { [backgroundTask, votingAPI, votingCrypto, mnemonic, walletStorage, pirLayout] send in
+            // MOB-1810: refresh operator health in the background so the
+            // share-resubmission walk's ordering reflects the present rather
+            // than poll entry. Fire-and-forget — it overlaps the delegation
+            // proof; nothing in this effect awaits probe results.
+            await votingAPI.startHealthProbeSweep()
+
             let bgTaskId = await backgroundTask.beginTask("Batch vote submission")
             _ = await backgroundTask.beginContinuedProcessing(
                 "co.zodl.voting.*",
@@ -1922,6 +1982,9 @@ extension VotingCoordFlow {
 
                         await send(.voteSubmissionStepUpdated(roundId: roundId, step: .confirming))
                         let txResult = try await votingAPI.submitVoteCommitment(builtBundle, castVoteSig)
+                        guard try await Self.isAcceptedVotingTransaction(txResult, votingAPI: votingAPI) else {
+                            throw VotingFlowError.voteCommitmentTxFailed(code: txResult.code, log: txResult.log)
+                        }
                         try await votingCrypto.storeVoteTxHash(roundId, bundleIndex, proposalId, txResult.txHash)
 
                         let voteDeadline = Date().addingTimeInterval(90)
@@ -2962,6 +3025,9 @@ extension VotingCoordFlow {
                         throw VotingFlowError.invalidDelegationSignature
                     }
                     let delegTxResult = try await votingAPI.submitDelegation(registration)
+                    guard try await Self.isAcceptedVotingTransaction(delegTxResult, votingAPI: votingAPI) else {
+                        throw VotingFlowError.delegationTxFailed(code: delegTxResult.code, log: delegTxResult.log)
+                    }
                     try await votingCrypto.storeDelegationTxHash(roundId, bundleIdx, delegTxResult.txHash)
                     let vanPosition = try await Self.requireKeystoneDelegationVanPosition(
                         txHash: delegTxResult.txHash,
@@ -3103,6 +3169,33 @@ extension VotingCoordFlow {
         return nil
     }
 
+    /// Some deployed `/tx` handlers opportunistically Base64-decode CometBFT
+    /// event text. A non-ASCII value is recovered only when it re-encodes to
+    /// the canonical decimal the server emits; all other values fail closed.
+    static func delegationVanPosition(from confirmation: TxConfirmation) -> UInt32? {
+        guard confirmation.code == 0,
+            let leafValue = confirmation.event(ofType: "delegate_vote")?.attribute(forKey: "leaf_index")
+        else {
+            return nil
+        }
+        let normalizedLeafValue = leafValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let position = UInt32(normalizedLeafValue) {
+            return position
+        }
+        guard normalizedLeafValue.unicodeScalars.contains(where: { $0.value > 0x7f }) else {
+            return nil
+        }
+        // Check that the reencoding produces the same value, to verify the precondition
+        // asserted in the method documentation, to ensure valuex from other
+        // sources of corruption don't get interpreted as the encoding issue this
+        // method is intended to protect against.
+        let reencodedLeafValue = Data(normalizedLeafValue.utf8).base64EncodedString()
+        guard let position = UInt32(reencodedLeafValue), String(position) == reencodedLeafValue else {
+            return nil
+        }
+        return position
+    }
+
     /// Crash-recovery lookup for a Keystone delegation TX hash.
     static func recoverKeystoneDelegationVanPosition(
         roundId: String,
@@ -3114,9 +3207,7 @@ extension VotingCoordFlow {
             return nil
         }
         if let confirmation = try? await votingAPI.fetchTxConfirmation(txHash),
-           confirmation.code == 0,
-           let leafValue = confirmation.event(ofType: "delegate_vote")?.attribute(forKey: "leaf_index"),
-           let vanPosition = UInt32(leafValue) {
+            let vanPosition = delegationVanPosition(from: confirmation) {
             try await votingCrypto.storeVanPosition(roundId, bundleIndex, vanPosition)
             return vanPosition
         }
@@ -3133,11 +3224,8 @@ extension VotingCoordFlow {
                 guard confirmation.code == 0 else {
                     throw VotingFlowError.delegationTxFailed(code: confirmation.code, log: confirmation.log)
                 }
-                guard
-                    let leafValue = confirmation.event(ofType: "delegate_vote")?.attribute(forKey: "leaf_index"),
-                    let vanPosition = UInt32(leafValue)
-                else {
-                    throw VotingFlowError.delegationTxFailed(code: 0, log: "missing delegate_vote leaf_index")
+                guard let vanPosition = delegationVanPosition(from: confirmation) else {
+                    throw VotingFlowError.delegationTxFailed(code: 0, log: "missing or unrecoverable delegate_vote leaf_index")
                 }
                 return vanPosition
             }
@@ -3169,9 +3257,9 @@ extension VotingCoordFlow {
             }
         }
         // If the user tapped Submit while delegation was still in flight,
-        // resume the batch now that authorization is done.
+        // resume the batch now that authorization is done. The ticket is
+        // consumed by `.authenticationSucceeded`'s entry guard, not here.
         if state.pendingBatchSubmission {
-            state.pendingBatchSubmission = false
             return .send(.authenticationSucceeded(roundId: roundId))
         }
         return .none
@@ -3293,7 +3381,7 @@ extension VotingCoordFlow {
         switch session.batchSubmissionStatus {
         case .idle, .authorizationFailed, .submissionFailed:
             return true
-        case .authorizing, .submitting, .completed:
+        case .requested, .authorizing, .submitting, .completed:
             return false
         }
     }
@@ -3353,6 +3441,29 @@ extension VotingCoordFlow {
         return (bundleResult.eligibleWeight, UInt32(bundleResult.bundles.count))
     }
 
+    /// Once bundle rows exist, the round may contain non-reproducible
+    /// delegation material. Restart recovery must preserve the entire round.
+    static func shouldResumePersistedRound(existingBundleCount: UInt32) -> Bool {
+        existingBundleCount > 0
+    }
+
+    /// Distinguish an absent round from a failed database read. A read failure
+    /// must propagate so the caller cannot mistake it for an empty round and
+    /// authorize `prepareFreshRound` to clear persisted recovery material.
+    static func loadExistingRoundSetup(
+        roundId: String,
+        votingCrypto: VotingCryptoClient
+    ) async throws -> (state: RoundStateInfo?, bundleCount: UInt32) {
+        let rounds = try await votingCrypto.listRounds()
+        guard rounds.contains(where: { $0.roundId == roundId }) else {
+            return (nil, 0)
+        }
+
+        let state = try await votingCrypto.getRoundState(roundId)
+        let bundleCount = try await votingCrypto.getBundleCount(roundId)
+        return (state, bundleCount)
+    }
+
     private static func votingWeight(for notes: [NoteInfo], bundleCount: UInt32) -> UInt64 {
         let allBundles = notes.smartBundles().bundles
         guard bundleCount > 0, Int(bundleCount) < allBundles.count else {
@@ -3365,8 +3476,42 @@ extension VotingCoordFlow {
         }
     }
 
+    /// What a surviving `rounds` row means for this setup attempt.
+    enum ExistingRoundRow: Equatable {
+        /// No row: this is a genuine first setup, so insert one.
+        case absent
+        /// A row from a setup interrupted between `initRound` and
+        /// `setupBundles`. Reuse it.
+        case reusable
+        /// A row that no longer describes the round the session reports.
+        /// Reused anyway: a row only reaches this classification with no
+        /// bundles yet, so there is nothing at stake to protect.
+        case parametersChanged
+    }
+
+    /// Classifies a surviving round row.
+    ///
+    /// A row reaches `prepareFreshRound` only when the round carries no
+    /// bundles, i.e. setup was interrupted between `initRound` and
+    /// `setupBundles`.
+    ///
+    /// Only `snapshotHeight` is compared, because that is the only round
+    /// parameter `RoundStateInfo` carries. A round whose `ea_pk`, `nc_root` or
+    /// `nullifier_imt_root` changed under a stable id is NOT detected here;
+    /// catching that needs those fields on `RoundStateInfo`, or the crate's
+    /// `ensure_round` exposed through the FFI with its network-only comparison
+    /// widened to the full parameter set.
+    static func classifyExistingRoundRow(
+        existingState: RoundStateInfo?,
+        snapshotHeight: UInt64
+    ) -> ExistingRoundRow {
+        guard let existingState else { return .absent }
+        return existingState.snapshotHeight == snapshotHeight ? .reusable : .parametersChanged
+    }
+
     private static func prepareFreshRound(
         roundId: String,
+        existingState: RoundStateInfo?,
         session: VotingSession,
         snapshotHeight: UInt64,
         walletDbPath: String,
@@ -3376,9 +3521,6 @@ extension VotingCoordFlow {
         sdkSynchronizer: SDKSynchronizerClient,
         send: Send<Action>
     ) async throws -> Bool {
-        try? await votingCrypto.clearRound(roundId)
-        try await votingCrypto.clearRecoveryState(roundId)
-
         let params = VotingRoundParams(
             voteRoundId: session.voteRoundId,
             snapshotHeight: snapshotHeight,
@@ -3386,7 +3528,26 @@ extension VotingCoordFlow {
             ncRoot: session.ncRoot,
             nullifierIMTRoot: session.nullifierIMTRoot
         )
-        try await votingCrypto.initRound(params, nil)
+
+        switch classifyExistingRoundRow(existingState: existingState, snapshotHeight: snapshotHeight) {
+        case .absent:
+            try await votingCrypto.initRound(params, nil)
+        case .reusable:
+            break
+        case .parametersChanged:
+            // Reached only when the round has no bundles yet (a round with
+            // bundles takes the `shouldResumePersistedRound` path instead), so
+            // there is no `van_comm_rand` here to protect by hard-failing.
+            // Reuse the row rather than making the round permanently
+            // unopenable: every value it feeds into a proof or submission is
+            // re-verified independently downstream, so a stale row fails
+            // loudly there instead of silently corrupting anything.
+            LoggerProxy.warn(
+                "Reusing round \(roundId) despite a snapshotHeight mismatch (no bundles exist yet to protect)"
+            )
+        }
+
+        try await votingCrypto.clearRecoveryState(roundId)
 
         let setupResult = try await votingCrypto.setupBundles(roundId, notes)
         let bundleCount = setupResult.bundleCount
@@ -3403,6 +3564,40 @@ extension VotingCoordFlow {
         // (the slow part of the pipeline) completes.
         await send(.earlyEligibilityConfirmed(roundId: roundId))
 
+        let allWitnesses = try await completeDeterministicRoundSetup(
+            roundId: roundId,
+            snapshotHeight: snapshotHeight,
+            walletDbPath: walletDbPath,
+            networkId: networkId,
+            notes: notes,
+            bundleCount: bundleCount,
+            votingCrypto: votingCrypto,
+            sdkSynchronizer: sdkSynchronizer
+        )
+
+        await send(.votingWeightLoaded(
+            roundId: roundId,
+            weight: eligibleWeight,
+            notes: notes,
+            witnesses: allWitnesses,
+            bundleCount: bundleCount,
+            delegationReady: false
+        ))
+        return true
+    }
+
+    /// Completes only deterministic tree-state and witness work for a persisted
+    /// round. This must not clear the round or rebuild delegation authorization.
+    static func completeDeterministicRoundSetup(
+        roundId: String,
+        snapshotHeight: UInt64,
+        walletDbPath: String,
+        networkId: UInt32,
+        notes: [NoteInfo],
+        bundleCount: UInt32,
+        votingCrypto: VotingCryptoClient,
+        sdkSynchronizer: SDKSynchronizerClient
+    ) async throws -> [WitnessData] {
         let treeStateBytes = try await sdkSynchronizer.getTreeState(snapshotHeight)
         try await votingCrypto.storeTreeState(roundId, treeStateBytes)
 
@@ -3425,16 +3620,7 @@ extension VotingCoordFlow {
             )
             allWitnesses.append(contentsOf: witnesses)
         }
-
-        await send(.votingWeightLoaded(
-            roundId: roundId,
-            weight: eligibleWeight,
-            notes: notes,
-            witnesses: allWitnesses,
-            bundleCount: bundleCount,
-            delegationReady: false
-        ))
-        return true
+        return allWitnesses
     }
 
     /// Look up the live `VotingSession` for a round id by scoping into
@@ -3511,6 +3697,36 @@ extension VotingCoordFlow {
     }
 
     // MARK: - Crash recovery for in-flight votes
+
+    /// Accept a successful broadcast directly. A spent-nullifier rejection is
+    /// accepted only when its exact transaction hash resolves on-chain with code 0.
+    static func isAcceptedVotingTransaction(
+        _ result: TxResult,
+        votingAPI: VotingAPIClient,
+        maxRecoveryAttempts: Int = 3,
+        retryDelay: Duration = .seconds(1)
+    ) async throws -> Bool {
+        let txHash = result.txHash.trimmingCharacters(in: .whitespacesAndNewlines)
+        if result.code == 0 {
+            return !txHash.isEmpty
+        }
+        guard maxRecoveryAttempts > 0,
+              !txHash.isEmpty,
+              VotingErrorMapper.isNullifierAlreadySpent(result.log)
+        else {
+            return false
+        }
+
+        for attempt in 0..<maxRecoveryAttempts {
+            if let confirmation = try await votingAPI.fetchTxConfirmation(txHash) {
+                return confirmation.code == 0
+            }
+            if attempt + 1 < maxRecoveryAttempts {
+                try await Task.sleep(for: retryDelay)
+            }
+        }
+        return false
+    }
 
     /// If we have a cached vote TX hash for `(roundId, bundleIndex, proposalId)`
     /// that confirmed on-chain, finish the share delegation step without
@@ -3669,12 +3885,17 @@ extension VotingCoordFlow {
         let bundleCount = UInt32(noteChunks.count)
         var completedBundles = Set<UInt32>()
         for idx: UInt32 in 0..<bundleCount {
+            // Single probe (timeout 0): a cached hash that never propagated —
+            // an earlier attempt died before confirmation — must fall through
+            // to a fresh delegation immediately instead of holding this
+            // bundle's full confirmation budget. The fresh submission below
+            // keeps the full `delegationConfirmationTimeout` wait.
             if let vanPosition = try await recoverDelegationVanPosition(
                 roundId: roundId,
                 bundleIndex: idx,
                 votingCrypto: votingCrypto,
                 votingAPI: votingAPI,
-                confirmationTimeout: delegationConfirmationTimeout,
+                confirmationTimeout: 0,
                 retryDelay: delegationConfirmationRetryDelay
             ) {
                 LoggerProxy.debug("Recovered delegation bundle \(idx) VAN position: \(vanPosition)")
@@ -3767,6 +3988,9 @@ extension VotingCoordFlow {
                 )
             }
             let delegTxResult = try await votingAPI.submitDelegation(registration)
+            guard try await isAcceptedVotingTransaction(delegTxResult, votingAPI: votingAPI) else {
+                throw VotingFlowError.delegationTxFailed(code: delegTxResult.code, log: delegTxResult.log)
+            }
             LoggerProxy.info("Delegation TX \(bundleIndex) submitted: \(delegTxResult.txHash)")
 
             try await votingCrypto.storeDelegationTxHash(roundId, bundleIndex, delegTxResult.txHash)
@@ -3854,11 +4078,8 @@ extension VotingCoordFlow {
                 guard confirmation.code == 0 else {
                     return .failed(code: confirmation.code, log: confirmation.log)
                 }
-                guard
-                    let leafValue = confirmation.event(ofType: "delegate_vote")?.attribute(forKey: "leaf_index"),
-                    let vanPosition = UInt32(leafValue)
-                else {
-                    return .failed(code: 0, log: "missing delegate_vote leaf_index")
+                guard let vanPosition = delegationVanPosition(from: confirmation) else {
+                    return .failed(code: 0, log: "missing or unrecoverable delegate_vote leaf_index")
                 }
                 return .confirmed(vanPosition: vanPosition)
             }

@@ -99,7 +99,7 @@ struct VotingSheetContent: View {
         switch visualStyle {
         case .standard:
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(iconStyle.color(colorScheme).opacity(0.1))
                     .frame(width: 48, height: 48)
                 Image(systemName: iconSystemName)
@@ -108,7 +108,7 @@ struct VotingSheetContent: View {
             }
         case .unverifiedWarning:
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
                     .frame(width: 44, height: 44)
                 Asset.Assets.Icons.alertOutline.image

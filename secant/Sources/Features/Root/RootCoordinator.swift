@@ -1008,6 +1008,22 @@ extension Root {
                 state.path = .giftCardList
                 return .none
 
+            #if VOTING_ENABLED
+            case .zappTabs(.coinholderPollingTapped):
+                guard let account = state.selectedWalletAccount else { return .none }
+                var votingState = VotingCoordFlow.State()
+                votingState.isKeystoneUser = account.vendor == .keystone
+                votingState.walletId = account.id.id.map { String(format: "%02x", $0) }.joined()
+                state.votingCoordFlow = votingState
+                state.path = .votingCoordFlow
+                return .none
+
+            case .votingCoordFlow(.presented(.dismissFlow)):
+                state.votingCoordFlow = nil
+                state.path = nil
+                return .none
+            #endif
+
             case .giftCard(.delegate(.exitFlow)), .giftCardList(.delegate(.exitFlow)):
                 state.path = nil
                 return .none

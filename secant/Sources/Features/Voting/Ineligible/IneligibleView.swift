@@ -44,7 +44,7 @@ struct IneligibleView: View {
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))
             .zashiBack(
                 primaryAction: {
-                    ZashiButton(String(localizable: .coinVoteCommonGotIt)) {
+                    ZappButton(title: String(localizable: .coinVoteCommonGotIt)) {
                         store.send(.dismissFlow)
                     }
                 }

@@ -8,9 +8,11 @@ import SwiftUI
 import ComposableArchitecture
 import ZcashLightClientKit
 
-/// Final review screen before vote submission. Renders four visual states from
+/// Final review screen before vote submission. Renders its visual states from
 /// the same body, driven by `RoundSession.batchSubmissionStatus`:
 ///   • `.idle` — Poll/Memo card + Confirm CTA
+///   • `.requested` — same chrome as `.idle`, with the Confirm CTA disabled
+///     behind a spinner while local auth (and any remaining prep) runs
 ///   • `.authorizing` / `.submitting` — Poll/VotingPower card + monotonic
 ///     progress bar + disabled CTA reflecting the current sub-step
 ///   • `.completed` — Poll/VotingPower card + green-check icon + Done CTA
@@ -29,7 +31,6 @@ struct ConfirmSubmissionView: View {
             let status = session?.batchSubmissionStatus ?? .idle
             let pollTitle = store.allRounds.first { $0.id == roundId }?.title ?? ""
             let weightString = Self.formatZec(session?.votingWeight ?? 0)
-            let submittedVotes = session?.votes ?? [:]
             let bundleCount = session?.bundleCount ?? 0
             // Finding #8 (CHP.md): a bare `draftVotes.isEmpty` check would keep
             // the CTA disabled for a proposal that's already on-chain but whose
@@ -57,22 +58,24 @@ struct ConfirmSubmissionView: View {
 
                 Spacer(minLength: 0)
 
-                bottomSection(
-                    status: status,
-                    delegationStatus: delegationStatus,
-                    hasPendingSubmissionWork: hasPendingSubmissionWork,
-                    submittedVotes: submittedVotes,
-                    bundleCount: bundleCount
-                )
-                .padding(.horizontal, 24)
-                .padding(.bottom, 16)
+                progressCard(status: status, delegationStatus: delegationStatus)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
             }
             .applyScreenBackground()
             .screenTitle(navTitle(status: status))
-            .zashiBack {
-                guard !status.isInFlight else { return }
-                dismiss()
-            }
+            .zashiBack(
+                status.isInFlight,
+                primaryAction: {
+                    bottomAction(
+                        status: status,
+                        delegationStatus: delegationStatus,
+                        hasPendingSubmissionWork: hasPendingSubmissionWork,
+                        bundleCount: bundleCount
+                    )
+                },
+                customDismiss: { dismiss() }
+            )
             .votingSheet(
                 isPresented: authorizationFailedBinding(status: status),
                 title: String(localizable: .coinVoteConfirmSubmissionAuthorizationFailedTitle),
@@ -138,15 +141,17 @@ struct ConfirmSubmissionView: View {
     }
 
     private func navTitle(status: BatchSubmissionStatus) -> String {
-        if case .idle = status {
+        switch status {
+        case .idle, .requested:
             return String(localizable: .coinVoteCommonConfirmation)
+        case .authorizing, .submitting, .completed, .authorizationFailed, .submissionFailed:
+            return String(localizable: .coinVoteCommonSubmission)
         }
-        return String(localizable: .coinVoteCommonSubmission)
     }
 
     private func headerTitle(status: BatchSubmissionStatus) -> String {
         switch status {
-        case .idle:
+        case .idle, .requested:
             return String(localizable: .coinVoteConfirmSubmissionHeaderTitleIdle)
         case .authorizing, .submitting, .authorizationFailed, .submissionFailed:
             return String(localizable: .coinVoteConfirmSubmissionHeaderTitleSubmitting)
@@ -157,7 +162,7 @@ struct ConfirmSubmissionView: View {
 
     private func headerSubtitle(status: BatchSubmissionStatus) -> String {
         switch status {
-        case .idle:
+        case .idle, .requested:
             if store.isKeystoneUser {
                 return String(localizable: .coinVoteConfirmSubmissionHeaderSubtitleIdleKeystone)
             }
@@ -179,8 +184,10 @@ struct ConfirmSubmissionView: View {
         isKeystoneUser: Bool
     ) -> some View {
         let isIdle: Bool = {
-            if case .idle = status { return true }
-            return false
+            switch status {
+            case .idle, .requested: return true
+            default: return false
+            }
         }()
 
         VStack(spacing: 0) {
@@ -203,7 +210,7 @@ struct ConfirmSubmissionView: View {
             }
         }
         .background(Design.Surfaces.bgSecondary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+        .clipShape(Rectangle())
     }
 
     @ViewBuilder
@@ -311,62 +318,85 @@ struct ConfirmSubmissionView: View {
 
     // MARK: - Bottom Section
 
+    private var confirmTitle: String {
+        store.isKeystoneUser
+            ? String(localizable: .coinVoteConfirmSubmissionConfirmWithKeystone)
+            : String(localizable: .coinVoteCommonConfirm)
+    }
+
+    /// The dock's CTA, one per submission state.
     @ViewBuilder
-    private func bottomSection(
+    private func bottomAction(
         status: BatchSubmissionStatus,
         delegationStatus: ProofStatus,
         hasPendingSubmissionWork: Bool,
-        submittedVotes: [UInt32: VoteChoice],
         bundleCount: UInt32
     ) -> some View {
         switch status {
         case .idle:
-            ZashiButton(
-                store.isKeystoneUser
-                    ? String(localizable: .coinVoteConfirmSubmissionConfirmWithKeystone)
-                    : String(localizable: .coinVoteCommonConfirm)
-            ) {
+            ZappButton(title: confirmTitle, isEnabled: hasPendingSubmissionWork && bundleCount > 0) {
                 store.send(.submitAllDraftsTapped(roundId: roundId))
             }
-            .disabled(!hasPendingSubmissionWork || bundleCount == 0)
+
+        case .requested:
+            // Same CTA as `.idle`, visibly working: the tap must register
+            // instantly even though local auth hasn't resolved yet. Disabled
+            // so re-taps can't spawn extra auth prompts.
+            ZappButton(title: confirmTitle, isEnabled: false) {}
+                .overlay(alignment: .trailing) {
+                    ProgressView()
+                        .padding(.trailing, Design.Spacing._xl)
+                }
 
         case .authorizing, .submitting, .authorizationFailed, .submissionFailed:
-            // Progress card stays on screen while the error sheets (driven
-            // by the `authorizationFailed` / `submissionFailed` bindings)
-            // own retry / cancel.
+            ZappButton(title: submissionProgress(status: status, delegationStatus: delegationStatus).title, isEnabled: false) {}
+
+        case .completed:
+            ZappButton(title: String(localizable: .coinVoteCommonDone)) {
+                store.send(.submissionDoneTapped(roundId: roundId))
+            }
+        }
+    }
+
+    /// Progress card for the in-flight states. It stays on screen while the
+    /// error sheets (driven by the `authorizationFailed` / `submissionFailed`
+    /// bindings) own retry / cancel.
+    @ViewBuilder
+    private func progressCard(status: BatchSubmissionStatus, delegationStatus: ProofStatus) -> some View {
+        switch status {
+        case .authorizing, .submitting, .authorizationFailed, .submissionFailed:
             let progressInfo = submissionProgress(
                 status: status,
                 delegationStatus: delegationStatus
             )
-            VStack(spacing: Design.Spacing._lg) {
-                VStack(alignment: .leading, spacing: Design.Spacing._lg) {
+            VStack(alignment: .leading, spacing: Design.Spacing._lg) {
+                VStack(alignment: .leading, spacing: Design.Spacing._xs) {
                     Text(progressInfo.title)
                         .zFont(.semiBold, size: 15, style: Design.Text.primary)
 
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 0)
-                                .fill(Design.Surfaces.bgTertiary.color(colorScheme))
-                            RoundedRectangle(cornerRadius: 0)
-                                .fill(Design.Text.primary.color(colorScheme))
-                                .frame(width: geo.size.width * progressInfo.progress)
-                                .animation(.easeInOut(duration: 0.3), value: progressInfo.progress)
-                        }
-                    }
-                    .frame(height: 8)
+                    Text(localizable: .coinVoteConfirmSubmissionProgressExplainer)
+                        .zFont(size: 14, style: Design.Text.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(Design.Spacing._2xl)
-                .background(Design.Surfaces.bgSecondary.color(colorScheme))
-                .clipShape(RoundedRectangle(cornerRadius: Design.Radius._xl))
 
-                ZashiButton(progressInfo.title) {}
-                    .disabled(true)
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(Design.Surfaces.bgTertiary.color(colorScheme))
+                        Rectangle()
+                            .fill(Design.Text.primary.color(colorScheme))
+                            .frame(width: geo.size.width * progressInfo.progress)
+                            .animation(.easeInOut(duration: 0.3), value: progressInfo.progress)
+                    }
+                }
+                .frame(height: 8)
             }
+            .padding(Design.Spacing._2xl)
+            .background(Design.Surfaces.bgSecondary.color(colorScheme))
+            .clipShape(Rectangle())
 
-        case .completed:
-            ZashiButton(String(localizable: .coinVoteCommonDone)) {
-                store.send(.submissionDoneTapped(roundId: roundId))
-            }
+        case .idle, .requested, .completed:
+            EmptyView()
         }
     }
 
@@ -454,7 +484,7 @@ private struct VotingHeaderIcons: View {
         HStack(spacing: 0) {
             leftDisc
                 .overlay {
-                    Circle()
+                    Rectangle()
                         .frame(width: 51, height: 51)
                         .offset(x: 42)
                         .blendMode(.destinationOut)
@@ -473,9 +503,9 @@ private struct VotingHeaderIcons: View {
             Asset.Assets.Brandmarks.brandmarkKeystone.image
                 .resizable()
                 .frame(width: 48, height: 48)
-                .clipShape(Circle())
+                .clipShape(Rectangle())
         } else {
-            Circle()
+            Rectangle()
                 .fill(Design.Text.primary.color(colorScheme))
                 .frame(width: 48, height: 48)
         }
@@ -493,7 +523,7 @@ private struct VotingHeaderIcons: View {
     private var rightDisc: some View {
         if showCheckmark {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Utility.SuccessGreen._500.color(colorScheme).opacity(0.15))
                     .frame(width: 48, height: 48)
 
@@ -503,7 +533,7 @@ private struct VotingHeaderIcons: View {
             }
         } else {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Surfaces.bgTertiary.color(colorScheme))
                     .frame(width: 48, height: 48)
                 Image(systemName: "hand.thumbsup")
@@ -521,10 +551,11 @@ private extension BatchSubmissionStatus {
     }
 
     /// True while we're actively making network/proving progress — used by
-    /// the view to disable the back gesture and CTA.
+    /// the view to disable the back gesture and CTA. `.requested` counts:
+    /// auth is pending and the submission is about to own the screen.
     var isInFlight: Bool {
         switch self {
-        case .authorizing, .submitting:
+        case .requested, .authorizing, .submitting:
             return true
         case .idle, .completed, .authorizationFailed, .submissionFailed:
             return false

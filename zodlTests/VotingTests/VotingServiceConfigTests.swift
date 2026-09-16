@@ -206,33 +206,36 @@ import Testing
     /// accepts whatever the host returns, turning the anchor into plain trust in
     /// the transport. Nothing else in the suite pins the bundled constant itself.
     @Test func bundledPinnedSourceCarriesAChecksumSoVerificationCannotSilentlyNoOp() throws {
-        let source = try PinnedConfigSource.parse(StaticVotingConfig.bundledPinnedSource)
+        #expect(StaticVotingConfig.bundledPinnedSources.first == StaticVotingConfig.bundledPinnedSource)
 
-        #expect(source.url.scheme == "https")
-        let digest = try #require(
-            source.sha256,
-            "bundled pin carries no checksum — decodeAndVerify would accept any bytes the host serves"
-        )
-        #expect(digest.count == 32)
+        for raw in StaticVotingConfig.bundledPinnedSources {
+            let source = try PinnedConfigSource.parse(raw)
 
-        // The digest is the pin; it must not also travel to the server as a query
-        // the host could key behaviour off.
-        let sentQuery = URLComponents(url: source.url, resolvingAgainstBaseURL: false)?.queryItems ?? []
-        #expect(!sentQuery.contains { $0.name == "checksum" })
+            #expect(source.url.scheme == "https")
+            let digest = try #require(
+                source.sha256,
+                "bundled pin carries no checksum — decodeAndVerify would accept any bytes the host serves"
+            )
+            #expect(digest.count == 32)
+
+            // The digest is the pin; it must not also travel to the server as a query
+            // the host could key behaviour off.
+            let sentQuery = URLComponents(url: source.url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            #expect(!sentQuery.contains { $0.name == "checksum" })
+        }
     }
 
     @Test func staticConfigDecodeAndVerifyAcceptsMatchingSHA256() throws {
-        let config = makeStaticConfig()
-        let data = try JSONEncoder().encode(config)
+        let data = Data(decodeAndVerifyFixtureJSON.utf8)
         let sha256 = Data(SHA256.hash(data: data))
 
         let decoded = try StaticVotingConfig.decodeAndVerify(data: data, expectedSHA256: sha256)
 
-        #expect(decoded == config)
+        #expect(decoded == makeStaticConfig())
     }
 
     @Test func staticConfigDecodeAndVerifyRejectsHashMismatch() throws {
-        let data = try JSONEncoder().encode(makeStaticConfig())
+        let data = Data(decodeAndVerifyFixtureJSON.utf8)
 
         let error = #expect(throws: VotingConfigError.self) {
             try StaticVotingConfig.decodeAndVerify(data: data, expectedSHA256: Data(repeating: 0, count: 32))
@@ -244,8 +247,18 @@ import Testing
     }
 
     @Test func staticConfigDecodeAndVerifyStillValidatesDecodedConfig() throws {
-        let config = makeStaticConfig(trustedKeyBytes: Data(repeating: 0x01, count: 31))
-        let data = try JSONEncoder().encode(config)
+        // 31-byte trusted key: the hash matches and decode succeeds, so the
+        // rejection can only come from validate().
+        let json = """
+        {
+          "static_config_version": 1,
+          "dynamic_config_url": "https://example.com/dynamic-voting-config.json",
+          "trusted_keys": [
+            {"key_id": "test", "alg": "ed25519", "pubkey": "\(Data(repeating: 0x01, count: 31).base64EncodedString())"}
+          ]
+        }
+        """
+        let data = Data(json.utf8)
         let sha256 = Data(SHA256.hash(data: data))
 
         #expect(throws: (any Error).self) {
@@ -334,6 +347,155 @@ import Testing
         #expect(component == "tally")
     }
 
+    @Test func staticConfigDecodesV1SingularURL() throws {
+        let json = """
+        {
+          "static_config_version": 1,
+          "dynamic_config_url": "https://voting.valargroup.dev/prod/dynamic-voting-config.json",
+          "trusted_keys": [
+            {"key_id": "valargroup", "alg": "ed25519", "pubkey": "\(Data(repeating: 0x01, count: 32).base64EncodedString())"}
+          ]
+        }
+        """
+        let config = try JSONDecoder().decode(StaticVotingConfig.self, from: Data(json.utf8))
+
+        #expect(config.staticConfigVersion == 1)
+        #expect(config.dynamicConfigURLs.map(\.absoluteString) == ["https://voting.valargroup.dev/prod/dynamic-voting-config.json"])
+        #expect(throws: Never.self) {
+            try config.validate()
+        }
+    }
+
+    @Test func staticConfigDecodesV2MirrorList() throws {
+        let json = """
+        {
+          "static_config_version": 2,
+          "dynamic_config_urls": [
+            "https://voting.valargroup.dev/prod/dynamic-voting-config.json",
+            "https://raw.githubusercontent.com/valargroup/token-holder-voting-config/main/prod/dynamic-voting-config.json"
+          ],
+          "trusted_keys": [
+            {"key_id": "valargroup", "alg": "ed25519", "pubkey": "\(Data(repeating: 0x01, count: 32).base64EncodedString())"}
+          ]
+        }
+        """
+        let config = try JSONDecoder().decode(StaticVotingConfig.self, from: Data(json.utf8))
+
+        #expect(config.staticConfigVersion == 2)
+        #expect(config.dynamicConfigURLs.count == 2)
+        #expect(config.dynamicConfigURLs.first?.host == "voting.valargroup.dev")
+        #expect(config.dynamicConfigURLs.last?.host == "raw.githubusercontent.com")
+        #expect(throws: Never.self) {
+            try config.validate()
+        }
+    }
+
+    @Test func staticConfigV2RejectsEmptyMirrorList() throws {
+        let config = StaticVotingConfig(
+            staticConfigVersion: 2,
+            dynamicConfigURLs: [],
+            trustedKeys: [
+                StaticVotingConfig.TrustedKey(keyId: "test", alg: "ed25519", pubkey: Data(repeating: 0x01, count: 32), notes: nil)
+            ]
+        )
+
+        #expect(throws: VotingConfigError.self) {
+            try config.validate()
+        }
+    }
+
+    @Test func staticConfigV2RejectsSingularOnlyDocument() {
+        let json = """
+        {
+          "static_config_version": 2,
+          "dynamic_config_url": "https://voting.valargroup.dev/prod/dynamic-voting-config.json",
+          "trusted_keys": []
+        }
+        """
+
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(StaticVotingConfig.self, from: Data(json.utf8))
+        }
+    }
+
+    @Test func staticConfigV1RejectsPluralOnlyDocument() {
+        let json = """
+        {
+          "static_config_version": 1,
+          "dynamic_config_urls": ["https://voting.valargroup.dev/prod/dynamic-voting-config.json"],
+          "trusted_keys": []
+        }
+        """
+
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(StaticVotingConfig.self, from: Data(json.utf8))
+        }
+    }
+
+    @Test func staticConfigRejectsUnsupportedVersionWithClearMessage() throws {
+        let json = """
+        {
+          "static_config_version": 3,
+          "trusted_keys": [
+            {"key_id": "valargroup", "alg": "ed25519", "pubkey": "\(Data(repeating: 0x01, count: 32).base64EncodedString())"}
+          ]
+        }
+        """
+        let config = try JSONDecoder().decode(StaticVotingConfig.self, from: Data(json.utf8))
+
+        let error = #expect(throws: VotingConfigError.self) {
+            try config.validate()
+        }
+        guard case .decodeFailed(let detail)? = error else {
+            Issue.record("expected decodeFailed, got \(String(describing: error))")
+            return
+        }
+        #expect(detail.contains("unsupported static_config_version 3"))
+    }
+
+    @Test func staticConfigRejectsNonHTTPSMirrorEntry() throws {
+        let config = StaticVotingConfig(
+            staticConfigVersion: 2,
+            dynamicConfigURLs: [
+                URL(string: "https://voting.valargroup.dev/prod/dynamic-voting-config.json")!,
+                URL(string: "http://mirror.example.com/dynamic-voting-config.json")!
+            ],
+            trustedKeys: [
+                StaticVotingConfig.TrustedKey(keyId: "test", alg: "ed25519", pubkey: Data(repeating: 0x01, count: 32), notes: nil)
+            ]
+        )
+
+        #expect(throws: VotingConfigError.self) {
+            try config.validate()
+        }
+    }
+
+    @Test func fetchFailuresRenderAsFetchFailedNotDecodeFailed() {
+        let dynamicMessage = VotingConfigError.dynamicConfigFetchFailed("CDN returned HTTP 403", statusCode: 403).errorDescription ?? ""
+        let staticMessage = VotingConfigError.staticConfigFetchFailed("HTTP 503").errorDescription ?? ""
+
+        #expect(dynamicMessage.contains("fetch failed"))
+        #expect(staticMessage.contains("fetch failed"))
+        #expect(!dynamicMessage.contains("decode"))
+        #expect(!staticMessage.contains("decode"))
+    }
+
+    @Test func resolveConfigSourcesUsesBundledWalkForNilOverride() {
+        #expect(StaticVotingConfig.resolveConfigSources(override: nil) == StaticVotingConfig.bundledParsedSources)
+    }
+
+    @Test func resolveConfigSourcesKeepsBundledWalkForSavedBundledMirror() throws {
+        for raw in StaticVotingConfig.bundledPinnedSources {
+            let source = try PinnedConfigSource.parse(raw)
+            #expect(StaticVotingConfig.resolveConfigSources(override: source) == StaticVotingConfig.bundledParsedSources)
+        }
+    }
+
+    @Test func resolveConfigSourcesIsolatesCustomOverride() throws {
+        let custom = try PinnedConfigSource.parse("https://example.com/static-voting-config.json")
+        #expect(StaticVotingConfig.resolveConfigSources(override: custom) == [custom])
+    }
+
     private func makeConfig(supportedVersions: VotingServiceConfig.SupportedVersions) -> VotingServiceConfig {
         VotingServiceConfig(
             configVersion: 1,
@@ -345,14 +507,24 @@ import Testing
         )
     }
 
+    private let decodeAndVerifyFixtureJSON = """
+    {
+      "static_config_version": 1,
+      "dynamic_config_url": "https://example.com/dynamic-voting-config.json",
+      "trusted_keys": [
+        {"key_id": "test", "alg": "ed25519", "pubkey": "\(Data(repeating: 0x01, count: 32).base64EncodedString())"}
+      ]
+    }
+    """
+
     private func makeStaticConfig(
         trustedKeyBytes: Data = Data(repeating: 0x01, count: 32)
     ) -> StaticVotingConfig {
         StaticVotingConfig(
             staticConfigVersion: 1,
-            dynamicConfigURL: URL(string: "https://example.com/dynamic-voting-config.json")!,
+            dynamicConfigURLs: [URL(string: "https://example.com/dynamic-voting-config.json")!],
             trustedKeys: [
-                .init(keyId: "test", alg: "ed25519", pubkey: trustedKeyBytes, notes: nil)
+                StaticVotingConfig.TrustedKey(keyId: "test", alg: "ed25519", pubkey: trustedKeyBytes, notes: nil)
             ]
         )
     }
@@ -692,6 +864,24 @@ import Testing
         #expect(throws: (any Error).self) {
             try parseVotingSession(from: makeRound(proposals: (1...16).map { makeProposal(id: $0) }))
         }
+    }
+
+    @Test func parseVotingSessionsSkipsARoundWithTooManyProposals() throws {
+        let sessions = try parseVotingSessions(from: [
+            makeRound(proposals: (1...37).map { makeProposal(id: $0) }),
+            makeRound()
+        ])
+        #expect(sessions.count == 1)
+    }
+
+    @Test func parseVotingSessionsThrowsWhenNoRoundParses() {
+        #expect(throws: (any Error).self) {
+            try parseVotingSessions(from: [makeRound(proposals: []), makeRound(proposals: [])])
+        }
+    }
+
+    @Test func parseVotingSessionsReturnsEmptyForAnEmptyList() throws {
+        #expect(try parseVotingSessions(from: []).isEmpty)
     }
 
     @Test func parseVotingSessionRejectsProposalIdOutsideRange() {
@@ -1343,7 +1533,11 @@ import Testing
 
     @Test func fallbackStillReachesTheOmittedHelperWhenTheOthersFail() async throws {
         let recorder = ShareTargetRecorder()
-        // Share 0 omits the server at index 0 from its initial targets.
+        // A single-share send falls below the 16-payload threshold that
+        // enables the per-share spread gate, so it never engages here —
+        // every server, this one included, is eligible from the first
+        // round, and the fallback walk should still reach it once the
+        // other helper fails.
         let omitted = "https://helper-a.example.com"
         let failing = "https://helper-b.example.com"
 
@@ -1359,7 +1553,7 @@ import Testing
         )
 
         let reached = await recorder.shareIndices(for: omitted)
-        #expect(reached.contains(0), "initial-submission omission must not survive into fallback — the share would be lost")
+        #expect(reached.contains(0), "single-share sends have the spread gate off, so the fallback walk must still reach the last one standing")
     }
 }
 

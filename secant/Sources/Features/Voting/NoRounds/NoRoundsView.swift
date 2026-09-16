@@ -97,7 +97,7 @@ struct VotingCoordFlowBackdrop: View {
             icon
                 .padding(8)
                 .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._md)
+                    Rectangle()
                         .fill(Design.Btns.Ghost.bg.color(colorScheme))
                 }
         }
@@ -125,9 +125,9 @@ struct PollsListSkeletonCard: View {
         .padding(Design.Spacing._xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Design.Surfaces.bgPrimary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+        .clipShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+            Rectangle()
                 .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
         )
     }
@@ -136,7 +136,7 @@ struct PollsListSkeletonCard: View {
         Color.gray.opacity(0.25)
             .frame(width: width, height: height)
             .shimmer(true)
-            .clipShape(RoundedRectangle(cornerRadius: 0))
+            .clipShape(Rectangle())
     }
 }
 #endif

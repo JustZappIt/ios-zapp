@@ -57,16 +57,17 @@ struct HowToVoteView: View {
                 snapshotNote
                     .padding(.horizontal, 24)
                     .padding(.bottom, 12)
-
-                ZashiButton(String(localizable: .coinVoteCommonContinue)) {
-                    store.send(.howToVoteContinueTapped)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))
-            .zashiBack { store.send(.dismissFlow) }
+            .zashiBack(
+                primaryAction: {
+                    ZappButton(title: String(localizable: .coinVoteCommonContinue)) {
+                        store.send(.howToVoteContinueTapped)
+                    }
+                },
+                customDismiss: { store.send(.dismissFlow) }
+            )
         }
     }
 
@@ -76,7 +77,7 @@ struct HowToVoteView: View {
     private var iconRow: some View {
         HStack(spacing: -8) {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Text.primary.color(colorScheme))
                     .frame(width: 48, height: 48)
 
@@ -84,7 +85,7 @@ struct HowToVoteView: View {
             }
 
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Surfaces.bgSecondary.color(colorScheme))
                     .frame(width: 48, height: 48)
 
@@ -101,7 +102,7 @@ struct HowToVoteView: View {
             Asset.Assets.Partners.keystoneLogo.image
                 .resizable()
                 .frame(width: 48, height: 48)
-                .clipShape(Circle())
+                .clipShape(Rectangle())
         } else {
             Asset.Assets.zashiLogo.image
                 .zImage(size: 22, color: Design.Surfaces.bgPrimary.color(colorScheme))
@@ -114,7 +115,7 @@ struct HowToVoteView: View {
     private func stepRow(number: Int, title: String, body: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Text.primary.color(colorScheme))
                     .frame(width: 24, height: 24)
 
