@@ -40,12 +40,6 @@ struct WalletSyncingView: View {
                 }
 
                 Spacer()
-
-                ZashiButton(String(localizable: .coinVoteCommonClose), type: .tertiary) {
-                    store.send(.dismissFlow)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))

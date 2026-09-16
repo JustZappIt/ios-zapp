@@ -84,18 +84,18 @@ struct DelegationSigningView: View {
                 }
 
                 Spacer(minLength: 0)
-
-                if isSigningRouteActive {
-                    actionButtons(status: status)
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 24)
-                }
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteDelegationSigningTitle))
-            .zashiBack {
-                store.send(.delegationRejected(roundId: roundId))
-            }
+            .zashiBack(
+                hasPrimaryAction: isSigningRouteActive && status == .awaitingSignature,
+                primaryAction: {
+                    ZappButton(title: String(localizable: .coinVoteDelegationSigningScanSignature)) {
+                        store.send(.openKeystoneSignatureScan)
+                    }
+                },
+                customDismiss: { store.send(.delegationRejected(roundId: roundId)) }
+            )
             .navigationBarBackButtonHidden()
             .sheet(
                 store: store.scope(state: \.$keystoneScan, action: \.keystoneScan)
@@ -109,7 +109,7 @@ struct DelegationSigningView: View {
                         AnimatedQRCode(urEncoder: encoder, size: UIScreen.main.bounds.width - 64)
                             .padding()
                             .background {
-                                RoundedRectangle(cornerRadius: Design.Radius._4xl)
+                                Rectangle()
                                     .fill(Color.white)
                             }
                     }
@@ -131,7 +131,7 @@ struct DelegationSigningView: View {
             Asset.Assets.Brandmarks.brandmarkKeystone.image
                 .resizable()
                 .frame(width: 40, height: 40)
-                .clipShape(Circle())
+                .clipShape(Rectangle())
                 .padding(.trailing, 16)
 
             VStack(alignment: .leading, spacing: 0) {
@@ -153,10 +153,10 @@ struct DelegationSigningView: View {
                 .padding(.vertical, 2)
                 .padding(.horizontal, 8)
                 .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._2xl)
+                    Rectangle()
                         .fill(Design.Utility.HyperBlue._50.color(colorScheme))
                         .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+                            Rectangle()
                                 .stroke(Design.Utility.HyperBlue._200.color(colorScheme))
                         }
                 }
@@ -165,10 +165,10 @@ struct DelegationSigningView: View {
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
         .background {
-            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+            Rectangle()
                 .fill(Design.Surfaces.bgPrimary.color(colorScheme))
                 .overlay {
-                    RoundedRectangle(cornerRadius: Design.Radius._2xl)
+                    Rectangle()
                         .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
                 }
         }
@@ -200,10 +200,10 @@ struct DelegationSigningView: View {
                         .frame(width: 216, height: 216)
                         .padding(24)
                         .background {
-                            RoundedRectangle(cornerRadius: Design.Radius._xl)
+                            Rectangle()
                                 .fill(Asset.Colors.ZDesign.Base.bone.color)
                                 .background {
-                                    RoundedRectangle(cornerRadius: Design.Radius._xl)
+                                    Rectangle()
                                         .stroke(Design.Surfaces.strokeSecondary.color(colorScheme))
                                 }
                         }
@@ -237,10 +237,10 @@ struct DelegationSigningView: View {
         }
         .frame(width: 264, height: 264)
         .background {
-            RoundedRectangle(cornerRadius: Design.Radius._3xl)
+            Rectangle()
                 .fill(Design.Surfaces.bgPrimary.color(colorScheme))
                 .overlay {
-                    RoundedRectangle(cornerRadius: Design.Radius._3xl)
+                    Rectangle()
                         .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
                 }
         }
@@ -291,7 +291,7 @@ struct DelegationSigningView: View {
             }
         }
         .background(Design.Surfaces.bgSecondary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._xl))
+        .clipShape(Rectangle())
     }
 
     @ViewBuilder
@@ -505,22 +505,5 @@ struct DelegationSigningView: View {
         }
     }
 
-    // MARK: - Action buttons
-
-    @ViewBuilder
-    private func actionButtons(status: KeystoneSigningStatus) -> some View {
-        switch status {
-        case .awaitingSignature:
-            ZashiButton(String(localizable: .coinVoteDelegationSigningScanSignature)) {
-                store.send(.openKeystoneSignatureScan)
-            }
-        case .failed:
-            ZashiButton(String(localizable: .coinVoteCommonGoBack)) {
-                store.send(.delegationRejected(roundId: roundId))
-            }
-        default:
-            EmptyView()
-        }
-    }
 }
 #endif

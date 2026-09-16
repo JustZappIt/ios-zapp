@@ -59,28 +59,23 @@ struct VotingErrorView: View {
                 .padding(.horizontal, 24)
 
                 Spacer()
-
-                VStack(spacing: 12) {
-                    if let recoveryAction {
-                        ZashiButton(recoveryAction.title, minHeight: 48) {
-                            store.send(recoveryAction.action)
-                        }
-                    }
-
-                    ZashiButton(
-                        String(localizable: .coinVoteCommonGotIt),
-                        type: recoveryAction == nil ? .primary : .secondary,
-                        minHeight: 48
-                    ) {
-                        store.send(.dismissFlow)
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
             }
             .applyScreenBackground()
             .screenTitle(String(localizable: .coinVoteCommonScreenTitle))
-            .zashiBack { store.send(.dismissFlow) }
+            .zashiBack(
+                primaryAction: {
+                    if let recoveryAction {
+                        ZappButton(title: recoveryAction.title) {
+                            store.send(recoveryAction.action)
+                        }
+                    } else {
+                        ZappButton(title: String(localizable: .coinVoteCommonGotIt)) {
+                            store.send(.dismissFlow)
+                        }
+                    }
+                },
+                customDismiss: { store.send(.dismissFlow) }
+            )
         }
     }
 }

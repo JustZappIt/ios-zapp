@@ -260,9 +260,9 @@ struct ProposalListView: View {
         .padding(Design.Spacing._xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Design.Surfaces.bgPrimary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+        .clipShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+            Rectangle()
                 .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
         )
     }
@@ -341,7 +341,7 @@ struct ProposalListView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(tone.background.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._md))
+        .clipShape(Rectangle())
     }
 
     /// Color category for the "Your vote:" pill. Picks a non-opinionated

@@ -185,7 +185,7 @@ struct PollsListView: View {
             icon
                 .padding(8)
                 .background {
-                    RoundedRectangle(cornerRadius: Design.Radius._md)
+                    Rectangle()
                         .fill(Design.Btns.Ghost.bg.color(colorScheme))
                 }
         }
@@ -321,9 +321,9 @@ struct PollsListView: View {
         .padding(Design.Spacing._xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Design.Surfaces.bgPrimary.color(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: Design.Radius._2xl))
+        .clipShape(Rectangle())
         .overlay(
-            RoundedRectangle(cornerRadius: Design.Radius._2xl)
+            Rectangle()
                 .stroke(Design.Surfaces.strokeSecondary.color(colorScheme), lineWidth: 1)
         )
         // Layered card shadow from Figma using shadow-sm = rgba(35, 31, 32, 0.04).
@@ -359,7 +359,7 @@ struct PollsListView: View {
     private func zodlTrustIndicator() -> some View {
         HStack(spacing: 6) {
             ZStack {
-                Circle()
+                Rectangle()
                     .fill(Design.Text.primary.color(colorScheme))
                     .frame(width: 24, height: 24)
 
