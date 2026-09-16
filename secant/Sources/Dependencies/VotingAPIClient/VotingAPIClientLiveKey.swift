@@ -829,10 +829,31 @@ private func authenticateVotingSession(_ session: VotingSession) async throws ->
     return session
 }
 
+/// One malformed round hides only that round, like one broken signature below: the live
+/// server has published rounds with more proposals than the wallet supports. A non-empty
+/// list that yields nothing still throws, so a wholesale format change surfaces as an
+/// error rather than as an empty poll list.
+func parseVotingSessions(from rounds: [[String: Any]]) throws -> [VotingSession] {
+    var sessions: [VotingSession] = []
+    var firstError: Error?
+    for round in rounds {
+        do {
+            sessions.append(try parseVotingSession(from: round))
+        } catch {
+            let roundId = (round["vote_round_id"] as? String) ?? "?"
+            LoggerProxy.error("Skipping unparseable round \(roundId): \(error)")
+            firstError = firstError ?? error
+        }
+    }
+    if sessions.isEmpty, let firstError {
+        throw firstError
+    }
+    return sessions
+}
+
 private func authenticatedVotingSessions(from rounds: [[String: Any]]) async throws -> [VotingSession] {
     var authenticated: [VotingSession] = []
-    for round in rounds {
-        let session = try parseVotingSession(from: round)
+    for session in try parseVotingSessions(from: rounds) {
         do {
             authenticated.append(try await authenticateVotingSession(session))
         } catch SvAPIError.noActiveVotingSession {

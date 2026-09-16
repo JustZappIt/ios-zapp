@@ -866,6 +866,24 @@ import Testing
         }
     }
 
+    @Test func parseVotingSessionsSkipsARoundWithTooManyProposals() throws {
+        let sessions = try parseVotingSessions(from: [
+            makeRound(proposals: (1...37).map { makeProposal(id: $0) }),
+            makeRound()
+        ])
+        #expect(sessions.count == 1)
+    }
+
+    @Test func parseVotingSessionsThrowsWhenNoRoundParses() {
+        #expect(throws: (any Error).self) {
+            try parseVotingSessions(from: [makeRound(proposals: []), makeRound(proposals: [])])
+        }
+    }
+
+    @Test func parseVotingSessionsReturnsEmptyForAnEmptyList() throws {
+        #expect(try parseVotingSessions(from: []).isEmpty)
+    }
+
     @Test func parseVotingSessionRejectsProposalIdOutsideRange() {
         #expect(throws: (any Error).self) {
             try parseVotingSession(from: makeRound(proposals: [makeProposal(id: 16)]))
