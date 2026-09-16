@@ -117,6 +117,7 @@ struct Root {
         var DidFinishLaunchingId = UUID()
         var CancelFlexaId = UUID()
         var shieldingProcessorCancelId = UUID()
+        var keystoneSigningCancelId = UUID()
         var zappMessagingCancelId = UUID()
         var chatNotificationTapCancelId = UUID()
         var automaticServerRefreshCancelId = UUID()
@@ -199,6 +200,8 @@ struct Root {
         var serverSetupState: ServerSetup.State
         var serverSetupViewBinding = false
         var signWithKeystoneCoordFlowBinding = false
+        /// The `keystoneSigning` request the lane is answering; nil while it serves shielding.
+        var pendingKeystoneSigningRequestId: UUID?
         var splashAppeared = false
         var supportData: SupportData?
         @Shared(.inMemory(.swapAPIAccess)) var swapAPIAccess: WalletStorage.SwapAPIAccess = .direct
@@ -504,6 +507,8 @@ struct Root {
         case settings(Settings.Action)
         case signWithKeystoneCoordFlow(SignWithKeystoneCoordFlow.Action)
         case signWithKeystoneRequested
+        case observeKeystoneSigning
+        case keystoneSigningEvent(KeystoneSigningEvent)
         case supportChat(SupportChat.Action)
         case supportTicketList(SupportTicketList.Action)
         case swapAndPayCoordFlow(SwapAndPayCoordFlow.Action)
@@ -587,6 +592,7 @@ struct Root {
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.reputation) var reputation
+    @Dependency(\.keystoneSigning) var keystoneSigning
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.shieldingProcessor) var shieldingProcessor
     @Dependency(\.swapAndPay) var swapAndPay

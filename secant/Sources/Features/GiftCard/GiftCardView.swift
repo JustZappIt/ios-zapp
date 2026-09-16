@@ -439,7 +439,6 @@ extension GiftCardView {
         case .amountInvalid: return String(localizable: .giftCardAmountErrorInvalid)
         case .messageTooLong: return String(localizable: .giftCardMessageErrorTooLong)
         case .insufficientFunds: return String(localizable: .giftCardErrorInsufficient)
-        case .keystoneUnsupported: return String(localizable: .giftCardErrorKeystone)
         case .unsupportedNetwork: return String(localizable: .giftCardErrorNetwork)
         case .chainTipUnavailable: return String(localizable: .giftCardErrorChainTip)
         case .persistFailed: return String(localizable: .giftCardErrorPersist)
@@ -447,6 +446,8 @@ extension GiftCardView {
         case .proposalFailed: return String(localizable: .giftCardErrorProposal)
         case .authenticationFailed: return String(localizable: .giftCardErrorAuth)
         case .submitUncertain: return String(localizable: .giftCardErrorSubmitUncertain)
+        case .signingFailed: return String(localizable: .giftCardErrorSigning)
+        case .wrongAccount: return String(localizable: .giftCardErrorWrongAccount)
         case .shareFailed: return String(localizable: .giftCardErrorShare)
         }
     }

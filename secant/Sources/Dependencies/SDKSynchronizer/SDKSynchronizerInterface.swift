@@ -330,6 +330,9 @@ struct SDKSynchronizerClient: Sendable {
     var addProofsToPCZT: @Sendable (Pczt) async throws -> Pczt
     /// PCZT variant of `createAndSubmitProposedTransactions`.
     var createAndSubmitTransactionFromPCZT: @Sendable (Pczt, Pczt) async throws -> CreateProposedTransactionsResult
+    /// PCZT variant of `createProposedTransactionsWithoutSubmit`: the proved and device-signed pair
+    /// becomes a local transaction whose txid gift funding records before `submitCreatedTransactionsForGift`.
+    var createTransactionFromPCZTWithoutSubmit: @Sendable (Pczt, Pczt) async throws -> [CreatedTransaction]
     var urEncoderForPCZT: @Sendable (Pczt) -> UREncoder?
     var redactPCZTForSigner: @Sendable (Pczt) async throws  -> Pczt
     

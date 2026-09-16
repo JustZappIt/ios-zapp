@@ -14,8 +14,14 @@ extension SignWithKeystoneCoordFlow {
                 
                 // MARK: - Scan
                 
-            case .path(.element(id: _, action: .scan(.foundPCZT(let pcztWithSigs)))):
-                state.path.append(.sending(state.sendConfirmationState))
+            case .path(.element(id: let id, action: .scan(.foundPCZT(let pcztWithSigs)))):
+                if state.sendConfirmationState.handsOffSignedPCZT {
+                    // Zapp: nothing is sent from here, so the scan holds its "Signing…" state
+                    // until `pcztSigned` closes the lane.
+                    state.path[id: id, case: \.scan]?.isKeystoneSigningInProgress = true
+                } else {
+                    state.path.append(.sending(state.sendConfirmationState))
+                }
                 return .send(.sendConfirmation(.foundPCZT(pcztWithSigs)))
 
             case .path(.element(id: _, action: .scan(.cancelTapped))):

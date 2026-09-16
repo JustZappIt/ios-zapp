@@ -415,6 +415,12 @@ extension SDKSynchronizerClient: DependencyKey {
                     )
                 }
             },
+            createTransactionFromPCZTWithoutSubmit: { pcztWithProofs, pcztWithSigs in
+                try await synchronizer.broadcaster.createTransactionFromPCZT(
+                    pcztWithProofs: pcztWithProofs,
+                    pcztWithSigs: pcztWithSigs
+                )
+            },
             urEncoderForPCZT: { pczt in
                 let keystoneSDK = KeystoneZcashSDK()
 

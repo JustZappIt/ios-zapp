@@ -1142,6 +1142,55 @@ extension Root {
 
                 // MARK: - Keystone
 
+                // Zapp: gift funding and the P2P bridge borrow shielding's lane through
+                // `keystoneSigning`; `pendingKeystoneSigningRequestId` tells their arms apart.
+            case .observeKeystoneSigning:
+                return .run { send in
+                    for await event in keystoneSigning.events() {
+                        await send(.keystoneSigningEvent(event))
+                    }
+                }
+                .cancellable(id: state.keystoneSigningCancelId, cancelInFlight: true)
+
+            case .keystoneSigningEvent(.requested(let request)):
+                guard !state.signWithKeystoneCoordFlowBinding else {
+                    return .run { _ in await keystoneSigning.complete(request.id, .failure(.busy)) }
+                }
+                guard state.selectedWalletAccount?.id == request.accountUUID else {
+                    return .run { _ in await keystoneSigning.complete(request.id, .failure(.wrongAccount)) }
+                }
+                state.pendingKeystoneSigningRequestId = request.id
+                state.signWithKeystoneCoordFlowState = .initial
+                state.signWithKeystoneCoordFlowState.sendConfirmationState.proposal = request.proposal
+                state.signWithKeystoneCoordFlowState.sendConfirmationState.handsOffSignedPCZT = true
+                state.signWithKeystoneCoordFlowBinding = true
+                return .send(.signWithKeystoneCoordFlow(.sendConfirmation(.resolvePCZT)))
+
+            case .keystoneSigningEvent(.withdrawn(let id)):
+                guard state.pendingKeystoneSigningRequestId == id else { return .none }
+                state.pendingKeystoneSigningRequestId = nil
+                state.signWithKeystoneCoordFlowBinding = false
+                return .none
+
+            case .signWithKeystoneCoordFlow(.sendConfirmation(.pcztSigned(let pcztWithProofs, let pcztWithSigs))):
+                return answerKeystoneSigning(
+                    &state,
+                    .success(KeystoneSignedPczt(pcztWithProofs: pcztWithProofs, pcztWithSigs: pcztWithSigs))
+                )
+
+            case .signWithKeystoneCoordFlow(.sendConfirmation(.rejectTapped))
+                where state.pendingKeystoneSigningRequestId != nil:
+                return answerKeystoneSigning(&state, .failure(.rejected))
+
+            case .signWithKeystoneCoordFlow(.path(.element(id: _, action: .preSendingFailure(.backFromPCZTFailureTapped))))
+                where state.pendingKeystoneSigningRequestId != nil:
+                return answerKeystoneSigning(&state, .failure(.failed))
+
+            case .binding(\.signWithKeystoneCoordFlowBinding):
+                // Swiped away while a request waits: closed without a signature.
+                guard !state.signWithKeystoneCoordFlowBinding else { return .none }
+                return answerKeystoneSigning(&state, .failure(.rejected))
+
             case .sendCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.rejectTapped)))),
                     .signWithKeystoneCoordFlow(.sendConfirmation(.rejectTapped)),
                     .swapAndPayCoordFlow(.path(.element(id: _, action: .confirmWithKeystone(.rejectTapped)))):
@@ -1456,6 +1505,16 @@ extension Root {
             default: return .none
             }
         }
+    }
+
+    private func answerKeystoneSigning(
+        _ state: inout Root.State,
+        _ result: Result<KeystoneSignedPczt, KeystoneSigningError>
+    ) -> Effect<Root.Action> {
+        guard let id = state.pendingKeystoneSigningRequestId else { return .none }
+        state.pendingKeystoneSigningRequestId = nil
+        state.signWithKeystoneCoordFlowBinding = false
+        return .run { _ in await keystoneSigning.complete(id, result) }
     }
 
     /// Applies the account-scoped reactions shared by a manual switch and every Keystone

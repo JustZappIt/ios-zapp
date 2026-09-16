@@ -18,10 +18,6 @@ struct P2pPaymentMethod {
         var destinations: [PeerDestination] = []
         /// False on every build but Base mainnet, where the Peer rails do not exist at all.
         var isPeerAvailable = false
-        /// Peer signs from the Base smart account this wallet derives, which a hardware wallet does
-        /// not expose. The rails are shown as unavailable rather than hidden, so the absence is
-        /// explained rather than mysterious.
-        var isSoftwareWallet = true
         /// What the rows show. Only `saveTapped` writes it to preferences.
         var selected: P2pRail = .default
         /// What preferences hold, so the button knows whether anything changed.
@@ -34,7 +30,7 @@ struct P2pPaymentMethod {
         var baseAddress: String?
         var isAddressCopied = false
 
-        var canSelectPeer: Bool { isPeerAvailable && isSoftwareWallet }
+        var canSelectPeer: Bool { isPeerAvailable }
 
         var canSave: Bool { selected != saved }
     }
@@ -77,8 +73,6 @@ struct P2pPaymentMethod {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
-                state.isSoftwareWallet = selectedAccount?.vendor == .zcash
                 state.saved = userStoredPreferences.p2pRail() ?? .default
                 state.selected = state.saved
                 state.isLoading = true

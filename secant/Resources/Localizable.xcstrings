@@ -33863,23 +33863,6 @@
         }
       }
     },
-    "p2p.payment.method.peer.hardware.wallet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cash-out signs from the Base account this wallet derives, which a hardware wallet doesn't expose. Switch to a Zapp software wallet to use it."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El cobro se firma desde la cuenta de Base que deriva esta billetera, algo que una billetera de hardware no expone. Cambia a una billetera de software de Zapp para usarlo."
-          }
-        }
-      }
-    },
     "peer.destination.revolut" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -35939,7 +35922,8 @@
     "gift.card.ready.claimable" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Claimable in about 15 minutes, once the funding transaction has enough confirmations."}},"es":{"stringUnit":{"state":"translated","value":"Se podrá reclamar en unos 15 minutos, cuando la transacción de financiación tenga suficientes confirmaciones."}}}},
     "gift.card.ready.bearer" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Anyone with this link can claim it. Share it privately, and only once."}},"es":{"stringUnit":{"state":"translated","value":"Cualquiera con este enlace puede reclamarlo. Compártelo de forma privada y solo una vez."}}}},
     "gift.card.unavailable.body" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This Zpacket is no longer ready to share. Open your saved Zpackets to review its current status. If funding can be retried, Zapp keeps this same Zpacket and link."}},"es":{"stringUnit":{"state":"translated","value":"Este Zpacket ya no está listo para compartir. Abre tus Zpackets guardados para revisar su estado actual. Si se puede reintentar la financiación, Zapp conserva este mismo Zpacket y enlace."}}}},
-    "gift.card.error.keystone" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zpackets need a spending key on this device. Switch to a Zapp account to create one."}},"es":{"stringUnit":{"state":"translated","value":"Los Zpackets necesitan una clave de gasto en este dispositivo. Cambia a una cuenta Zapp para crear uno."}}}},
+    "gift.card.error.signing" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Signing with Keystone didn't complete. Nothing was sent."}},"es":{"stringUnit":{"state":"translated","value":"La firma con Keystone no se completó. No se envió nada."}}}},
+    "gift.card.error.wrong.account" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Switch to the Keystone account this Zpacket was created from to fund it."}},"es":{"stringUnit":{"state":"translated","value":"Cambia a la cuenta Keystone desde la que se creó este Zpacket para financiarlo."}}}},
     "gift.card.error.network" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zpackets are available on mainnet and testnet only."}},"es":{"stringUnit":{"state":"translated","value":"Los Zpackets solo están disponibles en mainnet y testnet."}}}},
     "gift.card.error.chain.tip" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Zapp is still connecting. Try again once syncing has started."}},"es":{"stringUnit":{"state":"translated","value":"Zapp todavía se está conectando. Inténtalo cuando haya empezado la sincronización."}}}},
     "gift.card.error.persist" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The Zpacket could not be saved, so nothing was funded. Try again."}},"es":{"stringUnit":{"state":"translated","value":"No se pudo guardar el Zpacket, así que no se financió nada. Inténtalo de nuevo."}}}},

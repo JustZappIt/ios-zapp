@@ -34,7 +34,14 @@ struct ZappPayView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZappScreenHeader(title: String(localizable: .zappPayTitle)) {
-                    ZappSyncChip(state: syncState)
+                    HStack(spacing: Design.Spacing._md) {
+                        walletAccountChip
+
+                        ZappSyncChip(state: syncState)
+                    }
+                }
+                .sheet(isPresented: $store.accountSwitchRequest) {
+                    walletAccountsSheet()
                 }
 
                 // Android makes the wallet-home error message a tap target onto the sync-error
@@ -111,6 +118,11 @@ struct ZappPayView: View {
                     store.isZappSyncErrorSheetPresented = true
                 }
             }
+            .sheet(isPresented: $store.isInAppBrowserKeystoneOn) {
+                if let url = URL(string: store.inAppBrowserURLKeystone) {
+                    InAppBrowserView(url: url)
+                }
+            }
             .sheet(isPresented: $store.isZappSyncErrorSheetPresented) {
                 syncErrorSheet()
             }
@@ -129,6 +141,35 @@ struct ZappPayView: View {
 
     private var syncState: ZappSyncState {
         ZappSyncState(store.smartBannerState)
+    }
+
+    /// Which wallet the tab is showing, and the door to the others: Android's Pay header has no
+    /// switcher (its door is You → Hardware wallet), so this chip stands in for the nav-bar
+    /// switcher upstream's `HomeView` carried.
+    @ViewBuilder private var walletAccountChip: some View {
+        if let account = store.selectedWalletAccount {
+            ZappStatusChip(
+                text: account.vendor.name(),
+                variant: .outlined,
+                leadingIcon: account.vendor.icon()
+            ) {
+                store.send(.accountSwitchTapped)
+            }
+        }
+    }
+
+    @ViewBuilder private func walletAccountsSheet() -> some View {
+        WithPerceptionTracking {
+            ZappWalletAccountsSheet(store: store)
+                .presentationDetents([
+                    .height(ZappWalletAccountsSheet.detentHeight(
+                        accountCount: store.walletAccounts.count,
+                        showsKeystoneDoor: !store.isKeystoneConnected
+                    )),
+                    .large
+                ])
+                .presentationDragIndicator(.visible)
+        }
     }
 
     @ViewBuilder private func balanceCard() -> some View {

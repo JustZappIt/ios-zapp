@@ -97,6 +97,7 @@ struct GiftCardListView: View {
         case .retryInsufficientFunds: return String(localizable: .giftCardListErrorRetryFunds)
         case .retryFailed: return String(localizable: .giftCardListErrorRetry)
         case .retryUncertain: return String(localizable: .giftCardListErrorRetryUncertain)
+        case .retryWrongAccount: return String(localizable: .giftCardErrorWrongAccount)
         }
     }
 

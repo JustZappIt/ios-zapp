@@ -56,6 +56,7 @@ struct GiftCardList {
         case retryInsufficientFunds
         case retryFailed
         case retryUncertain
+        case retryWrongAccount
     }
 
     /// A finding rather than a failure — rendered muted, not in the danger colour.
@@ -121,6 +122,7 @@ struct GiftCardList {
         case linkRebuilt(cardId: String, link: String)
         case linkFailed
         case onAppear
+        case retryCancelled
         case retryConfirmTapped
         case retryDismissTapped
         case retryFinished
@@ -349,6 +351,8 @@ struct GiftCardList {
                         let txid = try await FundGiftCard().submit(quote)
                         await send(.retryFinished)
                         await ConfirmGiftCardFunding()(cardId: quote.card.id, fundingTxid: txid)
+                    } catch GiftFundingError.signingCancelled {
+                        await send(.retryCancelled)
                     } catch {
                         await send(.retryFailed(Self.retryError(error)))
                     }
@@ -359,6 +363,13 @@ struct GiftCardList {
                 guard state.retryingId == nil else { return .none }
                 retryBox.put(nil)
                 state.retryReview = nil
+                return .none
+
+            case .retryCancelled:
+                // Backed out on the Keystone: nothing was sent, nothing to report.
+                retryBox.put(nil)
+                state.retryingId = nil
+                state.items = Self.decorated(state.items, state: state)
                 return .none
 
             case .retryFinished:
@@ -404,7 +415,8 @@ struct GiftCardList {
         switch error as? GiftFundingError {
         case .insufficientFunds: return .retryInsufficientFunds
         case .submitUncertain: return .retryUncertain
-        case .proposalFailed, nil: return .retryFailed
+        case .wrongAccountSelected: return .retryWrongAccount
+        case .proposalFailed, .signingCancelled, .signingFailed, nil: return .retryFailed
         }
     }
 

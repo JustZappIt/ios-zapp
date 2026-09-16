@@ -91,7 +91,6 @@ enum OfframpHistoryOrderType: String, Equatable, Sendable {
 enum OfframpClientError: LocalizedError, Equatable {
     case configuration(String)
     case invalidQR(String)
-    case unsupportedAccount
     case authenticationCancelled
     case staleQuote
 
@@ -99,7 +98,6 @@ enum OfframpClientError: LocalizedError, Equatable {
         switch self {
         case .configuration(let message): return message
         case .invalidQR(let code): return "That QR is not valid for this payment method (\(code))."
-        case .unsupportedAccount: return "P2P payments currently require a Zapp software wallet."
         case .authenticationCancelled: return "Authentication was cancelled. No payment was submitted."
         case .staleQuote: return "The payment quote changed. Review the updated amount before trying again."
         }
