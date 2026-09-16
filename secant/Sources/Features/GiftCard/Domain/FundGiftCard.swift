@@ -36,6 +36,16 @@ enum GiftFundingError: Error, Equatable {
     /// blind retry from here: the first attempt may yet mine, and a card funded twice is money
     /// gone twice.
     case submitUncertain
+
+    /// The sender backed out of signing on the Keystone. Nothing was sent.
+    case signingCancelled
+
+    /// The Keystone lane could not produce a signed transaction. Nothing was sent.
+    case signingFailed
+
+    /// The card belongs to a Keystone account other than the selected one, and only the selected
+    /// account can sign. Nothing was sent.
+    case wrongAccountSelected
 }
 
 /// Split in two on purpose: `prepare` mints, persists and prices without spending, so the review
@@ -57,6 +67,7 @@ struct FundGiftCard {
     @Dependency(\.derivationTool) var derivationTool
     @Dependency(\.giftCardStorage) var giftCardStorage
     @Dependency(\.giftFundingOperationLock) var giftFundingOperationLock
+    @Dependency(\.keystoneSigning) var keystoneSigning
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.walletStorage) var walletStorage
@@ -178,19 +189,46 @@ struct FundGiftCard {
     /// The card stays a draft afterwards: `recordFundingSubmitted` claims only that a transaction
     /// exists, not that it mined. Advancing it to funded is `ConfirmGiftCardFunding`'s job.
     ///
-    /// The durable start marker divides this method: before it, failures are `proposalFailed`;
-    /// from it onwards — creation and storage writes included — `submitUncertain`. The SDK's
-    /// background resubmitter can broadcast a locally-created transaction before the app
-    /// explicitly submits it, and can retry one after a server rejection.
+    /// The durable start marker divides this method: before it, failures are `proposalFailed`
+    /// (or one of the signing refusals); from it onwards — creation and storage writes included —
+    /// `submitUncertain`. The SDK's background resubmitter can broadcast a locally-created
+    /// transaction before the app explicitly submits it, and can retry one after a server
+    /// rejection.
+    ///
+    /// The signing material is gathered between two holds of the card's lock: a spending key is
+    /// derived in microseconds, but a Keystone signature is a device round trip the sender paces,
+    /// and reconciliation must not be blocked for that long. A signed PCZT is inert until a
+    /// transaction is created from it, so the marker still precedes anything the SDK could
+    /// broadcast.
     func submit(_ quote: GiftFundingQuote) async throws -> String {
-        try await giftFundingOperationLock.withLock(quote.card.id) {
-            try await submitLocked(quote)
+        let owner = try await giftFundingOperationLock.withLock(quote.card.id) {
+            try await reviewedOwner(of: quote)
+        }
+
+        let create: @Sendable () async throws -> [CreatedTransaction]
+        switch owner.vendor {
+        case .zcash:
+            let spendingKey = try spendingKey(for: owner)
+            create = { try await sdkSynchronizer.createProposedTransactionsWithoutSubmit(quote.proposal, spendingKey) }
+        case .keystone:
+            let signed: KeystoneSignedPczt
+            do {
+                signed = try await keystoneSigning.sign(owner.id, quote.proposal)
+            } catch let error as KeystoneSigningError {
+                throw GiftFundingError(signing: error)
+            }
+            create = { try await sdkSynchronizer.createTransactionFromPCZTWithoutSubmit(signed.pcztWithProofs, signed.pcztWithSigs) }
+        }
+
+        return try await giftFundingOperationLock.withLock(quote.card.id) {
+            _ = try await reviewedOwner(of: quote)
+            return try await broadcastLocked(quote, create: create)
         }
     }
 
-    private func submitLocked(_ quote: GiftFundingQuote) async throws -> String {
-        // The quote can sit on a review sheet while reconciliation runs. Re-read under the same
-        // lock used by reconciliation and require the exact lifecycle class the sender reviewed.
+    /// Re-reads the card under the lock and requires the exact lifecycle class the sender
+    /// reviewed: the quote can sit on a review sheet while reconciliation runs.
+    private func reviewedOwner(of quote: GiftFundingQuote) async throws -> WalletAccount {
         guard let current = try? await giftCardStorage.get(quote.card.id),
               current.hasSameFundingIdentity(as: quote.card)
         else {
@@ -200,25 +238,28 @@ struct FundGiftCard {
             throw GiftFundingError.submitUncertain
         }
 
-        // Key lookup happens before the durable boundary and cannot create a transaction, so
-        // failures here remain safe to retry.
-        let spendingKey: UnifiedSpendingKey
+        // Refuse rather than guess. Falling back to account 0 would sign the funding transaction
+        // with a key the proposal was not built against — and the card records which account owns
+        // it precisely so a retry cannot drift to another one.
+        let accounts: [WalletAccount]
         do {
-            let accounts = try await sdkSynchronizer.walletAccounts()
-            // Refuse rather than guess, on both halves. Falling back to account 0 would sign the
-            // funding transaction with a key the proposal was not built against — and the card
-            // records which account owns it precisely so a retry cannot drift to another one. A
-            // missing `zip32AccountIndex` is an account with no locally derivable key at all,
-            // which is the hardware wallet `CreateGiftCard` already refuses to mint for.
-            guard
-                let owner = accounts.first(where: { $0.id.giftStorageKey == current.sourceAccountUuid }),
-                let accountIndex = owner.zip32AccountIndex
-            else {
-                throw GiftFundingError.proposalFailed
-            }
+            accounts = try await sdkSynchronizer.walletAccounts()
+        } catch {
+            throw GiftFundingError.proposalFailed
+        }
+        guard let owner = accounts.first(where: { $0.id.giftStorageKey == current.sourceAccountUuid }) else {
+            throw GiftFundingError.proposalFailed
+        }
+        return owner
+    }
+
+    /// Cannot create a transaction, so failures here remain safe to retry.
+    private func spendingKey(for owner: WalletAccount) throws -> UnifiedSpendingKey {
+        do {
+            guard let accountIndex = owner.zip32AccountIndex else { throw GiftFundingError.proposalFailed }
             let storedWallet = try walletStorage.exportWallet()
             let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
-            spendingKey = try derivationTool.deriveSpendingKey(
+            return try derivationTool.deriveSpendingKey(
                 seedBytes,
                 accountIndex,
                 zcashSDKEnvironment.network().networkType
@@ -226,7 +267,12 @@ struct FundGiftCard {
         } catch {
             throw GiftFundingError.proposalFailed
         }
+    }
 
+    private func broadcastLocked(
+        _ quote: GiftFundingQuote,
+        create: @escaping @Sendable () async throws -> [CreatedTransaction]
+    ) async throws -> String {
         // The durable gate, persisted before creation so no crash or storage failure can leave an
         // auto-broadcast transaction behind an "unfunded" card that is later funded again.
         do {
@@ -238,11 +284,10 @@ struct FundGiftCard {
         // From here the work is shielded from cancellation: a cancelled screen must not abandon a
         // broadcast mid-flight. The unstructured task never inherits the caller's cancellation.
         let cardId = quote.card.id
-        let proposal = quote.proposal
         return try await Task {
             let created: CreatedTransaction
             do {
-                let transactions = try await sdkSynchronizer.createProposedTransactionsWithoutSubmit(proposal, spendingKey)
+                let transactions = try await create()
                 guard transactions.count == 1, let single = transactions.first else {
                     throw GiftFundingError.submitUncertain
                 }
@@ -295,6 +340,16 @@ struct FundGiftCard {
     private func spendableBalance(of account: WalletAccount) async throws -> Zatoshi {
         let balances = try await sdkSynchronizer.getAccountsBalances()
         return balances[account.id]?.shieldedSpendableValue ?? .zero
+    }
+}
+
+private extension GiftFundingError {
+    init(signing error: KeystoneSigningError) {
+        switch error {
+        case .rejected: self = .signingCancelled
+        case .wrongAccount: self = .wrongAccountSelected
+        case .failed, .busy: self = .signingFailed
+        }
     }
 }
 

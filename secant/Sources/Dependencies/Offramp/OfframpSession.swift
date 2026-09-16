@@ -112,7 +112,7 @@ actor OfframpSession {
         }
         // Peer shares the off-ramp's encrypted file: both rails spend from one Base smart account,
         // so their records are read and written together and a wallet reset clears them together.
-        let storage = try OfframpEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
+        let storage = try OfframpEncryptedStorage(account: p2pOwnerAccount(fallback: wallet).account, walletStorage: walletStorage)
         let generation = baseSnapshot.generation
         let task = Task {
             let built = try await ApplePeerCashOutClient.companion.create(
@@ -1260,12 +1260,13 @@ actor OfframpSession {
         @Dependency(\.sdkSynchronizer) var sdkSynchronizer
         @Dependency(\.mnemonic) var mnemonic
         @Dependency(\.derivationTool) var derivationTool
+        @Dependency(\.keystoneSigning) var keystoneSigning
         @Dependency(\.zcashSDKEnvironment) var environment
 
         guard let wallet = selectedAccount else {
             throw OfframpClientError.configuration("Select a wallet account before using P2P payments.")
         }
-        let storage = try OfframpEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
+        let storage = try OfframpEncryptedStorage(account: p2pOwnerAccount(fallback: wallet).account, walletStorage: walletStorage)
         let bridge: OfframpNearBridge? = environment.network().networkType == .testnet ? nil : OfframpNearBridge(
             account: wallet,
             swapAndPay: swapAndPay,
@@ -1273,6 +1274,7 @@ actor OfframpSession {
             walletStorage: walletStorage,
             mnemonic: mnemonic,
             derivationTool: derivationTool,
+            keystoneSigning: keystoneSigning,
             environment: environment
         )
         let generation = baseSnapshot.generation
@@ -1314,9 +1316,10 @@ actor OfframpSession {
               let screeningKey = PartnerKeys.p2pScreeningKey else {
             throw OfframpClientError.configuration("P2P buying is not configured in PartnerKeys.plist.")
         }
-        let storage = try OnrampEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
+        let owner = p2pOwnerAccount(fallback: wallet).account
+        let storage = try OnrampEncryptedStorage(account: owner, walletStorage: walletStorage)
         // One relay identity per wallet: the key lives in the off-ramp's file, shared as Peer shares it.
-        let relayStorage = try OfframpEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
+        let relayStorage = try OfframpEncryptedStorage(account: owner, walletStorage: walletStorage)
         let gateway: OnrampZecSwapGateway? = environment.network().networkType == .testnet ? nil : OnrampZecSwapGateway(
             account: wallet,
             swapAndPay: swapAndPay,
@@ -1389,6 +1392,11 @@ actor OfframpSession {
     /// The wallet lifetime a session belongs to. The account UUID alone is not a sufficient
     /// boundary, so the SDK seed fingerprint is included: a delete and restore in the same process
     /// can then never retain the prior wallet's Base owner. The mnemonic is never a cache key.
+    ///
+    /// The Base owner derives from the software wallet's seed whichever account is selected, so
+    /// that wallet's fingerprint is the lifetime half. The selected account is the Zcash half —
+    /// a Keystone account funds the bridge and receives Buy deliveries — and a switch rebuilds the
+    /// rails around it.
     private func walletScope() throws -> String {
         @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
         @Dependency(\.zcashSDKEnvironment) var environment
@@ -1396,14 +1404,20 @@ actor OfframpSession {
         guard let account = selectedAccount else {
             throw OfframpClientError.configuration("Select a wallet account before using P2P payments.")
         }
-        guard account.vendor == .zcash else { throw OfframpClientError.unsupportedAccount }
-        guard let fingerprint = account.seedFingerprint, !fingerprint.isEmpty else {
+        guard let fingerprint = p2pOwnerAccount(fallback: account).seedFingerprint, !fingerprint.isEmpty else {
             throw OfframpClientError.configuration("The active wallet identity is unavailable. Reopen the wallet before using P2P payments.")
         }
         let accountID = account.id.id.map { String(format: "%02x", $0) }.joined()
         let seedFingerprint = fingerprint.map { String(format: "%02x", $0) }.joined()
         let network = environment.network().networkType == .testnet ? "testnet" : "mainnet"
         return "\(accountID):\(seedFingerprint):\(network)"
+    }
+
+    /// The software wallet: its seed derives the Base owner and its keys encrypt the P2P records,
+    /// so those belong to it even while a Keystone account is selected.
+    private func p2pOwnerAccount(fallback: WalletAccount) -> WalletAccount {
+        @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount?
+        return zashiWalletAccount ?? fallback
     }
 
     func previewTopUp(usdcMicros: String) async throws -> OfframpBridgePreview {

@@ -32,7 +32,6 @@ struct GiftCard {
         case amountInvalid
         case messageTooLong
         case insufficientFunds
-        case keystoneUnsupported
         case unsupportedNetwork
         case chainTipUnavailable
         case persistFailed
@@ -41,6 +40,10 @@ struct GiftCard {
         case authenticationFailed
         /// Broadcast outcome unknown. The copy must not invite a retry.
         case submitUncertain
+        /// The Keystone lane ended without a signed transaction. Nothing was sent.
+        case signingFailed
+        /// The card's Keystone account is not the selected one, so it cannot be signed for.
+        case wrongAccount
         /// The link left the device but the hand-off did not record, so the card still blocks the
         /// wallet reset.
         case shareFailed
@@ -152,6 +155,7 @@ struct GiftCard {
         case delegate(Delegate)
         case expiryChanged(Expiry)
         case funded(String)
+        case fundingCancelled
         case fundingFailed(FlowError)
         case fundTapped
         case handOffReady(String)
@@ -315,6 +319,8 @@ struct GiftCard {
                     do {
                         let txid = try await FundGiftCard().submit(quote)
                         await send(.funded(txid))
+                    } catch GiftFundingError.signingCancelled {
+                        await send(.fundingCancelled)
                     } catch {
                         await send(.fundingFailed((error as? GiftFundingError).map(FlowError.init) ?? .submitUncertain))
                     }
@@ -330,6 +336,12 @@ struct GiftCard {
                     await ConfirmGiftCardFunding()(cardId: cardId, fundingTxid: txid)
                 }
                 .cancellable(id: CancelId.confirmWatch, cancelInFlight: true)
+
+            case .fundingCancelled:
+                // Backed out on the Keystone: nothing was sent, and the review is where they were.
+                state.stage = .review
+                state.error = nil
+                return .none
 
             case .fundingFailed(let error):
                 state.stage = .review
@@ -414,6 +426,9 @@ private extension GiftCard.FlowError {
         case .insufficientFunds: self = .insufficientFunds
         case .proposalFailed: self = .proposalFailed
         case .submitUncertain: self = .submitUncertain
+        // Cancellation is handled before this mapping; a stray one is still "nothing was sent".
+        case .signingCancelled, .signingFailed: self = .signingFailed
+        case .wrongAccountSelected: self = .wrongAccount
         }
     }
 
@@ -427,7 +442,6 @@ private extension GiftCard.FlowError {
             switch creation {
             case .invalidAmount: self = .amountInvalid
             case .messageTooLong: self = .messageTooLong
-            case .keystoneUnsupported: self = .keystoneUnsupported
             case .unsupportedNetwork: self = .unsupportedNetwork
             case .chainTipUnavailable: self = .chainTipUnavailable
             case .persistFailed: self = .persistFailed

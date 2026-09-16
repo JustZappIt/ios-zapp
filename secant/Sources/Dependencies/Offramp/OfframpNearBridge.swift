@@ -27,6 +27,7 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
         walletStorage: WalletStorageClient,
         mnemonic: MnemonicClient,
         derivationTool: DerivationToolClient,
+        keystoneSigning: KeystoneSigningClient,
         environment: ZcashSDKEnvironment,
         pollingClock: AnyClock<Duration> = AnyClock(ContinuousClock()),
         pollingInterval: Duration = .seconds(5),
@@ -39,6 +40,7 @@ final class OfframpNearBridge: NSObject, AppleOfframpBridge, @unchecked Sendable
             walletStorage: walletStorage,
             mnemonic: mnemonic,
             derivationTool: derivationTool,
+            keystoneSigning: keystoneSigning,
             environment: environment,
             pollingClock: pollingClock,
             pollingInterval: pollingInterval,
@@ -161,6 +163,7 @@ private actor OfframpNearBridgeWorker {
     private let walletStorage: WalletStorageClient
     private let mnemonic: MnemonicClient
     private let derivationTool: DerivationToolClient
+    private let keystoneSigning: KeystoneSigningClient
     private let environment: ZcashSDKEnvironment
     private let pollingClock: AnyClock<Duration>
     private let pollingInterval: Duration
@@ -177,6 +180,7 @@ private actor OfframpNearBridgeWorker {
         walletStorage: WalletStorageClient,
         mnemonic: MnemonicClient,
         derivationTool: DerivationToolClient,
+        keystoneSigning: KeystoneSigningClient,
         environment: ZcashSDKEnvironment,
         pollingClock: AnyClock<Duration>,
         pollingInterval: Duration,
@@ -188,6 +192,7 @@ private actor OfframpNearBridgeWorker {
         self.walletStorage = walletStorage
         self.mnemonic = mnemonic
         self.derivationTool = derivationTool
+        self.keystoneSigning = keystoneSigning
         self.environment = environment
         self.pollingClock = pollingClock
         self.pollingInterval = pollingInterval
@@ -276,26 +281,44 @@ private actor OfframpNearBridgeWorker {
                 message: "The prepared bridge quote is no longer available. Resume the existing transfer."
             )
         }
-        guard account.vendor == .zcash, let accountIndex = account.zip32AccountIndex else {
-            return AppleBridgeExecution(
-                succeeded: false,
-                terminal: true,
-                message: "Adding funds from a Keystone account is not supported yet."
+        let result: SDKSynchronizerClient.CreateProposedTransactionsResult
+        switch account.vendor {
+        case .zcash:
+            guard let accountIndex = account.zip32AccountIndex else {
+                return AppleBridgeExecution(
+                    succeeded: false,
+                    terminal: true,
+                    message: "This account has no spending key on this device."
+                )
+            }
+            try Task.checkCancellation()
+            try requireActive()
+            let storedWallet = try walletStorage.exportWallet()
+            let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
+            let spendingKey = try derivationTool.deriveSpendingKey(
+                seedBytes,
+                accountIndex,
+                environment.network().networkType
             )
-        }
+            try Task.checkCancellation()
+            try requireActive()
+            result = try await sdkSynchronizer.createAndSubmitProposedTransactions(bridge.proposal, spendingKey)
 
-        try Task.checkCancellation()
-        try requireActive()
-        let storedWallet = try walletStorage.exportWallet()
-        let seedBytes = try mnemonic.toSeed(storedWallet.seedPhrase.value())
-        let spendingKey = try derivationTool.deriveSpendingKey(
-            seedBytes,
-            accountIndex,
-            environment.network().networkType
-        )
-        try Task.checkCancellation()
-        try requireActive()
-        let result = try await sdkSynchronizer.createAndSubmitProposedTransactions(bridge.proposal, spendingKey)
+        case .keystone:
+            try Task.checkCancellation()
+            try requireActive()
+            // The device signs while the session waits here. A refusal is terminal: nothing was
+            // sent, so the checkpoint is cleared and the next attempt quotes afresh.
+            let signed: KeystoneSignedPczt
+            do {
+                signed = try await keystoneSigning.sign(account.id, bridge.proposal)
+            } catch let error as KeystoneSigningError {
+                return AppleBridgeExecution(succeeded: false, terminal: true, message: error.bridgeMessage)
+            }
+            try Task.checkCancellation()
+            try requireActive()
+            result = try await sdkSynchronizer.createAndSubmitTransactionFromPCZT(signed.pcztWithProofs, signed.pcztWithSigs)
+        }
         let txId: String
         switch result {
         case .success(let txIds):
@@ -575,6 +598,17 @@ enum OfframpBridgeError: LocalizedError {
         case .insufficientSpendableBalance(let spendable):
             return "Not enough ZEC. Your spendable balance is \(spendable) ZEC."
         case .zeroOutput: return "The bridge quote would return no ZEC."
+        }
+    }
+}
+
+private extension KeystoneSigningError {
+    var bridgeMessage: String {
+        switch self {
+        case .rejected: return "Signing was rejected on the Keystone. No funds were sent."
+        case .failed: return "The Keystone signing could not be completed. No funds were sent."
+        case .wrongAccount: return "Switch to the Keystone account to add funds from it."
+        case .busy: return "Another Keystone signing is already in progress. No funds were sent."
         }
     }
 }

@@ -118,14 +118,13 @@ extension PeerCashOutClient: DependencyKey {
 
     /// Everything that decides whether the Peer rails exist at all, and nothing that can fail.
     ///
-    /// The rails are pinned to Base mainnet by local config, and they sign from a Base account only
-    /// a software wallet can derive — so the whole answer is on the device. Building the client to
-    /// ask it would turn an outage into a "not available", which is what callers must never see.
+    /// The rails are pinned to Base mainnet by local config, and they sign from the Base account the
+    /// software wallet derives whichever account is selected — so the whole answer is on the
+    /// device. Building the client to ask it would turn an outage into a "not available", which is
+    /// what callers must never see.
     static func isConfigured() -> Bool {
         @Dependency(\.zcashSDKEnvironment) var environment
-        @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
 
-        guard selectedAccount?.vendor == .zcash else { return false }
         guard let pimlicoKey = PartnerKeys.p2pPimlicoApiKey, !pimlicoKey.isEmpty else { return false }
         return environment.network().networkType != .testnet
     }

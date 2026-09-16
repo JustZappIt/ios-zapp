@@ -10,9 +10,6 @@ enum GiftCardCreationError: Error, Equatable {
 
     case messageTooLong
 
-    /// Funding a card needs a spending key this device holds.
-    case keystoneUnsupported
-
     /// Gift cards exist on mainnet and testnet only.
     case unsupportedNetwork
 
@@ -51,8 +48,6 @@ struct CreateGiftCard {
             try ensure(GiftMessage.isWithinLimits(note), .messageTooLong)
         }
 
-        // Keystone holds the spending key on the device, so funding one is a different flow. Out
-        // of scope for v1, and better refused here than half-way through a funding proposal.
         // Funding resolves the selected account once and passes it here. Reading selection again
         // would let a concurrent account switch persist B as the owner while proposing the send
         // from A, after which reconciliation would search the wrong wallet.
@@ -60,7 +55,6 @@ struct CreateGiftCard {
         guard let account = sourceAccount ?? selectedWalletAccount else {
             throw GiftCardCreationError.chainTipUnavailable
         }
-        try ensure(account.vendor != .keystone, .keystoneUnsupported)
 
         let networkType = zcashSDKEnvironment.network().networkType
         guard let networkName = GiftLinkCodec.networkName(networkType) else {

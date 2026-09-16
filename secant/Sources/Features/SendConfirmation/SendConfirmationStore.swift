@@ -51,6 +51,9 @@ struct SendConfirmation {
         var failedPcztMsg: String?
         @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         var feeRequired: Zatoshi
+        /// Zapp: the caller broadcasts — `createTransactionFromPCZT` emits `pcztSigned` with the
+        /// proved and signed pair instead of submitting it (gift funding, the P2P bridge).
+        var handsOffSignedPCZT = false
         var isAddressExpanded = false
         var isKeystoneCodeFound = false
         var isOrchardWarningPresented = false
@@ -190,6 +193,8 @@ struct SendConfirmation {
         case keystoneFirmwareUpdateRequired
         case pcztResolved(Pczt)
         case pcztSendFailed(ZcashError?)
+        /// Zapp: `(pcztWithProofs, pcztWithSigs)`, nothing broadcast; `Root` answers the request.
+        case pcztSigned(Pczt, Pczt)
         case pcztWithProofsResolved(Pczt)
         case redactedPCZTForSigner(Pczt)
         case redactPCZTForSigner
@@ -636,6 +641,9 @@ struct SendConfirmation {
                 guard let pcztWithProofs = state.pcztWithProofs, let pcztWithSigs = state.pcztWithSigs else {
                     return .none
                 }
+                if state.handsOffSignedPCZT {
+                    return .send(.pcztSigned(pcztWithProofs, pcztWithSigs))
+                }
                 #if DEBUG
                 let pcztMessage =
                 """
@@ -697,6 +705,9 @@ struct SendConfirmation {
 
             case .pcztSendFailed:
                 state.isSending = false
+                return .none
+
+            case .pcztSigned:
                 return .none
 
             case .backFromPCZTFailureTapped:

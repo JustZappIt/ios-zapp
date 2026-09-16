@@ -1287,6 +1287,7 @@ extension Root {
                     .send(.batteryStateChanged),
                     .send(.observeTransactions),
                     .send(.observeShieldingProcessor),
+                    .send(.observeKeystoneSigning),
                     .send(.observeTorInit),
                     .send(.refreshAutomaticServer),
                     // The chat identity derives from the wallet seed, so the
