@@ -139,6 +139,30 @@ struct RestoreWalletCoordFlow {
 
                 if let index = changedIndices.first {
                     let word = state.words[index]
+
+                    // A field only ever holds one word, so several words arriving at once is a
+                    // paste of (part of) a phrase: spread it across the grid instead of leaving
+                    // it crammed into one box.
+                    let pasted = Self.splitPastedSeedWords(word)
+                    if pasted.count > 1 {
+                        let before = state.words
+                        state.words = Self.placePastedSeedWords(before, at: index, words: pasted)
+                        state.prevWords = state.words
+                        state.suggestedWords = []
+                        // Only the slots the paste wrote to are re-judged; a word the user is
+                        // still typing elsewhere keeps its prefix-based verdict.
+                        for i in state.words.indices where i == index || state.words[i] != before[i] {
+                            state.wordsValidity[i] = Self.isPastedWordValid(state.words[i], suggest: mnemonic.suggestWords)
+                        }
+                        // Carry on from the pasted block: the first slot from its start that is
+                        // still empty or wrong, so a typo inside the paste gets focus too.
+                        let start = pasted.count >= state.words.count ? 0 : index
+                        state.nextIndex = state.words.indices.first {
+                            $0 >= start && (state.words[$0].isEmpty || !state.wordsValidity[$0])
+                        }
+                        return .send(.evaluateSeedValidity)
+                    }
+
                     if word.hasSuffix(" ") {
                         state.words[index] = word.trimmingCharacters(in: .whitespaces)
                         state.prevWords = state.words
@@ -237,6 +261,41 @@ struct RestoreWalletCoordFlow {
         }
         .forEach(\.path, action: \.path)
     }
+}
+
+// MARK: - Pasted seed phrases
+
+extension RestoreWalletCoordFlow {
+    /// Break pasted text into candidate seed words: whitespace, commas and semicolons all separate
+    /// words, and tokens with no letters (the "1." or "12)" of a numbered backup) are dropped.
+    /// BIP-39 words are lowercase, so the case of the paste is not preserved.
+    static func splitPastedSeedWords(_ text: String) -> [String] {
+        text
+            .components(separatedBy: pastedSeedSeparators)
+            .map { $0.lowercased() }
+            .filter { $0.contains { $0.isLetter } }
+    }
+
+    /// Lay `words` over `current`, starting at `index`; a paste that holds a whole phrase always
+    /// starts at the first field so pasting it into any box fills the grid. Words that would spill
+    /// past the last field are dropped.
+    static func placePastedSeedWords(_ current: [String], at index: Int, words: [String]) -> [String] {
+        guard !current.isEmpty else { return current }
+        let start = words.count >= current.count ? 0 : min(max(index, 0), current.count - 1)
+        var result = current
+        for (offset, word) in words.prefix(current.count - start).enumerated() {
+            result[start + offset] = word
+        }
+        return result
+    }
+
+    /// Unlike a word being typed, a pasted word is complete, so it has to be an exact wordlist
+    /// entry rather than a prefix of one. An empty slot is not flagged.
+    static func isPastedWordValid(_ word: String, suggest: (String) -> [String]) -> Bool {
+        word.isEmpty || suggest(word).contains(word)
+    }
+
+    private static let pastedSeedSeparators = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: ",;"))
 }
 
 @Reducer

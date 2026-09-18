@@ -160,7 +160,7 @@ struct SwapAndPay {
         }
         
         var amount: Decimal {
-            if !_XCTIsTesting {
+            if !isTesting {
                 @Dependency(\.numberFormatter) var numberFormatter
 
                 return numberFormatter.number(amountText)?.decimalValue ?? 0.0
@@ -170,7 +170,7 @@ struct SwapAndPay {
         }
         
         var assetAmount: Decimal {
-            if !_XCTIsTesting {
+            if !isTesting {
                 @Dependency(\.numberFormatter) var numberFormatter
 
                 return numberFormatter.number(amountAssetText)?.decimalValue ?? 0.0
@@ -180,7 +180,7 @@ struct SwapAndPay {
         }
 
         var usdAmount: Decimal {
-            if !_XCTIsTesting {
+            if !isTesting {
                 @Dependency(\.numberFormatter) var numberFormatter
 
                 return numberFormatter.number(amountUsdText)?.decimalValue ?? 0.0

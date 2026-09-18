@@ -8,7 +8,7 @@
 import SwiftUI
 @preconcurrency import ZcashLightClientKit
 import ComposableArchitecture
-import XCTestDynamicOverlay
+import IssueReporting
 @preconcurrency import Combine
 
 struct ZatoshiText: View {
@@ -72,7 +72,7 @@ struct ZatoshiRepresentationView: View {
         strikethrough: Bool = false,
         couldBeHidden: Bool = false
     ) {
-        if !_XCTIsTesting {
+        if !isTesting {
             @Dependency(\.balanceFormatter) var balanceFormatter
             
             self.zatoshiStringRepresentation = balanceFormatter.convert(

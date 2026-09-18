@@ -24,7 +24,7 @@
 import Foundation
 import Testing
 import ComposableArchitecture
-import XCTestDynamicOverlay
+import IssueReporting
 @testable @preconcurrency import ZcashLightClientKit
 @testable import zodl_internal
 
