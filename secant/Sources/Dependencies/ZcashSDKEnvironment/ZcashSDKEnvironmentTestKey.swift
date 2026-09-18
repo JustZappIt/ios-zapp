@@ -7,7 +7,7 @@
 
 import ComposableArchitecture
 @preconcurrency import ZcashLightClientKit
-import XCTestDynamicOverlay
+import IssueReporting
 
 extension ZcashSDKEnvironment: TestDependencyKey {
     static let testnet = ZcashSDKEnvironment.live(network: ZcashNetworkBuilder.network(for: .testnet))

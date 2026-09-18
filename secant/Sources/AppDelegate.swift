@@ -47,7 +47,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
 #if DEBUG
         // Short-circuit if running unit tests to avoid side-effects from the app running.
-        guard !_XCTIsTesting else { return true }
+        guard !isTesting else { return true }
         walletLogger = OSLogger(logLevel: .debug, category: LoggerConstants.walletLogs)
 #endif
         ChatPushNotifications.shared.configure(application: application)

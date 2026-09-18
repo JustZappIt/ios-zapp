@@ -25,9 +25,9 @@
 		34AA77182F857DB300D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77172F857DB300D244E2 /* ComposableArchitecture */; };
 		34AA771A2F857DB800D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77192F857DB800D244E2 /* ComposableArchitecture */; };
 		34AA771C2F857DBB00D244E2 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA771B2F857DBB00D244E2 /* ComposableArchitecture */; };
-		34AA77272F857E2F00D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77262F857E2F00D244E2 /* XCTestDynamicOverlay */; };
-		34AA77292F857E3400D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77282F857E3400D244E2 /* XCTestDynamicOverlay */; };
-		34AA772B2F857E3800D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA772A2F857E3800D244E2 /* XCTestDynamicOverlay */; };
+		34AA77272F857E2F00D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77262F857E2F00D244E2 /* IssueReporting */; };
+		34AA77292F857E3400D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77282F857E3400D244E2 /* IssueReporting */; };
+		34AA772B2F857E3800D244E2 /* XCTestDynamicOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA772A2F857E3800D244E2 /* IssueReporting */; };
 		34AA77362F8580CB00D244E2 /* CasePaths in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77352F8580CB00D244E2 /* CasePaths */; };
 		34AA77382F8580CB00D244E2 /* CasePathsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77372F8580CB00D244E2 /* CasePathsCore */; };
 		34AA773A2F8580D000D244E2 /* CasePaths in Frameworks */ = {isa = PBXBuildFile; productRef = 34AA77392F8580D000D244E2 /* CasePaths */; };
@@ -322,7 +322,7 @@
 				5A99EE0000000000000000B1 /* ZappMessaging */,
 				5A99EE0000000000000000B0 /* ZappMessaging */,
 				34AA771B2F857DBB00D244E2 /* ComposableArchitecture */,
-				34AA772A2F857E3800D244E2 /* XCTestDynamicOverlay */,
+				34AA772A2F857E3800D244E2 /* IssueReporting */,
 				34AA773D2F8580D700D244E2 /* CasePaths */,
 				34AA773F2F8580D700D244E2 /* CasePathsCore */,
 				34AA774A2F85815200D244E2 /* URLRouting */,
@@ -367,7 +367,7 @@
 				5AFB0000000000000000C0 /* FirebaseMessaging */,
 				5A99EE0000000000000000B2 /* ZappMessaging */,
 				34AA77172F857DB300D244E2 /* ComposableArchitecture */,
-				34AA77262F857E2F00D244E2 /* XCTestDynamicOverlay */,
+				34AA77262F857E2F00D244E2 /* IssueReporting */,
 				34AA77352F8580CB00D244E2 /* CasePaths */,
 				34AA77372F8580CB00D244E2 /* CasePathsCore */,
 				34AA77462F85814600D244E2 /* URLRouting */,
@@ -412,7 +412,7 @@
 				5AFB0000000000000000C1 /* FirebaseMessaging */,
 				5A99EE0000000000000000B3 /* ZappMessaging */,
 				34AA77192F857DB800D244E2 /* ComposableArchitecture */,
-				34AA77282F857E3400D244E2 /* XCTestDynamicOverlay */,
+				34AA77282F857E3400D244E2 /* IssueReporting */,
 				34AA77392F8580D000D244E2 /* CasePaths */,
 				34AA773B2F8580D000D244E2 /* CasePathsCore */,
 				34AA77482F85814C00D244E2 /* URLRouting */,
@@ -460,7 +460,7 @@
 				5A99EE0000000000000000A0 /* XCLocalSwiftPackageReference "../zappMessaging/ios" */,
 				5AFB0000000000000000A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */,
+				34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "swift-issue-reporting" */,
 				34AA772C2F8580B800D244E2 /* XCRemoteSwiftPackageReference "swift-case-paths" */,
 				34AA77412F85812500D244E2 /* XCRemoteSwiftPackageReference "swift-url-routing" */,
 				34AA774C2F85817200D244E2 /* XCRemoteSwiftPackageReference "MnemonicSwift" */,
@@ -1485,17 +1485,17 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 1.25.5;
+				minimumVersion = 1.26.2;
 			};
 			traits = (
 			);
 		};
-		34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */ = {
+		34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "swift-issue-reporting" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/xctest-dynamic-overlay";
+			repositoryURL = "https://github.com/pointfreeco/swift-issue-reporting";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 1.9.0;
+				minimumVersion = 2.1.0;
 			};
 		};
 		34AA772C2F8580B800D244E2 /* XCRemoteSwiftPackageReference "swift-case-paths" */ = {
@@ -1503,7 +1503,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-case-paths";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 1.7.3;
+				minimumVersion = 1.10.0;
 			};
 		};
 		34AA77412F85812500D244E2 /* XCRemoteSwiftPackageReference "swift-url-routing" */ = {
@@ -1511,7 +1511,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-url-routing";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.6.2;
+				minimumVersion = 0.7.0;
 			};
 		};
 		34AA774C2F85817200D244E2 /* XCRemoteSwiftPackageReference "MnemonicSwift" */ = {
@@ -1659,20 +1659,20 @@
 			package = 34AA77122F857DA300D244E2 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
-		34AA77262F857E2F00D244E2 /* XCTestDynamicOverlay */ = {
+		34AA77262F857E2F00D244E2 /* IssueReporting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */;
-			productName = XCTestDynamicOverlay;
+			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "swift-issue-reporting" */;
+			productName = IssueReporting;
 		};
-		34AA77282F857E3400D244E2 /* XCTestDynamicOverlay */ = {
+		34AA77282F857E3400D244E2 /* IssueReporting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */;
-			productName = XCTestDynamicOverlay;
+			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "swift-issue-reporting" */;
+			productName = IssueReporting;
 		};
-		34AA772A2F857E3800D244E2 /* XCTestDynamicOverlay */ = {
+		34AA772A2F857E3800D244E2 /* IssueReporting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "xctest-dynamic-overlay" */;
-			productName = XCTestDynamicOverlay;
+			package = 34AA771D2F857DFF00D244E2 /* XCRemoteSwiftPackageReference "swift-issue-reporting" */;
+			productName = IssueReporting;
 		};
 		34AA77352F8580CB00D244E2 /* CasePaths */ = {
 			isa = XCSwiftPackageProductDependency;
