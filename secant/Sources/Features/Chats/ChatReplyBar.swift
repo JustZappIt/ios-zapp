@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import ZappMessaging
 
 /// The staged reply, above the composer. The quote that ships *on* a sent message is drawn by
 /// `ChatMessageBubble`; this is only what the user is about to answer.
@@ -13,11 +14,17 @@ struct ChatReplyBar: View {
     private enum Constants {
         static let accentBarWidth: CGFloat = 3
         static let cancelSize: CGFloat = 44
+        static let thumbnail: CGFloat = 32
     }
 
     let senderName: String
-    let content: String
+    /// The message being answered. Its summary here is exactly what ships as the quote.
+    let message: ZMMessage
     let onCancel: () -> Void
+
+    private var kind: ChatReplyQuoteKind {
+        ChatReplyQuoteKind(contentType: ChatReplyPreview.wireContentType(for: message))
+    }
 
     var body: some View {
         HStack(spacing: Design.Spacing._md) {
@@ -30,11 +37,13 @@ struct ChatReplyBar: View {
                     .zappFont(.chip, style: ZappColors.accent)
                     .lineLimit(1)
 
-                Text(content)
-                    .zappFont(.caption, style: ZappColors.textMuted)
-                    .lineLimit(1)
+                ChatReplyQuoteLine(kind: kind, content: ChatReplyPreview.wireContent(for: message))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            if kind.showsThumbnail {
+                ChatReplyQuoteThumbnail(message: message, size: Constants.thumbnail)
+            }
 
             Button(action: onCancel) {
                 Text(verbatim: "×")
@@ -58,7 +67,13 @@ private extension ZappTextStyle {
 #Preview {
     ChatReplyBar(
         senderName: "satoshi",
-        content: "Sharp corners only.",
+        message: ZMMessage(
+            id: "1",
+            conversationId: "c",
+            senderId: "peer",
+            content: "Sharp corners only.",
+            isFromMe: false
+        ),
         onCancel: { }
     )
     .applyScreenBackground()
