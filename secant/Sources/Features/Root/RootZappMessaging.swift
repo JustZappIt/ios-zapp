@@ -53,11 +53,14 @@ extension Root {
                 return .none
 
             case .zappMessagingStateChanged(let messagingState):
+                // An invite tapped before the chat identity existed waits in the store, because
+                // joining needs an identity to name the joiner. This is the moment it can open.
+                let identityArrived = state.zappMessagingState.identity == nil && messagingState.identity != nil
                 state.zappMessagingState = messagingState
                 state.zappTabsState.chatUnreadCount = messagingState.totalUnreadCount
                 state.zappTabsState.hasChatIdentity = messagingState.identity != nil
                 state.zappTabsState.displayName = messagingState.identity?.displayName
-                return .none
+                return identityArrived ? .send(.groupInviteResumePending) : .none
 
             default: return .none
             }

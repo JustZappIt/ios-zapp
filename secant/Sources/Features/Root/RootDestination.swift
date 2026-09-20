@@ -18,6 +18,7 @@ extension Root {
         enum Destination {
             case deeplinkWarning
             case giftClaim
+            case groupInvite
             case notEnoughFreeSpace
             case onboarding
             case osStatusError
@@ -80,6 +81,12 @@ extension Root {
                 if url.host()?.lowercased() == GiftLinkCodec.giftLinkHost {
                     return .send(.giftLinkReceived(url.absoluteString))
                 }
+                // Group invite links, in both forms: the shared https link and the handoff the
+                // landing page opens. The host check is all the routing needs; the SDK does the
+                // real parsing, on the preview screen.
+                if GroupInviteLinks.isGroupLink(url.absoluteString) {
+                    return .send(.groupInviteReceived(url.absoluteString))
+                }
                 if let _ = uriParser.checkRP(url.absoluteString, zcashSDKEnvironment.network().networkType) {
                     // The deeplink is some zip321, we ignore it and let users know in a warning screen
                     return .send(.destination(.updateDestination(.deeplinkWarning)))
@@ -110,6 +117,49 @@ extension Root {
                     state.giftClaimState = GiftClaim.State(token: nil)
                     return .send(.destination(.updateDestination(.giftClaim)))
                 }
+
+            case .groupInviteReceived(let raw):
+                // A preview already on screen is never interrupted: its request is in flight and
+                // its effects still land on `groupInviteState`.
+                guard state.destinationState.destination != .groupInvite else { return .none }
+                guard state.featureFlags.groupLinks else {
+                    // Nothing is stored while the feature is off, but the tap still lands
+                    // somewhere that says so.
+                    state.groupInviteState = GroupInvite.State(comingSoon: true)
+                    return .send(.destination(.updateDestination(.groupInvite)))
+                }
+                switch pendingGroupInvites.put(raw) {
+                case .accepted(let token):
+                    return .send(.groupInviteResumed(token))
+                case .alreadyPending:
+                    // Its preview is already on its way in.
+                    return .none
+                case .refused:
+                    // Not a group link after all, or too many waiting. The tap still lands.
+                    state.groupInviteState = GroupInvite.State(token: nil)
+                    return .send(.destination(.updateDestination(.groupInvite)))
+                }
+
+            case .groupInviteResumePending:
+                // Held invites wait for a wallet, a finished onboarding and a chat identity,
+                // because the join needs an identity to name the joiner.
+                guard state.featureFlags.groupLinks,
+                      state.destinationState.destination != .groupInvite,
+                      state.appInitializationState == .initialized,
+                      state.zappMessagingState.identity != nil else {
+                    return .none
+                }
+                guard let token = pendingGroupInvites.newestToken() else { return .none }
+                return .send(.groupInviteResumed(token))
+
+            case .groupInviteResumed(let token):
+                guard state.appInitializationState == .initialized,
+                      state.zappMessagingState.identity != nil else {
+                    // The invite stays in the store and opens once the app is ready for it.
+                    return .none
+                }
+                state.groupInviteState = GroupInvite.State(token: token)
+                return .send(.destination(.updateDestination(.groupInvite)))
 
             case .destination(.deeplinkHome):
                 return .none

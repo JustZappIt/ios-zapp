@@ -60,7 +60,24 @@ extension ZappMessagingClient: DependencyKey {
             setPresenceVisible: { try await impl.setPresenceVisible($0) },
             messageReceivedStream: { impl.messageReceivedSubject.eraseToAnyPublisher() },
             setActiveConversation: { impl.setActiveConversation($0) },
-            setBlockedKeys: { impl.setBlockedKeys($0) }
+            setBlockedKeys: { impl.setBlockedKeys($0) },
+            inspectGroupLink: { try await impl.inspectGroupLink($0) },
+            joinGroupViaLink: { try await impl.joinGroupViaLink($0) },
+            groupJoinStatus: { try await impl.groupJoinStatus() },
+            cancelGroupJoin: { try await impl.cancelGroupJoin(linkId: $0) },
+            groupJoinUpdatesStream: { impl.groupJoinUpdateSubject.eraseToAnyPublisher() },
+            groupLink: { try await impl.groupLink(conversationId: $0) },
+            enableGroupLink: { try await impl.enableGroupLink(conversationId: $0, options: $1) },
+            updateGroupLink: { try await impl.updateGroupLink(conversationId: $0, options: $1) },
+            resetGroupLink: { try await impl.resetGroupLink(conversationId: $0) },
+            disableGroupLink: { try await impl.disableGroupLink(conversationId: $0) },
+            groupJoinRequests: { try await impl.groupJoinRequests(conversationId: $0) },
+            approveGroupJoinRequest: { try await impl.approveGroupJoinRequest(conversationId: $0, joinerKey: $1) },
+            declineGroupJoinRequest: { try await impl.declineGroupJoinRequest(conversationId: $0, joinerKey: $1) },
+            groupJoinRequestStream: { impl.groupJoinRequestSubject.eraseToAnyPublisher() },
+            removeMember: { try await impl.removeMember(conversationId: $0, publicKey: $1, resetLink: $2) },
+            olderMemberCount: { try await impl.olderMemberCount(conversationId: $0) },
+            groupMembershipStream: { impl.groupMembershipSubject.eraseToAnyPublisher() }
         )
     }
 }
@@ -87,6 +104,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     let messageStatusSubject = PassthroughSubject<(messageId: String, conversationId: String, status: String), Never>()
     let mediaProgressSubject = PassthroughSubject<(mediaId: String, progress: Double), Never>()
     let mediaCompleteSubject = PassthroughSubject<(mediaId: String, filePath: String), Never>()
+    let groupJoinUpdateSubject = PassthroughSubject<ZMGroupJoinUpdate, Never>()
+    let groupJoinRequestSubject = PassthroughSubject<ZMGroupJoinApprovalRequest, Never>()
+    let groupMembershipSubject = PassthroughSubject<GroupMembershipEvent, Never>()
 
     /// Created lazily: constructing it resolves the data dir, which touches the
     /// filesystem, and `liveValue` is built eagerly at first dependency access.
@@ -480,6 +500,12 @@ private final class ZappMessagingImpl: @unchecked Sendable {
 
     func setBlockedKeys(_ keys: Set<String>) {
         lock.withLock { blockedKeys = keys }
+        // The SDK admits people through invite links without asking the app each time, and the
+        // worklet starts each run without the set, so it is pushed rather than queried.
+        Task { @MainActor [weak self] in
+            guard let sdk = self?.sdk else { return }
+            try? await sdk.setBlockedKeys(Array(keys))
+        }
     }
 
     func setActiveConversation(_ conversationId: String?) {
@@ -487,6 +513,92 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         if let conversationId {
             clearUnread(for: conversationId)
         }
+    }
+
+    // MARK: - Group invite links
+
+    @MainActor
+    func inspectGroupLink(_ link: String) async throws -> ZMGroupLinkInspection {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.inspectGroupLink(link)
+    }
+
+    @MainActor
+    func joinGroupViaLink(_ link: String) async throws -> ZMGroupJoinResult {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.joinGroupViaLink(link)
+    }
+
+    @MainActor
+    func groupJoinStatus() async throws -> [ZMGroupJoinUpdate] {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.groupJoinStatus()
+    }
+
+    @MainActor
+    func cancelGroupJoin(linkId: String) async throws -> Bool {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.cancelGroupJoin(linkId: linkId)
+    }
+
+    @MainActor
+    func groupLink(conversationId: String) async throws -> ZMGroupLinkInfo {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.groupLink(conversationId: conversationId)
+    }
+
+    @MainActor
+    func enableGroupLink(conversationId: String, options: ZMGroupLinkOptions) async throws -> ZMGroupLinkInfo {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.enableGroupLink(conversationId: conversationId, options: options)
+    }
+
+    @MainActor
+    func updateGroupLink(conversationId: String, options: ZMGroupLinkOptions) async throws -> ZMGroupLinkInfo {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.updateGroupLink(conversationId: conversationId, options: options)
+    }
+
+    @MainActor
+    func resetGroupLink(conversationId: String) async throws -> ZMGroupLinkInfo {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.resetGroupLink(conversationId: conversationId)
+    }
+
+    @MainActor
+    func disableGroupLink(conversationId: String) async throws -> ZMGroupLinkInfo {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.disableGroupLink(conversationId: conversationId)
+    }
+
+    @MainActor
+    func groupJoinRequests(conversationId: String) async throws -> [ZMGroupJoinApprovalRequest] {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.groupJoinRequests(conversationId: conversationId)
+    }
+
+    @MainActor
+    func approveGroupJoinRequest(conversationId: String, joinerKey: String) async throws -> Bool {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.approveGroupJoinRequest(conversationId: conversationId, joinerKey: joinerKey)
+    }
+
+    @MainActor
+    func declineGroupJoinRequest(conversationId: String, joinerKey: String) async throws {
+        guard let sdk else { throw ZMError.notInitialized }
+        try await sdk.declineGroupJoinRequest(conversationId: conversationId, joinerKey: joinerKey)
+    }
+
+    @MainActor
+    func removeMember(conversationId: String, publicKey: String, resetLink: Bool) async throws -> ZMRemoveMemberResult {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.removeMember(conversationId: conversationId, publicKey: publicKey, resetLink: resetLink)
+    }
+
+    @MainActor
+    func olderMemberCount(conversationId: String) async throws -> Int {
+        guard let sdk else { throw ZMError.notInitialized }
+        return try await sdk.olderMemberCount(conversationId: conversationId)
     }
 
     // MARK: - Groups
@@ -712,6 +824,46 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         sdk.mediaDownloadComplete
             .receive(on: mainQueue)
             .sink { [weak self] complete in self?.mediaCompleteSubject.send(complete) }
+            .store(in: &cancellables)
+
+        sdk.groupJoinUpdated
+            .receive(on: mainQueue)
+            .sink { [weak self] update in self?.groupJoinUpdateSubject.send(update) }
+            .store(in: &cancellables)
+
+        sdk.groupJoinRequestReceived
+            .receive(on: mainQueue)
+            .sink { [weak self] request in self?.groupJoinRequestSubject.send(request) }
+            .store(in: &cancellables)
+
+        sdk.removedFromGroup
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId in
+                self?.groupMembershipSubject.send(.removedFromGroup(conversationId: conversationId))
+            }
+            .store(in: &cancellables)
+
+        sdk.groupRekeyed
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId in
+                self?.groupMembershipSubject.send(.rekeyed(conversationId: conversationId))
+            }
+            .store(in: &cancellables)
+
+        sdk.memberRemoved
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId, removedKey in
+                self?.groupMembershipSubject.send(
+                    .memberRemoved(conversationId: conversationId, removedKey: removedKey)
+                )
+            }
+            .store(in: &cancellables)
+
+        sdk.groupLinkMemberJoined
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId, _, _ in
+                self?.groupMembershipSubject.send(.linkMemberJoined(conversationId: conversationId))
+            }
             .store(in: &cancellables)
     }
 

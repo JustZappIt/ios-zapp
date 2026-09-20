@@ -120,6 +120,29 @@ extension ZappMessagingClient: TestDependencyKey {
         setPresenceVisible: { _ in },
         messageReceivedStream: { Empty().eraseToAnyPublisher() },
         setActiveConversation: { _ in },
-        setBlockedKeys: { _ in }
+        setBlockedKeys: { _ in },
+        inspectGroupLink: { _ in ZMGroupLinkInspection(status: .ok) },
+        joinGroupViaLink: { _ in ZMGroupJoinResult(status: .requested, linkId: "test") },
+        groupJoinStatus: { [] },
+        cancelGroupJoin: { _ in true },
+        groupJoinUpdatesStream: { Empty().eraseToAnyPublisher() },
+        groupLink: { conversationId in ZMGroupLinkInfo(conversationId: conversationId, state: .none) },
+        enableGroupLink: { conversationId, _ in
+            ZMGroupLinkInfo(conversationId: conversationId, state: .active, link: "https://join.justzappit.xyz/g/v1#test")
+        },
+        updateGroupLink: { conversationId, _ in
+            ZMGroupLinkInfo(conversationId: conversationId, state: .active, link: "https://join.justzappit.xyz/g/v1#test")
+        },
+        resetGroupLink: { conversationId in
+            ZMGroupLinkInfo(conversationId: conversationId, state: .active, link: "https://join.justzappit.xyz/g/v1#test")
+        },
+        disableGroupLink: { conversationId in ZMGroupLinkInfo(conversationId: conversationId, state: .off) },
+        groupJoinRequests: { _ in [] },
+        approveGroupJoinRequest: { _, _ in true },
+        declineGroupJoinRequest: { _, _ in },
+        groupJoinRequestStream: { Empty().eraseToAnyPublisher() },
+        removeMember: { _, _, _ in ZMRemoveMemberResult(participants: [], olderMemberCount: 0) },
+        olderMemberCount: { _ in 0 },
+        groupMembershipStream: { Empty().eraseToAnyPublisher() }
     )
 }

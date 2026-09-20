@@ -157,7 +157,7 @@ extension Root {
                 // runs the background boundary at all.
                 state.didScheduleStartFailureRetry = false
                 let giftResume: Effect<Root.Action> = state.appInitializationState == .initialized
-                    ? .send(.giftResumePendingClaim)
+                    ? .merge(.send(.giftResumePendingClaim), .send(.groupInviteResumePending))
                     : .none
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.initialSetups)))
@@ -1703,12 +1703,16 @@ extension Root {
                 state.destinationState.destination = .home
                 // A recipient who tapped a link before having a wallet deferred it on the way to
                 // onboarding; the wallet now exists, so their claim comes back.
-                let resumeDeferredGift: Effect<Root.Action> = .run { send in
-                    @Dependency(\.pendingGiftLinks) var pendingGiftLinks
-                    if let token = pendingGiftLinks.resumeDeferred() {
-                        await send(.giftClaimResumed(token))
-                    }
-                }
+                let resumeDeferredGift: Effect<Root.Action> = .merge(
+                    .run { send in
+                        @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+                        if let token = pendingGiftLinks.resumeDeferred() {
+                            await send(.giftClaimResumed(token))
+                        }
+                    },
+                    // The same for a group invite tapped before there was a wallet to join with.
+                    .send(.groupInviteResumePending)
+                )
                 if state.isStaleWalletHealedAlertPending {
                     return .merge(
                         presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId),

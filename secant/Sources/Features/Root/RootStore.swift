@@ -259,6 +259,7 @@ struct Root {
         var giftCardState = GiftCard.State()
         var giftCardListState = GiftCardList.State()
         var giftClaimState = GiftClaim.State()
+        var groupInviteState = GroupInvite.State()
         var peerCashOutActivityReturn: PeerCashOutActivityReturn?
         var peerCashOutOrigin = PeerCashOutOrigin.pay
         var offrampOrigin = OfframpOrigin.pay
@@ -481,6 +482,11 @@ struct Root {
         case giftCardList(GiftCardList.Action)
         case giftClaim(GiftClaim.Action)
         case giftLinkReceived(String)
+        case groupInvite(GroupInvite.Action)
+        case groupInviteReceived(String)
+        /// An invite held until there was a wallet, an onboarding and an identity to open it with.
+        case groupInviteResumePending
+        case groupInviteResumed(String)
         case giftStartupSweep
         case giftResumePendingClaim
         case giftClaimResumed(String)
@@ -593,6 +599,7 @@ struct Root {
     @Dependency(\.autoServerSelection) var autoServerSelection
     @Dependency(\.uriParser) var uriParser
     @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+    @Dependency(\.pendingGroupInvites) var pendingGroupInvites
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
@@ -745,6 +752,10 @@ struct Root {
 
         Scope(state: \.giftClaimState, action: \.giftClaim) {
             GiftClaim()
+        }
+
+        Scope(state: \.groupInviteState, action: \.groupInvite) {
+            GroupInvite()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {

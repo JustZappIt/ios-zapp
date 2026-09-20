@@ -81,6 +81,20 @@ private extension RootView {
                         store.send(.splashRemovalRequested)
                     }
 
+                case .groupInvite:
+                    NavigationView {
+                        GroupInviteView(
+                            store: store.scope(
+                                state: \.groupInviteState,
+                                action: \.groupInvite
+                            )
+                        )
+                    }
+                    .navigationViewStyle(.stack)
+                    .overlayedWithSplash(store.splashAppeared) {
+                        store.send(.splashRemovalRequested)
+                    }
+
                 case .deeplinkWarning:
                     NavigationView {
                         DeeplinkWarningView(

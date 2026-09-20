@@ -22,7 +22,7 @@
 # references ../zappMessaging/ios by path.
 #
 # GitHub: https://github.com/JustZappIt/zappmessaging-sdk
-zappMessaging=18c300c4b29cc3c3e2d6b2473377533c85b7bd63
+zappMessaging=22870476f01f042697a1fe41aacf4a661f62f0c0
 
 # zcash-swift-wallet-sdk — sibling LOCAL Swift package; run Scripts/bootstrap-zcash-sdk.sh
 # after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
