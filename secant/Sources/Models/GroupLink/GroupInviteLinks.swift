@@ -37,6 +37,12 @@ enum GroupInviteLinks {
         guard trimmed.utf8.count <= maxLength, isGroupLink(trimmed) else { return nil }
         guard var components = URLComponents(string: trimmed) else { return nil }
         components.percentEncodedQuery = nil
+        if components.scheme?.lowercased() == "https" {
+            // Rebuilt on the canonical host, as Android does, so the same link taken from the same
+            // message is one string on both platforms whatever case the sender's app used.
+            components.scheme = "https"
+            components.host = host
+        }
         guard let link = components.string, link.utf8.count <= maxLength else { return nil }
         return link
     }

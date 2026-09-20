@@ -1564,6 +1564,9 @@ extension Root {
                     .send(.batteryStateChanged),
                     .run { [migrationManager] send in
                         await zappMessaging.wipe()
+                        // A held invite is as personal as the chats it leads to, and it outlives
+                        // the worklet's store on its own, in the Keychain.
+                        pendingGroupInvites.clear()
                         await migrationManager.wipeAllMigrationState()
                         await send(.resetZashiKeychainRequest)
                     }
