@@ -29,6 +29,10 @@ struct ChatRoom {
 
         var conversationId: String
         var conversation: ZMConversation?
+
+        /// The owner removed this device from the group. The history stays where it is; nothing
+        /// new can be sent, and the SDK would refuse it anyway.
+        var isRemovedFromGroup: Bool { conversation?.removedAt != nil }
         var messages: [ZMMessage] = []
         var draft = ""
         var isLoading = true
@@ -525,7 +529,7 @@ struct ChatRoom {
 
             case .sendTapped:
                 let content = state.trimmedDraft
-                guard !content.isEmpty else { return .none }
+                guard !content.isEmpty, !state.isRemovedFromGroup else { return .none }
 
                 let replyTo = state.replyingTo
                 let reply = replyTo.map {
