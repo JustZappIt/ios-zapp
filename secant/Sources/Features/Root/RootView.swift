@@ -529,6 +529,15 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
+                            } else if path == .groupLink {
+                                GroupLinkView(
+                                    store: store.scope(
+                                        state: \.groupLinkState,
+                                        action: \.groupLink
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             }
                             #if VOTING_ENABLED
                             if path == .votingCoordFlow,

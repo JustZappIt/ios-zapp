@@ -25,7 +25,14 @@ struct GroupInfoView: View {
                     VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
                         nameSection
                         members
-                        addMemberButton
+
+                        if store.canAddMember {
+                            addMemberButton
+                        }
+
+                        if store.canShareLink {
+                            inviteLinkButton
+                        }
 
                         if store.didFail {
                             Text(String(localizable: .chatProfileSaveFailed))
@@ -41,6 +48,16 @@ struct GroupInfoView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
+            .overlay {
+                if let removing = store.removing {
+                    RemoveMemberDialog(
+                        removing: removing,
+                        onToggleResetLink: { store.send(.removeResetLinkToggled) },
+                        onConfirm: { store.send(.removeConfirmed) },
+                        onDismiss: { store.send(.removeDismissed) }
+                    )
+                }
+            }
             .zappSwipeBack { store.send(.backToHomeTapped) }
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
@@ -129,7 +146,12 @@ struct GroupInfoView: View {
 
             VStack(spacing: 0) {
                 ForEach(store.state.members) { member in
-                    GroupMemberRow(member: member)
+                    GroupMemberRow(
+                        member: member,
+                        onRemove: store.canRemoveMembers && !member.isOwner
+                            ? { store.send(.removeMemberTapped(member)) }
+                            : nil
+                    )
 
                     if member.id != store.state.members.last?.id {
                         ZappRowDivider(inset: true)
@@ -147,6 +169,17 @@ struct GroupInfoView: View {
             leadingIcon: Asset.Assets.Icons.userPlus.image
         ) {
             store.send(.addMemberTapped)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var inviteLinkButton: some View {
+        ZappButton(
+            title: String(localizable: .groupLinkHeader),
+            variant: .secondary,
+            isEnabled: !store.isMutating
+        ) {
+            store.send(.inviteLinkTapped)
         }
         .frame(maxWidth: .infinity)
     }
@@ -207,7 +240,11 @@ private enum GroupRowConstants {
 /// The roster carries no presence: the core never tells us whether a given member is reachable,
 /// only whether *we* are. A dot here would report our own connectivity under their name.
 private struct GroupMemberRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let member: GroupMember
+    /// Nil for everyone who cannot remove this person, which is everyone but the owner.
+    var onRemove: (() -> Void)?
 
     var body: some View {
         HStack(spacing: GroupRowConstants.spacing) {
@@ -226,6 +263,15 @@ private struct GroupMemberRow: View {
 
             if member.isOwner {
                 ZappStatusChip(text: String(localizable: .groupOwner), variant: .accent)
+            }
+
+            if let onRemove {
+                Button(action: onRemove) {
+                    Image(systemName: "person.badge.minus")
+                        .foregroundColor(ZappColors.textMuted.color(colorScheme))
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel(String(localizable: .groupMemberRemove))
             }
         }
         .padding(.horizontal, GroupRowConstants.horizontalPadding)
@@ -278,4 +324,64 @@ private struct GroupAvatar: View {
 
 #Preview {
     GroupInfoView(store: GroupInfo.initial)
+}
+
+/// Removing someone is not undoable and is not only a membership change, so the dialog says what
+/// it costs the person, and what this group cannot promise yet when older builds are still in it.
+private struct RemoveMemberDialog: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let removing: GroupInfo.State.RemoveDraft
+    let onToggleResetLink: () -> Void
+    let onConfirm: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZappDialog(onScrimTap: removing.isBusy ? nil : onDismiss) {
+            Text(String(localizable: .groupMemberRemoveTitleFmt(removing.member.name)))
+                .zappFont(.sectionTitle, style: ZappColors.text)
+
+            Text(String(localizable: .groupMemberRemoveBody))
+                .zappFont(.body, style: ZappColors.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if removing.olderMemberCount > 0 {
+                Text(String(localizable: .groupMemberRemoveOlderNote))
+                    .zappFont(.caption, style: ZappColors.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if removing.canResetLink {
+                Button(action: onToggleResetLink) {
+                    HStack(spacing: Design.Spacing._md) {
+                        Image(systemName: removing.resetLink ? "checkmark.square.fill" : "square")
+                            .foregroundColor(
+                                (removing.resetLink ? ZappColors.accent : ZappColors.textMuted).color(colorScheme)
+                            )
+                        Text(String(localizable: .groupMemberRemoveResetLink))
+                            .zappFont(.rowSubtitle, style: ZappColors.text)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(removing.resetLink ? [.isSelected, .isButton] : .isButton)
+            }
+
+            HStack(spacing: Design.Spacing._lg) {
+                ZappButton(
+                    title: String(localizable: .groupLinkCancel),
+                    variant: .ghost,
+                    isEnabled: !removing.isBusy,
+                    action: onDismiss
+                )
+
+                ZappButton(
+                    title: String(localizable: .groupMemberRemoveConfirm),
+                    variant: .danger,
+                    isEnabled: !removing.isBusy,
+                    action: onConfirm
+                )
+            }
+        }
+    }
 }
