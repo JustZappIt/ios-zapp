@@ -889,6 +889,19 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
+            case .groupInfo(.inviteLinkTapped):
+                state.groupLinkState = GroupLink.State(
+                    conversationId: state.groupInfoState.conversation.id,
+                    isOwner: state.groupInfoState.conversation.isOwner == true
+                )
+                state.path = .groupLink
+                return .none
+
+            case .groupLink(.backTapped):
+                // Back to the group it belongs to, which is where it was opened from.
+                state.path = .groupInfo
+                return .none
+
             case .groupInfo(.didLeave):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
@@ -1043,6 +1056,17 @@ extension Root {
 
             case .giftClaim(.delegate(.routeToOnboarding)):
                 return .send(.destination(.updateDestination(.onboarding)))
+
+            case .groupInvite(.delegate(.dismiss)):
+                return .send(.destination(.updateDestination(.home)))
+
+            case .groupInvite(.delegate(.openConversation(let conversationId))):
+                // Home first, then the room: the preview is a destination, not a path entry, so
+                // the room has to be pushed onto the home path it leaves behind.
+                return .merge(
+                    .send(.destination(.updateDestination(.home))),
+                    .send(.chatNotificationTapped(conversationId))
+                )
 
             case .giftStartupSweep:
                 return .merge(

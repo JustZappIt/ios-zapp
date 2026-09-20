@@ -40,6 +40,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>zcash</string>
+				<string>xyz.justzappit.zapp</string>
 			</array>
 		</dict>
 	</array>

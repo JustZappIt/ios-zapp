@@ -377,6 +377,82 @@ struct ZappMessagingClient {
 
     /// Blocked senders must not bump the unread badge. Unread is counted inside the
     /// messaging subsystem, which cannot see the contact list, so Root pushes the
-    /// set down whenever it changes.
+    /// set down whenever it changes. The set also reaches the SDK, which admits people
+    /// through invite links without asking the app each time.
     var setBlockedKeys: @Sendable (Set<String>) -> Void
+
+    // MARK: Group invite links
+
+    /// Reads a link on this device. Contacts nobody, and never returns keys or the secret.
+    var inspectGroupLink: @Sendable (_ link: String) async throws -> ZMGroupLinkInspection
+
+    /// Asks to join. The owner admits when their app is next open, so the answer comes later
+    /// on `groupJoinUpdatesStream`.
+    var joinGroupViaLink: @Sendable (_ link: String) async throws -> ZMGroupJoinResult
+
+    /// Requests this device has out, which outlive the screen that made them.
+    var groupJoinStatus: @Sendable () async throws -> [ZMGroupJoinUpdate] = { [] }
+    var cancelGroupJoin: @Sendable (_ linkId: String) async throws -> Bool = { _ in false }
+    var groupJoinUpdatesStream: @Sendable () -> AnyPublisher<ZMGroupJoinUpdate, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
+    /// Owner: the group's link, with state `.none` when there is none.
+    var groupLink: @Sendable (_ conversationId: String) async throws -> ZMGroupLinkInfo
+    var enableGroupLink: @Sendable (
+        _ conversationId: String,
+        _ options: ZMGroupLinkOptions
+    ) async throws -> ZMGroupLinkInfo
+    var updateGroupLink: @Sendable (
+        _ conversationId: String,
+        _ options: ZMGroupLinkOptions
+    ) async throws -> ZMGroupLinkInfo
+    var resetGroupLink: @Sendable (_ conversationId: String) async throws -> ZMGroupLinkInfo
+    var disableGroupLink: @Sendable (_ conversationId: String) async throws -> ZMGroupLinkInfo
+
+    /// Owner: people waiting, when the link asks for approval.
+    var groupJoinRequests: @Sendable (_ conversationId: String) async throws -> [ZMGroupJoinApprovalRequest] = { _ in [] }
+    /// False means the checks ran again and the group is full.
+    var approveGroupJoinRequest: @Sendable (
+        _ conversationId: String,
+        _ joinerKey: String
+    ) async throws -> Bool = { _, _ in false }
+    var declineGroupJoinRequest: @Sendable (_ conversationId: String, _ joinerKey: String) async throws -> Void
+    var groupJoinRequestStream: @Sendable () -> AnyPublisher<ZMGroupJoinApprovalRequest, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
+    /// Owner: drops the member and gives the group a new secret, so what is said next cannot be
+    /// read with the old one.
+    var removeMember: @Sendable (
+        _ conversationId: String,
+        _ publicKey: String,
+        _ resetLink: Bool
+    ) async throws -> ZMRemoveMemberResult
+
+    /// How many members' apps do not understand removal yet.
+    var olderMemberCount: @Sendable (_ conversationId: String) async throws -> Int = { _ in 0 }
+
+    /// Membership changes this device did not ask for.
+    var groupMembershipStream: @Sendable () -> AnyPublisher<GroupMembershipEvent, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+}
+
+/// What happened to a group without this device asking.
+enum GroupMembershipEvent: Equatable, Sendable {
+    /// The owner removed this device. The history stays, nothing new can be sent.
+    case removedFromGroup(conversationId: String)
+    /// The group took a new secret, which is what makes a removal real.
+    case rekeyed(conversationId: String)
+    case memberRemoved(conversationId: String, removedKey: String)
+    /// Someone came in through the invite link.
+    case linkMemberJoined(conversationId: String)
+
+    var conversationId: String {
+        switch self {
+        case .removedFromGroup(let id), .rekeyed(let id), .linkMemberJoined(let id): return id
+        case .memberRemoved(let id, _): return id
+        }
+    }
 }

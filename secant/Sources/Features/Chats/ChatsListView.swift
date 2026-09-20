@@ -32,7 +32,7 @@ struct ChatsListView: View {
 
                     if !store.isLoaded {
                         loading
-                    } else if store.sortedConversations.isEmpty {
+                    } else if store.sortedConversations.isEmpty && store.waitingJoins.isEmpty {
                         supportRow
                         ZappRowDivider(inset: true)
                         emptyState
@@ -98,6 +98,13 @@ struct ChatsListView: View {
                 supportRow
                 ZappRowDivider(inset: true)
 
+                ForEach(store.waitingJoins, id: \.linkId) { waiting in
+                    WithPerceptionTracking {
+                        waitingJoinRow(waiting)
+                        ZappRowDivider(inset: true)
+                    }
+                }
+
                 ForEach(store.sortedConversations) { conversation in
                     // Android swipes both direct and group rows away to leave; the context menu
                     // stays as the discoverable, accessible route to the same action.
@@ -147,6 +154,24 @@ struct ChatsListView: View {
             .zappScrollShadowSource()
         }
         .zappScrollEdges()
+    }
+
+    /// A link this device has asked with, and can take back. Android shows the same row.
+    private func waitingJoinRow(_ waiting: ZMGroupJoinUpdate) -> some View {
+        ZappRow(
+            title: waiting.nameHint?.isEmpty == false
+                ? waiting.nameHint ?? ""
+                : String(localizable: .groupInviteWaitingTitle),
+            subtitle: waiting.status == .pendingApproval
+                ? String(localizable: .groupInviteWaitingOwner)
+                : String(localizable: .groupInviteWaitingBody),
+            trailing: {
+                Button(String(localizable: .groupInviteCancel)) {
+                    store.send(.cancelWaitingJoinTapped(waiting.linkId))
+                }
+                .zappFont(.rowSubtitle, style: ZappColors.accent)
+            }
+        )
     }
 
     private var emptyState: some View {

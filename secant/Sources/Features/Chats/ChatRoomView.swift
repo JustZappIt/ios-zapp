@@ -81,6 +81,19 @@ struct ChatRoomView: View {
                     )
                 }
 
+                if store.isRemovedFromGroup {
+                    // The history stays; nothing new can be sent, so the composer is replaced by
+                    // the reason rather than sitting there refusing every tap.
+                    Text(String(localizable: .groupMemberRemovedSelf))
+                        .zappFont(.caption, style: ZappColors.textMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, Design.Spacing._2xl)
+                        .padding(.vertical, Design.Spacing._lg)
+                        .background {
+                            ZappColors.surface.color(colorScheme)
+                                .ignoresSafeArea(.container, edges: .bottom)
+                        }
+                } else {
                 ChatRoomInputRow(
                     draft: $store.draft.sending(\.draftChanged),
                     isFocused: $isComposerFocused,
@@ -151,6 +164,7 @@ struct ChatRoomView: View {
                         onCancel: { store.send(.cameraDismissed) }
                     )
                     .ignoresSafeArea()
+                }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
