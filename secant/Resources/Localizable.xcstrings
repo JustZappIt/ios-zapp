@@ -1035,40 +1035,6 @@
         }
       }
     },
-    "groupInvite.pasteEntry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Have an invite link? Tap it again or paste it here."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Tienes un enlace de invitación? Tócalo otra vez o pégalo aquí."
-          }
-        }
-      }
-    },
-    "groupInvite.pasteControl" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paste invite link"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar enlace de invitación"
-          }
-        }
-      }
-    },
     "groupInvite.openGroup" : {
       "extractionState" : "manual",
       "localizations" : {

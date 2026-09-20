@@ -889,15 +889,6 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
-            // A pasted link opens exactly the preview a tapped one does, including the screen
-            // that says a clipboard with no link in it could not be read.
-            case .chatsList(.pastedInviteFound(let link)):
-                guard let link else {
-                    state.groupInviteState = GroupInvite.State(token: nil)
-                    return .send(.destination(.updateDestination(.groupInvite)))
-                }
-                return .send(.groupInviteReceived(link))
-
             case .groupInfo(.inviteLinkTapped):
                 state.groupLinkState = GroupLink.State(
                     conversationId: state.groupInfoState.conversation.id,

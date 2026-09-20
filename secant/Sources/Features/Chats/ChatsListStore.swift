@@ -36,11 +36,6 @@ struct ChatsList {
         var stateCancelId = UUID()
         var joinUpdatesCancelId = UUID()
 
-        /// Offered with no conversations yet, for a link that arrived somewhere Zapp cannot see.
-        var showsPasteInvite: Bool {
-            featureFlags.groupLinks && isLoaded && sortedConversations.isEmpty && waitingJoins.isEmpty
-        }
-
         /// Decides which side of `isSupportConversation` this device is on. Absent until the
         /// chat identity lands, which is exactly Android's `chatConversationsRepository.localPublicKey`.
         var localPublicKey: String? {
@@ -138,9 +133,6 @@ struct ChatsList {
         case joinUpdated(ZMGroupJoinUpdate)
         case waitingJoinsLoaded([ZMGroupJoinUpdate])
         case cancelWaitingJoinTapped(String)
-        case pasteInviteTapped
-        /// Root routes it: a pasted link opens the same preview a tapped one does.
-        case pastedInviteFound(String?)
         case termsAccepted
         case termsDeclined
 
@@ -154,7 +146,6 @@ struct ChatsList {
     }
 
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
@@ -248,14 +239,6 @@ struct ChatsList {
                     }
                 }
 
-            // Reading the clipboard is announced by iOS, so it happens only on this tap. A
-            // clipboard with no link in it still lands on the screen that says so.
-            case .pasteInviteTapped:
-                let pasted = pasteboard.getString()?.data
-                return .send(.pastedInviteFound(pasted.flatMap(GroupInviteLinks.fromPastedText)))
-
-            case .pastedInviteFound:
-                return .none
 
             case .networkChipTapped:
                 state.showsNetworkDetails = true

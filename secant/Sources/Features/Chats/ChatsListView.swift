@@ -35,10 +35,6 @@ struct ChatsListView: View {
                     } else if store.sortedConversations.isEmpty && store.waitingJoins.isEmpty {
                         supportRow
                         ZappRowDivider(inset: true)
-                        if store.showsPasteInvite {
-                            pasteInviteRow
-                            ZappRowDivider(inset: true)
-                        }
                         emptyState
                     } else {
                         conversations
@@ -101,11 +97,6 @@ struct ChatsListView: View {
             LazyVStack(spacing: 0) {
                 supportRow
                 ZappRowDivider(inset: true)
-
-                if store.showsPasteInvite {
-                    pasteInviteRow
-                    ZappRowDivider(inset: true)
-                }
 
                 ForEach(store.waitingJoins, id: \.linkId) { waiting in
                     WithPerceptionTracking {
@@ -180,14 +171,6 @@ struct ChatsListView: View {
                 }
                 .zappFont(.rowSubtitle, style: ZappColors.accent)
             }
-        )
-    }
-
-    private var pasteInviteRow: some View {
-        ZappRow(
-            title: String(localizable: .groupInvitePasteEntry),
-            subtitle: String(localizable: .groupInvitePasteControl),
-            action: { store.send(.pasteInviteTapped) }
         )
     }
 
