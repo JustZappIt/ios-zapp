@@ -21,7 +21,8 @@ import ZappMessaging
 
 /// Shared across the suites below; file-scope so the `@MainActor` suites' dependency closures can
 /// read them without crossing an actor boundary.
-private let supportAgentKey = SupportChatConstants.supportPublicKey
+private let supportAgentKey = SupportChatConstants.supportPublicKeys[0]
+private let secondSupportAgentKey = SupportChatConstants.supportPublicKeys[1]
 private let supportTestUserKey = String(repeating: "a", count: 64)
 
 @Suite struct SupportChatConstantsTests {
@@ -119,6 +120,54 @@ private let supportTestUserKey = String(repeating: "a", count: 64)
                 displayName: "chinmay",
                 participantIds: [supportAgentKey],
                 localPublicKey: supportAgentKey
+            )
+        )
+    }
+
+    /// Every support key is an agent: a ticket reaches both, and either one can answer it.
+    @Test func everySupportKeyIsTreatedAsAnAgent() {
+        #expect(SupportChatConstants.supportPublicKeys == [
+            "81569106f5847498229b00103bd300ac2f4c93c8234e7e2c27c8de5a9b5574bf",
+            "74516b96f025af181d45722421ad1692cb79de6a81b3ea269c2528313471a79b"
+        ])
+
+        // The user's ticket as it appears on their own device: both agents are members.
+        #expect(
+            SupportChatConstants.isSupportConversation(
+                type: .group,
+                displayName: "Support: Problem",
+                participantIds: [supportAgentKey, secondSupportAgentKey],
+                localPublicKey: supportTestUserKey
+            )
+        )
+
+        // Either agent's key alone is still enough on the user's side.
+        #expect(
+            SupportChatConstants.isSupportConversation(
+                type: .group,
+                displayName: "Support: Problem",
+                participantIds: [secondSupportAgentKey],
+                localPublicKey: supportTestUserKey
+            )
+        )
+
+        // The second agent's own device takes the agent branch and sees the ticket.
+        #expect(
+            SupportChatConstants.isSupportConversation(
+                type: .group,
+                displayName: "Support: Problem",
+                participantIds: [supportTestUserKey, supportAgentKey],
+                localPublicKey: secondSupportAgentKey
+            )
+        )
+
+        // A direct chat with the second agent is still a normal chat.
+        #expect(
+            !SupportChatConstants.isSupportConversation(
+                type: .direct,
+                displayName: "Zapp Support",
+                participantIds: [secondSupportAgentKey],
+                localPublicKey: supportTestUserKey
             )
         )
     }
@@ -465,7 +514,7 @@ private let supportTestUserKey = String(repeating: "a", count: 64)
         await store.finish()
 
         #expect(createdGroups.value.map(\.0) == ["Support: Problem"])
-        #expect(createdGroups.value.map(\.1) == [[SupportChatConstants.supportPublicKey]])
+        #expect(createdGroups.value.map(\.1) == [SupportChatConstants.supportPublicKeys])
         #expect(
             sent.value == [
                 "[Category: Problem]",
