@@ -113,20 +113,27 @@ enum SupportChatConstants {
     ///
     /// Which branch runs is decided by comparing the viewer's own identity against the support
     /// key — hence "which side am I on", not "does either party equal the support key".
+    ///
+    /// On both sides a ticket is only ever the GROUP the topic picker creates, carrying the
+    /// `Support: ` prefix. The support key alone is not enough: a direct chat with the support
+    /// key, or an ordinary group it was added to, is a normal conversation and belongs in the
+    /// regular chat list, not the Zapp Support section.
     static func isSupportConversation(
+        type: ConversationType,
         displayName: String,
         participantIds: [String],
         localPublicKey: String?
     ) -> Bool {
+        guard type == .group, displayName.hasPrefix(displayNamePrefix) else { return false }
+
         let viewerIsSupportAgent = localPublicKey == supportPublicKey
 
-        return viewerIsSupportAgent
-            ? displayName.hasPrefix(displayNamePrefix)
-            : participantIds.contains(supportPublicKey)
+        return viewerIsSupportAgent || participantIds.contains(supportPublicKey)
     }
 
     static func isSupportConversation(_ conversation: ZMConversation, localPublicKey: String?) -> Bool {
         isSupportConversation(
+            type: conversation.type,
             displayName: conversation.displayName,
             participantIds: conversation.participantIds,
             localPublicKey: localPublicKey
