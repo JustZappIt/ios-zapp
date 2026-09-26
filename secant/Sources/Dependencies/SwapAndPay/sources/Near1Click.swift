@@ -11,7 +11,7 @@ import ComposableArchitecture
 
 struct Near1Click {
     enum Constants {
-        static let referral = "zodl"
+        static let referral = "zapp"
         
         // urls
         static let submitUrl = "https://1click.chaindefuser.com/v0/deposit/submit"
