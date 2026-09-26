@@ -175,22 +175,20 @@ jobs:
       # either case the .app bundle at the path below exists and we
       # overwrite the bundle's PartnerKeys.plist resource.
       #
-      # Two surgical secrets instead of the whole plist base64: the
+      # One surgical secret instead of the whole plist base64: the
       # e2e suite only exercises NEAR swap/pay paths, which
-      # `Near1Click.swift` reads via PartnerKeys.{nearKey,
-      # nearFeeDepositAddress}. Flexa / Coinbase / CMC keys aren't on
-      # any e2e code path. Values are JWT-shaped and 0x-prefixed hex
-      # — both safe to drop into XML without escaping.
+      # `Near1Click.swift` reads via PartnerKeys.nearKey. Flexa /
+      # Coinbase / CMC keys aren't on any e2e code path. The value is
+      # JWT-shaped — safe to drop into XML without escaping.
       #
-      # Skips silently when either secret is unset; the .app then
+      # Skips silently when the secret is unset; the .app then
       # ships the empty dummy and the swap/crosspay flows fail with
       # the recognizable "Quote Unavailable" message (so the broken
       # state is loud rather than silently green).
       - name: Inject PartnerKeys.plist into .app bundle
-        if: env.ZODL_IOS_NEAR_KEY != '' && env.ZODL_IOS_NEAR_FEE_DEPOSIT_ADDRESS != ''
+        if: env.ZAPP_IOS_NEAR_KEY != ''
         env:
-          ZODL_IOS_NEAR_KEY: ${{ secrets.ZODL_IOS_NEAR_KEY }}
-          ZODL_IOS_NEAR_FEE_DEPOSIT_ADDRESS: ${{ secrets.ZODL_IOS_NEAR_FEE_DEPOSIT_ADDRESS }}
+          ZAPP_IOS_NEAR_KEY: ${{ secrets.ZAPP_IOS_NEAR_KEY }}
         run: |
           APP_PLIST=$(ls build/Build/Products/Debug-iphonesimulator/*.app/PartnerKeys.plist 2>/dev/null | head -1)
           if [ -z "$APP_PLIST" ]; then
@@ -205,9 +203,7 @@ jobs:
           <plist version="1.0">
           <dict>
               <key>nearKey</key>
-              <string>${ZODL_IOS_NEAR_KEY}</string>
-              <key>nearFeeDepositAddress</key>
-              <string>${ZODL_IOS_NEAR_FEE_DEPOSIT_ADDRESS}</string>
+              <string>${ZAPP_IOS_NEAR_KEY}</string>
           </dict>
           </plist>
           EOF
@@ -215,7 +211,7 @@ jobs:
               echo "::error::Composed PartnerKeys.plist is not a valid plist."
               exit 1
           fi
-          echo "Injected PartnerKeys.plist into $APP_PLIST ($(wc -c <"$APP_PLIST") bytes, 2 keys)"
+          echo "Injected PartnerKeys.plist into $APP_PLIST ($(wc -c <"$APP_PLIST") bytes, 1 key)"
 
       - name: Upload .app bundle
         uses: actions/upload-artifact@v4
