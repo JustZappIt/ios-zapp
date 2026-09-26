@@ -18,17 +18,18 @@ struct ReputationSummaryModel: Equatable, Sendable {
     /// The Diamond's own per-order limit, from reputation alone.
     let buyLimitMicros: String
     let maxBuyLimitMicros: String
-    /// The higher of the Diamond's limit and the integrator's: what the screen shows.
+    /// Presentation value retained for the existing screen; live reads use the Diamond's limit.
     let shownLimitMicros: String
     let isLimitFromCheckout: Bool
     let isSelfieAvailable: Bool
     /// The integrator's standing the shown limit came from; nil where none is deployed.
     let liveness: LivenessStandingModel?
     let platforms: [ReputationPlatformModel]
+    var identityChecks: [ReputationPlatformModel] = []
 
     var verified: [ReputationPlatformModel] { platforms.filter(\.isVerified) }
 
-    /// Points say nothing here: a selfie-verified wallet holds none and can still buy.
+    /// Use the chain's permission rather than deriving buy eligibility from points.
     var canStartBuy: Bool { canBuy && !isBlocked }
 }
 

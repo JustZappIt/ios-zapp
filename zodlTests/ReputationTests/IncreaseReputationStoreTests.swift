@@ -595,6 +595,139 @@ struct IncreaseReputationStoreTests {
 
     // MARK: - Helpers
 
+    @MainActor @Test(arguments: [IdentityCheckModel.liveness, .passport])
+    func identityCompletionRefreshesReputationAndDuplicateTapsStartOnlyOneRun(_ check: IdentityCheckModel) async {
+        var state = IncreaseReputation.State.initial(currencyCode: "BRL")
+        state.isLoading = false
+        state.identityChecks = [ReputationFixtures.platform(id: check.rawValue, award: "75", gain: "75000000")]
+        let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
+        let starts = LockIsolated(0)
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
+            $0.liveness.verifyIdentity = { actual, currency, nonce, _ in
+                #expect(actual == check)
+                #expect(currency == "BRL")
+                #expect(!nonce.isEmpty)
+                starts.withValue { $0 += 1 }
+                return statuses.stream
+            }
+        }
+        store.exhaustivity = .off
+        await store.send(.identityTapped(check))
+        await store.send(.identityTapped(check))
+        statuses.continuation.yield(.submitting)
+        await store.receive(\.livenessStatusReceived)
+        #expect(starts.value == 1)
+        let summary = ReputationFixtures.summary(canBuy: true, buyLimitMicros: "175000000")
+        statuses.continuation.yield(.identityDone(summary))
+        await store.receive(\.livenessStatusReceived)
+        #expect(store.state.run?.stage == .done)
+        #expect(store.state.run?.newBuyLimitMicros == "175000000")
+        #expect(store.state.run?.newPoints == summary.points)
+        statuses.continuation.finish()
+        await store.receive(\.runEnded)
+    }
+
+    @MainActor @Test func dismissalInvalidatesWaitingSessionThroughDependency() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "BRL")
+        let id = UUID()
+        state.run = .init(id: id, kind: .passport, name: "Passport", stage: .verifying)
+        let cancelled = LockIsolated<[UUID]>([])
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.cancel = { check, currency, runID in
+                #expect(check == .passport)
+                #expect(currency == "BRL")
+                cancelled.withValue { $0.append(runID) }
+            }
+        }
+        await store.send(.onDisappear) { $0.run = nil }
+        await store.finish()
+        #expect(cancelled.value == [id])
+    }
+
+    @MainActor @Test func retryUsesIdentityRecoveryEntryPointWithoutReplayingCallback() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "BRL")
+        state.run = .init(id: UUID(), kind: .passport, name: "Passport", stage: .failed)
+        let calls = LockIsolated<[IdentityCheckModel]>([])
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
+            $0.liveness.verifyIdentity = { check, _, _, _ in
+                calls.withValue { $0.append(check) }
+                return AsyncThrowingStream { $0.yield(.failed(.network)); $0.finish() }
+            }
+            $0.liveness.resume = { _, _ in Issue.record("Retry replayed redemption callback"); throw Failure.wrong }
+        }
+        store.exhaustivity = .off
+        await store.send(.retryRunTapped)
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.runEnded)
+        #expect(calls.value == [.passport])
+        #expect(store.state.run?.stage == .failed)
+    }
+
+    @MainActor @Test func openingScreenRecoversPersistedPassportWithoutAnotherCallback() async {
+        let checks = LockIsolated<[IdentityCheckModel]>([])
+        let store = TestStore(initialState: IncreaseReputation.State.initial(currencyCode: "INR")) {
+            IncreaseReputation()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
+            $0.liveness.recoverable = { currency in
+                #expect(currency == "INR")
+                return .passport
+            }
+            $0.liveness.verifyIdentity = { check, _, _, _ in
+                checks.withValue { $0.append(check) }
+                return AsyncThrowingStream {
+                    $0.yield(.identityDone(ReputationFixtures.summary(canBuy: true, buyLimitMicros: "225000000")))
+                    $0.finish()
+                }
+            }
+        }
+        store.exhaustivity = .off
+        await store.send(.onAppear)
+        await store.receive(\.recoveryLoaded)
+        await store.receive(\.livenessStatusReceived)
+        await store.receive(\.runEnded)
+        #expect(checks.value == [.passport])
+        #expect(store.state.run?.kind == .passport)
+        #expect(store.state.run?.newBuyLimitMicros == "225000000")
+        #expect(store.state.run?.stage == .done)
+    }
+
+    @MainActor @Test func delayedCancellationCannotCancelANewerRun() async {
+        var state = IncreaseReputation.State.initial(currencyCode: "BRL")
+        state.run = .init(id: UUID(99), kind: .passport, name: "Passport", stage: .verifying)
+        state.identityChecks = [ReputationFixtures.platform(id: "Liveness", award: "75", gain: "75000000")]
+        let cancelling = AsyncStream<Void>.makeStream()
+        var cancellingIterator = cancelling.stream.makeAsyncIterator()
+        let release = AsyncStream<Void>.makeStream()
+        let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
+        let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.uuid = .incrementing
+            $0.liveness.cancel = { _, _, runID in
+                #expect(runID == UUID(99))
+                cancelling.continuation.yield(())
+                for await _ in release.stream { break }
+            }
+            $0.liveness.verifyIdentity = { _, _, _, _ in statuses.stream }
+        }
+        store.exhaustivity = .off
+        let cancellation = await store.send(.cancelRunTapped)
+        await cancellingIterator.next()
+        await store.send(.identityTapped(.liveness))
+        statuses.continuation.yield(.ready(widgetURL: "https://widget.example/new", expiresInSeconds: 1800))
+        await store.receive(\.livenessStatusReceived)
+        release.continuation.yield(())
+        release.continuation.finish()
+        await cancellation.finish()
+        statuses.continuation.yield(.identityDone(ReputationFixtures.summary(canBuy: true, buyLimitMicros: "325000000")))
+        await store.receive(\.livenessStatusReceived)
+        #expect(store.state.run?.newBuyLimitMicros == "325000000")
+        statuses.continuation.finish()
+        await store.receive(\.runEnded)
+    }
+
     private enum Failure: Error { case wrong }
 
     private func run(stage: IncreaseReputation.State.Stage) -> IncreaseReputation.State.Run {

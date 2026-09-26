@@ -537,8 +537,8 @@ extension Root {
                 if state.path == .increaseReputation {
                     return .send(.increaseReputation(.livenessReturnReceived(ret)))
                 }
-                // Rebuilt from the corridor in `state` with no confirmation, unlike the Reclaim
-                // link: the service only redeems a code for the wallet that opened its session.
+                // The corridor is only a routing hint. Before redemption the shared identity
+                // driver must match this return against the wallet's persisted authorization.
                 // Over another flow the return is dropped rather than replacing that flow's state.
                 guard let currencyCode = ReputationCorridor.match(ret.currencyCode),
                       state.path == nil || state.path == .reputation else { return .none }

@@ -115,6 +115,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [P2P] Selfie and passport checks now validate browser returns against your saved session and securely recover verification after app restarts. Retries preserve completed checks and reconcile pending transactions without sending twice.
 - [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.
 - [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.
 - [CHATS] The Chats list, the chat room and their sheets (network details, attachments, GIF search) now refresh when their data changes on iOS 16, where a sheet could stay on its spinner or the wrong page.

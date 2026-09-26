@@ -41,6 +41,7 @@ struct IncreaseReputationView: View {
             }
             .applyScreenBackground()
             .task { await store.send(.onAppear).finish() }
+            .onDisappear { store.send(.onDisappear) }
             .sheet(isPresented: infoBinding) {
                 IncreaseReputationInfoSheet { store.send(.infoDismissed) }
             }
@@ -82,6 +83,8 @@ struct IncreaseReputationView: View {
                     }
                 }
             }
+
+            identityGroup
 
             if let liveness = store.liveness {
                 ZappSettingsGroup(
@@ -161,7 +164,7 @@ struct IncreaseReputationView: View {
         VStack(alignment: .leading, spacing: ReputationLayout.sectionGap) {
             if run.stage == .done {
                 ZappSuccessHeader(
-                    title: run.isSelfie
+                    title: run.kind == .selfie
                         ? String(localizable: .increaseReputationLivenessDone)
                         : String(localizable: .increaseReputationDone(run.name)),
                     subtitle: run.newBuyLimitMicros.map {
@@ -228,7 +231,7 @@ struct IncreaseReputationView: View {
             case .done:
                 ZappButton(title: String(localizable: .increaseReputationFinish)) { store.send(.doneTapped) }
             case .failed:
-                ZappButton(title: String(localizable: .reputationRetry)) { store.send(.dismissRunTapped) }
+                ZappButton(title: String(localizable: .reputationRetry)) { store.send(.retryRunTapped) }
             }
         } else {
             ZappButton(title: String(localizable: .reputationRetry)) { store.send(.retryLoadTapped) }
@@ -256,6 +259,7 @@ struct IncreaseReputationView: View {
     }
 
     private func message(for run: IncreaseReputation.State.Run) -> String {
+        if let message = passportMessage(for: run) { return message }
         switch (run.stage, run.isSelfie) {
         case (.preparing, _): return String(localizable: .increaseReputationPreparing)
         case (.ready, false): return String(localizable: .increaseReputationReady(run.name))
@@ -266,6 +270,37 @@ struct IncreaseReputationView: View {
         case (.done, false): return String(localizable: .increaseReputationDone(run.name))
         case (.done, true): return String(localizable: .increaseReputationLivenessDone)
         case (.failed, _): return String(localizable: .increaseReputationFailed)
+        }
+    }
+}
+
+private extension IncreaseReputationView {
+    @ViewBuilder var identityGroup: some View {
+        if !store.identityChecks.isEmpty {
+            ZappSettingsGroup(title: String(localizable: .increaseReputationIdentityGroup)) {
+                ForEach(Array(store.identityChecks.enumerated()), id: \.element.id) { index, check in
+                    if index > 0 { ZappRowDivider() }
+                    ZappRow(
+                        title: check.id == IdentityCheckModel.passport.rawValue
+                            ? String(localizable: .increaseReputationPassportRow)
+                            : String(localizable: .increaseReputationLivenessRow),
+                        titleColor: check.isVerified ? .textMuted : .text,
+                        trailing: { platformTrailing(check) },
+                        action: check.isVerified ? nil : {
+                            if let kind = IdentityCheckModel(rawValue: check.id) { store.send(.identityTapped(kind)) }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    func passportMessage(for run: IncreaseReputation.State.Run) -> String? {
+        guard run.kind == .passport else { return nil }
+        switch run.stage {
+        case .ready, .verifying: return String(localizable: .increaseReputationPassportWaiting)
+        case .done: return String(localizable: .increaseReputationDone(run.name))
+        default: return nil
         }
     }
 }

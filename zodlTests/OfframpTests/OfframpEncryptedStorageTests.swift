@@ -42,6 +42,44 @@ struct OfframpEncryptedStorageTests {
         #expect(try peerStorage.peerCheckpointBookJson().value == peerCheckpoint)
     }
 
+    @Test func identityRecoverySurvivesRecreationAndClearsOnReset() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("zapp-offramp-test-wallet")
+        let key = try addressBookKey(byte: 0x37)
+        let record = "session-nonce|attestation-signature|transaction-hash|transaction-nonce|receipt-block"
+        try OfframpEncryptedStorage(key: key, fileURL: file).storeIdentityRecord(key: "wallet-chain-contract-Passport", value: record)
+        let recreated = OfframpEncryptedStorage(key: key, fileURL: file)
+        #expect(try recreated.identityRecord(key: "wallet-chain-contract-Passport").value == record)
+        #expect(try recreated.identityRecord(key: "other-wallet-chain-contract-Passport").value == nil)
+        #expect(try Data(contentsOf: file).range(of: Data(record.utf8)) == nil)
+        try OfframpEncryptedStorage.clearIdentityRecovery(directory: directory)
+        #expect(try recreated.identityRecord(key: "wallet-chain-contract-Passport").value == nil)
+    }
+
+    @Test func identityStorageWriteFailureThrowsInsteadOfAcknowledgingPersistence() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let storage = OfframpEncryptedStorage(key: try addressBookKey(byte: 0x61), fileURL: directory.appendingPathComponent("missing-parent"))
+        #expect(throws: (any Error).self) {
+            try storage.storeIdentityRecord(key: "wallet-chain-contract-Liveness", value: "before-broadcast-hash-and-nonce")
+        }
+    }
+
+    @Test func clearingOneIdentityCheckPreservesOtherRecoveryData() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storage = OfframpEncryptedStorage(key: try addressBookKey(byte: 0x14), fileURL: directory.appendingPathComponent("wallet"))
+        try storage.storeIdentityRecord(key: "Liveness", value: "live-attestation")
+        try storage.storeIdentityRecord(key: "Passport", value: "passport-receipt")
+        try storage.storeCheckpointJson(value: "payment-checkpoint")
+        try storage.storeIdentityRecord(key: "Liveness", value: nil)
+        #expect(try storage.identityRecord(key: "Liveness").value == nil)
+        #expect(try storage.identityRecord(key: "Passport").value == "passport-receipt")
+        #expect(try storage.checkpointJson().value == "payment-checkpoint")
+    }
+
     private func addressBookKey(byte: UInt8) throws -> AddressBookKey {
         let encoded = try JSONEncoder().encode(Data(repeating: byte, count: 32))
         return try JSONDecoder().decode(AddressBookKey.self, from: encoded)

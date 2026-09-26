@@ -71,7 +71,7 @@ extension Root {
                     guard let args = ReclaimReturnLink.resumeArgs(from: url) else { return .none }
                     return .send(.reclaimReturnReceived(args))
                 }
-                if url.host()?.lowercased() == LivenessReturnLink.host {
+                if [LivenessReturnLink.host, LivenessReturnLink.passportHost].contains(url.host()?.lowercased() ?? "") {
                     guard let ret = LivenessReturnLink.returnModel(from: url) else { return .none }
                     return .send(.livenessReturnReceived(ret))
                 }

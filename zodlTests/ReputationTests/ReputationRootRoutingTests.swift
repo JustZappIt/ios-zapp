@@ -155,6 +155,31 @@ struct ReputationRootRoutingTests {
         #expect(!store.state.canRecoverReclaimOnLaunch)
     }
 
+    @Test func walletResetJoinsIdentityWritesBeforeErasingRecovery() async {
+        let order = LockIsolated<[String]>([])
+        let store = makeStore(includeLifecycle: true, configure: { $0.maxResetZashiAppAttempts = 0 }, extra: {
+            $0.offramp.invalidateSession = { order.withValue { $0.append("joined") } }
+            $0.walletStorage.resetZashi = {
+                #expect(order.value == ["joined"])
+                order.withValue { $0.append("erase") }
+                throw WalletStorage.KeychainError.unknown(7)
+            }
+        }) { _ in throw Failure.network }
+        await store.send(.resetZashiKeychainRequest)
+        await store.receive(\.resetZashiKeychainFailed)
+        #expect(order.value == ["joined", "erase"])
+    }
+
+    @Test func aColdPassportCallbackRoutesWithItsOwnCheckAndCorridor() async throws {
+        let store = makeStore(includeLifecycle: true) { _ in throw Failure.network }
+        let url = try #require(URL(string: "zcash://passport-return?code=one-time-passport&state=nonce.INR"))
+        await store.send(.destination(.deeplink(url)))
+        await store.receive(\.livenessReturnReceived)
+        #expect(store.state.path == .increaseReputation)
+        #expect(store.state.increaseReputationState.currencyCode == "INR")
+        #expect(store.state.increaseReputationState.resumeLivenessReturn?.check == .passport)
+    }
+
     @Test func aLivenessReturnOverTheMountedScreenIsForwardedNotRebuilt() async {
         let delivered = LockIsolated(0)
         let store = makeStore(
@@ -353,6 +378,7 @@ struct ReputationRootRoutingTests {
 
     private func makeStore(
         checkpoint: OnrampCheckpointModel? = nil,
+        includeLifecycle: Bool = false,
         configure: (inout Root.State) -> Void = { _ in },
         extra: (inout DependencyValues) -> Void = { _ in },
         summary: @escaping @Sendable (String) async throws -> ReputationSummaryModel
@@ -371,6 +397,10 @@ struct ReputationRootRoutingTests {
                     }
                     Scope<Root.State, Root.Action, Onramp>(state: \.onrampState, action: \.onramp) { Onramp() }
                     Root().coordinatorReduce()
+                    if includeLifecycle {
+                        Root().destinationReduce()
+                        Root().initializationReduce()
+                    }
                 }
             } withDependencies: {
                 $0.reputation.summary = summary
