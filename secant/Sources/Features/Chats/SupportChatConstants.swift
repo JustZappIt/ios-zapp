@@ -5,7 +5,7 @@
 //  Swift port of `screen/chat/support/SupportChatConstants.kt`.
 //
 //  A support ticket is NOT a new wire format: it is an ordinary group conversation whose only
-//  remote participant is the Zapp support agent's public key. Everything else here is a
+//  remote participants are the Zapp support agents' public keys. Everything else here is a
 //  client-side convention over the SAME `message.send` body both platforms already use — a
 //  bot-authored prefix and a category marker — so an iOS ticket is readable by the Android
 //  support console and vice versa. Never change these literals on one platform alone.
@@ -48,10 +48,18 @@ enum SupportCategory: String, CaseIterable, Equatable, Sendable {
 }
 
 enum SupportChatConstants {
-    /// The Zapp support agent's Ed25519 public key. Android's
-    /// `SupportChatConstants.SUPPORT_PUBLIC_KEY` must be moved to match: a ticket addresses whatever
-    /// key its platform holds, so the two diverging sends iOS and Android users to different agents.
-    static let supportPublicKey = "81569106f5847498229b00103bd300ac2f4c93c8234e7e2c27c8de5a9b5574bf"
+    /// Every Zapp support agent's Ed25519 public key. A new ticket invites all of them, so each is
+    /// notified and any of them can reply as Zapp Support. Android's
+    /// `SupportChatConstants.SUPPORT_PUBLIC_KEYS` must be moved to match: a ticket addresses whatever
+    /// keys its platform holds, so the two diverging sends iOS and Android users to different agents.
+    static let supportPublicKeys = [
+        "81569106f5847498229b00103bd300ac2f4c93c8234e7e2c27c8de5a9b5574bf",
+        "74516b96f025af181d45722421ad1692cb79de6a81b3ea269c2528313471a79b"
+    ]
+
+    static func isSupportPublicKey(_ key: String?) -> Bool {
+        key.map { supportPublicKeys.contains($0) } ?? false
+    }
 
     /// Prefix set on every support-ticket conversation's display name. It is sent over the wire as
     /// part of the group invite so it lands on both peers; the support agent's device depends on
@@ -104,29 +112,36 @@ enum SupportChatConstants {
     /// The check is deliberately SIDE-ASYMMETRIC, exactly as on Android: the two ends of the same
     /// conversation must answer this question from different evidence.
     ///
-    /// - The user's device requires the support agent's key to actually be among the
+    /// - The user's device requires a support agent's key to actually be among the
     ///   participants. A display name is attacker-controlled, so trusting `"Support: …"` alone
     ///   would let any peer disguise itself as Zapp Support and get pinned to the top of the list.
-    /// - The support agent's device cannot use that test at all: the SDK omits the LOCAL user's
+    /// - A support agent's device cannot use that test at all: the SDK omits the LOCAL user's
     ///   own key from `participantIds`, so the agent never sees its own key there. It falls back
     ///   to the display-name prefix, which the ticket creator put on the wire with the invite.
     ///
     /// Which branch runs is decided by comparing the viewer's own identity against the support
-    /// key — hence "which side am I on", not "does either party equal the support key".
+    /// keys — hence "which side am I on", not "does either party equal a support key".
+    ///
+    /// On both sides a ticket is only ever the GROUP the topic picker creates, carrying the
+    /// `Support: ` prefix. A support key alone is not enough: a direct chat with a support
+    /// key, or an ordinary group one was added to, is a normal conversation and belongs in the
+    /// regular chat list, not the Zapp Support section.
     static func isSupportConversation(
+        type: ConversationType,
         displayName: String,
         participantIds: [String],
         localPublicKey: String?
     ) -> Bool {
-        let viewerIsSupportAgent = localPublicKey == supportPublicKey
+        guard type == .group, displayName.hasPrefix(displayNamePrefix) else { return false }
 
-        return viewerIsSupportAgent
-            ? displayName.hasPrefix(displayNamePrefix)
-            : participantIds.contains(supportPublicKey)
+        let viewerIsSupportAgent = isSupportPublicKey(localPublicKey)
+
+        return viewerIsSupportAgent || participantIds.contains { supportPublicKeys.contains($0) }
     }
 
     static func isSupportConversation(_ conversation: ZMConversation, localPublicKey: String?) -> Bool {
         isSupportConversation(
+            type: conversation.type,
             displayName: conversation.displayName,
             participantIds: conversation.participantIds,
             localPublicKey: localPublicKey
