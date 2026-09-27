@@ -188,7 +188,11 @@ struct RestoreWalletCoordFlow {
                     state.suggestedWords = []
                 } else {
                     state.suggestedWords = mnemonic.suggestWords(prefix)
-                    state.wordsValidity[index] = !state.suggestedWords.isEmpty
+                    // A focus change must not turn a pasted, incomplete word back into a
+                    // valid prefix. Only a text edit changes the field's validity here.
+                    if !hasIndexChanged {
+                        state.wordsValidity[index] = !state.suggestedWords.isEmpty
+                    }
                 }
                 if hasIndexChanged {
                     if let first = state.suggestedWords.first, first == prefix && !state.isValidSeed && state.suggestedWords.count == 1 {

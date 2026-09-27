@@ -7,7 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension DatabaseFilesClient {
     static let noOp = Self(

@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension ReviewRequestClient {
     static let noOp = Self(

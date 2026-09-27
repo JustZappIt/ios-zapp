@@ -5,7 +5,7 @@
 
 import ComposableArchitecture
 import UIKit
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension BackgroundTaskClient: TestDependencyKey {
     static let testValue = Self(

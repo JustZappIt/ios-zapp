@@ -71,6 +71,24 @@ import Testing
         #expect(!store.state.isValidSeed)
     }
 
+    @Test func focusingAnIncompletePastedWordKeepsItsInvalidVerdict() {
+        var phrase = Array(repeating: "abandon", count: 23) + ["art"]
+        phrase[7] = "aban"
+        let store = makeStore(validPhrase: [])
+        store.send(.selectedIndex(0))
+
+        store.send(.binding(.set(\.words, pasted(phrase.joined(separator: " "), into: 0))))
+        #expect(store.state.nextIndex == 7)
+        #expect(!store.state.wordsValidity[7])
+
+        // The view sends this when the nextIndex change moves focus to the bad word.
+        store.send(.selectedIndex(7))
+
+        #expect(store.state.suggestedWords == ["abandon"])
+        #expect(!store.state.wordsValidity[7])
+        #expect(!store.state.isValidSeed)
+    }
+
     @Test func aPartialPasteMovesFocusToTheFirstEmptyFieldAfterIt() {
         let store = makeStore(validPhrase: [])
         store.send(.selectedIndex(2))

@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension LogsHandlerClient {
     static let noOp = Self(

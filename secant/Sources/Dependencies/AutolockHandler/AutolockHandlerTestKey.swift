@@ -7,7 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension AutolockHandlerClient {
     static let noOp = Self(

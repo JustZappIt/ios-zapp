@@ -53,7 +53,7 @@ struct SendForm {
 
         var amount: Zatoshi {
             get {
-                if !isTesting {
+                if !_XCTIsTesting {
                     @Dependency(\.numberFormatter) var numberFormatter
                     var amount = Zatoshi.zero
                     
@@ -102,7 +102,7 @@ struct SendForm {
         }
 
         var isValidAmount: Bool {
-            if !isTesting {
+            if !_XCTIsTesting {
                 @Dependency(\.numberFormatter) var numberFormatter
                 
                 return numberFormatter.number(zecAmountText.data) != nil
@@ -117,7 +117,7 @@ struct SendForm {
         }
 
         var isInvalidAmountFormat: Bool {
-            if !isTesting {
+            if !_XCTIsTesting {
                 @Dependency(\.numberFormatter) var numberFormatter
                 
                 return !zecAmountText.data.isEmpty

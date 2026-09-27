@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 @preconcurrency import KeystoneSDK
 
 extension KeystoneHandlerClient {

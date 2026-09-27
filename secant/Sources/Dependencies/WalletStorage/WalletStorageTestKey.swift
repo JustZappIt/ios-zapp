@@ -7,7 +7,7 @@
 
 import ComposableArchitecture
 import Foundation
-import IssueReporting
+import XCTestDynamicOverlay
 
 extension WalletStorageClient {
     static let noOp = Self(

@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import IssueReporting
+import XCTestDynamicOverlay
 @preconcurrency import ZcashLightClientKit
 
 extension DerivationToolClient {

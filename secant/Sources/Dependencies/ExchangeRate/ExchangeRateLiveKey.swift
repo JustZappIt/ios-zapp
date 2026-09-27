@@ -40,7 +40,7 @@ extension FiatCurrencyResult: @retroactive @unchecked Sendable {}
     func setup() {
         guard !isSetUp else { return }
         isSetUp = true
-        if !isTesting {
+        if !_XCTIsTesting {
             @Dependency(\.sdkSynchronizer) var sdkSynchronizer
 
             cancellable = sdkSynchronizer.exchangeRateUSDStream().sink { [weak self] result in
@@ -97,7 +97,7 @@ extension FiatCurrencyResult: @retroactive @unchecked Sendable {}
 
     func refreshExchangeRateUSD(_ rateSource: ExchangeRateClient.RateSource = .coinMarketCap) {
         setup()
-        if !isTesting {
+        if !_XCTIsTesting {
             // guard the feature is opted-in by a user
             @Dependency(\.userStoredPreferences) var userStoredPreferences
 
