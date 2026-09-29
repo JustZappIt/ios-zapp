@@ -46,6 +46,7 @@ struct LivenessReturnLinkTests {
 
     @Test func theHostIsItsOwnThing() {
         #expect(LivenessReturnLink.url == "zcash://liveness-return")
+        #expect(LivenessReturnLink.passportURL == "zcash://kyc-return")
         #expect(LivenessReturnLink.host != ReclaimReturnLink.host)
     }
 
@@ -56,13 +57,14 @@ struct LivenessReturnLinkTests {
         "zcash://liveness-return?code=ok&error=cancelled&state=nonce.BRL",
         "zcash://liveness-return?code=ok",
         "zcash://liveness-return?error=cancelled",
-        "zcash://user@liveness-return?code=ok&state=nonce.BRL"
+        "zcash://user@liveness-return?code=ok&state=nonce.BRL",
+        "zcash://passport-return?code=ok&state=nonce.BRL"
     ]) func ambiguousOrUnboundCallbacksAreRejected(_ raw: String) throws {
         #expect(LivenessReturnLink.returnModel(from: try #require(URL(string: raw))) == nil)
     }
 
     @Test func passportCallbackRetainsItsCheckType() throws {
-        let url = try #require(URL(string: "zcash://passport-return?code=passport-code&state=nonce.INR"))
+        let url = try #require(URL(string: "zcash://kyc-return?code=passport-code&state=nonce.INR"))
         let result = try #require(LivenessReturnLink.returnModel(from: url))
         #expect(result.check == .passport)
         #expect(result.currencyCode == "INR")

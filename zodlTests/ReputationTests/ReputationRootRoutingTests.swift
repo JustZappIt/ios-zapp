@@ -172,7 +172,7 @@ struct ReputationRootRoutingTests {
 
     @Test func aColdPassportCallbackRoutesWithItsOwnCheckAndCorridor() async throws {
         let store = makeStore(includeLifecycle: true) { _ in throw Failure.network }
-        let url = try #require(URL(string: "zcash://passport-return?code=one-time-passport&state=nonce.INR"))
+        let url = try #require(URL(string: "zcash://kyc-return?code=one-time-passport&state=nonce.INR"))
         await store.send(.destination(.deeplink(url)))
         await store.receive(\.livenessReturnReceived)
         #expect(store.state.path == .increaseReputation)

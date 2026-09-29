@@ -10,8 +10,8 @@ import Foundation
 enum LivenessReturnLink {
     static let scheme = "zcash"
     static let host = "liveness-return"
-    static let passportHost = "passport-return"
-    static let passportURL = "zcash://passport-return"
+    static let passportHost = "kyc-return"
+    static let passportURL = "zcash://kyc-return"
     static let url = "\(scheme)://\(host)"
 
     static let codeQuery = IdentityReturn.companion.CODE_QUERY
