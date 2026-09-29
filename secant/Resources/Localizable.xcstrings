@@ -1,6 +1,41 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "increaseReputation.passport.stepScan" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Scan passport and verify your face"}}}},
+    "increaseReputation.identity.notPassed" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The identity check did not pass. Try again with a clear passport scan and good lighting."}}}},
+  "increaseReputation.passport.waiting": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open the verification page to scan your passport and complete the face check."
+        }
+      }
+    }
+  },
+  "increaseReputation.identity.group": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Identity checks"
+        }
+      }
+    }
+  },
+  "increaseReputation.passport.row": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Passport verification"
+        }
+      }
+    }
+  },
     " %@" : {
 
     },

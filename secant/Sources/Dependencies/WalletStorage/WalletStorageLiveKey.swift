@@ -36,6 +36,9 @@ extension WalletStorageClient: DependencyKey {
                 try walletStorage.markUserPassedPhraseBackupTest(flag)
             },
             resetZashi: {
+                if let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                    try OfframpEncryptedStorage.clearIdentityRecovery(directory: directory)
+                }
                 try walletStorage.resetZashi()
             },
             importAddressBookEncryptionKeys: { keys in
