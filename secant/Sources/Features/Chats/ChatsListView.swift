@@ -143,7 +143,9 @@ struct ChatsListView: View {
                 }
             }
             .padding(.top, Design.Spacing._xs)
-            .padding(.bottom, ZappNavBar.clearance)
+            // Clear the FAB, not just the nav pill, so the last conversation can scroll out from
+            // under the button.
+            .padding(.bottom, ZappNavBar.fabBottomPadding + ZappNavBar.fabListClearance)
             .zappScrollShadowSource()
         }
         .zappScrollEdges()
