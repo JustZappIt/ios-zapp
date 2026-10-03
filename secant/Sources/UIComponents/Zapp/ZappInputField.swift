@@ -147,7 +147,7 @@ struct ZappInputFieldAction: View {
                 .frame(width: ActionConstants.touchTarget, height: ActionConstants.touchTarget)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight)
         .accessibilityLabel(accessibilityLabel)
     }
 }

@@ -45,7 +45,7 @@ struct ZappActionTile: View {
             )
             .opacity(isEnabled ? 1 : Constants.disabledOpacity)
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight)
         .disabled(!isEnabled)
         .accessibilityLabel(label)
     }

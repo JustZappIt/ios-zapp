@@ -43,7 +43,7 @@ struct ZappAvailableBalanceHeader: View {
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.zappPress)
+            .buttonStyle(.zappHighlight)
             .disabled(fiatText == nil)
             .accessibilityLabel(String(localizable: .zappWalletToggleBalanceCurrency))
         }

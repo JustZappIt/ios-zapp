@@ -45,7 +45,7 @@ struct ZappScreenHeader<Left: View, Right: View>: View {
 
             if let onTitleTap {
                 Button(action: onTitleTap) { titles }
-                    .buttonStyle(.zappPress)
+                    .buttonStyle(.zappHighlight)
             } else {
                 titles
             }

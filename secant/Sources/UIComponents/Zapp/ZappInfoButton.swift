@@ -20,7 +20,7 @@ struct ZappInfoButton: View {
                 .frame(width: Constants.touchTarget, height: Constants.touchTarget)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight)
         .accessibilityLabel(accessibilityLabel)
     }
 }

@@ -41,7 +41,7 @@ struct ZappStatusChip: View {
                     .contentShape(Rectangle())
                     .padding(.vertical, -Constants.tapHitSlop)
             }
-            .buttonStyle(.zappPress)
+            .buttonStyle(.zappHighlight)
             .accessibilityLabel(text)
         } else {
             chip
