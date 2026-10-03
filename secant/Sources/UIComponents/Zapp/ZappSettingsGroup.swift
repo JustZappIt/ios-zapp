@@ -20,22 +20,23 @@ struct ZappSettingsGroup<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             if let titleLogo {
+                // Logo first, then the label, as Android's `ZappSettingsGroup` row.
                 HStack(spacing: 8) {
-                    if !title.isEmpty {
-                        ZappGroupHeader(text: title)
-                            .fixedSize()
-                    }
                     titleLogo
                         .resizable()
                         .scaledToFit()
                         .frame(height: title.isEmpty ? 18 : 14)
                         .accessibilityLabel(titleLogoLabel ?? title)
+                    if !title.isEmpty {
+                        ZappSectionLabel(text: title)
+                            .fixedSize()
+                    }
                     Spacer(minLength: 0)
                 }
-                .padding(.leading, title.isEmpty ? 18 : 0)
-                .padding(.top, title.isEmpty ? 16 : 0)
-                .padding(.bottom, title.isEmpty ? 6 : 0)
-                .padding(.trailing, 18)
+                .padding(.leading, ZappSettingsGroupLayout.textGutter)
+                .padding(.top, 16)
+                .padding(.bottom, 6)
+                .padding(.trailing, ZappSettingsGroupLayout.textGutter)
             } else {
                 ZappGroupHeader(text: title)
             }
@@ -58,9 +59,6 @@ struct ZappSettingsGroup<Content: View>: View {
                     .padding(.horizontal, ZappSettingsGroupLayout.textGutter)
                     .padding(.top, Design.Spacing._md)
             }
-
-            Spacer()
-                .frame(height: Design.Spacing._md)
         }
     }
 }
