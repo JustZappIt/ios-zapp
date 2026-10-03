@@ -2661,13 +2661,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tap + to start a new P2P chat"
+            "value" : "Tap the chat button to start a new P2P chat"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toca + para iniciar un nuevo chat P2P"
+            "value" : "Toca el botón de chat para iniciar un nuevo chat P2P"
           }
         }
       }
@@ -2831,13 +2831,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New chat"
+            "value" : "New conversation"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuevo chat"
+            "value" : "Nueva conversación"
           }
         }
       }
@@ -13266,23 +13266,6 @@
         }
       }
     },
-    "group.newGroup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New group"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo grupo"
-          }
-        }
-      }
-    },
     "group.owner" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19084,13 +19067,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scan someone's QR code or paste their public key to send them a message."
+            "value" : "Scan someone's QR code or enter their public key to send them a message."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escanea el código QR de alguien o pega su clave pública para enviarle un mensaje."
+            "value" : "Escanea el código QR de alguien o introduce su clave pública para enviarle un mensaje."
           }
         }
       }
@@ -19125,6 +19108,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo iniciar el chat"
+          }
+        }
+      }
+    },
+    "newChat.groupNameTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name this group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponle nombre a este grupo"
           }
         }
       }
@@ -19367,6 +19367,23 @@
         }
       }
     },
+    "newChat.removeParticipant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar a %@"
+          }
+        }
+      }
+    },
     "newChat.scan" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19407,13 +19424,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search contacts, or paste a key"
+            "value" : "Type or paste a public key…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Busca contactos o pega una clave"
+            "value" : "Escribe o pega una clave pública…"
+          }
+        }
+      }
+    },
+    "newChat.selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionado"
           }
         }
       }
@@ -19441,13 +19475,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New chat"
+            "value" : "New conversation"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuevo chat"
+            "value" : "Nueva conversación"
           }
         }
       }
