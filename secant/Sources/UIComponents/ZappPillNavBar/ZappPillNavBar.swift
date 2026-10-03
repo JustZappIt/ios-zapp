@@ -15,22 +15,14 @@ struct ZappPillNavBar: View {
         static let iconSize: CGFloat = 20
         static let inset: CGFloat = 5
         static let cellSpacing: CGFloat = 4
-        // Unread count chip: sharp rectangle, min 16pt, nudged onto the icon's top-trailing corner.
+        // Unread count chip: sharp rectangle, min 16pt, pinned inside the cell's top-trailing
+        // corner as Android's `Alignment.TopEnd` + `offset(-6, 4)`.
         static let badgeMinSize: CGFloat = 16
         static let badgeHPadding: CGFloat = 4
         static let badgeVPadding: CGFloat = 1
-        static let badgeOffsetX: CGFloat = 6
-        static let badgeOffsetY: CGFloat = -6
+        static let badgeOffsetX: CGFloat = -6
+        static let badgeOffsetY: CGFloat = 4
         static let badgeCountCap = 99
-        // Shadow at rest and at full elevation. The pill floats over the content even when
-        // nothing is scrolled under it, so it keeps a hairline of separation at rest and only
-        // deepens once content is actually passing beneath (Appendix C.5).
-        static let shadowRestOpacity: CGFloat = 0.04
-        static let shadowLiftOpacity: CGFloat = 0.10
-        static let shadowRestRadius: CGFloat = 2
-        static let shadowLiftRadius: CGFloat = 3
-        static let shadowRestOffsetY: CGFloat = 1
-        static let shadowLiftOffsetY: CGFloat = 2
     }
 
     // Mirrors Android's `chip` typography with the badge's fontSize 10 / Bold override.
@@ -38,9 +30,6 @@ struct ZappPillNavBar: View {
 
     let selectedTab: ZappTabs.Tab
     let chatUnreadCount: Int
-    /// 0 when the tab beneath is at the top of its scroll, 1 once content is running under the
-    /// pill. Anything in between is the ramp.
-    var elevation: CGFloat = 0
     let onTabSelected: (ZappTabs.Tab) -> Void
 
     var body: some View {
@@ -56,23 +45,12 @@ struct ZappPillNavBar: View {
                 Rectangle()
                     .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
             )
-            .shadow(
-                color: ZappColors.shadow.color(colorScheme).opacity(shadowOpacity),
-                radius: Constants.shadowRestRadius + Constants.shadowLiftRadius * liftProgress,
-                y: Constants.shadowRestOffsetY + Constants.shadowLiftOffsetY * liftProgress
-            )
+            // Static, as Android's `shadow(4.dp)`: the pill floats whether or not content is under it.
+            .zappElevation()
             .frame(width: proxy.size.width * Constants.widthRatio)
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(height: Constants.cellHeight + Constants.inset * 2)
-    }
-
-    private var liftProgress: CGFloat {
-        min(1, max(0, elevation))
-    }
-
-    private var shadowOpacity: CGFloat {
-        Constants.shadowRestOpacity + Constants.shadowLiftOpacity * liftProgress
     }
 
     @ViewBuilder
@@ -86,25 +64,26 @@ struct ZappPillNavBar: View {
                 onTabSelected(tab)
             }
         } label: {
-            ZStack(alignment: .topTrailing) {
-                icon(tab, selected: isSelected)
-                    .zImage(
-                        width: Constants.iconSize,
-                        height: Constants.iconSize,
-                        style: isSelected ? ZappColors.onAccent : ZappColors.textMuted
-                    )
-
-                if tab == .chats && chatUnreadCount > 0 {
-                    unreadBadge
+            icon(tab, selected: isSelected)
+                .zImage(
+                    width: Constants.iconSize,
+                    height: Constants.iconSize,
+                    style: isSelected ? ZappColors.onAccent : ZappColors.textMuted
+                )
+                .frame(maxWidth: .infinity)
+                .frame(height: Constants.cellHeight)
+                .background(isSelected ? ZappColors.accent.color(colorScheme) : .clear)
+                .animation(ZappMotion.content, value: isSelected)
+                .overlay(alignment: .topTrailing) {
+                    if tab == .chats && chatUnreadCount > 0 {
+                        unreadBadge
+                    }
                 }
-            }
-            .animation(ZappMotion.content, value: chatUnreadCount)
-            .frame(maxWidth: .infinity)
-            .frame(height: Constants.cellHeight)
-            .background(isSelected ? ZappColors.accent.color(colorScheme) : .clear)
-            .contentShape(Rectangle())
+                .animation(ZappMotion.state, value: chatUnreadCount)
+                .contentShape(Rectangle())
         }
-        .buttonStyle(.zappPress)
+        // Android ripples the cell in `accent`, or `onAccent` over the selected fill; no scale.
+        .buttonStyle(.zappHighlight(tint: isSelected ? .onAccent : .accent))
         .accessibilityLabel(tab.title)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }

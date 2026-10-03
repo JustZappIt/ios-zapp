@@ -75,6 +75,7 @@ struct ZappSpeedDialFab: View {
                 .padding(.horizontal, Constants.labelHorizontalPadding)
                 .padding(.vertical, Constants.labelVerticalPadding)
                 .background(ZappColors.surface.color(colorScheme))
+                .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
 
             ZappFab(icon: action.icon, accessibilityLabel: action.label) {
                 // Collapse BEFORE firing: the action pushes a screen, and a speed dial
@@ -95,8 +96,11 @@ struct ZappSpeedDialFab: View {
                 .rotationEffect(.degrees(isExpanded ? Constants.expandedRotation : 0))
                 .frame(width: Constants.toggleSize, height: Constants.toggleSize)
                 .background(ZappColors.accent.color(colorScheme))
+                .overlay(Rectangle().strokeBorder(ZappColors.accentBorder.color(colorScheme), lineWidth: 1))
+                .zappElevation()
         }
-        .buttonStyle(.zappPress)
+        // Android's toggle has a ripple but no press scale, unlike the action FABs above it.
+        .buttonStyle(.zappHighlight(tint: .onAccent))
         .accessibilityLabel(isExpanded ? collapseLabel : expandLabel)
     }
 
