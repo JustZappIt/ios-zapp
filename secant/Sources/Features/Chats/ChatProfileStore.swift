@@ -47,6 +47,9 @@ struct ChatProfile {
         var isPresenceBusy = false
         var isBackgroundNotificationsBusy = false
 
+        /// The Chat settings screen's staged values — see `ChatSettingsStaging.swift`.
+        var chatSettingsDraft = ChatSettingsValues()
+
         // MARK: Secret reveal — see ChatProfileSecrets.swift
 
         /// The secret whose authentication is in flight. Cleared as soon as it is shown or aborted.
@@ -134,6 +137,13 @@ struct ChatProfile {
         case backgroundNotificationsToggled
         case backgroundNotificationsFinished(Bool)
 
+        // MARK: Chat settings — see ChatSettingsStaging.swift
+        case chatSettingsAppeared
+        case chatSettingsReadReceiptsToggled
+        case chatSettingsOnlineStatusToggled
+        case chatSettingsBackgroundDeliveryToggled
+        case chatSettingsSaveTapped
+
         // MARK: Display name editor
         case editDisplayNameTapped
         case editDisplayNameChanged(String)
@@ -197,6 +207,7 @@ struct ChatProfile {
         displayNameReduce()
         publicKeyCopyReduce()
         privacyReduce()
+        chatSettingsReduce()
         deleteReduce()
             .ifLet(\.$alert, action: \.alert)
     }
