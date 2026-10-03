@@ -11,7 +11,10 @@ struct ZappToggle: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            ZappHaptics.toggle()
+            action()
+        } label: {
             ZappToggleIndicator(isOn: isOn)
                 .frame(minWidth: 44, minHeight: 44)
         }

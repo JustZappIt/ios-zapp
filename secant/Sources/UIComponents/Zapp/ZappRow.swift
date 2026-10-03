@@ -52,7 +52,7 @@ struct ZappRow<Trailing: View>: View {
     var body: some View {
         if let action {
             Button(action: action) { row }
-                .buttonStyle(.zappPress)
+                .buttonStyle(.zappHighlight)
         } else {
             row
         }
@@ -210,7 +210,10 @@ struct ZappToggleRow: View {
             iconTint: iconTint,
             iconBackground: iconBackground,
             trailing: { ZappToggleIndicator(isOn: isOn) },
-            action: isEnabled ? action : nil
+            action: isEnabled ? {
+                ZappHaptics.toggle()
+                action()
+            } : nil
         )
         .accessibilityValue(toggleAccessibilityValue(isOn))
         .accessibilityAddTraits(isOn ? .isSelected : [])

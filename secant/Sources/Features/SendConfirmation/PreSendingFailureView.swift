@@ -17,6 +17,7 @@ struct PreSendingFailureView: View {
     }
 
     @Perception.Bindable var store: StoreOf<SendConfirmation>
+    @State private var hasPlayedHaptic = false
     let tokenName: String
 
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
@@ -76,6 +77,12 @@ struct PreSendingFailureView: View {
             .background(ZappColors.bg.color(colorScheme))
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            // Android's `Reject` on the failed result, once.
+            guard !hasPlayedHaptic else { return }
+            hasPlayedHaptic = true
+            ZappHaptics.error()
+        }
     }
 }
 

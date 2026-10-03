@@ -14,6 +14,11 @@ import UIKit
 /// | Android | Zapp | Fired at |
 /// |---|---|---|
 /// | `SegmentTick` | `selection` | tab switch (`ZappPillNavBar`) |
+/// | `VirtualKey` | `KeyTicker` | PIN key (`ZappPINPad`) |
+/// | `ToggleOn` / `ToggleOff` | `impact` | `ZappToggle` |
+/// | `Reject` | `error` | PIN mismatch, wrong PIN, lockout (`AppPINEntryView`) |
+/// | `Confirm` | `success` | PIN set (`AppLockSetupStore`) |
+/// | `Confirm` / `Reject` | `success` / `error` | transaction result (`SendConfirmation`) |
 /// | `GestureThresholdActivate` | `selection` | swipe-to-leave arming (`ChatSwipeToRevealRow`) |
 /// | `Confirm` | `success` | onboarding done screen |
 /// | `Reject` | `error` | biometric enrollment failure |
@@ -47,6 +52,11 @@ enum ZappHaptics {
         UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
 
+    /// A switch flipped. Android's `ToggleOn` / `ToggleOff`, which differ only in name there.
+    static func toggle() {
+        impact(.light)
+    }
+
     /// A burst of `selection` pulses, for a gesture that ticks continuously — chart scrubbing crosses
     /// dozens of points a second. The per-call rule above assumes seconds between pulses; here a cold
     /// generator would drop the first tick and lag the rest, so this one is held and kept warm for as
@@ -61,6 +71,22 @@ enum ZappHaptics {
 
         func tick() {
             generator.selectionChanged()
+            generator.prepare()
+        }
+    }
+
+    /// A keypad press. Android's `VirtualKey`. PIN entry is a burst of taps a fraction of a second
+    /// apart, so, like `SelectionTicker`, the generator is held warm by the keypad on screen.
+    @MainActor
+    final class KeyTicker {
+        private lazy var generator: UIImpactFeedbackGenerator = {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
+            return generator
+        }()
+
+        func tick() {
+            generator.impactOccurred()
             generator.prepare()
         }
     }

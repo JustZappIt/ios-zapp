@@ -5,45 +5,90 @@
 
 import SwiftUI
 
+/// Android's `PinComponents.kt` metrics.
 enum ZappPINMetrics {
-    static let keyHeight: CGFloat = 66
+    static let keyHeight: CGFloat = 60
+    static let dotSize: CGFloat = 14
+    static let dotSpacing: CGFloat = 14
+    /// A dot lands at this scale and settles to 1 as it fills.
+    static let dotPopScale: CGFloat = 1.35
+    /// How long a pressed key takes to fade back after release; the press itself is instant.
+    static let keyReleaseFade: TimeInterval = 0.18
+    /// Android's key face: `button` at 20sp Black.
+    static let keyStyle = ZappTextStyle(weight: .black, size: 20, lineHeight: 26)
 }
 
 struct ZappPINDots: View {
-    @Environment(\.colorScheme)
-    private var colorScheme
-
     let filledCount: Int
     var hasError = false
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: ZappPINMetrics.dotSpacing) {
             ForEach(0..<6, id: \.self) { index in
-                Rectangle()
-                    .fill(color(for: index))
-                    .frame(width: 14, height: 14)
-                    .scaleEffect(index < filledCount ? 1 : 0.86)
-                    .animation(ZappMotion.state, value: filledCount)
+                ZappPINDot(isFilled: index < filledCount, hasError: hasError)
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localizable: .appLockPINProgress(String(filledCount))))
     }
+}
 
-    private func color(for index: Int) -> Color {
+private struct ZappPINDot: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let isFilled: Bool
+    let hasError: Bool
+
+    @State private var pops: CGFloat = 0
+
+    var body: some View {
+        Rectangle()
+            .fill(color.color(colorScheme))
+            .animation(ZappMotion.state, value: color)
+            .frame(width: ZappPINMetrics.dotSize, height: ZappPINMetrics.dotSize)
+            .modifier(ZappPINDotPop(pops: pops))
+            .onChange(of: isFilled) { filled in
+                guard filled else { return }
+                withAnimation(ZappMotion.state) { pops += 1 }
+            }
+    }
+
+    private var color: ZappColors {
         if hasError {
-            return ZappColors.danger.color(colorScheme)
+            return .danger
         }
-        return (index < filledCount ? ZappColors.text : ZappColors.border).color(colorScheme)
+        return isFilled ? .text : .border
     }
 }
 
-struct ZappPINPad: View {
-    @Environment(\.colorScheme)
-    private var colorScheme
+/// Snaps a dot to `dotPopScale` and eases it back to 1 each time `pops` steps up. The fractional
+/// part of the animated value is the progress through the current pop, so it rests at scale 1.
+private struct ZappPINDotPop: GeometryEffect {
+    var pops: CGFloat
 
+    var animatableData: CGFloat {
+        get { pops }
+        set { pops = newValue }
+    }
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let progress = pops - pops.rounded(.down)
+        guard progress > 0 else { return ProjectionTransform() }
+        let scale = ZappPINMetrics.dotPopScale - (ZappPINMetrics.dotPopScale - 1) * progress
+        let transform = CGAffineTransform(translationX: size.width / 2, y: size.height / 2)
+            .scaledBy(x: scale, y: scale)
+            .translatedBy(x: -size.width / 2, y: -size.height / 2)
+        return ProjectionTransform(transform)
+    }
+}
+
+/// Phone-layout keypad as Android's `PinKeypad`: hairline-bordered transparent keys that invert
+/// while pressed, with a key tick on every tap.
+struct ZappPINPad: View {
     let isEnabled: Bool
     let onKey: (PINKey) -> Void
+
+    @State private var keyTicker = ZappHaptics.KeyTicker()
 
     private let rows: [[PINKey?]] = [
         [.digit(1), .digit(2), .digit(3)],
@@ -55,24 +100,16 @@ struct ZappPINPad: View {
     var body: some View {
         VStack(spacing: 1) {
             ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
-                HStack(spacing: 1) {
+                HStack(spacing: 0) {
                     ForEach(Array(row.enumerated()), id: \.offset) { _, key in
                         if let key {
                             Button {
+                                keyTicker.tick()
                                 onKey(key)
                             } label: {
                                 Text(key.label)
-                                    .zappFont(.pinKey, style: ZappColors.text)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: ZappPINMetrics.keyHeight)
-                                    .contentShape(Rectangle())
                             }
-                            .buttonStyle(.zappPress)
-                            .background(ZappColors.surface.color(colorScheme))
-                            .overlay {
-                                Rectangle()
-                                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
-                            }
+                            .buttonStyle(ZappPINKeyStyle())
                             .disabled(!isEnabled)
                             .accessibilityLabel(key.accessibilityLabel)
                         } else {
@@ -85,6 +122,32 @@ struct ZappPINPad: View {
             }
         }
         .opacity(isEnabled ? 1 : 0.45)
+    }
+}
+
+/// Android's key press: background to `text` and digit to `bg` the instant the finger lands, then
+/// a 180ms fade back on release, so even the fastest tap flashes. No scale.
+private struct ZappPINKeyStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ZappPINKeyBody(configuration: configuration)
+    }
+}
+
+private struct ZappPINKeyBody: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let configuration: ButtonStyleConfiguration
+
+    var body: some View {
+        let isPressed = configuration.isPressed
+        configuration.label
+            .zappFont(ZappPINMetrics.keyStyle, color: (isPressed ? ZappColors.bg : ZappColors.text).color(colorScheme))
+            .frame(maxWidth: .infinity)
+            .frame(height: ZappPINMetrics.keyHeight)
+            .background(isPressed ? ZappColors.text.color(colorScheme) : .clear)
+            .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
+            .contentShape(Rectangle())
+            .animation(isPressed ? nil : .linear(duration: ZappPINMetrics.keyReleaseFade), value: isPressed)
     }
 }
 

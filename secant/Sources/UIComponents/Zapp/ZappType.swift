@@ -50,7 +50,6 @@ extension ZappTextStyle {
     static let chip = ZappTextStyle(weight: .semiBold, size: 11, lineHeight: 14, tracking: 0.4)
     static let button = ZappTextStyle(weight: .semiBold, size: 15, lineHeight: 20)
     static let buttonSmall = ZappTextStyle(weight: .semiBold, size: 12, lineHeight: 16)
-    static let pinKey = ZappTextStyle(weight: .black, size: 22, lineHeight: 26)
     static let mono = ZappTextStyle(family: .robotoMono, weight: .medium, size: 12, lineHeight: 16)
 }
 
