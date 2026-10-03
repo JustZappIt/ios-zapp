@@ -6,20 +6,24 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The username step, between `messagingIntro` and `identityDerivation`, wearing the same part-2
-/// onboarding chrome as its neighbours.
+/// The username step, between `messagingIntro` (or the restore flow's seed confirm) and
+/// `identityDerivation`, wearing the same part-2 onboarding chrome as its neighbours. Android's
+/// `UsernameEntryScreen` (view/MessagingIdentityView.kt).
 struct ChatUsernameEntryView: View {
     private enum Constants {
         /// The messaging half of onboarding, shared with `messagingIntro`.
         static let part = 2
         static let heroTopPadding: CGFloat = 14
-        static let subtitleTopPadding: CGFloat = 16
-        static let fieldTopPadding: CGFloat = 36
-        static let fieldVerticalPadding: CGFloat = 6
-        static let ruleHeight: CGFloat = 2
-        static let hintTopPadding: CGFloat = 10
-        static let hintSpacing: CGFloat = 12
-        static let handleSpacing: CGFloat = 4
+        static let subtitleTopPadding: CGFloat = 14
+        static let fieldTopPadding: CGFloat = 28
+        static let fieldPadding: CGFloat = 12
+        static let fieldVerticalPadding: CGFloat = 14
+        static let fieldBorderWidth: CGFloat = 2
+        static let chipsTopPadding: CGFloat = 12
+        static let chipSpacing: CGFloat = 14
+        static let calloutTopPadding: CGFloat = 20
+        static let calloutIconSize: CGFloat = 14
+        static let handleSpacing: CGFloat = 2
         static let handleMinimumScale: CGFloat = 0.6
         static let heroMinimumScale: CGFloat = 0.7
     }
@@ -44,9 +48,10 @@ struct ChatUsernameEntryView: View {
                     }
                     .padding(.horizontal, ZappOnboarding.gutter)
                     .padding(.top, ZappOnboarding.contentTopPadding)
+                    .padding(.bottom, 16)
                 }
 
-                ZappOnboardingPrimaryDock {
+                ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
                     ZappButton(
                         title: String(localizable: .chatIdentityContinue),
                         isEnabled: store.isValid
@@ -58,100 +63,124 @@ struct ChatUsernameEntryView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
             .navigationBarBackButtonHidden()
+            .zappSwipeBack { store.send(.backTapped) }
             .task { isNameFocused = true }
         }
     }
 
     private var heading: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ZappOnboardingEyebrow(text: String(localizable: .onboardingMsgIntroBadge))
+            ZappOnboardingEyebrow(text: String(localizable: .onboardingUsernameBadge))
 
-            Text(localizable: .chatIdentityTitle)
+            Text(localizable: .onboardingUsernameTitle)
                 .zappFont(.onboardingHero, style: ZappColors.text)
                 .lineLimit(2)
                 .minimumScaleFactor(Constants.heroMinimumScale)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, Constants.heroTopPadding)
 
-            Text(localizable: .chatIdentitySubtitle)
+            Text(localizable: .onboardingUsernameSubtitle)
                 .zappFont(.onboardingSub, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, Constants.subtitleTopPadding)
 
             handleField
                 .padding(.top, Constants.fieldTopPadding)
+
+            HStack(spacing: Constants.chipSpacing) {
+                ruleChip(String(localizable: .onboardingUsernameRuleMin), isMet: store.displayName.count >= UsernameRules.minLength)
+                ruleChip(String(localizable: .onboardingUsernameRuleMax), isMet: store.displayName.count <= UsernameRules.maxLength)
+                // `sanitize` guarantees the character set, so this is met as soon as anything is typed.
+                ruleChip(String(localizable: .onboardingUsernameRuleCharset), isMet: !store.displayName.isEmpty)
+            }
+            .padding(.top, Constants.chipsTopPadding)
+
+            callout
+                .padding(.top, Constants.calloutTopPadding)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var handleField: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: Constants.handleSpacing) {
-                Text(verbatim: "@")
-                    .zappFont(.usernameHandle, style: ZappColors.textSubtle)
+        HStack(alignment: .firstTextBaseline, spacing: Constants.handleSpacing) {
+            Text(verbatim: "@")
+                .zappFont(.usernameHandle, style: ZappColors.textSubtle)
 
-                // Drawn rather than handed to `TextField`, which gives no token control over the
-                // placeholder's colour.
-                ZStack(alignment: .leading) {
-                    if store.displayName.isEmpty {
-                        Text(localizable: .chatIdentityPlaceholder)
-                            .zappFont(.usernameHandle, style: ZappColors.textSubtle)
-                            .allowsHitTesting(false)
-                    }
-
-                    TextField(
-                        "",
-                        text: Binding(
-                            get: { store.displayName },
-                            set: { store.send(.displayNameChanged($0)) }
-                        )
-                    )
-                    .focused($isNameFocused)
-                    .zappFont(.usernameHandle, style: ZappColors.text)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .onSubmit { store.send(.continueTapped) }
-                    .accessibilityLabel(String(localizable: .chatIdentityTitle))
+            // Drawn rather than handed to `TextField`, which gives no token control over the
+            // placeholder's colour.
+            ZStack(alignment: .leading) {
+                if store.displayName.isEmpty {
+                    Text(localizable: .onboardingUsernamePlaceholder)
+                        .zappFont(.usernameHandle, style: ZappColors.textSubtle)
+                        .allowsHitTesting(false)
                 }
+
+                TextField(
+                    "",
+                    text: Binding(
+                        get: { store.displayName },
+                        set: { store.send(.displayNameChanged($0)) }
+                    )
+                )
+                .focused($isNameFocused)
+                .zappFont(.usernameHandle, style: ZappColors.text)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.done)
+                .onSubmit { store.send(.continueTapped) }
+                .accessibilityLabel(String(localizable: .chatIdentityTitle))
             }
-            .lineLimit(1)
-            .minimumScaleFactor(Constants.handleMinimumScale)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, Constants.fieldVerticalPadding)
 
-            Rectangle()
-                .fill(ruleStyle.color(colorScheme))
-                .frame(height: Constants.ruleHeight)
-                .animation(ZappMotion.state, value: ruleStyle)
-
-            HStack(alignment: .top, spacing: Constants.hintSpacing) {
-                Text(localizable: .chatIdentityRules)
-                    .zappFont(.caption, style: ZappColors.textSubtle)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 0)
-
-                Text(localizable: .chatIdentityCounter(store.displayName.count, UsernameRules.maxLength))
-                    .zappFont(.caption, style: isOverLimit ? ZappColors.danger : ZappColors.textSubtle)
-                    .monospacedDigit()
+            if store.isValid {
+                Text(verbatim: "✓")
+                    .zappFont(.sectionTitle, style: ZappColors.success)
                     .accessibilityHidden(true)
             }
-            .padding(.top, Constants.hintTopPadding)
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(Constants.handleMinimumScale)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, Constants.fieldPadding)
+        .padding(.vertical, Constants.fieldVerticalPadding)
+        .overlay {
+            Rectangle()
+                .strokeBorder(
+                    (store.displayName.isEmpty ? ZappColors.border : ZappColors.text).color(colorScheme),
+                    lineWidth: Constants.fieldBorderWidth
+                )
+                .animation(ZappMotion.state, value: store.displayName.isEmpty)
         }
         .zappFieldTapTarget($isNameFocused)
     }
 
-    private var isOverLimit: Bool { store.displayName.count > UsernameRules.maxLength }
+    private func ruleChip(_ label: String, isMet: Bool) -> some View {
+        HStack(spacing: 4) {
+            Text(verbatim: isMet ? "✓" : "✕")
+            Text(label)
+        }
+        .zappFont(.chip, style: isMet ? ZappColors.success : ZappColors.textSubtle)
+        .animation(ZappMotion.state, value: isMet)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityAddTraits(isMet ? .isSelected : [])
+    }
 
-    private var ruleStyle: ZappColors {
-        if isOverLimit {
-            return .danger
+    private var callout: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Asset.Assets.Icons.shieldTick.image
+                .zImage(size: Constants.calloutIconSize, style: ZappColors.accent)
+                .padding(.top, 2)
+
+            Text(localizable: .onboardingUsernameInfo)
+                .zappFont(.caption, style: ZappColors.textSubtle)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        if store.isValid {
-            return .accent
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .overlay {
+            Rectangle()
+                .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
         }
-        return isNameFocused ? .borderStrong : .border
     }
 }
 

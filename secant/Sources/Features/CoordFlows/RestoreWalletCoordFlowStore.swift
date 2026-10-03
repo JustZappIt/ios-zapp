@@ -25,49 +25,59 @@ struct RestoreWalletCoordFlow {
         case restored
     }
 
+    /// The phrase and birthday a restore runs with, kept until it succeeds so Retry can rerun it.
+    struct RestoreRequest: Equatable {
+        var seedPhrase: String
+        var birthday: BlockHeight
+    }
+
     @Reducer
     enum Path {
         case appLockSetup(AppLockSetup)
         case chatUsername(ChatUsernameEntry)
         case done(OnboardingDone)
-        case estimateBirthdaysDate(WalletBirthday)
-        case estimatedBirthday(WalletBirthday)
         case identityDerivation(OnboardingIdentityDerivation)
+        case keepOpen(ZappKeepOpen)
         case messagingIntro(OnboardingMessagingIntro)
-        case recoverySeedPhraseEntry(RestoreWalletCoordFlow)
-        case restoreInfo(RestoreInfo)
+        case restoreBirthday(ZappRestoreBirthday)
+        case restoreSeedEntry(ZappRestoreSeedEntry)
+        case restoring(ZappRestoreProgress)
         case seedBackup(OnboardingSeedBackup)
-        case walletBirthday(WalletBirthday)
     }
     
     @ObservableState
     struct State {
         @Presents var alert: AlertState<Action>?
-        var birthday: BlockHeight? = nil
         var isHelpSheetPresented = false
         var isKeyboardVisible = false
         var isValidSeed = false
-        var isTorOn = false
-        var isTorSheetPresented = false
         var landingForward = true
         var landingStep = LandingStep.welcome
         var walletCreationError: String?
         var nextIndex: Int?
         var path = StackState<Path.State>()
+        /// A saved wallet the SDK has not prepared yet. A new wallet is prepared only once its
+        /// seed is backed up, so the seed backup step provisions it on continue.
+        var pendingProvisioning: WalletProvisioningMode?
+        var restoreRequest: RestoreRequest?
         var prevWords: [String] = Array(repeating: "", count: 24)
         var selectedIndex: Int?
         var suggestedWords: [String] = []
         var words: [String] = Array(repeating: "", count: 24)
         var wordsValidity: [Bool] = Array(repeating: true, count: 24)
 
+        /// The restore flow ends on Keep open instead of Done. A resumed restore starts on the
+        /// seed confirm step, so that marks it as well as the seed entry does.
         var isImportingWallet: Bool {
-            for element in path {
-                if element.is(\.recoverySeedPhraseEntry) {
+            path.contains { element in
+                if element.is(\.restoreSeedEntry) {
                     return true
                 }
+                if case let .seedBackup(seedBackup) = element {
+                    return seedBackup.kind == .confirm
+                }
+                return false
             }
-            
-            return false
         }
         
         init() { }
@@ -76,20 +86,21 @@ struct RestoreWalletCoordFlow {
     enum Action: BindableAction {
         case alert(PresentationAction<Action>)
         case binding(BindingAction<RestoreWalletCoordFlow.State>)
+        case chatIdentityAvailable
         case evaluateSeedValidity
-        case failedToRecover(ZcashError)
         case helpSheetRequested
         case landingBackTapped
         case landingContinueTapped
         case landingGetStartedTapped
         case nextTapped
         case path(StackActionOf<Path>)
-        case resolveRestore
-        case resolveRestoreRequested
-        case resolveRestoreTapped
-        case restoreCancelTapped
+        case restoreFailed(ZcashError)
+        /// Keep open's "Enter Zapp": Root takes the restored wallet home.
+        case restoreFlowCompleted(keepsScreenOn: Bool)
+        case restoreSucceeded
+        /// Launch found a saved wallet whose onboarding never finished.
+        case resume(OnboardingResumePlan)
         case selectedIndex(Int?)
-        case successfullyRecovered
         case suggestedWordTapped(String)
         case suggestionsRequested(Int, Bool)
         case updateKeyboardFlag(Bool)
@@ -114,6 +125,7 @@ struct RestoreWalletCoordFlow {
     @Dependency(\.continuousClock) var continuousClock
     @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
+    @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
@@ -310,8 +322,16 @@ struct OnboardingIdentityDerivation {
 
 @Reducer
 struct OnboardingSeedBackup {
+    enum Kind: Equatable {
+        /// Create path: back up the phrase of the wallet just made.
+        case backup
+        /// Restore path: Android's `SEED_CONFIRM`, the phrase just entered shown back.
+        case confirm
+    }
+
     @ObservableState
     struct State: Equatable {
+        var kind = Kind.backup
         var errorMessage: String?
         var isConfirmed = false
         var isLoading = false
@@ -323,6 +343,7 @@ struct OnboardingSeedBackup {
         var isBlockedByScreenCapture = false
 
         static let initial = State()
+        static let confirm = State(kind: .confirm)
     }
 
     enum Action: Equatable {

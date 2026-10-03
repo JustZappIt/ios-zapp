@@ -57,6 +57,10 @@ extension Root {
                 state.zappTabsState.chatUnreadCount = messagingState.totalUnreadCount
                 state.zappTabsState.hasChatIdentity = messagingState.identity != nil
                 state.zappTabsState.displayName = messagingState.identity?.displayName
+                // A resumed onboarding whose identity survived skips the username steps.
+                if state.destinationState.destination == .onboarding && messagingState.identity != nil {
+                    return .send(.onboarding(.chatIdentityAvailable))
+                }
                 return .none
 
             default: return .none

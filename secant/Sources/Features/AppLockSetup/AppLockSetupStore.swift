@@ -96,6 +96,9 @@ struct AppLockSetup {
                 case let .confirmed(pin):
                     state.isProcessing = true
                     return .run { send in
+                        await MainActor.run {
+                            ZappHaptics.success()
+                        }
                         let succeeded: Bool
                         do {
                             try await appSecurity.configurePIN(pin)

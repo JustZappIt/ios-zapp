@@ -1183,24 +1183,6 @@ extension Root {
             case .settings(.path(.element(id: _, action: .resetZashi(.deleteTapped(let areMetadataPreserved))))):
                 return .send(.initialization(.resetZashiRequest(areMetadataPreserved)))
 
-                // MARK: - Restore Wallet Coord Flow from Onboarding
-
-            case .onboarding(.path(.element(id: _, action: .restoreInfo(.gotItTapped)))):
-                var leavesScreenOpen = false
-                for element in state.onboardingState.path {
-                    if case .restoreInfo(let restoreInfoState) = element {
-                        leavesScreenOpen = restoreInfoState.isAcknowledged
-                    }
-                }
-                userDefaults.setValue(leavesScreenOpen, Constants.udLeavesScreenOpen)
-                state.isRestoringWallet = true
-                userDefaults.setValue(true, Constants.udIsRestoringWallet)
-                state.$walletStatus.withLock { $0 = .restoring }
-                return .concatenate(
-                    .send(.initialization(.checkBackupPhraseValidation)),
-                    .send(.batteryStateChanged)
-                )
-
                 // MARK: - Scan Coord Flow
 
                 // Android's `OnAddressScannedUseCase` HOMEPAGE branch: a scanned address *replaces*

@@ -27,11 +27,14 @@ import Testing
             $0.defaultInMemoryStorage = InMemoryStorage()
         } operation: {
             var state = RestoreWalletCoordFlow.State()
-            state.birthday = 1_000_000
+            state.path.append(.restoreSeedEntry(.initial))
+            state.path.append(.restoreBirthday(.initial))
+            let birthdayId = state.path.ids.last ?? 0
             let calls = LockIsolated<[Bool]>([])
             let store = makeStore(state: state, calls: calls)
-            store.send(.resolveRestore)
-            #expect(!store.state.path.isEmpty)
+            store.send(.path(.element(id: birthdayId, action: .restoreBirthday(.restoreRequested(1_000_000)))))
+            await waitUntil { store.state.path.last?.is(\.seedBackup) == true }
+            #expect(store.state.path.last?.is(\.seedBackup) == true)
             #expect(calls.value.isEmpty)
         }
     }
@@ -44,6 +47,8 @@ import Testing
         Store(initialState: state) { RestoreWalletCoordFlow() } withDependencies: {
             $0.mnemonic = .noOp
             $0.continuousClock = clock
+            $0.sdkSynchronizer = .noOp
+            $0.userDefaults = .noOp
             $0.walletStorage = .noOp
             $0.walletStorage.importIronwoodAnnouncementFlag = { flag in calls.withValue { $0.append(flag) } }
         }

@@ -75,9 +75,6 @@ struct RestoreWalletCoordFlowView: View {
                 .zashiSheet(isPresented: $store.isHelpSheetPresented) {
                     helpSheetContent()
                 }
-                .zashiSheet(isPresented: $store.isTorSheetPresented) {
-                    torSheetContent()
-                }
                 .alert($store.scope(state: \.alert, action: \.alert))
             } destination: { store in
                 switch store.case {
@@ -87,22 +84,20 @@ struct RestoreWalletCoordFlowView: View {
                     ChatUsernameEntryView(store: store)
                 case let .done(store):
                     ZappOnboardingDoneView(store: store)
-                case let .estimateBirthdaysDate(store):
-                    WalletBirthdayEstimateDateView(store: store)
-                case let .estimatedBirthday(store):
-                    WalletBirthdayEstimatedHeightView(store: store)
                 case let .identityDerivation(store):
                     ZappIdentityDerivationView(store: store)
+                case let .keepOpen(store):
+                    ZappKeepOpenView(store: store)
                 case let .messagingIntro(store):
                     ZappMessagingIntroView(store: store)
-                case let .recoverySeedPhraseEntry(store):
-                    RecoverySeedPhraseEntryView(store: store)
-                case let .restoreInfo(store):
-                    RestoreInfoView(store: store)
+                case let .restoreBirthday(store):
+                    ZappRestoreBirthdayView(store: store)
+                case let .restoreSeedEntry(store):
+                    ZappRestoreSeedEntryView(store: store)
+                case let .restoring(store):
+                    ZappRestoreProgressView(store: store)
                 case let .seedBackup(store):
                     ZappOnboardingSeedBackupView(store: store)
-                case let .walletBirthday(store):
-                    WalletBirthdayView(store: store)
                 }
             }
         }
@@ -128,49 +123,6 @@ struct RestoreWalletCoordFlowView: View {
         }
     }
     
-    @ViewBuilder private func torSheetContent() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Asset.Assets.infoOutline.image
-                .zImage(size: 20, style: Design.Utility.Gray._500)
-                .background {
-                    Circle()
-                        .fill(Design.Utility.Gray._100.color(colorScheme))
-                        .frame(width: 44, height: 44)
-                }
-                .padding(.top, 48)
-                .padding(.leading, 12)
-            
-            Text(localizable: .torSettingsSheetTitle)
-                .zFont(.semiBold, size: 24, style: Design.Text.primary)
-                .padding(.top, 24)
-                .padding(.bottom, 12)
-            
-            Text(localizable: .torSettingsSheetMsg)
-                .zFont(size: 14, style: Design.Text.tertiary)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-                .lineSpacing(2)
-                .padding(.bottom, Design.Spacing._3xl)
-            
-            DescriptiveToggle(
-                isOn: $store.isTorOn,
-                title: String(localizable: .torSettingsSheetTitle),
-                desc: String(localizable: .torSettingsSheetDesc)
-            )
-            .padding(.bottom, 32)
-            
-            ZashiButton(String(localizable: .generalCancel), type: .tertiary) {
-                store.send(.restoreCancelTapped)
-            }
-            .padding(.bottom, Design.Spacing._lg)
-            
-            ZashiButton(String(localizable: .importWalletButtonRestoreWallet)) {
-                store.send(.resolveRestoreRequested)
-            }
-            .padding(.bottom, Design.Spacing.sheetBottomSpace)
-        }
-    }
-    
     @ViewBuilder private func infoContent(text: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Asset.Assets.infoCircle.image
@@ -190,30 +142,38 @@ struct RestoreWalletCoordFlowView: View {
 
 // MARK: - Zapp onboarding landing screens
 
+// Black where Android's screens are Black (`WelcomeGateView.kt`, `SeedRevealScreen`,
+// `OnboardingDoneScreen.kt`); the shared `onboardingHero` token stays Bold for the other steps.
 private extension ZappTextStyle {
+    static let onboardingWordmark = ZappTextStyle(
+        weight: .black,
+        size: 22,
+        lineHeight: 28,
+        tracking: -0.5
+    )
     static let onboardingWelcomeHero = ZappTextStyle(
-        weight: .bold,
+        weight: .black,
         size: 54,
         lineHeight: 52,
         tracking: -2.4
     )
     static let onboardingSeedTitle = ZappTextStyle(
-        weight: .bold,
+        weight: .black,
         size: 26,
         lineHeight: 30,
         tracking: -0.8
     )
-    static let onboardingGreeting = ZappTextStyle(
-        weight: .bold,
-        size: 112,
-        lineHeight: 104,
-        tracking: -5
-    )
     static let onboardingDoneCheck = ZappTextStyle(
-        weight: .bold,
+        weight: .black,
         size: 88,
         lineHeight: 92,
         tracking: -4
+    )
+    static let onboardingDoneTitle = ZappTextStyle(
+        weight: .black,
+        size: 42,
+        lineHeight: 44,
+        tracking: -1.8
     )
 }
 
@@ -267,8 +227,8 @@ private struct ZappWelcomeGateView: View {
                                 .frame(width: 40, height: 40)
                                 .accessibilityHidden(true)
 
-                            Text("Zapp")
-                                .zappFont(.screenTitle, style: ZappColors.text)
+                            Text(verbatim: "Zapp")
+                                .zappFont(.onboardingWordmark, style: ZappColors.text)
                         }
 
                         Spacer().frame(height: 40)
@@ -533,7 +493,19 @@ private struct ZappMessagingIntroView: View {
 }
 
 private struct ZappOnboardingDoneView: View {
+    /// Android's `OnboardingDoneScreen` staged entrance: check, title, rule, subtitle, one every
+    /// 90 ms, the check scaling up from 0.6 and the rest sliding up a quarter of their height.
+    private enum Constants {
+        static let stageCount = 4
+        static let stageDelay: Duration = .milliseconds(90)
+        static let checkInitialScale: CGFloat = 0.6
+        static let slideOffset: CGFloat = 12
+    }
+
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var stage = 0
 
     @Perception.Bindable var store: StoreOf<OnboardingDone>
 
@@ -543,18 +515,22 @@ private struct ZappOnboardingDoneView: View {
                 VStack(spacing: 0) {
                     Spacer()
 
-                    Text("✓")
+                    Text(verbatim: "✓")
                         .zappFont(.onboardingDoneCheck, style: ZappColors.accent)
+                        .scaleEffect(stage >= 1 ? 1 : Constants.checkInitialScale)
+                        .opacity(stage >= 1 ? 1 : 0)
 
                     Text(localizable: .onboardingDoneTitle)
-                        .zappFont(.onboardingHero, style: ZappColors.text)
+                        .zappFont(.onboardingDoneTitle, style: ZappColors.text)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
+                        .stagedEntrance(isVisible: stage >= 2, offset: Constants.slideOffset)
                         .padding(.top, 18)
 
                     Rectangle()
                         .fill(ZappColors.text.color(colorScheme))
                         .frame(width: 36, height: 3)
+                        .stagedEntrance(isVisible: stage >= 3, offset: Constants.slideOffset)
                         .padding(.top, 20)
 
                     Text(
@@ -565,6 +541,7 @@ private struct ZappOnboardingDoneView: View {
                     .zappFont(.onboardingSub, style: ZappColors.textMuted)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+                    .stagedEntrance(isVisible: stage >= 4, offset: Constants.slideOffset)
                     .padding(.top, 20)
 
                     Spacer()
@@ -580,136 +557,26 @@ private struct ZappOnboardingDoneView: View {
             }
             .background(ZappColors.bg.color(colorScheme))
             .navigationBarBackButtonHidden(true)
-            .onAppear {
+            .task {
                 ZappHaptics.success()
-            }
-        }
-    }
-}
-
-private struct ZappOnboardingLoadingView: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    @State private var pulse = false
-
-    let message: String
-    let errorMessage: String?
-    let errorDetail: String?
-    let onRetry: (() -> Void)?
-
-    var body: some View {
-        ZStack {
-            ZappLoadingWave(heightFraction: pulse ? 0.48 : 0.30)
-                .fill(Color.white.opacity(0.10))
-            ZappLoadingWave(heightFraction: pulse ? 0.20 : 0.36)
-                .fill(Color.white.opacity(0.16))
-
-            VStack(spacing: 0) {
-                Text(localizable: .onboardingLoadingGreeting)
-                    .zappFont(.onboardingGreeting, color: .white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-
-                Rectangle()
-                    .fill(ZappColors.text.color(colorScheme))
-                    .frame(width: 36, height: 3)
-                    .padding(.top, 20)
-
-                if let errorMessage {
-                    Text(errorMessage)
-                        .zappFont(.rowTitle, style: ZappColors.text)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 24)
-
-                    if let errorDetail {
-                        Text(errorDetail)
-                            .zappFont(.mono, style: ZappColors.text)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(3)
-                            .padding(.top, 10)
-                    }
-
-                    if let onRetry {
-                        Button(action: onRetry) {
-                            Text(localizable: .onboardingLoadingRetry)
-                                .zappFont(.buttonSmall, style: ZappColors.text)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .overlay {
-                                    Rectangle()
-                                        .strokeBorder(ZappColors.text.color(colorScheme), lineWidth: 2)
-                                }
-                        }
-                        .buttonStyle(.zappPress)
-                        .padding(.top, 22)
-                    }
-                } else {
-                    Text(message)
-                        .zappFont(.rowTitle, color: .white)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 24)
-
-                    TimelineView(.periodic(from: .now, by: 0.4)) { context in
-                        let active = Int(context.date.timeIntervalSinceReferenceDate / 0.4) % 3
-                        HStack(spacing: 10) {
-                            ForEach(0..<3, id: \.self) { index in
-                                Rectangle()
-                                    .fill(
-                                        ZappColors.text.color(colorScheme)
-                                            .opacity(index == active ? 1 : 0.28)
-                                    )
-                                    .frame(width: 10, height: 10)
-                            }
-                        }
-                    }
-                    .frame(height: 10)
-                    .padding(.top, 28)
+                guard !reduceMotion else {
+                    stage = Constants.stageCount
+                    return
+                }
+                while stage < Constants.stageCount {
+                    withAnimation(ZappMotion.content) { stage += 1 }
+                    try? await Task.sleep(for: Constants.stageDelay)
                 }
             }
-            .padding(.horizontal, 28)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .background(ZappColors.accent.color(colorScheme))
-        .ignoresSafeArea()
-        .navigationBarBackButtonHidden(true)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true)) {
-                pulse = true
-            }
         }
     }
 }
 
-private struct ZappLoadingWave: Shape {
-    var heightFraction: CGFloat
-
-    var animatableData: CGFloat {
-        get { heightFraction }
-        set { heightFraction = newValue }
-    }
-
-    func path(in rect: CGRect) -> Path {
-        let points: [(CGFloat, CGFloat)] = [
-            (0.00, 0.18), (0.08, 0.56), (0.17, 0.32), (0.25, 0.78),
-            (0.34, 0.45), (0.43, 0.88), (0.53, 0.38), (0.62, 0.68),
-            (0.72, 0.30), (0.82, 0.82), (0.91, 0.48), (1.00, 0.66)
-        ]
-        let bandHeight = rect.height * heightFraction
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
-        for point in points {
-            path.addLine(
-                to: CGPoint(
-                    x: rect.minX + rect.width * point.0,
-                    y: rect.maxY - bandHeight * point.1
-                )
-            )
-        }
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.closeSubpath()
-        return path
+private extension View {
+    func stagedEntrance(isVisible: Bool, offset: CGFloat) -> some View {
+        self
+            .opacity(isVisible ? 1 : 0)
+            .offset(y: isVisible ? 0 : offset)
     }
 }
 
@@ -749,14 +616,22 @@ private struct ZappOnboardingSeedBackupView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(localizable: .onboardingSeedTitle)
-                            .zappFont(.onboardingSeedTitle, style: ZappColors.text)
+                        Text(
+                            store.kind == .confirm
+                                ? String(localizable: .restoreFlowConfirmTitle)
+                                : String(localizable: .onboardingSeedTitle)
+                        )
+                        .zappFont(.onboardingSeedTitle, style: ZappColors.text)
                             .lineLimit(2)
                             .minimumScaleFactor(0.7)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        Text(localizable: .onboardingSeedSubtitle)
-                            .zappFont(.onboardingSub, style: ZappColors.textMuted)
+                        Text(
+                            store.kind == .confirm
+                                ? String(localizable: .restoreFlowConfirmSubtitle)
+                                : String(localizable: .onboardingSeedSubtitle)
+                        )
+                        .zappFont(.onboardingSub, style: ZappColors.textMuted)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 8)
 

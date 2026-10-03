@@ -992,8 +992,13 @@ extension Root {
                     return .none
                 case .keysMissing:
                     state.appInitializationState = .keysMissing
+                    // Progress belongs to a wallet in the keychain; with none, it is stale.
+                    OnboardingProgress.clear(userDefaults)
                     return .send(.destination(.updateDestination(.onboarding)))
                 case .filesMissing:
+                    if let resume = resumeOnboardingIfUnfinished(state: &state, areDbFilesPresent: false) {
+                        return resume
+                    }
                     state.appInitializationState = .filesMissing
                     state.isRestoringWallet = true
                     userDefaults.setValue(true, Constants.udIsRestoringWallet)
@@ -1003,6 +1008,9 @@ extension Root {
                         .send(.initialization(.checkBackupPhraseValidation))
                     )
                 case .initialized:
+                    if let resume = resumeOnboardingIfUnfinished(state: &state, areDbFilesPresent: true) {
+                        return resume
+                    }
                     if let isRestoringWallet = userDefaults.objectForKey(Constants.udIsRestoringWallet) as? Bool, isRestoringWallet {
                         state.isRestoringWallet = true
                         state.$walletStatus.withLock { $0 = .restoring }
@@ -1024,6 +1032,7 @@ extension Root {
                     )
                 case .uninitialized:
                     state.appInitializationState = .uninitialized
+                    OnboardingProgress.clear(userDefaults)
                     return .run { send in
                         try await mainQueue.sleep(for: .seconds(0.5))
                         await send(.destination(.updateDestination(.onboarding)))
@@ -1511,6 +1520,9 @@ extension Root {
             case .resetZashiSDKSucceeded:
                 state.splashAppeared = true
                 state.isRestoringWallet = false
+                // Not in `clearDeviceScopedWalletState`: the stale-database heal runs that too, and
+                // a healed wallet has still finished onboarding.
+                OnboardingProgress.clear(userDefaults)
                 Root.clearDeviceScopedWalletState(
                     userDefaults: userDefaults,
                     flexaHandler: flexaHandler,
@@ -1736,6 +1748,17 @@ extension Root {
                     )
                 }
                 return resumeDeferredGift
+
+            case .onboarding(.restoreFlowCompleted(let keepsScreenOn)):
+                // Keep open's "Enter Zapp", which replaced upstream RestoreInfo's "Got it!".
+                userDefaults.setValue(keepsScreenOn, Constants.udLeavesScreenOpen)
+                state.isRestoringWallet = true
+                userDefaults.setValue(true, Constants.udIsRestoringWallet)
+                state.$walletStatus.withLock { $0 = .restoring }
+                return .concatenate(
+                    .send(.initialization(.checkBackupPhraseValidation)),
+                    .send(.batteryStateChanged)
+                )
 
             case .onboarding(.createNewWalletTapped):
                 if state.appInitializationState == .keysMissing {
