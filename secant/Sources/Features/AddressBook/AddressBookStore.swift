@@ -28,6 +28,7 @@ struct AddressBook {
         var address = ""
         var addressAlreadyExists = false
         @Shared(.inMemory(.addressBookContacts)) var addressBookContacts: AddressBookContacts = .empty
+        @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
         @Presents var alert: AlertState<Action>?
         var context: Context = .unknown
         var deleteIdToConfirm: String?
@@ -115,7 +116,20 @@ struct AddressBook {
                 default: true
                 }
             }
-            
+
+            // Android keeps chat contacts in the wallet address book, so one with a ZEC address
+            // is a Send recipient there. iOS stores them apart, so they are merged in here, for
+            // picking only: they are edited on the Contacts screen, not in this one. An address
+            // already in the book keeps its book entry.
+            if isInSelectMode && context == .send {
+                for chatContact in chatContacts.saved where !chatContact.address.isEmpty {
+                    let recipient = Contact(address: chatContact.address, name: chatContact.name)
+                    guard abContactsCopy.contacts[id: recipient.id] == nil else { continue }
+
+                    abContactsCopy.contacts.append(recipient)
+                }
+            }
+
             return abContactsCopy
         }
 
