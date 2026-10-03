@@ -1569,13 +1569,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block %@? You'll stop receiving their messages, and they won't be told they've been blocked."
+            "value" : "Block %@? You will no longer receive messages from this user. They won't be notified that they've been blocked."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Bloquear a %@? Dejarás de recibir sus mensajes y no se le avisará de que le has bloqueado."
+            "value" : "¿Bloquear a %@? Dejarás de recibir mensajes de este usuario. No se le avisará de que le has bloqueado."
           }
         }
       }
@@ -1586,7 +1586,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block user"
+            "value" : "Block User"
           }
         },
         "es" : {
@@ -1620,13 +1620,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock %@? You'll be able to receive their messages again."
+            "value" : "Unblock %@? You will be able to receive messages from them again."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Desbloquear a %@? Volverás a recibir sus mensajes."
+            "value" : "¿Desbloquear a %@? Podrás volver a recibir sus mensajes."
           }
         }
       }
@@ -1637,7 +1637,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock user"
+            "value" : "Unblock User"
           }
         },
         "es" : {
@@ -1926,13 +1926,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "So you can pay them from the chat"
+            "value" : "Enter Unified Address…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para que puedas pagarles desde el chat"
+            "value" : "Introduce la dirección unificada…"
           }
         }
       }
@@ -2039,19 +2039,36 @@
         }
       }
     },
+    "chatContacts.addTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add New Contact"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir nuevo contacto"
+          }
+        }
+      }
+    },
     "chatContacts.block" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block"
+            "value" : "Block user"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear"
+            "value" : "Bloquear usuario"
           }
         }
       }
@@ -2090,19 +2107,138 @@
         }
       }
     },
+    "chatContacts.copyAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy wallet address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar dirección de billetera"
+          }
+        }
+      }
+    },
+    "chatContacts.copyKey" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy messaging key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar clave de mensajería"
+          }
+        }
+      }
+    },
+    "chatContacts.copyName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy contact name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar nombre del contacto"
+          }
+        }
+      }
+    },
     "chatContacts.delete" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove contact"
+            "value" : "Delete contact"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminar contacto"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirmSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta acción no se puede deshacer."
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirmTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete contact?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar contacto?"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't delete contact. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo eliminar el contacto. Inténtalo de nuevo."
           }
         }
       }
@@ -2124,13 +2260,13 @@
         }
       }
     },
-    "chatContacts.edit" : {
+    "chatContacts.editTitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit contact"
+            "value" : "Edit Contact"
           }
         },
         "es" : {
@@ -2175,61 +2311,6 @@
         }
       }
     },
-    "chatContacts.form.details" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contact details"
-          }
-        }
-      }
-    },
-    "chatContacts.form.payments" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ZEC address"
-          }
-        }
-      }
-    },
-    "chatContacts.form.paymentsHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optional. Add a wallet address to send ZEC to this contact."
-          }
-        }
-      }
-    },
-    "chatContacts.form.preview" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New contact"
-          }
-        }
-      }
-    },
-    "chatContacts.form.intro" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A name you know. A private way to connect."
-          }
-        }
-      }
-    },
     "chatContacts.invalidAddress" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2264,6 +2345,23 @@
         }
       }
     },
+    "chatContacts.keyPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messaging Key (64 hex chars)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de mensajería (64 caracteres hex)"
+          }
+        }
+      }
+    },
     "chatContacts.nameLabel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2287,13 +2385,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What you'll call them"
+            "value" : "Enter contact name…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo les llamarás"
+            "value" : "Introduce el nombre del contacto…"
           }
         }
       }
@@ -2315,6 +2413,23 @@
         }
       }
     },
+    "chatContacts.saveChanges" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save changes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar cambios"
+          }
+        }
+      }
+    },
     "chatContacts.savedCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2328,6 +2443,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld guardados"
+          }
+        }
+      }
+    },
+    "chatContacts.saveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save contact. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar el contacto. Inténtalo de nuevo."
           }
         }
       }
@@ -2406,13 +2538,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock"
+            "value" : "Unblock user"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquear"
+            "value" : "Desbloquear usuario"
           }
         }
       }

@@ -26,6 +26,13 @@ struct ChatContactForm {
         case solana
     }
 
+    /// The fields Android's edit sheet offers a copy action on.
+    enum CopyField: Equatable {
+        case name
+        case publicKey
+        case address
+    }
+
     @ObservableState
     struct State: Equatable {
         /// The chat core caps a contact name at 100; the address book's 32 does not apply here.
@@ -63,6 +70,14 @@ struct ChatContactForm {
         /// Needs `derivationTool`, so the reducer computes it; an empty address is valid.
         var isValidAddress = true
 
+        /// Android's inline "Delete contact? This cannot be undone." panel, in place of the buttons.
+        var isConfirmingDelete = false
+
+        /// Android's single inline error line: a save or delete the store refused.
+        var errorMessage: String?
+
+        var copiedField: CopyField?
+
         var isEditing: Bool { existing != nil }
 
         /// The key is the row's identity everywhere it is already known — a saved contact, or a
@@ -90,8 +105,18 @@ struct ChatContactForm {
             return chatContacts.saved.contains { PublicKeyRules.sanitize($0.publicKey) == publicKey }
         }
 
+        /// Android's `EditChatContactVM.isSaveEnabled`: an edit needs something to save. A peer that
+        /// is not a contact yet can be saved as it stands — saving is what makes it one.
+        var hasChanges: Bool {
+            guard let existing else { return true }
+
+            return trimmedName != existing.name
+                || trimmedAddress != existing.address
+                || walletAddresses != existing.walletAddresses
+        }
+
         var canSave: Bool {
-            isValidName && isValidKey && !isDuplicateKey && isValidAddress
+            isValidName && isValidKey && !isDuplicateKey && isValidAddress && hasChanges
         }
 
         /// What `saveTapped` persists. Only the three typed keys are rewritten; anything else
@@ -145,10 +170,14 @@ struct ChatContactForm {
         case scanTapped(ScanTarget)
         case scan(PresentationAction<Scan.Action>)
         case alert(PresentationAction<Action>)
+        case copyTapped(CopyField)
+        case copyIndicatorExpired
         case saveTapped
         case blockTapped
         case blockConfirmed
         case deleteTapped
+        case deleteCancelled
+        case deleteConfirmed
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -158,7 +187,11 @@ struct ChatContactForm {
 
     @Dependency(\.chatContacts) var chatContacts
     @Dependency(\.derivationTool) var derivationTool
+    @Dependency(\.mainQueue) var mainQueue
+    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
+
+    private enum CancelID { case copyIndicator }
 
     init() { }
 
@@ -171,6 +204,7 @@ struct ChatContactForm {
 
             case .nameChanged(let value):
                 state.name = String(value.prefix(State.Constants.nameMaxLength))
+                state.errorMessage = nil
                 return .none
 
             case .publicKeyChanged(let value):
@@ -181,6 +215,28 @@ struct ChatContactForm {
             case .addressChanged(let value):
                 state.address = value
                 state.isValidAddress = isValidAddress(state.trimmedAddress)
+                state.errorMessage = nil
+                return .none
+
+            case .copyTapped(let field):
+                let value: String
+                switch field {
+                case .name: value = state.trimmedName
+                case .publicKey: value = state.publicKey
+                case .address: value = state.trimmedAddress
+                }
+                guard !value.isEmpty else { return .none }
+
+                pasteboard.setString(RedactableString(value))
+                state.copiedField = field
+                return .run { send in
+                    try await mainQueue.sleep(for: .seconds(2))
+                    await send(.copyIndicatorExpired)
+                }
+                .cancellable(id: CancelID.copyIndicator, cancelInFlight: true)
+
+            case .copyIndicatorExpired:
+                state.copiedField = nil
                 return .none
 
             case .transparentAddressChanged(let value):
@@ -237,10 +293,12 @@ struct ChatContactForm {
                     isSaved: true
                 )
 
+                state.errorMessage = nil
                 do {
                     return .send(.delegate(.contactsChanged(try chatContacts.save(account.account, contact))))
                 } catch {
                     LoggerProxy.error("Chat contact save failed: \(error)")
+                    state.errorMessage = String(localizable: .chatContactsSaveFailed)
                     return .none
                 }
 
@@ -264,7 +322,10 @@ struct ChatContactForm {
                     )
                     return .send(.delegate(.contactsChanged(contacts)))
                 } catch {
+                    // Android's dialog dismisses only on success, so a failed write leaves it up
+                    // to retry rather than letting the user walk away believing it took effect.
                     LoggerProxy.error("Chat contact block toggle failed: \(error)")
+                    state.alert = .blockContact(name: target.name, isUnblock: target.isBlocked)
                     return .none
                 }
 
@@ -279,7 +340,17 @@ struct ChatContactForm {
             case .alert:
                 return .none
 
+                // Android asks inline first: a contact's name and address are not recoverable.
             case .deleteTapped:
+                guard state.isEditing else { return .none }
+                state.isConfirmingDelete = true
+                return .none
+
+            case .deleteCancelled:
+                state.isConfirmingDelete = false
+                return .none
+
+            case .deleteConfirmed:
                 guard let existing = state.existing, let account = state.zashiWalletAccount else { return .none }
 
                 do {
@@ -287,6 +358,8 @@ struct ChatContactForm {
                     return .send(.delegate(.contactsChanged(contacts)))
                 } catch {
                     LoggerProxy.error("Chat contact delete failed: \(error)")
+                    state.isConfirmingDelete = false
+                    state.errorMessage = String(localizable: .chatContactsDeleteFailed)
                     return .none
                 }
 
