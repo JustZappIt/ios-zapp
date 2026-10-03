@@ -106,7 +106,18 @@ extension RestoreWalletCoordFlow {
 
                 // MARK: Recovery Seed Phrase Entry
                 
-            case .path(.element(id: _, action: .chatUsername(.continueTapped))):
+            case let .path(.element(id: id, action: .chatUsername(.continueTapped))):
+                // The keyboard's Done key sends this too, and unlike the button it is never
+                // disabled. Advancing on an invalid name pushed a derivation screen with no name
+                // queued: an endless spinner with no retry and no back, which users escaped by
+                // force-quitting and then got asked for the name again in Chats. Done followed by
+                // the button also pushed derivation twice, and with it app lock setup twice.
+                guard
+                    state.path.ids.last == id,
+                    state.path[id: id, case: \.chatUsername]?.isValid == true
+                else {
+                    return .none
+                }
                 state.path.append(.identityDerivation(.initial))
                 return .none
 
