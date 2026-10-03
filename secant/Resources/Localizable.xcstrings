@@ -184,7 +184,7 @@
     "reputation.unreadableTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn't reach Base"}},"es":{"stringUnit":{"state":"translated","value":"No pudimos conectar con Base"}}}},
     "reputation.verifiedGroup" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"VERIFIED"}},"es":{"stringUnit":{"state":"translated","value":"VERIFICADAS"}}}},
     "reputation.verifyToBuy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verify to buy"}},"es":{"stringUnit":{"state":"translated","value":"Verifica para comprar"}}}},
-    "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status and alerts"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea y alertas"}}}},
+    "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status, delivery"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea, entrega"}}}},
     "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
     "~%@ %@" : {
       "localizations" : {
@@ -26244,6 +26244,57 @@
         }
       }
     },
+    "settingsYou.baseAccountInProgress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash-out in progress"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro en curso"
+          }
+        }
+      }
+    },
+    "settingsYou.baseAccountSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your USDC balance and activity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu saldo y actividad en USDC"
+          }
+        }
+      }
+    },
+    "settingsYou.baseAccountTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta Base"
+          }
+        }
+      }
+    },
     "settingsYou.chatProfile.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26482,6 +26533,23 @@
         }
       }
     },
+    "settingsYou.localCurrencyValue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
+        }
+      }
+    },
     "settingsYou.p2pPaymentMethodSubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26516,36 +26584,36 @@
         }
       }
     },
-    "settingsYou.p2pTransactionsSubtitle" : {
+    "settingsYou.p2pRailCurrenciesMore" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View payments and recover cancelled orders"
+            "value" : "%1$@ and %2$lld more"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Consulta pagos y recupera pedidos cancelados"
+            "value" : "%1$@ y %2$lld más"
           }
         }
       }
     },
-    "settingsYou.p2pTransactionsTitle" : {
+    "settingsYou.p2pRailSubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P transactions"
+            "value" : "%1$@ - %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transacciones P2P"
+            "value" : "%1$@ - %2$@"
           }
         }
       }
@@ -26556,13 +26624,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your name, messaging key, privacy"
+            "value" : "Seed phrase, messaging key, wallet address"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu nombre, clave de mensajería, privacidad"
+            "value" : "Frase semilla, clave de mensajería, dirección de billetera"
           }
         }
       }
