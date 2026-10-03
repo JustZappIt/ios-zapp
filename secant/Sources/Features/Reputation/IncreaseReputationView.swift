@@ -169,7 +169,7 @@ struct IncreaseReputationView: View {
                         : String(localizable: .increaseReputationDone(run.name)),
                     subtitle: run.newBuyLimitMicros.map {
                         String(localizable: .increaseReputationNewLimit(ReputationCopy.usd($0)))
-                    } ?? ""
+                    }
                 )
 
                 if let points = run.newPoints {
@@ -229,7 +229,7 @@ struct IncreaseReputationView: View {
             case .submitting:
                 ZappButton(title: String(localizable: .increaseReputationSavingAction), isEnabled: false) { }
             case .done:
-                ZappButton(title: String(localizable: .increaseReputationFinish)) { store.send(.doneTapped) }
+                ZappDoneButton(title: String(localizable: .increaseReputationFinish)) { store.send(.doneTapped) }
             case .failed:
                 ZappButton(title: String(localizable: .reputationRetry)) { store.send(.retryRunTapped) }
             }

@@ -276,58 +276,25 @@ struct GiftCardView: View {
         .frame(maxWidth: .infinity)
     }
 
+    /// Nothing here can be measured — a broadcast lands when it lands — so the bar sweeps rather
+    /// than inventing a percentage for it (Android's `FundingSection`).
     private var fundingStage: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
             podium(isTurning: true, fiatOnFace: false)
-            sweepBar
-            Text(String(localizable: .giftCardFundingNote))
-                .zappFont(.caption, style: ZappColors.textMuted)
-            VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-                fundingStep(String(localizable: .giftCardStepMinted), state: .done)
-                fundingStep(String(localizable: .giftCardStepFunding), state: .active)
-                fundingStep(String(localizable: .giftCardStepReady), state: .pending)
+            VStack(alignment: .leading, spacing: Design.Spacing._xl) {
+                ZappProgressBar(fraction: nil, label: String(localizable: .giftCardFundingNote))
+                ZappOfframpStepList(items: [
+                    fundingStep(String(localizable: .giftCardStepMinted), status: .completed),
+                    fundingStep(String(localizable: .giftCardStepFunding), status: .inProgress),
+                    fundingStep(String(localizable: .giftCardStepReady), status: .pending)
+                ])
             }
         }
     }
 
-    private enum StepState { case done, active, pending }
-
-    private func fundingStep(_ title: String, state: StepState) -> some View {
-        HStack(spacing: Design.Spacing._md) {
-            Rectangle()
-                .fill(stepColor(state).color(colorScheme))
-                .frame(width: 8, height: 8)
-            Text(title)
-                .zappFont(.rowSubtitle, style: state == .pending ? ZappColors.textSubtle : ZappColors.text)
-        }
+    private func fundingStep(_ title: String, status: ZappOfframpStepStatus) -> ZappOfframpStepItem {
+        ZappOfframpStepItem(id: title, label: title, detail: nil, status: status)
     }
-
-    private func stepColor(_ state: StepState) -> ZappColors {
-        switch state {
-        case .done: return .success
-        case .active: return .accent
-        case .pending: return .border
-        }
-    }
-
-    /// An indeterminate sweep: a 30%-width accent block gliding along a bordered track.
-    private var sweepBar: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            let phase = timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.4) / 1.4
-            GeometryReader { proxy in
-                let width = proxy.size.width
-                let blockWidth = width * 0.3
-                Rectangle()
-                    .fill(ZappColors.accent.color(colorScheme))
-                    .frame(width: blockWidth)
-                    .offset(x: (width + blockWidth) * phase - blockWidth)
-            }
-            .frame(height: 3)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
-            .clipped()
-        }
-    }
-
 }
 
 extension GiftCardView {

@@ -5,8 +5,6 @@ import SwiftUI
 @preconcurrency import ZcashLightClientKit
 
 struct GiftClaimView: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     @Perception.Bindable var store: StoreOf<GiftClaim>
 
     var body: some View {
@@ -56,9 +54,8 @@ struct GiftClaimView: View {
                 ProgressView()
             } else {
                 podium
-                sweepBar
-                Text(String(localizable: .giftClaimConnecting))
-                    .zappFont(.body, style: ZappColors.textMuted)
+                // A sweep rather than a figure: there is no progress to report, only a wait.
+                ZappProgressBar(fraction: nil, label: String(localizable: .giftClaimConnecting))
             }
 
         case .needsWallet:
@@ -92,16 +89,14 @@ struct GiftClaimView: View {
 
         case .claiming:
             podium
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
+            VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 Text(String(localizable: .giftClaimProgressSyncing))
-                    .zappFont(.body, style: ZappColors.text)
-                progressBar
-                if let remaining = blocksRemaining {
-                    Text(String(localizable: .giftClaimProgressRemaining(remaining)))
-                        .zappFont(.caption, style: ZappColors.textSubtle)
-                }
-                Text(String(localizable: .giftClaimProgressNote))
-                    .zappFont(.caption, style: ZappColors.textMuted)
+                    .zappFont(.sectionTitle, style: ZappColors.text)
+                ZappProgressBar(
+                    fraction: scanFraction,
+                    label: String(localizable: .giftClaimProgressNote),
+                    detail: blocksRemaining.map { String(localizable: .giftClaimProgressRemaining($0)) }
+                )
             }
 
         case .done:
@@ -113,31 +108,27 @@ struct GiftClaimView: View {
 
         case .claimConfirming:
             podium
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
+            VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 Text(String(localizable: .giftClaimConfirmingTitle))
                     .zappFont(.sectionTitle, style: ZappColors.text)
-                confirmationBar
-                if let confirmations = store.confirmations {
-                    Text(String(localizable: .giftClaimPendingCount(confirmations, store.requiredConfirmations)))
-                        .zappFont(.caption, style: ZappColors.textSubtle)
-                }
-                Text(String(localizable: .giftClaimConfirmingBody))
-                    .zappFont(.body, style: ZappColors.textMuted)
+                ZappProgressBar(
+                    fraction: confirmationFraction,
+                    label: String(localizable: .giftClaimConfirmingBody),
+                    detail: confirmationDetail
+                )
             }
             errorLine
 
         case .pendingConfirmations:
             podium
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
+            VStack(alignment: .leading, spacing: Design.Spacing._lg) {
                 Text(String(localizable: .giftClaimPendingTitle))
                     .zappFont(.sectionTitle, style: ZappColors.text)
-                confirmationBar
-                if let confirmations = store.confirmations {
-                    Text(String(localizable: .giftClaimPendingCount(confirmations, store.requiredConfirmations)))
-                        .zappFont(.caption, style: ZappColors.textSubtle)
-                }
-                Text(String(localizable: .giftClaimPendingBody))
-                    .zappFont(.body, style: ZappColors.textMuted)
+                ZappProgressBar(
+                    fraction: confirmationFraction,
+                    label: String(localizable: .giftClaimPendingBody),
+                    detail: confirmationDetail
+                )
             }
 
         case .awaitingFunding:
@@ -254,56 +245,20 @@ struct GiftClaimView: View {
         return tip - scanned
     }
 
-    private var progressBar: some View {
-        Group {
-            if let fraction = store.progress?.fraction, fraction > 0 {
-                GeometryReader { proxy in
-                    Rectangle()
-                        .fill(ZappColors.accent.color(colorScheme))
-                        .frame(width: proxy.size.width * CGFloat(min(fraction, 1)))
-                }
-                .frame(height: 3)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
-            } else {
-                // The SDK reports zero before measuring anything, and a bar pinned at 0% reads
-                // as broken where a sweep reads as working.
-                sweepBar
-            }
-        }
+    /// Nil until the scan reports a real figure: the SDK reports zero before measuring anything,
+    /// and a bar pinned at 0% reads as broken where a sweep reads as working.
+    private var scanFraction: Double? {
+        guard let fraction = store.progress?.fraction, fraction > 0 else { return nil }
+        return Double(fraction)
     }
 
-    private var confirmationBar: some View {
-        Group {
-            if let confirmations = store.confirmations, store.requiredConfirmations > 0 {
-                let fraction = CGFloat(confirmations) / CGFloat(store.requiredConfirmations)
-                GeometryReader { proxy in
-                    Rectangle()
-                        .fill(ZappColors.accent.color(colorScheme))
-                        .frame(width: proxy.size.width * min(fraction, 1))
-                }
-                .frame(height: 3)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
-            } else {
-                sweepBar
-            }
-        }
+    private var confirmationFraction: Double? {
+        guard let confirmations = store.confirmations, store.requiredConfirmations > 0 else { return nil }
+        return Double(confirmations) / Double(store.requiredConfirmations)
     }
 
-    private var sweepBar: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            let phase = timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.4) / 1.4
-            GeometryReader { proxy in
-                let width = proxy.size.width
-                let blockWidth = width * 0.3
-                Rectangle()
-                    .fill(ZappColors.accent.color(colorScheme))
-                    .frame(width: blockWidth)
-                    .offset(x: (width + blockWidth) * phase - blockWidth)
-            }
-            .frame(height: 3)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
-            .clipped()
-        }
+    private var confirmationDetail: String? {
+        store.confirmations.map { String(localizable: .giftClaimPendingCount($0, store.requiredConfirmations)) }
     }
 
     @ViewBuilder

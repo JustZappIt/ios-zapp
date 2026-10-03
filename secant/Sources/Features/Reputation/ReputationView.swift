@@ -88,7 +88,8 @@ struct ReputationView: View {
     /// card: as a row it clipped to "Locked until you verify one acc…".
     @ViewBuilder
     private func buyLimitCard(_ summary: ReputationSummaryModel) -> some View {
-        ZappBorderedCard {
+        // Android's `HERO_PADDING`, wider than the card default.
+        ZappBorderedCard(padding: 18) {
             VStack(alignment: .leading, spacing: 0) {
                 ZappSectionLabel(text: String(localizable: .reputationBuyLimit))
 
