@@ -3688,6 +3688,227 @@
         }
       }
     },
+    "chatP2pKey.infoButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How the P2P key works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona la clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoDerivation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This key is derived from your seed phrase on its own path. It is not your Zcash spending key and it cannot touch your ZEC. Losing the app never loses it: the same seed always re-derives the same key."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta clave se deriva de tu frase semilla por su propia ruta. No es tu clave de gasto de Zcash y no puede tocar tu ZEC. Perder la app nunca la pierde: la misma semilla siempre vuelve a derivar la misma clave."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSafety" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone holding the private key controls that account and the funds sitting in it. Export it only if you need to move those funds with another wallet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quien tenga la clave privada controla esa cuenta y los fondos que contiene. Expórtala solo si necesitas mover esos fondos con otra billetera."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSmartAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It owns a smart account. The address your cash-outs settle through is a contract account on Base that this key controls, which is what lets Zapp sponsor the network fees so you never hold gas."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es la propietaria de una cuenta inteligente. La dirección por la que se liquidan tus retiros es una cuenta de contrato en Base que controla esta clave, lo que permite a Zapp patrocinar las comisiones de red para que nunca necesites gas."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About your P2P key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de tu clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The address derived from the owner key. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección derivada de la clave de propietario. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLockedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The private key that controls the smart account. Revealing it asks for your app lock first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave privada que controla la cuenta inteligente. Para mostrarla primero se te pedirá el bloqueo de la app."
+          }
+        }
+      }
+    },
+    "chatP2pKey.privateKeyCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never share this. Anyone with it can spend everything in the smart account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca la compartas. Quien la tenga puede gastar todo lo que hay en la cuenta inteligente."
+          }
+        }
+      }
+    },
+    "chatP2pKey.reveal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar clave de propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Base account your P2P cash-outs settle through. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cuenta de Base por la que se liquidan tus retiros P2P. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta inteligente"
+          }
+        }
+      }
+    },
     "chatPrivacy.onlineStatusIntro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4221,13 +4442,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This removes your messaging identity and all chat history from this device. Your funds are unaffected and can be recovered at any time with your seed phrase."
+            "value" : "This removes your messaging identity and all chat history, and resets this device back to onboarding. Your wallet funds can be restored with your seed phrase."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esto elimina tu identidad de mensajería y todo el historial de chats de este dispositivo. Tus fondos no se ven afectados y puedes recuperarlos en cualquier momento con tu frase semilla."
+            "value" : "Esto elimina tu identidad de mensajería y todo el historial de chats, y devuelve este dispositivo al inicio. Los fondos de tu billetera se pueden restaurar con tu frase semilla."
           }
         }
       }
@@ -4283,6 +4504,23 @@
         }
       }
     },
+    "chatProfile.displayNameSaveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save your display name. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar tu nombre visible. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
     "chatProfile.groupIdentity" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4334,23 +4572,6 @@
         }
       }
     },
-    "chatProfile.p2pKeyAddressLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Owner address"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección del propietario"
-          }
-        }
-      }
-    },
     "chatProfile.p2pKeyCopy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4364,40 +4585,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiar"
-          }
-        }
-      }
-    },
-    "chatProfile.p2pKeyDialogMessage" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Derived from your seed phrase. This key controls your P2P cash-out account — anyone with it can spend those funds."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Derivada de tu frase semilla. Esta clave controla tu cuenta de retiro P2P: cualquiera que la tenga puede gastar esos fondos."
-          }
-        }
-      }
-    },
-    "chatProfile.p2pKeyDialogTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "P2P wallet key"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clave de billetera P2P"
           }
         }
       }
@@ -4697,7 +4884,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backs up both your messaging and wallet identities"
+            "value" : "Backs up both messaging & wallet identities"
           }
         },
         "es" : {

@@ -670,12 +670,66 @@ import ZappMessaging
         }
         store.exhaustivity = .off
 
-        await store.send(.p2pKeyTapped)
+        await store.send(.p2pKeyRevealTapped)
         await store.receive(\.secretUnlocked)
         await store.receive(\.p2pKeyLoaded)
 
         #expect(store.state.p2pKey == key)
-        #expect(store.state.showsP2PKeyDialog)
+        #expect(store.state.showsP2PKey)
+    }
+
+    /// Android's `ChatP2pKeyVM`: the screen opens on the smart account, which needs no app lock,
+    /// and nothing secret is read until "Reveal owner key".
+    @MainActor @Test func theP2pKeyScreenShowsTheSmartAccountWithoutReadingTheKey() async {
+        let exports = LockIsolated(0)
+        let store = TestStore(initialState: ChatProfile.State()) {
+            ChatProfile()
+        } withDependencies: {
+            $0.appSecurity.authenticationMethod = { .biometric }
+            $0.offramp.accountSummary = {
+                OfframpAccountModel(
+                    address: "0xSmart",
+                    balanceMicros: nil,
+                    balanceDisplay: nil,
+                    explorerURL: nil,
+                    canBridgeToBase: false,
+                    canRefundToZec: false
+                )
+            }
+            $0.offramp.exportWalletKey = {
+                exports.withValue { $0 += 1 }
+                throw CancellationError()
+            }
+        }
+
+        await store.send(.p2pKeyTapped) {
+            $0.isP2pKeyScreenPresented = true
+        }
+        await store.receive(.p2pSmartAccountLoaded("0xSmart")) {
+            $0.p2pSmartAccountAddress = "0xSmart"
+        }
+
+        #expect(exports.value == 0)
+        #expect(!store.state.isAwaitingBiometric)
+
+        await store.send(.p2pKeyScreenClosed) {
+            $0.isP2pKeyScreenPresented = false
+        }
+    }
+
+    /// Leaving the screen relocks the owner card: the key is dropped, not kept for next time.
+    @MainActor @Test func closingTheP2pKeyScreenDropsTheOwnerKey() async {
+        var initial = ChatProfile.State()
+        initial.isP2pKeyScreenPresented = true
+        initial.p2pKey = OfframpWalletKey(address: "0xOwner", privateKeyHex: RedactableString("0xsecret"))
+        let store = TestStore(initialState: initial) {
+            ChatProfile()
+        }
+
+        await store.send(.p2pKeyScreenClosed) {
+            $0.isP2pKeyScreenPresented = false
+            $0.p2pKey = nil
+        }
     }
 
     @MainActor @Test func aFailedExportSurfacesAnErrorRatherThanAnEmptyDialog() async {
@@ -689,7 +743,7 @@ import ZappMessaging
         }
         store.exhaustivity = .off
 
-        await store.send(.p2pKeyTapped)
+        await store.send(.p2pKeyRevealTapped)
         await store.receive(\.secretUnlocked)
         await store.receive(\.secretLoadFailed)
 
@@ -735,7 +789,7 @@ import ZappMessaging
         }
         store.exhaustivity = .off
 
-        await store.send(.p2pKeyTapped)
+        await store.send(.p2pKeyRevealTapped)
 
         #expect(store.state.p2pKey == nil)
         #expect(!store.state.isAwaitingBiometric)
@@ -834,7 +888,7 @@ import ZappMessaging
         #expect(spy.invocations == 0)
     }
 
-    @MainActor @Test func theP2pDialogCopiesBothOfItsFields() async {
+    @MainActor @Test func theP2pKeyScreenCopiesBothOwnerFields() async {
         let key = OfframpWalletKey(address: "0xOwner", privateKeyHex: RedactableString("0xsecret"))
         var initial = ChatProfile.State()
         initial.p2pKey = key

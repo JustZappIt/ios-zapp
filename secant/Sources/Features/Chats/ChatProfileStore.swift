@@ -64,7 +64,14 @@ struct ChatProfile {
         /// Non-empty only while the seed dialog is up. Cleared on dismiss AND on backgrounding.
         var seedWords: [RedactableString] = []
 
-        /// Non-nil only while the P2P key dialog is up.
+        /// Android's P2P wallet key screen, drawn over the profile.
+        var isP2pKeyScreenPresented = false
+
+        /// The smart account the owner key controls. Safe to show without the app lock.
+        var p2pSmartAccountAddress: String?
+        var didCopyP2PSmartAccount = false
+
+        /// Non-nil only while the owner key is revealed on the P2P key screen.
         var p2pKey: OfframpWalletKey?
 
         var didCopyP2PAddress = false
@@ -99,14 +106,14 @@ struct ChatProfile {
         var hasPublicKey: Bool { !publicKey.isEmpty }
 
         var showsSeedDialog: Bool { !seedWords.isEmpty }
-        var showsP2PKeyDialog: Bool { p2pKey != nil }
+        var showsP2PKey: Bool { p2pKey != nil }
 
         /// Any surface that must never be photographed, recorded, or left up in the app switcher.
-        var isShowingSecret: Bool { showsSeedDialog || showsP2PKeyDialog }
+        var isShowingSecret: Bool { showsSeedDialog || showsP2PKey }
 
         /// Interactive back must not slip out from under a modal — least of all out from under a
         /// save in flight or a revealed secret.
-        var isModalPresented: Bool { editName != nil || pinEntry != nil || isShowingSecret }
+        var isModalPresented: Bool { editName != nil || pinEntry != nil || isShowingSecret || isP2pKeyScreenPresented }
 
         init() { }
     }
@@ -143,6 +150,10 @@ struct ChatProfile {
         // MARK: Secret reveal
         case seedPhraseTapped
         case p2pKeyTapped
+        case p2pSmartAccountLoaded(String)
+        case p2pKeyRevealTapped
+        case p2pKeyScreenClosed
+        case copyP2PSmartAccountTapped
         case biometricFinished(SecretTarget, Bool)
         case pinKeyTapped(PINKey)
         case pinVerificationFinished(PINVerificationResult)
@@ -176,6 +187,7 @@ struct ChatProfile {
     enum CancelID {
         case copyIndicator
         case p2pCopyIndicator
+        case p2pSmartAccount
         case pinLockout
     }
 
@@ -227,6 +239,7 @@ private extension ChatProfile {
                 // leaves the button reading "Copied" for as long as the state survives.
             case .onDisappear:
                 state.didCopy = false
+                state.isP2pKeyScreenPresented = false
 
                 return .merge(
                     .cancel(id: state.messagingCancelId),

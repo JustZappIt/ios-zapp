@@ -41,8 +41,30 @@ extension ChatProfile {
             case .seedPhraseTapped:
                 return beginReveal(.seedPhrase, state: &state)
 
+                // Android pushes a screen first: the smart account is shown openly, and only the
+                // owner key waits behind "Reveal owner key".
             case .p2pKeyTapped:
+                state.isP2pKeyScreenPresented = true
+                state.secretFailed = false
+                state.secretBlockedByCapture = false
+                return .run { [offramp] send in
+                    await send(.p2pSmartAccountLoaded(try await offramp.accountSummary().address))
+                } catch: { _, _ in
+                    // Android logs and leaves the card out; the owner key still reveals.
+                    LoggerProxy.error("ChatProfile: smart account address resolve failed")
+                }
+                .cancellable(id: CancelID.p2pSmartAccount, cancelInFlight: true)
+
+            case .p2pSmartAccountLoaded(let address):
+                state.p2pSmartAccountAddress = address
+                return .none
+
+            case .p2pKeyRevealTapped:
                 return beginReveal(.p2pKey, state: &state)
+
+            case .p2pKeyScreenClosed:
+                state.isP2pKeyScreenPresented = false
+                return .merge(.cancel(id: CancelID.p2pSmartAccount), clearSecrets(&state))
 
                 // A dismissed or failed prompt is silent, exactly like Android's empty catch
                 // blocks for BiometricsCancelledException / BiometricsFailureException.
@@ -197,16 +219,26 @@ extension ChatProfile {
         }
     }
 
-    /// Copy-to-pasteboard, offered on the P2P dialog only.
+    /// Copy-to-pasteboard, offered on the P2P key screen only.
     private func secretCopyReduce() -> Reduce<State, Action> {
         Reduce { state, action in
             switch action {
+            case .copyP2PSmartAccountTapped:
+                guard let address = state.p2pSmartAccountAddress else { return .none }
+
+                pasteboard.setString(RedactableString(address))
+                state.didCopyP2PSmartAccount = true
+                state.didCopyP2PAddress = false
+                state.didCopyP2PKey = false
+                return copyIndicatorTimer()
+
             case .copyP2PAddressTapped:
                 guard let key = state.p2pKey else { return .none }
 
                 pasteboard.setString(RedactableString(key.address))
                 state.didCopyP2PAddress = true
                 state.didCopyP2PKey = false
+                state.didCopyP2PSmartAccount = false
                 return copyIndicatorTimer()
 
                 // Android's P2P dialog is the only one of the two that offers copy, and it offers
@@ -218,11 +250,13 @@ extension ChatProfile {
                 pasteboard.setString(key.privateKeyHex)
                 state.didCopyP2PKey = true
                 state.didCopyP2PAddress = false
+                state.didCopyP2PSmartAccount = false
                 return copyIndicatorTimer()
 
             case .p2pCopyIndicatorExpired:
                 state.didCopyP2PAddress = false
                 state.didCopyP2PKey = false
+                state.didCopyP2PSmartAccount = false
                 return .none
 
             default:
@@ -272,6 +306,7 @@ extension ChatProfile {
         state.p2pKey = nil
         state.didCopyP2PAddress = false
         state.didCopyP2PKey = false
+        state.didCopyP2PSmartAccount = false
         state.secretFailed = false
         state.secretBlockedByCapture = false
 
