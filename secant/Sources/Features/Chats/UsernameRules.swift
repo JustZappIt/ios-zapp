@@ -18,8 +18,11 @@ enum UsernameRules {
     /// non-ASCII letters, so "é" survives `sanitize` only for `isValid` to reject it. Filtering to
     /// ASCII here makes `sanitize` actually guarantee the character set `isValid` demands, which is
     /// the intent the Kotlin was reaching for.
+    ///
+    /// Capped at `maxLength` for the same reason: an uncapped field let a 21st character through,
+    /// which silently disabled Continue with no hint why.
     static func sanitize(_ raw: String) -> String {
-        raw.lowercased().filter { allowed.contains($0) }
+        String(raw.lowercased().filter { allowed.contains($0) }.prefix(maxLength))
     }
 
     static func isValid(_ name: String) -> Bool {

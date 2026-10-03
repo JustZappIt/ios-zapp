@@ -160,6 +160,18 @@ extension Root {
                     ? .send(.giftResumePendingClaim)
                     : .none
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
+                    // Onboarding owns initialization while it is on screen: `.walletProvisioned`
+                    // prepares the wallet and the flow's own exit routes home. Re-running the launch
+                    // chain here found the wallet onboarding had just saved and routed home through
+                    // `.checkBackupPhraseValidation` mid-flow — skipping the username step, so Chats
+                    // asked for it again. A new wallet is saved before seed backup but prepared only
+                    // after it, so switching apps to note the seed phrase was enough to trigger it.
+                    // A failed initialization and a locked keychain keep this re-entry as their retry.
+                    if state.destinationState.destination == .onboarding
+                        && state.appInitializationState != .failed
+                        && !state.isLockedInKeychainUnavailableState {
+                        return .merge(migrationTickEffect, migrationCheck, giftResume)
+                    }
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.initialSetups)))
                 } else {
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.retryStart)))
