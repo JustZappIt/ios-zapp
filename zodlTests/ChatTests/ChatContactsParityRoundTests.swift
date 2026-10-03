@@ -44,7 +44,7 @@ import ZappMessaging
 
     @MainActor @Test func startChatOpensTheDirectConversationForThatKey() async {
         let contact = ChatContact(publicKey: key("a"), name: "Ada", isSaved: true)
-        let conversation = ZMConversation(id: "dm", type: .direct, participantIds: [contact.publicKey], displayName: nil)
+        let conversation = ZMConversation(id: "dm", type: .direct, participantIds: [contact.publicKey], displayName: "Ada")
         let requested = LockIsolated<String?>(nil)
         let store = TestStore(initialState: ChatContactsList.State()) {
             ChatContactsList()
