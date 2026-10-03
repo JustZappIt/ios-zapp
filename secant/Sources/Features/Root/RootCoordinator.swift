@@ -917,7 +917,8 @@ extension Root {
 
                 // Creating a conversation lands the user straight in it, rather than
                 // back on a list they then have to find it in.
-            case .newChat(.created(let conversation)):
+            case .newChat(.created(let conversation)),
+                .chatContactsList(.conversationOpened(let conversation)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversation.id
                 state.chatRoomState.conversation = conversation

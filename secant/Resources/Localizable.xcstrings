@@ -2147,13 +2147,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save someone's public key to give them a name."
+            "value" : "Add contacts to start chatting"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guarda la clave pública de alguien para darle un nombre."
+            "value" : "Añade contactos para empezar a chatear"
           }
         }
       }
@@ -2315,6 +2315,23 @@
         }
       }
     },
+    "chatContacts.savedCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld saved"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld guardados"
+          }
+        }
+      }
+    },
     "chatContacts.scanAddress" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2345,6 +2362,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escanear el QR de la clave de mensajería"
+          }
+        }
+      }
+    },
+    "chatContacts.startChat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar chat"
           }
         }
       }
