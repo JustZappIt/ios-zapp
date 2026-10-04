@@ -75,6 +75,7 @@ private struct UnifiedSendContent: View {
 
     @FocusState private var isAddressFocused
     @FocusState private var isAmountFocused
+    @FocusState private var isDestinationFocused
 
     private var isSwap: Bool { store.mode == .swap }
 
@@ -86,7 +87,14 @@ private struct UnifiedSendContent: View {
                     containerColor: .bg,
                     titleStyle: .displaySecondary,
                     left: { EmptyView() },
-                    right: { hideBalancesButton }
+                    right: {
+                        HStack(spacing: 0) {
+                            if isSwap {
+                                crossPayInfoButton
+                            }
+                            hideBalancesButton
+                        }
+                    }
                 )
 
                 ScrollView {
@@ -117,7 +125,11 @@ private struct UnifiedSendContent: View {
                                 sentence(String(localizable: .unifiedSendSentenceIllPay))
                                     .padding(.bottom, Design.Spacing._sm)
 
-                                amountSection
+                                if store.isExactOutput {
+                                    payEstimateRow
+                                } else {
+                                    amountSection
+                                }
 
                                 if isSwap {
                                     theyReceiveRow
@@ -230,6 +242,20 @@ private extension UnifiedSendContent {
                 .frame(width: Constants.toolbarTouchTarget, height: Constants.toolbarTouchTarget)
         }
         .buttonStyle(.zappPress)
+    }
+
+    /// Android's `infoButton`: swap mode only, opens the CrossPay explainer.
+    private var crossPayInfoButton: some View {
+        Button {
+            store.send(.crossPayInfoTapped)
+        } label: {
+            Asset.Assets.Icons.help.image
+                .zImage(width: Constants.toolbarIconSize, height: Constants.toolbarIconSize, style: ZappColors.text)
+                .frame(width: Constants.toolbarTouchTarget, height: Constants.toolbarTouchTarget)
+        }
+        .buttonStyle(.zappPress)
+        .disabled(swapStore.isQuoteRequestInFlight)
+        .accessibilityLabel(String(localizable: .unifiedSendCrosspayInfo))
     }
 
     /// Android renders the form as a sentence: "I want to send … Asset … I'll pay …".
@@ -529,7 +555,7 @@ private extension UnifiedSendContent {
 
     private var amountErrorText: String? {
         if isSwap {
-            return swapStore.isInsufficientFunds ? String(localizable: .sendErrorInsufficientFunds) : nil
+            return store.isInsufficientFunds ? String(localizable: .sendErrorInsufficientFunds) : nil
         }
         return store.isFiatPrimary
             ? sendStore.invalidCurrencyAmountErrorText
@@ -539,15 +565,22 @@ private extension UnifiedSendContent {
     // MARK: Swap-only rows
 
     private var theyReceiveRow: some View {
-        HStack(spacing: Design.Spacing._md) {
-            if let asset = swapStore.selectedAsset {
-                tokenTicker(asset: asset, colorScheme)
+        UnifiedSendDestinationRow(
+            store: store,
+            placeholder: swapStore.localePlaceholder,
+            isDisabled: swapStore.isQuoteRequestInFlight,
+            isFocused: $isDestinationFocused
+        )
+    }
 
-                Text(String(localizable: .unifiedSendTheyReceiveApprox(swapStore.primaryLabelTo, asset.token)))
-                    .zappFont(.caption, style: ZappColors.text)
-
-                Spacer(minLength: 0)
-            }
+    private var payEstimateRow: some View {
+        UnifiedSendPayEstimateRow(
+            store: store,
+            tokenName: tokenName,
+            errorText: amountErrorText,
+            isDisabled: swapStore.isQuoteRequestInFlight
+        ) {
+            isDestinationFocused = false
         }
     }
 
@@ -688,6 +721,7 @@ private extension UnifiedSendContent {
                 Button {
                     isAmountFocused = false
                     isAddressFocused = false
+                    isDestinationFocused = false
                 } label: {
                     Text(String(localizable: .generalDone).uppercased())
                         .zappFont(.chip, style: ZappColors.accentText)
@@ -748,6 +782,13 @@ private struct SwapModeSheets: ViewModifier {
         )
     }
 
+    private var crossPayInfoBinding: Binding<Bool> {
+        Binding(
+            get: { coordStore.isCrossPayInfoPresented },
+            set: { if !$0 { coordStore.send(.crossPayInfoDismissed) } }
+        )
+    }
+
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
@@ -776,6 +817,9 @@ private struct SwapModeSheets: ViewModifier {
                 .sheet(isPresented: $store.isSlippagePresented) {
                     ZappSwapSlippageSheet(store: store, keyboardVisible: keyboardVisible)
                         .padding(.horizontal, Design.Spacing._2xl)
+                }
+                .zashiSheet(isPresented: crossPayInfoBinding) {
+                    ZappCrossPayInfoSheet { coordStore.send(.crossPayInfoDismissed) }
                 }
                 .insufficientFundsSheet(isPresented: $store.isInsufficientBalance)
                 .alert(store: store.scope(state: \.$alert, action: \.alert))
