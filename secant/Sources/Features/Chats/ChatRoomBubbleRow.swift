@@ -64,8 +64,8 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
     private var kind: ChatMessageKind { ChatMessageKind.of(message) }
 
     /// One bubble per message type, dispatched in Android's order
-    /// (`ChatMessageBubble.kt: MessageContent`) via `ChatMessageKind`. Anything unrecognised —
-    /// including location, out of scope per Decision 3 — falls through to the text bubble.
+    /// (`ChatMessageBubble.kt: MessageContent`) via `ChatMessageKind`. Anything unrecognised
+    /// falls through to the text bubble.
     @ViewBuilder
     private var bubble: some View {
         switch kind {
@@ -109,6 +109,13 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
                 message: message,
                 senderName: senderName,
                 progress: progress,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
+
+        case .location:
+            ChatLocationBubble(
+                message: message,
+                senderName: senderName,
                 readReceiptsEnabled: readReceiptsEnabled
             )
 

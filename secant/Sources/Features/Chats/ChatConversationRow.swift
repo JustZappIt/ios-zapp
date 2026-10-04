@@ -276,6 +276,10 @@ enum ChatPreviewSentinel {
     static func jsonLabel(for lastMessage: String) -> String? {
         guard lastMessage.hasPrefix("{") else { return nil }
 
+        if lastMessage.contains(locationMarker) {
+            return String(localizable: .chatListLocationPlaceholder)
+        }
+
         if lastMessage.hasPrefix(paymentRequestPrefix) || lastMessage.contains(paymentRequestAddressMarker) {
             return String(localizable: .chatListPaymentRequestPlaceholder)
         }
@@ -285,6 +289,7 @@ enum ChatPreviewSentinel {
 
     private static let paymentRequestPrefix = "{\"id\":"
     private static let paymentRequestAddressMarker = "\"requesterAddress\""
+    private static let locationMarker = "\"latitude\""
 }
 
 #Preview {

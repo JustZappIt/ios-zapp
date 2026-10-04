@@ -33,8 +33,9 @@ enum ChatMessageKind: Equatable {
     case image
     case video
     case file
-    /// Plain text, and the deliberate fallback for anything unrecognised — including
-    /// `application/location`, which Decision 3 puts out of scope.
+    /// Rendered from an incoming message only; iOS does not send locations yet.
+    case location
+    /// Plain text, and the deliberate fallback for anything unrecognised.
     case text
 
     static func of(_ message: ZMMessage) -> ChatMessageKind {
@@ -44,6 +45,7 @@ enum ChatMessageKind: Equatable {
         case ChatContentType.paymentRequest: return .paymentRequest
         case ChatContentType.walletAddress: return .walletAddress
         case ChatContentType.zecTransaction: return .zecTransaction
+        case ChatContentType.location: return .location
         default: break
         }
 
