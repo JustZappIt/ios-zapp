@@ -1158,6 +1158,17 @@ extension Root {
                 state.path = nil
                 return .none
 
+                // "Send in chat" lands in the conversation the request went to, as Android's
+                // `navigationRouter.forward(ChatRoomArgs(conversationId))` does. Root keeps one
+                // screen at a time, so the Request cover closes with Receive underneath it.
+            case .receive(.requestFlow(.presented(.path(.element(id: _, action: .requestZecSummary(.sentInChat(let conversation))))))):
+                state.receiveState.requestFlow = nil
+                state.chatRoomState = .initial
+                state.chatRoomState.conversationId = conversation.id
+                state.chatRoomState.conversation = conversation
+                state.path = .chatRoom
+                return .none
+
                 // MARK: - Reset Zashi
 
             case .settings(.path(.element(id: _, action: .disconnectHWWallet(.disconnectFinished)))):
