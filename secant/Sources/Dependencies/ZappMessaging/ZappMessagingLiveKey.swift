@@ -52,6 +52,7 @@ extension ZappMessagingClient: DependencyKey {
             sendWalletAddress: { try await impl.sendWalletAddress(conversationId: $0, address: $1) },
             sendPaymentRequest: { try await impl.sendPaymentRequest(conversationId: $0, payload: $1) },
             sendTransactionReceipt: { try await impl.sendTransactionReceipt(conversationId: $0, payload: $1) },
+            sendLocation: { try await impl.sendLocation(conversationId: $0, payload: $1) },
             markRead: { try await impl.markRead(conversationId: $0) },
             messageStatusStream: { impl.messageStatusSubject.eraseToAnyPublisher() },
             mediaProgressStream: { impl.mediaProgressSubject.eraseToAnyPublisher() },
@@ -466,6 +467,39 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         }
     }
 
+    /// Wire format, mirrored from Android's `ChatRoomVM.sendLocationMessage()`:
+    /// `{ content: <latitude/longitude/accuracy JSON>, contentType: "application/location" }`.
+    ///
+    /// Android reaches the core through `message.send` with that content type. The public SDK's
+    /// `sendMessage` cannot carry a content type, so this takes the same structured route as
+    /// `sendWalletAddress`: `ipc-handler.js` handles `send_wallet_address` in the same case as the
+    /// other structured types and spreads `{ content, contentType }` into the same
+    /// `chatStore.addMessage`. The stored, and therefore the broadcast, message is identical to
+    /// Android's. No new IPC type and no new payload shape.
+    func sendLocation(conversationId: String, payload: String) async throws -> ZMMessage {
+        guard let sdk else { throw ZMError.notInitialized }
+        let protection = await beginProtectedSend(named: "Finish chat location")
+        do {
+            try await validateRecipient(conversationId: conversationId, sdk: sdk)
+            let message = try await sdk.sendPaymentMessage(
+                conversationId: conversationId,
+                message: [
+                    "content": payload,
+                    "contentType": ChatContentType.location
+                ],
+                type: .walletAddress
+            )
+            publishMessageActivity(message)
+            await finishProtectedSend(protection)
+            clearFailure(for: .local(.messageSend))
+            return message
+        } catch {
+            await finishProtectedSend(protection)
+            recordFailure(.local(.messageSend), error)
+            throw error
+        }
+    }
+
     func markRead(conversationId: String) async throws {
         guard let sdk else { throw ZMError.notInitialized }
         do {
@@ -751,6 +785,10 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     /// The same sentinels the JS core writes on a cold load, so an optimistic row and a
     /// reloaded one read identically. Mirrors `lastMessagePreview` on Android.
     private static func preview(for message: ZMMessage) -> String {
+        if message.contentType == ChatContentType.location {
+            return "[Location]"
+        }
+
         if !message.content.isEmpty {
             return message.content
         }

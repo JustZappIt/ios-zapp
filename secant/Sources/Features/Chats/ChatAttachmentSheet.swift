@@ -5,8 +5,8 @@
 //  The composer's "+" menu. Mirrors Android's `AttachmentSheet.kt` (four stacked actions,
 //  divider between each) and `MediaAttachmentSheet.kt` (title + a row of square tiles).
 //
-//  Location sharing is deliberately absent from the media page — Decision 3 puts it out of
-//  scope, which is the same branch Android takes when `onShareLocation` is null.
+//  Location appears only where a host passes `onShareLocation`, the same branch Android takes:
+//  the chat room offers it, the support chat does not.
 //
 
 import ComposableArchitecture
@@ -126,7 +126,7 @@ struct ChatAttachmentSheet: View {
     }
 }
 
-/// Page two: gallery / file / camera.
+/// Page two: gallery / file / camera, plus location in the chat room.
 struct ChatMediaAttachmentSheet: View {
     private enum Constants {
         static let iconSize: CGFloat = 28
@@ -140,10 +140,16 @@ struct ChatMediaAttachmentSheet: View {
     let onChooseMedia: () -> Void
     let onAttachFile: () -> Void
     let onTakePhoto: () -> Void
+    var onShareLocation: (() -> Void)?
 
     /// Title, the 16pt gap under it, one row of tiles, and the shared chrome.
     static var detentHeight: CGFloat {
         Constants.titleHeight + Design.Spacing._xl + Constants.tileHeight + ChatAttachmentSheetChrome.total
+    }
+
+    /// With location the tiles wrap onto a second row, as Android's do.
+    static var locationDetentHeight: CGFloat {
+        detentHeight + Constants.tileSpacing + Constants.tileHeight
     }
 
     var body: some View {
@@ -152,27 +158,49 @@ struct ChatMediaAttachmentSheet: View {
             Text(String(localizable: .chatRoomMediaTitle))
                 .zappFont(.sectionTitle, style: ZappColors.text)
 
-            HStack(spacing: Constants.tileSpacing) {
-                tile(
-                    icon: Asset.Assets.Icons.imageLibrary.image,
-                    label: String(localizable: .chatRoomMediaMedia),
-                    action: onChooseMedia
-                )
+            // Android's `MediaAttachmentSheet`: Media, File, Camera in one row; with location,
+            // Media and File on the first row and Camera and Location on the second.
+            VStack(spacing: Constants.tileSpacing) {
+                HStack(spacing: Constants.tileSpacing) {
+                    tile(
+                        icon: Asset.Assets.Icons.imageLibrary.image,
+                        label: String(localizable: .chatRoomMediaMedia),
+                        action: onChooseMedia
+                    )
 
-                tile(
-                    icon: Asset.Assets.Icons.file.image,
-                    label: String(localizable: .chatRoomMediaFile),
-                    action: onAttachFile
-                )
+                    tile(
+                        icon: Asset.Assets.Icons.file.image,
+                        label: String(localizable: .chatRoomMediaFile),
+                        action: onAttachFile
+                    )
 
-                tile(
-                    icon: Asset.Assets.Icons.camera.image,
-                    label: String(localizable: .chatRoomMediaCamera),
-                    action: onTakePhoto
-                )
+                    if onShareLocation == nil {
+                        cameraTile
+                    }
+                }
+
+                if let onShareLocation {
+                    HStack(spacing: Constants.tileSpacing) {
+                        cameraTile
+
+                        tile(
+                            icon: Asset.Assets.Icons.markerPin.image,
+                            label: String(localizable: .chatRoomMediaLocation),
+                            action: onShareLocation
+                        )
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var cameraTile: some View {
+        tile(
+            icon: Asset.Assets.Icons.camera.image,
+            label: String(localizable: .chatRoomMediaCamera),
+            action: onTakePhoto
+        )
     }
 
     private func tile(icon: Image, label: String, action: @escaping () -> Void) -> some View {

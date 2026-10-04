@@ -121,7 +121,7 @@ struct ChatRoomView: View {
                         get: { pickedItem },
                         set: { store.send(.pickedItemChanged($0)) }
                     ),
-                    matching: .images
+                    matching: .any(of: [.images, .videos])
                 )
                 .fileImporter(
                     isPresented: Binding(
@@ -184,7 +184,7 @@ struct ChatRoomView: View {
             ) {
                 WithPerceptionTracking {
                     if let message = store.imageViewerMessage {
-                        ChatImageViewer(message: message) {
+                        ChatMediaViewer(message: message) {
                             store.send(.imageViewerDismissed)
                         }
                     }
@@ -218,7 +218,8 @@ struct ChatRoomView: View {
                 ChatMediaAttachmentSheet(
                     onChooseMedia: { store.send(.chooseMediaTapped) },
                     onAttachFile: { store.send(.attachFileTapped) },
-                    onTakePhoto: { store.send(.takePhotoTapped) }
+                    onTakePhoto: { store.send(.takePhotoTapped) },
+                    onShareLocation: { store.send(.shareLocationTapped) }
                 )
             }
         }
@@ -234,7 +235,7 @@ struct ChatRoomView: View {
     private var attachmentSheetHeight: CGFloat {
         switch store.attachmentPage {
         case .actions: return ChatAttachmentSheet.detentHeight
-        case .media: return ChatMediaAttachmentSheet.detentHeight
+        case .media: return ChatMediaAttachmentSheet.locationDetentHeight
         }
     }
 

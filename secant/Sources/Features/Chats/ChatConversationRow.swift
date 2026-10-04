@@ -276,6 +276,12 @@ enum ChatPreviewSentinel {
     static func jsonLabel(for lastMessage: String) -> String? {
         guard lastMessage.hasPrefix("{") else { return nil }
 
+        // The core stores a location's raw body as the cold-load preview, and Android shows it
+        // verbatim. Its first key is always `latitude` (`sendLocationMessage`'s insertion order).
+        if lastMessage.hasPrefix(locationPrefix) {
+            return String(localizable: .chatListLocationPlaceholder)
+        }
+
         if lastMessage.hasPrefix(paymentRequestPrefix) || lastMessage.contains(paymentRequestAddressMarker) {
             return String(localizable: .chatListPaymentRequestPlaceholder)
         }
@@ -283,6 +289,7 @@ enum ChatPreviewSentinel {
         return String(localizable: .chatListPaymentPlaceholder)
     }
 
+    private static let locationPrefix = "{\"latitude\":"
     private static let paymentRequestPrefix = "{\"id\":"
     private static let paymentRequestAddressMarker = "\"requesterAddress\""
 }

@@ -75,10 +75,11 @@ import ZappMessaging
         #expect(ChatMessageKind.of(message(content: "notes.pdf", contentType: "application/pdf", mediaId: "m")) == .file)
     }
 
-    /// Decision 3 keeps location out of scope, and every other unknown type degrades the same
-    /// way — the text bubble, never a crash and never raw JSON pretending to be a bubble.
-    @Test func unknownTypesIncludingLocationFallBackToText() {
-        #expect(ChatMessageKind.of(message(content: "{}", contentType: ChatContentType.location)) == .text)
+    /// Unknown types degrade to the text bubble — never a crash and never raw JSON pretending to
+    /// be a bubble. Location is classified by its declared type; an unparseable body still falls
+    /// back to text at render time (`ChatLocation.parse` returns nil, see `ChatLocationWireTests`).
+    @Test func unknownTypesFallBackToText() {
+        #expect(ChatMessageKind.of(message(content: "{}", contentType: ChatContentType.location)) == .location)
         #expect(ChatMessageKind.of(message(content: "hi", contentType: "application/something-new")) == .text)
         #expect(ChatMessageKind.of(message(content: "hi", contentType: ChatContentType.text)) == .text)
     }

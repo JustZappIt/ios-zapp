@@ -343,6 +343,13 @@ struct ZappMessagingClient {
         _ payload: String
     ) async throws -> ZMMessage
 
+    /// Post an `application/location` message. `payload` comes from `ChatLocation.json(...)`,
+    /// mirroring Android's `ChatRoomVM.sendLocationMessage`.
+    var sendLocation: @Sendable (
+        _ conversationId: String,
+        _ payload: String
+    ) async throws -> ZMMessage
+
     var markRead: @Sendable (_ conversationId: String) async throws -> Void
 
     /// Delivery-state changes for messages already on screen (queued -> sent -> read).
