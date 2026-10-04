@@ -763,6 +763,7 @@ struct IncreaseReputationStoreTests {
     ) async -> TestStoreOf<IncreaseReputation> {
         await TestStore(initialState: .initial(currencyCode: currencyCode)) { IncreaseReputation() }
         withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.reputation.summary = { _ in
                 ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", liveness: liveness)
             }
