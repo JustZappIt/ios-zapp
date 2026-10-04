@@ -97,8 +97,9 @@ extension RestoreWalletCoordFlow {
             case let .path(.element(id: id, action: .restoreSeedEntry(.backTapped))),
                 let .path(.element(id: id, action: .restoreBirthday(.backTapped))),
                 let .path(.element(id: id, action: .chatUsername(.backTapped))):
-                state.path.pop(from: id)
-                return .none
+                // Popped through the stack rather than here: this reducer runs before the path's
+                // `forEach`, which would otherwise get the child's action for an element just removed.
+                return .send(.path(.popFrom(id: id)))
 
             case .path(.element(id: _, action: .restoreSeedEntry(.nextTapped))):
                 guard state.path.last?.is(\.restoreSeedEntry) == true else {
