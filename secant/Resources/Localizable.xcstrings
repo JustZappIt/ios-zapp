@@ -34210,13 +34210,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your Revtag, without the @"
+            "value" : "Revtag (e.g. andrew1abc)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu Revtag, sin la @"
+            "value" : "Revtag (p. ej. andrew1abc)"
           }
         }
       }
@@ -34227,13 +34227,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The email address registered with Zelle"
+            "value" : "Email address enrolled with Zelle"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El correo electrónico registrado en Zelle"
+            "value" : "Correo electrónico registrado en Zelle"
           }
         }
       }
@@ -34244,13 +34244,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your $ChimeSign"
+            "value" : "ChimeSign (e.g. $andrew)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu $ChimeSign"
+            "value" : "ChimeSign (p. ej. $andrew)"
           }
         }
       }
@@ -34261,13 +34261,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your monzo.me username"
+            "value" : "Monzo.me username"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu nombre de usuario de monzo.me"
+            "value" : "Usuario de Monzo.me"
           }
         }
       }
@@ -34346,13 +34346,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AMOUNT TO OFFER"
+            "value" : "Amount"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IMPORTE A OFRECER"
+            "value" : "Cantidad"
           }
         }
       }
@@ -34465,13 +34465,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ at today's rate"
+            "value" : "≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ al cambio de hoy"
+            "value" : "≈ %1$@ %2$@"
           }
         }
       }
@@ -34482,13 +34482,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indicative rate"
+            "value" : "Rate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tipo indicativo"
+            "value" : "Tasa"
           }
         }
       }
@@ -34499,13 +34499,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         }
       }
@@ -34550,13 +34550,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Held by orders in progress"
+            "value" : "In progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retenido por órdenes en curso"
+            "value" : "En curso"
           }
         }
       }
@@ -34567,13 +34567,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paid to you on"
+            "value" : "Paid to"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Te pagan en"
+            "value" : "Se paga a"
           }
         }
       }
@@ -34584,13 +34584,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WHERE BUYERS PAY YOU"
+            "value" : "Where you get paid"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DÓNDE TE PAGAN LOS COMPRADORES"
+            "value" : "Dónde te pagan"
           }
         }
       }
@@ -34618,13 +34618,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This service can't confirm the handle for us. Check it carefully — buyers will send your money to exactly what you enter here."
+            "value" : "We cannot confirm this handle. A buyer pays exactly what you register here, so check it carefully."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este servicio no puede confirmarnos el identificador. Revísalo con cuidado: los compradores enviarán tu dinero exactamente a lo que escribas aquí."
+            "value" : "No podemos confirmar este identificador. Un comprador paga exactamente lo que registres aquí, así que revísalo con cuidado."
           }
         }
       }
@@ -34635,13 +34635,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CURRENCIES YOU'LL ACCEPT"
+            "value" : "Currencies you accept"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MONEDAS QUE ACEPTARÁS"
+            "value" : "Monedas que aceptas"
           }
         }
       }
@@ -34669,13 +34669,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Review and confirm"
+            "value" : "Continue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar y confirmar"
+            "value" : "Continuar"
           }
         }
       }
@@ -34686,13 +34686,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "YOUR OPEN ORDERS"
+            "value" : "Orders in progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TUS ÓRDENES ABIERTAS"
+            "value" : "Órdenes en curso"
           }
         }
       }
@@ -34720,13 +34720,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offer at least %@ USDC."
+            "value" : "Enter at least %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ofrece al menos %@ USDC."
+            "value" : "Introduce al menos %@ USDC"
           }
         }
       }
@@ -34737,13 +34737,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can offer up to %@ USDC right now."
+            "value" : "Enter at most %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ahora mismo puedes ofrecer hasta %@ USDC."
+            "value" : "Introduce como máximo %@ USDC"
           }
         }
       }
@@ -34771,13 +34771,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That doesn't look like a valid handle for this service."
+            "value" : "That does not look like a valid handle for this rail."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eso no parece un identificador válido para este servicio."
+            "value" : "Eso no parece un identificador válido para esta vía."
           }
         }
       }
@@ -34805,13 +34805,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Larger than buyers usually take (about %@ USDC each). It will still fill, but probably in pieces over several hours."
+            "value" : "Buyers take about %@ USDC at a time, so this will fill in several pieces over a few hours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es mayor de lo que suelen tomar los compradores (unos %@ USDC cada uno). Se llenará igualmente, pero probablemente por partes durante varias horas."
+            "value" : "Los compradores toman unos %@ USDC cada vez, así que esto se llenará en varias partes a lo largo de unas horas."
           }
         }
       }
