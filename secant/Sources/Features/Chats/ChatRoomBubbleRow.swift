@@ -70,7 +70,7 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
 
     /// One bubble per message type, dispatched in Android's order
     /// (`ChatMessageBubble.kt: MessageContent`) via `ChatMessageKind`. Anything unrecognised —
-    /// including location, out of scope per Decision 3 — falls through to the text bubble.
+    /// including a location body that does not parse — falls through to the text bubble.
     @ViewBuilder
     private var bubble: some View {
         switch kind {
@@ -101,6 +101,18 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
                 readReceiptsEnabled: readReceiptsEnabled
             )
 
+        case .location:
+            if let location = ChatLocation.parse(message.content) {
+                ChatLocationBubble(
+                    message: message,
+                    location: location,
+                    senderName: senderName,
+                    readReceiptsEnabled: readReceiptsEnabled
+                )
+            } else {
+                textBubble
+            }
+
         case .image, .video:
             ChatMediaBubble(
                 message: message,
@@ -118,20 +130,24 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
             )
 
         case .text:
-            VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
-                ChatMessageBubble(
-                    message: message,
-                    senderName: senderName,
-                    readReceiptsEnabled: readReceiptsEnabled
-                )
-
-                if let preview = linkPreview {
-                    ChatLinkPreviewCard(preview: preview)
-                        .frame(maxWidth: Constants.linkPreviewWidth)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: message.isFromMe ? .trailing : .leading)
+            textBubble
         }
+    }
+
+    private var textBubble: some View {
+        VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
+            ChatMessageBubble(
+                message: message,
+                senderName: senderName,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
+
+            if let preview = linkPreview {
+                ChatLinkPreviewCard(preview: preview)
+                    .frame(maxWidth: Constants.linkPreviewWidth)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: message.isFromMe ? .trailing : .leading)
     }
 
     /// Reply on every bubble (Android's swipe-to-reply equivalent), plus Copy on the ones that

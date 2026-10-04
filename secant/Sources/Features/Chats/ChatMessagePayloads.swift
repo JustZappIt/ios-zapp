@@ -11,6 +11,7 @@
 //  * transaction receipt — `common/usecase/SubmitProposalUseCase.kt: notifyChatPeer(...)`
 //                          read back by `bubbles/TransactionBubble.kt`
 //  * settlement link     — `ChatMessageBubble.kt: paymentRequestId(...)` / `paidRequestIds(...)`
+//  * location            — `ChatLocation.swift`
 //
 //  Android's own comment on `buildPaymentRequestJson` states the field set is wire format and
 //  that "iOS parses the same payloads" — this file is that parser. Additive changes only, and
@@ -30,11 +31,11 @@ enum ChatMessageKind: Equatable {
     case paymentRequest
     case walletAddress
     case zecTransaction
+    case location
     case image
     case video
     case file
-    /// Plain text, and the deliberate fallback for anything unrecognised — including
-    /// `application/location`, which Decision 3 puts out of scope.
+    /// Plain text, and the deliberate fallback for anything unrecognised.
     case text
 
     static func of(_ message: ZMMessage) -> ChatMessageKind {
@@ -44,6 +45,7 @@ enum ChatMessageKind: Equatable {
         case ChatContentType.paymentRequest: return .paymentRequest
         case ChatContentType.walletAddress: return .walletAddress
         case ChatContentType.zecTransaction: return .zecTransaction
+        case ChatContentType.location: return .location
         default: break
         }
 

@@ -80,6 +80,7 @@ struct ChatRoom {
         var showsAttachmentSheet = false
         var attachmentPage: ChatRoom.AttachmentPage = .actions
         var pendingAttachment: ChatRoom.PendingAttachment?
+        var pendingLocationShare = false
         var showsPhotosPicker = false
         var showsFileImporter = false
         var showsCamera = false
@@ -318,12 +319,19 @@ struct ChatRoom {
         case cameraUnavailable
         case cameraDismissed
         case cameraCaptured(Data)
+        case shareLocationTapped
         case shareAddressTapped
         case shareAddressFailed
         /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address.
         case sendZecTapped
         /// Routed by Root into `ScanCoordFlow`.
         case scanWalletAddressTapped
+
+        // MARK: Location — reduced in `ChatRoomLocation.swift`
+
+        case locationAuthorizationResolved(Bool)
+        /// A location or video attempt that failed with its own copy for the failure strip.
+        case attachmentFailed(String)
 
         // MARK: Split bill — reduced in `ChatSplitBillStore.swift`
 
@@ -372,6 +380,7 @@ struct ChatRoom {
 
     var body: some Reducer<State, Action> {
         attachmentReduce()
+        locationReduce()
         splitBillReduce()
 
         Reduce { state, action in
@@ -879,8 +888,12 @@ struct ChatRoom {
             case .attachTapped, .attachmentSheetDismissed, .attachmentSheetClosed, .attachMediaTapped,
                 .chooseMediaTapped, .attachFileTapped, .takePhotoTapped, .photosPickerDismissed,
                 .fileImporterDismissed, .fileImported, .cameraAuthorizationResolved, .cameraUnavailable,
-                .cameraDismissed, .cameraCaptured, .shareAddressTapped, .shareAddressFailed,
+                .cameraDismissed, .cameraCaptured, .shareLocationTapped, .shareAddressTapped, .shareAddressFailed,
                 .sendZecTapped, .scanWalletAddressTapped:
+                return .none
+
+            // Owned by `locationReduce()`, which runs first.
+            case .locationAuthorizationResolved, .attachmentFailed:
                 return .none
 
             // Owned by `splitBillReduce()`, which runs first.

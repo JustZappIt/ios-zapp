@@ -5,8 +5,8 @@
 //  The strip above the composer that reports why the last attachment or send did not go through.
 //  Shared by the room and the support chat, which run the identical attachment reducer branches.
 //
-//  One failure is recoverable from inside iOS Settings rather than by retrying — a denied camera
-//  permission — and `ScanView` already established how this app offers that: a `ZappButton`
+//  Two failures are recoverable from inside iOS Settings rather than by retrying — a denied camera
+//  or location permission — and `ScanView` already established how this app offers that: a `ZappButton`
 //  titled `scan.openSettings` that deep-links into the app's Settings page. The same button is
 //  offered here rather than the bare "enable it in Settings" sentence the tile used to end on.
 //
@@ -66,6 +66,7 @@ enum ChatSendFailure {
     /// later, unrelated failure.
     static func offersSettings(_ message: String?) -> Bool {
         message == String(localizable: .chatRoomCameraPermissionRequired)
+            || message == String(localizable: .chatRoomLocationPermissionRequired)
     }
 }
 

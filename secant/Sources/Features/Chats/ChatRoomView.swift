@@ -218,7 +218,8 @@ struct ChatRoomView: View {
                 ChatMediaAttachmentSheet(
                     onChooseMedia: { store.send(.chooseMediaTapped) },
                     onAttachFile: { store.send(.attachFileTapped) },
-                    onTakePhoto: { store.send(.takePhotoTapped) }
+                    onTakePhoto: { store.send(.takePhotoTapped) },
+                    onShareLocation: { store.send(.shareLocationTapped) }
                 )
             }
         }
@@ -234,7 +235,7 @@ struct ChatRoomView: View {
     private var attachmentSheetHeight: CGFloat {
         switch store.attachmentPage {
         case .actions: return ChatAttachmentSheet.detentHeight
-        case .media: return ChatMediaAttachmentSheet.detentHeight
+        case .media: return ChatMediaAttachmentSheet.locationDetentHeight
         }
     }
 

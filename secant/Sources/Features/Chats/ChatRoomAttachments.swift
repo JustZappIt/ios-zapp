@@ -55,6 +55,14 @@ extension ChatRoom {
             // Fires once the sheet is off screen, which is the first moment a picker can be
             // presented without the system silently dropping it.
             case .attachmentSheetClosed:
+                // Location is parked in its own flag rather than in `PendingAttachment`, which the
+                // support chat shares and which has no location option there.
+                if state.pendingLocationShare {
+                    state.pendingLocationShare = false
+                    state.attachmentPage = .actions
+                    return requestLocationAuthorization()
+                }
+
                 guard let pending = state.pendingAttachment else { return .none }
 
                 state.pendingAttachment = nil
@@ -100,6 +108,11 @@ extension ChatRoom {
 
             case .takePhotoTapped:
                 state.pendingAttachment = .camera
+                state.showsAttachmentSheet = false
+                return .none
+
+            case .shareLocationTapped:
+                state.pendingLocationShare = true
                 state.showsAttachmentSheet = false
                 return .none
 
