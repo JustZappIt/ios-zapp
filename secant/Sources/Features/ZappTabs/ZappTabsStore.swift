@@ -60,6 +60,7 @@ struct ZappTabs {
         case coinholderPollingTapped
         #endif
         case giftCardListTapped
+        case hardwareWalletTapped
         case localCurrencyTapped
         case onlineStatusTapped
         case portfolioChartTapped
@@ -67,6 +68,7 @@ struct ZappTabs {
         case p2pTransactionsTapped
         case readReceiptsTapped
         case torTapped
+        case viewingKeyExportTapped
     }
 
     init() { }
@@ -86,8 +88,9 @@ struct ZappTabs {
                 return .none
 
             case .allSettingsTapped, .appLockTapped, .chatContactsTapped, .chatProfileTapped, .chatSettingsTapped,
-            .chooseServerTapped, .giftCardListTapped, .localCurrencyTapped, .onlineStatusTapped,
-            .p2pPaymentMethodTapped, .p2pTransactionsTapped, .portfolioChartTapped, .readReceiptsTapped, .torTapped:
+            .chooseServerTapped, .giftCardListTapped, .hardwareWalletTapped, .localCurrencyTapped, .onlineStatusTapped,
+            .p2pPaymentMethodTapped, .p2pTransactionsTapped, .portfolioChartTapped, .readReceiptsTapped, .torTapped,
+            .viewingKeyExportTapped:
                 return .none
 
             #if VOTING_ENABLED

@@ -475,7 +475,7 @@ private extension RootView {
                                 // it: `path` holds one destination, so a lone address screen would
                                 // uncover the You tab mid-swipe and only snap to the profile once
                                 // the gesture finished.
-                            } else if path == .chatProfile || path == .chatWalletAddress {
+                            } else if path == .chatProfile || path == .chatWalletAddress || path == .chatP2pKey {
                                 ChatProfileView(
                                     store: store.scope(
                                         state: \.chatProfileState,
@@ -483,7 +483,7 @@ private extension RootView {
                                     )
                                 )
                                 .allowsHitTesting(path == .chatProfile)
-                                .accessibilityHidden(path == .chatWalletAddress)
+                                .accessibilityHidden(path != .chatProfile)
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
 
@@ -497,6 +497,26 @@ private extension RootView {
                                     .transition(.move(edge: .trailing))
                                     .zIndex(2)
                                 }
+
+                                if path == .chatP2pKey {
+                                    ChatP2pKeyView(
+                                        store: store.scope(
+                                            state: \.chatP2pKeyState,
+                                            action: \.chatP2pKey
+                                        )
+                                    )
+                                    .transition(.move(edge: .trailing))
+                                    .zIndex(2)
+                                }
+                            } else if path == .viewingKeyExport {
+                                ViewingKeyExportView(
+                                    store: store.scope(
+                                        state: \.viewingKeyExportState,
+                                        action: \.viewingKeyExport
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
                             } else if path == .securitySettings {
                                 SecuritySettingsView(
                                     store: store.scope(

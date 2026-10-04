@@ -203,6 +203,18 @@ struct SettingsTabContent: View {
     @ViewBuilder private var walletGroup: some View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
             ZappRow(
+                title: String(localizable: .settingsYouHardwareWalletTitle),
+                subtitle: String(localizable: .settingsYouHardwareWalletSubtitle),
+                icon: Asset.Assets.Icons.hardDrive.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.hardwareWalletTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
                 title: String(localizable: .settingsGiftCards),
                 subtitle: String(localizable: .giftCardListSubtitle),
                 icon: Asset.Assets.Icons.giftCard.image,
@@ -234,6 +246,18 @@ struct SettingsTabContent: View {
                 iconBackground: .accentSoft
             ) {
                 store.send(.portfolioChartTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsYouViewingKeyExportTitle),
+                subtitle: String(localizable: .settingsYouViewingKeyExportSubtitle),
+                icon: Asset.Assets.eyeOn.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.viewingKeyExportTapped)
             }
 
             ZappRowDivider(inset: true)

@@ -10,7 +10,7 @@ struct ZappTabsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Perception.Bindable var store: StoreOf<ZappTabs>
 
-    let homeStore: StoreOf<Home>
+    @Perception.Bindable var homeStore: StoreOf<Home>
     let chatsListStore: StoreOf<ChatsList>
     let chatIdentitySetupStore: StoreOf<ChatIdentitySetup>
     let chatProfileStore: StoreOf<ChatProfile>
@@ -41,6 +41,18 @@ struct ZappTabsView: View {
                 }
             }
             .onPreferenceChange(ZappScrollProgressKey.self) { scrollProgress = $0 }
+            // The You tab's Hardware wallet row. Home owns the request and the account actions, so
+            // Root's existing account-switch and Add Keystone handling apply unchanged.
+            .sheet(isPresented: $homeStore.accountSwitchRequest) {
+                ZappWalletAccountsSheet(store: homeStore)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $homeStore.isInAppBrowserKeystoneOn) {
+                if let url = URL(string: homeStore.inAppBrowserURLKeystone) {
+                    InAppBrowserView(url: url)
+                }
+            }
         }
     }
 

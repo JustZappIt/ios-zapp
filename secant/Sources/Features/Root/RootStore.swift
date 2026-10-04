@@ -17,6 +17,7 @@ struct Root {
             case addKeystoneHWWalletCoordFlow
             case chatContacts
             case chatOnlineStatus
+            case chatP2pKey
             case chatProfile
             case chatReadReceipts
             case chatRoom
@@ -48,6 +49,7 @@ struct Root {
             case swapAndPayCoordFlow
             case torSetup
             case transactionsCoordFlow
+            case viewingKeyExport
             #if VOTING_ENABLED
             case votingCoordFlow
             #endif
@@ -228,10 +230,12 @@ struct Root {
         var chatsListState = ChatsList.State.initial
         var chatIdentitySetupState = ChatIdentitySetup.State.initial
         var chatContactsListState = ChatContactsList.State.initial
+        var chatP2pKeyState = ChatP2pKey.State.initial
         var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
         var chatWalletAddressState = ChatWalletAddress.State.initial
         var groupInfoState = GroupInfo.State.initial
+        var viewingKeyExportState = ViewingKeyExport.State.initial
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
@@ -335,11 +339,11 @@ struct Root {
             // Both gift screens can put bearer material on screen, and the create flow broadcasts.
             case .giftCard, .giftCardList:
                 return true
-            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
+            case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatP2pKey, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress, .groupInfo,
                  .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
-                 .supportChat, .supportTicketList, .torSetup, .walletBackup:
+                 .supportChat, .supportTicketList, .torSetup, .viewingKeyExport, .walletBackup:
                 return false
             }
         }
@@ -463,10 +467,12 @@ struct Root {
         case chatsList(ChatsList.Action)
         case chatIdentitySetup(ChatIdentitySetup.Action)
         case chatContactsList(ChatContactsList.Action)
+        case chatP2pKey(ChatP2pKey.Action)
         case chatProfile(ChatProfile.Action)
         case chatRoom(ChatRoom.Action)
         case chatWalletAddress(ChatWalletAddress.Action)
         case groupInfo(GroupInfo.Action)
+        case viewingKeyExport(ViewingKeyExport.Action)
         case newChat(NewChat.Action)
         case onramp(Onramp.Action)
         case reputation(Reputation.Action)
@@ -693,6 +699,14 @@ struct Root {
 
         Scope(state: \.chatWalletAddressState, action: \.chatWalletAddress) {
             ChatWalletAddress()
+        }
+
+        Scope(state: \.chatP2pKeyState, action: \.chatP2pKey) {
+            ChatP2pKey()
+        }
+
+        Scope(state: \.viewingKeyExportState, action: \.viewingKeyExport) {
+            ViewingKeyExport()
         }
 
         Scope(state: \.groupInfoState, action: \.groupInfo) {
