@@ -13164,23 +13164,6 @@
         }
       }
     },
-    "group.info.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Group"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grupo"
-          }
-        }
-      }
-    },
     "group.leave" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13232,6 +13215,23 @@
         }
       }
     },
+    "group.membersCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ members"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ miembros"
+          }
+        }
+      }
+    },
     "group.name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13249,19 +13249,19 @@
         }
       }
     },
-    "group.namePlaceholder" : {
+    "group.noContactsToAdd" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What to call this group"
+            "value" : "No contacts to add"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo llamar a este grupo"
+            "value" : "No hay contactos para añadir"
           }
         }
       }
@@ -13296,23 +13296,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Renombrar grupo"
-          }
-        }
-      }
-    },
-    "group.selectMembers" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select who to add"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige a quién añadir"
           }
         }
       }

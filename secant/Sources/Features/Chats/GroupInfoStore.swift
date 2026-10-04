@@ -34,7 +34,7 @@ struct GroupInfo {
         /// Read from the messaging state, not guessed.
         var localPublicKey = ""
 
-        /// Non-nil while the inline rename field is open.
+        /// Non-nil while the rename dialog is open.
         var nameDraft: String?
 
         var isAddMemberPresented = false
@@ -47,6 +47,10 @@ struct GroupInfo {
         /// missing value is not an ownership claim — so nil is treated as "not the owner" and the
         /// control is hidden rather than offered and then failing.
         var canRename: Bool { conversation.isOwner == true }
+
+        /// Only the creator's changes are accepted by the other members, so only the owner is
+        /// offered them. Android gates Add member the same way.
+        var canAddMember: Bool { conversation.isOwner == true }
 
         var isRenaming: Bool { nameDraft != nil }
 
@@ -103,7 +107,6 @@ struct GroupInfo {
     enum Action: Equatable {
         case onAppear
         case onDisappear
-        case backToHomeTapped
         case conversationsChanged([ZMConversation])
         case renameTapped
         case nameDraftChanged(String)
@@ -118,8 +121,8 @@ struct GroupInfo {
         case mutationFailed
         case alert(PresentationAction<Action>)
 
-        /// We left the group; this screen's subject no longer exists. Root clears the path —
-        /// a pushed screen cannot pop itself.
+        /// We left the group; this sheet's subject no longer exists. Root closes the room
+        /// under it as well.
         case didLeave
     }
 
@@ -192,6 +195,7 @@ struct GroupInfo {
                 }
 
             case .addMemberTapped:
+                guard state.canAddMember else { return .none }
                 state.isAddMemberPresented = true
                 state.didFail = false
                 return .none
@@ -255,9 +259,6 @@ struct GroupInfo {
 
             case .didLeave:
                 state.isMutating = false
-                return .none
-
-            case .backToHomeTapped:
                 return .none
             }
         }

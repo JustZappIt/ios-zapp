@@ -93,6 +93,9 @@ struct ChatRoom {
         /// Add / edit / block the peer, opened from the DM's title. Android's `openEditSheet`.
         @Presents var contactForm: ChatContactForm.State?
 
+        /// A group's name, roster and controls, opened from its title. Android's `GroupInfoSheet`.
+        @Presents var groupInfo: GroupInfo.State?
+
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
         var completedMediaIds: Set<String> = []
@@ -351,6 +354,7 @@ struct ChatRoom {
         case imageTapped(ZMMessage)
         case imageViewerDismissed
         case contactForm(PresentationAction<ChatContactForm.Action>)
+        case groupInfo(PresentationAction<GroupInfo.Action>)
 
         /// Handed up to Root, which owns the shared contacts projection.
         case contactsChanged(ChatContacts)
@@ -435,10 +439,15 @@ struct ChatRoom {
             case .backToHomeTapped:
                 return .none
 
-            // A group's title is routed by Root into group info. A DM's title opens the peer's
+            // A group's title opens group info over the room. A DM's title opens the peer's
             // contact record instead — add when they are unknown, edit when they are saved —
             // which is also where Block/Unblock lives. Mirrors Android's `onTitleClick`.
             case .titleTapped:
+                if let conversation = state.conversation, conversation.type == .group {
+                    state.groupInfo = GroupInfo.State(conversation: conversation)
+                    return .none
+                }
+
                 guard !state.isGroup, let publicKey = state.peerPublicKey else { return .none }
 
                 let existing = state.chatContacts.contact(for: publicKey)
@@ -462,6 +471,22 @@ struct ChatRoom {
                 return .none
 
             case .contactForm, .contactsChanged:
+                return .none
+
+            // The sheet follows renames and adds from the core; carry them into the room's
+            // header too, so the title is current once the sheet closes.
+            case .groupInfo(.presented(.conversationsChanged)):
+                if let conversation = state.groupInfo?.conversation {
+                    state.conversation = conversation
+                }
+                return .none
+
+            // Root closes the room as well: the conversation is gone.
+            case .groupInfo(.presented(.didLeave)):
+                state.groupInfo = nil
+                return .none
+
+            case .groupInfo:
                 return .none
 
             case .draftChanged(let draft):
@@ -888,6 +913,9 @@ struct ChatRoom {
                 .splitShareChanged, .splitCurrencyToggled, .splitSendTapped, .splitSendFailed:
                 return .none
             }
+        }
+        .ifLet(\.$groupInfo, action: \.groupInfo) {
+            GroupInfo()
         }
         .ifLet(\.$contactForm, action: \.contactForm) {
             ChatContactForm()

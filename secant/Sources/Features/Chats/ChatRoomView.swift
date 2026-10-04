@@ -195,6 +195,9 @@ struct ChatRoomView: View {
                     ChatContactFormView(store: formStore)
                 }
             }
+            .sheet(item: $store.scope(state: \.groupInfo, action: \.groupInfo)) { groupStore in
+                GroupInfoView(store: groupStore)
+            }
             .sheet(item: $store.scope(state: \.gifPicker, action: \.gifPicker)) { pickerStore in
                 ChatGIFPickerView(store: pickerStore)
             }

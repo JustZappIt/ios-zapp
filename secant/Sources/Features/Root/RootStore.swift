@@ -24,7 +24,6 @@ struct Root {
             case chatWalletAddress
             case giftCard
             case giftCardList
-            case groupInfo
             case increaseReputation
             case newChat
             case onramp
@@ -231,7 +230,6 @@ struct Root {
         var chatProfileState = ChatProfile.State.initial
         var chatRoomState = ChatRoom.State.initial
         var chatWalletAddressState = ChatWalletAddress.State.initial
-        var groupInfoState = GroupInfo.State.initial
         var ironwoodAnnouncementState = IronwoodAnnouncement.State.initial
         var newChatState = NewChat.State.initial
         var onrampState = Onramp.State.initial(currencyCode: "INR")
@@ -336,7 +334,7 @@ struct Root {
             case .giftCard, .giftCardList:
                 return true
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
-                 .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress, .groupInfo,
+                 .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress,
                  .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
@@ -466,7 +464,6 @@ struct Root {
         case chatProfile(ChatProfile.Action)
         case chatRoom(ChatRoom.Action)
         case chatWalletAddress(ChatWalletAddress.Action)
-        case groupInfo(GroupInfo.Action)
         case newChat(NewChat.Action)
         case onramp(Onramp.Action)
         case reputation(Reputation.Action)
@@ -693,10 +690,6 @@ struct Root {
 
         Scope(state: \.chatWalletAddressState, action: \.chatWalletAddress) {
             ChatWalletAddress()
-        }
-
-        Scope(state: \.groupInfoState, action: \.groupInfo) {
-            GroupInfo()
         }
 
         Scope(state: \.supportTicketListState, action: \.supportTicketList) {

@@ -22,7 +22,6 @@ extension Root {
                 .chatContactsList(.backToHomeTapped),
                 .chatProfile(.backToHomeTapped),
                 .chatRoom(.backToHomeTapped),
-                .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
                 .onramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
@@ -733,17 +732,6 @@ extension Root {
             case .chatProfile(.deleteIdentityConfirmed):
                 return .send(.initialization(.resetZashiRequest(false)))
 
-                // Only a group has anything behind its title.
-            case .chatRoom(.titleTapped):
-                guard let conversation = state.chatRoomState.conversation,
-                      conversation.type == .group else {
-                    return .none
-                }
-                state.groupInfoState = .initial
-                state.groupInfoState.conversation = conversation
-                state.path = .groupInfo
-                return .none
-
                 // Send ZEC from the composer's attachment sheet. The address is whatever the peer
                 // shared in this chat, else their saved contact row — Android's
                 // `onSendZecClick`. With neither, the room asks for the scanner instead and this
@@ -889,7 +877,7 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
-            case .groupInfo(.didLeave):
+            case .chatRoom(.groupInfo(.presented(.didLeave))):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
 

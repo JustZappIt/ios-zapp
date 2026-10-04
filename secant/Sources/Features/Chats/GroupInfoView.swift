@@ -2,6 +2,9 @@
 //  GroupInfoView.swift
 //  Zapp
 //
+//  Android's `GroupInfoSheet`: a sheet over the room, so dismissing it lands back in the
+//  conversation it describes.
+//
 
 import ComposableArchitecture
 import SwiftUI
@@ -14,34 +17,57 @@ struct GroupInfoView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 0) {
-                ZappScreenHeader(title: String(localizable: .groupInfoTitle)) {
-                    ZappBackButton { store.send(.backToHomeTapped) }
-                } right: {
-                    EmptyView()
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                        .padding(.bottom, Design.Spacing._lg)
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
-                        nameSection
-                        members
-                        addMemberButton
-
-                        if store.didFail {
-                            Text(String(localizable: .chatProfileSaveFailed))
-                                .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
+                    // Only the creator can rename or add. Offering the controls to anyone else
+                    // would produce a call the core rejects.
+                    if store.canRename {
+                        GroupActionRow(
+                            icon: Asset.Assets.Icons.pencil.image,
+                            label: String(localizable: .groupRename),
+                            isEnabled: !store.isMutating
+                        ) {
+                            store.send(.renameTapped)
                         }
-
-                        leaveButton
                     }
-                    .padding(.horizontal, Design.Spacing._lg)
-                    .padding(.top, Design.Spacing._lg)
-                    .padding(.bottom, ZappNavBar.pushedFloatingMargin)
+
+                    if store.canAddMember {
+                        GroupActionRow(
+                            icon: Asset.Assets.Icons.userPlus.image,
+                            label: String(localizable: .groupAddMember),
+                            isEnabled: !store.isMutating
+                        ) {
+                            store.send(.addMemberTapped)
+                        }
+                    }
+
+                    members
+                        .padding(.top, Design.Spacing._md)
+
+                    if store.didFail {
+                        Text(String(localizable: .chatProfileSaveFailed))
+                            .zappFont(.caption, color: ZappColors.danger.color(colorScheme))
+                            .padding(.top, Design.Spacing._lg)
+                    }
+
+                    leaveButton
+                        .padding(.top, Design.Spacing._2xl)
                 }
+                .padding(.horizontal, Design.Spacing._2xl)
+                .padding(.top, Design.Spacing._2xl)
+                .padding(.bottom, Design.Spacing._2xl)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(ZappColors.bg.color(colorScheme))
-            .zappSwipeBack { store.send(.backToHomeTapped) }
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay {
+                if store.isRenaming {
+                    renameDialog
+                }
+            }
+            .presentationDetents([.medium, .large])
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
             .sheet(isPresented: addMemberBinding) {
@@ -66,36 +92,25 @@ struct GroupInfoView: View {
         )
     }
 
-    @ViewBuilder private var nameSection: some View {
-        if store.isRenaming {
-            renameField
-        } else {
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
-                Text(store.conversation.displayName)
-                    .zappFont(.display, style: ZappColors.text)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            Text(store.conversation.displayName)
+                .zappFont(.sectionTitle, style: ZappColors.text)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                // Only the creator can rename. Offering the control to anyone else would
-                // produce a call the core rejects.
-                if store.canRename {
-                    ZappButton(
-                        title: String(localizable: .groupRename),
-                        variant: .accentGhost,
-                        isEnabled: !store.isMutating
-                    ) {
-                        store.send(.renameTapped)
-                    }
-                }
-            }
+            Text(String(localizable: .groupMembersCount(String(store.state.members.count))))
+                .zappFont(.caption, style: ZappColors.textMuted)
         }
     }
 
-    private var renameField: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .groupName))
+    /// Android's `GroupRenameDialog`.
+    private var renameDialog: some View {
+        ZappDialog(onScrimTap: { store.send(.renameCancelled) }) {
+            Text(String(localizable: .groupRename))
+                .zappFont(.sectionTitle, style: ZappColors.text)
 
             TextField(
-                String(localizable: .groupNamePlaceholder),
+                String(localizable: .groupName),
                 text: Binding(
                     get: { store.nameDraft ?? "" },
                     set: { store.send(.nameDraftChanged($0)) }
@@ -104,11 +119,13 @@ struct GroupInfoView: View {
             .focused($isNameFocused)
             .zappFont(.body, style: ZappColors.text)
             .autocorrectionDisabled()
-            .padding(Design.Spacing._md)
+            .submitLabel(.done)
+            .onSubmit { store.send(.renameSaveTapped) }
+            .padding(Design.Spacing._lg)
             .background(ZappColors.surfaceInput.color(colorScheme))
             .zappFieldTapTarget($isNameFocused)
 
-            HStack(spacing: Design.Spacing._md) {
+            HStack(spacing: Design.Spacing._lg) {
                 ZappButton(title: String(localizable: .generalCancel), variant: .ghost) {
                     store.send(.renameCancelled)
                 }
@@ -121,34 +138,20 @@ struct GroupInfoView: View {
                 }
             }
         }
+        .onAppear { isNameFocused = true }
     }
 
     private var members: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._md) {
-            ZappSectionLabel(text: String(localizable: .groupMembers))
+        VStack(alignment: .leading, spacing: Design.Spacing._sm) {
+            Text(String(localizable: .groupMembers).uppercased())
+                .zappFont(.eyebrow, style: ZappColors.textSubtle)
 
             VStack(spacing: 0) {
                 ForEach(store.state.members) { member in
                     GroupMemberRow(member: member)
-
-                    if member.id != store.state.members.last?.id {
-                        ZappRowDivider(inset: true)
-                    }
                 }
             }
         }
-    }
-
-    private var addMemberButton: some View {
-        ZappButton(
-            title: String(localizable: .groupAddMember),
-            variant: .secondary,
-            isEnabled: !store.isMutating,
-            leadingIcon: Asset.Assets.Icons.userPlus.image
-        ) {
-            store.send(.addMemberTapped)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     private var leaveButton: some View {
@@ -160,20 +163,20 @@ struct GroupInfoView: View {
             store.send(.leaveTapped)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, Design.Spacing._lg)
     }
 
+    /// Android's `AddMemberSheet`.
     private var addMemberSheet: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-            Text(String(localizable: .groupSelectMembers))
+            Text(String(localizable: .groupAddMember))
                 .zappFont(.sectionTitle, style: ZappColors.text)
-                .padding(.horizontal, Design.Spacing._lg)
+                .padding(.horizontal, Design.Spacing._2xl)
                 .padding(.top, Design.Spacing._2xl)
 
             if store.state.addableContacts.isEmpty {
-                Text(String(localizable: .newChatNoContacts))
+                Text(String(localizable: .groupNoContactsToAdd))
                     .zappFont(.body, style: ZappColors.textMuted)
-                    .padding(.horizontal, Design.Spacing._lg)
+                    .padding(.horizontal, Design.Spacing._2xl)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 0) {
@@ -193,15 +196,52 @@ struct GroupInfoView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(ZappColors.bg.color(colorScheme))
+        .background(ZappColors.surface.color(colorScheme))
+        .presentationDetents([.medium, .large])
     }
 }
 
 private enum GroupRowConstants {
     static let avatarSize: CGFloat = 40
+    static let memberAvatarSize: CGFloat = 36
+    static let actionIconSize: CGFloat = 24
+    static let actionSpacing: CGFloat = 16
+    static let actionVerticalPadding: CGFloat = 14
     static let spacing: CGFloat = 12
-    static let horizontalPadding: CGFloat = 6
     static let verticalPadding: CGFloat = 10
+    static let memberVerticalPadding: CGFloat = 8
+}
+
+/// Android's `GroupActionRow`: an accent icon and a label, the whole row tappable.
+private struct GroupActionRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let icon: Image
+    let label: String
+    var isEnabled = true
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: GroupRowConstants.actionSpacing) {
+                icon
+                    .zImage(
+                        width: GroupRowConstants.actionIconSize,
+                        height: GroupRowConstants.actionIconSize,
+                        style: ZappColors.accent
+                    )
+
+                Text(label)
+                    .zappFont(.rowTitle, style: ZappColors.text)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.vertical, GroupRowConstants.actionVerticalPadding)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.zappPress)
+        .disabled(!isEnabled)
+        .accessibilityLabel(label)
+    }
 }
 
 /// The roster carries no presence: the core never tells us whether a given member is reachable,
@@ -211,25 +251,19 @@ private struct GroupMemberRow: View {
 
     var body: some View {
         HStack(spacing: GroupRowConstants.spacing) {
-            GroupAvatar(name: member.name)
+            GroupAvatar(name: member.name, size: GroupRowConstants.memberAvatarSize, style: .chip)
 
-            VStack(alignment: .leading, spacing: Design.Spacing._xxs) {
-                Text(member.name)
-                    .zappFont(.rowTitle, style: ZappColors.text)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-
-                Text(member.publicKey.zappEllipsized())
-                    .zappFont(.mono, style: ZappColors.textMuted)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(member.name)
+                .zappFont(.rowTitle, style: ZappColors.text)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if member.isOwner {
                 ZappStatusChip(text: String(localizable: .groupOwner), variant: .accent)
             }
         }
-        .padding(.horizontal, GroupRowConstants.horizontalPadding)
-        .padding(.vertical, GroupRowConstants.verticalPadding)
+        .padding(.vertical, GroupRowConstants.memberVerticalPadding)
         .frame(maxWidth: .infinity)
     }
 }
@@ -254,7 +288,7 @@ private struct GroupAddableContactRow: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, Design.Spacing._lg)
+            .padding(.horizontal, Design.Spacing._2xl)
             .padding(.vertical, GroupRowConstants.verticalPadding)
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
@@ -267,11 +301,13 @@ private struct GroupAvatar: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let name: String
+    var size: CGFloat = GroupRowConstants.avatarSize
+    var style: ZappTextStyle = .rowTitle
 
     var body: some View {
         Text(name.zappInitials)
-            .zappFont(.rowTitle, style: ZappColors.onAccent)
-            .frame(width: GroupRowConstants.avatarSize, height: GroupRowConstants.avatarSize)
+            .zappFont(style, style: ZappColors.onAccent)
+            .frame(width: size, height: size)
             .background(ZappColors.accent.color(colorScheme))
     }
 }
