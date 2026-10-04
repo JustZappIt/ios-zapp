@@ -2519,23 +2519,6 @@
         }
       }
     },
-    "chatIdentity.failed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Couldn't set up chat"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo configurar el chat"
-          }
-        }
-      }
-    },
     "chatIdentity.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2549,23 +2532,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "nombre de usuario"
-          }
-        }
-      }
-    },
-    "chatIdentity.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try again"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentar"
           }
         }
       }
@@ -2617,6 +2583,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elige un nombre de usuario"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.copyDetails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy error details"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar detalles del error"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.create" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create my identity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi identidad"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.deriveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't set up your chat identity from this wallet. Go back and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo configurar tu identidad de chat desde esta billetera. Vuelve atrás e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.displayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre visible"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.nameInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display name must be 3–20 characters, using lowercase letters, numbers, or underscores."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El nombre visible debe tener entre 3 y 20 caracteres y usar letras minúsculas, números o guiones bajos."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your messaging identity is derived from your wallet. Pick a display name to finish setting it up."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu identidad de mensajería se deriva de tu billetera. Elige un nombre visible para terminar de configurarla."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.supportHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If this keeps happening, copy the error details and send them to the Zapp team."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si esto sigue ocurriendo, copia los detalles del error y envíalos al equipo de Zapp."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Your Chat Identity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura tu identidad de chat"
           }
         }
       }
