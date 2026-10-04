@@ -54,6 +54,9 @@ struct RequestZecSummaryView: View {
                         qrPanel
                             .padding(.top, Design.Spacing._4xl)
 
+                        addressSection
+                            .padding(.top, Design.Spacing._3xl)
+
                         ZappButton(
                             title: String(localizable: .generalClose),
                             variant: .ghost
@@ -95,6 +98,55 @@ struct RequestZecSummaryView: View {
                     }
             }
         }
+    }
+
+    /// Android's `RequestQrCodeView.AddressSection`: which address is being requested into, with a
+    /// copy action, then the note the request carries (if any).
+    private var addressSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(
+                String(localizable: store.maxPrivacy ? .requestZecAddressShielded : .requestZecAddressTransparent)
+                    .uppercased()
+            )
+            .zappFont(.groupLabel, style: ZappColors.textSubtle)
+            .padding(.bottom, Design.Spacing._md)
+
+            HStack(spacing: Design.Spacing._md) {
+                Text(store.address.data.zappEllipsized())
+                    .zappFont(.mono, style: ZappColors.textMuted)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityLabel(store.address.data)
+
+                Button {
+                    store.send(.copyAddressTapped)
+                } label: {
+                    Asset.Assets.copy.image
+                        .zImage(width: 18, height: 18, style: ZappColors.accentText)
+                        .frame(width: 40, height: 40)
+                        .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
+                }
+                .buttonStyle(.zappPress)
+                .accessibilityLabel(String(localizable: .requestZecCopyAddress))
+            }
+
+            if !store.memoState.text.isEmpty {
+                VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+                    Text(localizable: .requestZecNoteLabel)
+                        .zappFont(.groupLabel, style: ZappColors.textSubtle)
+
+                    Text(store.memoState.text)
+                        .zappFont(.rowSubtitle, style: ZappColors.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
+                .padding(.top, Design.Spacing._lg)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // The QR keeps a white fill in both themes: a scanner has to read it.

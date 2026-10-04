@@ -184,6 +184,91 @@
     "reputation.unreadableTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn't reach Base"}},"es":{"stringUnit":{"state":"translated","value":"No pudimos conectar con Base"}}}},
     "reputation.verifiedGroup" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"VERIFIED"}},"es":{"stringUnit":{"state":"translated","value":"VERIFICADAS"}}}},
     "reputation.verifyToBuy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verify to buy"}},"es":{"stringUnit":{"state":"translated","value":"Verifica para comprar"}}}},
+    "requestZec.address.shielded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Shielded Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección protegida"
+          }
+        }
+      }
+    },
+    "requestZec.address.transparent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Transparent Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección transparente"
+          }
+        }
+      }
+    },
+    "requestZec.copyAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar dirección"
+          }
+        }
+      }
+    },
+    "requestZec.noteHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a note (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega una nota (opcional)"
+          }
+        }
+      }
+    },
+    "requestZec.noteLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTE"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTA"
+          }
+        }
+      }
+    },
     "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status and alerts"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea y alertas"}}}},
     "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
     "~%@ %@" : {
