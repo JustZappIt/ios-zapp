@@ -120,6 +120,8 @@ struct ChatProfile {
         case copyIndicatorExpired
         /// Consumed by Root, which pushes the wallet-address screen.
         case walletAddressTapped
+        /// Consumed by Root, which pushes the P2P wallet key screen (Android's `ChatP2pKeyArgs`).
+        case p2pKeyScreenTapped
         case readReceiptsToggled
         case readReceiptsFinished(Bool)
         case presenceToggled
