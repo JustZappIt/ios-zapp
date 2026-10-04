@@ -734,18 +734,18 @@ extension Root {
 
                 // Send ZEC from the composer's attachment sheet. The address is whatever the peer
                 // shared in this chat, else their saved contact row — Android's
-                // `onSendZecClick`. With neither, the room asks for the scanner instead and this
-                // case never fires.
+                // `onSendZecClick`. With neither, the form opens empty, still in chat-send context.
             case .chatRoom(.sendZecTapped):
-                guard let address = state.chatRoomState.resolvedPeerWalletAddress else {
-                    return .none
-                }
                 state.sendCoordFlowState = .initial
                 state.returnsToChatRoomAfterWalletFlow = true
                 // No request id: this send settles nothing, it is just a payment to the peer.
                 state.chatSendContext = .init(conversationId: state.chatRoomState.conversationId)
                 state.path = .sendCoordFlow
                 exchangeRate.refreshExchangeRateUSD()
+
+                guard let address = state.chatRoomState.resolvedPeerWalletAddress else {
+                    return .none
+                }
                 return .send(.sendCoordFlow(.sendForm(.addressUpdated(address.redacted))))
 
                 // A shared wallet-address bubble tapped into a send — Android's `onSendToAddress`,
@@ -814,16 +814,6 @@ extension Root {
                 }
                 state.returnsToChatRoomAfterWalletFlow = true
                 state.path = .transactionsCoordFlow
-                return .none
-
-                // Falls out of Send ZEC when no peer address is known. The scanner ends in the
-                // same send form, so it returns to the room on the way out too — and it is still
-                // a chat-initiated send, so it carries the same receipt context.
-            case .chatRoom(.scanWalletAddressTapped):
-                state.scanCoordFlowState = .initial
-                state.returnsToChatRoomAfterWalletFlow = true
-                state.chatSendContext = .init(conversationId: state.chatRoomState.conversationId)
-                state.path = .scanCoordFlow
                 return .none
 
                 // MARK: - Chat payment receipt

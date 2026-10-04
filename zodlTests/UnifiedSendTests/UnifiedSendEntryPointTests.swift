@@ -195,18 +195,15 @@ import ZappMessaging
         #expect(store.sendCoordFlowState.sendFormState.address.data == Self.peerAddress)
     }
 
-    /// The scanner opened from a chat room keeps its chat context across the handoff, so the receipt
-    /// still posts and the flow still returns to the room.
-    @Test func aScannedAddressFromAChatRoomKeepsTheChatContext() async {
+    /// With no peer address, Send ZEC opens the empty unified form, still carrying the chat
+    /// context so the receipt posts and the flow returns to the room (Android's `onSendZecClick`).
+    @Test func chatSendZecWithoutAPeerAddressOpensTheEmptyFormWithTheChatContext() async {
         let store = chatRoomStore(peerSharedAddress: false)
 
-        store.send(.chatRoom(.scanWalletAddressTapped))
-        #expect(store.path == .scanCoordFlow)
-        #expect(store.returnsToChatRoomAfterWalletFlow)
-
-        store.send(.scanCoordFlow(.scan(.foundAddress(Self.peerAddress.redacted))))
+        store.send(.chatRoom(.sendZecTapped))
         await waitForRoot { store.path == .sendCoordFlow }
 
+        #expect(store.sendCoordFlowState.sendFormState.address.data.isEmpty)
         #expect(store.returnsToChatRoomAfterWalletFlow)
         #expect(store.chatSendContext?.conversationId == "conversation")
     }

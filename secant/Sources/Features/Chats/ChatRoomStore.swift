@@ -187,9 +187,7 @@ struct ChatRoom {
             return senderName(for: message) ?? String(localizable: .generalUnknown)
         }
 
-        /// The header pill owns peer presence and transport detail. Keep the
-        /// subtitle quiet while our node is connected; when it is offline there
-        /// cannot be a reachable peer, so saying so here is still useful.
+        /// Always shown, as Android's header always carries the connection subtitle.
         var subtitle: String? {
             messagingState.roomSubtitle(for: conversationId)
         }
@@ -323,10 +321,8 @@ struct ChatRoom {
         case cameraCaptured(Data)
         case shareAddressTapped
         case shareAddressFailed
-        /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address.
+        /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address when known.
         case sendZecTapped
-        /// Routed by Root into `ScanCoordFlow`.
-        case scanWalletAddressTapped
 
         // MARK: Split bill — reduced in `ChatSplitBillStore.swift`
 
@@ -905,7 +901,7 @@ struct ChatRoom {
                 .chooseMediaTapped, .attachFileTapped, .takePhotoTapped, .photosPickerDismissed,
                 .fileImporterDismissed, .fileImported, .cameraAuthorizationResolved, .cameraUnavailable,
                 .cameraDismissed, .cameraCaptured, .shareAddressTapped, .shareAddressFailed,
-                .sendZecTapped, .scanWalletAddressTapped:
+                .sendZecTapped:
                 return .none
 
             // Owned by `splitBillReduce()`, which runs first.

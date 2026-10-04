@@ -200,17 +200,9 @@ extension ChatRoom {
                 state.sendFailureMessage = String(localizable: .chatRoomShareAddressFailed)
                 return .none
 
-            // Root opens the send flow prefilled, reading `resolvedPeerWalletAddress`. With no
-            // address to prefill there is nothing to send to, so the room offers the scanner
-            // instead — Android reaches the same scan from its send-ZEC path.
+            // Root opens the send flow, prefilled from `resolvedPeerWalletAddress` when there is
+            // one and empty otherwise — Android's `onSendZecClick` opens the form either way.
             case .sendZecTapped:
-                state.showsAttachmentSheet = false
-
-                return state.resolvedPeerWalletAddress == nil
-                    ? .send(.scanWalletAddressTapped)
-                    : .none
-
-            case .scanWalletAddressTapped:
                 state.showsAttachmentSheet = false
                 return .none
 

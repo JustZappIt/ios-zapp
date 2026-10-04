@@ -65,6 +65,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [CHATS-PARITY] Send ZEC in a chat now always opens the Send screen, as on Android. When Zapp doesn't know the other person's address the form opens empty instead of jumping to the QR scanner.
 - [CHATS-PARITY] Link previews in chats now sit inside the message bubble and open the link when tapped. The message composer matches Android: larger controls, an accent "+" button and up to four visible lines.
 - [CHATS-PARITY] The chat identity setup screen now matches Android: "Set Up Your Chat Identity" with a display name field and "Create my identity". The name rules appear only if the name doesn't fit them, and if setup fails you can copy the error details to send to the Zapp team.
 - [CHATS-PARITY] Chat connection status now reads like Android: the conversation header always says how the conversation is connected ("Peer online", "P2P connected", "Waiting for peer…", "Offline" and so on), the status chips use Android's short labels, and the network details sheet uses Android's sections, labels and icons, hiding details until they have loaded instead of showing "Unknown".
