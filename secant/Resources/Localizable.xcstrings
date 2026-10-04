@@ -12466,6 +12466,23 @@
         }
       }
     },
+    "filter.unread" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unread"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No leídos"
+          }
+        }
+      }
+    },
     "filter.weTried" : {
       "extractionState" : "manual",
       "localizations" : {
