@@ -19917,6 +19917,57 @@
     "offramp.history.type.buy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Buy"}},"es":{"stringUnit":{"state":"translated","value":"Comprar"}}}},
     "offramp.history.type.pay" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay"}},"es":{"stringUnit":{"state":"translated","value":"Pagar"}}}},
     "offramp.history.type.sell" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sell"}},"es":{"stringUnit":{"state":"translated","value":"Vender"}}}},
+    "offramp.pay.addFundsToPay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add funds to pay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar fondos para pagar"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monto"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountSent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount sent"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe enviado"
+          }
+        }
+      }
+    },
     "offramp.history.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19968,6 +20019,108 @@
         }
       }
     },
+    "offramp.pay.confirm.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %1$@ using about %2$@ USDC at %3$@ per USDC."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paga %1$@ con aproximadamente %2$@ USDC a %3$@ por USDC."
+          }
+        }
+      }
+    },
+    "offramp.pay.confirm.payNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagar ahora"
+          }
+        }
+      }
+    },
+    "offramp.pay.discardInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard local order & start over"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar orden local y empezar de nuevo"
+          }
+        }
+      }
+    },
+    "offramp.pay.errorInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An offramp is already in progress. Resume it before starting a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya hay un offramp en curso. Reanúdalo antes de iniciar otro."
+          }
+        }
+      }
+    },
+    "offramp.pay.recentTransactions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent transactions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transacciones recientes"
+          }
+        }
+      }
+    },
+    "offramp.pay.resumeInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume in-flight offramp"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar offramp en curso"
+          }
+        }
+      }
+    },
     "offramp.pay.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19981,40 +20134,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagar a un comercio"
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The rate, fee, or required USDC changed. Review the updated quote before confirming."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La tasa, la comisión o los USDC necesarios cambiaron. Revisa la cotización actualizada antes de confirmar."
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Review updated payment quote"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisar la cotización de pago actualizada"
           }
         }
       }

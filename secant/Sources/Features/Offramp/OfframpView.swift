@@ -46,20 +46,18 @@ struct OfframpView: View {
             } message: {
                 Text(bridgePreviewMessage)
             }
+            // Android's "Confirm payment" dialog (`upi_offramp_confirm_*`), shown before every pay.
             .alert(
-                text("offramp.pay.updated.title", "Review updated payment quote"),
+                String(localizable: .offrampPayConfirm),
                 isPresented: Binding(
                     get: { store.isPayConfirmationPresented },
                     set: { if !$0 { store.send(.payDismissed) } }
                 )
             ) {
-                Button(text("general.cancel", "Cancel"), role: .cancel) { store.send(.payDismissed) }
-                Button(text("offramp.pay.confirm", "Confirm payment")) { store.send(.payConfirmed) }
+                Button(String(localizable: .generalCancel), role: .cancel) { store.send(.payDismissed) }
+                Button(String(localizable: .offrampPayConfirmPayNow)) { store.send(.payConfirmed) }
             } message: {
-                Text(text(
-                    "offramp.pay.updated.message",
-                    "The rate, fee, or required USDC changed. Review the updated quote before confirming."
-                ))
+                Text(payConfirmationMessage)
             }
             .alert(
                 text("offramp.topup.confirm.title", "Confirm ZEC bridge"),
@@ -205,8 +203,8 @@ struct OfframpView: View {
                         ) { store.send(.addFundsTapped) }
                         .padding(.top, 16)
 
-                        if store.hasCheckpoint && !store.isResumingCheckpoint {
-                            checkpointActions
+                        if isInFlight {
+                            inFlightDiscard
                                 .padding(.top, 12)
                         }
 
@@ -221,11 +219,16 @@ struct OfframpView: View {
             }
 
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                if let quote = store.quote {
+                if isInFlight {
+                    // Android's in-flight CTA: the only way forward is to resume the saved order.
+                    ZappButton(title: String(localizable: .offrampPayResumeInFlight)) {
+                        store.send(.resumeCheckpointTapped)
+                    }
+                } else if let quote = store.quote {
                     ZappButton(
                         title: quote.canPayFromBase
                             ? text("offramp.pay.button", "Pay")
-                            : text("offramp.addFunds.button", "Add funds"),
+                            : String(localizable: .offrampPayAddFundsToPay),
                         isEnabled: !store.isLoading && !store.hasCheckpoint
                     ) {
                         store.send(quote.canPayFromBase ? .payTapped : .addFundsTapped)
@@ -246,7 +249,7 @@ struct OfframpView: View {
     private var amountHero: some View {
         VStack(spacing: 6) {
             HStack {
-                Text(text("offramp.pay.amount", "AMOUNT"))
+                Text(String(localizable: .offrampPayAmountLabel).uppercased())
                     .zappFont(.eyebrow, style: ZappColors.textMuted)
                 Spacer()
                 Text(store.selectedCorridor?.currencyCode ?? store.selectedCurrencyCode)
@@ -290,9 +293,15 @@ struct OfframpView: View {
 
     private var settlementLedger: some View {
         VStack(spacing: 6) {
+            // Android's ledger reads "Amount sent" / "Rate". Base balance stays as a third row
+            // until it moves into the hero field ("On Base"), which is the design lane's work.
             ZappCompactLedger(rows: [
                 ZappCompactLedgerRow(
-                    label: text("offramp.quote.rate", "Rate"),
+                    label: String(localizable: .offrampPayAmountSent),
+                    value: amountSentText ?? "—"
+                ),
+                ZappCompactLedgerRow(
+                    label: String(localizable: .offrampQuoteRate),
                     value: store.quote.map { "1 USDC = \($0.sellRate) \($0.currencyCode)" } ?? "—"
                 ),
                 ZappCompactLedgerRow(
@@ -318,24 +327,43 @@ struct OfframpView: View {
         }
     }
 
-    private var checkpointActions: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(text(
-                "offramp.checkpoint.message",
-                "A P2P payment is still in progress. Resume it before starting another payment."
-            ))
-            .zappFont(.caption, style: ZappColors.danger)
+    /// A saved order blocks a new one. Android states it as the field error and offers the
+    /// discard as an underlined danger link; the CTA becomes "Resume in-flight offramp".
+    private var isInFlight: Bool {
+        store.hasCheckpoint && !store.isResumingCheckpoint
+    }
 
-            HStack(spacing: 10) {
-                ZappButton(
-                    title: text("offramp.checkpoint.discard", "Discard"),
-                    variant: .ghost
-                ) { store.send(.discardCheckpointTapped) }
-                ZappButton(title: text("offramp.checkpoint.resume", "Resume")) {
-                    store.send(.resumeCheckpointTapped)
-                }
+    private var inFlightDiscard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(String(localizable: .offrampPayErrorInFlight))
+                .zappFont(.caption, style: ZappColors.danger)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button { store.send(.discardCheckpointTapped) } label: {
+                Text(String(localizable: .offrampPayDiscardInFlight))
+                    .underline()
+                    .zappFont(.caption, style: ZappColors.danger)
             }
+            .buttonStyle(.zappPress)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Android's `fiatAmountText`: the currency symbol plus the amount typed.
+    private var amountSentText: String? {
+        guard Offramp.hasPositiveAmount(store.fiatAmount) else { return nil }
+        let symbol = store.selectedCorridor?.symbol ?? ""
+        return "\(symbol)\(store.fiatAmount)"
+    }
+
+    private var payConfirmationMessage: String {
+        guard let quote = store.quote else { return "" }
+        let symbol = store.selectedCorridor?.symbol ?? ""
+        return String(localizable: .offrampPayConfirmMessage(
+            "\(symbol)\(quote.fiatAmount)",
+            quote.usdcDisplay,
+            "\(symbol)\(quote.sellRate)"
+        ))
     }
 
     private var recentTransactionsButton: some View {
@@ -343,7 +371,7 @@ struct OfframpView: View {
             HStack(spacing: 6) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .semibold))
-                Text(text("offramp.history.recent", "Recent transactions"))
+                Text(String(localizable: .offrampPayRecentTransactions))
                     .zappFont(.caption, style: ZappColors.accent)
             }
             .foregroundStyle(ZappColors.accent.color(colorScheme))

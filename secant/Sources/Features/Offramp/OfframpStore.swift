@@ -327,14 +327,12 @@ struct Offramp {
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
             case .payQuoteRefreshed(let refreshed):
-                let changed = state.quote != refreshed
+                // Android's `UpiOfframpVM.onSendClick`: every payment goes through "Confirm
+                // payment", built from the commit-time quote — not only when that quote moved.
                 state.quote = refreshed
                 state.isLoading = false
-                if changed {
-                    state.isPayConfirmationPresented = true
-                    return .none
-                }
-                return .send(.payConfirmed)
+                state.isPayConfirmationPresented = true
+                return .none
 
             case .payConfirmed:
                 guard let quote = state.quote, quote.canPayFromBase, !state.isLoading else { return .none }

@@ -88,10 +88,13 @@ struct OfframpTests {
         await store.send(.payTapped) {
             $0.isLoading = true
         }
+        // Android always confirms, even when the commit-time quote did not move.
         await store.receive(\.payQuoteRefreshed) {
             $0.isLoading = false
+            $0.isPayConfirmationPresented = true
         }
-        await store.receive(\.payConfirmed) {
+        await store.send(.payConfirmed) {
+            $0.isPayConfirmationPresented = false
             $0.page = .progress
             $0.isLoading = true
         }
