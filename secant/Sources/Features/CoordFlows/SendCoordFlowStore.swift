@@ -51,6 +51,7 @@ struct SendCoordFlow {
     @Reducer
     enum Path {
         case addressBook(AddressBook)
+        case addressDetails(AddressDetails)
         case addressBookContact(AddressBook)
         case confirmWithKeystone(SendConfirmation)
         case keystoneFirmwareUpdate(SendConfirmation)
@@ -70,10 +71,16 @@ struct SendCoordFlow {
         var path = StackState<Path.State>()
         var sendFormState = SendForm.State.initial
         var swapState = SwapAndPay.State.initial
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         @Shared(.inMemory(.transactions)) var transactions: IdentifiedArrayOf<TransactionState> = []
 
         var mode: Mode = .zec
         var isAssetPickerPresented = false
+        /// Android's `TopUpArgs` sheet, raised by the "Top Up" CTA. See `SendCoordFlow+TopUp`.
+        var isTopUpPresented = false
+        /// Opened from the Pay tab's Swap action. Android's FAB opens a screen titled "Swap"; this
+        /// form keeps that title while it is in swap mode.
+        var isSwapEntry = false
         /// Which of the two amount inputs leads. Android keeps one field plus an "≈" line and a
         /// swap affordance; this is that affordance's state for ZEC-direct mode (swap mode uses
         /// `SwapAndPay.State.isInputInUsd`).
@@ -151,8 +158,11 @@ struct SendCoordFlow {
         /// Delegate to Root: hand off to `SwapAndPayCoordFlow`'s swap-to-ZEC corridor, which the
         /// unified screen deliberately does not cover (Android's unified screen doesn't either).
         case swapToZecRequested
-        /// Delegate to Root: Android's `TopUpArgs`.
+        /// Android's `TopUpArgs`: the source picker over the form (`SendCoordFlow+TopUp`).
         case topUpRequested
+        case topUpDismissed
+        case topUpSourcePicked(TopUpSource)
+        case topUpUnifiedAddressResolved(String?)
         case viewTransactionRequested(SendConfirmation.State)
         case zecAssetSelected
     }
@@ -161,6 +171,7 @@ struct SendCoordFlow {
     @Dependency(\.keystoneHandler) var keystoneHandler
     @Dependency(\.localAuthentication) var localAuthentication
     @Dependency(\.numberFormatter) var numberFormatter
+    @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.swapAndPay) var swapAndPay
     @Dependency(\.userMetadataProvider) var userMetadataProvider
 
@@ -168,6 +179,8 @@ struct SendCoordFlow {
 
     var body: some Reducer<State, Action> {
         coordinatorReduce()
+
+        topUpReduce()
 
         Scope(state: \.sendFormState, action: \.sendForm) {
             SendForm()

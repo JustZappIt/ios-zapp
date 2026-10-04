@@ -29,6 +29,8 @@ struct SendCoordFlowView: View {
                     AddressBookView(store: store)
                 case let .addressBookContact(store):
                     AddressBookContactView(store: store)
+                case let .addressDetails(store):
+                    AddressDetailsView(store: store)
                 case let .confirmWithKeystone(store):
                     SignWithKeystoneView(store: store, tokenName: tokenName)
                 case let .keystoneFirmwareUpdate(store):
@@ -54,6 +56,16 @@ struct SendCoordFlowView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(
+                isPresented: Binding(
+                    get: { store.isTopUpPresented },
+                    set: { if !$0 { store.send(.topUpDismissed) } }
+                )
+            ) {
+                ZappTopUpSheet { store.send(.topUpSourcePicked($0)) }
+                    .presentationDetents([.height(ZappTopUpSheet.detentHeight)])
+                    .presentationDragIndicator(.visible)
+            }
         }
         .background(ZappColors.bg.color(colorScheme))
     }

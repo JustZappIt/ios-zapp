@@ -268,6 +268,7 @@ extension Root {
                 state.sendCoordFlowState.mode = .swap
                 state.sendCoordFlowState.swapState.isSwapExperienceEnabled = true
                 state.sendCoordFlowState.swapState.isSwapToZecExperienceEnabled = false
+                state.sendCoordFlowState.isSwapEntry = true
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 state.path = .sendCoordFlow
@@ -1315,17 +1316,6 @@ extension Root {
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 return .send(.fetchTransactionsForTheSelectedAccount)
-
-                // Android's `PrimaryButtonState.TopUp` → `TopUpArgs`. On iOS the bridge-funds
-                // corridor lives in Offramp; `addFundsTapped` is the action that opens its Top-Up
-                // page and loads the account behind it.
-            case .sendCoordFlow(.topUpRequested):
-                state.offrampState = .initial(page: .amount, corridorContext: .settings)
-                state.offrampOrigin = .pay
-                state.returnsToChatRoomAfterWalletFlow = false
-                state.chatSendContext = nil
-                state.path = .offramp
-                return .send(.offramp(.addFundsTapped))
 
                 // Swap-to-ZEC (deposit an external asset, receive ZEC) is not part of Android's
                 // unified screen. It keeps its own flow, entered from the unified form's deposit

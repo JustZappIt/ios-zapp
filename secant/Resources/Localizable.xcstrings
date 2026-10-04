@@ -31593,6 +31593,108 @@
         }
       }
     },
+    "topUp.fromExchange.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchanges like Binance or Coinbase can only send to a transparent address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los exchanges como Binance o Coinbase solo pueden enviar a una dirección transparente."
+          }
+        }
+      }
+    },
+    "topUp.fromExchange.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From an exchange"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde un exchange"
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive directly to your shielded address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe directamente en tu dirección blindada."
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From another wallet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde otra billetera"
+          }
+        }
+      }
+    },
+    "topUp.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where your ZEC is coming from."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige de dónde provienen tus ZEC."
+          }
+        }
+      }
+    },
+    "topUp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How are you topping up?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo vas a recargar?"
+          }
+        }
+      }
+    },
     "torSettingsSheet.desc" : {
       "extractionState" : "manual",
       "localizations" : {
