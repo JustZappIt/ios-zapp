@@ -36,6 +36,7 @@ extension Onramp {
         case deliveryActionTapped
         case copyAccountAddressTapped
         case copyPaymentAddressTapped
+        case copyPaymentFieldTapped(Int)
         case sendBaseBalanceToZecTapped
         case baseRefundPreviewLoaded(OfframpBridgePreview)
         case sendBaseBalanceToZecConfirmed

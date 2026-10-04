@@ -125,7 +125,8 @@ struct Onramp {
         var qrPayload: String? {
             switch paymentInstruction {
             case .upi(_, let payload), .qr(let payload): return payload
-            case .fields, .plain, nil: return nil
+            case .fields(_, let qrPayload): return qrPayload
+            case .plain, nil: return nil
             }
         }
 
@@ -133,7 +134,10 @@ struct Onramp {
             switch paymentInstruction {
             case .upi(let address, _), .plain(let address): return address
             case .qr(let payload): return payload
-            case .fields(let fields): return fields.map { "\($0.label): \($0.value)" }.joined(separator: "\n")
+            // Android's `Fields.copyValue`: the bare values, in order, as the payee's handle.
+            case .fields(let fields, _):
+                let values = fields.map(\.value).joined(separator: "|")
+                return values.isEmpty ? nil : values
             case nil: return nil
             }
         }
@@ -543,6 +547,11 @@ struct Onramp {
             case .copyPaymentAddressTapped:
                 guard let address = state.paymentAddress else { return .none }
                 pasteboard.setString(RedactableString(address))
+                return .none
+
+            case .copyPaymentFieldTapped(let index):
+                guard case .fields(let fields, _) = state.paymentInstruction, fields.indices.contains(index) else { return .none }
+                pasteboard.setString(RedactableString(fields[index].value))
                 return .none
 
             case .sendBaseBalanceToZecTapped:
