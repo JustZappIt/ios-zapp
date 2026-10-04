@@ -55,6 +55,7 @@ private struct UnifiedSendContent: View {
         static let amountFieldHeight: CGFloat = 40
         static let swapAmountsButtonSize: CGFloat = 36
         static let assetSelectorMaxWidth: CGFloat = 280
+        static let slippageButtonSize: CGFloat = 52
     }
 
     private enum InputID: Hashable {
@@ -72,6 +73,7 @@ private struct UnifiedSendContent: View {
     @Shared(.appStorage(.sensitiveContent)) private var isSensitiveContentHidden = false
 
     @State private var keyboardVisible = false
+    @State private var isCrossPayInfoPresented = false
 
     @FocusState private var isAddressFocused
     @FocusState private var isAmountFocused
@@ -82,11 +84,23 @@ private struct UnifiedSendContent: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZappScreenHeader(
-                    title: String(localizable: .generalSend),
+                    // Android's FAB Swap opens a screen titled "Swap"; this form keeps that title
+                    // for as long as it is in swap mode.
+                    title: store.isSwapEntry && isSwap
+                        ? String(localizable: .swapAndPaySwap)
+                        : String(localizable: .generalSend),
                     containerColor: .bg,
                     titleStyle: .displaySecondary,
                     left: { EmptyView() },
-                    right: { hideBalancesButton }
+                    right: {
+                        HStack(spacing: 0) {
+                            hideBalancesButton
+
+                            if isSwap {
+                                crossPayInfoButton
+                            }
+                        }
+                    }
                 )
 
                 ScrollView {
@@ -122,9 +136,6 @@ private struct UnifiedSendContent: View {
                                 if isSwap {
                                     theyReceiveRow
                                         .padding(.top, Design.Spacing._xl)
-
-                                    slippageRow
-                                        .padding(.top, Design.Spacing._2xl)
 
                                     depositForZecRow
                                         .padding(.top, Design.Spacing._2xl)
@@ -212,6 +223,11 @@ private struct UnifiedSendContent: View {
                     keyboardDismissAccessory
                 }
             }
+            .sheet(isPresented: $isCrossPayInfoPresented) {
+                ZappCrossPayInfoSheet { isCrossPayInfoPresented = false }
+                    .presentationDetents([.height(ZappCrossPayInfoSheet.detentHeight)])
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
 }
@@ -230,6 +246,19 @@ private extension UnifiedSendContent {
                 .frame(width: Constants.toolbarTouchTarget, height: Constants.toolbarTouchTarget)
         }
         .buttonStyle(.zappPress)
+    }
+
+    /// Android's swap-mode header action → `CrossPayInfoArgs`.
+    private var crossPayInfoButton: some View {
+        Button {
+            isCrossPayInfoPresented = true
+        } label: {
+            Asset.Assets.infoCircle.image
+                .zImage(width: Constants.toolbarIconSize, height: Constants.toolbarIconSize, style: ZappColors.text)
+                .frame(width: Constants.toolbarTouchTarget, height: Constants.toolbarTouchTarget)
+        }
+        .buttonStyle(.zappPress)
+        .accessibilityLabel(String(localizable: .crosspayHelpPayWith))
     }
 
     /// Android renders the form as a sentence: "I want to send … Asset … I'll pay …".
@@ -551,31 +580,33 @@ private extension UnifiedSendContent {
         }
     }
 
-    private var slippageRow: some View {
-        HStack(spacing: 0) {
-            Text(localizable: .swapAndPaySlippageTolerance)
-                .zappFont(.body, style: ZappColors.textMuted)
+    /// Android's `SlippageButton`: a 52pt square beside the CTA in the bottom bar, swap mode only.
+    private var slippageButton: some View {
+        Button {
+            isAmountFocused = false
+            swapStore.send(.slippageTapped)
+        } label: {
+            VStack(spacing: Design.Spacing._xxs) {
+                Asset.Assets.Icons.slippage.image
+                    .zImage(width: 16, height: 16, style: slippageEnabled ? ZappColors.text : ZappColors.textSubtle)
 
-            Spacer()
-
-            Button {
-                isAmountFocused = false
-                swapStore.send(.slippageTapped)
-            } label: {
-                HStack(spacing: Design.Spacing._sm) {
-                    Text(swapStore.currentSlippageString)
-                        .zappFont(.buttonSmall, style: ZappColors.text)
-
-                    Asset.Assets.Icons.settings2.image
-                        .zImage(width: 16, height: 16, style: ZappColors.text)
-                }
-                .padding(.horizontal, Design.Spacing._lg)
-                .padding(.vertical, Design.Spacing._md)
-                .background(ZappColors.surfaceAlt.color(colorScheme))
+                Text(swapStore.currentSlippageString)
+                    .zappFont(.caption, style: slippageEnabled ? ZappColors.textMuted : ZappColors.textSubtle)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
-            .buttonStyle(.zappPress)
-            .disabled(swapStore.isQuoteRequestInFlight)
+            .frame(width: Constants.slippageButtonSize, height: Constants.slippageButtonSize)
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
         }
+        .buttonStyle(.zappPress)
+        .disabled(!slippageEnabled)
+        .accessibilityLabel(String(localizable: .swapAndPaySlippageTolerance))
+        .accessibilityValue(swapStore.currentSlippageString)
+    }
+
+    private var slippageEnabled: Bool {
+        !swapStore.isQuoteRequestInFlight
     }
 
     /// The opposite direction (deposit another asset, receive ZEC) is not part of Android's unified
@@ -604,6 +635,7 @@ private extension UnifiedSendContent {
     // MARK: Memo
 
     @ViewBuilder private var memoSection: some View {
+        // Android hides the memo section entirely for a transparent (or TEX) recipient.
         if sendStore.isMemoInputEnabled {
             VStack(alignment: .leading, spacing: Design.Spacing._sm) {
                 sentence(String(localizable: .unifiedSendMemoHint))
@@ -613,49 +645,46 @@ private extension UnifiedSendContent {
                     .frame(maxHeight: Constants.memoMaxHeight)
                     .id(InputID.message)
             }
-        } else {
-            HStack(alignment: .top, spacing: Design.Spacing._lg) {
-                Asset.Assets.infoOutline.image
-                    .zImage(width: 20, height: 20, style: ZappColors.textMuted)
-
-                Text(localizable: .sendInfoMemo)
-                    .zappFont(.caption, style: ZappColors.textMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 0)
-            }
-            .padding(Design.Spacing._lg)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
         }
     }
 
     // MARK: CTA
 
+    /// Android's bottom bar: Back, then (swap mode only) the slippage button, then the CTA.
     @ViewBuilder private var ctaButton: some View {
         WithPerceptionTracking {
-            switch store.primaryButton {
-            case .topUp:
-                ZappButton(title: String(localizable: .unifiedSendTopUp)) {
-                    store.send(.topUpRequested)
+            HStack(spacing: Design.Spacing._md) {
+                if isSwap {
+                    slippageButton
                 }
 
-            case .review, .disabled:
-                ZappButton(
-                    title: isSwap
-                        ? String(localizable: .swapAndPayGetQuote)
-                        : String(localizable: .sendReview),
-                    isEnabled: store.primaryButton == .review
-                ) {
-                    if isSwap {
-                        swapStore.send(.getQuoteTapped)
-                    } else {
-                        sendStore.send(.reviewTapped)
-                    }
-                }
-                .accessibilityIdentifier(
-                    isSwap ? AccessibilityID.SwapForm.reviewButton : AccessibilityID.SendForm.reviewButton
-                )
+                primaryButton
             }
+        }
+    }
+
+    @ViewBuilder private var primaryButton: some View {
+        switch store.primaryButton {
+        case .topUp:
+            ZappButton(title: String(localizable: .unifiedSendTopUp)) {
+                store.send(.topUpRequested)
+            }
+
+        case .review, .disabled:
+            // Android's CTA reads "Review" in both modes; swap mode fetches the quote behind it.
+            ZappButton(
+                title: String(localizable: .sendReview),
+                isEnabled: store.primaryButton == .review
+            ) {
+                if isSwap {
+                    swapStore.send(.getQuoteTapped)
+                } else {
+                    sendStore.send(.reviewTapped)
+                }
+            }
+            .accessibilityIdentifier(
+                isSwap ? AccessibilityID.SwapForm.reviewButton : AccessibilityID.SendForm.reviewButton
+            )
         }
     }
 
