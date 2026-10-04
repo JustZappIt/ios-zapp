@@ -406,6 +406,7 @@ struct ReputationRootRoutingTests {
                 $0.reputation.summary = summary
                 $0.onramp.isConfigured = { true }
                 $0.onramp.checkpoint = { checkpoint }
+                $0.liveness.recoverable = { _ in nil }
                 $0.uuid = .incrementing
                 extra(&$0)
             }
