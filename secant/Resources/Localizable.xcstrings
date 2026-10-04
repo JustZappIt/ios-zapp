@@ -12421,13 +12421,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         }
       }
@@ -19799,13 +19799,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BASE BALANCE"
+            "value" : "Balance on Base"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SALDO EN BASE"
+            "value" : "Saldo en Base"
           }
         }
       }
@@ -19901,13 +19901,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Return to ZEC"
+            "value" : "Refund to ZEC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Devolver a ZEC"
+            "value" : "Reembolsar a ZEC"
           }
         }
       }
@@ -36046,13 +36046,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P activity"
+            "value" : "Base activity"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actividad P2P"
+            "value" : "Actividad en Base"
           }
         }
       }
@@ -36097,13 +36097,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nothing here yet. Orders you open and payments you make will appear here."
+            "value" : "No activity yet."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aquí no hay nada todavía. Las órdenes que abras y los pagos que hagas aparecerán aquí."
+            "value" : "Aún no hay actividad."
           }
         }
       }
