@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 @preconcurrency import ZcashLightClientKit
 import ZcashPaymentURI
+import ZappMessaging
 
 @Reducer
 struct RequestZec {
@@ -18,11 +19,16 @@ struct RequestZec {
         var cancelId = UUID()
 
         var address: RedactableString = .empty
+        /// Non-nil while the "Send in chat" contact picker is open. See `RequestZecQRActions`.
+        var chatPicker: RequestChatPicker.State?
         var encryptedOutput: String?
         var encryptedOutputToBeShared: String?
         var isQRCodeEnlarged = false
         var maxPrivacy = false
         var memoState: MessageEditor.State = .initial
+        var qrSaveOutcome: QRSaveOutcome?
+        /// The fiat amount as typed on the keyboard, or nil when the request was typed in ZEC.
+        var requestedFiat: Decimal?
         var requestedZec: Zatoshi = .zero
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         var storedEnlargedQR: CGImage?
@@ -34,19 +40,29 @@ struct RequestZec {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<RequestZec.State>)
         case cancelRequestTapped
+        case chatPicker(RequestChatPicker.Action)
+        case chatPickerDismissRequested
         case generateEnlargedQRCode
         case generateQRCode(Bool)
         case memo(MessageEditor.Action)
         case onAppear
         case onDisappear
         case qrCodeTapped
+        case qrSaveFinished(QRSaveOutcome)
+        case qrSaveNoticeExpired
         case rememberEnlargedQR(CGImage?)
         case rememberQR(CGImage?)
         case requestTapped
+        case saveQRTapped
+        case sendInChatTapped
+        /// The request went out in this conversation; Root opens it.
+        case sentInChat(ZMConversation)
         case shareFinished
         case shareQR
     }
     
+    @Dependency(\.continuousClock) var clock
+    @Dependency(\.photoLibrary) var photoLibrary
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
     
     init() { }
@@ -166,7 +182,16 @@ struct RequestZec {
             case .shareQR:
                 state.encryptedOutputToBeShared = state.encryptedOutput
                 return .none
+
+            case .chatPicker, .chatPickerDismissRequested, .qrSaveFinished, .qrSaveNoticeExpired,
+                .saveQRTapped, .sendInChatTapped, .sentInChat:
+                return .none
             }
         }
+
+        qrActionsReduce()
+            .ifLet(\.chatPicker, action: \.chatPicker) {
+                RequestChatPicker()
+            }
     }
 }
