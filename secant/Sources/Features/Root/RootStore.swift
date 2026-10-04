@@ -353,9 +353,9 @@ struct Root {
         /// `path == nil` excludes every pushed Root flow (including Zapp's chat,
         /// offramp, payment, settings, and support destinations). The remaining
         /// terms cover presentation states outside `Path`: Keystone signing,
-        /// Server Setup, background work, alerts, and the two live Zapp Pay sheets. Upstream
+        /// Server Setup, background work, alerts, and the live Zapp Pay sheets. Upstream
         /// Home informational sheets keep their bindings in child state and can re-present, but
-        /// interrupting either actionable Zapp sheet would discard in-progress user context.
+        /// interrupting an actionable Zapp sheet would discard in-progress user context.
         var canPresentIronwoodAnnouncement: Bool {
             destinationState.destination == .home
                 && path == nil
@@ -363,6 +363,7 @@ struct Root {
                 && !serverSetupViewBinding
                 && !homeState.isZappPoolBalancesSheetPresented
                 && !homeState.isZappSyncErrorSheetPresented
+                && !homeState.isZappShieldInfoPresented
                 && bgTask == nil
                 && alert == nil
                 && splashAppeared

@@ -84,39 +84,69 @@ struct ZappSyncProgressRow: View {
     private enum Constants {
         static let barHeight: CGFloat = 3
         static let horizontalPadding: CGFloat = 18
+        static let verticalPadding: CGFloat = 10
         static let spacing: CGFloat = 6
+        static let minVisibleFraction: CGFloat = 0.02
+        static let label = ZappTextStyle(weight: .semiBold, size: 12, lineHeight: 18, tracking: 0.5)
+        static let percent = ZappTextStyle(weight: .bold, size: 12, lineHeight: 18)
     }
 
     let state: ZappSyncState
     /// `SmartBanner.State.syncingPercentage`, already normalised to 0...1 by the reducer.
     let percentage: Double
-    let errorMessage: String
 
+    /// Mirrors Android's `SyncProgressRow`: a status label, a two-decimal percentage while
+    /// syncing, and a bar on a `surfaceAlt` track. The raw SDK error never shows here; it belongs
+    /// to the sync-error sheet.
     var body: some View {
         if state == .synced {
             EmptyView()
         } else {
             VStack(alignment: .leading, spacing: Constants.spacing) {
-                if let detail {
-                    Text(detail)
-                        .zappFont(.caption, style: detailStyle)
+                HStack(spacing: 8) {
+                    Text(label)
+                        .zappFont(Constants.label, style: isError ? ZappColors.danger : ZappColors.textMuted)
                         .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: detailAlignment)
+
+                    Spacer(minLength: 0)
+
+                    if state.showsProgress {
+                        Text(String(format: "%.2f%%", clampedPercentage * 100))
+                            .zappFont(Constants.percent, style: ZappColors.text)
+                    }
                 }
 
                 bar
             }
             .padding(.horizontal, Constants.horizontalPadding)
-            .padding(.top, Constants.spacing)
-            .padding(.bottom, 10)
+            .padding(.vertical, Constants.verticalPadding)
         }
+    }
+
+    private var label: String {
+        switch state {
+        case .syncing: return String(localizable: .zappSyncSyncing)
+        case .restoring: return String(localizable: .zappSyncRestoring)
+        case .connecting: return String(localizable: .zappSyncConnecting)
+        case .offline: return String(localizable: .zappSyncOfflineReconnecting)
+        case .error: return String(localizable: .zappSyncError)
+        case .synced: return String(localizable: .zappSyncSynced)
+        }
+    }
+
+    private var isError: Bool {
+        state == .offline || state == .error
+    }
+
+    private var clampedPercentage: Double {
+        min(max(percentage, 0), 1)
     }
 
     private var bar: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .fill(ZappColors.border.color(colorScheme))
+                    .fill(ZappColors.surfaceAlt.color(colorScheme))
 
                 Rectangle()
                     .fill(state.dotColor.color(colorScheme))
@@ -129,38 +159,20 @@ struct ZappSyncProgressRow: View {
 
     private var fraction: CGFloat {
         switch state {
-        case .restoring, .syncing: return CGFloat(min(max(percentage, 0), 1))
+        case .restoring, .syncing: return max(CGFloat(clampedPercentage), Constants.minVisibleFraction)
         case .offline, .error: return 1
         case .connecting, .synced: return 0
         }
     }
-
-    private var detail: String? {
-        if state.showsProgress {
-            return String(format: "%.0f%%", min(max(percentage, 0), 1) * 100)
-        }
-
-        if state == .error, !errorMessage.isEmpty {
-            return errorMessage
-        }
-
-        return nil
-    }
-
-    private var detailStyle: ZappColors {
-        state.showsProgress ? .textMuted : .danger
-    }
-
-    private var detailAlignment: Alignment {
-        state.showsProgress ? .trailing : .leading
-    }
 }
 
-/// The actionable half of the smart banner: wallet backup, shielding, currency conversion.
+/// The actionable half of the smart banner. Only the wallet-backup reminder is kept.
 ///
-/// Android drops these entirely. Not copied: wallet backup is a funds-loss surface and the Zapp
-/// shell has no other entry point to it. The non-actionable priorities (disconnected, sync error,
-/// restoring, syncing) are carried by the chip and the progress row instead.
+/// Android shows none of these on the Pay tab. Shield already lives in the balance card (a second
+/// CTA here duplicated it) and currency conversion is reachable from You, so both are dropped.
+/// The backup reminder stays on purpose: wallet backup is a funds-loss surface and the Zapp shell
+/// has no other prompt for it. The non-actionable priorities (disconnected, sync error, restoring,
+/// syncing) are carried by the chip and the progress row, and migration by `ZappMigrationBanner`.
 struct ZappSmartActionStrip: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -211,38 +223,15 @@ struct ZappSmartActionStrip: View {
     }
 
     private var action: ZappSmartAction? {
-        switch store.priorityContent {
-        case .priority6:
-            return ZappSmartAction(
-                icon: Asset.Assets.Icons.alertTriangle.image,
-                title: String(localizable: .smartBannerContentBackupTitle),
-                info: String(localizable: .smartBannerContentBackupInfo),
-                cta: String(localizable: .smartBannerContentBackupButton),
-                event: .walletBackupTapped
-            )
-        case .priority7:
-            return ZappSmartAction(
-                icon: Asset.Assets.Icons.shieldOff.image,
-                title: String(localizable: .smartBannerContentShieldTitle),
-                info: "\(store.transparentBalance.decimalString()) \(store.tokenName)",
-                cta: String(localizable: .smartBannerContentShieldButton),
-                event: .shieldFundsTapped,
-                isEnabled: !store.isShielding
-            )
-        case .priority75:
-            // Android exposes Tor in You > Privacy, not as a Pay action.
-            return nil
-        case .priority8:
-            return ZappSmartAction(
-                icon: Asset.Assets.Icons.coinsSwap.image,
-                title: String(localizable: .smartBannerContentCurrencyConversionTitle),
-                info: String(localizable: .smartBannerContentCurrencyConversionInfo),
-                cta: String(localizable: .smartBannerContentCurrencyConversionButton),
-                event: .currencyConversionTapped
-            )
-        default:
-            return nil
-        }
+        guard store.priorityContent == .priority6 else { return nil }
+
+        return ZappSmartAction(
+            icon: Asset.Assets.Icons.alertTriangle.image,
+            title: String(localizable: .smartBannerContentBackupTitle),
+            info: String(localizable: .smartBannerContentBackupInfo),
+            cta: String(localizable: .smartBannerContentBackupButton),
+            event: .walletBackupTapped
+        )
     }
 }
 

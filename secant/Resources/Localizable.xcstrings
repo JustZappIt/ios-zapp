@@ -33024,23 +33024,6 @@
         }
       }
     },
-    "zappPay.chart.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Portfolio value"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Valor del portafolio"
-          }
-        }
-      }
-    },
     "zappPay.empty.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33200,7 +33183,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "See all"
+            "value" : "See All"
           }
         },
         "es" : {
@@ -33365,6 +33348,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "zappSync.offlineReconnecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline, reconnecting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión, reconectando"
           }
         }
       }

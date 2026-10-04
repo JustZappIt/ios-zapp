@@ -14,6 +14,7 @@ import SwiftUI
 
 struct ZappPayView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Dependency(\.walletStorage) private var walletStorage
 
     private enum Constants {
         static let fabTrailingPadding: CGFloat = 18
@@ -21,6 +22,7 @@ struct ZappPayView: View {
         static let cardHorizontalPadding: CGFloat = 18
         static let emptyBarWidth: CGFloat = 3
         static let emptyBarHeight: CGFloat = 20
+        static let emptyTitle = ZappTextStyle(weight: .black, size: 15, lineHeight: 20, tracking: -0.3)
     }
 
     @Perception.Bindable var store: StoreOf<Home>
@@ -32,50 +34,7 @@ struct ZappPayView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 0) {
-                ZappScreenHeader(title: String(localizable: .zappPayTitle)) {
-                    ZappSyncChip(state: syncState)
-                }
-
-                // Android makes the wallet-home error message a tap target onto the sync-error
-                // sheet (`HomeVM.onWalletErrorMessageClick`); the progress row is the iOS row that
-                // carries that message, so it is the tap target here. A healthy sync stays inert.
-                ZappSyncProgressRow(
-                    state: syncState,
-                    percentage: store.smartBannerState.syncingPercentage,
-                    errorMessage: store.smartBannerState.lastKnownErrorMessage
-                )
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    guard isSyncErrorActionable else { return }
-
-                    store.isZappSyncErrorSheetPresented = true
-                }
-                .accessibilityAddTraits(isSyncErrorActionable ? .isButton : [])
-
-                ScrollView {
-                    VStack(spacing: 0) {
-                        balanceCard()
-                            .padding(.horizontal, Constants.cardHorizontalPadding)
-                            .padding(.top, 14)
-                            .padding(.bottom, 20)
-
-                        ZappSmartActionStrip(
-                            store: store.scope(state: \.smartBannerState, action: \.smartBanner)
-                        )
-
-                        ZappSectionLabel(text: String(localizable: .zappPayRecentActivity))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, Constants.sectionLeadingPadding)
-                            .padding(.bottom, 8)
-
-                        activity()
-                    }
-                    .padding(.bottom, ZappNavBar.clearance)
-                    .zappScrollShadowSource()
-                }
-                .zappScrollEdges()
-            }
+            scrollContent()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
             .overlay {
@@ -103,6 +62,7 @@ struct ZappPayView: View {
                 }
             }
             .onDisappear { store.send(.onDisappear) }
+            .modifier(SheetsModifier(view: self))
             // Android auto-raises the sync-error sheet once per session; the reducer already
             // makes that decision (guarded by `isSyncTimedOutAutoAppeareDisabled`), so this
             // just follows it.
@@ -110,12 +70,6 @@ struct ZappPayView: View {
                 if isRequested {
                     store.isZappSyncErrorSheetPresented = true
                 }
-            }
-            .sheet(isPresented: $store.isZappSyncErrorSheetPresented) {
-                syncErrorSheet()
-            }
-            .sheet(isPresented: $store.isZappPoolBalancesSheetPresented) {
-                poolBalancesSheet()
             }
             .alert(
                 store:
@@ -125,6 +79,55 @@ struct ZappPayView: View {
                     )
             )
         }
+    }
+
+    @ViewBuilder private func scrollContent() -> some View {
+        // Android's `WalletHomeView` is one `LazyColumn`: the header and the sync row scroll
+        // away with the content rather than staying pinned.
+        ScrollView {
+            VStack(spacing: 0) {
+                ZappScreenHeader(title: String(localizable: .zappPayTitle)) {
+                    ZappSyncChip(state: syncState)
+                }
+
+                // Android makes the wallet-home error message a tap target onto the sync-error
+                // sheet (`HomeVM.onWalletErrorMessageClick`); the progress row is the iOS row
+                // that carries that message, so it is the tap target here. A healthy sync
+                // stays inert.
+                ZappSyncProgressRow(
+                    state: syncState,
+                    percentage: store.smartBannerState.syncingPercentage
+                )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    guard isSyncErrorActionable else { return }
+
+                    store.isZappSyncErrorSheetPresented = true
+                }
+                .accessibilityAddTraits(isSyncErrorActionable ? .isButton : [])
+
+                migrationBanner()
+
+                balanceCard()
+                    .padding(.horizontal, Constants.cardHorizontalPadding)
+                    .padding(.top, 14)
+                    .padding(.bottom, 20)
+
+                ZappSmartActionStrip(
+                    store: store.scope(state: \.smartBannerState, action: \.smartBanner)
+                )
+
+                ZappSectionLabel(text: String(localizable: .zappPayRecentActivity))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, Constants.sectionLeadingPadding)
+                    .padding(.bottom, 8)
+
+                activity()
+            }
+            .padding(.bottom, ZappNavBar.clearance)
+            .zappScrollShadowSource()
+        }
+        .zappScrollEdges()
     }
 
     private var syncState: ZappSyncState {
@@ -138,8 +141,7 @@ struct ZappPayView: View {
                 confirmedBalance: confirmedBalance,
                 shieldedBalance: store.walletBalancesState.shieldedWithPendingBalance,
                 transparentBalance: store.walletBalancesState.transparentBalance,
-                showsBreakdown: store.walletBalancesState.transparentBalance.amount > 0,
-                canShield: store.walletBalancesState.transparentBalance >= store.walletBalancesState.autoShieldingThreshold,
+                showsBreakdown: isShieldingAvailable,
                 tokenName: tokenName,
                 transactions: Array(store.transactionListState.transactions),
                 showZecAsPrimary: showZecAsPrimary,
@@ -149,8 +151,36 @@ struct ZappPayView: View {
                     store.isZappPoolBalancesSheetPresented = true
                 },
                 onToggleBalanceDisplay: { showZecAsPrimary.toggle() },
-                onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }
+                onShieldTapped: { store.send(.zappShieldTapped) }
             )
+        }
+    }
+
+    /// Android's `WalletAccount.isShieldingAvailable`: the breakdown (and its Shield button) only
+    /// appears once the transparent balance clears the shielding threshold, so dust never shows a
+    /// breakdown with nothing to do. The threshold is `.zero` until `WalletBalances.onAppear`
+    /// loads it, hence the explicit non-zero check.
+    private var isShieldingAvailable: Bool {
+        let balances = store.walletBalancesState
+        return balances.transparentBalance.amount > 0
+            && ShieldingProcessorClient.isShieldable(
+                balance: balances.transparentBalance,
+                threshold: balances.autoShieldingThreshold
+            )
+    }
+
+    /// Android's `WalletMigrationBanner`, rendered only while the smart banner holds the
+    /// migration slot. "More" (or the card) opens `MigrationCoordFlow` through the same
+    /// `smartBannerContentTapped` → `.migrationTapped` route the legacy banner used.
+    @ViewBuilder private func migrationBanner() -> some View {
+        WithPerceptionTracking {
+            if store.smartBannerState.isOpen, store.smartBannerState.priorityContent == .priorityMigration {
+                ZappMigrationBanner(variant: store.smartBannerState.migrationBannerVariant) {
+                    store.send(.smartBanner(.smartBannerContentTapped))
+                }
+                .padding(.horizontal, Constants.cardHorizontalPadding)
+                .padding(.top, 8)
+            }
         }
     }
 
@@ -165,7 +195,13 @@ struct ZappPayView: View {
 
     @ViewBuilder private func activity() -> some View {
         WithPerceptionTracking {
-            if store.transactionListState.transactions.isEmpty && !store.transactionListState.isInvalidated {
+            if store.transactionListState.transactions.isEmpty && store.transactionListState.isInvalidated {
+                // Android's `ActivityLoading`: a centred spinner until the first list arrives.
+                ProgressView()
+                    .tint(ZappColors.accent.color(colorScheme))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+            } else if store.transactionListState.transactions.isEmpty {
                 emptyState()
             } else {
                 ForEach(store.transactionListState.transactionListHomePage) { transaction in
@@ -221,7 +257,7 @@ struct ZappPayView: View {
                 .padding(.bottom, 14)
 
             Text(localizable: .zappPayEmptyTitle)
-                .zappFont(.sectionTitle, style: ZappColors.text)
+                .zappFont(Constants.emptyTitle, style: ZappColors.text)
                 .padding(.bottom, 4)
 
             Text(localizable: .zappPayEmptySubtitle)
@@ -243,55 +279,81 @@ struct ZappPayView: View {
         )
     }
 
+    /// Android's `PayActionSpeedDial` order. "Buy ZEC" is always offered: without partner keys
+    /// Root opens the onramp screen, which shows its own "unavailable" page.
     private var speedDialActions: [ZappSpeedDialAction] {
-        var actions = [
+        [
+            ZappSpeedDialAction(
+                icon: Asset.Assets.Icons.walletBuy.image,
+                label: String(localizable: .onrampSpeedDialBuy)
+            ) {
+                store.send(.buyTapped)
+            },
             // Nearest catalogue equivalent to Android's Storefront. The old `pay` glyph is an
             // arrow entering a circle, which read as "send" beside Send.
             ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.shoppingBag.image,
-                    label: String(localizable: .zappPayFabPay)
-                ) {
-                    store.send(.payWithNearTapped)
-                },
-                ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.sent.image,
-                    label: String(localizable: .zappPayFabSend)
-                ) {
-                    store.send(.sendTapped)
-                },
-                // The catalogue's exact counterpart to Android's `Icons.Default.SwapHoriz`.
-                ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.switchHorizontal.image,
-                    label: String(localizable: .zappPayFabSwap)
-                ) {
-                    store.send(.swapWithNearTapped)
-                },
-                ZappSpeedDialAction(
-                    // No gift asset exists in the catalogue yet; the SF Symbol is the decision.
-                    icon: Asset.Assets.Icons.giftCard.image,
-                    label: String(localizable: .giftCardSpeedDial)
-                ) {
-                    store.send(.giftTapped)
-                },
-                ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.received.image,
-                    label: String(localizable: .zappPayFabReceive)
-                ) {
-                    store.send(.receiveScreenRequested)
-                }
+                icon: Asset.Assets.Icons.shoppingBag.image,
+                label: String(localizable: .zappPayFabPay)
+            ) {
+                store.send(.payWithNearTapped)
+            },
+            ZappSpeedDialAction(
+                icon: Asset.Assets.Icons.sent.image,
+                label: String(localizable: .zappPayFabSend)
+            ) {
+                store.send(.sendTapped)
+            },
+            // The catalogue's exact counterpart to Android's `Icons.Default.SwapHoriz`.
+            ZappSpeedDialAction(
+                icon: Asset.Assets.Icons.switchHorizontal.image,
+                label: String(localizable: .zappPayFabSwap)
+            ) {
+                store.send(.swapWithNearTapped)
+            },
+            ZappSpeedDialAction(
+                // No gift asset exists in the catalogue yet; the SF Symbol is the decision.
+                icon: Asset.Assets.Icons.giftCard.image,
+                label: String(localizable: .giftCardSpeedDial)
+            ) {
+                store.send(.giftTapped)
+            },
+            ZappSpeedDialAction(
+                icon: Asset.Assets.Icons.received.image,
+                label: String(localizable: .zappPayFabReceive)
+            ) {
+                store.send(.receiveScreenRequested)
+            }
         ]
-        if PartnerKeys.isOnrampConfigured {
-            actions.insert(
-                ZappSpeedDialAction(
-                    icon: Asset.Assets.Icons.walletBuy.image,
-                    label: String(localizable: .onrampSpeedDialBuy)
-                ) {
-                    store.send(.buyTapped)
-                },
-                at: 0
-            )
+    }
+}
+
+// MARK: - Sheets
+
+extension ZappPayView {
+    /// The tab's sheets, split out of `body` so the type checker can cope with the chain.
+    private struct SheetsModifier: ViewModifier {
+        @Perception.Bindable var store: StoreOf<Home>
+        let view: ZappPayView
+
+        init(view: ZappPayView) {
+            self.store = view.store
+            self.view = view
         }
-        return actions
+
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .sheet(isPresented: $store.isZappSyncErrorSheetPresented) {
+                        view.syncErrorSheet()
+                    }
+                    .sheet(isPresented: $store.isZappPoolBalancesSheetPresented) {
+                        view.poolBalancesSheet()
+                    }
+                    .sheet(isPresented: $store.isZappShieldInfoPresented) {
+                        view.shieldInfoSheet()
+                    }
+            }
+        }
     }
 }
 
@@ -314,6 +376,23 @@ extension ZappPayView {
     }
 }
 
+// MARK: - Shield explainer
+
+extension ZappPayView {
+    @ViewBuilder func shieldInfoSheet() -> some View {
+        WithPerceptionTracking {
+            ZappShieldFundsInfoSheet(
+                store: store.scope(state: \.smartBannerState, action: \.smartBanner),
+                onShield: { store.send(.zappShieldInfoConfirmed) },
+                onNotNow: { store.isZappShieldInfoPresented = false }
+            )
+            .background(ZappColors.surface.color(colorScheme))
+            .presentationDetents([.height(ZappShieldFundsInfoSheet.detentHeight), .large])
+            .presentationDragIndicator(.visible)
+        }
+    }
+}
+
 // MARK: - Sync error surface
 
 /// Android's sync-error remedies, mirroring `SyncErrorView.kt`. Kept in an extension so the tab's
@@ -331,11 +410,10 @@ extension ZappPayView {
     @ViewBuilder func syncErrorSheet() -> some View {
         WithPerceptionTracking {
             ZappSyncErrorSheet(
-                // Offline is actionable but is not itself the previous synchronizer failure. Use
-                // the generic copy/remedy there instead of leaking a stale error classification.
+                // Offline is actionable but is not itself the previous synchronizer failure, so
+                // its sheet carries no stale error detail.
                 errorMessage: syncState == .error ? store.smartBannerState.lastKnownErrorMessage : "",
-                isIncompatibleServer:
-                    syncState == .error && store.smartBannerState.lastKnownErrorIsIncompatibleServer,
+                isTorEnabled: walletStorage.exportTorSetupFlag() ?? false,
                 onTryAgain: {
                     store.isZappSyncErrorSheetPresented = false
                     // `Home.retrySync` restarts the synchronizer — the counterpart to Android's
