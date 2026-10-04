@@ -99,7 +99,6 @@ import Testing
             let store = makeStore(initialState: state)
 
             await store.send(.zappShieldInfoConfirmed)
-            await store.skipInFlightEffects()
 
             #expect(store.state.smartBannerState.isOpen)
             #expect(store.state.smartBannerState.priorityContent == .priorityMigration)
@@ -129,8 +128,6 @@ import Testing
             #expect(store.state.hasZappSyncErrorEpisodeBeenShown == false)
             await store.send(.smartBanner(.synchronizerStateChanged(error)))
             #expect(store.state.isZappSyncErrorSheetPresented)
-
-            await store.skipInFlightEffects()
         }
     }
 }
