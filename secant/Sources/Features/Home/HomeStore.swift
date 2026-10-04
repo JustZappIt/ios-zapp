@@ -20,6 +20,9 @@ struct Home {
         /// Home unmount. Local view state would be lost when the announcement takes over Root.
         var isZappPoolBalancesSheetPresented = false
         var isZappSyncErrorSheetPresented = false
+        /// Android's Spendable balance sheet (`SpendableBalanceArgs`), opened from the balance card's
+        /// shielded/transparent breakdown. Upstream's `Balances` is the same screen, so it is reused.
+        var isZappSpendableBalanceSheetPresented = false
         var isRateEducationEnabled = false
         var isRateTooltipEnabled = false
         var migratingDatabase = true
@@ -32,6 +35,7 @@ struct Home {
         var transactionListState: TransactionList.State
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletBalancesState: WalletBalances.State
+        var zappSpendableBalancesState = Balances.State.initial
 
         var isSmartWidgetOpen: Bool {
             smartBannerState.isOpen
@@ -112,6 +116,8 @@ struct Home {
         case transactionList(TransactionList.Action)
         case walletAccountTapped(WalletAccount)
         case walletBalances(WalletBalances.Action)
+        case zappSpendableBalanceTapped
+        case zappSpendableBalances(Balances.Action)
         
         // more actions
         case flexaTapped
@@ -136,6 +142,10 @@ struct Home {
 
         Scope(state: \.walletBalancesState, action: \.walletBalances) {
             WalletBalances()
+        }
+
+        Scope(state: \.zappSpendableBalancesState, action: \.zappSpendableBalances) {
+            Balances()
         }
 
         Scope(state: \.smartBannerState, action: \.smartBanner) {
@@ -325,6 +335,19 @@ struct Home {
                 return .none
                 
             case .syncFailed:
+                return .none
+
+            case .zappSpendableBalanceTapped:
+                state.isZappSpendableBalanceSheetPresented = true
+                return .none
+
+            // `Balances` itself starts the shielding; Android's sheet closes as it does
+            // (`ShieldFundsUseCase(closeCurrentScreen = true)`).
+            case .zappSpendableBalances(.dismissTapped), .zappSpendableBalances(.shieldFundsTapped):
+                state.isZappSpendableBalanceSheetPresented = false
+                return .none
+
+            case .zappSpendableBalances:
                 return .none
 
             case .walletBalances(.exchangeRateRefreshTapped):

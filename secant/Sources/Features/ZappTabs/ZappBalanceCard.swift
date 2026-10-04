@@ -43,6 +43,7 @@ struct ZappBalanceCard: View {
     let transactions: [TransactionState]
     let showZecAsPrimary: Bool
     let onBalanceTapped: () -> Void
+    let onBreakdownTapped: () -> Void
     let onToggleBalanceDisplay: () -> Void
     let onShieldTapped: () -> Void
 
@@ -190,18 +191,29 @@ struct ZappBalanceCard: View {
                 .frame(height: 1)
                 .padding(.bottom, 14)
 
-            breakdownLine(
-                label: String(localizable: .zappPayShielded),
-                amount: hidable("\(shieldedBalance.decimalString()) \(tokenName)"),
-                dotColor: .accent
-            )
-            .padding(.bottom, 8)
+            // Both lines are one tap target onto the Spendable balance sheet, as Android's
+            // breakdown column is (`WalletBalanceCard.kt:219-239`, no ripple). The Shield button
+            // below stays its own target.
+            Button(action: onBreakdownTapped) {
+                VStack(alignment: .leading, spacing: 8) {
+                    breakdownLine(
+                        label: String(localizable: .zappPayShielded),
+                        amount: hidable("\(shieldedBalance.decimalString()) \(tokenName)"),
+                        dotColor: .accent
+                    )
 
-            breakdownLine(
-                label: String(localizable: .zappPayTransparent),
-                amount: hidable("\(transparentBalance.decimalString()) \(tokenName)"),
-                dotColor: .textSubtle
-            )
+                    breakdownLine(
+                        label: String(localizable: .zappPayTransparent),
+                        amount: hidable("\(transparentBalance.decimalString()) \(tokenName)"),
+                        dotColor: .textSubtle
+                    )
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(String(localizable: .balancesSpendableBalanceTitle))
+            .accessibilityIdentifier("pay.balanceBreakdown")
 
             if canShield {
                 ZappButton(title: String(localizable: .zappPayShield), action: onShieldTapped)

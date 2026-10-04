@@ -115,10 +115,12 @@ import Testing
             poolSheet.homeState.isZappPoolBalancesSheetPresented = true
             var syncSheet = state()
             syncSheet.homeState.isZappSyncErrorSheetPresented = true
+            var spendableSheet = state()
+            spendableSheet.homeState.isZappSpendableBalanceSheetPresented = true
             var splash = state()
             splash.splashAppeared = false
 
-            for initial in [notHome, signing, server, alert, poolSheet, syncSheet, splash] {
+            for initial in [notHome, signing, server, alert, poolSheet, syncSheet, spendableSheet, splash] {
                 let store = store(initial)
                 store.send(.synchronizerStateChanged(syncState(activation)))
                 #expect(store.state.destinationState.destination != .ironwoodAnnouncement)
