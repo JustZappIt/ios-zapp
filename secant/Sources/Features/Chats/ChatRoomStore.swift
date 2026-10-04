@@ -731,6 +731,10 @@ struct ChatRoom {
                 let conversationId = state.conversationId
                 let supportedTypes = item.supportedContentTypes
 
+                if ChatVideoEncoder.isVideo(supportedTypes) {
+                    return sendPickedVideo(item, conversationId: conversationId)
+                }
+
                 return .run { send in
                     guard let imported = try await item.loadTransferable(type: ChatPickedMedia.self) else {
                         await send(.mediaSendFailed)

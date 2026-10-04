@@ -473,7 +473,7 @@ enum ChatMediaImage {
     }
 }
 
-private extension ZappTextStyle {
+extension ZappTextStyle {
     static let mediaMeta = ZappTextStyle(weight: .medium, size: 10, lineHeight: 16)
 }
 

@@ -121,7 +121,7 @@ struct ChatRoomView: View {
                         get: { pickedItem },
                         set: { store.send(.pickedItemChanged($0)) }
                     ),
-                    matching: .images
+                    matching: .any(of: [.images, .videos])
                 )
                 .fileImporter(
                     isPresented: Binding(
@@ -184,7 +184,7 @@ struct ChatRoomView: View {
             ) {
                 WithPerceptionTracking {
                     if let message = store.imageViewerMessage {
-                        ChatImageViewer(message: message) {
+                        ChatMediaViewer(message: message) {
                             store.send(.imageViewerDismissed)
                         }
                     }

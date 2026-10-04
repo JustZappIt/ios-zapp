@@ -113,8 +113,16 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
                 textBubble
             }
 
-        case .image, .video:
+        case .image:
             ChatMediaBubble(
+                message: message,
+                senderName: senderName,
+                progress: progress,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
+
+        case .video:
+            ChatVideoBubble(
                 message: message,
                 senderName: senderName,
                 progress: progress,
@@ -186,6 +194,11 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
         }
 
         if kind == .image && message.status != "sending" {
+            store.send(.imageTapped(message))
+        }
+
+        // A video plays only once its file is on disk; the viewer slot picks the player.
+        if kind == .video && message.status != "sending" && ChatVideoPlayback.fileURL(for: message) != nil {
             store.send(.imageTapped(message))
         }
     }
