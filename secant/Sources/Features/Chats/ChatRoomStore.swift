@@ -191,7 +191,7 @@ struct ChatRoom {
         /// subtitle quiet while our node is connected; when it is offline there
         /// cannot be a reachable peer, so saying so here is still useful.
         var subtitle: String? {
-            messagingState.isOnline ? nil : String(localizable: .chatRoomPeerOffline)
+            messagingState.roomSubtitle(for: conversationId)
         }
 
         init(conversationId: String, conversation: ZMConversation? = nil) {

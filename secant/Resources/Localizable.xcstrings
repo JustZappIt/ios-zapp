@@ -2621,40 +2621,6 @@
         }
       }
     },
-    "chatList.connecting" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connecting…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conectando…"
-          }
-        }
-      }
-    },
-    "chatList.degraded" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weak connection"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conexión débil"
-          }
-        }
-      }
-    },
     "chatList.empty.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2859,23 +2825,6 @@
         }
       }
     },
-    "chatList.offline" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión"
-          }
-        }
-      }
-    },
     "chatList.paymentPlaceholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2940,6 +2889,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ sin leer"
+          }
+        }
+      }
+    },
+    "chatList.status.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "…"
+          }
+        }
+      }
+    },
+    "chatList.status.disconnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "off"
+          }
+        }
+      }
+    },
+    "chatList.status.error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "err"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "err"
           }
         }
       }
@@ -3080,19 +3080,36 @@
         }
       }
     },
+    "chatNetwork.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando"
+          }
+        }
+      }
+    },
     "chatNetwork.connections" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TCP connections"
+            "value" : "Connections"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conexiones TCP"
+            "value" : "Conexiones"
           }
         }
       }
@@ -3216,6 +3233,23 @@
         }
       }
     },
+    "chatNetwork.disconnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectado"
+          }
+        }
+      }
+    },
     "chatNetwork.error" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3239,13 +3273,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invites"
+            "value" : "Pending invites"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invitaciones"
+            "value" : "Invitaciones pendientes"
           }
         }
       }
@@ -3256,13 +3290,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT"
+            "value" : "Behind NAT, via relay"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT"
+            "value" : "Detrás de NAT, vía relé"
           }
         }
       }
@@ -3324,13 +3358,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P peers"
+            "value" : "Peers"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pares P2P"
+            "value" : "Pares"
           }
         }
       }
@@ -3348,6 +3382,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pendientes"
+          }
+        }
+      }
+    },
+    "chatNetwork.pendingCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ msgs in %2$@ queues"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ mensajes en %2$@ colas"
           }
         }
       }
@@ -3443,13 +3494,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Peers"
+            "value" : "Peers and DHT"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pares"
+            "value" : "Pares y DHT"
           }
         }
       }
@@ -3477,13 +3528,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strict NAT"
+            "value" : "Strict NAT, via relay"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT estricta"
+            "value" : "NAT estricto, vía relé"
           }
         }
       }
@@ -4729,6 +4780,91 @@
         }
       }
     },
+    "chatRoom.chip.connected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.dht" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.err" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Err"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Err"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.off" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.online" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Online"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En línea"
+          }
+        }
+      }
+    },
     "chatRoom.copyMessage" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5035,57 +5171,6 @@
         }
       }
     },
-    "chatRoom.peer.connected" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conectado"
-          }
-        }
-      }
-    },
-    "chatRoom.peer.offline" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión"
-          }
-        }
-      }
-    },
-    "chatRoom.peer.online" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Online"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En línea"
-          }
-        }
-      }
-    },
     "chatRoom.photo" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5388,6 +5473,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enviado, pendiente de entrega"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando…"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.dhtDegraded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT degraded"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT degradada"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.dhtUnreachable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT unreachable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT inaccesible"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de conexión"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.offline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.p2pConnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P connected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P conectado"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.peerOnline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer online"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par en línea"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.waitingForPeer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for peer…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando al par…"
           }
         }
       }
