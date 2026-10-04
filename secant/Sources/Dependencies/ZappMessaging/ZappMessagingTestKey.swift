@@ -112,6 +112,16 @@ extension ZappMessagingClient: TestDependencyKey {
                 isFromMe: true
             )
         },
+        sendLocation: { conversationId, payload in
+            ZMMessage(
+                id: UUID().uuidString,
+                conversationId: conversationId,
+                senderId: "test",
+                content: payload,
+                contentType: ChatContentType.location,
+                isFromMe: true
+            )
+        },
         markRead: { _ in },
         messageStatusStream: { Empty().eraseToAnyPublisher() },
         mediaProgressStream: { Empty().eraseToAnyPublisher() },
