@@ -5256,6 +5256,23 @@
         }
       }
     },
+    "chatRoom.openLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link from %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace de %@"
+          }
+        }
+      }
+    },
     "chatRoom.ownKeySendFailed" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -19,11 +19,6 @@ import UIKit
 import ZappMessaging
 
 struct ChatRoomBubbleRow: View, @MainActor Equatable {
-    private enum Constants {
-        /// Matches the media bubble, so a link card and a photo line up on the same edge.
-        static let linkPreviewWidth: CGFloat = 280
-    }
-
     let store: StoreOf<ChatRoom>
 
     let message: ZMMessage
@@ -118,19 +113,12 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
             )
 
         case .text:
-            VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
-                ChatMessageBubble(
-                    message: message,
-                    senderName: senderName,
-                    readReceiptsEnabled: readReceiptsEnabled
-                )
-
-                if let preview = linkPreview {
-                    ChatLinkPreviewCard(preview: preview)
-                        .frame(maxWidth: Constants.linkPreviewWidth)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: message.isFromMe ? .trailing : .leading)
+            ChatMessageBubble(
+                message: message,
+                senderName: senderName,
+                readReceiptsEnabled: readReceiptsEnabled,
+                linkPreview: linkPreview
+            )
         }
     }
 

@@ -17,6 +17,7 @@ struct ChatMessageBubble: View {
         static let quoteBarHeight: CGFloat = 36
         static let quoteTopPadding: CGFloat = 8
         static let quoteBottomPadding: CGFloat = 6
+        static let linkPreviewSpacing: CGFloat = 10
     }
 
     let message: ZMMessage
@@ -26,6 +27,8 @@ struct ChatMessageBubble: View {
     /// Read receipts are reciprocal. The stored status remains read, but the bubble only
     /// highlights it while receipts are enabled.
     var readReceiptsEnabled: Bool
+    /// Android draws the link card inside the text bubble, under the time.
+    var linkPreview: ChatLinkPreview?
 
     private var isFromMe: Bool { message.isFromMe }
     private var hasQuote: Bool { message.replyToId != nil }
@@ -54,8 +57,9 @@ struct ChatMessageBubble: View {
         .frame(maxWidth: .infinity, alignment: isFromMe ? .trailing : .leading)
     }
 
-    /// A quoted bubble fills the group's width so the quote block and the message share one edge.
-    private var fillWidth: CGFloat? { hasQuote ? .infinity : nil }
+    /// A quoted bubble fills the group's width so the quote block and the message share one edge;
+    /// so does one carrying a link card, which is as wide as the bubble allows.
+    private var fillWidth: CGFloat? { hasQuote || linkPreview != nil ? .infinity : nil }
 
     /// Only the spans the detector recognised become links, so a bare `www.` or a scheme the
     /// app will not open stays inert text rather than a tap that goes nowhere.
@@ -86,13 +90,19 @@ struct ChatMessageBubble: View {
         // text, so matching box edges leaves the time floating above the words.
         // Aligning on the LAST baseline sits it on the final line of the message,
         // which is where a reader expects it.
-        HStack(alignment: .lastTextBaseline, spacing: Design.Spacing._md) {
-            Text(linkedContent)
-                .zappFont(.body, color: textColor)
-                .tint(linkColor)
-                .frame(maxWidth: fillWidth, alignment: .leading)
+        VStack(alignment: .leading, spacing: Constants.linkPreviewSpacing) {
+            HStack(alignment: .lastTextBaseline, spacing: Design.Spacing._md) {
+                Text(linkedContent)
+                    .zappFont(.body, color: textColor)
+                    .tint(linkColor)
+                    .frame(maxWidth: fillWidth, alignment: .leading)
 
-            meta
+                meta
+            }
+
+            if let linkPreview {
+                ChatLinkPreviewBubble(preview: linkPreview, isFromMe: isFromMe)
+            }
         }
         .padding(Constants.padding)
         .frame(maxWidth: fillWidth, alignment: .leading)
