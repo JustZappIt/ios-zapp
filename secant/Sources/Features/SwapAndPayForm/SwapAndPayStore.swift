@@ -78,6 +78,11 @@ struct SwapAndPay {
         var walletBalancesState: WalletBalances.State
         var zecAsset: SwapAsset?
 
+        // Unified send exact-output. The unified form owns the destination amount and hands over
+        // the exact base units to request, so `getQuote` never re-derives them from locale text.
+        var exactOutputBaseUnits: String?
+        var exactOutputRequest: ExactOutputSwap.Request?
+
         // Swap to ZEC
         var addressToShare: RedactableString?
         var isAddressExpanded = false
@@ -694,7 +699,19 @@ struct SwapAndPay {
                 let zecAmountInt = NSDecimalNumber(decimal: zecAmountDecimal)
                     .multiplying(by: NSDecimalNumber(value: Zatoshi.Constants.oneZecInZatoshi)).int64Value
                 var amountString = String(zecAmountInt)
-                if !state.isSwapExperienceEnabled {
+                state.exactOutputRequest = nil
+                if !state.isSwapExperienceEnabled && !isSwapToZec, let baseUnits = state.exactOutputBaseUnits {
+                    amountString = baseUnits
+                    state.exactOutputRequest = ExactOutputSwap.Request(
+                        baseUnits: baseUnits,
+                        destinationDecimals: toAsset.decimals,
+                        originAssetId: zecAsset.assetId,
+                        destinationAssetId: toAsset.assetId,
+                        destinationAddress: destination,
+                        refundAddress: refundTo,
+                        slippageBps: slippageTolerance
+                    )
+                } else if !state.isSwapExperienceEnabled {
                     var bigTokenAmountDecimal = BigDecimal(tokenAmountDecimal)
                     if let tokenAmountUsdDecimal = numberFormatter.number(state.secondaryLabelTo)?.decimalValue, state.isInputInUsd {
                         bigTokenAmountDecimal = BigDecimal(tokenAmountUsdDecimal)
@@ -734,6 +751,12 @@ struct SwapAndPay {
             case .swapQuoteLoaded(let quote):
                 guard let account = state.selectedWalletAccount else {
                     return .none
+                }
+                // Exact-output pays whatever ZEC the quote asks for, so the echo is checked before
+                // a proposal is built from it (Android's `requestExactOutput` validation).
+                if let request = state.exactOutputRequest, !ExactOutputSwap.quote(quote, satisfies: request) {
+                    state.quote = nil
+                    return .send(.quoteUnavailable(String(localizable: .swapQuoteUnavailable)))
                 }
                 state.quote = quote
                 if state.isSwapToZecExperienceEnabled {
