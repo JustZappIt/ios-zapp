@@ -10,7 +10,7 @@ import ComposableArchitecture
 import Foundation
 import Testing
 import ZappMessaging
-@preconcurrency import ZcashLightClientKit
+@testable @preconcurrency import ZcashLightClientKit
 @testable import zodl_internal
 
 @Suite(.serialized) struct ChatContactsListParityTests {
