@@ -15,7 +15,7 @@ import Testing
 @testable @preconcurrency import ZcashLightClientKit
 @testable import zodl_internal
 
-@Suite(.serialized) @MainActor struct RootOnboardingGateTests {
+@Suite(.serialized, .timeLimit(.minutes(1))) @MainActor struct RootOnboardingGateTests {
     private static let seedDerivedAccount = WalletAccount(
         Account(
             id: AccountUUID(id: [UInt8](repeating: 0x01, count: 16)),
@@ -127,13 +127,12 @@ import Testing
     }
 
     /// The launch chain prepares and routes from effects; keep taking their actions until the
-    /// outcome shows, rather than waiting a fixed time.
+    /// outcome shows. No deadline: the suite's `.timeLimit` is the only clock.
     private func waitUntil(
         _ store: TestStore<Root.State, Root.Action>,
         _ condition: @escaping @MainActor () -> Bool
     ) async {
-        let deadline = ContinuousClock.now + .seconds(2)
-        while !condition(), ContinuousClock.now < deadline {
+        while !condition() {
             try? await Task.sleep(for: .milliseconds(10))
             await store.skipReceivedActions(strict: false)
         }

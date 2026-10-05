@@ -18,7 +18,7 @@ import Testing
 @testable import zodl_internal
 @preconcurrency import ZcashLightClientKit
 
-@Suite(.serialized) @MainActor struct OnboardingFlowTests {
+@Suite(.serialized, .timeLimit(.minutes(1))) @MainActor struct OnboardingFlowTests {
     /// Every side effect the flow has on storage, and every action it hands up, in order.
     private enum Event: Equatable {
         case progress(String)
@@ -83,9 +83,10 @@ import Testing
         }
     }
 
+    /// Polls until the effect chain lands. No deadline: a slow CI runner gets there later, not
+    /// differently, and the suite's `.timeLimit` is the only clock.
     private func waitUntil(_ condition: @escaping @MainActor () -> Bool) async {
-        let deadline = ContinuousClock.now + .seconds(2)
-        while !condition(), ContinuousClock.now < deadline {
+        while !condition() {
             try? await Task.sleep(for: .milliseconds(10))
         }
     }
