@@ -115,9 +115,10 @@ struct ZappWalletAccountsSheet: View {
                     Text(localizable: .keystoneDrawerBannerTitle)
                         .zappFont(.sectionTitle, style: ZappColors.text)
 
-                    // The catalogue escapes the percent sign ("5%%") for a format string; a key with no
-                    // arguments is shown verbatim, so it is formatted here to read "5%".
-                    Text(String(format: String(localizable: .keystoneDrawerBannerDesc)))
+                    // The catalogue escapes the percent sign ("5%%"). `Text(localizable:)` shows that
+                    // verbatim, while `String(localizable:)` resolves it to "5%" (never format it again:
+                    // "% o" would then read as a placeholder).
+                    Text(String(localizable: .keystoneDrawerBannerDesc))
                         .zappFont(.caption, style: ZappColors.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
