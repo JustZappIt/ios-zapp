@@ -223,10 +223,8 @@ private struct UnifiedSendContent: View {
                     keyboardDismissAccessory
                 }
             }
-            .sheet(isPresented: $isCrossPayInfoPresented) {
+            .zashiSheet(isPresented: $isCrossPayInfoPresented, horizontalPadding: 0) {
                 ZappCrossPayInfoSheet { isCrossPayInfoPresented = false }
-                    .presentationDetents([.height(ZappCrossPayInfoSheet.detentHeight)])
-                    .presentationDragIndicator(.visible)
             }
         }
     }

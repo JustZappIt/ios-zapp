@@ -56,15 +56,14 @@ struct SendCoordFlowView: View {
                 }
             }
             .navigationBarHidden(true)
-            .sheet(
+            .zashiSheet(
                 isPresented: Binding(
                     get: { store.isTopUpPresented },
                     set: { if !$0 { store.send(.topUpDismissed) } }
-                )
+                ),
+                horizontalPadding: 0
             ) {
                 ZappTopUpSheet { store.send(.topUpSourcePicked($0)) }
-                    .presentationDetents([.height(ZappTopUpSheet.detentHeight)])
-                    .presentationDragIndicator(.visible)
             }
         }
         .background(ZappColors.bg.color(colorScheme))

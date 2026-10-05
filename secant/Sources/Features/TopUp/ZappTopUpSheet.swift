@@ -14,13 +14,10 @@ struct ZappTopUpSheet: View {
     private enum Constants {
         static let iconBoxSize: CGFloat = 36
         static let iconSize: CGFloat = 20
-        static let height: CGFloat = 360
         static let title = ZappTextStyle(weight: .black, size: 18, lineHeight: 24, tracking: -0.3)
     }
 
     let onSourcePicked: (SendCoordFlow.TopUpSource) -> Void
-
-    static var detentHeight: CGFloat { Constants.height }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -48,12 +45,12 @@ struct ZappTopUpSheet: View {
                 subtitle: String(localizable: .topUpFromWalletSubtitle),
                 source: .wallet
             )
-
-            Spacer(minLength: 0)
         }
+        // Sized to its content by `zashiSheet`, so the sheet ends just below the last row.
         .padding(.horizontal, Design.Spacing._3xl)
         .padding(.top, Design.Spacing._3xl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.bottom, Design.Spacing._lg)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(ZappColors.surface.color(colorScheme))
     }
 

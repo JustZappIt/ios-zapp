@@ -14,12 +14,9 @@ struct ZappCrossPayInfoSheet: View {
     private enum Constants {
         static let nearLogoWidth: CGFloat = 98
         static let nearLogoHeight: CGFloat = 24
-        static let height: CGFloat = 420
     }
 
     let onDismiss: () -> Void
-
-    static var detentHeight: CGFloat { Constants.height }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -42,14 +39,14 @@ struct ZappCrossPayInfoSheet: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Spacer(minLength: Design.Spacing._3xl)
-
             ZappButton(title: String(localizable: .generalOk), action: onDismiss)
-                .padding(.bottom, Design.Spacing._xl)
+                .padding(.top, Design.Spacing._3xl)
+                .padding(.bottom, Design.Spacing._lg)
         }
+        // Sized to its content by `zashiSheet`.
         .padding(.horizontal, Design.Spacing._3xl)
         .padding(.top, Design.Spacing._3xl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(ZappColors.surface.color(colorScheme))
     }
 }
