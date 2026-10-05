@@ -58,8 +58,8 @@ struct OnrampPaymentFieldsTests {
     }
 
     @Test func everyKindHasItsOwnLocalizedLabel() {
-        let labels = OnrampPaymentFieldKind.allCases.map(OnrampPaymentInstructionRows.label(for:))
-        #expect(Set(labels).count == OnrampPaymentFieldKind.allCases.count)
+        let labels = zodl_internal.OnrampPaymentFieldKind.allCases.map { (kind: zodl_internal.OnrampPaymentFieldKind) in OnrampPaymentInstructionRows.label(for: kind) }
+        #expect(Set(labels).count == zodl_internal.OnrampPaymentFieldKind.allCases.count)
         #expect(OnrampPaymentInstructionRows.label(for: OnrampFieldModel(label: "PIX_KEY", value: "x")) == String(localizable: .onrampPaymentFieldPixKey))
         #expect(OnrampPaymentInstructionRows.label(for: OnrampFieldModel(label: "CEDULA", value: "x")) == String(localizable: .onrampPaymentFieldCedula))
     }
