@@ -10,6 +10,7 @@
 import ComposableArchitecture
 import Foundation
 import Testing
+import UIKit
 import ZappMessaging
 @testable import zodl_internal
 @testable @preconcurrency import ZcashLightClientKit
@@ -259,6 +260,23 @@ import ZappMessaging
     }
 
     /// A refused permission stays on screen (with the Settings link) rather than timing out.
+    /// A saved QR stands on its own, so it gets a white quiet zone the in-app card does not need.
+    @Test func theSavedQRHasAWhiteQuietZone() throws {
+        let code = try #require(QRCodeGenerator.generateCode(from: "zcash:u1test?amount=1.5", maxPrivacy: false, vendor: .zashi, color: .black))
+        let padded = try #require(RequestZec.withQuietZone(code).cgImage)
+        let inset = (padded.width - code.width) / 2
+
+        #expect(padded.width > code.width)
+        #expect(Double(inset) >= Double(code.width) * 0.07)
+
+        let rgba = try #require(padded.dataProvider?.data as Data?)
+        let bytesPerPixel = padded.bitsPerPixel / 8
+        let cornerAndEdge = [0, (inset - 1) * padded.bytesPerRow + (inset - 1) * bytesPerPixel]
+        for offset in cornerAndEdge {
+            #expect(rgba[offset] > 240 && rgba[offset + 1] > 240 && rgba[offset + 2] > 240)
+        }
+    }
+
     @MainActor @Test func aRefusedPermissionStaysUntilTheNextTap() async {
         await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()

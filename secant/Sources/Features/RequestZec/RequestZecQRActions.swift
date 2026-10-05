@@ -115,8 +115,26 @@ extension RequestZec {
     static func savableQRImage(from output: String, maxPrivacy: Bool) async -> Data? {
         await Task.detached(priority: .userInitiated) {
             QRCodeGenerator.generateCode(from: output, maxPrivacy: maxPrivacy, vendor: .zashi, color: .black)
-                .flatMap { UIImage(cgImage: $0).pngData() }
+                .flatMap { withQuietZone($0).pngData() }
         }
         .value
+    }
+
+    /// The generator leaves about one module of margin, which is fine inside the app's white card
+    /// but not for a picture viewed or printed on its own: scanners want a white quiet zone. This
+    /// adds one of 8% per side (about four modules at typical request sizes; Android's has two).
+    static func withQuietZone(_ code: CGImage) -> UIImage {
+        let side = CGFloat(max(code.width, code.height))
+        let inset = (side * 0.08).rounded()
+        let canvas = CGSize(width: side + 2 * inset, height: side + 2 * inset)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+
+        return UIGraphicsImageRenderer(size: canvas, format: format).image { context in
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: canvas))
+            UIImage(cgImage: code).draw(in: CGRect(x: inset, y: inset, width: side, height: side))
+        }
     }
 }
