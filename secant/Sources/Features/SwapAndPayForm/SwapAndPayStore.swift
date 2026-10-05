@@ -1348,7 +1348,17 @@ extension SwapAndPay.State {
         guard let quote else {
             return "0"
         }
-        
+
+        // Exact-output promises this figure, so it is shown unrounded at the asset's precision, as
+        // Android does (`amountOutFormatted.setScale(decimals, DOWN)`), never `simplified`'s 0.5%.
+        if exactOutputRequest != nil, let selectedAsset {
+            return ExactOutputSwap.display(
+                quote.amountOut,
+                maxFractionDigits: selectedAsset.decimals,
+                locale: Locale.current
+            )
+        }
+
         return conversionFormatter.string(from: NSDecimalNumber(decimal: quote.amountOut.simplified)) ?? "\(quote.amountOut.simplified)"
     }
     

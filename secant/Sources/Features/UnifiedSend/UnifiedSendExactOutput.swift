@@ -43,6 +43,9 @@ enum ExactOutputSwap {
     static func decimal(from text: String, locale: Locale) -> Decimal? {
         let separator = locale.decimalSeparator ?? "."
         let trimmed = text.trimmingCharacters(in: .whitespaces)
+        // Under a locale whose separator is not ".", a "." can only be grouping (or a pasted
+        // foreign figure): refused rather than guessed, so "1.5" in German never becomes 1.5 or 15.
+        guard separator == "." || !trimmed.contains(".") else { return nil }
         let normalized = trimmed.replacingOccurrences(of: separator, with: ".")
         guard
             !normalized.isEmpty,
