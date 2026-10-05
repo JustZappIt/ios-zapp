@@ -30,7 +30,8 @@ struct ZappSyncErrorSheet: View {
         static let rowHorizontalPadding: CGFloat = 16
         static let dividerInset: CGFloat = 8
         static let errorDetailLineLimit = 3
-        static let height: CGFloat = 540
+        /// Used until the content has been measured.
+        static let estimatedHeight: CGFloat = 480
     }
 
     @Environment(\.colorScheme) private var colorScheme
@@ -42,7 +43,7 @@ struct ZappSyncErrorSheet: View {
     let onDisableTor: () -> Void
     let onContactSupport: () -> Void
 
-    static var detentHeight: CGFloat { Constants.height }
+    @State private var contentHeight = Constants.estimatedHeight
 
     /// Android's `SyncErrorVM.createState`: both recovery routes every time, Tor only when on.
     static func remedies(isTorEnabled: Bool) -> [Remedy] {
@@ -50,30 +51,35 @@ struct ZappSyncErrorSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    header
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                header
 
-                    VStack(spacing: 0) {
-                        let remedies = Self.remedies(isTorEnabled: isTorEnabled)
-                        ForEach(Array(remedies.enumerated()), id: \.offset) { index, remedy in
-                            if index > 0 {
-                                divider
-                            }
-                            row(for: remedy)
+                VStack(spacing: 0) {
+                    let remedies = Self.remedies(isTorEnabled: isTorEnabled)
+                    ForEach(Array(remedies.enumerated()), id: \.offset) { index, remedy in
+                        if index > 0 {
+                            divider
                         }
+                        row(for: remedy)
                     }
-                    .padding(.top, Design.Spacing._xl)
+                }
+                .padding(.top, Design.Spacing._xl)
+
+                ZappButton(title: String(localizable: .errorPageActionContactSupport)) {
+                    onContactSupport()
+                }
+                .padding(.top, Design.Spacing._xl)
+            }
+            .padding(Design.Spacing._3xl)
+            .readHeight { height in
+                if height > 0, abs(height - contentHeight) > 1 {
+                    contentHeight = height
                 }
             }
-
-            ZappButton(title: String(localizable: .errorPageActionContactSupport)) {
-                onContactSupport()
-            }
-            .padding(.top, Design.Spacing._xl)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .zappFittedSheetDetent(contentHeight)
     }
 
     private var header: some View {

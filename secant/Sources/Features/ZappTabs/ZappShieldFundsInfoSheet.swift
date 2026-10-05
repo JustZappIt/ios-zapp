@@ -19,14 +19,15 @@ struct ZappShieldFundsInfoSheet: View {
         static let iconSize: CGFloat = 28
         static let checkboxSize: CGFloat = 20
         static let checkIconSize: CGFloat = 11
-        static let height: CGFloat = 600
+        /// Used until the content has been measured.
+        static let estimatedHeight: CGFloat = 520
     }
 
     @Perception.Bindable var store: StoreOf<SmartBanner>
     let onShield: () -> Void
     let onNotNow: () -> Void
 
-    static var detentHeight: CGFloat { Constants.height }
+    @State private var contentHeight = Constants.estimatedHeight
 
     var body: some View {
         WithPerceptionTracking {
@@ -84,7 +85,13 @@ struct ZappShieldFundsInfoSheet: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 24)
                 .padding(.bottom, Design.Spacing.sheetBottomSpace)
+                .readHeight { height in
+                    if height > 0, abs(height - contentHeight) > 1 {
+                        contentHeight = height
+                    }
+                }
             }
+            .zappFittedSheetDetent(contentHeight)
         }
     }
 

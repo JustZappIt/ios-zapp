@@ -387,7 +387,6 @@ extension ZappPayView {
                 onNotNow: { store.isZappShieldInfoPresented = false }
             )
             .background(ZappColors.surface.color(colorScheme))
-            .presentationDetents([.height(ZappShieldFundsInfoSheet.detentHeight), .large])
             .presentationDragIndicator(.visible)
         }
     }
@@ -433,11 +432,8 @@ extension ZappPayView {
                     store.send(.smartBanner(.reportTapped))
                 }
             )
-            .padding(.horizontal, Design.Spacing._3xl)
-            .padding(.vertical, Design.Spacing._3xl)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(ZappColors.surface.color(colorScheme))
-            .presentationDetents([.height(ZappSyncErrorSheet.detentHeight)])
             .presentationDragIndicator(.visible)
         }
     }
