@@ -52,7 +52,9 @@ extension Root {
                 // MARK: - Accounts
 
             case .home(.walletAccountTapped(let walletAccount)):
-                guard state.selectedWalletAccount != walletAccount else {
+                // By id: the sheet's copy of the current account can differ in rotating fields
+                // (`privateUA`), and treating that as a switch would cancel the onramp and offramp.
+                guard state.selectedWalletAccount?.id != walletAccount.id else {
                     return .none
                 }
                 state.$selectedWalletAccount.withLock { $0 = walletAccount }

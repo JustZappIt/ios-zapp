@@ -72,6 +72,26 @@ import Testing
         }
     }
 
+    /// Tapping the account already in use is not a switch, even when the sheet's copy of it differs
+    /// in a rotating field: a switch would cancel any open onramp or offramp and reload everything.
+    @Test func pickingTheCurrentAccountDoesNotSwitch() {
+        withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let zapp = Self.walletAccount(idByte: 10, keystone: false)
+            var listedCopy = zapp
+            listedCopy.seedFingerprint = [1, 2, 3]
+            var initial = Root.State.initial
+            initial.$selectedWalletAccount.withLock { $0 = zapp }
+            initial.homeState.transactionListState.isInvalidated = false
+
+            let state = route(from: nil, .home(.walletAccountTapped(listedCopy)), state: initial)
+
+            #expect(state.selectedWalletAccount == zapp)
+            #expect(!state.homeState.transactionListState.isInvalidated)
+        }
+    }
+
     @MainActor @Test func pickingAnAccountClosesTheSheet() async {
         await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()

@@ -73,7 +73,9 @@ struct ZappWalletAccountsSheet: View {
     }
 
     private func accountRow(_ account: WalletAccount) -> some View {
-        let isSelected = store.selectedWalletAccount == account
+        // By id: the selected copy and the listed copy can differ in rotating fields (`privateUA`),
+        // which made whole-value equality leave the current account unmarked.
+        let isSelected = store.selectedWalletAccount?.id == account.id
 
         return Button {
             store.send(.walletAccountTapped(account))
@@ -113,7 +115,9 @@ struct ZappWalletAccountsSheet: View {
                     Text(localizable: .keystoneDrawerBannerTitle)
                         .zappFont(.sectionTitle, style: ZappColors.text)
 
-                    Text(localizable: .keystoneDrawerBannerDesc)
+                    // The catalogue escapes the percent sign ("5%%") for a format string; a key with no
+                    // arguments is shown verbatim, so it is formatted here to read "5%".
+                    Text(String(format: String(localizable: .keystoneDrawerBannerDesc)))
                         .zappFont(.caption, style: ZappColors.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
