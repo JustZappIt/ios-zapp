@@ -150,7 +150,7 @@ import ZappMessaging
 @Suite(.serialized) struct NewChatScanParityTests {
     private let peerKey = String(repeating: "c", count: 64)
 
-    @MainActor @Test func scanningAPublicKeyFillsTheSearchField() async {
+    @MainActor @Test func scanningAPublicKeyAddsThePerson() async {
         let store = TestStore(initialState: NewChat.State()) {
             NewChat()
         }
@@ -164,8 +164,8 @@ import ZappMessaging
         await store.receive(\.peerKeyChanged)
 
         #expect(store.state.scan == nil)
-        #expect(store.state.searchInput == peerKey)
-        #expect(store.state.isValidKey)
+        #expect(store.state.participants.map(\.publicKey) == [peerKey])
+        #expect(store.state.searchInput.isEmpty)
     }
 
     /// The checker is the guard: a wallet address scanned into the key field is rejected outright

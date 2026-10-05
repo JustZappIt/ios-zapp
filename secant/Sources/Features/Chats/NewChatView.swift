@@ -12,7 +12,6 @@ import SwiftUI
 struct NewChatView: View {
     private enum Field: Hashable {
         case search
-        case name
         case groupName
     }
 
@@ -100,10 +99,6 @@ struct NewChatView: View {
                 Text(String(localizable: .newChatOwnKey))
                     .zappFont(.caption, style: ZappColors.danger)
                     .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if store.showsNameField {
-                nameField
             }
 
             if store.errorCode != nil && store.errorCode != .ownPublicKey && !store.isNamingGroup {
@@ -211,29 +206,6 @@ struct NewChatView: View {
         }
         .buttonStyle(.zappPress)
         .disabled(!store.canAddDetectedKey)
-    }
-
-    private var nameField: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            ZappSectionLabel(text: String(localizable: .newChatNameLabel))
-
-            TextField(
-                String(localizable: .newChatNamePlaceholder),
-                text: Binding(
-                    get: { store.displayName },
-                    set: { store.send(.displayNameChanged($0)) }
-                )
-            )
-            .focused($focusedField, equals: .name)
-            .zappFont(.body, style: ZappColors.text)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .submitLabel(.done)
-            .onSubmit { store.send(.detectedKeyAdded) }
-            .padding(Design.Spacing._md)
-            .background(ZappColors.surfaceInput.color(colorScheme))
-            .zappFieldTapTarget($focusedField, equals: .name)
-        }
     }
 
     /// Android's `GroupNameDialog`.

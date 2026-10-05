@@ -19537,40 +19537,6 @@
         }
       }
     },
-    "newChat.nameLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name (optional)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nombre (opcional)"
-          }
-        }
-      }
-    },
-    "newChat.namePlaceholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How they'll appear in your chats"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo aparecerán en tus chats"
-          }
-        }
-      }
-    },
     "newChat.noContacts" : {
       "extractionState" : "manual",
       "localizations" : {

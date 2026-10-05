@@ -3,9 +3,9 @@
 //  Zapp
 //
 //  Start a conversation: search the saved contacts, scan a QR, or paste a peer's key.
-//  Android's NewConversation model: one multi-select screen. Tapping a contact, or adding a
-//  detected key, builds participant chips. One chip starts (or reopens) the DM; two or more
-//  ask for a group name and create the group.
+//  Android's NewConversation model: one multi-select screen. Tapping a contact, or pasting,
+//  scanning or typing a complete key, builds participant chips. One chip starts (or reopens)
+//  the DM; two or more ask for a group name and create the group.
 //
 
 import ComposableArchitecture
@@ -26,11 +26,10 @@ struct NewChat {
         /// Someone picked for the conversation, shown as a chip.
         struct Participant: Equatable, Identifiable {
             let publicKey: String
-            /// What the chip reads: the contact's name, the name typed for a pasted key, or an
-            /// abbreviated key.
+            /// What the chip reads: the contact's name, or an abbreviated key.
             let name: String
-            /// What the core is told to call the peer. Nil for a pasted key nobody named, so
-            /// the abbreviated key on the chip never becomes their saved name.
+            /// What the core is told to call the peer. Nil for an unsaved pasted key, so the
+            /// abbreviated key on the chip never becomes their saved name.
             let displayName: String?
 
             var id: String { publicKey }
@@ -41,7 +40,6 @@ struct NewChat {
         /// Held raw, not sanitized: the one field both searches contacts and takes a
         /// pasted key, so it has to keep the non-hex characters a name search needs.
         var searchInput = ""
-        var displayName = ""
         var isCreating = false
         var errorCode: ZappMessagingFailureCode?
         var didCopy = false
@@ -102,14 +100,12 @@ struct NewChat {
         }
 
         /// Android's "Public key detected" banner: a complete key that is not already a chip.
+        /// A key that can join becomes a chip as soon as it lands, so in practice the banner
+        /// only shows our own key, or a key that arrived while a chat was being created.
         var showsDetectedKey: Bool { isValidKey && !isDetectedKeySelected }
 
         /// Our own key is a dead end, so the banner shows it without an Add.
         var canAddDetectedKey: Bool { showsDetectedKey && !isOwnKey && !isCreating }
-
-        /// Only an unknown pasted key needs a name; a saved contact already has one. The name
-        /// rides on the chip once the key is added.
-        var showsNameField: Bool { canAddDetectedKey && detectedContact == nil }
 
         /// Nothing to search, nobody picked and nobody to pick: explain the screen instead of
         /// rendering an empty list. Android shows this whenever the field is empty, hiding
@@ -146,7 +142,6 @@ struct NewChat {
         case onDisappear
         case backToHomeTapped
         case peerKeyChanged(String)
-        case displayNameChanged(String)
         case pasteTapped
         case searchCleared
         case copyMyKeyTapped
@@ -179,6 +174,23 @@ struct NewChat {
 
     private enum CancelID { case copyIndicator }
 
+    /// A pasted key can join without ever becoming a saved contact, so the chip is an unsaved
+    /// stand-in. It is local to this screen and never reaches @Shared.
+    private func addDetectedKey(_ state: inout State) {
+        let key = state.detectedKey
+        let name = state.detectedContact?.name
+
+        state.participants.append(
+            State.Participant(
+                publicKey: key,
+                name: name ?? String(key.prefix(Constants.keyPreviewLength)),
+                displayName: name
+            )
+        )
+        state.searchInput = ""
+        state.errorCode = nil
+    }
+
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
@@ -189,19 +201,15 @@ struct NewChat {
             case .onDisappear:
                 return .cancel(id: CancelID.copyIndicator)
 
+            // A complete key joins as a chip the moment it lands (pasted, scanned or typed), and
+            // the field clears for the next person. Android waits for a tap on "Add"; this skips
+            // that step without starting anything, so more people can still be added for a group.
             case .peerKeyChanged(let value):
-                // A name typed for the previous key must not carry over onto a different
-                // one, or the peer gets saved under a stranger's label.
-                let previousKey = state.detectedKey
                 state.searchInput = value
-                if state.detectedKey != previousKey {
-                    state.displayName = ""
-                }
                 state.errorCode = state.isOwnKey ? .ownPublicKey : nil
-                return .none
-
-            case .displayNameChanged(let value):
-                state.displayName = value
+                if state.canAddDetectedKey {
+                    addDetectedKey(&state)
+                }
                 return .none
 
             case .pasteTapped:
@@ -211,7 +219,6 @@ struct NewChat {
 
             case .searchCleared:
                 state.searchInput = ""
-                state.displayName = ""
                 state.errorCode = nil
                 return .none
 
@@ -242,28 +249,14 @@ struct NewChat {
                 state.errorCode = nil
                 return .none
 
-            // A pasted key can join without ever becoming a saved contact, so the chip is an
-            // unsaved stand-in. It is local to this screen and never reaches @Shared.
+            // The banner's own Add, for a key that landed while a chat was being created.
             case .detectedKeyAdded:
                 guard state.canAddDetectedKey else {
                     if state.isOwnKey { state.errorCode = .ownPublicKey }
                     return .none
                 }
 
-                let key = state.detectedKey
-                let typed = state.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-                let name = state.detectedContact?.name ?? (typed.isEmpty ? nil : typed)
-
-                state.participants.append(
-                    State.Participant(
-                        publicKey: key,
-                        name: name ?? String(key.prefix(Constants.keyPreviewLength)),
-                        displayName: name
-                    )
-                )
-                state.searchInput = ""
-                state.displayName = ""
-                state.errorCode = nil
+                addDetectedKey(&state)
                 return .none
 
             case .participantRemoved(let publicKey):
@@ -298,7 +291,7 @@ struct NewChat {
                 return .none
 
                 // The scanner only ever hands back a sanitized 64-hex key, so it lands in
-                // the same field a paste would and the detected-key banner takes over.
+                // the same field a paste would and joins as a chip from there.
             case .scan(.presented(.foundString(let key))):
                 state.scan = nil
                 return .send(.peerKeyChanged(key))

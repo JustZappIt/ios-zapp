@@ -45,7 +45,7 @@ import ZappMessaging
     // MARK: - The docked primary action
 
     /// Android's dock: SCAN QR CODE until somebody is picked, START CHAT once a chip exists.
-    /// A detected key is not a chip until it is added.
+    /// A complete pasted key is a chip straight away.
     @MainActor @Test func primaryActionOffersScanUntilAParticipantIsPicked() async {
         let store = makeStore()
 
@@ -53,13 +53,6 @@ import ZappMessaging
         #expect(store.state.isPrimaryEnabled)
 
         await store.send(.peerKeyChanged(Self.peerKey)) {
-            $0.searchInput = Self.peerKey
-        }
-
-        #expect(store.state.primaryAction == .scan)
-
-        await store.send(.detectedKeyAdded) {
-            $0.searchInput = ""
             $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
         }
 
@@ -107,31 +100,42 @@ import ZappMessaging
         }
     }
 
-    @MainActor @Test func aNamedPastedKeyCarriesItsNameOntoTheChip() async {
+    /// Pasting adds the person and clears the field, without starting anything, so a second
+    /// paste adds a second person and Start chat asks for a group name.
+    @MainActor @Test func pastedKeysJoinAsChipsAndKeepTheGroupOpen() async {
         let store = makeStore()
 
         await store.send(.peerKeyChanged(Self.peerKey)) {
-            $0.searchInput = Self.peerKey
+            $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
+        }
+        #expect(store.state.searchInput.isEmpty)
+        #expect(!store.state.isCreating)
+
+        await store.send(.peerKeyChanged(Self.otherKey)) {
+            $0.participants.append(
+                .init(publicKey: Self.otherKey, name: String(Self.otherKey.prefix(8)), displayName: nil)
+            )
         }
 
-        #expect(store.state.showsNameField)
-
-        await store.send(.displayNameChanged(" Bob ")) {
-            $0.displayName = " Bob "
-        }
-
-        await store.send(.detectedKeyAdded) {
-            $0.searchInput = ""
-            $0.displayName = ""
-            $0.participants = [.init(publicKey: Self.peerKey, name: "Bob", displayName: "Bob")]
-        }
-
-        // An added key is a chip, so the banner does not offer it a second time.
+        // An added key is a chip, so pasting it again neither duplicates it nor re-offers it.
         await store.send(.peerKeyChanged(Self.peerKey)) {
             $0.searchInput = Self.peerKey
         }
-
+        #expect(store.state.participants.count == 2)
         #expect(!store.state.showsDetectedKey)
+
+        await store.send(.startTapped) {
+            $0.isNamingGroup = true
+        }
+    }
+
+    @MainActor @Test func aPastedKeyOfASavedContactCarriesTheirName() async {
+        let contact = ChatContact(publicKey: Self.peerKey, name: "Alice", lastUpdated: .distantPast)
+        let store = makeStore(contacts: [contact])
+
+        await store.send(.peerKeyChanged(Self.peerKey)) {
+            $0.participants = [.init(publicKey: Self.peerKey, name: "Alice", displayName: "Alice")]
+        }
     }
 
     @MainActor @Test func ourOwnKeyCannotBecomeAChip() async {
@@ -268,16 +272,12 @@ import ZappMessaging
 
     // MARK: - A pasted key is shown once, not twice
 
-    @MainActor @Test func aCompleteKeyShowsTheDetectedKeyBanner() async {
+    @MainActor @Test func aCompleteKeyIsSanitizedIntoAChip() async {
         let store = makeStore()
 
         await store.send(.peerKeyChanged("0x\(Self.peerKey.uppercased())")) {
-            $0.searchInput = "0x\(Self.peerKey.uppercased())"
+            $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
         }
-
-        #expect(store.state.showsDetectedKey)
-        #expect(store.state.canAddDetectedKey)
-        #expect(store.state.detectedKey == Self.peerKey)
     }
 
     @Test func abbreviationKeepsBothEndsOfTheKey() {
@@ -292,61 +292,18 @@ import ZappMessaging
         #expect(PublicKeyRules.abbreviated("abc") == "abc")
     }
 
-    @MainActor @Test func clearingTheSearchDropsTheKeyAndTheTypedName() async {
+    @MainActor @Test func clearingTheSearchEmptiesTheField() async {
         let store = makeStore()
 
-        await store.send(.peerKeyChanged(Self.peerKey)) {
-            $0.searchInput = Self.peerKey
-        }
-
-        await store.send(.displayNameChanged("Alice")) {
-            $0.displayName = "Alice"
+        await store.send(.peerKeyChanged("bbbb")) {
+            $0.searchInput = "bbbb"
         }
 
         await store.send(.searchCleared) {
             $0.searchInput = ""
-            $0.displayName = ""
         }
 
-        #expect(!store.state.showsDetectedKey)
         #expect(store.state.primaryAction == .scan)
-    }
-
-    /// Otherwise a name typed for one key silently gets attached to the next key pasted.
-    @MainActor @Test func swappingTheKeyDiscardsTheNameTypedForThePreviousOne() async {
-        let store = makeStore()
-
-        await store.send(.peerKeyChanged(Self.peerKey)) {
-            $0.searchInput = Self.peerKey
-        }
-
-        await store.send(.displayNameChanged("Alice")) {
-            $0.displayName = "Alice"
-        }
-
-        await store.send(.peerKeyChanged(Self.otherKey)) {
-            $0.searchInput = Self.otherKey
-            $0.displayName = ""
-        }
-    }
-
-    @MainActor @Test func retypingTheSameKeyKeepsTheNameBeingTyped() async {
-        let store = makeStore()
-
-        await store.send(.peerKeyChanged(Self.peerKey)) {
-            $0.searchInput = Self.peerKey
-        }
-
-        await store.send(.displayNameChanged("Alice")) {
-            $0.displayName = "Alice"
-        }
-
-        // Trailing whitespace sanitizes to the same key, so the name has to survive.
-        await store.send(.peerKeyChanged("\(Self.peerKey) ")) {
-            $0.searchInput = "\(Self.peerKey) "
-        }
-
-        #expect(store.state.displayName == "Alice")
     }
 
     // MARK: - Scanning
@@ -372,8 +329,8 @@ import ZappMessaging
         await store.receive(\.peerKeyChanged)
 
         #expect(store.state.scan == nil)
-        #expect(store.state.detectedKey == Self.peerKey)
-        #expect(store.state.showsDetectedKey)
+        #expect(store.state.participants.map(\.publicKey) == [Self.peerKey])
+        #expect(store.state.searchInput.isEmpty)
     }
 
     @MainActor @Test func cancellingTheScannerLeavesTheScreenUntouched() async {
@@ -496,18 +453,5 @@ import ZappMessaging
 
         #expect(!store.state.showsEmptyState)
         #expect(store.state.visibleContacts.count == 1)
-    }
-
-    @MainActor @Test func ourOwnKeyIsNeverOfferedAName() async {
-        let store = makeStore(myPublicKey: Self.ownKey)
-
-        await store.send(.peerKeyChanged(Self.ownKey)) {
-            $0.searchInput = Self.ownKey
-            $0.errorCode = .ownPublicKey
-        }
-
-        #expect(store.state.isOwnKey)
-        #expect(!store.state.showsNameField)
-        #expect(!store.state.canAddDetectedKey)
     }
 }
