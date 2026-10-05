@@ -183,6 +183,7 @@ import ZappMessaging
             let store = TestStore(initialState: state) {
                 RequestZec()
             } withDependencies: {
+                $0.uuid = .incrementing
                 $0.zappMessaging.sendPaymentRequest = { _, _ in throw ZMError.notInitialized }
             }
             store.exhaustivity = .off
