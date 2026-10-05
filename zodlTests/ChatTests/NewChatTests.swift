@@ -45,7 +45,7 @@ import ZappMessaging
     // MARK: - The docked primary action
 
     /// Android's dock: SCAN QR CODE until somebody is picked, START CHAT once a chip exists.
-    /// A complete pasted key is a chip straight away.
+    /// A pasted key is offered on the detected-key row; it is not a chip until it is added.
     @MainActor @Test func primaryActionOffersScanUntilAParticipantIsPicked() async {
         let store = makeStore()
 
@@ -53,6 +53,14 @@ import ZappMessaging
         #expect(store.state.isPrimaryEnabled)
 
         await store.send(.peerKeyChanged(Self.peerKey)) {
+            $0.searchInput = Self.peerKey
+        }
+
+        #expect(store.state.showsDetectedKey)
+        #expect(store.state.primaryAction == .scan)
+
+        await store.send(.detectedKeyAdded) {
+            $0.searchInput = ""
             $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
         }
 
@@ -100,29 +108,38 @@ import ZappMessaging
         }
     }
 
-    /// Pasting adds the person and clears the field, without starting anything, so a second
-    /// paste adds a second person and Start chat asks for a group name.
-    @MainActor @Test func pastedKeysJoinAsChipsAndKeepTheGroupOpen() async {
+    /// Add on the detected-key row makes a chip and clears the field without starting anything,
+    /// so a second pasted key can join and Start chat asks for a group name.
+    @MainActor @Test func pastedKeysAreAddedFromTheDetectedRowAndKeepTheGroupOpen() async {
         let store = makeStore()
 
         await store.send(.peerKeyChanged(Self.peerKey)) {
+            $0.searchInput = Self.peerKey
+        }
+        #expect(store.state.canAddDetectedKey)
+
+        await store.send(.detectedKeyAdded) {
+            $0.searchInput = ""
             $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
         }
-        #expect(store.state.searchInput.isEmpty)
         #expect(!store.state.isCreating)
 
         await store.send(.peerKeyChanged(Self.otherKey)) {
+            $0.searchInput = Self.otherKey
+        }
+        await store.send(.detectedKeyAdded) {
+            $0.searchInput = ""
             $0.participants.append(
                 .init(publicKey: Self.otherKey, name: String(Self.otherKey.prefix(8)), displayName: nil)
             )
         }
 
-        // An added key is a chip, so pasting it again neither duplicates it nor re-offers it.
+        // An added key is a chip, so pasting it again does not offer it a second time.
         await store.send(.peerKeyChanged(Self.peerKey)) {
             $0.searchInput = Self.peerKey
         }
-        #expect(store.state.participants.count == 2)
         #expect(!store.state.showsDetectedKey)
+        #expect(store.state.participants.count == 2)
 
         await store.send(.startTapped) {
             $0.isNamingGroup = true
@@ -134,6 +151,10 @@ import ZappMessaging
         let store = makeStore(contacts: [contact])
 
         await store.send(.peerKeyChanged(Self.peerKey)) {
+            $0.searchInput = Self.peerKey
+        }
+        await store.send(.detectedKeyAdded) {
+            $0.searchInput = ""
             $0.participants = [.init(publicKey: Self.peerKey, name: "Alice", displayName: "Alice")]
         }
     }
@@ -272,12 +293,17 @@ import ZappMessaging
 
     // MARK: - A pasted key is shown once, not twice
 
-    @MainActor @Test func aCompleteKeyIsSanitizedIntoAChip() async {
+    @MainActor @Test func aCompleteKeyShowsTheDetectedKeyRow() async {
         let store = makeStore()
 
         await store.send(.peerKeyChanged("0x\(Self.peerKey.uppercased())")) {
-            $0.participants = [.init(publicKey: Self.peerKey, name: String(Self.peerKey.prefix(8)), displayName: nil)]
+            $0.searchInput = "0x\(Self.peerKey.uppercased())"
         }
+
+        #expect(store.state.showsDetectedKey)
+        #expect(store.state.canAddDetectedKey)
+        #expect(store.state.detectedKey == Self.peerKey)
+        #expect(store.state.participants.isEmpty)
     }
 
     @Test func abbreviationKeepsBothEndsOfTheKey() {
@@ -329,8 +355,8 @@ import ZappMessaging
         await store.receive(\.peerKeyChanged)
 
         #expect(store.state.scan == nil)
-        #expect(store.state.participants.map(\.publicKey) == [Self.peerKey])
-        #expect(store.state.searchInput.isEmpty)
+        #expect(store.state.detectedKey == Self.peerKey)
+        #expect(store.state.showsDetectedKey)
     }
 
     @MainActor @Test func cancellingTheScannerLeavesTheScreenUntouched() async {

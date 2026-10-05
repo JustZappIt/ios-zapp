@@ -38,6 +38,14 @@ struct NewChatView: View {
                     .scrollDismissesKeyboard(.interactively)
                 }
 
+                // Pinned above the field rather than scrolled with the list, so after a paste
+                // the Add is right under the thumb.
+                if store.showsDetectedKey {
+                    detectedKeyRow
+                        .padding(.horizontal, Design.Spacing._lg)
+                        .padding(.top, Design.Spacing._md)
+                }
+
                 searchField
                     .padding(.horizontal, Design.Spacing._lg)
                     .padding(.vertical, Design.Spacing._md)
@@ -89,16 +97,6 @@ struct NewChatView: View {
                         }
                     }
                 }
-            }
-
-            if store.showsDetectedKey {
-                detectedKeyBanner
-            }
-
-            if store.isOwnKey {
-                Text(String(localizable: .newChatOwnKey))
-                    .zappFont(.caption, style: ZappColors.danger)
-                    .fixedSize(horizontal: false, vertical: true)
             }
 
             if store.errorCode != nil && store.errorCode != .ownPublicKey && !store.isNamingGroup {
@@ -170,7 +168,20 @@ struct NewChatView: View {
         .zappFieldTapTarget($focusedField, equals: .search)
     }
 
-    /// Android's `PublicKeyDetectedBanner`: the whole banner adds the key as a chip.
+    /// Android's `PublicKeyDetectedBanner`: the whole row adds the key as a chip. Our own key
+    /// shows without an Add, with the reason underneath.
+    private var detectedKeyRow: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+            detectedKeyBanner
+
+            if store.isOwnKey {
+                Text(String(localizable: .newChatOwnKey))
+                    .zappFont(.caption, style: ZappColors.danger)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
     private var detectedKeyBanner: some View {
         Button {
             store.send(.detectedKeyAdded)

@@ -3,9 +3,9 @@
 //  Zapp
 //
 //  Start a conversation: search the saved contacts, scan a QR, or paste a peer's key.
-//  Android's NewConversation model: one multi-select screen. Tapping a contact, or pasting,
-//  scanning or typing a complete key, builds participant chips. One chip starts (or reopens)
-//  the DM; two or more ask for a group name and create the group.
+//  Android's NewConversation model: one multi-select screen. Tapping a contact, or adding a
+//  pasted, scanned or typed key from the "Public key detected" row, builds participant chips.
+//  One chip starts (or reopens) the DM; two or more ask for a group name and create the group.
 //
 
 import ComposableArchitecture
@@ -99,9 +99,8 @@ struct NewChat {
             }
         }
 
-        /// Android's "Public key detected" banner: a complete key that is not already a chip.
-        /// A key that can join becomes a chip as soon as it lands, so in practice the banner
-        /// only shows our own key, or a key that arrived while a chat was being created.
+        /// Android's "Public key detected" row: a complete key that is not already a chip. It
+        /// sits right above the search field, so Add is one thumb-reach tap after a paste.
         var showsDetectedKey: Bool { isValidKey && !isDetectedKeySelected }
 
         /// Our own key is a dead end, so the banner shows it without an Add.
@@ -201,15 +200,9 @@ struct NewChat {
             case .onDisappear:
                 return .cancel(id: CancelID.copyIndicator)
 
-            // A complete key joins as a chip the moment it lands (pasted, scanned or typed), and
-            // the field clears for the next person. Android waits for a tap on "Add"; this skips
-            // that step without starting anything, so more people can still be added for a group.
             case .peerKeyChanged(let value):
                 state.searchInput = value
                 state.errorCode = state.isOwnKey ? .ownPublicKey : nil
-                if state.canAddDetectedKey {
-                    addDetectedKey(&state)
-                }
                 return .none
 
             case .pasteTapped:
@@ -249,7 +242,8 @@ struct NewChat {
                 state.errorCode = nil
                 return .none
 
-            // The banner's own Add, for a key that landed while a chat was being created.
+            // Add on the "Public key detected" row: the key becomes a chip and the field clears
+            // for the next person, so a group can be built from several pasted keys.
             case .detectedKeyAdded:
                 guard state.canAddDetectedKey else {
                     if state.isOwnKey { state.errorCode = .ownPublicKey }
@@ -291,7 +285,7 @@ struct NewChat {
                 return .none
 
                 // The scanner only ever hands back a sanitized 64-hex key, so it lands in
-                // the same field a paste would and joins as a chip from there.
+                // the same field a paste would and the detected-key row takes over.
             case .scan(.presented(.foundString(let key))):
                 state.scan = nil
                 return .send(.peerKeyChanged(key))
