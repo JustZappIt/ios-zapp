@@ -28,7 +28,7 @@ struct ZappCopyIconButton: View {
                 )
                 .frame(width: Constants.touchTarget, height: Constants.touchTarget)
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight)
         .accessibilityLabel(isCopied ? copiedAccessibilityLabel : accessibilityLabel)
     }
 }

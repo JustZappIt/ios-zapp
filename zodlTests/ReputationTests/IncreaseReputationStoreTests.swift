@@ -50,6 +50,7 @@ struct IncreaseReputationStoreTests {
         state.platforms = [ReputationFixtures.platform(id: "LinkedIn", award: "100", gain: nil, isVerified: true)]
 
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.verify = { _, _, _ in Issue.record("a verified row minted a session"); throw Failure.wrong }
         }
@@ -163,6 +164,7 @@ struct IncreaseReputationStoreTests {
         state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
 
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.verify = { platformID, _, _ in
                 started.withValue { $0.append(platformID) }
@@ -264,6 +266,7 @@ struct IncreaseReputationStoreTests {
         )
         state.isLoading = false
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
             $0.reputation.resume = { _, _, _, _ in
@@ -296,6 +299,7 @@ struct IncreaseReputationStoreTests {
             resumePlatformID: "LinkedIn"
         )
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
             $0.reputation.resume = { _, _, sessionID, _ in
@@ -321,6 +325,7 @@ struct IncreaseReputationStoreTests {
     @MainActor @Test func rejectingAColdReturnNeverResumesIt() async {
         let state = IncreaseReputation.State.initial(currencyCode: "INR", resumeSessionID: "foreign-session", resumePlatformID: "LinkedIn")
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
             $0.reputation.resume = { _, _, _, _ in
                 Issue.record("A return URL must not authorize a verification")
@@ -345,6 +350,7 @@ struct IncreaseReputationStoreTests {
         let verified = ReputationFixtures.platform(id: "LinkedIn", award: "100", gain: nil, isVerified: true)
         let current = ReputationFixtures.summary(canBuy: true, buyLimitMicros: "200000000", platforms: [verified])
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.reputation.verify = { _, _, _ in
                 Issue.record("The successfully verified account must stay inert")
                 return ReclaimStatusStream { $0.finish() }
@@ -497,6 +503,7 @@ struct IncreaseReputationStoreTests {
         state.isLoading = false
         state.run = run(stage: .verifying)
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.liveness.deliverReturn = { _ in Issue.record("delivered over a Reclaim run"); return false }
             $0.liveness.resume = { _, _ in
                 Issue.record("resumed over a Reclaim run")
@@ -532,6 +539,7 @@ struct IncreaseReputationStoreTests {
         let ret = LivenessReturnModel(code: "one-time", error: nil, state: "nonce.INR")
         let state = IncreaseReputation.State.initial(currencyCode: "INR", resumeLivenessReturn: ret)
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.summary = { _ in
                 ReputationFixtures.summary(
@@ -565,6 +573,7 @@ struct IncreaseReputationStoreTests {
         )
         state.run = run(stage: .verifying)
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.reputation.summary = { _ in ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0") }
             $0.liveness.resume = { _, _ in
                 Issue.record("a return must never be resumed over a live run")
@@ -586,6 +595,7 @@ struct IncreaseReputationStoreTests {
         state.isLoading = false
         state.liveness = LivenessStandingModel(isVerified: true, limitMicros: "20000000", tierCapMicros: "20000000")
         let store = await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.liveness.verify = { _, _, _ in Issue.record("a verified row opened a session"); throw Failure.wrong }
         }
 
@@ -603,6 +613,7 @@ struct IncreaseReputationStoreTests {
         let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
         let starts = LockIsolated(0)
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.liveness.verifyIdentity = { actual, currency, nonce, _ in
                 #expect(actual == check)
@@ -634,6 +645,7 @@ struct IncreaseReputationStoreTests {
         state.run = .init(id: id, kind: .passport, name: "Passport", stage: .verifying)
         let cancelled = LockIsolated<[UUID]>([])
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.liveness.cancel = { check, currency, runID in
                 #expect(check == .passport)
                 #expect(currency == "BRL")
@@ -650,6 +662,7 @@ struct IncreaseReputationStoreTests {
         state.run = .init(id: UUID(), kind: .passport, name: "Passport", stage: .failed)
         let calls = LockIsolated<[IdentityCheckModel]>([])
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.liveness.verifyIdentity = { check, _, _, _ in
                 calls.withValue { $0.append(check) }
@@ -704,6 +717,7 @@ struct IncreaseReputationStoreTests {
         let release = AsyncStream<Void>.makeStream()
         let statuses = AsyncThrowingStream<LivenessStatusModel, Error>.makeStream()
         let store = TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.liveness.cancel = { _, _, runID in
                 #expect(runID == UUID(99))
@@ -749,6 +763,7 @@ struct IncreaseReputationStoreTests {
     ) async -> TestStoreOf<IncreaseReputation> {
         await TestStore(initialState: .initial(currencyCode: currencyCode)) { IncreaseReputation() }
         withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.reputation.summary = { _ in
                 ReputationFixtures.summary(canBuy: false, buyLimitMicros: "0", liveness: liveness)
             }
@@ -765,6 +780,7 @@ struct IncreaseReputationStoreTests {
         state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
         state.liveness = LivenessStandingModel(isVerified: false, limitMicros: "0", tierCapMicros: "20000000")
         return await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.liveness.verify = verify
             extra(&$0)
@@ -780,6 +796,7 @@ struct IncreaseReputationStoreTests {
         state.isLoading = false
         state.platforms = ReputationFixtures.platforms.filter { $0.id != "Binance" }
         return await TestStore(initialState: state) { IncreaseReputation() } withDependencies: {
+            $0.liveness.recoverable = { _ in nil }
             $0.uuid = .incrementing
             $0.reputation.verify = { _, _, _ in
                 ReclaimStatusStream { continuation in

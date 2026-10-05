@@ -16,6 +16,8 @@ struct ZappSummaryRow: View {
         static let infoTouchTarget: CGFloat = 44
         static let infoTouchInset: CGFloat = -(infoTouchTarget - infoIconSize) / 2
         static let labelIconGap: CGFloat = 2
+        static let valueGap: CGFloat = 10
+        static let valueStyle = ZappTextStyle(weight: .semiBold, size: 14, lineHeight: 20)
     }
 
     let label: String
@@ -25,7 +27,7 @@ struct ZappSummaryRow: View {
     var info: ZappSummaryRowInfo?
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: Constants.labelIconGap) {
                 Text(label).zappFont(.caption, style: ZappColors.textMuted)
 
@@ -45,14 +47,17 @@ struct ZappSummaryRow: View {
                                     .offset(x: Constants.infoTouchInset, y: Constants.infoTouchInset)
                             )
                     }
-                    .buttonStyle(.zappPress)
+                    .buttonStyle(.zappHighlight)
                     .accessibilityLabel(info.accessibilityLabel)
                 }
             }
-            Spacer(minLength: 8)
+            Spacer(minLength: Constants.valueGap)
+            // The emphasised half, on one line: it ellipsizes rather than wrapping so a long value
+            // cannot push the label off the row (Android's `ZappSummaryRow`).
             Text(value)
-                .zappFont(.body, style: ZappColors.text)
-                .multilineTextAlignment(.trailing)
+                .zappFont(Constants.valueStyle, style: ZappColors.text)
+                .lineLimit(1)
+                .truncationMode(.tail)
         }
     }
 }
@@ -63,16 +68,19 @@ struct ZappBorderedCard<Content: View>: View {
     enum Variant { case standard, danger }
 
     let variant: Variant
+    let padding: CGFloat
     let content: Content
 
-    init(variant: Variant = .standard, @ViewBuilder content: () -> Content) {
+    /// 14 is Android's `ZappBorderedCard` default; a few screens pass their own.
+    init(variant: Variant = .standard, padding: CGFloat = 14, @ViewBuilder content: () -> Content) {
         self.variant = variant
+        self.padding = padding
         self.content = content()
     }
 
     var body: some View {
         content
-            .padding(16)
+            .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(ZappColors.surface.color(colorScheme))
             .overlay(Rectangle().strokeBorder(border.color(colorScheme), lineWidth: 1))
@@ -81,37 +89,43 @@ struct ZappBorderedCard<Content: View>: View {
     private var border: ZappColors { variant == .danger ? .danger : .border }
 }
 
-struct ZappSuccessHeader: View {
+/// Compact accent action for dense balance and summary rows, as Android's `ZappCompactButton`: a
+/// small filled chip inside a 48pt touch target.
+struct ZappCompactButton: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    let title: String
-    let subtitle: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Asset.Assets.check.image
-                .zImage(size: 18, style: ZappColors.onAccent)
-                .frame(width: 36, height: 36)
-                .background(ZappColors.success.color(colorScheme))
-            Text(title).zappFont(.screenTitle, style: ZappColors.text)
-            Text(subtitle).zappFont(.body, style: ZappColors.textMuted)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    private enum Constants {
+        static let horizontalPadding: CGFloat = 12
+        static let verticalPadding: CGFloat = 6
+        static let touchTarget: CGFloat = 48
     }
-}
 
-struct ZappCompactButton: View {
     let title: String
-    var variant: ZappButtonVariant = .ghost
+    /// Kept for source compatibility; Android's compact button has a single, accent style.
+    var variant: ZappButtonVariant = .primary
     var isEnabled = true
     let action: () -> Void
 
     var body: some View {
-        ZappButton(title: title, variant: variant, isEnabled: isEnabled, action: action)
-            .fixedSize(horizontal: true, vertical: false)
+        Button(action: action) {
+            Text(title)
+                .zappFont(.buttonSmall, style: isEnabled ? ZappColors.onAccent : ZappColors.textSubtle)
+                .lineLimit(1)
+                .padding(.horizontal, Constants.horizontalPadding)
+                .padding(.vertical, Constants.verticalPadding)
+                .background((isEnabled ? ZappColors.accent : ZappColors.surfaceAlt).color(colorScheme))
+                .frame(minHeight: Constants.touchTarget)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .fixedSize()
+        .disabled(!isEnabled)
+        .accessibilityLabel(title)
     }
 }
 
+/// Ellipsized, tappable monospace link to a block explorer, in the accent and underlined as
+/// Android's `ZappExplorerLink`.
 struct ZappExplorerLink: View {
     let address: String
     let url: URL?
@@ -119,12 +133,16 @@ struct ZappExplorerLink: View {
     var body: some View {
         Group {
             if let url {
-                Link(address, destination: url)
+                Link(destination: url) {
+                    Text(address)
+                        .underline()
+                        .zappFont(.mono, style: ZappColors.accent)
+                }
             } else {
                 Text(address)
+                    .zappFont(.mono, style: ZappColors.text)
             }
         }
-        .zappFont(.mono, style: ZappColors.text)
         .lineLimit(1)
         .truncationMode(.middle)
     }
@@ -136,50 +154,88 @@ struct ZappFieldBalance: Equatable {
     let amount: String
 }
 
+/// The big amount entry for money flows, as Android's `ZappOfframpHeroAmountField`: no box, the
+/// symbol and digits set in `display`, a 2pt accent rule underneath (danger on error), the balance
+/// in a column at the trailing edge and an optional secondary line below the rule.
 struct ZappAmountHero: View {
     @Environment(\.colorScheme) private var colorScheme
     @FocusState private var isAmountFocused: Bool
+
+    private enum Constants {
+        static let labelGap: CGFloat = 14
+        static let flagSize = CGSize(width: 30, height: 20)
+        static let flagGap: CGFloat = 10
+        static let symbolGap: CGFloat = 8
+        static let balanceGap: CGFloat = 12
+        static let fieldVerticalPadding: CGFloat = 4
+        static let underline: CGFloat = 2
+        static let secondaryGap: CGFloat = 8
+        static let secondaryInset: CGFloat = 2
+        static let heroStyle = ZappTextStyle(weight: .semiBold, size: 32, lineHeight: 36, tracking: -1.0)
+        static let balanceAmountStyle = ZappTextStyle(weight: .medium, size: 12, lineHeight: 16)
+    }
 
     let label: String
     let symbol: String
     let amount: String
     let balance: ZappFieldBalance?
     let isEnabled: Bool
+    var isError = false
+    var flag: Image?
+    var secondary: String?
     let onChange: @Sendable (String) -> Void
 
     var body: some View {
-        // Two columns rather than three stacked rows, so the box stays two rows tall.
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(label).zappFont(.caption, style: ZappColors.textMuted)
+        VStack(alignment: .leading, spacing: Constants.labelGap) {
+            Text(label).zappFont(.eyebrow, style: ZappColors.textMuted)
 
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(symbol).zappFont(.screenTitle, style: ZappColors.textMuted)
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
+                    if let flag {
+                        flag
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: Constants.flagSize.width, height: Constants.flagSize.height)
+                            .padding(.trailing, Constants.flagGap)
+                            .accessibilityHidden(true)
+                    }
+
+                    Text(symbol)
+                        .zappFont(Constants.heroStyle, style: ZappColors.text)
+                        .padding(.trailing, Constants.symbolGap)
+
                     TextField("", text: Binding(get: { amount }, set: onChange))
                         .focused($isAmountFocused)
                         .keyboardType(.decimalPad)
-                        .zappFont(.screenTitle, style: ZappColors.text)
+                        .zappFont(Constants.heroStyle, style: isError ? ZappColors.danger : ZappColors.text)
+                        .padding(.vertical, Constants.fieldVerticalPadding)
                         .disabled(!isEnabled)
                         .accessibilityLabel(label)
+
+                    if let balance {
+                        VStack(alignment: .trailing, spacing: 0) {
+                            Text(balance.label).zappFont(.caption, style: ZappColors.textSubtle)
+                            Text(balance.amount).zappFont(Constants.balanceAmountStyle, style: ZappColors.textMuted)
+                        }
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .padding(.leading, Constants.balanceGap)
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+
+                Rectangle()
+                    .fill((isError ? ZappColors.danger : ZappColors.accent).color(colorScheme))
+                    .frame(height: Constants.underline)
+
+                if let secondary {
+                    Text(secondary)
+                        .zappFont(.body, style: ZappColors.textMuted)
+                        .padding(.top, Constants.secondaryGap)
+                        .padding(.leading, Constants.secondaryInset)
                 }
             }
-
-            if let balance {
-                Spacer(minLength: 8)
-
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text(balance.label).zappFont(.caption, style: ZappColors.textMuted)
-                    Text(balance.amount).zappFont(.rowTitle, style: ZappColors.text)
-                }
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .fixedSize(horizontal: true, vertical: false)
-                .accessibilityElement(children: .combine)
-            }
+            .zappFieldTapTarget($isAmountFocused)
         }
-        .padding(16)
-        .background(ZappColors.surface.color(colorScheme))
-        .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
-        .zappFieldTapTarget($isAmountFocused)
     }
 }

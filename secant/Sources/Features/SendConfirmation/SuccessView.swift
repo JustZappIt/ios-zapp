@@ -17,6 +17,7 @@ struct SuccessView: View {
     }
 
     @Perception.Bindable var store: StoreOf<SendConfirmation>
+    @State private var hasPlayedHaptic = false
     let tokenName: String
 
     init(store: StoreOf<SendConfirmation>, tokenName: String) {
@@ -80,6 +81,12 @@ struct SuccessView: View {
             .background(ZappColors.bg.color(colorScheme))
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            // The payment landing is the peak of the flow: punctuate it, once (Android's `Confirm`).
+            guard !hasPlayedHaptic else { return }
+            hasPlayedHaptic = true
+            ZappHaptics.success()
+        }
     }
 }
 

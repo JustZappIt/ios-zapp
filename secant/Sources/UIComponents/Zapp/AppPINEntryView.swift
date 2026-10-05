@@ -42,7 +42,10 @@ struct AppPINEntryView: View {
                 Spacer(minLength: 24)
 
                 VStack(spacing: 28) {
-                    ZappPINDots(filledCount: digitCount, hasError: errorMessage != nil)
+                    // Android shakes the dots on a mismatch, a wrong PIN or a lockout, and pairs it
+                    // with a Reject pulse: the shake is the visual half of the cue.
+                    ZappPINDots(filledCount: digitCount, hasError: hasError)
+                        .zappShake(trigger: hasError)
                     ZappPINPad(isEnabled: isInputEnabled, onKey: onKey)
                 }
                 .frame(maxWidth: .infinity)
@@ -62,6 +65,17 @@ struct AppPINEntryView: View {
         }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.keyboard)
+        .onChange(of: hasError) { hasError in
+            if hasError {
+                ZappHaptics.error()
+            }
+        }
+    }
+
+    /// A Bool, not the message: a lockout countdown rewrites the message every second, and that
+    /// must not re-shake.
+    private var hasError: Bool {
+        errorMessage != nil
     }
 
     private var onboardingProgress: some View {

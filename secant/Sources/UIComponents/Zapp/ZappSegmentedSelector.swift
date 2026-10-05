@@ -12,15 +12,14 @@ struct ZappSegmentedSelector: View {
     private enum Constants {
         static let inset: CGFloat = 3
         static let spacing: CGFloat = 2
-        /// Android's selector sets its cells to that platform's 48dp minimum touch target
-        /// (`ZappSegmentedSelector.kt:110`); 44pt is the iOS equivalent per the HIG. The old 20
-        /// left a hairline bar that only reached a tappable size through invisible hit slop.
-        static let cellMinHeight: CGFloat = 44
+        /// Android's `MIN_TOUCH_TARGET` (`ZappSegmentedSelector.kt`), taken as-is so the selector
+        /// sits at the same height on both platforms.
+        static let cellMinHeight: CGFloat = 48
         static let logoHeight: CGFloat = 16
-        static let iconSize: CGFloat = 16
-        static let iconGap: CGFloat = 6
-        /// Desaturated rather than faded: a yellow wordmark at low alpha on white disappears.
-        static let unselectedLogoOpacity: Double = 0.75
+        static let iconSize: CGFloat = 20
+        static let iconGap: CGFloat = 8
+        /// Android's `UNSELECTED_ICON_ALPHA`, for icons and logos alike.
+        static let unselectedMarkOpacity: Double = 0.5
         static let accentLabel = ZappTextStyle(weight: .black, size: 12, lineHeight: 16)
     }
 
@@ -89,7 +88,7 @@ struct ZappSegmentedSelector: View {
             .background(isSelected && !usesAccentSelection ? selectedBackground.color(colorScheme) : .clear)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight(tint: .accent))
         .accessibilityLabel(option)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
@@ -99,8 +98,7 @@ struct ZappSegmentedSelector: View {
             .resizable()
             .scaledToFit()
             .frame(height: height)
-            .grayscale(isSelected ? 0 : 1)
-            .opacity(isSelected ? 1 : Constants.unselectedLogoOpacity)
+            .opacity(isSelected ? 1 : Constants.unselectedMarkOpacity)
     }
 
     private func label(_ option: String, isSelected: Bool) -> some View {

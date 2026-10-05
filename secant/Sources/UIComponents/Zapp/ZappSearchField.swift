@@ -43,7 +43,7 @@ struct ZappSearchField: View {
                         .contentShape(Rectangle())
                         .padding(-Constants.clearHitSlop)
                 }
-                .buttonStyle(.zappPress)
+                .buttonStyle(.zappHighlight)
                 .accessibilityLabel(String(localizable: .generalClear))
             }
         }

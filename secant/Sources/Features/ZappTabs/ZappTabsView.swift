@@ -16,9 +16,6 @@ struct ZappTabsView: View {
     let chatProfileStore: StoreOf<ChatProfile>
     let tokenName: String
 
-    /// How far the visible tab's list has scrolled, published by `zappScrollShadowSource()`.
-    @State private var scrollProgress: CGFloat = 0
-
     var body: some View {
         WithPerceptionTracking {
             ZStack(alignment: .bottom) {
@@ -30,17 +27,16 @@ struct ZappTabsView: View {
                 if !store.hideNavPill {
                     ZappPillNavBar(
                         selectedTab: store.selectedTab,
-                        chatUnreadCount: store.chatUnreadCount,
-                        elevation: scrollProgress / ZappScrollEdge.shadowRampDistance
+                        chatUnreadCount: store.chatUnreadCount
                     ) { tab in
                         store.send(.tabSelected(tab), animation: .easeInOut(duration: 0.2))
                     }
-                    .padding(.horizontal, Design.Spacing._lg)
-                    .padding(.bottom, Design.Spacing._md)
+                    // Android's `padding(horizontal = 14, vertical = 12)` above the system inset.
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, Design.Spacing._lg)
                     .transition(.opacity)
                 }
             }
-            .onPreferenceChange(ZappScrollProgressKey.self) { scrollProgress = $0 }
         }
     }
 

@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// The Zapp palette, mirroring `ZappPalette.kt` token-for-token.
+/// The Zapp palette, mirroring `ZappPalette.kt` token-for-token (all 24 tokens, light and dark).
 ///
 /// This is the fork's visual source of truth and it sits alongside `Design.*` (the upstream Zashi
 /// layer) exactly as `ZappTheme.colors` sits alongside `ZashiColors` on Android: new Zapp components
@@ -17,12 +17,18 @@ enum ZappColors: Colorable {
     case surfaceInput
     case border
     case borderStrong
+    /// Outline for accent-filled controls. Transparent in light, where `border` reads as white.
+    case accentBorder
+    /// Depth and rings under an accent fill.
+    case accentShade
     case text
     case textMuted
     case textSubtle
     case accent
     case accentSoft
     case accentText
+    /// The check stroke on a success mark, which is filled with `accent`.
+    case onCompletion
     case success
     case successSoft
     case danger
@@ -43,12 +49,15 @@ enum ZappColors: Colorable {
         case .surfaceInput: return palette.surfaceInput
         case .border: return palette.border
         case .borderStrong: return palette.borderStrong
+        case .accentBorder: return palette.accentBorder
+        case .accentShade: return palette.accentShade
         case .text: return palette.text
         case .textMuted: return palette.textMuted
         case .textSubtle: return palette.textSubtle
         case .accent: return palette.accent
         case .accentSoft: return palette.accentSoft
         case .accentText: return palette.accentText
+        case .onCompletion: return palette.onCompletion
         case .success: return palette.success
         case .successSoft: return palette.successSoft
         case .danger: return palette.danger
@@ -69,12 +78,15 @@ struct ZappPalette {
     let surfaceInput: Color
     let border: Color
     let borderStrong: Color
+    let accentBorder: Color
+    let accentShade: Color
     let text: Color
     let textMuted: Color
     let textSubtle: Color
     let accent: Color
     let accentSoft: Color
     let accentText: Color
+    let onCompletion: Color
     let success: Color
     let successSoft: Color
     let danger: Color
@@ -96,12 +108,15 @@ extension ZappPalette {
         surfaceInput: Color(zappHex: 0xFFF6_F4F0),
         border: Color(zappHex: 0xFFEB_E7E0),
         borderStrong: Color(zappHex: 0xFFD9_D4CA),
+        accentBorder: .clear,
+        accentShade: Color(zappHex: 0xFFE9_7A0A),
         text: Color(zappHex: 0xFF15_120D),
         textMuted: Color(zappHex: 0xFF6B_645A),
         textSubtle: Color(zappHex: 0xFF9A_9288),
         accent: Color(zappHex: 0xFFFF_9417),
         accentSoft: Color(zappHex: 0xFFFF_E7CC),
         accentText: Color(zappHex: 0xFFA6_5500),
+        onCompletion: Color(zappHex: 0xFF21_1A08),
         success: Color(zappHex: 0xFF2F_9D6A),
         successSoft: Color(zappHex: 0xFFD7_F0E3),
         danger: Color(zappHex: 0xFFD9_4545),
@@ -120,12 +135,15 @@ extension ZappPalette {
         surfaceInput: Color(zappHex: 0xFF20_1D19),
         border: Color(zappHex: 0xFF2A_2622),
         borderStrong: Color(zappHex: 0xFF3A_342D),
+        accentBorder: Color(zappHex: 0xFF2A_2622),
+        accentShade: Color(zappHex: 0xFFE3_7609),
         text: Color(zappHex: 0xFFF6_F2EA),
         textMuted: Color(zappHex: 0xFFA5_9C90),
         textSubtle: Color(zappHex: 0xFF72_6A60),
         accent: Color(zappHex: 0xFFFF_9417),
         accentSoft: Color(zappHex: 0xFF3A_2713),
         accentText: Color(zappHex: 0xFFFF_B26B),
+        onCompletion: Color(zappHex: 0xFF21_1A08),
         success: Color(zappHex: 0xFF5F_D49C),
         successSoft: Color(zappHex: 0xFF1A_2E24),
         danger: Color(zappHex: 0xFFEF_6A5F),
@@ -136,6 +154,17 @@ extension ZappPalette {
         onAccent: Color(zappHex: 0xFF1A_140B),
         shadow: Color(zappHex: 0x8000_0000)
     )
+}
+
+extension View {
+    /// Android's `Modifier.shadow(elevation = 4.dp)` on the FABs and the nav pill. Compose draws that
+    /// with the platform's black ambient (3.9%) and spot (19%) shadows, not with the `shadow` token,
+    /// and the lift reads clearly in light mode; the token scaled down to ~1% did not.
+    func zappElevation() -> some View {
+        self
+            .shadow(color: .black.opacity(0.04), radius: 2, y: 0)
+            .shadow(color: .black.opacity(0.19), radius: 4, y: 3)
+    }
 }
 
 extension Color {

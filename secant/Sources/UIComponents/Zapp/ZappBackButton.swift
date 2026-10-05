@@ -22,7 +22,7 @@ struct ZappBackButton: View {
                 .zImage(width: Constants.iconSize, height: Constants.iconSize, style: tint)
                 .frame(width: Constants.touchTarget, height: Constants.touchTarget)
         }
-        .buttonStyle(.zappPress)
+        .buttonStyle(.zappHighlight)
         .disabled(!isEnabled)
         .accessibilityLabel(String(localizable: .generalBack))
         .accessibilityIdentifier(AccessibilityID.Navigation.back)

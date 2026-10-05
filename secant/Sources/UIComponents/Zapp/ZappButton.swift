@@ -23,18 +23,30 @@ struct ZappButton: View {
         static let iconSize: CGFloat = 18
         static let iconSpacing: CGFloat = 8
         static let disabledOpacity: CGFloat = 0.45
+        static let progressSize: CGFloat = 16
+        /// The regular `ProgressView`'s intrinsic size, scaled down to `progressSize`.
+        static let systemSpinnerSize: CGFloat = 20
     }
 
     let title: String
     var variant: ZappButtonVariant = .primary
     var isEnabled = true
+    /// A wait shown as one: a spinner replaces the icon and the button stops taking taps. Colours
+    /// still follow `isEnabled`, as Android's `loading` does.
+    var isLoading = false
     var leadingIcon: Image?
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: Constants.iconSpacing) {
-                if let leadingIcon {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(fg.color(colorScheme))
+                        .frame(width: Constants.progressSize, height: Constants.progressSize)
+                        .scaleEffect(Constants.progressSize / Constants.systemSpinnerSize)
+                } else if let leadingIcon {
                     leadingIcon
                         .zImage(width: Constants.iconSize, height: Constants.iconSize, style: fg)
                 }
@@ -57,7 +69,7 @@ struct ZappButton: View {
             .opacity(dimsWhenDisabled ? Constants.disabledOpacity : 1)
         }
         .buttonStyle(.zappPress)
-        .disabled(!isEnabled)
+        .disabled(!isEnabled || isLoading)
         .accessibilityLabel(title)
     }
 
@@ -97,6 +109,7 @@ struct ZappButton: View {
     VStack(spacing: 12) {
         ZappButton(title: "Primary") { }
         ZappButton(title: "Primary disabled", isEnabled: false) { }
+        ZappButton(title: "Loading", isLoading: true) { }
         ZappButton(title: "Secondary", variant: .secondary) { }
         ZappButton(title: "Ghost", variant: .ghost) { }
         ZappButton(title: "Danger", variant: .danger) { }

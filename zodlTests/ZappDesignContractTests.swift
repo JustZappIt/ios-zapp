@@ -26,13 +26,28 @@ import Testing
         #expect(ZappTextStyle.button.tracking == 0)
     }
 
+    /// Android's `PinComponents.kt`: 60dp keys, digits in `button` at 20sp Black, 14dp dots that pop
+    /// in from 1.35x, and a 180ms release fade. The hero title keeps its own iOS style.
     @Test func pinSizingContract() {
         #expect(ZappTextStyle.pinHero.size == 46)
         #expect(ZappTextStyle.pinHero.lineHeight == 49)
         #expect(ZappTextStyle.pinHero.tracking == -2)
-        #expect(ZappTextStyle.pinKey.size == 22)
-        #expect(ZappTextStyle.pinKey.lineHeight == 26)
-        #expect(ZappPINMetrics.keyHeight == 66)
+        #expect(ZappPINMetrics.keyHeight == 60)
+        #expect(ZappPINMetrics.keyStyle.size == 20)
+        #expect(ZappPINMetrics.keyStyle.weight == .black)
+        #expect(ZappPINMetrics.dotSize == 14)
+        #expect(ZappPINMetrics.dotPopScale == 1.35)
+        #expect(ZappPINMetrics.keyReleaseFade == 0.18)
+    }
+
+    /// The three tokens iOS lacked until the parity pass, byte-for-byte from `ZappPalette.kt`.
+    @Test func androidPaletteAdditions() {
+        #expect(ZappPalette.light.accentShade == Color(zappHex: 0xFFE9_7A0A))
+        #expect(ZappPalette.dark.accentShade == Color(zappHex: 0xFFE3_7609))
+        #expect(ZappPalette.light.accentBorder == .clear)
+        #expect(ZappPalette.dark.accentBorder == Color(zappHex: 0xFF2A_2622))
+        #expect(ZappPalette.light.onCompletion == Color(zappHex: 0xFF21_1A08))
+        #expect(ZappPalette.dark.onCompletion == Color(zappHex: 0xFF21_1A08))
     }
 
     @Test func navigationClearanceContract() {
