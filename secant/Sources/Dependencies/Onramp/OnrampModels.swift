@@ -93,15 +93,40 @@ struct OnrampZecEstimateModel: Equatable, Sendable {
     let costBasisPoints: Int
 }
 
+/// Stable field identities for direct orders, mirroring offramp-lib's `OnrampPaymentFieldKind`.
+/// Android localises them at the display boundary, and so does iOS.
+enum OnrampPaymentFieldKind: String, CaseIterable, Equatable, Sendable {
+    case phoneNumber = "PHONE_NUMBER"
+    case documentID = "DOCUMENT_ID"
+    case bank = "BANK"
+    case accountNumber = "ACCOUNT_NUMBER"
+    case bankName = "BANK_NAME"
+    case accountName = "ACCOUNT_NAME"
+    case cardNumber = "CARD_NUMBER"
+    case accountType = "ACCOUNT_TYPE"
+    case cedula = "CEDULA"
+    case cci = "CCI"
+    case pixKey = "PIX_KEY"
+    case paymentAlias = "PAYMENT_ALIAS"
+}
+
 struct OnrampFieldModel: Equatable, Sendable {
+    /// What the bridge sends as the label: a provider's own label when it has one, else the
+    /// field kind's name (`AppleOnrampClient.toApple`: `label ?: kind?.name.orEmpty()`).
     let label: String
     let value: String
+
+    /// Nil for a provider label or an unknown kind name: the label is then shown as sent, so a
+    /// newer framework never loses a field this build has no translation for.
+    var kind: OnrampPaymentFieldKind? { OnrampPaymentFieldKind(rawValue: label) }
 }
 
 enum OnrampPaymentInstructionModel: Equatable, Sendable {
     case upi(address: String, payload: String)
     case qr(payload: String)
-    case fields([OnrampFieldModel])
+    /// Per-corridor payee fields, optionally beside a scannable QR (Venezuela, Peru, the
+    /// Philippines and Bolivia carry both).
+    case fields([OnrampFieldModel], qrPayload: String?)
     case plain(address: String)
 
     var kind: String {
@@ -117,7 +142,9 @@ enum OnrampPaymentInstructionModel: Equatable, Sendable {
         switch self {
         case .upi(_, let payload), .qr(let payload): return payload
         case .plain(let address): return address
-        case .fields: return ""
+        // The bridge rebuilds a fields instruction from this alone, so the amount check reads
+        // the QR's declared amount exactly as Android's `OnrampIntentAmount` does.
+        case .fields(_, let qrPayload): return qrPayload ?? ""
         }
     }
 }

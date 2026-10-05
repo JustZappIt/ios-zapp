@@ -302,7 +302,13 @@ extension OnrampStatusModel {
             }
             instruction = .qr(payload: payload)
         case "fields":
-            instruction = .fields(value.instructionFields.map { OnrampFieldModel(label: $0.label, value: $0.value) })
+            // A blank field carries nothing to pay to; a blank payload is no QR.
+            instruction = .fields(
+                value.instructionFields
+                    .map { OnrampFieldModel(label: $0.label, value: $0.value.trimmingCharacters(in: .whitespacesAndNewlines)) }
+                    .filter { !$0.value.isEmpty },
+                qrPayload: value.instructionPayload.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+            )
         case "plain":
             guard let address = value.instructionAddress else {
                 throw OnrampClientError.invalidFrameworkValue("plain instruction")

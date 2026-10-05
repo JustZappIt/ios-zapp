@@ -47,8 +47,8 @@ extension OnrampView {
                             value: "\(store.currencySymbol)\(Onramp.displayMicros(fiat))"
                         )
                     }
-                    if let address = store.paymentAddress {
-                        ZappSummaryRow(label: String(localizable: .onrampPaymentAddressLabel), value: address)
+                    if let instruction = store.paymentInstruction {
+                        OnrampPaymentInstructionRows(instruction: instruction) { store.send(.copyPaymentFieldTapped($0)) }
                     }
                     if let seconds = store.paymentSecondsRemaining {
                         ZappSummaryRow(label: String(localizable: .onrampExpiresInLabel), value: duration(seconds))
@@ -56,7 +56,9 @@ extension OnrampView {
                 }
             }
 
-            if let payload = store.qrPayload {
+            // Android shows the QR only while the order is payable: a closed window or a payload
+            // whose amount disagrees with the order must not stay scannable.
+            if let payload = payableQrPayload {
                 OnrampQRCode(payload: payload)
                     .frame(maxWidth: 260, maxHeight: 260)
                     .frame(maxWidth: .infinity)
@@ -67,7 +69,7 @@ extension OnrampView {
 
             ZappButton(
                 title: String(localizable: .onrampCopyPaymentDetails),
-                variant: store.qrPayload == nil ? .primary : .ghost,
+                variant: payableQrPayload == nil ? .primary : .ghost,
                 leadingIcon: Asset.Assets.copy.image
             ) { store.send(.copyPaymentAddressTapped) }
 
@@ -81,6 +83,10 @@ extension OnrampView {
             }
             errorText
         }
+    }
+
+    var payableQrPayload: String? {
+        store.isPayable ? store.qrPayload : nil
     }
 
     var converting: some View {

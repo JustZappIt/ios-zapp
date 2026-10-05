@@ -12466,6 +12466,23 @@
         }
       }
     },
+    "filter.unread" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unread"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No leídos"
+          }
+        }
+      }
+    },
     "filter.weTried" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33659,6 +33676,18 @@
     "onramp.payMerchant.body" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Send exactly this amount to the merchant, then confirm below."}},"es":{"stringUnit":{"state":"translated","value":"Envía exactamente este importe al comerciante y después confirma abajo."}}}},
     "onramp.payMerchant.title" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay the merchant"}},"es":{"stringUnit":{"state":"translated","value":"Paga al comerciante"}}}},
     "onramp.paymentAddress.label" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay to"}},"es":{"stringUnit":{"state":"translated","value":"Pagar a"}}}},
+    "onramp.paymentField.accountName" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Account name"}},"es":{"stringUnit":{"state":"translated","value":"Nombre de la cuenta"}}}},
+    "onramp.paymentField.accountNumber" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Account number"}},"es":{"stringUnit":{"state":"translated","value":"Número de cuenta"}}}},
+    "onramp.paymentField.accountType" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Account type"}},"es":{"stringUnit":{"state":"translated","value":"Tipo de cuenta"}}}},
+    "onramp.paymentField.alias" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment alias"}},"es":{"stringUnit":{"state":"translated","value":"Alias de pago"}}}},
+    "onramp.paymentField.bank" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Bank"}},"es":{"stringUnit":{"state":"translated","value":"Banco"}}}},
+    "onramp.paymentField.bankName" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Bank name"}},"es":{"stringUnit":{"state":"translated","value":"Nombre del banco"}}}},
+    "onramp.paymentField.cardNumber" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Card number"}},"es":{"stringUnit":{"state":"translated","value":"Número de tarjeta"}}}},
+    "onramp.paymentField.cci" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"CCI"}},"es":{"stringUnit":{"state":"translated","value":"CCI"}}}},
+    "onramp.paymentField.cedula" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Cédula"}},"es":{"stringUnit":{"state":"translated","value":"Cédula"}}}},
+    "onramp.paymentField.documentID" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"ID / RIF"}},"es":{"stringUnit":{"state":"translated","value":"Cédula / RIF"}}}},
+    "onramp.paymentField.phoneNumber" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Phone number"}},"es":{"stringUnit":{"state":"translated","value":"Número de teléfono"}}}},
+    "onramp.paymentField.pixKey" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"PIX key"}},"es":{"stringUnit":{"state":"translated","value":"Clave PIX"}}}},
     "onramp.paymentRail.bankTransfer" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Bank transfer"}},"es":{"stringUnit":{"state":"translated","value":"Transferencia bancaria"}}}},
     "onramp.paymentRail.label" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Payment method"}},"es":{"stringUnit":{"state":"translated","value":"Método de pago"}}}},
     "onramp.paymentWindow.closed" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This payment window has closed. Do not send money now: it will not be matched to your order. Start over to get a fresh one."}},"es":{"stringUnit":{"state":"translated","value":"Esta ventana de pago se ha cerrado. No envíes dinero: no se asociará con tu orden. Empieza de nuevo para obtener una nueva."}}}},

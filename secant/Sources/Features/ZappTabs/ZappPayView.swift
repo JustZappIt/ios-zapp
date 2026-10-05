@@ -117,6 +117,9 @@ struct ZappPayView: View {
             .sheet(isPresented: $store.isZappPoolBalancesSheetPresented) {
                 poolBalancesSheet()
             }
+            .zashiSheet(isPresented: $store.isZappSpendableBalanceSheetPresented) {
+                spendableBalanceSheet()
+            }
             .alert(
                 store:
                     store.scope(
@@ -148,6 +151,7 @@ struct ZappPayView: View {
                     store.send(.walletBalances(.balanceTapped))
                     store.isZappPoolBalancesSheetPresented = true
                 },
+                onBreakdownTapped: { store.send(.zappSpendableBalanceTapped) },
                 onToggleBalanceDisplay: { showZecAsPrimary.toggle() },
                 onShieldTapped: { store.send(.smartBanner(.shieldFundsTapped)) }
             )
@@ -310,6 +314,19 @@ extension ZappPayView {
             // its content, and `.large` stays available for larger type.
             .presentationDetents([.height(PoolBalancesSheet.detentHeight), .large])
             .presentationDragIndicator(.visible)
+        }
+    }
+}
+
+extension ZappPayView {
+    /// Upstream's Spendable balance sheet, as the unified send screen already presents it. Its
+    /// amounts go through `ZatoshiText`, which masks them while balances are hidden.
+    @ViewBuilder func spendableBalanceSheet() -> some View {
+        WithPerceptionTracking {
+            BalancesView(
+                store: store.scope(state: \.zappSpendableBalancesState, action: \.zappSpendableBalances),
+                tokenName: tokenName
+            )
         }
     }
 }

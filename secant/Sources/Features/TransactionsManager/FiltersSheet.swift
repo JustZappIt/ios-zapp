@@ -70,18 +70,16 @@ extension TransactionsManagerView {
                 .padding(.top, 32)
                 .padding(.bottom, 24)
 
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    FilterView(title: String(localizable: .filterSent), active: store.isSentFilterActive) { store.send(.toggleFilter(.sent)) }
-                    FilterView(title: String(localizable: .filterReceived), active: store.isReceivedFilterActive) { store.send(.toggleFilter(.received)) }
-                    FilterView(title: String(localizable: .filterMemos), active: store.isMemosFilterActive) { store.send(.toggleFilter(.memos)) }
-                }
-
-                HStack(spacing: 8) {
-                    FilterView(title: String(localizable: .filterNotes), active: store.isNotesFilterActive) { store.send(.toggleFilter(.notes)) }
-                    FilterView(title: String(localizable: .filterBookmarked), active: store.isBookmarkedFilterActive) { store.send(.toggleFilter(.bookmarked)) }
-                    FilterView(title: String(localizable: .filterSwap), active: store.isSwapFilterActive) { store.send(.toggleFilter(.swap)) }
-                }
+            // Android's `TransactionFilter` order in a `FlowRow`: seven chips no longer fit two
+            // fixed rows of three, so they wrap instead of clipping on narrow phones.
+            ZappFlowLayout(spacing: 8, lineSpacing: 8) {
+                FilterView(title: String(localizable: .filterSent), active: store.isSentFilterActive) { store.send(.toggleFilter(.sent)) }
+                FilterView(title: String(localizable: .filterReceived), active: store.isReceivedFilterActive) { store.send(.toggleFilter(.received)) }
+                FilterView(title: String(localizable: .filterMemos), active: store.isMemosFilterActive) { store.send(.toggleFilter(.memos)) }
+                FilterView(title: String(localizable: .filterUnread), active: store.isUnreadFilterActive) { store.send(.toggleFilter(.unread)) }
+                FilterView(title: String(localizable: .filterBookmarked), active: store.isBookmarkedFilterActive) { store.send(.toggleFilter(.bookmarked)) }
+                FilterView(title: String(localizable: .filterNotes), active: store.isNotesFilterActive) { store.send(.toggleFilter(.notes)) }
+                FilterView(title: String(localizable: .filterSwap), active: store.isSwapFilterActive) { store.send(.toggleFilter(.swap)) }
             }
             .padding(.bottom, 32)
 
