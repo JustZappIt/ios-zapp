@@ -54,6 +54,9 @@ struct RequestZecSummaryView: View {
                         qrPanel
                             .padding(.top, Design.Spacing._4xl)
 
+                        RequestZecQRActionsView(store: store)
+                            .padding(.top, Design.Spacing._lg)
+
                         ZappButton(
                             title: String(localizable: .generalClose),
                             variant: .ghost
