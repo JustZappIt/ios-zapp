@@ -268,6 +268,24 @@ import Testing
         #expect(store.primaryButton == .disabled)
     }
 
+    /// Text that is not a number never leaves the last valid amount requested behind it: the field
+    /// keeps showing what was typed, so the request must follow it to "nothing", not stay at 0.001.
+    @Test func textThatIsNotANumberClearsTheRequestedAmount() {
+        let store = Self.makeStore(Self.swapState(balance: Zatoshi(100_000_000)))
+
+        store.send(.destinationAmountChanged("0.001"))
+        #expect(store.swapState.exactOutputBaseUnits == "1000")
+
+        store.send(.destinationAmountChanged("0.0000000010.001"))
+
+        #expect(store.isExactOutput)
+        #expect(store.destinationText == "0.0000000010.001")
+        #expect(store.destinationTokenAmount == nil)
+        #expect(store.swapState.exactOutputBaseUnits == nil)
+        #expect(store.exactOutputZecEstimate == nil)
+        #expect(store.primaryButton == .disabled)
+    }
+
     /// Android's `clearTokenAmount` on an asset change.
     @Test func changingTheAssetReturnsToExactInput() {
         let store = Self.makeStore(Self.swapState(balance: Zatoshi(100_000_000)))

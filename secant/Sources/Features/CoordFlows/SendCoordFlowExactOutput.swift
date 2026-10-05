@@ -149,11 +149,10 @@ extension SendCoordFlow {
                 // payment exact-output with no amount yet, so Review simply disables.
             case .destinationAmountChanged(let text):
                 guard state.mode == .swap, !state.swapState.isQuoteRequestInFlight else { return .none }
+                // Not a number (e.g. "0.10.5"): kept, with no amount, so Review disables. Android's
+                // field drops the keystroke, but a SwiftUI TextField keeps showing it, and a dropped
+                // edit would leave the last valid figure requested under text that says otherwise.
                 let typed = ExactOutputSwap.decimal(from: text, locale: locale)
-                // Not a number: drop the keystroke, as Android's number field does.
-                if !text.isEmpty && typed == nil {
-                    return .none
-                }
                 if !state.isExactOutput {
                     // Nothing typed yet: the estimate stays an estimate.
                     guard !text.isEmpty else { return .none }
