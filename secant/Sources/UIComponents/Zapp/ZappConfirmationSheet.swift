@@ -18,8 +18,9 @@ struct ZappConfirmation: Equatable {
 /// centred title and message, then a Primary (or Danger) `ZappButton` over a Ghost one, on the
 /// `surface` colour above the `overlay` scrim.
 ///
-/// The panel keeps iOS's square sheet corners (Android rounds its top to 20dp); the handle is the
-/// Zapp one, not the system indicator, so it reads the same on every iOS version.
+/// Like Android, the panel's top corners are rounded to 20pt and the handle is a capsule: the one
+/// rounded surface in an otherwise square UI. The handle is the Zapp one, not the system indicator,
+/// so it reads the same on every iOS version.
 struct ZappConfirmationSheet: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -27,6 +28,7 @@ struct ZappConfirmationSheet: View {
         static let handleAreaHeight: CGFloat = 40
         static let handleTop: CGFloat = 8
         static let handleSize = CGSize(width: 42, height: 5)
+        static let topCornerRadius: CGFloat = 20
         static let horizontalPadding: CGFloat = 24
         static let gapSmall: CGFloat = 8
         static let gapLarge: CGFloat = 20
@@ -39,7 +41,7 @@ struct ZappConfirmationSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Rectangle()
+            Capsule()
                 .fill(ZappColors.borderStrong.color(colorScheme))
                 .frame(width: Constants.handleSize.width, height: Constants.handleSize.height)
                 .padding(.top, Constants.handleTop)
@@ -75,7 +77,11 @@ struct ZappConfirmationSheet: View {
             .padding(.bottom, Constants.gapLarge)
         }
         .frame(maxWidth: .infinity)
-        .background(ZappColors.surface.color(colorScheme).ignoresSafeArea(edges: .bottom))
+        .background(
+            TopRoundedRectangle(radius: Constants.topCornerRadius)
+                .fill(ZappColors.surface.color(colorScheme))
+                .ignoresSafeArea(edges: .bottom)
+        )
     }
 }
 
