@@ -52,7 +52,9 @@ extension Root {
                 // MARK: - Accounts
 
             case .home(.walletAccountTapped(let walletAccount)):
-                guard state.selectedWalletAccount != walletAccount else {
+                // By id: the sheet's copy of the current account can differ in rotating fields
+                // (`privateUA`), and treating that as a switch would cancel the onramp and offramp.
+                guard state.selectedWalletAccount?.id != walletAccount.id else {
                     return .none
                 }
                 state.$selectedWalletAccount.withLock { $0 = walletAccount }
@@ -725,6 +727,17 @@ extension Root {
                 state.path = .chatProfile
                 return .none
 
+                // Android's `ChatP2pKeyArgs`: a screen of its own, pushed on top of the profile the
+                // same way the wallet-address screen is, and back to it on leaving.
+            case .chatProfile(.p2pKeyScreenTapped):
+                state.chatP2pKeyState = .initial
+                state.path = .chatP2pKey
+                return .none
+
+            case .chatP2pKey(.backTapped):
+                state.path = .chatProfile
+                return .none
+
                 // Android's `DeleteChatIdentityUseCase` shuts the messaging SDK down and then
                 // deletes the wallet data and preferences behind it. On iOS that whole sequence
                 // already exists as the reset the Settings path runs — including
@@ -991,6 +1004,21 @@ extension Root {
                 state.currencyConversionSetupState = .initial
                 state.currencyConversionSetupState.isSettingsView = true
                 state.path = .currencyConversionSetup
+                return .none
+
+                // Android's `AccountListArgs`: the Wallets & Hardware sheet, presented over the tabs.
+                // Selecting an account and Add Keystone run through Home's existing actions.
+            case .zappTabs(.hardwareWalletTapped):
+                state.homeState.accountSwitchRequest = true
+                return .none
+
+            case .zappTabs(.viewingKeyExportTapped):
+                state.viewingKeyExportState = .initial
+                state.path = .viewingKeyExport
+                return .none
+
+            case .viewingKeyExport(.backTapped):
+                state.path = nil
                 return .none
 
             case .zappTabs(.p2pPaymentMethodTapped):

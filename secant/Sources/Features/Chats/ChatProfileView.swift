@@ -156,7 +156,7 @@ struct ChatProfileView: View {
                 iconTint: .accentText,
                 iconBackground: .accentSoft
             ) {
-                store.send(.p2pKeyTapped)
+                store.send(.p2pKeyScreenTapped)
             }
 
             secretFailure

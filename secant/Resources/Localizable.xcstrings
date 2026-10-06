@@ -3522,6 +3522,278 @@
         }
       }
     },
+    "chatP2pKey.copy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoAccessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How the P2P key works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona la clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoDerivation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This key is derived from your seed phrase on its own path. It is not your Zcash spending key and it cannot touch your ZEC. Losing the app never loses it: the same seed always re-derives the same key."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta clave se deriva de tu frase semilla por una ruta propia. No es tu clave de gasto de Zcash y no puede tocar tus ZEC. Perder la app no la pierde: la misma semilla siempre vuelve a derivar la misma clave."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSafety" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone holding the private key controls that account and the funds sitting in it. Export it only if you need to move those funds with another wallet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quien tenga la clave privada controla esa cuenta y los fondos que haya en ella. Expórtala solo si necesitas mover esos fondos con otra cartera."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSmartAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It owns a smart account. The address your cash-outs settle through is a contract account on Base that this key controls, which is what lets Zapp sponsor the network fees so you never hold gas."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controla una cuenta inteligente. La dirección por la que se liquidan tus cobros es una cuenta de contrato en Base gobernada por esta clave, y eso permite que Zapp cubra las comisiones de red para que nunca necesites gas."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About your P2P key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre tu clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The address derived from the owner key. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección derivada de la clave propietaria. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección propietaria"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave propietaria"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLockedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The private key that controls the smart account. Revealing it asks for your app lock first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave privada que controla la cuenta inteligente. Para mostrarla se pide antes tu bloqueo de app."
+          }
+        }
+      }
+    },
+    "chatP2pKey.privateKeyCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never share this. Anyone with it can spend everything in the smart account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No la compartas nunca. Quien la tenga puede gastar todo lo que haya en la cuenta inteligente."
+          }
+        }
+      }
+    },
+    "chatP2pKey.privateKeyLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave privada"
+          }
+        }
+      }
+    },
+    "chatP2pKey.reveal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar clave propietaria"
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Base account your P2P cash-outs settle through. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cuenta de Base por la que se liquidan tus cobros P2P. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta inteligente"
+          }
+        }
+      }
+    },
+    "chatP2pKey.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P wallet key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de cartera P2P"
+          }
+        }
+      }
+    },
     "chatPrivacy.onlineStatusIntro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26448,6 +26720,40 @@
         }
       }
     },
+    "settingsYou.hardwareWalletSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect a Keystone or switch wallets"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conecta un Keystone o cambia de billetera"
+          }
+        }
+      }
+    },
+    "settingsYou.hardwareWalletTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware wallet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billetera de hardware"
+          }
+        }
+      }
+    },
     "settingsYou.localCurrencySubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26665,6 +26971,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tor"
+          }
+        }
+      }
+    },
+    "settingsYou.viewingKeyExportSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create view-only access for dashboards and accounting tools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea acceso de solo lectura para paneles y herramientas contables"
+          }
+        }
+      }
+    },
+    "settingsYou.viewingKeyExportTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export viewing key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar clave de visualización"
           }
         }
       }
@@ -32763,6 +33103,482 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recarga desde un exchange u otra billetera."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.accessLevelLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access level"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nivel de acceso"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.accountIndex" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta %lld"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.accountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.acknowledgement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I understand what this reveals, and that it cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entiendo lo que revela y que no se puede deshacer."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.authFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication was not completed. The key remains hidden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La autenticación no se completó. La clave permanece oculta."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.authenticating" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticating…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autenticando…"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.copy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy raw key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar clave sin modificar"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.hide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar clave"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoAccessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About viewing keys"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de las claves de visualización"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoCompatibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make sure the receiving tool supports Zcash unified viewing keys."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que la herramienta receptora admita claves de visualización unificadas de Zcash."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoIntro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A viewing key gives a dashboard or accounting tool read-only access to this account. It can never spend your funds."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una clave de visualización da a un panel o a una herramienta contable acceso de solo lectura a esta cuenta. Nunca puede gastar tus fondos."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoIrrevocableBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access continues for all future activity. The only way to revoke it is to move your funds to a new wallet account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El acceso continúa para toda la actividad futura. La única forma de revocarlo es mover tus fondos a una cuenta nueva."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoIrrevocableTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This cannot be undone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto no se puede deshacer"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About viewing keys"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de las claves de visualización"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoUfvkBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows incoming and outgoing payments, spends and balances. Appropriate for accounting."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra los pagos entrantes y salientes, los gastos y los saldos. Apropiada para contabilidad."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.infoUivkBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows incoming payments only. It cannot see what you spend, so a balance calculated from it may read higher than it is."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra solo los pagos entrantes. No puede ver lo que gastas, así que un saldo calculado con ella puede parecer mayor de lo que es."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.keyUnavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected viewing key is unavailable."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave de visualización seleccionada no está disponible."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.loadFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viewing-key details could not be loaded."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar los detalles de la clave de visualización."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.reveal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticate and reveal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autenticar y revelar"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.revealedLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viewing key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de visualización"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share viewing key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir clave de visualización"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read-only access. Cannot spend funds."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso de solo lectura. No puede gastar fondos."
+          }
+        }
+      }
+    },
+    "viewingKeyExport.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export viewing key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar clave de visualización"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.ufvkDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All activity, spends and balances"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toda la actividad, los gastos y los saldos"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.ufvkTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full viewing key (UFVK)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de visualización completa (UFVK)"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.uivkDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incoming payments only"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo pagos entrantes"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.uivkTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incoming viewing key (UIVK)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de visualización entrante (UIVK)"
+          }
+        }
+      }
+    },
+    "viewingKeyExport.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not available for this account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No disponible para esta cuenta"
           }
         }
       }
