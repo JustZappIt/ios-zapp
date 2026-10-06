@@ -52,7 +52,7 @@ struct Home {
         }
 
         var inAppBrowserURLKeystone: String {
-            "https://keyst.one/shop/products/keystone-3-pro?discount=Zapp"
+            "https://keyst.one/shop/products/keystone-3-pro?discount=Zodl"
         }
 
         init(

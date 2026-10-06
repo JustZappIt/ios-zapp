@@ -48,11 +48,6 @@ struct ZappTabsView: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $homeStore.isInAppBrowserKeystoneOn) {
-                if let url = URL(string: homeStore.inAppBrowserURLKeystone) {
-                    InAppBrowserView(url: url)
-                }
-            }
         }
     }
 

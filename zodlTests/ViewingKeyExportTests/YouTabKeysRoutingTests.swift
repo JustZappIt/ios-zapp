@@ -119,23 +119,6 @@ import Testing
         }
     }
 
-    /// Android's promo link carries Zapp's discount code, which the promo copy names.
-    /// The promo copy reads "5% off": neither the escaped "%%" nor a format-mangled "50ff".
-    @Test func theKeystonePromoShowsASinglePercentSign() {
-        let copy = String(localizable: .keystoneDrawerBannerDesc)
-
-        #expect(copy.contains("5% off"))
-        #expect(!copy.contains("%%"))
-    }
-
-    @Test func theKeystonePromoCarriesZappsCode() {
-        withDependencies {
-            $0.defaultInMemoryStorage = InMemoryStorage()
-        } operation: {
-            #expect(Home.State.initial.inAppBrowserURLKeystone.hasSuffix("discount=Zapp"))
-        }
-    }
-
     // MARK: - Viewing key
 
     @Test func theViewingKeyRowPushesTheExportScreen() {

@@ -21,8 +21,6 @@ struct ZappWalletAccountsSheet: View {
         static let iconSize: CGFloat = 24
         static let iconPadding: CGFloat = 8
         static let rowSpacing: CGFloat = 8
-        static let promoTextTrailing: CGFloat = 80
-        static let promoImageHeight: CGFloat = 148
     }
 
     @Perception.Bindable var store: StoreOf<Home>
@@ -41,12 +39,6 @@ struct ZappWalletAccountsSheet: View {
                         ForEach(store.walletAccounts, id: \.self) { account in
                             accountRow(account)
                         }
-
-                        // Android offers the promo and the connect button only until a Keystone
-                        // is connected.
-                        if !store.isKeystoneConnected {
-                            keystonePromo
-                        }
                     }
                     .padding(.horizontal, Constants.rowInset)
 
@@ -57,6 +49,8 @@ struct ZappWalletAccountsSheet: View {
                             .padding(.top, Constants.contentPadding)
                     }
 
+                    // Offered only until a Keystone is connected, as on Android. Unlike Android and the
+                    // legacy sheet, Zapp shows no Keystone shop promo here.
                     if !store.isKeystoneConnected {
                         ZappButton(title: String(localizable: .keystoneConnect), variant: .secondary) {
                             store.send(.addKeystoneHWWalletTapped)
@@ -104,40 +98,5 @@ struct ZappWalletAccountsSheet: View {
         }
         .buttonStyle(.zappPress)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-    }
-
-    private var keystonePromo: some View {
-        Button {
-            store.send(.keystoneBannerTapped)
-        } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-                    Text(localizable: .keystoneDrawerBannerTitle)
-                        .zappFont(.sectionTitle, style: ZappColors.text)
-
-                    // The catalogue escapes the percent sign ("5%%"). `Text(localizable:)` shows that
-                    // verbatim, while `String(localizable:)` resolves it to "5%" (never format it again:
-                    // "% o" would then read as a placeholder).
-                    Text(String(localizable: .keystoneDrawerBannerDesc))
-                        .zappFont(.caption, style: ZappColors.textMuted)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .multilineTextAlignment(.leading)
-                        .padding(.trailing, Constants.promoTextTrailing)
-                }
-                .padding(Constants.contentPadding)
-
-                Asset.Assets.Partners.keystonePromo.image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: Constants.promoImageHeight)
-                    .clipped()
-                    .accessibilityHidden(true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(ZappColors.surfaceAlt.color(colorScheme))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.zappPress)
     }
 }
