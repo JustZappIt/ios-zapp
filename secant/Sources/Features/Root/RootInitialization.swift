@@ -134,7 +134,12 @@ extension Root {
                 // The tip survives backgrounding in memory (`sdkSynchronizer.latestState()`),
                 // which is what makes this call site immediate rather than waiting for a fresh
                 // sync tick to repopulate it via `.synchronizerStateChanged`.
-                presentIronwoodAnnouncementIfNeeded(state: &state, tip: sdkSynchronizer.latestState().latestBlockHeight)
+                let retained = sdkSynchronizer.latestState()
+                presentIronwoodAnnouncementIfNeeded(
+                    state: &state,
+                    tip: retained.latestBlockHeight,
+                    accountsBalances: retained.accountsBalances
+                )
                 // MOB-1466: "the open breaks the loop's sleep" — a fresh foreground always
                 // restarts the tick loop's 30s countdown from zero (`cancelInFlight: true` inside
                 // `migrationTickLoopEffect`), whichever branch below this open actually takes.
@@ -293,7 +298,11 @@ extension Root {
                 // Keep this above every early return. A fresh install may not
                 // have a selected account yet, and background work is excluded
                 // by the announcement's own safety gate.
-                presentIronwoodAnnouncementIfNeeded(state: &state, tip: latestState.data.latestBlockHeight)
+                presentIronwoodAnnouncementIfNeeded(
+                    state: &state,
+                    tip: latestState.data.latestBlockHeight,
+                    accountsBalances: latestState.data.accountsBalances
+                )
 
                 let snapshot = SyncStatusSnapshot.snapshotFor(state: latestState.data.syncStatus)
 
@@ -1821,13 +1830,27 @@ extension Root {
     /// only a stored `true` counts as acknowledged and then consumes the latch;
     /// and a failed presentation-safety check does not consume the latch, so a
     /// later sync tick or foreground entry can retry.
-    func presentIronwoodAnnouncementIfNeeded(state: inout Root.State, tip: BlockHeight) {
+    ///
+    /// The announcement is about moving Orchard funds, so it waits until some account holds at
+    /// least the amount the migration banner offers to move (Android shows only that banner, on
+    /// the same floor). A new wallet, or a restore whose scan hasn't found Orchard value yet, has
+    /// nothing to be told about. Like the safety check, this doesn't consume the latch, so Orchard
+    /// funds arriving later still raise it.
+    func presentIronwoodAnnouncementIfNeeded(
+        state: inout Root.State,
+        tip: BlockHeight,
+        accountsBalances: [AccountUUID: AccountBalance]
+    ) {
         guard !state.ironwoodAnnouncementResolved else { return }
         guard tip > 0, tip >= zcashSDKEnvironment.ironwoodActivationHeight() else { return }
         guard walletStorage.exportIronwoodAnnouncementFlag() != true else {
             state.ironwoodAnnouncementResolved = true
             return
         }
+        let holdsMigratableOrchard = accountsBalances.values.contains {
+            $0.orchardBalance.unlockedForMigration >= MigrationDerivations.minimumOfferableOrchardBalance
+        }
+        guard holdsMigratableOrchard else { return }
         guard state.canPresentIronwoodAnnouncement else { return }
 
         state.ironwoodAnnouncementResolved = true

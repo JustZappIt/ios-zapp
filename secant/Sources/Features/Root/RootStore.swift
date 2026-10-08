@@ -365,6 +365,9 @@ struct Root {
                 && !homeState.isZappSyncErrorSheetPresented
                 && bgTask == nil
                 && alert == nil
+                // Replacing Home under the Chats terms sheet tears it down unanswered, so Chats
+                // asks again once Home is back: wait until the terms are answered.
+                && !chatsListState.showsTermsDialog
                 && splashAppeared
         }
 
