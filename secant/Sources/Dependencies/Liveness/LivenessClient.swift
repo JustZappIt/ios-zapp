@@ -13,10 +13,14 @@ extension DependencyValues {
 
 typealias LivenessStatusStream = AsyncThrowingStream<LivenessStatusModel, Error>
 
-/// The selfie check: a browser widget, a one-time code on its redirect, an attestation written
-/// to Zapp's integrator from the smart account.
+/// Hosted selfie and passport checks. The shared driver validates durable authorization and
+/// submits the signed attestation to the ReputationManager from the smart account.
 @DependencyClient
 struct LivenessClient {
+    var verifyIdentity: @Sendable (_ check: IdentityCheckModel, _ currencyCode: String, _ nonce: String, _ runID: UUID)
+        async throws -> LivenessStatusStream
+    var cancel: @Sendable (_ check: IdentityCheckModel, _ currencyCode: String, _ runID: UUID) async throws -> Void = { _, _, _ in }
+    var recoverable: @Sendable (_ currencyCode: String) async throws -> IdentityCheckModel? = { _ in nil }
     var verify: @Sendable (_ currencyCode: String, _ nonce: String, _ runID: UUID) async throws -> LivenessStatusStream
     var resume: @Sendable (_ ret: LivenessReturnModel, _ runID: UUID) async throws -> LivenessStatusStream
     /// Hands the widget's redirect to the live run. False when none is waiting: resume it instead.
@@ -25,9 +29,24 @@ struct LivenessClient {
 
 extension LivenessClient: DependencyKey {
     static let liveValue = Self.live()
+    // Recovery reads may run on every appearance. Tests stay offline unless a closure is overridden;
+    // the macro's write-operation defaults still report an unexpected call.
+    static let testValue = Self()
 
     static func live() -> Self {
         Self(
+            verifyIdentity: { check, currencyCode, nonce, runID in
+                let generation = try await OfframpSession.shared.generationToken()
+                return try await OfframpSession.shared.verifyLiveness(
+                    currencyCode: currencyCode, nonce: nonce, runID: runID, expectedGeneration: generation, check: check
+                )
+            },
+            cancel: { check, currencyCode, runID in
+                try await OfframpSession.shared.cancelIdentity(check: check, currencyCode: currencyCode, runID: runID)
+            },
+            recoverable: { currencyCode in
+                try await OfframpSession.shared.recoverableIdentity(currencyCode: currencyCode)
+            },
             verify: { currencyCode, nonce, runID in
                 let generation = try await OfframpSession.shared.generationToken()
                 return try await OfframpSession.shared.verifyLiveness(

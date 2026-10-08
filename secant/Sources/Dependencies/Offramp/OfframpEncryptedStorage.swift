@@ -20,6 +20,7 @@ private struct OfframpStoragePayload: Codable {
     /// Optional, so a payload written before Peer existed still decodes.
     var peerCheckpointBookJSON: String?
     var peerPayeeBookJSON: String?
+    var identityRecords: [String: String]?
 }
 
 enum OfframpStorageError: Error {
@@ -59,7 +60,7 @@ private final class OfframpStorageLockRegistry: @unchecked Sendable {
 /// Peer shares this file rather than opening its own. Both rails spend from one Base smart account,
 /// so their records are only ever read and written together, and a second envelope would mean a
 /// second lock, a second key and a second chance for a wallet reset to clear one and miss the other.
-final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCashOutStorage, @unchecked Sendable {
+final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCashOutStorage, AppleIdentityStorage, @unchecked Sendable {
     private let lock: NSLock
     private let key: AddressBookKey
     private let fileURL: URL
@@ -147,6 +148,27 @@ final class OfframpEncryptedStorage: NSObject, AppleOfframpStorage, ApplePeerCas
 
     func clearRefundCheckpoint() throws {
         try mutate { $0.refundCheckpointJSON = nil }
+    }
+
+    /// Called only after OfframpSession has joined its writers, before wallet keys are erased.
+    static func clearIdentityRecovery(directory: URL) throws {
+        for file in try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+            where file.lastPathComponent.hasPrefix("zapp-offramp-") {
+            // A wallet reset already discards all rails' custody; remove their encrypted envelope too.
+            try FileManager.default.removeItem(at: file)
+        }
+    }
+
+    func identityRecord(key: String) throws -> AppleStorageValue {
+        AppleStorageValue(value: try withPayload { $0.identityRecords?[key] })
+    }
+
+    func storeIdentityRecord(key: String, value: String?) throws {
+        try mutate { payload in
+            var records = payload.identityRecords ?? [:]
+            records[key] = value
+            payload.identityRecords = records
+        }
     }
 
     // MARK: - Peer

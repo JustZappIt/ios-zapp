@@ -1,6 +1,41 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "increaseReputation.passport.stepScan" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Scan passport and verify your face"}}}},
+    "increaseReputation.identity.notPassed" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The identity check did not pass. Try again with a clear passport scan and good lighting."}}}},
+  "increaseReputation.passport.waiting": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open the verification page to scan your passport and complete the face check."
+        }
+      }
+    }
+  },
+  "increaseReputation.identity.group": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Identity checks"
+        }
+      }
+    }
+  },
+  "increaseReputation.passport.row": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Passport verification"
+        }
+      }
+    }
+  },
     " %@" : {
 
     },
@@ -23230,13 +23265,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(download link: https://apps.apple.com/app/zashi-zcash-wallet/id1672392439)"
+            "value" : "(download link: https://justzappit.xyz)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(enlace de descarga: https://apps.apple.com/app/zashi-zcash-wallet/id1672392439)"
+            "value" : "(enlace de descarga: https://justzappit.xyz)"
           }
         }
       }

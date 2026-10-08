@@ -64,6 +64,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [ZAPP-BRAND] Swaps and payments through NEAR Intents are now attributed to Zapp rather than the upstream Zodl wallet, matching Android. Support emails from the app now go to hello@justzappit.xyz instead of Zodl's support address, and the download link in a shared payment request now points to justzappit.xyz instead of the old Zashi App Store listing.
 - [P2P] Your buy limit is now the higher of what reputation and the selfie check each allow, and a purchase goes through whichever carries the amount. Reputation shows that higher figure and says when it comes from Zapp's checkout, a wallet that passed only the selfie check can buy without any reputation points, and Back on a finished purchase returns to the amount screen so the next one is a step away.
 - [P2P] Buy ZEC now places every order from your own Base account, the way Android does, instead of through Zapp's retired onramp service. Your limit is your own: the amount screen shows the most you can buy per order, read from the exchange, and a new wallet is guided to verification before its first purchase rather than shown a limit it cannot use. When the exchange refuses an order it now tells you why in its own words, and a payment the merchant has not yet settled keeps the order open instead of reporting it failed.
 - [CHATS] Text messages now sit in lightly rounded bubbles with a small tail on the side they came from, level with the last line.
@@ -116,6 +117,7 @@ directly impact users rather than highlighting other crucial architectural updat
 
 ### Fixed
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.
+- [P2P] Selfie and passport checks now return to Zapp through the supported verification links, validate returns against your saved session, and recover after app restarts. Retries preserve completed checks and reconcile pending transactions without sending twice.
 - [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.
 - [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.
 - [CHATS] The Chats list, the chat room and their sheets (network details, attachments, GIF search) now refresh when their data changes on iOS 16, where a sheet could stay on its spinner or the wrong page.

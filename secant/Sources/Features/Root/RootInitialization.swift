@@ -1461,7 +1461,10 @@ extension Root {
 
             case .giftResetGuardCleared:
                 state.hasClearedGiftResetGuard = true
-                return .send(.initialization(.resetZashi))
+                return .run { send in
+                    await offramp.invalidateSession()
+                    await send(.initialization(.resetZashi))
+                }
 
             case .initialization(.resetZashi):
                 // The guard belongs on the use path, not on one screen's action: this wipe
@@ -1572,11 +1575,16 @@ extension Root {
 
             case .resetZashiKeychainRequest:
                 return .run { send in
+                    // Every reset entry point, including explicit data-loss overrides, joins
+                    // native identity persistence before encrypted recovery storage is erased.
+                    await offramp.invalidateSession()
                     do {
                         try walletStorage.resetZashi()
                         await send(.resetZashiFinishProcessing)
                     } catch WalletStorage.KeychainError.unknown(let osStatus) {
                         await send(.resetZashiKeychainFailed(osStatus))
+                    } catch {
+                        await send(.resetZashiKeychainFailedWithCorruptedData(error.localizedDescription))
                     }
                 }
 

@@ -49,6 +49,12 @@ actor OfframpSession {
         func release() { gateway?.invalidate() }
     }
 
+    private struct IdentityRunContext {
+        let client: AppleIdentityClient
+        let check: IdentityCheckModel
+        let currencyCode: String
+    }
+
     private struct BaseReservationSnapshot: Sendable {
         let scanAndPayMicros: String?
         let refundMicros: String?
@@ -66,14 +72,15 @@ actor OfframpSession {
     private var peer: ApplePeerCashOutClient?
     private var reputation: AppleReputationClient?
     private var reclaimRunID: UUID?
-    private var liveness: AppleLivenessClient?
+    private var liveness: AppleIdentityClient?
     private var livenessRunID: UUID?
+    private var identityCancellation: Task<Void, Error>?
     private var accountTask: Task<AppleBaseAccount, Error>?
     private var offrampTask: Task<OfframpRail, Error>?
     private var onrampTask: Task<OnrampRail, Error>?
     private var peerTask: Task<ApplePeerCashOutClient, Error>?
     private var reputationTask: Task<AppleReputationClient, Error>?
-    private var livenessTask: Task<AppleLivenessClient, Error>?
+    private var livenessTask: Task<AppleIdentityClient, Error>?
     private var reservationHydrationTask: Task<Void, Error>?
     private var reservationsHydratedGeneration: Int?
     private var stateWritingFlowTasks: [UUID: Task<Void, Never>] = [:]
@@ -154,27 +161,24 @@ actor OfframpSession {
         return try await value(of: task) { if self.reputationTask == task { self.reputationTask = nil } }
     }
 
-    func livenessClient() async throws -> AppleLivenessClient {
+    func livenessClient() async throws -> AppleIdentityClient {
         await waitUntilActive()
         let baseSnapshot = try await baseAccountSnapshot()
         try validateGeneration(baseSnapshot.generation)
+        if let liveness { return liveness }
         if let livenessTask { return try await livenessTask.value }
 
         let generation = baseSnapshot.generation
-        // Blank keys are admitted, as the Reclaim credentials are: the driver reports NotConfigured.
-        let apiURL = PartnerKeys.livenessApiUrl ?? ""
-        let apiKey = PartnerKeys.livenessApiKey ?? ""
-        let tenant = PartnerKeys.livenessTenant ?? ""
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedAccount: WalletAccount?
+        @Dependency(\.walletStorage) var walletStorage
+        guard let wallet = selectedAccount else { throw CancellationError() }
+        let storage = try OfframpEncryptedStorage(account: wallet.account, walletStorage: walletStorage)
         let task = Task {
-            let built = try AppleLivenessClient.companion.create(
+            let built = AppleIdentityClient.companion.create(
                 account: baseSnapshot.account,
-                apiUrl: apiURL,
-                apiKey: apiKey,
-                tenant: tenant,
-                returnUrl: LivenessReturnLink.url,
-                onUnrecognisedRevert: { selector in
-                    LoggerProxy.warn("submitLivenessAttestation reverted with an unmapped selector: \(selector)")
-                }
+                storage: storage,
+                livenessReturnUrl: LivenessReturnLink.url,
+                passportReturnUrl: LivenessReturnLink.passportURL
             )
             guard self.adopt(built, generation: generation) else { throw CancellationError() }
             return built
@@ -226,6 +230,7 @@ actor OfframpSession {
         reservationHydrationTask?.cancel()
         stateWritingFlowTasks.forEach { $0.cancel() }
         stateWritingOperations.forEach { $0.cancel() }
+        _ = await identityCancellation?.result
         await peerRunner.reset()
         if let accountTask { _ = await accountTask.result }
         if let offrampTask { _ = await offrampTask.result }
@@ -235,6 +240,7 @@ actor OfframpSession {
         if let livenessTask { _ = await livenessTask.result }
         if let reservationHydrationTask { _ = await reservationHydrationTask.result }
         for task in stateWritingFlowTasks { _ = await task.result }
+        await joinIdentityPersistence()
         for operation in stateWritingOperations { await operation.wait() }
         // A Peer builder may have reached `bind` while the first reset was joining. Builders are
         // now fully stopped, so this second join closes that last reentrancy window.
@@ -245,8 +251,8 @@ actor OfframpSession {
         onramp = nil
         offramp = nil
         peer = nil
-        // It owns no storage and no gateway, so there is nothing to release — but dropping it is
-        // what stops a verification running against the previous account's submitter.
+        // Verification work has joined above. Drop both facades and their wallet-scoped storage
+        // references before releasing the account's shared submitter and owner key.
         reputation = nil
         reclaimRunID = nil
         liveness = nil
@@ -1015,16 +1021,55 @@ actor OfframpSession {
         return stream
     }
 
+    private func joinIdentityPersistence() async {
+        // SKIE's Swift iterator may terminate before Kotlin's NonCancellable redemption write.
+        // Join the native run lock before dropping the account or allowing reset to erase storage.
+        guard let liveness else { return }
+        let join = Task { try await liveness.awaitIdle() }
+        _ = await join.result
+    }
+
+    func cancelIdentity(check: IdentityCheckModel, currencyCode: String, runID: UUID) async throws {
+        if let identityCancellation { return try await identityCancellation.value }
+        guard livenessRunID == nil || livenessRunID == runID, let client = liveness else { return }
+        let flowTask = stateWritingFlowTasks[runID]
+        flowTask?.cancel()
+        // Joining preserves a redeemed attestation even if the user leaves during its response-to-disk handoff.
+        let task = Task {
+            if let flowTask { await flowTask.value }
+            try await client.cancelWaiting(check: check.kotlin, currencyCode: currencyCode)
+            self.stateWritingFlowFinished(id: runID)
+        }
+        identityCancellation = task
+        defer { identityCancellation = nil }
+        try await task.value
+    }
+
+    func recoverableIdentity(currencyCode: String) async throws -> IdentityCheckModel? {
+        guard livenessRunID == nil, identityCancellation == nil else { return nil }
+        let client = try await livenessClient()
+        guard livenessRunID == nil, identityCancellation == nil else { return nil }
+        let check = try await client.recoverableCheck(currencyCode: currencyCode)
+        return check.flatMap { IdentityCheckModel(rawValue: $0.name) }
+    }
+
     func verifyLiveness(
         currencyCode: String,
         nonce: String,
         runID: UUID,
-        expectedGeneration: Int
+        expectedGeneration: Int,
+        check: IdentityCheckModel = .liveness
     ) async throws -> LivenessStatusStream {
         guard expectedGeneration == generation else { throw CancellationError() }
         let client = try await livenessClient()
+        try Task.checkCancellation()
         try validateGeneration(expectedGeneration)
-        return try trackLivenessFlow(client.verify(currencyCode: currencyCode, nonce: nonce), runID: runID, generation: expectedGeneration)
+        return try trackLivenessFlow(
+            client.verify(check: check.kotlin, currencyCode: currencyCode, nonce: nonce),
+            runID: runID,
+            generation: expectedGeneration,
+            context: IdentityRunContext(client: client, check: check, currencyCode: currencyCode)
+        )
     }
 
     func resumeLiveness(
@@ -1034,24 +1079,32 @@ actor OfframpSession {
     ) async throws -> LivenessStatusStream {
         guard expectedGeneration == generation else { throw CancellationError() }
         let client = try await livenessClient()
+        try Task.checkCancellation()
         try validateGeneration(expectedGeneration)
-        let flow = client.resume(code: ret.code, error: ret.error, state: ret.state)
-        return try trackLivenessFlow(flow, runID: runID, generation: expectedGeneration)
+        let flow = client.resume(check: ret.check.kotlin, code: ret.code, error: ret.error, state: ret.state)
+        guard let currencyCode = ret.currencyCode else { throw CancellationError() }
+        return try trackLivenessFlow(
+            flow,
+            runID: runID,
+            generation: expectedGeneration,
+            context: IdentityRunContext(client: client, check: ret.check, currencyCode: currencyCode)
+        )
     }
 
     func deliverLivenessReturn(_ ret: LivenessReturnModel) -> Bool {
         guard livenessRunID != nil, let liveness else { return false }
-        return liveness.deliverReturn(code: ret.code, error: ret.error, state: ret.state)
+        return liveness.deliverReturn(check: ret.check.kotlin, code: ret.code, error: ret.error, state: ret.state)
     }
 
     /// State-writing work, as the Reclaim run is: the submit step broadcasts a sponsored UserOperation.
-    func trackLivenessFlow(
-        _ flow: SkieSwiftFlow<AppleLivenessStatus>,
+    private func trackLivenessFlow(
+        _ flow: SkieSwiftFlow<AppleIdentityStatus>,
         runID: UUID,
-        generation expectedGeneration: Int
+        generation expectedGeneration: Int,
+        context: IdentityRunContext
     ) throws -> LivenessStatusStream {
         try validateGeneration(expectedGeneration)
-        guard livenessRunID == nil else {
+        guard livenessRunID == nil, identityCancellation == nil else {
             return LivenessStatusStream {
                 $0.yield(.failed(.busy))
                 $0.finish()
@@ -1063,15 +1116,33 @@ actor OfframpSession {
         let stream = LivenessStatusStream { continuation in capturedContinuation = continuation }
         guard let continuation = capturedContinuation else { return stream }
         let task = Task { [weak self] in
-            for await status in flow {
+            var iterator = Optional(flow.makeAsyncIterator())
+            while let status = await iterator?.next() {
                 guard !Task.isCancelled else { break }
                 continuation.yield(LivenessStatusModel(status))
+            }
+            // Releasing SKIE's iterator cancels its Kotlin producer. Do this explicitly before
+            // waiting on the driver's mutex, rather than relying on ARC's extended local lifetime.
+            iterator = nil
+            if Task.isCancelled {
+                // Keep the run gate until browser authorization is revoked. SwiftUI can cancel
+                // its task before onDisappear arrives, independently of reducer effect ordering.
+                let cleanup = Task {
+                    try await context.client.cancelWaiting(check: context.check.kotlin, currencyCode: context.currencyCode)
+                }
+                if case .failure = await cleanup.result {
+                    // Fail closed: a failed revocation must not admit a callback in this process.
+                    continuation.finish()
+                    return
+                }
             }
             continuation.finish()
             await self?.stateWritingFlowFinished(id: id)
         }
         stateWritingFlowTasks[id] = task
-        continuation.onTermination = { _ in task.cancel() }
+        continuation.onTermination = { termination in
+            if case .cancelled = termination { task.cancel() }
+        }
         return stream
     }
 
@@ -1186,7 +1257,7 @@ actor OfframpSession {
         return true
     }
 
-    private func adopt(_ built: AppleLivenessClient, generation: Int) -> Bool {
+    private func adopt(_ built: AppleIdentityClient, generation: Int) -> Bool {
         guard generation == self.generation, !isInvalidating else { return false }
         liveness = built
         return true
