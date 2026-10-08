@@ -5477,6 +5477,108 @@
         }
       }
     },
+    "chatRoom.sendZec.addressRequestText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could you share your wallet address so I can send you ZEC? Tap + and choose Share Address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Me compartes tu dirección de billetera para enviarte ZEC? Toca + y elige Compartir dirección."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.askForAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask for their address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedir su dirección"
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.enterAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribir una dirección"
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hasn't shared a wallet address in this chat. Ask for it, or enter one yourself."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no ha compartido una dirección de billetera en este chat. Pídesela o escríbela tú."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.messageUnnamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They haven't shared a wallet address in this chat. Ask for it, or enter one yourself."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta persona no ha compartido una dirección de billetera en este chat. Pídesela o escríbela tú."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No wallet address yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay dirección de billetera"
+          }
+        }
+      }
+    },
     "chatRoom.sendingMedia" : {
       "extractionState" : "manual",
       "localizations" : {

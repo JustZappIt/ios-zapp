@@ -734,8 +734,13 @@ extension Root {
 
                 // Send ZEC from the composer's attachment sheet. The address is whatever the peer
                 // shared in this chat, else their saved contact row — Android's
-                // `onSendZecClick`. With neither, the form opens empty, still in chat-send context.
-            case .chatRoom(.sendZecTapped):
+                // `onSendZecClick`. A direct chat with neither asks first (the room shows the
+                // prompt and Root waits); its "Enter an address", and a group with no address,
+                // open the form empty, still in chat-send context.
+            case .chatRoom(.sendZecTapped), .chatRoom(.addressRequest(.enterAddressTapped)):
+                if case .chatRoom(.sendZecTapped) = action, state.chatRoomState.needsPeerAddressRequest {
+                    return .none
+                }
                 state.sendCoordFlowState = .initial
                 state.returnsToChatRoomAfterWalletFlow = true
                 // No request id: this send settles nothing, it is just a payment to the peer.

@@ -201,6 +201,7 @@ struct ChatRoomView: View {
             .sheet(item: $store.scope(state: \.gifPicker, action: \.gifPicker)) { pickerStore in
                 ChatGIFPickerView(store: pickerStore)
             }
+            .chatAddressRequestSheet(store: store)
         }
     }
 

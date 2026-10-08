@@ -201,7 +201,7 @@ extension ChatRoom {
                 return .none
 
             // Root opens the send flow, prefilled from `resolvedPeerWalletAddress` when there is
-            // one and empty otherwise — Android's `onSendZecClick` opens the form either way.
+            // one. A direct chat with none asks first (`addressRequestReduce()`).
             case .sendZecTapped:
                 state.showsAttachmentSheet = false
                 return .none
@@ -216,13 +216,27 @@ extension ChatRoom {
 // MARK: - Peer address resolution
 
 extension ChatRoom.State {
-    /// The newest address the peer posted into THIS chat. Android's `resolvePeerWalletAddress()`
-    /// reads the same last-wins wallet-address message.
+    /// The newest address the peer posted into THIS chat: an address card, or in a direct chat
+    /// the `requesterAddress` on a payment request they sent. In a group only an address card
+    /// says plainly enough whose address it is. Android's `resolvePeerWalletAddress()`.
     var peerSharedWalletAddress: String? {
-        messages
-            .last { !$0.isFromMe && $0.contentType == ChatContentType.walletAddress }
-            .map(\.content)
-            .flatMap { $0.isEmpty ? nil : $0 }
+        let isDirect = conversation?.type == .direct
+
+        return messages
+            .reversed()
+            .lazy
+            .filter { !$0.isFromMe }
+            .compactMap { message -> String? in
+                switch message.contentType {
+                case ChatContentType.walletAddress:
+                    return message.content
+                case ChatContentType.paymentRequest where isDirect:
+                    return ChatPaymentRequest.parse(message.content).requesterAddress
+                default:
+                    return nil
+                }
+            }
+            .first { !$0.isEmpty }
     }
 
     /// The peer's saved address-book row, so Send ZEC prefills for a saved contact who has not
@@ -244,6 +258,11 @@ extension ChatRoom.State {
 
     var resolvedPeerWalletAddress: String? {
         peerSharedWalletAddress ?? savedContactWalletAddress
+    }
+
+    /// Send ZEC has nobody to prefill in a direct chat, so the room asks before opening the form.
+    var needsPeerAddressRequest: Bool {
+        conversation?.type == .direct && resolvedPeerWalletAddress == nil
     }
 
     /// The other side of a DM. A conversation can list OUR key among its participants, so it is

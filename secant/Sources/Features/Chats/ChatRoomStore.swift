@@ -96,6 +96,13 @@ struct ChatRoom {
         /// A group's name, roster and controls, opened from its title. Android's `GroupInfoSheet`.
         @Presents var groupInfo: GroupInfo.State?
 
+        /// Send ZEC with no address for a direct-chat peer: ask them for one, or type one in.
+        /// Android's `addressRequestSheet`.
+        var addressRequest: ChatRoom.AddressRequestPrompt?
+        /// Set by Send ZEC while the attachment sheet is still closing; iOS can't present the
+        /// prompt over it, so `attachmentSheetClosed` raises it.
+        var isAddressRequestPending = false
+
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
         var completedMediaIds: Set<String> = []
@@ -322,7 +329,16 @@ struct ChatRoom {
         case shareAddressTapped
         case shareAddressFailed
         /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address when known.
+        /// A direct chat with no known address asks first (`addressRequest`), and Root waits.
         case sendZecTapped
+        /// "Enter an address" is routed by Root into an empty `SendCoordFlow`.
+        case addressRequest(AddressRequest)
+
+        enum AddressRequest: Equatable {
+            case askForAddressTapped
+            case enterAddressTapped
+            case dismissed
+        }
 
         // MARK: Split bill — reduced in `ChatSplitBillStore.swift`
 
@@ -373,6 +389,7 @@ struct ChatRoom {
     var body: some Reducer<State, Action> {
         attachmentReduce()
         splitBillReduce()
+        addressRequestReduce()
 
         Reduce { state, action in
             switch action {
@@ -904,6 +921,10 @@ struct ChatRoom {
                 .sendZecTapped:
                 return .none
 
+            // Owned by `addressRequestReduce()`, which runs first.
+            case .addressRequest:
+                return .none
+
             // Owned by `splitBillReduce()`, which runs first.
             case .splitBillTapped, .splitSheetDismissed, .splitTotalChanged, .splitMemoChanged,
                 .splitShareChanged, .splitCurrencyToggled, .splitSendTapped, .splitSendFailed:
@@ -918,6 +939,43 @@ struct ChatRoom {
         }
         .ifLet(\.$gifPicker, action: \.gifPicker) {
             ChatGIFPicker()
+        }
+    }
+
+    /// Posts a ready-made text message (the "ask for their address" request) the same way the
+    /// composer posts a typed one: it shows as "sending" at once and is reconciled when the core
+    /// answers. It never quotes anything and leaves the composer's draft and reply alone.
+    func postCannedText(_ content: String, state: inout State) -> Effect<Action> {
+        state.sendDidFail = false
+        state.sendFailureMessage = nil
+        let conversationId = state.conversationId
+        let clientId = "local_\(UUID().uuidString)"
+
+        state.insert(
+            ZMMessage(
+                id: clientId,
+                conversationId: conversationId,
+                senderId: state.messagingState.identity?.publicKey ?? "",
+                senderName: state.messagingState.identity?.displayName,
+                content: content,
+                contentType: ChatContentType.text,
+                timestamp: Date(),
+                isFromMe: true,
+                status: "sending"
+            )
+        )
+
+        return .run { send in
+            let message = try await zappMessaging.sendMessage(conversationId, content, nil)
+            await send(.sendSucceeded(clientId: clientId, message: message))
+        } catch: { error, send in
+            LoggerProxy.error("Chat room failed to send message: \(error)")
+            await send(
+                .sendFailed(
+                    clientId: clientId,
+                    code: ZappMessagingFailureCode(error: error)
+                )
+            )
         }
     }
 
