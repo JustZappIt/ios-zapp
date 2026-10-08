@@ -193,12 +193,15 @@ extension ChatRoom {
                     return .none
                 }
 
+                // A fiat amount travels only when the requester typed one. It fixes the card's
+                // headline at that price, so attaching it to an amount typed in ZEC would show the
+                // payer a dollar figure nobody asked for.
                 let payloads = ChatRoom.splitPayloads(
                     shares: shares,
                     memo: split.memoText.trimmingCharacters(in: .whitespacesAndNewlines),
                     requesterAddress: requesterAddress,
                     isGroup: split.isGroup,
-                    rate: rate
+                    rate: split.isFiat ? rate : nil
                 )
 
                 state.splitBill = nil

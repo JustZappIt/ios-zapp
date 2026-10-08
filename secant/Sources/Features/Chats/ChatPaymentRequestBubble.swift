@@ -111,7 +111,7 @@ struct ChatPaymentRequestBubble: View {
             Text(labels.amount)
                 .zappFont(.screenTitle, style: ZappColors.text)
 
-            if let equivalent = labels.zecEquivalent {
+            if let equivalent = labels.equivalent {
                 Text(equivalent)
                     .zappFont(.body, style: ZappColors.textMuted)
                     .padding(.top, Design.Spacing._xxs)
@@ -188,10 +188,12 @@ struct ChatPaymentRequestBubble: View {
     }
 
     /// The amount/equivalent pair, mirroring `parsePaymentRequest`'s precedence:
-    /// an embedded fiat amount leads and pushes ZEC into the equivalent line; otherwise a live
-    /// conversion leads; with no rate at all only ZEC is shown. Note that Android suppresses the
-    /// EMBEDDED label too when there is no live rate — a stale price is not shown as a price.
-    private var labels: (amount: String, zecEquivalent: String?) {
+    /// an embedded fiat amount (the requester typed a price) leads and pushes ZEC into the
+    /// equivalent line; otherwise ZEC, the amount actually asked for, leads and a live conversion
+    /// sits under it, so the headline doesn't drift with the rate; with no rate at all only ZEC is
+    /// shown. Note that Android suppresses the EMBEDDED label too when there is no live rate — a
+    /// stale price is not shown as a price.
+    private var labels: (amount: String, equivalent: String?) {
         let request = self.request
         let zecLabel = "\(ChatAmountFormat.zec(request.amount)) \(request.token)"
 
@@ -207,7 +209,7 @@ struct ChatPaymentRequestBubble: View {
             ChatAmountFormat.roundedFiat(fiatRate.zecToFiat(request.amount))
         )
 
-        return ("≈ \(fiatRate.symbol)\(converted)", zecLabel)
+        return (zecLabel, "≈ \(fiatRate.symbol)\(converted)")
     }
 
     private func embeddedFiatLabel(_ request: ChatPaymentRequest) -> String? {

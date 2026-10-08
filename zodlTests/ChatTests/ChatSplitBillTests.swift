@@ -282,6 +282,66 @@ import ZappMessaging
         #expect(parsed.compactMap(\.debtorId).sorted() == ["key0", "key1"])
     }
 
+    /// A request typed in ZEC must not carry a price: the payer's card would lead with a dollar
+    /// figure the requester never asked for.
+    @MainActor @Test func aRequestTypedInZecCarriesNoFiatAmount() async throws {
+        let parsed = try await sendDirectRequest(totalText: "2", isFiat: false)
+
+        #expect(parsed.amount == Decimal(2))
+        #expect(parsed.fiatAmount == nil)
+        #expect(parsed.fiatCurrency == nil)
+    }
+
+    /// A request typed in fiat keeps the price it was typed at.
+    @MainActor @Test func aRequestTypedInFiatCarriesItsFiatAmount() async throws {
+        let parsed = try await sendDirectRequest(totalText: "100", isFiat: true)
+
+        #expect(parsed.amount == Decimal(2))
+        #expect(parsed.fiatAmount == Decimal(100))
+        #expect(parsed.fiatCurrency == "USD")
+    }
+
+    /// Sends a one-person request at 50 USD per ZEC and returns the parsed payload.
+    @MainActor private func sendDirectRequest(totalText: String, isFiat: Bool) async throws -> ChatPaymentRequest {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.$zashiWalletAccount.withLock { $0 = try? zashiAccount() }
+        state.$currencyConversion.withLock { $0 = CurrencyConversion(.usd, ratio: 50, timestamp: 0) }
+        state.splitBill = ChatRoom.SplitBillState(
+            isGroup: false,
+            participants: participants(1),
+            totalText: totalText,
+            isFiat: isFiat
+        )
+
+        let sent = LockIsolated<[String]>([])
+
+        let store = TestStore(initialState: state) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.sendPaymentRequest = { conversationId, payload in
+                sent.withValue { $0.append(payload) }
+
+                return ZMMessage(
+                    id: UUID().uuidString,
+                    conversationId: conversationId,
+                    senderId: "me",
+                    content: payload,
+                    contentType: ChatContentType.paymentRequest,
+                    isFromMe: true
+                )
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.splitSendTapped) {
+            $0.splitBill = nil
+        }
+        await store.receive(\.messageReceived)
+
+        let payload = try #require(sent.value.first)
+        return ChatPaymentRequest.parse(payload)
+    }
+
     /// An out-of-range share kills the WHOLE batch rather than sending a partial split the group
     /// would have to reconcile by hand.
     @MainActor @Test func anOutOfRangeShareCancelsTheEntireSplit() async throws {
