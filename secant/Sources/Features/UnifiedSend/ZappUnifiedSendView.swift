@@ -107,50 +107,54 @@ private struct UnifiedSendContent: View {
                     ScrollViewReader { value in
                         WithPerceptionTracking {
                             VStack(alignment: .leading, spacing: 0) {
-                                ZappAvailableBalanceHeader(
-                                    balance: sendStore.walletBalancesState.totalBalance,
-                                    fiatText: sendStore.walletBalancesState.currencyValue.nilIfEmpty,
-                                    tokenName: tokenName
-                                )
-                                .padding(.bottom, Design.Spacing._4xl)
-
-                                sentence(String(localizable: .unifiedSendSentenceIWantToSend))
-                                    .padding(.bottom, Design.Spacing._sm)
-
-                                addressField
-                                    .padding(.bottom, Design.Spacing._2xl)
-
-                                sentence(String(localizable: .zappWalletAsset))
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                                    .padding(.bottom, Design.Spacing._sm)
-
-                                assetSelector
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                                    .padding(.bottom, Design.Spacing._2xl)
-
-                                sentence(String(localizable: .unifiedSendSentenceIllPay))
-                                    .padding(.bottom, Design.Spacing._sm)
-
-                                amountSection
-
-                                if isSwap {
-                                    theyReceiveRow
-                                        .padding(.top, Design.Spacing._xl)
-
-                                    depositForZecRow
-                                        .padding(.top, Design.Spacing._2xl)
+                                if store.showsAddFundsPanel {
+                                    addFundsPanel
                                 } else {
-                                    memoSection
-                                        .padding(.top, Design.Spacing._2xl)
-                                }
+                                    ZappAvailableBalanceHeader(
+                                        balance: sendStore.walletBalancesState.totalBalance,
+                                        fiatText: sendStore.walletBalancesState.currencyValue.nilIfEmpty,
+                                        tokenName: tokenName
+                                    )
+                                    .padding(.bottom, Design.Spacing._4xl)
 
-                                if store.isTopUpFooterVisible {
-                                    Text(localizable: .unifiedSendTopUpSubtitle)
-                                        .zappFont(.caption, style: ZappColors.textMuted)
-                                        .multilineTextAlignment(.center)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.top, Design.Spacing._2xl)
+                                    sentence(String(localizable: .unifiedSendSentenceIWantToSend))
+                                        .padding(.bottom, Design.Spacing._sm)
+
+                                    addressField
+                                        .padding(.bottom, Design.Spacing._2xl)
+
+                                    sentence(String(localizable: .zappWalletAsset))
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                        .padding(.bottom, Design.Spacing._sm)
+
+                                    assetSelector
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                        .padding(.bottom, Design.Spacing._2xl)
+
+                                    sentence(String(localizable: .unifiedSendSentenceIllPay))
+                                        .padding(.bottom, Design.Spacing._sm)
+
+                                    amountSection
+
+                                    if isSwap {
+                                        theyReceiveRow
+                                            .padding(.top, Design.Spacing._xl)
+
+                                        depositForZecRow
+                                            .padding(.top, Design.Spacing._2xl)
+                                    } else {
+                                        memoSection
+                                            .padding(.top, Design.Spacing._2xl)
+                                    }
+
+                                    if store.isTopUpFooterVisible {
+                                        Text(localizable: .unifiedSendTopUpSubtitle)
+                                            .zappFont(.caption, style: ZappColors.textMuted)
+                                            .multilineTextAlignment(.center)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.top, Design.Spacing._2xl)
+                                    }
                                 }
                             }
                             .padding(.horizontal, Design.Spacing._2xl)
@@ -646,13 +650,33 @@ private extension UnifiedSendContent {
         }
     }
 
+    // MARK: Empty wallet
+
+    /// Android's `AddFundsPanel` in place of the form. Swap mode keeps its deposit row, so an
+    /// empty wallet can still bring another asset in.
+    @ViewBuilder private var addFundsPanel: some View {
+        VStack(spacing: 0) {
+            ZappAddFundsPanel(
+                message: isSwap
+                    ? String(localizable: .topUpAddFundsPanelSwap)
+                    : String(localizable: .topUpAddFundsPanelSend)
+            )
+            .padding(.top, Design.Spacing._4xl)
+
+            if isSwap {
+                depositForZecRow
+                    .padding(.top, Design.Spacing._4xl)
+            }
+        }
+    }
+
     // MARK: CTA
 
     /// Android's bottom bar: Back, then (swap mode only) the slippage button, then the CTA.
     @ViewBuilder private var ctaButton: some View {
         WithPerceptionTracking {
             HStack(spacing: Design.Spacing._md) {
-                if isSwap {
+                if isSwap && !store.showsAddFundsPanel {
                     slippageButton
                 }
 
@@ -665,6 +689,11 @@ private extension UnifiedSendContent {
         switch store.primaryButton {
         case .topUp:
             ZappButton(title: String(localizable: .unifiedSendTopUp)) {
+                store.send(.topUpRequested)
+            }
+
+        case .addZec:
+            ZappButton(title: String(localizable: .topUpAddZec)) {
                 store.send(.topUpRequested)
             }
 

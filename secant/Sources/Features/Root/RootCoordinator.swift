@@ -232,6 +232,11 @@ extension Root {
                 
             case .home(.receiveTapped):
                 state.receiveState = .initial
+                if let focus = state.receiveFocusOnOpen {
+                    state.receiveState.currentFocus = focus
+                    state.receiveState.focusOnAppear = focus
+                    state.receiveFocusOnOpen = nil
+                }
                 state.path = .receive
                 return .none
 
@@ -1029,6 +1034,11 @@ extension Root {
                 state.path = nil
                 return .none
 
+                // Add ZEC from an empty wallet's gift screen: the Top Up source picks which
+                // address Receive opens on (an exchange can only send to the transparent one).
+            case .giftCard(.delegate(.topUpSourcePicked(let source))):
+                return openReceiveForTopUp(source, state: &state)
+
             case .giftCard(.delegate(.openSavedCards)):
                 state.giftCardListState = GiftCardList.State()
                 state.path = .giftCardList
@@ -1078,6 +1088,9 @@ extension Root {
                 state.peerCashOutActivityReturn = nil
                 state.path = .p2pActivity
                 return .none
+
+            case .offramp(.delegate(.topUpSourcePicked(let source))):
+                return openReceiveForTopUp(source, state: &state)
 
             case .offramp(.delegate(.openActivity)):
                 state.offrampActivityReturn = Root.State.OfframpActivityReturn(
@@ -1451,6 +1464,14 @@ extension Root {
     /// Applies the account-scoped reactions shared by a manual switch and every Keystone
     /// auto-selection signal. The transaction fetch cancellation must finish before the refetch is
     /// dispatched, or the switch could cancel its own work for the newly selected account.
+    /// Android's `TopUpVM.onSourcePicked` for screens outside the send flow (Gift, Pay a merchant,
+    /// Add funds to Base): Receive opens on the address the picked source can send to, going
+    /// through Home's own route so the shielded address is derived first.
+    func openReceiveForTopUp(_ source: SendCoordFlow.TopUpSource, state: inout Root.State) -> Effect<Root.Action> {
+        state.receiveFocusOnOpen = source == .exchange ? .tAddress : .uaAddress
+        return .send(.home(.receiveScreenRequested))
+    }
+
     private func accountSwitchedEffect(state: inout Root.State) -> Effect<Root.Action> {
         state.autoUpdateSwapCandidates.removeAll()
         state.homeState.transactionListState.isInvalidated = true

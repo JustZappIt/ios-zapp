@@ -49,6 +49,9 @@ struct Offramp {
         var isTopUpAmountInsufficient = false
         var isTopUpValidationLoading = false
         var topUpValidatedMicros: String?
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
+        /// Android's Top Up sheet, raised by the empty wallet's Add ZEC.
+        var isTopUpSourcePickerPresented = false
 
         var selectedCorridor: OfframpCorridor? {
             corridors.first { $0.currencyCode == selectedCurrencyCode }
@@ -59,6 +62,24 @@ struct Offramp {
         }
 
         var latestProgress: OfframpProgressModel? { progress.last }
+
+        /// The Base USDC balance once it has been read; nil until then.
+        var baseUsdc: Decimal? {
+            account?.balanceMicros.flatMap { Decimal(string: $0) }.map { $0 / 1_000_000 }
+        }
+
+        /// Android's `UpiOfframpState.addFundsPanel`: a merchant can be paid from ZEC or from USDC
+        /// on Base, so only an empty wallet with an empty (read) Base balance sees Add ZEC. An
+        /// order in flight keeps its form, so it can still be resumed.
+        var showsPayAddFundsPanel: Bool {
+            !hasCheckpoint && walletFunding.withBaseUsdc(baseUsdc) == .empty
+        }
+
+        /// Android's `BridgeToBaseState.addFundsPanel`: bridging needs ZEC; a saved top-up keeps
+        /// its form so it can still be resumed.
+        var showsTopUpAddFundsPanel: Bool {
+            !hasTopUpCheckpoint && walletFunding == .empty
+        }
 
         var canSaveCorridor: Bool {
             !isLoading && draftCurrencyCode != selectedCurrencyCode
@@ -134,6 +155,9 @@ struct Offramp {
         case cancelAll
         case backTapped
         case retryTapped
+        case addZecTapped
+        case topUpSourcePickerDismissed
+        case topUpSourcePicked(SendCoordFlow.TopUpSource)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -141,6 +165,8 @@ struct Offramp {
             /// P2P history is one unified feed now, so this screen hands it over rather than
             /// carrying a second copy of the list beside it.
             case openActivity
+            /// Root opens Receive on the address that source can send to.
+            case topUpSourcePicked(SendCoordFlow.TopUpSource)
         }
     }
 
@@ -685,13 +711,25 @@ struct Offramp {
                     return .send(.delegate(.close))
                 }
 
+            case .addZecTapped:
+                state.isTopUpSourcePickerPresented = true
+                return .none
+
+            case .topUpSourcePickerDismissed:
+                state.isTopUpSourcePickerPresented = false
+                return .none
+
+            case .topUpSourcePicked(let source):
+                state.isTopUpSourcePickerPresented = false
+                return .send(.delegate(.topUpSourcePicked(source)))
+
             case .retryTapped:
                 return .send(.onAppear)
 
             case .delegate(.close):
                 return .send(.cancelAll)
 
-            case .delegate(.openActivity):
+            case .delegate(.openActivity), .delegate(.topUpSourcePicked):
                 return .none
             }
         }

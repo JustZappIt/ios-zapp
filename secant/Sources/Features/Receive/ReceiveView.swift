@@ -157,7 +157,7 @@ struct ReceiveView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
-        .onAppear { store.send(.updateCurrentFocus(.uaAddress)) }
+        .onAppear { store.send(.updateCurrentFocus(store.focusOnAppear)) }
         // Mounted here, not on the NavigationStack, which already owns the Request fullScreenCover.
         .sheet(isPresented: explainerBinding) {
             WithPerceptionTracking { explainerSheet }

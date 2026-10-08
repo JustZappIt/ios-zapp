@@ -31797,6 +31797,125 @@
         }
       }
     },
+    "topUp.addFundsPanel.base" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you move funds to Base."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de mover fondos a Base."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.gift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you fund a Zpacket. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cargar un Zpacket. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.payMerchant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC or USDC on Base before you pay. Zapp pays merchants from either."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC o USDC en Base antes de pagar. Zapp paga a los comercios con cualquiera de los dos."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you send. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de enviar. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.swap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you swap it. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cambiarlos. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wallet is empty"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu billetera está vacía"
+          }
+        }
+      }
+    },
+    "topUp.addZec" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar ZEC"
+          }
+        }
+      }
+    },
     "topUp.fromExchange.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {

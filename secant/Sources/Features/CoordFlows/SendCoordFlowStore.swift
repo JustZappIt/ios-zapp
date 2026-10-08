@@ -45,6 +45,9 @@ struct SendCoordFlow {
     enum PrimaryButton: Equatable {
         case review
         case topUp
+        /// An empty wallet's form is replaced by the Add funds panel; this opens the same Top Up
+        /// picker as `.topUp`.
+        case addZec
         case disabled
     }
 
@@ -73,6 +76,7 @@ struct SendCoordFlow {
         var swapState = SwapAndPay.State.initial
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         @Shared(.inMemory(.transactions)) var transactions: IdentifiedArrayOf<TransactionState> = []
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
 
         var mode: Mode = .zec
         var isAssetPickerPresented = false
@@ -111,9 +115,19 @@ struct SendCoordFlow {
             path.contains { $0.is(\.sending) || $0.is(\.confirmWithKeystone) }
         }
 
+        /// Android's `UnifiedSendState.addFundsPanel`: a synced, empty wallet sees "Add ZEC" in
+        /// place of the form, for Send and for Swap (this form only swaps ZEC out). Swap-in stays
+        /// reachable through the deposit row, so an empty wallet can still bring another asset in.
+        var showsAddFundsPanel: Bool {
+            walletFunding == .empty
+        }
+
         /// Android's `buildPrimaryButton`: zero balance in ZEC mode, or insufficient funds in
-        /// either mode, replaces Review with Top Up.
+        /// either mode, replaces Review with Top Up; an empty wallet's panel offers Add ZEC.
         var primaryButton: PrimaryButton {
+            if showsAddFundsPanel {
+                return .addZec
+            }
             if mode == .zec && hasZeroBalance {
                 return .topUp
             }

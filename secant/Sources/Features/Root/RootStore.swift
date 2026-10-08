@@ -209,6 +209,8 @@ struct Root {
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletConfig: WalletConfig
         @Shared(.inMemory(.walletStatus)) var walletStatus: WalletStatus = .none
+        /// Whether the money flows have anything to spend; derived on every sync tick below.
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
         var wasRestoringWhenDisconnected = false
         var welcomeState: Welcome.State
         @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount? = nil
@@ -266,6 +268,9 @@ struct Root {
         /// replaces the first rather than racing a second navigation against it.
         var p2pRailResolveCancelId = UUID()
         var receiveState = Receive.State.initial
+        /// The address Receive opens on when Add ZEC sends someone there: an exchange can only
+        /// send to the transparent one. Applied and cleared when Receive opens.
+        var receiveFocusOnOpen: Receive.State.AddressType?
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
         var migrationCoordFlowState = MigrationCoordFlow.State.initial
