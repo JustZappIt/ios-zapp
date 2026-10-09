@@ -88,14 +88,21 @@ enum ChatReplyQuoteKind: Equatable {
 enum ChatReplyPreview {
     /// Mirrors Android's `REPLY_WIRE_CONTENT_MAX_LENGTH` and the SDK's own preview cap.
     static let maxLength = 100
+    private static let maxContentTypeBytes = 256
 
     /// The `replyToContentType` a reply carries: the quoted message's resolved MIME type. A file
     /// attachment whose type resolves to `text/plain` (a `.txt`) is labelled as a file, not as
-    /// text, so the quote never reads a filename as a sentence.
+    /// text, so the quote never reads a filename as a sentence. An unrecognised text message
+    /// stays text; a malformed media type falls back to a file type the SDK accepts.
     static func wireContentType(for message: ZMMessage) -> String {
         let resolved = ChatMessageKind.resolvedContentType(of: message)
+        let kind = ChatMessageKind.of(message)
 
-        if ChatMessageKind.of(message) == .file, resolved == ChatContentType.text {
+        if kind == .text, resolved != ChatContentType.location {
+            return ChatContentType.text
+        }
+
+        if (kind == .file && resolved == ChatContentType.text) || !isWireContentType(resolved) {
             return "application/octet-stream"
         }
 
@@ -119,7 +126,10 @@ enum ChatReplyPreview {
             let receipt = ChatTransactionReceipt.parse(message.content)
             summary = zecSummary(amount: receipt.amount, memo: nil, fallback: message.content)
 
-        case .walletAddress, .image, .video, .file, .text:
+        case .walletAddress:
+            summary = ChatMessageJSON.string(message.content, "content") ?? message.content
+
+        case .image, .video, .file, .text:
             if ChatMessageKind.resolvedContentType(of: message) == ChatContentType.location {
                 summary = locationSummary(message.content)
             } else {
@@ -138,6 +148,20 @@ enum ChatReplyPreview {
         guard let label = kind.label else { return body }
 
         return body.isEmpty ? label : "\(label) · \(body)"
+    }
+
+    /// The SDK validates this hint before storing the entire reply. A body may name its own
+    /// type without that string ever having passed the SDK's MIME validation, so echoing an
+    /// unchecked resolved type can make an otherwise valid reply unsendable.
+    private static func isWireContentType(_ contentType: String) -> Bool {
+        guard contentType.utf8.count <= maxContentTypeBytes else { return false }
+
+        let match = contentType.range(
+            of: #"^[A-Za-z0-9_.+-]+/[A-Za-z0-9_.+-]+(?:;[^\r\n]*)?$"#,
+            options: .regularExpression
+        )
+
+        return match == contentType.startIndex..<contentType.endIndex
     }
 
     private static func zecSummary(amount: Decimal, memo: String?, fallback: String) -> String {
@@ -198,13 +222,25 @@ struct ChatReplyQuoteLine: View {
 /// The small picture beside a quoted photo, GIF or video. Degrades like `ChatMediaBubble`: the
 /// local file, else the wire thumbnail, else nothing (the label still names the kind).
 struct ChatReplyQuoteThumbnail: View {
+    private struct ImageSource: Equatable {
+        let messageId: String
+        let path: String?
+        let thumbnailData: String?
+    }
+
     let message: ZMMessage
     var size: CGFloat = 36
 
     @State private var image: UIImage?
 
+    private var imageSource: ImageSource {
+        ImageSource(messageId: message.id, path: message.mediaLocalPath, thumbnailData: message.thumbnailData)
+    }
+
     var body: some View {
-        Group {
+        // Keep a container mounted before the image exists: an empty Group has no view on
+        // which SwiftUI can start the loading task.
+        ZStack {
             if let image {
                 Image(uiImage: image)
                     .resizable()
@@ -213,7 +249,9 @@ struct ChatReplyQuoteThumbnail: View {
                     .clipped()
             }
         }
-        .task(id: message.mediaLocalPath) {
+        // Switching between undownloaded photos keeps a nil path, but still needs a new image.
+        .task(id: imageSource) {
+            image = nil
             await load()
         }
     }

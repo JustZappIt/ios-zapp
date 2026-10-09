@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [VOTING] Coinholder Polling: vote on Zcash governance proposals from You → Governance. Zapp loads the polls from the publishers' hash-pinned, signature-authenticated configuration, now with a mirror so a blocked gateway no longer makes voting unavailable; delegates your shielded voting weight to a per-poll key and casts each vote through the vote servers over Tor; and records a vote as cast only once the chain has accepted it. A tapped Confirm is acknowledged instantly, a proof you abandon is cancelled rather than left running in the background, and vote-server health is checked in the background instead of holding up the polls list. A poll the wallet cannot read (the network has published test polls with more proposals than the protocol allows) is skipped instead of taking the whole list down with it.
 - [P2P] Selfie check: on Base Sepolia, Raise my limit now offers a short face check in your browser under "No account needed". Passing it unlocks buying up to a per-order limit through Zapp's own checkout — no social account, no reputation points — and one person can verify one wallet. Coming back from the browser resumes the check even if Zapp was closed in between.
 - [BALANCE-PRIVACY] Hide or reveal your holdings from the Pay screen with an eye button and Android-style scrambling animation. Hidden balances also stay hidden in activity and charts.
@@ -115,6 +116,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.
 - [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.
 - [CHATS] The Chats list, the chat room and their sheets (network details, attachments, GIF search) now refresh when their data changes on iOS 16, where a sheet could stay on its spinner or the wrong page.

@@ -66,11 +66,56 @@ import ZappMessaging
         #expect(ChatReplyQuoteKind(contentType: ChatReplyPreview.wireContentType(for: txt)) == .file)
     }
 
+    @Test(arguments: ["not-a-mime", "application/json"])
+    func aPlainJSONMessageStaysAReplyableText(contentType: String) throws {
+        let body = try #require(ChatMessageJSON.encode([("contentType", contentType), ("content", "hello")]))
+        let original = message(content: body)
+
+        #expect(ChatReplyPreview.wireContentType(for: original) == ChatContentType.text)
+        #expect(ChatReplyPreview.wireContent(for: original) == body)
+    }
+
+    @Test(arguments: ["image/ bad", "image/jpeg\n", "image/jpeg\r", "image/é"])
+    func aMalformedMediaTypeUsesASendableFileType(contentType: String) throws {
+        // The declared text type is valid on the wire; the arbitrary type is inside its body.
+        let body = try #require(ChatMessageJSON.encode([("contentType", contentType)]))
+        let original = message(content: body)
+
+        #expect(ChatReplyPreview.wireContentType(for: original) == "application/octet-stream")
+    }
+
+    @Test
+    func aMediaTypeMustFitTheSDKByteLimit() throws {
+        let prefix = "image/jpeg; name="
+        let atLimit = "\(prefix)\(String(repeating: "a", count: 256 - prefix.utf8.count))"
+        let overLimit = "\(atLimit)a"
+        let multibyte = "\(prefix)\(String(repeating: "é", count: 128))"
+
+        for contentType in [atLimit, overLimit, multibyte] {
+            let body = try #require(ChatMessageJSON.encode([("contentType", contentType)]))
+            let original = message(content: body)
+
+            #expect(ChatReplyPreview.wireContentType(for: original)
+                == (contentType == atLimit ? atLimit : "application/octet-stream"))
+        }
+    }
+
     @Test func aWalletAddressQuoteKeepsTheAddress() {
         let original = message(content: "u1abcdef", contentType: ChatContentType.walletAddress)
 
         #expect(ChatReplyPreview.wireContent(for: original) == "u1abcdef")
         #expect(ChatReplyQuoteKind(contentType: ChatReplyPreview.wireContentType(for: original)) == .walletAddress)
+    }
+
+    @Test(arguments: [ChatContentType.text, ChatContentType.walletAddress])
+    func aWrappedWalletAddressQuotesTheAddress(contentType: String) throws {
+        let body = try #require(
+            ChatMessageJSON.encode([("contentType", ChatContentType.walletAddress), ("content", "u1abcdef")])
+        )
+        let original = message(content: body, contentType: contentType)
+
+        #expect(ChatReplyPreview.wireContent(for: original) == "u1abcdef")
+        #expect(ChatReplyPreview.wireContentType(for: original) == ChatContentType.walletAddress)
     }
 
     /// The JSON body never ships as the quote: an older peer would render it verbatim.
