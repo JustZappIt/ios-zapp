@@ -157,6 +157,9 @@ private extension RootView {
                         .onChange(of: store.path) { value in
                             if value == nil {
                                 store.send(.home(.onAppear))
+                                // The You tab stays mounted under a pushed screen, so its live
+                                // subtitles are re-read when that screen closes.
+                                store.send(.zappTabs(.youTabAppeared))
                             } else {
                                 store.send(.home(.onDisappear))
                             }

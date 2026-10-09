@@ -44,7 +44,7 @@ struct ChatProfileEditNameDialog: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if editName.failed {
-                Text(String(localizable: .chatProfileSaveFailed))
+                Text(String(localizable: .chatProfileDisplayNameSaveFailed))
                     .zappFont(.caption, style: ZappColors.danger)
                     .fixedSize(horizontal: false, vertical: true)
             }

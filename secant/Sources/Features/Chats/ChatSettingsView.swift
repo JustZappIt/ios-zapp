@@ -6,9 +6,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-/// The three chat preferences on one screen, as Android's `ChatSettingsView` gathers them.
-/// Android stages edits behind a Save button; iOS applies each toggle immediately, as every
-/// other toggle here does.
+/// The three chat preferences on one screen, as Android's `ChatSettingsView` gathers them: the
+/// toggles are staged and applied together by Save in the bottom bar, which is enabled only while
+/// something has changed. Back discards the draft.
 struct ChatSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -22,17 +22,20 @@ struct ChatSettingsView: View {
 
                 ScrollView {
                     VStack(spacing: 0) {
-                        ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
+                        ZappSettingsGroup(
+                            title: String(localizable: .settingsYouGroupPrivacy),
+                            footer: String(localizable: .chatSettingsPrivacyFooter)
+                        ) {
                             ZappToggleRow(
                                 title: String(localizable: .chatPrivacyReadReceiptsToggleTitle),
                                 subtitle: String(localizable: .chatPrivacyReadReceiptsToggleSubtitle),
                                 icon: Asset.Assets.Icons.checkSolid.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.readReceiptsEnabled,
-                                isEnabled: !store.isReadReceiptsBusy
+                                isOn: store.chatSettingsDraft.readReceipts,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
-                                store.send(.readReceiptsToggled)
+                                store.send(.chatSettingsReadReceiptsToggled)
                             }
 
                             ZappRowDivider(inset: true)
@@ -43,33 +46,53 @@ struct ChatSettingsView: View {
                                 icon: Asset.Assets.Icons.user.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.presenceVisible,
-                                isEnabled: !store.isPresenceBusy
+                                isOn: store.chatSettingsDraft.onlineStatus,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
-                                store.send(.presenceToggled)
+                                store.send(.chatSettingsOnlineStatusToggled)
                             }
                         }
 
-                        ZappSettingsGroup(title: String(localizable: .chatSettingsSectionDelivery)) {
+                        ZappSettingsGroup(
+                            title: String(localizable: .chatSettingsSectionDelivery),
+                            footer: String(localizable: .chatSettingsDeliveryFooter)
+                        ) {
                             ZappToggleRow(
                                 title: String(localizable: .chatNotificationsBackgroundTitle),
                                 subtitle: String(localizable: .chatNotificationsBackgroundSubtitle),
                                 icon: Asset.Assets.Icons.messageChat.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.backgroundNotificationsEnabled,
-                                isEnabled: !store.isBackgroundNotificationsBusy
+                                isOn: store.chatSettingsDraft.backgroundDelivery,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
-                                store.send(.backgroundNotificationsToggled)
+                                store.send(.chatSettingsBackgroundDeliveryToggled)
                             }
+                        }
+
+                        if store.chatSettingsSaveFailed {
+                            Text(String(localizable: .chatProfileSaveFailed))
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(Design.Spacing._lg)
                         }
                     }
                     .padding(.vertical, Design.Spacing._xl)
                 }
+
+                ZappBottomActionBar(onBack: onBack, isBackEnabled: !store.isChatSettingsBusy) {
+                    ZappButton(
+                        title: String(localizable: store.isChatSettingsBusy ? .chatProfileSaving : .chatProfileSave),
+                        isEnabled: store.canSaveChatSettings
+                    ) {
+                        store.send(.chatSettingsSaveTapped)
+                    }
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
-            .zashiBack(customDismiss: onBack)
+            .zappSwipeBack(isEnabled: !store.isChatSettingsBusy, action: onBack)
+            .onAppear { store.send(.chatSettingsAppeared) }
         }
     }
 }
