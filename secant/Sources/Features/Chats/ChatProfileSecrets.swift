@@ -41,8 +41,33 @@ extension ChatProfile {
             case .seedPhraseTapped:
                 return beginReveal(.seedPhrase, state: &state)
 
+                // Android pushes a screen first: the smart account is shown openly, and only the
+                // owner key waits behind "Reveal owner key".
             case .p2pKeyTapped:
+                state.isP2pKeyScreenPresented = true
+                state.secretFailed = false
+                state.secretBlockedByCapture = false
+                return .run { [offramp] send in
+                    await send(.p2pSmartAccountLoaded(try await offramp.accountSummary().address))
+                } catch: { _, _ in
+                    // Android logs and leaves the card out; the owner key still reveals.
+                    LoggerProxy.error("ChatProfile: smart account address resolve failed")
+                }
+                .cancellable(id: CancelID.p2pSmartAccount, cancelInFlight: true)
+
+            case .p2pSmartAccountLoaded(let address):
+                state.p2pSmartAccountAddress = address
+                return .none
+
+            case .p2pKeyRevealTapped:
                 return beginReveal(.p2pKey, state: &state)
+
+            case .p2pKeyScreenClosed:
+                state.isP2pKeyScreenPresented = false
+                // Explicit dismissal also revokes a gate; only resign-active from the system
+                // biometric sheet is allowed to preserve it.
+                state.isAwaitingBiometric = false
+                return .merge(.cancel(id: CancelID.p2pSmartAccount), clearSecrets(&state))
 
                 // A dismissed or failed prompt is silent, exactly like Android's empty catch
                 // blocks for BiometricsCancelledException / BiometricsFailureException.
@@ -143,9 +168,12 @@ extension ChatProfile {
             switch action {
                 // The gate has passed: now, and only now, read the secret.
             case .secretUnlocked(let target):
+                guard state.pendingSecret == target else { return .none }
                 state.pendingSecret = nil
                 state.secretFailed = false
                 state.secretBlockedByCapture = false
+                let loadID = UUID()
+                state.secretLoadID = loadID
 
                 switch target {
                 case .seedPhrase:
@@ -156,35 +184,43 @@ extension ChatProfile {
                                 .value()
                                 .split(separator: " ")
                                 .map { RedactableString(String($0)) }
-                            await send(.seedLoaded(words))
+                            await send(.seedLoaded(loadID, words))
                         } catch {
                             // Deliberately not interpolating `error`: a keychain error can echo
                             // back the item it was reading.
                             LoggerProxy.error("ChatProfile: seed phrase export failed")
-                            await send(.secretLoadFailed)
+                            await send(.secretLoadFailed(loadID))
                         }
                     }
+                    .cancellable(id: CancelID.secretLoad, cancelInFlight: true)
 
                 case .p2pKey:
                     return .run { [offramp] send in
                         do {
-                            await send(.p2pKeyLoaded(try await offramp.exportWalletKey()))
+                            await send(.p2pKeyLoaded(loadID, try await offramp.exportWalletKey()))
                         } catch {
                             LoggerProxy.error("ChatProfile: P2P wallet key export failed")
-                            await send(.secretLoadFailed)
+                            await send(.secretLoadFailed(loadID))
                         }
                     }
+                    .cancellable(id: CancelID.secretLoad, cancelInFlight: true)
                 }
 
-            case .seedLoaded(let words):
+            case let .seedLoaded(loadID, words):
+                guard state.secretLoadID == loadID else { return .none }
+                state.secretLoadID = nil
                 state.seedWords = words
                 return .none
 
-            case .p2pKeyLoaded(let key):
+            case let .p2pKeyLoaded(loadID, key):
+                guard state.secretLoadID == loadID else { return .none }
+                state.secretLoadID = nil
                 state.p2pKey = key
                 return .none
 
-            case .secretLoadFailed:
+            case .secretLoadFailed(let loadID):
+                guard state.secretLoadID == loadID else { return .none }
+                state.secretLoadID = nil
                 state.secretFailed = true
                 return .none
 
@@ -197,16 +233,26 @@ extension ChatProfile {
         }
     }
 
-    /// Copy-to-pasteboard, offered on the P2P dialog only.
+    /// Copy-to-pasteboard, offered on the P2P key screen only.
     private func secretCopyReduce() -> Reduce<State, Action> {
         Reduce { state, action in
             switch action {
+            case .copyP2PSmartAccountTapped:
+                guard let address = state.p2pSmartAccountAddress else { return .none }
+
+                pasteboard.setString(RedactableString(address))
+                state.didCopyP2PSmartAccount = true
+                state.didCopyP2PAddress = false
+                state.didCopyP2PKey = false
+                return copyIndicatorTimer()
+
             case .copyP2PAddressTapped:
                 guard let key = state.p2pKey else { return .none }
 
                 pasteboard.setString(RedactableString(key.address))
                 state.didCopyP2PAddress = true
                 state.didCopyP2PKey = false
+                state.didCopyP2PSmartAccount = false
                 return copyIndicatorTimer()
 
                 // Android's P2P dialog is the only one of the two that offers copy, and it offers
@@ -218,11 +264,13 @@ extension ChatProfile {
                 pasteboard.setString(key.privateKeyHex)
                 state.didCopyP2PKey = true
                 state.didCopyP2PAddress = false
+                state.didCopyP2PSmartAccount = false
                 return copyIndicatorTimer()
 
             case .p2pCopyIndicatorExpired:
                 state.didCopyP2PAddress = false
                 state.didCopyP2PKey = false
+                state.didCopyP2PSmartAccount = false
                 return .none
 
             default:
@@ -235,7 +283,7 @@ extension ChatProfile {
     /// method that guards the secret. No lock configured means no gate — the same fall-through
     /// Android's `AuthMethod.NONE` takes.
     private func beginReveal(_ target: SecretTarget, state: inout State) -> Effect<Action> {
-        guard state.pendingSecret == nil, !state.isShowingSecret else { return .none }
+        guard state.pendingSecret == nil, state.secretLoadID == nil, !state.isShowingSecret else { return .none }
 
         state.secretFailed = false
         state.secretBlockedByCapture = false
@@ -248,16 +296,15 @@ extension ChatProfile {
             return .none
         }
 
+        state.pendingSecret = target
         switch appSecurity.authenticationMethod() {
         case .biometric:
-            state.pendingSecret = target
             state.isAwaitingBiometric = true
             return .run { send in
                 await send(.biometricFinished(target, await localAuthentication.authenticateAppLock()))
             }
 
         case .pin:
-            state.pendingSecret = target
             state.pinEntry = State.PINEntry(lockoutSeconds: appSecurity.lockoutRemaining(date.now()))
             return (state.pinEntry?.lockoutSeconds ?? 0) > 0 ? lockoutTimer() : .none
 
@@ -269,9 +316,11 @@ extension ChatProfile {
     /// Drops every byte of both secrets and everything that could hint at them.
     private func clearSecrets(_ state: inout State) -> Effect<Action> {
         state.seedWords.removeAll(keepingCapacity: false)
+        state.secretLoadID = nil
         state.p2pKey = nil
         state.didCopyP2PAddress = false
         state.didCopyP2PKey = false
+        state.didCopyP2PSmartAccount = false
         state.secretFailed = false
         state.secretBlockedByCapture = false
 
@@ -286,6 +335,7 @@ extension ChatProfile {
         }
 
         return .merge(
+            .cancel(id: CancelID.secretLoad),
             .cancel(id: CancelID.pinLockout),
             .cancel(id: CancelID.p2pCopyIndicator)
         )

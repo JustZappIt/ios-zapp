@@ -537,8 +537,8 @@ extension Root {
                 if state.path == .increaseReputation {
                     return .send(.increaseReputation(.livenessReturnReceived(ret)))
                 }
-                // Rebuilt from the corridor in `state` with no confirmation, unlike the Reclaim
-                // link: the service only redeems a code for the wallet that opened its session.
+                // The corridor is only a routing hint. Before redemption the shared identity
+                // driver must match this return against the wallet's persisted authorization.
                 // Over another flow the return is dropped rather than replacing that flow's state.
                 guard let currencyCode = ReputationCorridor.match(ret.currencyCode),
                       state.path == nil || state.path == .reputation else { return .none }
@@ -917,7 +917,8 @@ extension Root {
 
                 // Creating a conversation lands the user straight in it, rather than
                 // back on a list they then have to find it in.
-            case .newChat(.created(let conversation)):
+            case .newChat(.created(let conversation)),
+                .chatContactsList(.conversationOpened(let conversation)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversation.id
                 state.chatRoomState.conversation = conversation
@@ -1098,6 +1099,11 @@ extension Root {
 
             case .zappTabs(.chatSettingsTapped):
                 state.path = .chatSettings
+                return .none
+
+            case .chatProfile(.chatSettingsSaved):
+                guard state.path == .chatSettings else { return .none }
+                state.path = nil
                 return .none
 
             case .zappTabs(.readReceiptsTapped):

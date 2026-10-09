@@ -74,11 +74,12 @@ extension ReputationSummaryModel {
             isAtCeiling: value.isAtCeiling,
             buyLimitMicros: value.buyLimitMicros,
             maxBuyLimitMicros: value.maxBuyLimitMicros,
-            shownLimitMicros: value.shownLimitMicros,
-            isLimitFromCheckout: value.isLimitFromCheckout,
-            isSelfieAvailable: value.isSelfieAvailable,
-            liveness: value.liveness.map(LivenessStandingModel.init),
-            platforms: value.platforms.map(ReputationPlatformModel.init)
+            shownLimitMicros: value.buyLimitMicros,
+            isLimitFromCheckout: false,
+            isSelfieAvailable: false,
+            liveness: nil,
+            platforms: value.platforms.map(ReputationPlatformModel.init),
+            identityChecks: value.identityChecks.map(ReputationPlatformModel.init)
         )
     }
 }
