@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
 - [PARITY] P2P wallet key now opens its own screen: your smart account address is shown openly, and the owner key stays locked until you reveal it with your app lock.
 - [VOTING] Coinholder Polling: vote on Zcash governance proposals from You → Governance. Zapp loads the polls from the publishers' hash-pinned, signature-authenticated configuration, now with a mirror so a blocked gateway no longer makes voting unavailable; delegates your shielded voting weight to a per-poll key and casts each vote through the vote servers over Tor; and records a vote as cast only once the chain has accepted it. A tapped Confirm is acknowledged instantly, a proof you abandon is cancelled rather than left running in the background, and vote-server health is checked in the background instead of holding up the polls list. A poll the wallet cannot read (the network has published test polls with more proposals than the protocol allows) is skipped instead of taking the whole list down with it.
@@ -122,6 +123,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.
 - [#82] Chat settings now stay open when a save fails, so privacy changes can be retried. Cash-out activity stays visible while orders are still being indexed and refreshes as they settle. Closing the P2P key screen prevents a pending export from revealing the key afterward.
