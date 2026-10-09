@@ -16,6 +16,12 @@ import Foundation
 
 @Reducer
 struct ChatProfile {
+    enum ChatSetting: Hashable {
+        case readReceipts
+        case onlineStatus
+        case backgroundDelivery
+    }
+
     /// Which secret a reveal is being authorised for.
     enum SecretTarget: Equatable {
         case seedPhrase
@@ -47,10 +53,17 @@ struct ChatProfile {
         var isPresenceBusy = false
         var isBackgroundNotificationsBusy = false
 
+        /// The Chat settings screen's staged values — see `ChatSettingsStaging.swift`.
+        var chatSettingsDraft = ChatSettingsValues()
+        var pendingChatSettings: Set<ChatSetting> = []
+        var chatSettingsSaveFailed = false
+
         // MARK: Secret reveal — see ChatProfileSecrets.swift
 
         /// The secret whose authentication is in flight. Cleared as soon as it is shown or aborted.
         var pendingSecret: SecretTarget?
+        /// Identifies the export authorised by the current reveal. Clearing it rejects late results.
+        var secretLoadID: UUID?
 
         /// True only between the system biometric sheet going up and its result coming back.
         /// That sheet makes the app resign active, which is one of the `hideSensitiveContent`
@@ -64,7 +77,14 @@ struct ChatProfile {
         /// Non-empty only while the seed dialog is up. Cleared on dismiss AND on backgrounding.
         var seedWords: [RedactableString] = []
 
-        /// Non-nil only while the P2P key dialog is up.
+        /// Android's P2P wallet key screen, drawn over the profile.
+        var isP2pKeyScreenPresented = false
+
+        /// The smart account the owner key controls. Safe to show without the app lock.
+        var p2pSmartAccountAddress: String?
+        var didCopyP2PSmartAccount = false
+
+        /// Non-nil only while the owner key is revealed on the P2P key screen.
         var p2pKey: OfframpWalletKey?
 
         var didCopyP2PAddress = false
@@ -99,14 +119,14 @@ struct ChatProfile {
         var hasPublicKey: Bool { !publicKey.isEmpty }
 
         var showsSeedDialog: Bool { !seedWords.isEmpty }
-        var showsP2PKeyDialog: Bool { p2pKey != nil }
+        var showsP2PKey: Bool { p2pKey != nil }
 
         /// Any surface that must never be photographed, recorded, or left up in the app switcher.
-        var isShowingSecret: Bool { showsSeedDialog || showsP2PKeyDialog }
+        var isShowingSecret: Bool { showsSeedDialog || showsP2PKey }
 
         /// Interactive back must not slip out from under a modal — least of all out from under a
         /// save in flight or a revealed secret.
-        var isModalPresented: Bool { editName != nil || pinEntry != nil || isShowingSecret }
+        var isModalPresented: Bool { editName != nil || pinEntry != nil || isShowingSecret || isP2pKeyScreenPresented }
 
         init() { }
     }
@@ -127,6 +147,15 @@ struct ChatProfile {
         case backgroundNotificationsToggled
         case backgroundNotificationsFinished(Bool)
 
+        // MARK: Chat settings — see ChatSettingsStaging.swift
+        case chatSettingsAppeared
+        case chatSettingsReadReceiptsToggled
+        case chatSettingsOnlineStatusToggled
+        case chatSettingsBackgroundDeliveryToggled
+        case chatSettingsSaveTapped
+        /// Root closes Chat settings only after every changed preference was saved.
+        case chatSettingsSaved
+
         // MARK: Display name editor
         case editDisplayNameTapped
         case editDisplayNameChanged(String)
@@ -143,15 +172,19 @@ struct ChatProfile {
         // MARK: Secret reveal
         case seedPhraseTapped
         case p2pKeyTapped
+        case p2pSmartAccountLoaded(String)
+        case p2pKeyRevealTapped
+        case p2pKeyScreenClosed
+        case copyP2PSmartAccountTapped
         case biometricFinished(SecretTarget, Bool)
         case pinKeyTapped(PINKey)
         case pinVerificationFinished(PINVerificationResult)
         case pinLockoutTick
         case pinCancelled
         case secretUnlocked(SecretTarget)
-        case seedLoaded([RedactableString])
-        case p2pKeyLoaded(OfframpWalletKey)
-        case secretLoadFailed
+        case seedLoaded(UUID, [RedactableString])
+        case p2pKeyLoaded(UUID, OfframpWalletKey)
+        case secretLoadFailed(UUID)
         case secretDismissed
         case copyP2PAddressTapped
         case copyP2PKeyTapped
@@ -176,6 +209,8 @@ struct ChatProfile {
     enum CancelID {
         case copyIndicator
         case p2pCopyIndicator
+        case p2pSmartAccount
+        case secretLoad
         case pinLockout
     }
 
@@ -185,6 +220,7 @@ struct ChatProfile {
         displayNameReduce()
         publicKeyCopyReduce()
         privacyReduce()
+        chatSettingsReduce()
         deleteReduce()
             .ifLet(\.$alert, action: \.alert)
     }
@@ -227,6 +263,7 @@ private extension ChatProfile {
                 // leaves the button reading "Copied" for as long as the state survives.
             case .onDisappear:
                 state.didCopy = false
+                state.isP2pKeyScreenPresented = false
 
                 return .merge(
                     .cancel(id: state.messagingCancelId),
