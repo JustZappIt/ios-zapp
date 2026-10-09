@@ -145,18 +145,19 @@ struct RestoreWalletCoordFlow {
                     // it crammed into one box.
                     let pasted = Self.splitPastedSeedWords(word)
                     if pasted.count > 1 {
-                        let before = state.words
-                        state.words = Self.placePastedSeedWords(before, at: index, words: pasted)
+                        let start = pasted.count >= state.words.count ? 0 : index
+                        let end = min(start + pasted.count, state.words.count)
+                        state.words = Self.placePastedSeedWords(state.words, at: index, words: pasted)
                         state.prevWords = state.words
                         state.suggestedWords = []
-                        // Only the slots the paste wrote to are re-judged; a word the user is
-                        // still typing elsewhere keeps its prefix-based verdict.
-                        for i in state.words.indices where i == index || state.words[i] != before[i] {
+                        // Validate every slot covered by the paste, including unchanged text:
+                        // a typed prefix may have been valid before, but pasted words must match
+                        // exactly. Words outside the paste keep their prefix-based verdict.
+                        for i in start..<end {
                             state.wordsValidity[i] = Self.isPastedWordValid(state.words[i], suggest: mnemonic.suggestWords)
                         }
                         // Carry on from the pasted block: the first slot from its start that is
                         // still empty or wrong, so a typo inside the paste gets focus too.
-                        let start = pasted.count >= state.words.count ? 0 : index
                         state.nextIndex = state.words.indices.first {
                             $0 >= start && (state.words[$0].isEmpty || !state.wordsValidity[$0])
                         }
@@ -204,6 +205,7 @@ struct RestoreWalletCoordFlow {
             case .suggestedWordTapped(let word):
                 if let index = state.selectedIndex {
                     state.words[index] = word
+                    state.wordsValidity[index] = Self.isPastedWordValid(word, suggest: mnemonic.suggestWords)
                     if !state.isValidSeed && state.selectedIndex != 23 {
                         state.prevWords = state.words
                         state.nextIndex = index + 1 < 24 ? index + 1 : 0
