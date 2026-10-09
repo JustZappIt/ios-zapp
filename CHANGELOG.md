@@ -122,6 +122,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [#82] Chat settings now stay open when a save fails, so privacy changes can be retried. Cash-out activity stays visible while orders are still being indexed and refreshes as they settle. Closing the P2P key screen prevents a pending export from revealing the key afterward.
 - [P2P] Selfie and passport checks now return to Zapp through the supported verification links, validate returns against your saved session, and recover after app restarts. Retries preserve completed checks and reconcile pending transactions without sending twice.
 - [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.
 - [CHATS] Sending several messages in a row no longer draws the new bubble over the previous one: a message keeps its bubble as it goes from sending to sent instead of being redrawn, and the room scrolls once per message.

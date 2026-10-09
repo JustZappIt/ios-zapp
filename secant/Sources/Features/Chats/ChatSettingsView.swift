@@ -32,7 +32,8 @@ struct ChatSettingsView: View {
                                 icon: Asset.Assets.Icons.checkSolid.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.chatSettingsDraft.readReceipts
+                                isOn: store.chatSettingsDraft.readReceipts,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
                                 store.send(.chatSettingsReadReceiptsToggled)
                             }
@@ -45,7 +46,8 @@ struct ChatSettingsView: View {
                                 icon: Asset.Assets.Icons.user.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.chatSettingsDraft.onlineStatus
+                                isOn: store.chatSettingsDraft.onlineStatus,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
                                 store.send(.chatSettingsOnlineStatusToggled)
                             }
@@ -61,30 +63,35 @@ struct ChatSettingsView: View {
                                 icon: Asset.Assets.Icons.messageChat.image,
                                 iconTint: .accentText,
                                 iconBackground: .accentSoft,
-                                isOn: store.chatSettingsDraft.backgroundDelivery
+                                isOn: store.chatSettingsDraft.backgroundDelivery,
+                                isEnabled: !store.isChatSettingsBusy
                             ) {
                                 store.send(.chatSettingsBackgroundDeliveryToggled)
                             }
+                        }
+
+                        if store.chatSettingsSaveFailed {
+                            Text(String(localizable: .chatProfileSaveFailed))
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(Design.Spacing._lg)
                         }
                     }
                     .padding(.vertical, Design.Spacing._xl)
                 }
 
-                ZappBottomActionBar(onBack: onBack) {
+                ZappBottomActionBar(onBack: onBack, isBackEnabled: !store.isChatSettingsBusy) {
                     ZappButton(
-                        title: String(localizable: .chatProfileSave),
+                        title: String(localizable: store.isChatSettingsBusy ? .chatProfileSaving : .chatProfileSave),
                         isEnabled: store.canSaveChatSettings
                     ) {
-                        // Android leaves once the values are handed over; the profile store
-                        // outlives this screen, so the writes and the permission prompt finish.
                         store.send(.chatSettingsSaveTapped)
-                        onBack()
                     }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
-            .zappSwipeBack(action: onBack)
+            .zappSwipeBack(isEnabled: !store.isChatSettingsBusy, action: onBack)
             .onAppear { store.send(.chatSettingsAppeared) }
         }
     }

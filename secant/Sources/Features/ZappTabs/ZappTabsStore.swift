@@ -50,9 +50,13 @@ struct ZappTabs {
 
         /// Android's `TabsVM.hasPeerActivity`: an attempt not yet on the indexer, or an order still
         /// on offer. A cash-out can wait hours, so the Base account row says so.
-        var hasPeerActivity: Bool { peerRuns.contains(where: \.isInFlight) || activePeerOrderCount > 0 }
+        var hasPeerActivity: Bool {
+            peerRuns.contains { $0.failure == nil && $0.isAwaitingIndex(in: indexedPeerDepositIDs) } || activePeerOrderCount > 0
+        }
         var peerRuns: [PeerRun] = []
         var activePeerOrderCount = 0
+        /// Remember orders already seen, including finished ones that later leave the active list.
+        var indexedPeerDepositIDs: Set<String> = []
 
         /// Android hides the Wallet group until the wallet secret is ready.
         var hasWallet: Bool { selectedWalletAccount != nil }
@@ -71,7 +75,7 @@ struct ZappTabs {
         case youTabDisappeared
         case p2pRailSubtitleLoaded(P2pRail, String)
         case peerRunsChanged([PeerRun])
-        case activePeerOrdersLoaded(Int)
+        case activePeerOrdersLoaded([PeerOrder])
 
         // Routed by RootCoordinator into Root's path overlays, the same way Home's
         // *Tapped actions are. The You tab stays navigation-agnostic.
@@ -97,9 +101,11 @@ struct ZappTabs {
     private enum CancelID {
         case peerRunner
         case peerOrders
+        case peerOrdersRefresh
         case p2pRailSubtitle
     }
 
+    @Dependency(\.continuousClock) var continuousClock
     @Dependency(\.offramp) var offramp
     @Dependency(\.peerCashOut) var peerCashOut
     @Dependency(\.userStoredPreferences) var userStoredPreferences
@@ -135,6 +141,7 @@ struct ZappTabs {
                 return .merge(
                     .cancel(id: CancelID.peerRunner),
                     .cancel(id: CancelID.peerOrders),
+                    .cancel(id: CancelID.peerOrdersRefresh),
                     .cancel(id: CancelID.p2pRailSubtitle)
                 )
 
@@ -152,8 +159,9 @@ struct ZappTabs {
                 // an order — an order that is broadcast but not yet indexed exists on no list.
                 return changed ? loadActivePeerOrders() : .none
 
-            case .activePeerOrdersLoaded(let count):
-                state.activePeerOrderCount = count
+            case .activePeerOrdersLoaded(let orders):
+                state.activePeerOrderCount = orders.filter { !$0.isFinished }.count
+                state.indexedPeerDepositIDs.formUnion(orders.map(\.depositID))
                 return .none
 
             case .allSettingsTapped, .appLockTapped, .chatContactsTapped, .chatProfileTapped, .chatSettingsTapped,
@@ -226,7 +234,16 @@ struct ZappTabs {
                 // No Peer rails on this build; the row keeps its resting subtitle.
             }
             .cancellable(id: CancelID.peerRunner, cancelInFlight: true),
-            loadActivePeerOrders()
+            // A receipt can precede the indexer, and orders settle without changing the runner.
+            // Read once immediately, then refresh after each completed read so a slow indexer
+            // request is not repeatedly cancelled by a timer before it can return.
+            .run { send in
+                while !Task.isCancelled {
+                    await readPeerOrders(send)
+                    try await continuousClock.sleep(for: .seconds(15))
+                }
+            }
+            .cancellable(id: CancelID.peerOrdersRefresh, cancelInFlight: true)
         )
     }
 
@@ -234,19 +251,21 @@ struct ZappTabs {
     /// `GetPeerActiveOrdersUseCase` is: a drained order stays ACTIVE on chain forever.
     private func loadActivePeerOrders() -> Effect<Action> {
         .run { send in
-            let orders = try await peerCashOut.activeOrders()
-            await send(.activePeerOrdersLoaded(orders.filter { !$0.isFinished }.count))
-        } catch: { _, _ in
-            // An unreadable chain is not evidence of activity.
+            await readPeerOrders(send)
         }
         .cancellable(id: CancelID.peerOrders, cancelInFlight: true)
     }
-}
 
-private extension PeerRun {
-    /// Android's `isUnindexed && failure == null`. A failed attempt is never evicted, so counting
-    /// it would leave the row claiming a cash-out is in progress for the rest of the session.
-    var isInFlight: Bool { depositID == nil && failure == nil }
+    private func readPeerOrders(_ send: Send<Action>) async {
+        do {
+            // History also reconciles an attempt whose order finished before You opened.
+            // The active list alone cannot answer for an already closed deposit.
+            let orders = try await peerCashOut.orderHistory()
+            await send(.activePeerOrdersLoaded(orders))
+        } catch {
+            // An unreadable chain is not evidence of activity.
+        }
+    }
 }
 
 // MARK: Placeholders

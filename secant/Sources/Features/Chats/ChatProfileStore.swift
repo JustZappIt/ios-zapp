@@ -16,6 +16,12 @@ import Foundation
 
 @Reducer
 struct ChatProfile {
+    enum ChatSetting: Hashable {
+        case readReceipts
+        case onlineStatus
+        case backgroundDelivery
+    }
+
     /// Which secret a reveal is being authorised for.
     enum SecretTarget: Equatable {
         case seedPhrase
@@ -49,11 +55,15 @@ struct ChatProfile {
 
         /// The Chat settings screen's staged values — see `ChatSettingsStaging.swift`.
         var chatSettingsDraft = ChatSettingsValues()
+        var pendingChatSettings: Set<ChatSetting> = []
+        var chatSettingsSaveFailed = false
 
         // MARK: Secret reveal — see ChatProfileSecrets.swift
 
         /// The secret whose authentication is in flight. Cleared as soon as it is shown or aborted.
         var pendingSecret: SecretTarget?
+        /// Identifies the export authorised by the current reveal. Clearing it rejects late results.
+        var secretLoadID: UUID?
 
         /// True only between the system biometric sheet going up and its result coming back.
         /// That sheet makes the app resign active, which is one of the `hideSensitiveContent`
@@ -143,6 +153,8 @@ struct ChatProfile {
         case chatSettingsOnlineStatusToggled
         case chatSettingsBackgroundDeliveryToggled
         case chatSettingsSaveTapped
+        /// Root closes Chat settings only after every changed preference was saved.
+        case chatSettingsSaved
 
         // MARK: Display name editor
         case editDisplayNameTapped
@@ -170,9 +182,9 @@ struct ChatProfile {
         case pinLockoutTick
         case pinCancelled
         case secretUnlocked(SecretTarget)
-        case seedLoaded([RedactableString])
-        case p2pKeyLoaded(OfframpWalletKey)
-        case secretLoadFailed
+        case seedLoaded(UUID, [RedactableString])
+        case p2pKeyLoaded(UUID, OfframpWalletKey)
+        case secretLoadFailed(UUID)
         case secretDismissed
         case copyP2PAddressTapped
         case copyP2PKeyTapped
@@ -198,6 +210,7 @@ struct ChatProfile {
         case copyIndicator
         case p2pCopyIndicator
         case p2pSmartAccount
+        case secretLoad
         case pinLockout
     }
 

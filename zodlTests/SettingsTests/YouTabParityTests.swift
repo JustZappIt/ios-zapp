@@ -143,8 +143,9 @@ import Testing
             $0.userStoredPreferences.p2pRail = { nil }
             $0.offramp.corridors = { [] }
             $0.peerCashOut.isConfigured = { true }
+            $0.continuousClock = TestClock()
             $0.peerCashOut.runnerState = { stream }
-            $0.peerCashOut.activeOrders = {
+            $0.peerCashOut.orderHistory = {
                 orderReads.withValue { $0 += 1 }
                 return []
             }
@@ -167,19 +168,26 @@ import Testing
     }
 
     @Test func onlyUnfinishedOrdersAndUnfailedAttemptsCountAsActivity() {
-        var state = youState()
-        #expect(!state.hasPeerActivity)
+        withDependencies {
+            $0.defaultInMemoryStorage = .init()
+        } operation: {
+            var state = youState()
+            #expect(!state.hasPeerActivity)
 
-        state.activePeerOrderCount = 1
-        #expect(state.hasPeerActivity)
+            state.activePeerOrderCount = 1
+            #expect(state.hasPeerActivity)
 
-        state.activePeerOrderCount = 0
-        // Indexed: the order list answers for it from here.
-        state.peerRuns = [run("a", statuses: [progress(depositID: "escrow_a")])]
-        #expect(!state.hasPeerActivity)
+            state.activePeerOrderCount = 0
+            state.peerRuns = [run("a", statuses: [progress(depositID: "escrow_a")])]
+            // A receipt's deposit ID does not mean the indexer has caught up.
+            #expect(state.hasPeerActivity)
 
-        state.peerRuns = [run("a")]
-        #expect(state.hasPeerActivity)
+            state.indexedPeerDepositIDs = ["escrow_a"]
+            #expect(!state.hasPeerActivity)
+
+            state.peerRuns = [run("a")]
+            #expect(state.hasPeerActivity)
+        }
     }
 
     @MainActor @Test func finishedOrdersAreNotOnOffer() async {
@@ -191,15 +199,78 @@ import Testing
             $0.userStoredPreferences.p2pRail = { nil }
             $0.offramp.corridors = { [] }
             $0.peerCashOut.isConfigured = { true }
+            $0.continuousClock = TestClock()
             $0.peerCashOut.runnerState = { AsyncStream { $0.finish() } }
-            $0.peerCashOut.activeOrders = { [order("a", isFinished: true), order("b", isFinished: false)] }
+            $0.peerCashOut.orderHistory = { [order("a", isFinished: true), order("b", isFinished: false)] }
         }
         store.exhaustivity = .off
 
         await store.send(.youTabAppeared)
         await store.receive(\.activePeerOrdersLoaded) {
             $0.activePeerOrderCount = 1
+            $0.indexedPeerDepositIDs = ["escrow_a", "escrow_b"]
         }
         await store.send(.youTabDisappeared)
+    }
+
+    @MainActor @Test func pollingKeepsAReceiptVisibleUntilIndexedAndClearsItWhenTheOrderFinishes() async {
+        let clock = TestClock()
+        let orders = LockIsolated<[PeerOrder]>([])
+        let reads = LockIsolated(0)
+        let storage = InMemoryStorage()
+        let state = withDependencies {
+            $0.defaultInMemoryStorage = storage
+        } operation: {
+            var state = youState()
+            state.peerRuns = [run("a", statuses: [progress(depositID: "escrow_a")])]
+            return state
+        }
+        let store = TestStore(initialState: state) {
+            ZappTabs()
+        } withDependencies: {
+            $0.defaultInMemoryStorage = storage
+            $0.continuousClock = clock
+            $0.userStoredPreferences.exchangeRate = { nil }
+            $0.userStoredPreferences.p2pRail = { nil }
+            $0.offramp.corridors = { [] }
+            $0.peerCashOut.isConfigured = { true }
+            $0.peerCashOut.runnerState = { AsyncStream { $0.finish() } }
+            $0.peerCashOut.orderHistory = {
+                reads.withValue { $0 += 1 }
+                return orders.value
+            }
+        }
+
+        await store.send(.youTabAppeared)
+        await store.receive(.activePeerOrdersLoaded([]))
+        #expect(store.state.hasPeerActivity)
+
+        let active = order("a", isFinished: false)
+        orders.setValue([active])
+        await clock.advance(by: .seconds(15))
+        await store.receive(.activePeerOrdersLoaded([active])) {
+            $0.activePeerOrderCount = 1
+            $0.indexedPeerDepositIDs = ["escrow_a"]
+        }
+        #expect(store.state.hasPeerActivity)
+
+        let finished = order("a", isFinished: true)
+        orders.setValue([finished])
+        await clock.advance(by: .seconds(15))
+        await store.receive(.activePeerOrdersLoaded([finished])) {
+            $0.activePeerOrderCount = 0
+        }
+        #expect(!store.state.hasPeerActivity)
+
+        orders.setValue([])
+        await clock.advance(by: .seconds(15))
+        await store.receive(.activePeerOrdersLoaded([]))
+        #expect(!store.state.hasPeerActivity)
+        #expect(reads.value == 4)
+
+        await store.send(.youTabDisappeared)
+        await clock.advance(by: .seconds(30))
+        #expect(reads.value == 4)
+        await store.finish()
     }
 }

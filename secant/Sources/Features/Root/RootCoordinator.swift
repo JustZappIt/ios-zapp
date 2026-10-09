@@ -1101,6 +1101,11 @@ extension Root {
                 state.path = .chatSettings
                 return .none
 
+            case .chatProfile(.chatSettingsSaved):
+                guard state.path == .chatSettings else { return .none }
+                state.path = nil
+                return .none
+
             case .zappTabs(.readReceiptsTapped):
                 state.path = .chatReadReceipts
                 return .none
