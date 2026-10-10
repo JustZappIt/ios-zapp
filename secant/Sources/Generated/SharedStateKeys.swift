@@ -11,6 +11,7 @@ public extension String {
     static let exchangeRate = "sharedStateKey_exchangeRate"
     static let sensitiveContent = "udHideBalances"
     static let walletStatus = "sharedStateKey_walletStatus"
+    static let walletFunding = "sharedStateKey_walletFunding"
     static let flexaAccountId = "sharedStateKey_flexaAccountId"
     static let addressBookContacts = "sharedStateKey_addressBookContacts"
     static let chatContacts = "sharedStateKey_chatContacts"

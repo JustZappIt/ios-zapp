@@ -209,6 +209,8 @@ struct Root {
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletConfig: WalletConfig
         @Shared(.inMemory(.walletStatus)) var walletStatus: WalletStatus = .none
+        /// Whether the money flows have anything to spend; derived on every sync tick below.
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
         var wasRestoringWhenDisconnected = false
         var welcomeState: Welcome.State
         @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount? = nil
@@ -266,6 +268,9 @@ struct Root {
         /// replaces the first rather than racing a second navigation against it.
         var p2pRailResolveCancelId = UUID()
         var receiveState = Receive.State.initial
+        /// The address Receive opens on when Add ZEC sends someone there: an exchange can only
+        /// send to the transparent one. Applied and cleared when Receive opens.
+        var receiveFocusOnOpen: Receive.State.AddressType?
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
         var migrationCoordFlowState = MigrationCoordFlow.State.initial
@@ -353,9 +358,9 @@ struct Root {
         /// `path == nil` excludes every pushed Root flow (including Zapp's chat,
         /// offramp, payment, settings, and support destinations). The remaining
         /// terms cover presentation states outside `Path`: Keystone signing,
-        /// Server Setup, background work, alerts, and the two live Zapp Pay sheets. Upstream
+        /// Server Setup, background work, alerts, and the live Zapp Pay sheets. Upstream
         /// Home informational sheets keep their bindings in child state and can re-present, but
-        /// interrupting either actionable Zapp sheet would discard in-progress user context.
+        /// interrupting an actionable Zapp sheet would discard in-progress user context.
         var canPresentIronwoodAnnouncement: Bool {
             destinationState.destination == .home
                 && path == nil
@@ -363,6 +368,7 @@ struct Root {
                 && !serverSetupViewBinding
                 && !homeState.isZappPoolBalancesSheetPresented
                 && !homeState.isZappSyncErrorSheetPresented
+                && !homeState.isZappShieldInfoPresented
                 && bgTask == nil
                 && alert == nil
                 && splashAppeared

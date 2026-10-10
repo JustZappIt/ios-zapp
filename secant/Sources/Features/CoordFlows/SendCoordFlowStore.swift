@@ -45,12 +45,16 @@ struct SendCoordFlow {
     enum PrimaryButton: Equatable {
         case review
         case topUp
+        /// An empty wallet's form is replaced by the Add funds panel; this opens the same Top Up
+        /// picker as `.topUp`.
+        case addZec
         case disabled
     }
 
     @Reducer
     enum Path {
         case addressBook(AddressBook)
+        case addressDetails(AddressDetails)
         case addressBookContact(AddressBook)
         case confirmWithKeystone(SendConfirmation)
         case keystoneFirmwareUpdate(SendConfirmation)
@@ -70,10 +74,17 @@ struct SendCoordFlow {
         var path = StackState<Path.State>()
         var sendFormState = SendForm.State.initial
         var swapState = SwapAndPay.State.initial
+        @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         @Shared(.inMemory(.transactions)) var transactions: IdentifiedArrayOf<TransactionState> = []
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
 
         var mode: Mode = .zec
         var isAssetPickerPresented = false
+        /// Android's `TopUpArgs` sheet, raised by the "Top Up" CTA. See `SendCoordFlow+TopUp`.
+        var isTopUpPresented = false
+        /// Opened from the Pay tab's Swap action. Android's FAB opens a screen titled "Swap"; this
+        /// form keeps that title while it is in swap mode.
+        var isSwapEntry = false
         /// Which of the two amount inputs leads. Android keeps one field plus an "≈" line and a
         /// swap affordance; this is that affordance's state for ZEC-direct mode (swap mode uses
         /// `SwapAndPay.State.isInputInUsd`).
@@ -104,9 +115,19 @@ struct SendCoordFlow {
             path.contains { $0.is(\.sending) || $0.is(\.confirmWithKeystone) }
         }
 
+        /// Android's `UnifiedSendState.addFundsPanel`: a synced, empty wallet sees "Add ZEC" in
+        /// place of the form, for Send and for Swap (this form only swaps ZEC out). Swap-in stays
+        /// reachable through the deposit row, so an empty wallet can still bring another asset in.
+        var showsAddFundsPanel: Bool {
+            walletFunding == .empty
+        }
+
         /// Android's `buildPrimaryButton`: zero balance in ZEC mode, or insufficient funds in
-        /// either mode, replaces Review with Top Up.
+        /// either mode, replaces Review with Top Up; an empty wallet's panel offers Add ZEC.
         var primaryButton: PrimaryButton {
+            if showsAddFundsPanel {
+                return .addZec
+            }
             if mode == .zec && hasZeroBalance {
                 return .topUp
             }
@@ -151,8 +172,11 @@ struct SendCoordFlow {
         /// Delegate to Root: hand off to `SwapAndPayCoordFlow`'s swap-to-ZEC corridor, which the
         /// unified screen deliberately does not cover (Android's unified screen doesn't either).
         case swapToZecRequested
-        /// Delegate to Root: Android's `TopUpArgs`.
+        /// Android's `TopUpArgs`: the source picker over the form (`SendCoordFlow+TopUp`).
         case topUpRequested
+        case topUpDismissed
+        case topUpSourcePicked(TopUpSource)
+        case topUpUnifiedAddressResolved(String?)
         case viewTransactionRequested(SendConfirmation.State)
         case zecAssetSelected
     }
@@ -161,6 +185,7 @@ struct SendCoordFlow {
     @Dependency(\.keystoneHandler) var keystoneHandler
     @Dependency(\.localAuthentication) var localAuthentication
     @Dependency(\.numberFormatter) var numberFormatter
+    @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.swapAndPay) var swapAndPay
     @Dependency(\.userMetadataProvider) var userMetadataProvider
 
@@ -168,6 +193,8 @@ struct SendCoordFlow {
 
     var body: some Reducer<State, Action> {
         coordinatorReduce()
+
+        topUpReduce()
 
         Scope(state: \.sendFormState, action: \.sendForm) {
             SendForm()

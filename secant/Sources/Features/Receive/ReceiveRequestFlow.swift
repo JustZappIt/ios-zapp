@@ -2,7 +2,8 @@
 //  ReceiveRequestFlow.swift
 //  Zapp
 //
-//  The Request-ZEC sub-chain (amount keyboard -> memo -> shareable QR), lifted out of Receive's
+//  The Request-ZEC sub-chain (amount keyboard with an inline note -> shareable QR, Android's two
+//  `RequestVM` stages), lifted out of Receive's
 //  own `NavigationStack` so it can RISE instead of sliding in from the trailing edge.
 //
 //  Why: Android routes `NavigationTargets.REQUEST` through `ScreenAnimation.sheetEnterTransition`
@@ -30,9 +31,11 @@ import SwiftUI
 struct ReceiveRequestFlow {
     @Reducer
     enum Path {
-        case requestZec(RequestZec)
         case requestZecSummary(RequestZec)
     }
+
+    /// `MemoBytes` caps a memo at 512 UTF-8 bytes; the QR cannot carry more.
+    static let noteByteLimit = 512
 
     @ObservableState
     struct State: Equatable {
@@ -50,6 +53,8 @@ struct ReceiveRequestFlow {
     enum Action {
         /// The chain asked to close itself (Cancel on the summary). Receive tears the cover down.
         case dismissRequested
+        /// The inline "Add a note (optional)" field on the amount screen.
+        case noteChanged(String)
         case path(StackActionOf<Path>)
         case zecKeyboard(ZecKeyboard.Action)
     }
@@ -63,19 +68,19 @@ struct ReceiveRequestFlow {
 
         Reduce { state, action in
             switch action {
-            case .zecKeyboard(.nextTapped):
-                state.requestZecState.memoState.text = state.memo
-                state.requestZecState.requestedZec = state.zecKeyboardState.amount.roundToAvoidDustSpend()
-                state.path.append(.requestZec(state.requestZecState))
+            case .noteChanged(let note):
+                var capped = note
+                while capped.utf8.count > Self.noteByteLimit {
+                    capped.removeLast()
+                }
+                state.memo = capped
                 return .none
 
-            case .path(.element(id: _, action: .requestZec(.requestTapped))):
-                for element in state.path {
-                    if case .requestZec(let requestZecState) = element {
-                        state.requestZecState.memoState = requestZecState.memoState
-                        break
-                    }
-                }
+                // Android's `onAmountAndMemoDone`: the amount screen goes straight to the QR. A
+                // transparent request carries no note (a transparent address cannot take a memo).
+            case .zecKeyboard(.nextTapped):
+                state.requestZecState.memoState.text = state.requestZecState.maxPrivacy ? state.memo : ""
+                state.requestZecState.requestedZec = state.zecKeyboardState.amount.roundToAvoidDustSpend()
                 state.path.append(.requestZecSummary(state.requestZecState))
                 return .none
 
@@ -106,13 +111,14 @@ struct ReceiveRequestFlowView: View {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 ZecKeyboardView(
                     store: store.scope(state: \.zecKeyboardState, action: \.zecKeyboard),
-                    tokenName: tokenName
+                    tokenName: tokenName,
+                    note: store.requestZecState.maxPrivacy
+                        ? Binding(get: { store.memo }, set: { store.send(.noteChanged($0)) })
+                        : nil
                 )
                 .navigationBarHidden(true)
             } destination: { store in
                 switch store.case {
-                case let .requestZec(store):
-                    RequestZecView(store: store, tokenName: tokenName)
                 case let .requestZecSummary(store):
                     RequestZecSummaryView(store: store, tokenName: tokenName)
                 }

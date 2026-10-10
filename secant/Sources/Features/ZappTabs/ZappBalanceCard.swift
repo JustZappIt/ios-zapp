@@ -37,13 +37,15 @@ struct ZappBalanceCard: View {
     let confirmedBalance: Zatoshi
     let shieldedBalance: Zatoshi
     let transparentBalance: Zatoshi
+    /// Android's `isShieldingAvailable`; the breakdown always carries its Shield button.
     let showsBreakdown: Bool
-    let canShield: Bool
     let tokenName: String
     let transactions: [TransactionState]
     let showZecAsPrimary: Bool
     let onBalanceTapped: () -> Void
     let onToggleBalanceDisplay: () -> Void
+    /// A shield in flight; Shield stays disabled until it finishes.
+    var isShielding = false
     let onShieldTapped: () -> Void
 
     var body: some View {
@@ -203,10 +205,8 @@ struct ZappBalanceCard: View {
                 dotColor: .textSubtle
             )
 
-            if canShield {
-                ZappButton(title: String(localizable: .zappPayShield), action: onShieldTapped)
-                    .padding(.top, 14)
-            }
+            ZappButton(title: String(localizable: .zappPayShield), isEnabled: !isShielding, action: onShieldTapped)
+                .padding(.top, 14)
         }
     }
 

@@ -49,6 +49,9 @@ struct Offramp {
         var isTopUpAmountInsufficient = false
         var isTopUpValidationLoading = false
         var topUpValidatedMicros: String?
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
+        /// Android's Top Up sheet, raised by the empty wallet's Add ZEC.
+        var isTopUpSourcePickerPresented = false
 
         var selectedCorridor: OfframpCorridor? {
             corridors.first { $0.currencyCode == selectedCurrencyCode }
@@ -59,6 +62,25 @@ struct Offramp {
         }
 
         var latestProgress: OfframpProgressModel? { progress.last }
+
+        /// The Base USDC balance once it has been read; nil until then.
+        var baseUsdc: Decimal? {
+            account?.balanceMicros.flatMap { Decimal(string: $0) }.map { $0 / 1_000_000 }
+        }
+
+        /// Android's `UpiOfframpState.addFundsPanel`: a merchant can be paid from ZEC or from USDC
+        /// on Base, so only an empty wallet with an empty (read) Base balance sees Add ZEC. An
+        /// order in flight keeps its form, so it can still be resumed.
+        var showsPayAddFundsPanel: Bool {
+            !hasCheckpoint && walletFunding.withBaseUsdc(baseUsdc) == .empty
+        }
+
+        /// Android's `BridgeToBaseState.addFundsPanel`: bridging needs ZEC; a saved top-up keeps
+        /// its form so it can still be resumed. An account that can't bridge (testnet) funds Base
+        /// by sending USDC to it directly, so it needs no ZEC and keeps its funding instructions.
+        var showsTopUpAddFundsPanel: Bool {
+            !hasTopUpCheckpoint && account?.canBridgeToBase == true && walletFunding == .empty
+        }
 
         var canSaveCorridor: Bool {
             !isLoading && draftCurrencyCode != selectedCurrencyCode
@@ -134,6 +156,9 @@ struct Offramp {
         case cancelAll
         case backTapped
         case retryTapped
+        case addZecTapped
+        case topUpSourcePickerDismissed
+        case topUpSourcePicked(SendCoordFlow.TopUpSource)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -141,6 +166,8 @@ struct Offramp {
             /// P2P history is one unified feed now, so this screen hands it over rather than
             /// carrying a second copy of the list beside it.
             case openActivity
+            /// Root opens Receive on the address that source can send to.
+            case topUpSourcePicked(SendCoordFlow.TopUpSource)
         }
     }
 
@@ -327,14 +354,14 @@ struct Offramp {
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
             case .payQuoteRefreshed(let refreshed):
-                let changed = state.quote != refreshed
+                // Android's `UpiOfframpVM.onSendClick`: every payment goes through "Confirm
+                // payment", built from the commit-time quote — not only when that quote moved.
                 state.quote = refreshed
                 state.isLoading = false
-                if changed {
-                    state.isPayConfirmationPresented = true
-                    return .none
-                }
-                return .send(.payConfirmed)
+                // A rate or fee that moved can leave the Base balance short. The page then shows
+                // its Add funds callout for the refreshed quote; confirming would do nothing.
+                state.isPayConfirmationPresented = refreshed.canPayFromBase
+                return .none
 
             case .payConfirmed:
                 guard let quote = state.quote, quote.canPayFromBase, !state.isLoading else { return .none }
@@ -687,10 +714,23 @@ struct Offramp {
                     return .send(.delegate(.close))
                 }
 
+            case .addZecTapped:
+                state.isTopUpSourcePickerPresented = true
+                return .none
+
+            case .topUpSourcePickerDismissed:
+                state.isTopUpSourcePickerPresented = false
+                return .none
+
+            case .topUpSourcePicked(let source):
+                state.isTopUpSourcePickerPresented = false
+                return .send(.delegate(.topUpSourcePicked(source)))
+
             case .retryTapped:
                 return .send(.onAppear)
 
-            case .delegate(.close):
+            case .delegate(.close), .delegate(.topUpSourcePicked):
+                // Add ZEC leaves Pay for Receive, so it ends the screen session like closing does.
                 return .send(.cancelAll)
 
             case .delegate(.openActivity):

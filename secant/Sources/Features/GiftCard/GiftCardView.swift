@@ -41,6 +41,15 @@ struct GiftCardView: View {
             }
             .applyScreenBackground()
             .sheet(isPresented: $isInfoPresented) { fundingInfoSheet }
+            .zashiSheet(
+                isPresented: Binding(
+                    get: { store.isTopUpPresented },
+                    set: { if !$0 { store.send(.topUpDismissed) } }
+                ),
+                horizontalPadding: 0
+            ) {
+                ZappTopUpSheet { store.send(.topUpSourcePicked($0)) }
+            }
             .background(shareMount)
             .onAppear { store.send(.onAppear) }
         }
@@ -97,13 +106,19 @@ struct GiftCardView: View {
 
     // MARK: - Details
 
+    @ViewBuilder
     private var detailsStage: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
-            podium(isTurning: false, fiatOnFace: false)
-            amountGroup
-            messageGroup
-            expiryControl
-            errorLine
+        if store.showsAddFundsPanel {
+            ZappAddFundsPanel(message: String(localizable: .topUpAddFundsPanelGift))
+                .padding(.top, Design.Spacing._4xl)
+        } else {
+            VStack(alignment: .leading, spacing: Design.Spacing._2xl) {
+                podium(isTurning: false, fiatOnFace: false)
+                amountGroup
+                messageGroup
+                expiryControl
+                errorLine
+            }
         }
     }
 
@@ -461,10 +476,14 @@ extension GiftCardView {
         switch store.visibleStage {
         case .details:
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                ZappButton(
-                    title: String(localizable: .giftCardContinue),
-                    isEnabled: store.canContinue
-                ) { store.send(.reviewTapped) }
+                if store.showsAddFundsPanel {
+                    ZappButton(title: String(localizable: .topUpAddZec)) { store.send(.addZecTapped) }
+                } else {
+                    ZappButton(
+                        title: String(localizable: .giftCardContinue),
+                        isEnabled: store.canContinue
+                    ) { store.send(.reviewTapped) }
+                }
             }
         case .review:
             ZappBottomActionBar(onBack: { store.send(.backTapped) }, isBackEnabled: store.isBackEnabled) {

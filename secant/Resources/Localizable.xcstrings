@@ -184,6 +184,91 @@
     "reputation.unreadableTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn't reach Base"}},"es":{"stringUnit":{"state":"translated","value":"No pudimos conectar con Base"}}}},
     "reputation.verifiedGroup" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"VERIFIED"}},"es":{"stringUnit":{"state":"translated","value":"VERIFICADAS"}}}},
     "reputation.verifyToBuy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verify to buy"}},"es":{"stringUnit":{"state":"translated","value":"Verifica para comprar"}}}},
+    "requestZec.address.shielded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Shielded Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección protegida"
+          }
+        }
+      }
+    },
+    "requestZec.address.transparent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Transparent Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección transparente"
+          }
+        }
+      }
+    },
+    "requestZec.copyAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar dirección"
+          }
+        }
+      }
+    },
+    "requestZec.noteHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a note (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega una nota (opcional)"
+          }
+        }
+      }
+    },
+    "requestZec.noteLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTE"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTA"
+          }
+        }
+      }
+    },
     "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status, delivery"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea, entrega"}}}},
     "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
     "~%@ %@" : {
@@ -12961,13 +13046,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         }
       }
@@ -20339,13 +20424,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BASE BALANCE"
+            "value" : "Balance on Base"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SALDO EN BASE"
+            "value" : "Saldo en Base"
           }
         }
       }
@@ -20441,13 +20526,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Return to ZEC"
+            "value" : "Refund to ZEC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Devolver a ZEC"
+            "value" : "Reembolsar a ZEC"
           }
         }
       }
@@ -20457,6 +20542,57 @@
     "offramp.history.type.buy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Buy"}},"es":{"stringUnit":{"state":"translated","value":"Comprar"}}}},
     "offramp.history.type.pay" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay"}},"es":{"stringUnit":{"state":"translated","value":"Pagar"}}}},
     "offramp.history.type.sell" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sell"}},"es":{"stringUnit":{"state":"translated","value":"Vender"}}}},
+    "offramp.pay.addFundsToPay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add funds to pay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar fondos para pagar"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monto"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountSent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount sent"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe enviado"
+          }
+        }
+      }
+    },
     "offramp.history.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20508,6 +20644,108 @@
         }
       }
     },
+    "offramp.pay.confirm.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %1$@ using about %2$@ USDC at %3$@ per USDC."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paga %1$@ con aproximadamente %2$@ USDC a %3$@ por USDC."
+          }
+        }
+      }
+    },
+    "offramp.pay.confirm.payNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagar ahora"
+          }
+        }
+      }
+    },
+    "offramp.pay.discardInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard local order & start over"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar orden local y empezar de nuevo"
+          }
+        }
+      }
+    },
+    "offramp.pay.errorInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An offramp is already in progress. Resume it before starting a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya hay un offramp en curso. Reanúdalo antes de iniciar otro."
+          }
+        }
+      }
+    },
+    "offramp.pay.recentTransactions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent transactions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transacciones recientes"
+          }
+        }
+      }
+    },
+    "offramp.pay.resumeInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume in-flight offramp"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar offramp en curso"
+          }
+        }
+      }
+    },
     "offramp.pay.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20521,40 +20759,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagar a un comercio"
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The rate, fee, or required USDC changed. Review the updated quote before confirming."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La tasa, la comisión o los USDC necesarios cambiaron. Revisa la cotización actualizada antes de confirmar."
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Review updated payment quote"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisar la cotización de pago actualizada"
           }
         }
       }
@@ -32201,6 +32405,227 @@
         }
       }
     },
+    "topUp.addFundsPanel.base" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you move funds to Base."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de mover fondos a Base."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.gift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you fund a Zpacket. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cargar un Zpacket. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.payMerchant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC or USDC on Base before you pay. Zapp pays merchants from either."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC o USDC en Base antes de pagar. Zapp paga a los comercios con cualquiera de los dos."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you send. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de enviar. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.swap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you swap it. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cambiarlos. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wallet is empty"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu billetera está vacía"
+          }
+        }
+      }
+    },
+    "topUp.addZec" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar ZEC"
+          }
+        }
+      }
+    },
+    "topUp.fromExchange.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchanges like Binance or Coinbase can only send to a transparent address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los exchanges como Binance o Coinbase solo pueden enviar a una dirección transparente."
+          }
+        }
+      }
+    },
+    "topUp.fromExchange.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From an exchange"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde un exchange"
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive directly to your shielded address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe directamente en tu dirección blindada."
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From another wallet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde otra billetera"
+          }
+        }
+      }
+    },
+    "topUp.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where your ZEC is coming from."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige de dónde provienen tus ZEC."
+          }
+        }
+      }
+    },
+    "topUp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How are you topping up?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo vas a recargar?"
+          }
+        }
+      }
+    },
     "torSettingsSheet.desc" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33666,23 +34091,6 @@
         }
       }
     },
-    "zappPay.chart.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Portfolio value"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Valor del portafolio"
-          }
-        }
-      }
-    },
     "zappPay.empty.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -33842,7 +34250,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "See all"
+            "value" : "See All"
           }
         },
         "es" : {
@@ -34007,6 +34415,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "zappSync.offlineReconnecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline, reconnecting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión, reconectando"
           }
         }
       }
@@ -34631,13 +35056,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your Revtag, without the @"
+            "value" : "Revtag (e.g. andrew1abc)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu Revtag, sin la @"
+            "value" : "Revtag (p. ej. andrew1abc)"
           }
         }
       }
@@ -34648,13 +35073,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The email address registered with Zelle"
+            "value" : "Email address enrolled with Zelle"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El correo electrónico registrado en Zelle"
+            "value" : "Correo electrónico registrado en Zelle"
           }
         }
       }
@@ -34665,13 +35090,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your $ChimeSign"
+            "value" : "ChimeSign (e.g. $andrew)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu $ChimeSign"
+            "value" : "ChimeSign (p. ej. $andrew)"
           }
         }
       }
@@ -34682,13 +35107,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your monzo.me username"
+            "value" : "Monzo.me username"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu nombre de usuario de monzo.me"
+            "value" : "Usuario de Monzo.me"
           }
         }
       }
@@ -34767,13 +35192,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AMOUNT TO OFFER"
+            "value" : "Amount"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IMPORTE A OFRECER"
+            "value" : "Cantidad"
           }
         }
       }
@@ -34886,13 +35311,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ at today's rate"
+            "value" : "≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ al cambio de hoy"
+            "value" : "≈ %1$@ %2$@"
           }
         }
       }
@@ -34903,13 +35328,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indicative rate"
+            "value" : "Rate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tipo indicativo"
+            "value" : "Tasa"
           }
         }
       }
@@ -34920,13 +35345,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         }
       }
@@ -34971,13 +35396,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Held by orders in progress"
+            "value" : "In progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retenido por órdenes en curso"
+            "value" : "En curso"
           }
         }
       }
@@ -34988,13 +35413,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paid to you on"
+            "value" : "Paid to"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Te pagan en"
+            "value" : "Se paga a"
           }
         }
       }
@@ -35005,13 +35430,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WHERE BUYERS PAY YOU"
+            "value" : "Where you get paid"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DÓNDE TE PAGAN LOS COMPRADORES"
+            "value" : "Dónde te pagan"
           }
         }
       }
@@ -35039,13 +35464,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This service can't confirm the handle for us. Check it carefully — buyers will send your money to exactly what you enter here."
+            "value" : "We cannot confirm this handle. A buyer pays exactly what you register here, so check it carefully."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este servicio no puede confirmarnos el identificador. Revísalo con cuidado: los compradores enviarán tu dinero exactamente a lo que escribas aquí."
+            "value" : "No podemos confirmar este identificador. Un comprador paga exactamente lo que registres aquí, así que revísalo con cuidado."
           }
         }
       }
@@ -35056,13 +35481,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CURRENCIES YOU'LL ACCEPT"
+            "value" : "Currencies you accept"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MONEDAS QUE ACEPTARÁS"
+            "value" : "Monedas que aceptas"
           }
         }
       }
@@ -35090,13 +35515,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Review and confirm"
+            "value" : "Continue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar y confirmar"
+            "value" : "Continuar"
           }
         }
       }
@@ -35107,13 +35532,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "YOUR OPEN ORDERS"
+            "value" : "Orders in progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TUS ÓRDENES ABIERTAS"
+            "value" : "Órdenes en curso"
           }
         }
       }
@@ -35141,13 +35566,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offer at least %@ USDC."
+            "value" : "Enter at least %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ofrece al menos %@ USDC."
+            "value" : "Introduce al menos %@ USDC"
           }
         }
       }
@@ -35158,13 +35583,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can offer up to %@ USDC right now."
+            "value" : "Enter at most %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ahora mismo puedes ofrecer hasta %@ USDC."
+            "value" : "Introduce como máximo %@ USDC"
           }
         }
       }
@@ -35192,13 +35617,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That doesn't look like a valid handle for this service."
+            "value" : "That does not look like a valid handle for this rail."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eso no parece un identificador válido para este servicio."
+            "value" : "Eso no parece un identificador válido para esta vía."
           }
         }
       }
@@ -35226,13 +35651,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Larger than buyers usually take (about %@ USDC each). It will still fill, but probably in pieces over several hours."
+            "value" : "Buyers take about %@ USDC at a time, so this will fill in several pieces over a few hours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es mayor de lo que suelen tomar los compradores (unos %@ USDC cada uno). Se llenará igualmente, pero probablemente por partes durante varias horas."
+            "value" : "Los compradores toman unos %@ USDC cada vez, así que esto se llenará en varias partes a lo largo de unas horas."
           }
         }
       }
@@ -36467,13 +36892,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P activity"
+            "value" : "Base activity"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actividad P2P"
+            "value" : "Actividad en Base"
           }
         }
       }
@@ -36518,13 +36943,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nothing here yet. Orders you open and payments you make will appear here."
+            "value" : "No activity yet."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aquí no hay nada todavía. Las órdenes que abras y los pagos que hagas aparecerán aquí."
+            "value" : "Aún no hay actividad."
           }
         }
       }

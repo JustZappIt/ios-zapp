@@ -353,6 +353,18 @@ extension Root {
                     return migrationReconcileEffect
                 }
                 
+                // Android's `ObserveFundingUseCase.zec()`: the money flows read this to offer
+                // "Add ZEC" up front rather than a form an empty wallet cannot pay for.
+                let isUpToDate = SyncStatusSnapshot.snapshotFor(state: latestState.data.syncStatus).syncStatus == .upToDate
+                state.$walletFunding.withLock {
+                    $0 = WalletFunding.next(
+                        previous: $0,
+                        total: latestState.data.accountsBalances[account.id]?.fundingTotal,
+                        isUpToDate: isUpToDate,
+                        isRestoring: state.walletStatus == .restoring
+                    )
+                }
+
                 // update flexa balance
                 if let accountBalance = latestState.data.accountsBalances[account.id] {
                     // Pool-agnostic accessors: sum sapling + orchard + ironwood (and any future

@@ -34,6 +34,15 @@ struct OfframpView: View {
             .onAppear { store.send(.onAppear) }
             .zashiSheet(isPresented: $isPaymentInfoPresented) { paymentMethodInfo }
             .zashiSheet(isPresented: $isTopUpInfoPresented) { topUpInfo }
+            .zashiSheet(
+                isPresented: Binding(
+                    get: { store.isTopUpSourcePickerPresented },
+                    set: { if !$0 { store.send(.topUpSourcePickerDismissed) } }
+                ),
+                horizontalPadding: 0
+            ) {
+                ZappTopUpSheet { store.send(.topUpSourcePicked($0)) }
+            }
             .alert(
                 text("offramp.refund.confirm.title", "Return Base funds to ZEC?"),
                 isPresented: Binding(
@@ -46,20 +55,18 @@ struct OfframpView: View {
             } message: {
                 Text(bridgePreviewMessage)
             }
+            // Android's "Confirm payment" dialog (`upi_offramp_confirm_*`), shown before every pay.
             .alert(
-                text("offramp.pay.updated.title", "Review updated payment quote"),
+                String(localizable: .offrampPayConfirm),
                 isPresented: Binding(
                     get: { store.isPayConfirmationPresented },
                     set: { if !$0 { store.send(.payDismissed) } }
                 )
             ) {
-                Button(text("general.cancel", "Cancel"), role: .cancel) { store.send(.payDismissed) }
-                Button(text("offramp.pay.confirm", "Confirm payment")) { store.send(.payConfirmed) }
+                Button(String(localizable: .generalCancel), role: .cancel) { store.send(.payDismissed) }
+                Button(String(localizable: .offrampPayConfirmPayNow)) { store.send(.payConfirmed) }
             } message: {
-                Text(text(
-                    "offramp.pay.updated.message",
-                    "The rate, fee, or required USDC changed. Review the updated quote before confirming."
-                ))
+                Text(payConfirmationMessage)
             }
             .alert(
                 text("offramp.topup.confirm.title", "Confirm ZEC bridge"),
@@ -186,16 +193,20 @@ struct OfframpView: View {
             GeometryReader { geometry in
                 ScrollView {
                     VStack(spacing: 0) {
-                        amountHero
+                        if store.showsPayAddFundsPanel {
+                            ZappAddFundsPanel(message: String(localizable: .topUpAddFundsPanelPayMerchant))
+                                .padding(.top, 40)
+                        } else {
+                            amountHero
 
-                        settlementLedger
-                            .padding(.top, 6)
+                            settlementLedger
+                                .padding(.top, 6)
 
-                        if let error = store.errorMessage {
-                            Text(error)
-                                .zappFont(.caption, style: ZappColors.danger)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.top, 10)
+                            if let error = store.errorMessage {
+                                Text(error)
+                                    .zappFont(.caption, style: ZappColors.danger)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top, 10)
                         }
 
                         ZappButton(
@@ -205,9 +216,10 @@ struct OfframpView: View {
                         ) { store.send(.addFundsTapped) }
                         .padding(.top, 16)
 
-                        if store.hasCheckpoint && !store.isResumingCheckpoint {
-                            checkpointActions
+                        if isInFlight {
+                            inFlightDiscard
                                 .padding(.top, 12)
+                        }
                         }
 
                         Spacer(minLength: 16)
@@ -221,11 +233,18 @@ struct OfframpView: View {
             }
 
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                if let quote = store.quote {
+                if store.showsPayAddFundsPanel {
+                    ZappButton(title: String(localizable: .topUpAddZec)) { store.send(.addZecTapped) }
+                } else if isInFlight {
+                    // Android's in-flight CTA: the only way forward is to resume the saved order.
+                    ZappButton(title: String(localizable: .offrampPayResumeInFlight)) {
+                        store.send(.resumeCheckpointTapped)
+                    }
+                } else if let quote = store.quote {
                     ZappButton(
                         title: quote.canPayFromBase
                             ? text("offramp.pay.button", "Pay")
-                            : text("offramp.addFunds.button", "Add funds"),
+                            : String(localizable: .offrampPayAddFundsToPay),
                         isEnabled: !store.isLoading && !store.hasCheckpoint
                     ) {
                         store.send(quote.canPayFromBase ? .payTapped : .addFundsTapped)
@@ -246,7 +265,7 @@ struct OfframpView: View {
     private var amountHero: some View {
         VStack(spacing: 6) {
             HStack {
-                Text(text("offramp.pay.amount", "AMOUNT"))
+                Text(String(localizable: .offrampPayAmountLabel).uppercased())
                     .zappFont(.eyebrow, style: ZappColors.textMuted)
                 Spacer()
                 Text(store.selectedCorridor?.currencyCode ?? store.selectedCurrencyCode)
@@ -290,9 +309,15 @@ struct OfframpView: View {
 
     private var settlementLedger: some View {
         VStack(spacing: 6) {
+            // Android's ledger reads "Amount sent" / "Rate". Base balance stays as a third row
+            // until it moves into the hero field ("On Base"), which is the design lane's work.
             ZappCompactLedger(rows: [
                 ZappCompactLedgerRow(
-                    label: text("offramp.quote.rate", "Rate"),
+                    label: String(localizable: .offrampPayAmountSent),
+                    value: amountSentText ?? "—"
+                ),
+                ZappCompactLedgerRow(
+                    label: String(localizable: .offrampQuoteRate),
                     value: store.quote.map { "1 USDC = \($0.sellRate) \($0.currencyCode)" } ?? "—"
                 ),
                 ZappCompactLedgerRow(
@@ -318,24 +343,43 @@ struct OfframpView: View {
         }
     }
 
-    private var checkpointActions: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(text(
-                "offramp.checkpoint.message",
-                "A P2P payment is still in progress. Resume it before starting another payment."
-            ))
-            .zappFont(.caption, style: ZappColors.danger)
+    /// A saved order blocks a new one. Android states it as the field error and offers the
+    /// discard as an underlined danger link; the CTA becomes "Resume in-flight offramp".
+    private var isInFlight: Bool {
+        store.hasCheckpoint && !store.isResumingCheckpoint
+    }
 
-            HStack(spacing: 10) {
-                ZappButton(
-                    title: text("offramp.checkpoint.discard", "Discard"),
-                    variant: .ghost
-                ) { store.send(.discardCheckpointTapped) }
-                ZappButton(title: text("offramp.checkpoint.resume", "Resume")) {
-                    store.send(.resumeCheckpointTapped)
-                }
+    private var inFlightDiscard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(String(localizable: .offrampPayErrorInFlight))
+                .zappFont(.caption, style: ZappColors.danger)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button { store.send(.discardCheckpointTapped) } label: {
+                Text(String(localizable: .offrampPayDiscardInFlight))
+                    .underline()
+                    .zappFont(.caption, style: ZappColors.danger)
             }
+            .buttonStyle(.zappPress)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Android's `fiatAmountText`: the currency symbol plus the amount typed.
+    private var amountSentText: String? {
+        guard Offramp.hasPositiveAmount(store.fiatAmount) else { return nil }
+        let symbol = store.selectedCorridor?.symbol ?? ""
+        return "\(symbol)\(store.fiatAmount)"
+    }
+
+    private var payConfirmationMessage: String {
+        guard let quote = store.quote else { return "" }
+        let symbol = store.selectedCorridor?.symbol ?? ""
+        return String(localizable: .offrampPayConfirmMessage(
+            "\(symbol)\(quote.fiatAmount)",
+            quote.usdcDisplay,
+            "\(symbol)\(quote.sellRate)"
+        ))
     }
 
     private var recentTransactionsButton: some View {
@@ -343,7 +387,7 @@ struct OfframpView: View {
             HStack(spacing: 6) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .semibold))
-                Text(text("offramp.history.recent", "Recent transactions"))
+                Text(String(localizable: .offrampPayRecentTransactions))
                     .zappFont(.caption, style: ZappColors.accent)
             }
             .foregroundStyle(ZappColors.accent.color(colorScheme))
@@ -362,79 +406,87 @@ struct OfframpView: View {
                 infoButton { isTopUpInfoPresented = true }
             }
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(text("offramp.topup.amount", "Amount to add"))
-                            .zappFont(.eyebrow, style: ZappColors.textMuted)
-                        HStack(spacing: 8) {
-                            Text(topUpUsesFiat
-                                ? store.selectedCorridor?.symbol ?? ""
-                                : "USDC")
-                                .zappFont(amountStyle, style: ZappColors.text)
-                            TextField("0", text: topUpAmountBinding)
-                                .focused($focusedField, equals: .topUpAmount)
-                                .keyboardType(.decimalPad)
-                                .textFieldStyle(.plain)
-                                .multilineTextAlignment(.leading)
-                                .zappFont(amountStyle, style: ZappColors.text)
+                if store.showsTopUpAddFundsPanel {
+                    ZappAddFundsPanel(message: String(localizable: .topUpAddFundsPanelBase))
+                        .padding(.top, 40)
+                        .padding(18)
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(text("offramp.topup.amount", "Amount to add"))
+                                .zappFont(.eyebrow, style: ZappColors.textMuted)
+                            HStack(spacing: 8) {
+                                Text(topUpUsesFiat
+                                    ? store.selectedCorridor?.symbol ?? ""
+                                    : "USDC")
+                                    .zappFont(amountStyle, style: ZappColors.text)
+                                TextField("0", text: topUpAmountBinding)
+                                    .focused($focusedField, equals: .topUpAmount)
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(.plain)
+                                    .multilineTextAlignment(.leading)
+                                    .zappFont(amountStyle, style: ZappColors.text)
+                            }
+                            .padding(.vertical, 4)
+                            .zappFieldTapTarget($focusedField, equals: .topUpAmount)
+
+                            Rectangle()
+                                .fill(store.isTopUpAmountInsufficient
+                                    ? ZappColors.danger.color(colorScheme)
+                                    : ZappColors.accent.color(colorScheme))
+                                .frame(height: 2)
+
+                            if topUpUsesFiat, !store.topUpAmount.isEmpty {
+                                Text("≈ \(store.topUpAmount) USDC · \(text("offramp.topup.landsOnBase", "lands on Base"))")
+                                    .zappFont(.body, style: ZappColors.textMuted)
+                            }
                         }
-                        .padding(.vertical, 4)
-                        .zappFieldTapTarget($focusedField, equals: .topUpAmount)
 
-                        Rectangle()
-                            .fill(store.isTopUpAmountInsufficient
-                                ? ZappColors.danger.color(colorScheme)
-                                : ZappColors.accent.color(colorScheme))
-                            .frame(height: 2)
-
-                        if topUpUsesFiat, !store.topUpAmount.isEmpty {
-                            Text("≈ \(store.topUpAmount) USDC · \(text("offramp.topup.landsOnBase", "lands on Base"))")
-                                .zappFont(.body, style: ZappColors.textMuted)
-                        }
-                    }
-
-                    if let account = store.account {
-                        Text(String(
-                            format: text("offramp.topup.baseBalance", "Base balance: %@"),
-                            account.balanceDisplay.map { "\($0) USDC" } ?? "—"
-                        ))
-                        .zappFont(.caption, style: ZappColors.textMuted)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    if let validation = topUpValidationMessage ?? store.errorMessage {
-                        Text(validation)
-                            .zappFont(.caption, style: ZappColors.danger)
+                        if let account = store.account {
+                            Text(String(
+                                format: text("offramp.topup.baseBalance", "Base balance: %@"),
+                                account.balanceDisplay.map { "\($0) USDC" } ?? "—"
+                            ))
+                            .zappFont(.caption, style: ZappColors.textMuted)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    if store.account?.canBridgeToBase == true {
-                        if store.hasTopUpCheckpoint {
+                        }
+
+                        if let validation = topUpValidationMessage ?? store.errorMessage {
+                            Text(validation)
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        if store.account?.canBridgeToBase == true {
+                            if store.hasTopUpCheckpoint {
+                                callout(
+                                    title: text("offramp.topup.resume.title", "Base top-up in progress"),
+                                    detail: text(
+                                        "offramp.topup.resume.detail",
+                                        "Resume the saved bridge to avoid sending ZEC twice, or discard it only if you have verified it will not settle."
+                                    )
+                                )
+                                ZappButton(
+                                    title: text("offramp.topup.discard", "Discard saved top-up"),
+                                    variant: .danger
+                                ) { store.send(.discardTopUpCheckpointTapped) }
+                            }
+                        } else {
                             callout(
-                                title: text("offramp.topup.resume.title", "Base top-up in progress"),
+                                title: text("offramp.topup.testnet.title", "Fund your testnet Base account"),
                                 detail: text(
-                                    "offramp.topup.resume.detail",
-                                    "Resume the saved bridge to avoid sending ZEC twice, or discard it only if you have verified it will not settle."
+                                    "offramp.topup.testnet.detail",
+                                    "Automatic ZEC bridging is unavailable on testnet. Send testnet USDC to this Base account."
                                 )
                             )
-                            ZappButton(
-                                title: text("offramp.topup.discard", "Discard saved top-up"),
-                                variant: .danger
-                            ) { store.send(.discardTopUpCheckpointTapped) }
                         }
-                    } else {
-                        callout(
-                            title: text("offramp.topup.testnet.title", "Fund your testnet Base account"),
-                            detail: text(
-                                "offramp.topup.testnet.detail",
-                                "Automatic ZEC bridging is unavailable on testnet. Send testnet USDC to this Base account."
-                            )
-                        )
                     }
+                    .padding(18)
                 }
-                .padding(18)
             }
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                if store.account?.canBridgeToBase == true {
+                if store.showsTopUpAddFundsPanel {
+                    ZappButton(title: String(localizable: .topUpAddZec)) { store.send(.addZecTapped) }
+                } else if store.account?.canBridgeToBase == true {
                     ZappButton(
                         title: store.isTopUpValidationLoading
                             ? text("offramp.topup.checking.android", "Checking balance…")

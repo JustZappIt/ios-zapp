@@ -72,6 +72,9 @@ struct GiftCard {
         var shareLink: String?
         var spendableBalanceText: String?
         @Shared(.inMemory(.exchangeRate)) var currencyConversion: CurrencyConversion? = nil
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
+        /// Android's Top Up sheet, raised by the empty wallet's Add ZEC.
+        var isTopUpPresented = false
 
         /// What the sender typed, exactly representable or nil.
         var typedAmount: Zatoshi? {
@@ -103,6 +106,12 @@ struct GiftCard {
 
         var isMessageTooLong: Bool {
             !message.isEmpty && !GiftMessage.isWithinLimits(message)
+        }
+
+        /// Android's `GiftCardState.addFundsPanel`: a synced, empty wallet sees "Add ZEC" in place
+        /// of the details form.
+        var showsAddFundsPanel: Bool {
+            visibleStage == .details && walletFunding == .empty
         }
 
         /// Both message bounds, not just the counter's: a note can sit well under 128 clusters and
@@ -162,6 +171,9 @@ struct GiftCard {
         case prepared(GiftFundingQuote, PreparedInputs)
         case prepareFailed(FlowError)
         case reviewTapped
+        case addZecTapped
+        case topUpDismissed
+        case topUpSourcePicked(SendCoordFlow.TopUpSource)
         case shareFinished(Bool)
         case shareTapped
         case spendableUpdated(String?)
@@ -170,6 +182,8 @@ struct GiftCard {
         enum Delegate: Equatable {
             case exitFlow
             case openSavedCards
+            /// Root opens Receive on the address that source can send to.
+            case topUpSourcePicked(SendCoordFlow.TopUpSource)
         }
     }
 
@@ -249,6 +263,18 @@ struct GiftCard {
                 state.expiry = expiry
                 state.error = nil
                 return .none
+
+            case .addZecTapped:
+                state.isTopUpPresented = true
+                return .none
+
+            case .topUpDismissed:
+                state.isTopUpPresented = false
+                return .none
+
+            case .topUpSourcePicked(let source):
+                state.isTopUpPresented = false
+                return .send(.delegate(.topUpSourcePicked(source)))
 
             case .reviewTapped:
                 guard state.stage == .details else { return .none }
