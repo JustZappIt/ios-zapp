@@ -154,7 +154,7 @@ struct ZappRestoreBirthdayView: View {
                     )
                 ) {
                     ForEach(ZappRestoreBirthday.months(for: store.selectedYear, now: Date()), id: \.self) { month in
-                        Text(Calendar.current.standaloneMonthSymbols[month - 1].localizedCapitalized)
+                        Text(ZappRestoreBirthday.calendar.standaloneMonthSymbols[month - 1].localizedCapitalized)
                             .zappFont(.sectionTitle, style: ZappColors.text)
                     }
                 }

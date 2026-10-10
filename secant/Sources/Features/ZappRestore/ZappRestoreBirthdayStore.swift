@@ -117,7 +117,7 @@ struct ZappRestoreBirthday {
         components.year = state.selectedYear
         components.month = state.selectedMonth
         components.day = 1
-        guard let date = Calendar.current.date(from: components) else {
+        guard let date = Self.calendar.date(from: components) else {
             state.errorMessage = String(localizable: .restoreFlowErrorEstimationFailed)
             return
         }
@@ -143,15 +143,25 @@ struct ZappRestoreBirthday {
 }
 
 extension ZappRestoreBirthday {
+    /// Always Gregorian, whatever calendar the phone is set to: the years and months on screen and
+    /// the date handed to the birthday estimate are Gregorian ones. With the phone's calendar, a
+    /// phone set to the Japanese calendar turned "October 2018" into a date centuries ahead, and
+    /// the restore started past every transaction.
+    static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = .current
+        return calendar
+    }()
+
     static func years(now: Date) -> [Int] {
-        Array(Constants.startYear...max(Constants.startYear, Calendar.current.component(.year, from: now)))
+        Array(Constants.startYear...max(Constants.startYear, calendar.component(.year, from: now)))
     }
 
     /// The 1-based months selectable in `year`: none before Sapling, none in the future.
     static func months(for year: Int, now: Date) -> [Int] {
-        let currentYear = Calendar.current.component(.year, from: now)
+        let currentYear = calendar.component(.year, from: now)
         let first = year == Constants.startYear ? Constants.startMonth : 1
-        let last = year == currentYear ? Calendar.current.component(.month, from: now) : 12
+        let last = year == currentYear ? calendar.component(.month, from: now) : 12
         return first <= last ? Array(first...last) : []
     }
 }

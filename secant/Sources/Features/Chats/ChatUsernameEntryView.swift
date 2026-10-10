@@ -89,8 +89,10 @@ struct ChatUsernameEntryView: View {
 
             HStack(spacing: Constants.chipSpacing) {
                 ruleChip(String(localizable: .onboardingUsernameRuleMin), isMet: store.displayName.count >= UsernameRules.minLength)
-                ruleChip(String(localizable: .onboardingUsernameRuleMax), isMet: store.displayName.count <= UsernameRules.maxLength)
-                // `sanitize` guarantees the character set, so this is met as soon as anything is typed.
+                // `sanitize` caps the length and guarantees the character set, so these two can't
+                // fail; they light up once something is typed instead of showing a tick on an
+                // empty field.
+                ruleChip(String(localizable: .onboardingUsernameRuleMax), isMet: !store.displayName.isEmpty)
                 ruleChip(String(localizable: .onboardingUsernameRuleCharset), isMet: !store.displayName.isEmpty)
             }
             .padding(.top, Constants.chipsTopPadding)

@@ -143,7 +143,12 @@ struct ZappRestoreSeedEntry {
             state.suggestedWords = []
         } else {
             state.suggestedWords = mnemonic.suggestWords(prefix)
-            state.wordsValidity[index] = !state.suggestedWords.isEmpty
+            // Focus moving onto a field doesn't change its word, so it keeps its verdict. A pasted
+            // "aban" is flagged because a pasted word must be whole; re-judging it here as a prefix
+            // of "abandon" cleared the flag on the one field that was wrong.
+            if !hasIndexChanged {
+                state.wordsValidity[index] = !state.suggestedWords.isEmpty
+            }
         }
         // Landing on a field that already holds a complete word must not jump focus onward.
         if hasIndexChanged, state.suggestedWords == [prefix], !state.isValidSeed {

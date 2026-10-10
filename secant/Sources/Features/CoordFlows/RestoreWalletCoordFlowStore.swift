@@ -49,22 +49,14 @@ struct RestoreWalletCoordFlow {
     struct State {
         @Presents var alert: AlertState<Action>?
         var isHelpSheetPresented = false
-        var isKeyboardVisible = false
-        var isValidSeed = false
         var landingForward = true
         var landingStep = LandingStep.welcome
         var walletCreationError: String?
-        var nextIndex: Int?
         var path = StackState<Path.State>()
         /// A saved wallet the SDK has not prepared yet. A new wallet is prepared only once its
         /// seed is backed up, so the seed backup step provisions it on continue.
         var pendingProvisioning: WalletProvisioningMode?
         var restoreRequest: RestoreRequest?
-        var prevWords: [String] = Array(repeating: "", count: 24)
-        var selectedIndex: Int?
-        var suggestedWords: [String] = []
-        var words: [String] = Array(repeating: "", count: 24)
-        var wordsValidity: [Bool] = Array(repeating: true, count: 24)
 
         /// The restore flow ends on Keep open instead of Done. A resumed restore starts on the
         /// seed confirm step, so that marks it as well as the seed entry does.
@@ -87,12 +79,10 @@ struct RestoreWalletCoordFlow {
         case alert(PresentationAction<Action>)
         case binding(BindingAction<RestoreWalletCoordFlow.State>)
         case chatIdentityAvailable
-        case evaluateSeedValidity
         case helpSheetRequested
         case landingBackTapped
         case landingContinueTapped
         case landingGetStartedTapped
-        case nextTapped
         case path(StackActionOf<Path>)
         case restoreFailed(ZcashError)
         /// Keep open's "Enter Zapp": Root takes the restored wallet home.
@@ -100,14 +90,7 @@ struct RestoreWalletCoordFlow {
         case restoreSucceeded
         /// Launch found a saved wallet whose onboarding never finished.
         case resume(OnboardingResumePlan)
-        case selectedIndex(Int?)
-        case suggestedWordTapped(String)
-        case suggestionsRequested(Int, Bool)
-        case updateKeyboardFlag(Bool)
         case walletProvisioned(WalletProvisioningMode)
-        #if DEBUG
-        case debugPasteSeed
-        #endif
         
         // Onboarding
         case createNewWalletTapped
@@ -123,10 +106,10 @@ struct RestoreWalletCoordFlow {
     @Dependency(\.appSecurity) var appSecurity
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.continuousClock) var continuousClock
-    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.walletStorage) var walletStorage
+    @Dependency(\.zappMessaging) var zappMessaging
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
     init() { }
@@ -145,104 +128,9 @@ struct RestoreWalletCoordFlow {
                 state.alert = nil
                 return .none
 
-            case .binding(\.words):
-                let changedIndices = state.words.indices.filter { state.words[$0] != state.prevWords[$0] }
-                state.prevWords = state.words
-
-                if let index = changedIndices.first {
-                    let word = state.words[index]
-                    if word.hasSuffix(" ") {
-                        state.words[index] = word.trimmingCharacters(in: .whitespaces)
-                        state.prevWords = state.words
-                        return .send(.suggestedWordTapped(state.words[index]))
-                    }
-                    
-                    return .send(.suggestionsRequested(index, false))
-                }
-                
-                return .none
-                
-            case .selectedIndex(let index):
-                state.selectedIndex = index
-                state.nextIndex = state.selectedIndex
-                if let index {
-                    return .send(.suggestionsRequested(index, true))
-                }
-                return .none
-                
-            case let .suggestionsRequested(index, hasIndexChanged):
-                let prefix = state.words[index]
-                if prefix.isEmpty {
-                    state.suggestedWords = []
-                } else {
-                    state.suggestedWords = mnemonic.suggestWords(prefix)
-                    state.wordsValidity[index] = !state.suggestedWords.isEmpty
-                }
-                if hasIndexChanged {
-                    if let first = state.suggestedWords.first, first == prefix && !state.isValidSeed && state.suggestedWords.count == 1 {
-                        return .none
-                    }
-                }
-                return .send(.evaluateSeedValidity)
-
-            case .suggestedWordTapped(let word):
-                if let index = state.selectedIndex {
-                    state.words[index] = word
-                    if !state.isValidSeed && state.selectedIndex != 23 {
-                        state.prevWords = state.words
-                        state.nextIndex = index + 1 < 24 ? index + 1 : 0
-                    }
-                    return .send(.evaluateSeedValidity)
-                }
-                return .none
-                
             case .helpSheetRequested:
                 state.isHelpSheetPresented.toggle()
                 return .none
-
-            case .evaluateSeedValidity:
-                do {
-                    try mnemonic.isValid(state.words.joined(separator: " "))
-                    state.isValidSeed = true
-                    state.isKeyboardVisible = false
-                } catch {
-                    state.isValidSeed = false
-                    if let index = state.selectedIndex {
-                        let prefix = state.words[index]
-                        if let first = state.suggestedWords.first, first == prefix && !state.isValidSeed && state.suggestedWords.count == 1 {
-                            state.prevWords = state.words
-                            state.nextIndex = index + 1 < 24 ? index + 1 : 0
-                        }
-                    }
-                }
-                return .none
-                
-            case .updateKeyboardFlag(let value):
-                state.isKeyboardVisible = value
-                return .none
-                
-#if DEBUG
-            case .debugPasteSeed:
-                do {
-                    var testSeed = ""
-                    if let testSeedPK = PartnerKeys.testSeed {
-                        testSeed = testSeedPK
-                    }
-                    let seedToPaste = pasteboard.getString()?.data ?? testSeed
-                    try mnemonic.isValid(seedToPaste)
-                    state.isValidSeed = true
-                    state.isKeyboardVisible = false
-                    state.words = seedToPaste.components(separatedBy: " ")
-                } catch {
-                    state.isValidSeed = false
-                    if let testSeedPK = PartnerKeys.testSeed {
-                        state.isValidSeed = true
-                        state.isKeyboardVisible = false
-                        state.words = testSeedPK.components(separatedBy: " ")
-                    }
-                }
-                return .none
-#endif
 
             default: return .none
             }

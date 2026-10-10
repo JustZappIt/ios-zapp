@@ -81,10 +81,19 @@ extension RestoreWalletCoordFlow {
                 // Android skips the username steps once the identity exists (`isMessagingGate` /
                 // `isIdentityGate`). Only a resumed onboarding gets here with one: the identity
                 // survived the interruption, and deriving it again would ignore the new name.
-                guard let last = state.path.last, last.is(\.messagingIntro) || last.is(\.chatUsername) else {
+                // `usernameOrAppLockStep()` covers an identity that is already known when the
+                // username step comes up; this covers one that loads while the intro or the
+                // username screen is showing. The username screen is replaced, not stacked under
+                // app lock, so a name being typed isn't left behind it.
+                guard let last = state.path.last else {
                     return .none
                 }
-                state.path.append(.appLockSetup(.initial))
+                if last.is(\.chatUsername) {
+                    state.path.removeLast()
+                    state.path.append(.appLockSetup(.initial))
+                } else if last.is(\.messagingIntro) {
+                    state.path.append(.appLockSetup(.initial))
+                }
                 return .none
 
                 // MARK: - Zapp restore flow
@@ -180,7 +189,7 @@ extension RestoreWalletCoordFlow {
                 if seedBackup.kind == .confirm {
                     // Restore: the backup flag was set with the import. Username comes next, and
                     // its back button returns here (Android's `RestoreStep.USERNAME` back).
-                    state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                    state.path.append(usernameOrAppLockStep())
                     return .none
                 }
                 do {
@@ -199,7 +208,7 @@ extension RestoreWalletCoordFlow {
                 return .send(.walletProvisioned(mode))
 
             case .path(.element(id: _, action: .messagingIntro(.continueTapped))):
-                state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+                state.path.append(usernameOrAppLockStep())
                 return .none
 
             case .path(.element(id: _, action: .identityDerivation(.identityReady))):
@@ -227,60 +236,65 @@ extension RestoreWalletCoordFlow {
         }
     }
 
+    /// The step after the messaging intro or the restore's seed confirm. An identity that
+    /// survived an interrupted onboarding is already known here, and asking for a name it would
+    /// ignore is what Android's identity gate avoids.
+    private func usernameOrAppLockStep() -> Path.State {
+        zappMessaging.latestState().identity != nil
+            ? .appLockSetup(.initial)
+            : .chatUsername(ChatUsernameEntry.State.initial)
+    }
+
     private func createWalletEffect() -> Effect<Action> {
-        .merge(
-            torByDefaultEffect(),
-            .run { send in
-                // Give SwiftUI a render pass so the loading state is visible before
-                // seed generation and encrypted persistence begin.
-                await Task.yield()
-                do {
-                    let newRandomPhrase = try mnemonic.randomMnemonic()
-                    let birthday = zcashSDKEnvironment.latestCheckpoint()
-                    // Recorded ahead of the keychain write: a saved wallet with no progress
-                    // would be taken for an install from before the onboarding gate.
-                    OnboardingProgress.save(.walletCreated, userDefaults)
-                    try walletStorage.importWallet(newRandomPhrase, birthday, .english, false)
-                    // The operation can be faster than one frame on modern devices. Keep
-                    // the explicit progress state legible instead of flashing through it.
-                    try? await continuousClock.sleep(for: .milliseconds(900))
-                    await send(.newWalletPersisted)
-                } catch {
-                    await send(.createNewWalletFailed(error.toZcashError()))
-                }
+        .run { send in
+            // Give SwiftUI a render pass so the loading state is visible before
+            // seed generation and encrypted persistence begin.
+            await Task.yield()
+            do {
+                let newRandomPhrase = try mnemonic.randomMnemonic()
+                let birthday = zcashSDKEnvironment.latestCheckpoint()
+                // Recorded ahead of the keychain write: a saved wallet with no progress
+                // would be taken for an install from before the onboarding gate.
+                OnboardingProgress.save(.walletCreated, userDefaults)
+                try walletStorage.importWallet(newRandomPhrase, birthday, .english, false)
+                await enableTorByDefault()
+                // The operation can be faster than one frame on modern devices. Keep
+                // the explicit progress state legible instead of flashing through it.
+                try? await continuousClock.sleep(for: .milliseconds(900))
+                await send(.newWalletPersisted)
+            } catch {
+                await send(.createNewWalletFailed(error.toZcashError()))
             }
-        )
+        }
     }
 
     private func restoreWalletEffect(_ request: RestoreRequest) -> Effect<Action> {
-        .merge(
-            torByDefaultEffect(),
-            .run { send in
-                await Task.yield()
-                do {
-                    try mnemonic.isValid(request.seedPhrase)
-                    OnboardingProgress.save(.walletRestored, userDefaults)
-                    try walletStorage.importWallet(request.seedPhrase, request.birthday, .english, false)
-                    // A restored phrase was backed up by definition.
-                    try walletStorage.markUserPassedPhraseBackupTest(true)
-                    try? await continuousClock.sleep(for: .milliseconds(900))
-                    await send(.restoreSucceeded)
-                } catch {
-                    await send(.restoreFailed(error.toZcashError()))
-                }
+        .run { send in
+            await Task.yield()
+            do {
+                try mnemonic.isValid(request.seedPhrase)
+                OnboardingProgress.save(.walletRestored, userDefaults)
+                // A restored phrase was backed up by definition. Saved with the wallet in one
+                // keychain write: a second write that failed after the first succeeded left Retry
+                // facing `alreadyImported` on every attempt, on a screen with no back button.
+                try walletStorage.importWallet(request.seedPhrase, request.birthday, .english, true)
+                await enableTorByDefault()
+                try? await continuousClock.sleep(for: .milliseconds(900))
+                await send(.restoreSucceeded)
+            } catch {
+                await send(.restoreFailed(error.toZcashError()))
             }
-        )
+        }
     }
 
     /// Tor is on for every created and restored wallet, and the restore-time opt-in is gone
     /// (Android's ZAPP_CHANGES §7, `WalletRepository.createNewWallet` / `restoreWallet`). The flag
     /// is stored for the synchronizer built on the next launch; the runtime call switches the one
     /// already built, as the old restore Tor sheet did. A failed Tor start surfaces through
-    /// Root's `.observeTorInit` once the wallet is prepared.
-    private func torByDefaultEffect() -> Effect<Action> {
+    /// Root's `.observeTorInit` once the wallet is prepared. Only called once the wallet is
+    /// saved, so a failed attempt leaves the setting as it was.
+    private func enableTorByDefault() async {
         try? walletStorage.importTorSetupFlag(true)
-        return .run { _ in
-            try? await sdkSynchronizer.torEnabled(true)
-        }
+        try? await sdkSynchronizer.torEnabled(true)
     }
 }

@@ -46,6 +46,16 @@ extension Root {
                 userDefaults.setValue(true, Constants.udIsRestoringWallet)
                 state.$walletStatus.withLock { $0 = .restoring }
             }
+            // Onboarding already on screen: this is the foreground retry after a failed
+            // initialization, not a launch. Rebuilding the flow would throw the user back from
+            // the username or app lock step to an earlier one, so only the initialization is
+            // retried and the flow keeps its place.
+            if state.destinationState.destination == .onboarding && !state.onboardingState.path.isEmpty {
+                guard let mode = plan.initializeNow else {
+                    return Effect<Root.Action>.none
+                }
+                return .send(.initialization(.initializeSDK(mode)))
+            }
             var effects: [Effect<Root.Action>] = [
                 .send(.onboarding(.resume(plan))),
                 .send(.destination(.updateDestination(.onboarding)))

@@ -15,6 +15,7 @@
 import ComposableArchitecture
 import Foundation
 import Testing
+import ZappMessaging
 @testable import zodl_internal
 @preconcurrency import ZcashLightClientKit
 
@@ -25,6 +26,8 @@ import Testing
         case torFlag(Bool)
         case torEnabled(Bool)
         case importWallet(BlockHeight?)
+        /// The wallet went into the keychain already marked as backed up.
+        case importedAsBackedUp
         case backupPassed
         case provisioned(RestoreWalletCoordFlow.WalletProvisioningMode)
         case newWalletSuccessfullyCreated
@@ -36,7 +39,8 @@ import Testing
     private func makeStore(
         _ state: RestoreWalletCoordFlow.State,
         events: LockIsolated<[Event]>,
-        importFails: LockIsolated<Bool> = LockIsolated(false)
+        importFails: LockIsolated<Bool> = LockIsolated(false),
+        messagingState: ZappMessagingState = ZappMessagingState()
     ) -> StoreOf<RestoreWalletCoordFlow> {
         Store(initialState: state) {
             CombineReducers {
@@ -75,10 +79,14 @@ import Testing
             $0.sdkSynchronizer.torEnabled = { enabled in events.withValue { $0.append(.torEnabled(enabled)) } }
             $0.walletStorage = .noOp
             $0.walletStorage.importTorSetupFlag = { flag in events.withValue { $0.append(.torFlag(flag)) } }
-            $0.walletStorage.importWallet = { _, birthday, _, _ in
+            $0.walletStorage.importWallet = { _, birthday, _, passedBackup in
                 if importFails.value { throw ZcashError.synchronizerNotPrepared }
                 events.withValue { $0.append(.importWallet(birthday)) }
+                if passedBackup {
+                    events.withValue { $0.append(.importedAsBackedUp) }
+                }
             }
+            $0.zappMessaging.latestState = { messagingState }
             $0.walletStorage.markUserPassedPhraseBackupTest = { _ in events.withValue { $0.append(.backupPassed) } }
         }
     }
@@ -184,7 +192,10 @@ import Testing
         #expect(events.value.contains(.torFlag(true)))
         #expect(events.value.contains(.torEnabled(true)))
         #expect(events.value.contains(.importWallet(1_234_567)))
-        #expect(events.value.contains(.backupPassed))
+        // One keychain write: a second one failing after the first left Retry stuck on
+        // `alreadyImported`.
+        #expect(events.value.contains(.importedAsBackedUp))
+        #expect(!events.value.contains(.backupPassed))
         let progressIndex = index(of: .progress(OnboardingProgress.walletRestored.rawValue), in: events)
         let importIndex = index(of: .importWallet(1_234_567), in: events)
         #expect(progressIndex != nil && importIndex != nil && (progressIndex ?? .max) < (importIndex ?? .min))
@@ -212,12 +223,15 @@ import Testing
 
         let restoringId = store.state.path.ids.last ?? 0
         #expect(store.state.path[id: restoringId, case: \.restoring]?.errorMessage != nil)
+        // Nothing was saved, so the Tor setting is left as it was.
+        #expect(!events.value.contains(.torFlag(true)))
 
         importFails.setValue(false)
         store.send(.path(.element(id: restoringId, action: .restoring(.retryTapped))))
         await waitUntil { events.value.contains(.restoreSucceeded) }
 
         #expect(events.value.contains(.importWallet(1_000_000)))
+        #expect(events.value.contains(.torFlag(true)))
         #expect(store.state.path.last.flatMap { $0.seedBackup?.kind } == .confirm)
     }
 
@@ -298,6 +312,44 @@ import Testing
         // Repeated state ticks do not stack a second app lock.
         store.send(.chatIdentityAvailable)
         #expect(store.state.path.count == 2)
+    }
+
+    /// An identity already known when the username step comes up skips it, wherever the resumed
+    /// flow started: the name typed there would be ignored.
+    @Test func knownIdentitySkipsTheUsernameWhenItComesUp() async {
+        let identity = ZappMessagingState(identity: ZMIdentity(publicKey: "key", displayName: "sam"))
+
+        var introState = RestoreWalletCoordFlow.State()
+        introState.path.append(.messagingIntro(.initial))
+        let intro = makeStore(introState, events: LockIsolated([]), messagingState: identity)
+        intro.send(.path(.element(id: intro.state.path.ids.last ?? 0, action: .messagingIntro(.continueTapped))))
+        #expect(intro.state.path.last?.is(\.appLockSetup) == true)
+        #expect(!intro.state.path.contains { $0.is(\.chatUsername) })
+
+        var confirm = OnboardingSeedBackup.State.confirm
+        confirm.isRevealed = true
+        confirm.isConfirmed = true
+        var confirmState = RestoreWalletCoordFlow.State()
+        confirmState.path.append(.seedBackup(confirm))
+        let restore = makeStore(confirmState, events: LockIsolated([]), messagingState: identity)
+        restore.send(.path(.element(id: restore.state.path.ids.last ?? 0, action: .seedBackup(.continueTapped))))
+        #expect(restore.state.path.last?.is(\.appLockSetup) == true)
+        #expect(!restore.state.path.contains { $0.is(\.chatUsername) })
+    }
+
+    /// An identity that loads while the username screen is up replaces that screen rather than
+    /// stacking app lock over a half-typed name.
+    @Test func identityArrivingOnTheUsernameReplacesIt() async {
+        var state = RestoreWalletCoordFlow.State()
+        state.path.append(.messagingIntro(.initial))
+        state.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+        let store = makeStore(state, events: LockIsolated([]))
+
+        store.send(.chatIdentityAvailable)
+
+        #expect(store.state.path.count == 2)
+        #expect(store.state.path.last?.is(\.appLockSetup) == true)
+        #expect(!store.state.path.contains { $0.is(\.chatUsername) })
     }
 
     @Test func identityDoesNotSkipTheSeedConfirm() async {

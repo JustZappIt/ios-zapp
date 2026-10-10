@@ -73,7 +73,36 @@ import Testing
         let now = Date(timeIntervalSince1970: 1_790_000_000) // September 2026
         #expect(ZappRestoreBirthday.months(for: 2018, now: now) == [10, 11, 12])
         #expect(ZappRestoreBirthday.months(for: 2020, now: now) == Array(1...12))
-        #expect(ZappRestoreBirthday.months(for: 2026, now: now).last == Calendar.current.component(.month, from: now))
+        #expect(ZappRestoreBirthday.months(for: 2026, now: now).last == 9)
+        #expect(ZappRestoreBirthday.years(now: now).last == 2026)
+    }
+
+    /// The estimate gets the first of the picked Gregorian month, whatever the phone's calendar.
+    @Test func estimateUsesTheGregorianMonth() async throws {
+        var state = ZappRestoreBirthday.State.initial
+        state.mode = .date
+        let requested = LockIsolated<Date?>(nil)
+        let store = TestStore(initialState: state) {
+            ZappRestoreBirthday()
+        } withDependencies: {
+            $0.zcashSDKEnvironment = .testnet
+            $0.sdkSynchronizer = .noOp
+            $0.sdkSynchronizer.estimateBirthdayHeight = { date in
+                requested.setValue(date)
+                return 2_000_000
+            }
+            $0.date = DateClient(now: { Date(timeIntervalSince1970: 1_790_000_000) })
+        }
+        await store.send(.primaryTapped) {
+            $0.heightText = "2000000"
+            $0.mode = .height
+        }
+        let date = try #require(requested.value)
+        let parts = Calendar(identifier: .gregorian).dateComponents([.year, .month, .day], from: date)
+        #expect(parts.year == 2018)
+        #expect(parts.month == 10)
+        #expect(parts.day == 1)
+        #expect(ZappRestoreBirthday.calendar.identifier == .gregorian)
     }
 }
 
@@ -95,6 +124,32 @@ import Testing
         #expect(store.state.words == phrase)
         #expect(store.state.wordsValidity.allSatisfy { $0 })
         #expect(store.state.isValidSeed)
+    }
+
+    /// A pasted word has to be whole. Focus then lands on the flagged field, and that must not
+    /// re-judge it as a prefix ("aban" of "abandon") and clear the flag.
+    @Test func focusKeepsAPastedWordFlagged() async {
+        let wordlist = ["abandon"] + (1...24).map { "word\($0)" }
+        let store = TestStore(initialState: ZappRestoreSeedEntry.State.initial) {
+            ZappRestoreSeedEntry()
+        } withDependencies: {
+            $0.mnemonic = .noOp
+            $0.mnemonic.suggestWords = { prefix in wordlist.filter { $0.hasPrefix(prefix) } }
+            $0.mnemonic.isValid = { _ in throw ZcashError.synchronizerNotPrepared }
+        }
+        store.exhaustivity = .off
+
+        var phrase = (1...24).map { "word\($0)" }
+        phrase[3] = "aban"
+        var words = ZappRestoreSeedEntry.State.initial.words
+        words[0] = phrase.joined(separator: " ")
+        await store.send(.binding(.set(\.words, words)))
+        #expect(store.state.wordsValidity[3] == false)
+        #expect(store.state.nextIndex == 3)
+
+        await store.send(.selectedIndex(3))
+        #expect(store.state.wordsValidity[3] == false)
+        #expect(!store.state.isValidSeed)
     }
 
     @Test func partialPasteFillsFromTheFocusedField() {

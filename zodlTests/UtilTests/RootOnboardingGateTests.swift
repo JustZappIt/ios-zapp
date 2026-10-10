@@ -49,7 +49,9 @@ import Testing
         defaults: Defaults,
         hasPassedBackup: Bool,
         areDbFilesPresent: Bool,
-        prepareModes: LockIsolated<[BlockHeight?]>
+        prepareModes: LockIsolated<[BlockHeight?]>,
+        destination: Root.DestinationState.Destination = .welcome,
+        onboardingState: RestoreWalletCoordFlow.State = RestoreWalletCoordFlow.State()
     ) -> TestStore<Root.State, Root.Action> {
         let seedDerivedAccount = Self.seedDerivedAccount
         let storedWallet: StoredWallet = {
@@ -58,9 +60,9 @@ import Testing
             return wallet
         }()
         let initialState = Root.State(
-            destinationState: Root.DestinationState(internalDestination: .welcome),
+            destinationState: Root.DestinationState(internalDestination: destination),
             exportLogsState: ExportLogs.State(),
-            onboardingState: RestoreWalletCoordFlow.State(),
+            onboardingState: onboardingState,
             phraseDisplayState: RecoveryPhraseDisplay.State(),
             walletConfig: .initial,
             welcomeState: Welcome.State()
@@ -175,6 +177,37 @@ import Testing
 
         #expect(store.state.destinationState.destination == .onboarding)
         #expect(store.state.onboardingState.path.last?.is(\.messagingIntro) == true)
+        #expect(prepares.value.count == 1)
+
+        await drain(store)
+    }
+
+    /// A failed initialization during onboarding is retried when the app comes back to the
+    /// foreground. That retry runs the launch chain, which must not rebuild the flow and throw the
+    /// user back from the username step to the messaging intro.
+    @Test func foregroundRetryDuringOnboardingKeepsThePlace() async {
+        let defaults = Defaults()
+        defaults.values.setValue([OnboardingProgress.storageKey: OnboardingProgress.walletCreated.rawValue])
+        let prepares = LockIsolated<[BlockHeight?]>([])
+        var onboarding = RestoreWalletCoordFlow.State()
+        onboarding.path.append(.seedBackup(.initial))
+        onboarding.path.append(.messagingIntro(.initial))
+        onboarding.path.append(.chatUsername(ChatUsernameEntry.State.initial))
+        let store = makeStore(
+            defaults: defaults,
+            hasPassedBackup: true,
+            areDbFilesPresent: true,
+            prepareModes: prepares,
+            destination: .onboarding,
+            onboardingState: onboarding
+        )
+
+        await store.send(.initialization(.respondToWalletInitializationState(.initialized)))
+        await waitUntil(store) { prepares.value.count == 1 }
+
+        #expect(store.state.destinationState.destination == .onboarding)
+        #expect(store.state.onboardingState.path.count == 3)
+        #expect(store.state.onboardingState.path.last?.is(\.chatUsername) == true)
         #expect(prepares.value.count == 1)
 
         await drain(store)
