@@ -115,15 +115,17 @@ struct AppLockSetupView: View {
             VStack(spacing: 0) {
                 Spacer()
 
-                Text("◎")
-                    .zappFont(
-                        .display,
-                        style: store.errorMessage == nil ? ZappColors.accentText : ZappColors.danger
-                    )
+                // Android's `BioScanScreen`: accent while verifying, danger on error, ink at rest.
+                Text(verbatim: "◉")
+                    .zappFont(.biometricGlyph, style: biometricGlyphStyle)
 
-                Text(localizable: .onboardingBiometricTitle)
-                    .zappFont(.displaySecondary, style: ZappColors.text)
-                    .padding(.top, 20)
+                Text(
+                    store.isProcessing
+                        ? String(localizable: .onboardingBiometricVerifying)
+                        : String(localizable: .onboardingBiometricTitle)
+                )
+                .zappFont(.displaySecondary, style: ZappColors.text)
+                .padding(.top, 20)
 
                 Text(store.errorMessage ?? String(localizable: .onboardingBiometricSubtitle))
                     .zappFont(
@@ -140,9 +142,7 @@ struct AppLockSetupView: View {
 
             ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
                 ZappButton(
-                    title: store.isProcessing
-                        ? String(localizable: .onboardingBiometricVerifying)
-                        : String(localizable: .onboardingBiometricEnable),
+                    title: biometricCTATitle,
                     isEnabled: store.isBiometricAvailable && !store.isProcessing
                 ) {
                     store.send(.enableBiometricTapped)
@@ -152,6 +152,23 @@ struct AppLockSetupView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
         .navigationBarBackButtonHidden(true)
+    }
+
+    private var biometricGlyphStyle: ZappColors {
+        if store.isProcessing {
+            return .accent
+        }
+        return store.errorMessage == nil ? .text : .danger
+    }
+
+    private var biometricCTATitle: String {
+        if store.isProcessing {
+            return String(localizable: .onboardingBiometricVerifying)
+        }
+        // Android relabels the CTA "Retry" once an attempt failed.
+        return store.errorMessage == nil
+            ? String(localizable: .onboardingBiometricEnable)
+            : String(localizable: .onboardingLoadingRetry)
     }
 
     private var onboardingProgress: some View {
@@ -207,4 +224,8 @@ struct AppLockSetupView: View {
                 .frame(height: 1)
         }
     }
+}
+
+private extension ZappTextStyle {
+    static let biometricGlyph = ZappTextStyle(weight: .black, size: 72, lineHeight: 80)
 }

@@ -134,7 +134,12 @@ extension Root {
                 // The tip survives backgrounding in memory (`sdkSynchronizer.latestState()`),
                 // which is what makes this call site immediate rather than waiting for a fresh
                 // sync tick to repopulate it via `.synchronizerStateChanged`.
-                presentIronwoodAnnouncementIfNeeded(state: &state, tip: sdkSynchronizer.latestState().latestBlockHeight)
+                let retained = sdkSynchronizer.latestState()
+                presentIronwoodAnnouncementIfNeeded(
+                    state: &state,
+                    tip: retained.latestBlockHeight,
+                    accountsBalances: retained.accountsBalances
+                )
                 // MOB-1466: "the open breaks the loop's sleep" — a fresh foreground always
                 // restarts the tick loop's 30s countdown from zero (`cancelInFlight: true` inside
                 // `migrationTickLoopEffect`), whichever branch below this open actually takes.
@@ -160,6 +165,18 @@ extension Root {
                     ? .send(.giftResumePendingClaim)
                     : .none
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
+                    // Onboarding owns initialization while it is on screen: `.walletProvisioned`
+                    // prepares the wallet and the flow's own exit routes home. Re-running the launch
+                    // chain here found the wallet onboarding had just saved and routed home through
+                    // `.checkBackupPhraseValidation` mid-flow — skipping the username step, so Chats
+                    // asked for it again. A new wallet is saved before seed backup but prepared only
+                    // after it, so switching apps to note the seed phrase was enough to trigger it.
+                    // A failed initialization and a locked keychain keep this re-entry as their retry.
+                    if state.destinationState.destination == .onboarding
+                        && state.appInitializationState != .failed
+                        && !state.isLockedInKeychainUnavailableState {
+                        return .merge(migrationTickEffect, migrationCheck, giftResume)
+                    }
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.initialSetups)))
                 } else {
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.retryStart)))
@@ -281,7 +298,11 @@ extension Root {
                 // Keep this above every early return. A fresh install may not
                 // have a selected account yet, and background work is excluded
                 // by the announcement's own safety gate.
-                presentIronwoodAnnouncementIfNeeded(state: &state, tip: latestState.data.latestBlockHeight)
+                presentIronwoodAnnouncementIfNeeded(
+                    state: &state,
+                    tip: latestState.data.latestBlockHeight,
+                    accountsBalances: latestState.data.accountsBalances
+                )
 
                 let snapshot = SyncStatusSnapshot.snapshotFor(state: latestState.data.syncStatus)
 
@@ -980,8 +1001,13 @@ extension Root {
                     return .none
                 case .keysMissing:
                     state.appInitializationState = .keysMissing
+                    // Progress belongs to a wallet in the keychain; with none, it is stale.
+                    OnboardingProgress.clear(userDefaults)
                     return .send(.destination(.updateDestination(.onboarding)))
                 case .filesMissing:
+                    if let resume = resumeOnboardingIfUnfinished(state: &state, areDbFilesPresent: false) {
+                        return resume
+                    }
                     state.appInitializationState = .filesMissing
                     state.isRestoringWallet = true
                     userDefaults.setValue(true, Constants.udIsRestoringWallet)
@@ -991,6 +1017,9 @@ extension Root {
                         .send(.initialization(.checkBackupPhraseValidation))
                     )
                 case .initialized:
+                    if let resume = resumeOnboardingIfUnfinished(state: &state, areDbFilesPresent: true) {
+                        return resume
+                    }
                     if let isRestoringWallet = userDefaults.objectForKey(Constants.udIsRestoringWallet) as? Bool, isRestoringWallet {
                         state.isRestoringWallet = true
                         state.$walletStatus.withLock { $0 = .restoring }
@@ -1012,6 +1041,7 @@ extension Root {
                     )
                 case .uninitialized:
                     state.appInitializationState = .uninitialized
+                    OnboardingProgress.clear(userDefaults)
                     return .run { send in
                         try await mainQueue.sleep(for: .seconds(0.5))
                         await send(.destination(.updateDestination(.onboarding)))
@@ -1499,6 +1529,9 @@ extension Root {
             case .resetZashiSDKSucceeded:
                 state.splashAppeared = true
                 state.isRestoringWallet = false
+                // Not in `clearDeviceScopedWalletState`: the stale-database heal runs that too, and
+                // a healed wallet has still finished onboarding.
+                OnboardingProgress.clear(userDefaults)
                 Root.clearDeviceScopedWalletState(
                     userDefaults: userDefaults,
                     flexaHandler: flexaHandler,
@@ -1725,6 +1758,17 @@ extension Root {
                 }
                 return resumeDeferredGift
 
+            case .onboarding(.restoreFlowCompleted(let keepsScreenOn)):
+                // Keep open's "Enter Zapp", which replaced upstream RestoreInfo's "Got it!".
+                userDefaults.setValue(keepsScreenOn, Constants.udLeavesScreenOpen)
+                state.isRestoringWallet = true
+                userDefaults.setValue(true, Constants.udIsRestoringWallet)
+                state.$walletStatus.withLock { $0 = .restoring }
+                return .concatenate(
+                    .send(.initialization(.checkBackupPhraseValidation)),
+                    .send(.batteryStateChanged)
+                )
+
             case .onboarding(.createNewWalletTapped):
                 if state.appInitializationState == .keysMissing {
                     state.alert = AlertState.existingWallet()
@@ -1786,13 +1830,27 @@ extension Root {
     /// only a stored `true` counts as acknowledged and then consumes the latch;
     /// and a failed presentation-safety check does not consume the latch, so a
     /// later sync tick or foreground entry can retry.
-    func presentIronwoodAnnouncementIfNeeded(state: inout Root.State, tip: BlockHeight) {
+    ///
+    /// The announcement is about moving Orchard funds, so it waits until some account holds at
+    /// least the amount the migration banner offers to move (Android shows only that banner, on
+    /// the same floor). A new wallet, or a restore whose scan hasn't found Orchard value yet, has
+    /// nothing to be told about. Like the safety check, this doesn't consume the latch, so Orchard
+    /// funds arriving later still raise it.
+    func presentIronwoodAnnouncementIfNeeded(
+        state: inout Root.State,
+        tip: BlockHeight,
+        accountsBalances: [AccountUUID: AccountBalance]
+    ) {
         guard !state.ironwoodAnnouncementResolved else { return }
         guard tip > 0, tip >= zcashSDKEnvironment.ironwoodActivationHeight() else { return }
         guard walletStorage.exportIronwoodAnnouncementFlag() != true else {
             state.ironwoodAnnouncementResolved = true
             return
         }
+        let holdsMigratableOrchard = accountsBalances.values.contains {
+            $0.orchardBalance.unlockedForMigration >= MigrationDerivations.minimumOfferableOrchardBalance
+        }
+        guard holdsMigratableOrchard else { return }
         guard state.canPresentIronwoodAnnouncement else { return }
 
         state.ironwoodAnnouncementResolved = true

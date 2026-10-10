@@ -67,6 +67,9 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [ONBOARDING] Restoring Zapp now uses the same Zapp-styled flow from "I already use Zapp" and from "Restore from phrase": enter your 24 words (pasting a whole phrase fills every field), pick a block height or a month and year on one screen (or skip and scan everything), confirm the phrase you entered, choose a username, secure the app, and finish on "Keep Zapp open". The separate Tor question during restore is gone.
+- [ONBOARDING] Tor is now on for every wallet you create or restore, and the Pay tab no longer asks you to turn it on.
+- [ONBOARDING] The username step now shows live checks for length and characters, explains that your keypair is generated on your device, and has a back button. Onboarding copy matches Android, including "I already use Zapp", a "Taking longer than expected." note after 15 seconds of waiting, and a staged "You're all set." screen.
 - [PARITY] The You tab now matches Android: "Base account" shows when a cash-out is still in progress, the P2P payment method and local currency rows name what you picked, and the Privacy and Wallet rows follow Android's order. The Wallet group is hidden until a wallet exists.
 - [PARITY] Deleting a contact now asks first, and failed saves, deletes or blocks are reported instead of failing silently. When editing, Save stays off until you change something.
 - [PARITY] Chat settings are saved together with a Save button, as on Android, and enabling background delivery asks for notification permission when you save.
@@ -123,6 +126,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [ONBOARDING] Closing Zapp during setup no longer skips the rest of it. The next launch picks up where you left off (your recovery phrase, username or app lock) instead of opening the wallet without a backup or app lock. Installs that already finished setup are not affected.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.

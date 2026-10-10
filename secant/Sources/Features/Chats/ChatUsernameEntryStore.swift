@@ -29,6 +29,8 @@ struct ChatUsernameEntry {
     }
 
     enum Action: Equatable {
+        /// Pops back to the messaging intro (create) or the seed confirm (restore).
+        case backTapped
         case displayNameChanged(String)
         case continueTapped
     }
@@ -40,6 +42,9 @@ struct ChatUsernameEntry {
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .backTapped:
+                return .none
+
             case .displayNameChanged(let value):
                 state.displayName = UsernameRules.sanitize(value)
                 return .none

@@ -25,49 +25,51 @@ struct RestoreWalletCoordFlow {
         case restored
     }
 
+    /// The phrase and birthday a restore runs with, kept until it succeeds so Retry can rerun it.
+    struct RestoreRequest: Equatable {
+        var seedPhrase: String
+        var birthday: BlockHeight
+    }
+
     @Reducer
     enum Path {
         case appLockSetup(AppLockSetup)
         case chatUsername(ChatUsernameEntry)
         case done(OnboardingDone)
-        case estimateBirthdaysDate(WalletBirthday)
-        case estimatedBirthday(WalletBirthday)
         case identityDerivation(OnboardingIdentityDerivation)
+        case keepOpen(ZappKeepOpen)
         case messagingIntro(OnboardingMessagingIntro)
-        case recoverySeedPhraseEntry(RestoreWalletCoordFlow)
-        case restoreInfo(RestoreInfo)
+        case restoreBirthday(ZappRestoreBirthday)
+        case restoreSeedEntry(ZappRestoreSeedEntry)
+        case restoring(ZappRestoreProgress)
         case seedBackup(OnboardingSeedBackup)
-        case walletBirthday(WalletBirthday)
     }
     
     @ObservableState
     struct State {
         @Presents var alert: AlertState<Action>?
-        var birthday: BlockHeight? = nil
         var isHelpSheetPresented = false
-        var isKeyboardVisible = false
-        var isValidSeed = false
-        var isTorOn = false
-        var isTorSheetPresented = false
         var landingForward = true
         var landingStep = LandingStep.welcome
         var walletCreationError: String?
-        var nextIndex: Int?
         var path = StackState<Path.State>()
-        var prevWords: [String] = Array(repeating: "", count: 24)
-        var selectedIndex: Int?
-        var suggestedWords: [String] = []
-        var words: [String] = Array(repeating: "", count: 24)
-        var wordsValidity: [Bool] = Array(repeating: true, count: 24)
+        /// A saved wallet the SDK has not prepared yet. A new wallet is prepared only once its
+        /// seed is backed up, so the seed backup step provisions it on continue.
+        var pendingProvisioning: WalletProvisioningMode?
+        var restoreRequest: RestoreRequest?
 
+        /// The restore flow ends on Keep open instead of Done. A resumed restore starts on the
+        /// seed confirm step, so that marks it as well as the seed entry does.
         var isImportingWallet: Bool {
-            for element in path {
-                if element.is(\.recoverySeedPhraseEntry) {
+            path.contains { element in
+                if element.is(\.restoreSeedEntry) {
                     return true
                 }
+                if case let .seedBackup(seedBackup) = element {
+                    return seedBackup.kind == .confirm
+                }
+                return false
             }
-            
-            return false
         }
         
         init() { }
@@ -76,27 +78,19 @@ struct RestoreWalletCoordFlow {
     enum Action: BindableAction {
         case alert(PresentationAction<Action>)
         case binding(BindingAction<RestoreWalletCoordFlow.State>)
-        case evaluateSeedValidity
-        case failedToRecover(ZcashError)
+        case chatIdentityAvailable
         case helpSheetRequested
         case landingBackTapped
         case landingContinueTapped
         case landingGetStartedTapped
-        case nextTapped
         case path(StackActionOf<Path>)
-        case resolveRestore
-        case resolveRestoreRequested
-        case resolveRestoreTapped
-        case restoreCancelTapped
-        case selectedIndex(Int?)
-        case successfullyRecovered
-        case suggestedWordTapped(String)
-        case suggestionsRequested(Int, Bool)
-        case updateKeyboardFlag(Bool)
+        case restoreFailed(ZcashError)
+        /// Keep open's "Enter Zapp": Root takes the restored wallet home.
+        case restoreFlowCompleted(keepsScreenOn: Bool)
+        case restoreSucceeded
+        /// Launch found a saved wallet whose onboarding never finished.
+        case resume(OnboardingResumePlan)
         case walletProvisioned(WalletProvisioningMode)
-        #if DEBUG
-        case debugPasteSeed
-        #endif
         
         // Onboarding
         case createNewWalletTapped
@@ -112,9 +106,10 @@ struct RestoreWalletCoordFlow {
     @Dependency(\.appSecurity) var appSecurity
     @Dependency(\.mnemonic) var mnemonic
     @Dependency(\.continuousClock) var continuousClock
-    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.sdkSynchronizer) var sdkSynchronizer
+    @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.walletStorage) var walletStorage
+    @Dependency(\.zappMessaging) var zappMessaging
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
     init() { }
@@ -133,175 +128,15 @@ struct RestoreWalletCoordFlow {
                 state.alert = nil
                 return .none
 
-            case .binding(\.words):
-                let changedIndices = state.words.indices.filter { state.words[$0] != state.prevWords[$0] }
-                state.prevWords = state.words
-
-                if let index = changedIndices.first {
-                    let word = state.words[index]
-
-                    // A field only ever holds one word, so several words arriving at once is a
-                    // paste of (part of) a phrase: spread it across the grid instead of leaving
-                    // it crammed into one box.
-                    let pasted = Self.splitPastedSeedWords(word)
-                    if pasted.count > 1 {
-                        let start = pasted.count >= state.words.count ? 0 : index
-                        let end = min(start + pasted.count, state.words.count)
-                        state.words = Self.placePastedSeedWords(state.words, at: index, words: pasted)
-                        state.prevWords = state.words
-                        state.suggestedWords = []
-                        // Validate every slot covered by the paste, including unchanged text:
-                        // a typed prefix may have been valid before, but pasted words must match
-                        // exactly. Words outside the paste keep their prefix-based verdict.
-                        for i in start..<end {
-                            state.wordsValidity[i] = Self.isPastedWordValid(state.words[i], suggest: mnemonic.suggestWords)
-                        }
-                        // Carry on from the pasted block: the first slot from its start that is
-                        // still empty or wrong, so a typo inside the paste gets focus too.
-                        state.nextIndex = state.words.indices.first {
-                            $0 >= start && (state.words[$0].isEmpty || !state.wordsValidity[$0])
-                        }
-                        return .send(.evaluateSeedValidity)
-                    }
-
-                    if word.hasSuffix(" ") {
-                        state.words[index] = word.trimmingCharacters(in: .whitespaces)
-                        state.prevWords = state.words
-                        return .send(.suggestedWordTapped(state.words[index]))
-                    }
-                    
-                    return .send(.suggestionsRequested(index, false))
-                }
-                
-                return .none
-                
-            case .selectedIndex(let index):
-                state.selectedIndex = index
-                state.nextIndex = state.selectedIndex
-                if let index {
-                    return .send(.suggestionsRequested(index, true))
-                }
-                return .none
-                
-            case let .suggestionsRequested(index, hasIndexChanged):
-                let prefix = state.words[index]
-                if prefix.isEmpty {
-                    state.suggestedWords = []
-                } else {
-                    state.suggestedWords = mnemonic.suggestWords(prefix)
-                    // A focus change must not turn a pasted, incomplete word back into a
-                    // valid prefix. Only a text edit changes the field's validity here.
-                    if !hasIndexChanged {
-                        state.wordsValidity[index] = !state.suggestedWords.isEmpty
-                    }
-                }
-                if hasIndexChanged {
-                    if let first = state.suggestedWords.first, first == prefix && !state.isValidSeed && state.suggestedWords.count == 1 {
-                        return .none
-                    }
-                }
-                return .send(.evaluateSeedValidity)
-
-            case .suggestedWordTapped(let word):
-                if let index = state.selectedIndex {
-                    state.words[index] = word
-                    state.wordsValidity[index] = Self.isPastedWordValid(word, suggest: mnemonic.suggestWords)
-                    if !state.isValidSeed && state.selectedIndex != 23 {
-                        state.prevWords = state.words
-                        state.nextIndex = index + 1 < 24 ? index + 1 : 0
-                    }
-                    return .send(.evaluateSeedValidity)
-                }
-                return .none
-                
             case .helpSheetRequested:
                 state.isHelpSheetPresented.toggle()
                 return .none
-
-            case .evaluateSeedValidity:
-                do {
-                    try mnemonic.isValid(state.words.joined(separator: " "))
-                    state.isValidSeed = true
-                    state.isKeyboardVisible = false
-                } catch {
-                    state.isValidSeed = false
-                    if let index = state.selectedIndex {
-                        let prefix = state.words[index]
-                        if let first = state.suggestedWords.first, first == prefix && !state.isValidSeed && state.suggestedWords.count == 1 {
-                            state.prevWords = state.words
-                            state.nextIndex = index + 1 < 24 ? index + 1 : 0
-                        }
-                    }
-                }
-                return .none
-                
-            case .updateKeyboardFlag(let value):
-                state.isKeyboardVisible = value
-                return .none
-                
-#if DEBUG
-            case .debugPasteSeed:
-                do {
-                    var testSeed = ""
-                    if let testSeedPK = PartnerKeys.testSeed {
-                        testSeed = testSeedPK
-                    }
-                    let seedToPaste = pasteboard.getString()?.data ?? testSeed
-                    try mnemonic.isValid(seedToPaste)
-                    state.isValidSeed = true
-                    state.isKeyboardVisible = false
-                    state.words = seedToPaste.components(separatedBy: " ")
-                } catch {
-                    state.isValidSeed = false
-                    if let testSeedPK = PartnerKeys.testSeed {
-                        state.isValidSeed = true
-                        state.isKeyboardVisible = false
-                        state.words = testSeedPK.components(separatedBy: " ")
-                    }
-                }
-                return .none
-#endif
 
             default: return .none
             }
         }
         .forEach(\.path, action: \.path)
     }
-}
-
-// MARK: - Pasted seed phrases
-
-extension RestoreWalletCoordFlow {
-    /// Break pasted text into candidate seed words: whitespace, commas and semicolons all separate
-    /// words, and tokens with no letters (the "1." or "12)" of a numbered backup) are dropped.
-    /// BIP-39 words are lowercase, so the case of the paste is not preserved.
-    static func splitPastedSeedWords(_ text: String) -> [String] {
-        text
-            .components(separatedBy: pastedSeedSeparators)
-            .map { $0.lowercased() }
-            .filter { $0.contains { $0.isLetter } }
-    }
-
-    /// Lay `words` over `current`, starting at `index`; a paste that holds a whole phrase always
-    /// starts at the first field so pasting it into any box fills the grid. Words that would spill
-    /// past the last field are dropped.
-    static func placePastedSeedWords(_ current: [String], at index: Int, words: [String]) -> [String] {
-        guard !current.isEmpty else { return current }
-        let start = words.count >= current.count ? 0 : min(max(index, 0), current.count - 1)
-        var result = current
-        for (offset, word) in words.prefix(current.count - start).enumerated() {
-            result[start + offset] = word
-        }
-        return result
-    }
-
-    /// Unlike a word being typed, a pasted word is complete, so it has to be an exact wordlist
-    /// entry rather than a prefix of one. An empty slot is not flagged.
-    static func isPastedWordValid(_ word: String, suggest: (String) -> [String]) -> Bool {
-        word.isEmpty || suggest(word).contains(word)
-    }
-
-    private static let pastedSeedSeparators = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: ",;"))
 }
 
 @Reducer
@@ -375,8 +210,16 @@ struct OnboardingIdentityDerivation {
 
 @Reducer
 struct OnboardingSeedBackup {
+    enum Kind: Equatable {
+        /// Create path: back up the phrase of the wallet just made.
+        case backup
+        /// Restore path: Android's `SEED_CONFIRM`, the phrase just entered shown back.
+        case confirm
+    }
+
     @ObservableState
     struct State: Equatable {
+        var kind = Kind.backup
         var errorMessage: String?
         var isConfirmed = false
         var isLoading = false
@@ -388,6 +231,7 @@ struct OnboardingSeedBackup {
         var isBlockedByScreenCapture = false
 
         static let initial = State()
+        static let confirm = State(kind: .confirm)
     }
 
     enum Action: Equatable {

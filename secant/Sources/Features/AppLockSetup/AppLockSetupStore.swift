@@ -103,6 +103,13 @@ struct AppLockSetup {
                         } catch {
                             succeeded = false
                         }
+                        // Success feedback only for a PIN that was saved; a failed save goes back
+                        // to PIN creation with an error, which a success haptic contradicted.
+                        if succeeded {
+                            await MainActor.run {
+                                ZappHaptics.success()
+                            }
+                        }
                         await send(.pinConfigurationFinished(succeeded))
                     }
                 }

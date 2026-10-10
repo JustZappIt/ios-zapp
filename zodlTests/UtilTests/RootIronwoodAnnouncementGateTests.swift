@@ -17,11 +17,32 @@ import Testing
         return state
     }
 
-    private func syncState(_ tip: BlockHeight) -> RedactableSynchronizerState {
+    /// An account holding exactly the Orchard value the migration banner starts offering at.
+    private static let migratableOrchard = MigrationDerivations.minimumOfferableOrchardBalance
+
+    private func syncState(
+        _ tip: BlockHeight,
+        orchard: Zatoshi = migratableOrchard
+    ) -> RedactableSynchronizerState {
         var state = SynchronizerState.zero
         state.syncStatus = .upToDate
         state.latestBlockHeight = tip
+        state.accountsBalances = Self.balances(orchard: orchard)
         return state.redacted
+    }
+
+    private static func balances(orchard: Zatoshi) -> [AccountUUID: AccountBalance] {
+        [
+            AccountUUID(id: [UInt8](repeating: 7, count: 16)): AccountBalance(
+                saplingBalance: .zero,
+                orchardBalance: PoolBalance(
+                    spendableValue: orchard,
+                    changePendingConfirmation: .zero,
+                    valuePendingSpendability: .zero
+                ),
+                unshielded: .zero
+            )
+        ]
     }
 
     private func store(
@@ -127,6 +148,43 @@ import Testing
         }
     }
 
+    @Test func walletWithoutOrchardFundsIsNotToldToMoveThem() async {
+        await withDependencies { $0.defaultInMemoryStorage = InMemoryStorage() } operation: {
+            let store = store(flag: nil)
+            store.send(.synchronizerStateChanged(syncState(activation, orchard: .zero)))
+            #expect(store.state.destinationState.destination == .home)
+            #expect(!store.state.ironwoodAnnouncementResolved)
+
+            let belowFloor = Zatoshi(Self.migratableOrchard.amount - 1)
+            store.send(.synchronizerStateChanged(syncState(activation + 1, orchard: belowFloor)))
+            #expect(store.state.destinationState.destination == .home)
+            #expect(!store.state.ironwoodAnnouncementResolved)
+        }
+    }
+
+    @Test func orchardFundsFoundLaterStillRaiseTheAnnouncement() async {
+        await withDependencies { $0.defaultInMemoryStorage = InMemoryStorage() } operation: {
+            let store = store(flag: nil)
+            store.send(.synchronizerStateChanged(syncState(activation, orchard: .zero)))
+            #expect(store.state.destinationState.destination == .home)
+            store.send(.synchronizerStateChanged(syncState(activation + 1)))
+            #expect(store.state.destinationState.destination == .ironwoodAnnouncement)
+        }
+    }
+
+    @Test func chatsTermsAnsweredLetsTheBlockedAnnouncementRetry() async {
+        await withDependencies { $0.defaultInMemoryStorage = InMemoryStorage() } operation: {
+            var initial = state()
+            initial.chatsListState.showsTermsDialog = true
+            let store = store(initial)
+            store.send(.synchronizerStateChanged(syncState(activation)))
+            #expect(store.state.destinationState.destination == .home)
+            store.send(.chatsList(.termsAccepted))
+            store.send(.synchronizerStateChanged(syncState(activation + 1)))
+            #expect(store.state.destinationState.destination == .ironwoodAnnouncement)
+        }
+    }
+
     @Test func dismissedZappSheetLetsTheBlockedAnnouncementRetry() async {
         await withDependencies { $0.defaultInMemoryStorage = InMemoryStorage() } operation: {
             var initial = state()
@@ -164,6 +222,7 @@ import Testing
                 var value = SynchronizerState.zero
                 value.syncStatus = .upToDate
                 value.latestBlockHeight = activation
+                value.accountsBalances = Self.balances(orchard: Self.migratableOrchard)
                 return value
             }()
             let store = Store(initialState: initial) { Root() } withDependencies: {
