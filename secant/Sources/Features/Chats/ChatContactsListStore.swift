@@ -5,6 +5,7 @@
 
 import ComposableArchitecture
 import Foundation
+import ZappMessaging
 
 @Reducer
 struct ChatContactsList {
@@ -15,8 +16,32 @@ struct ChatContactsList {
 
         @Presents var form: ChatContactForm.State?
 
+        /// A Start-chat tap is in flight; a second tap would race the first to open the room.
+        var isStartingChat = false
+
         /// Block-only rows are not contacts, so the list never shows them.
         var contacts: [ChatContact] { chatContacts.saved }
+
+        /// Android's A–Z grouping: by the name's first character, upper-cased, `?` for none.
+        var sections: [Section] {
+            var sections: [Section] = []
+            for contact in contacts {
+                let letter = contact.name.first.map { String($0).uppercased() } ?? "?"
+                if sections.last?.letter == letter {
+                    sections[sections.count - 1].contacts.append(contact)
+                } else {
+                    sections.append(Section(letter: letter, contacts: [contact]))
+                }
+            }
+            return sections
+        }
+
+        struct Section: Equatable, Identifiable {
+            let letter: String
+            var contacts: [ChatContact]
+
+            var id: String { letter }
+        }
 
         init() { }
     }
@@ -26,6 +51,10 @@ struct ChatContactsList {
         case backToHomeTapped
         case addTapped
         case contactTapped(ChatContact)
+        case startChatTapped(ChatContact)
+        case startChatFailed
+        /// Consumed by Root, which lands the user in the room, as Android's `onStartChat` does.
+        case conversationOpened(ZMConversation)
         case form(PresentationAction<ChatContactForm.Action>)
 
         /// Root owns the shared projection; a mutation is handed up rather than written here.
@@ -33,6 +62,7 @@ struct ChatContactsList {
     }
 
     @Dependency(\.chatContacts) var chatContacts
+    @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
 
@@ -55,6 +85,27 @@ struct ChatContactsList {
 
             case .contactTapped(let contact):
                 state.form = ChatContactForm.State(existing: contact)
+                return .none
+
+                // Re-opens the existing DM when there is one; the core keys a direct conversation
+                // on its participant. A blocked contact has no Start-chat button to send this.
+            case .startChatTapped(let contact):
+                guard !state.isStartingChat, !contact.isBlocked else { return .none }
+
+                state.isStartingChat = true
+                return .run { send in
+                    await send(.conversationOpened(try await zappMessaging.createDirectConversation(contact.publicKey, nil)))
+                } catch: { error, send in
+                    LoggerProxy.event("ChatContactsList: createDirectConversation failed: \(error)")
+                    await send(.startChatFailed)
+                }
+
+            case .startChatFailed:
+                state.isStartingChat = false
+                return .none
+
+            case .conversationOpened:
+                state.isStartingChat = false
                 return .none
 
             case .form(.presented(.delegate(.contactsChanged(let contacts)))):

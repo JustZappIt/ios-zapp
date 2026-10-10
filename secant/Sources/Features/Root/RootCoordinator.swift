@@ -923,7 +923,8 @@ extension Root {
 
                 // Creating a conversation lands the user straight in it, rather than
                 // back on a list they then have to find it in.
-            case .newChat(.created(let conversation)):
+            case .newChat(.created(let conversation)),
+                .chatContactsList(.conversationOpened(let conversation)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversation.id
                 state.chatRoomState.conversation = conversation
@@ -1112,6 +1113,11 @@ extension Root {
 
             case .zappTabs(.chatSettingsTapped):
                 state.path = .chatSettings
+                return .none
+
+            case .chatProfile(.chatSettingsSaved):
+                guard state.path == .chatSettings else { return .none }
+                state.path = nil
                 return .none
 
             case .zappTabs(.readReceiptsTapped):
