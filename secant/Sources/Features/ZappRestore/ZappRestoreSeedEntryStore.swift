@@ -63,18 +63,19 @@ struct ZappRestoreSeedEntry {
                 // into one box.
                 let pasted = Self.splitPastedSeedWords(word)
                 if pasted.count > 1 {
-                    let before = state.words
-                    state.words = Self.placePastedSeedWords(before, at: index, words: pasted)
+                    let start = pasted.count >= state.words.count ? 0 : index
+                    let end = min(start + pasted.count, state.words.count)
+                    state.words = Self.placePastedSeedWords(state.words, at: index, words: pasted)
                     state.prevWords = state.words
                     state.suggestedWords = []
-                    // Only the slots the paste wrote to are re-judged; a word the user is still
-                    // typing elsewhere keeps its prefix-based verdict.
-                    for i in state.words.indices where i == index || state.words[i] != before[i] {
+                    // Every slot the paste covers is judged, unchanged text included: a typed
+                    // prefix may have passed before, but a pasted word must match exactly. Words
+                    // outside the paste keep their prefix-based verdict.
+                    for i in start..<end {
                         state.wordsValidity[i] = Self.isPastedWordValid(state.words[i], suggest: mnemonic.suggestWords)
                     }
                     // Carry on from the pasted block: the first slot from its start that is still
                     // empty or wrong, so a typo inside the paste gets focus too.
-                    let start = pasted.count >= state.words.count ? 0 : index
                     state.nextIndex = state.words.indices.first {
                         $0 >= start && (state.words[$0].isEmpty || !state.wordsValidity[$0])
                     }
@@ -106,6 +107,8 @@ struct ZappRestoreSeedEntry {
                     return .none
                 }
                 state.words[index] = word
+                // A picked suggestion is a whole wordlist entry, which clears a flag a paste left.
+                state.wordsValidity[index] = Self.isPastedWordValid(word, suggest: mnemonic.suggestWords)
                 if !state.isValidSeed && index != Self.wordCount - 1 {
                     state.prevWords = state.words
                     state.nextIndex = index + 1

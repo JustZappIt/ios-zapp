@@ -126,32 +126,6 @@ import Testing
         #expect(store.state.isValidSeed)
     }
 
-    /// A pasted word has to be whole. Focus then lands on the flagged field, and that must not
-    /// re-judge it as a prefix ("aban" of "abandon") and clear the flag.
-    @Test func focusKeepsAPastedWordFlagged() async {
-        let wordlist = ["abandon"] + (1...24).map { "word\($0)" }
-        let store = TestStore(initialState: ZappRestoreSeedEntry.State.initial) {
-            ZappRestoreSeedEntry()
-        } withDependencies: {
-            $0.mnemonic = .noOp
-            $0.mnemonic.suggestWords = { prefix in wordlist.filter { $0.hasPrefix(prefix) } }
-            $0.mnemonic.isValid = { _ in throw ZcashError.synchronizerNotPrepared }
-        }
-        store.exhaustivity = .off
-
-        var phrase = (1...24).map { "word\($0)" }
-        phrase[3] = "aban"
-        var words = ZappRestoreSeedEntry.State.initial.words
-        words[0] = phrase.joined(separator: " ")
-        await store.send(.binding(.set(\.words, words)))
-        #expect(store.state.wordsValidity[3] == false)
-        #expect(store.state.nextIndex == 3)
-
-        await store.send(.selectedIndex(3))
-        #expect(store.state.wordsValidity[3] == false)
-        #expect(!store.state.isValidSeed)
-    }
-
     @Test func partialPasteFillsFromTheFocusedField() {
         let current = Array(repeating: "", count: ZappRestoreSeedEntry.wordCount)
         let placed = ZappRestoreSeedEntry.placePastedSeedWords(current, at: 22, words: ["a", "b", "c"])

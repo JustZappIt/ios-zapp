@@ -60,11 +60,11 @@ struct SettingsTabContent: View {
                         governanceGroup
                         #endif
 
-                        // iOS keeps the "P2P transactions" history row (Appendix B, iOS-only)
-                        // alongside Android's payment-method row in this group.
                         p2pGroup
 
-                        walletGroup
+                        if store.hasWallet {
+                            walletGroup
+                        }
 
                         footer
                     }
@@ -76,8 +76,14 @@ struct SettingsTabContent: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ZappColors.bg.color(colorScheme))
-            .onAppear { chatProfileStore.send(.onAppear) }
-            .onDisappear { chatProfileStore.send(.onDisappear) }
+            .onAppear {
+                chatProfileStore.send(.onAppear)
+                store.send(.youTabAppeared)
+            }
+            .onDisappear {
+                chatProfileStore.send(.onDisappear)
+                store.send(.youTabDisappeared)
+            }
             // The nav pill draws above this tab's content, so it would otherwise float over the
             // enlarged code.
             .onChange(of: enlargedPublicKey) { store.send(.fullscreenChanged($0 != nil)) }
@@ -133,6 +139,18 @@ struct SettingsTabContent: View {
 
     @ViewBuilder private var privacyGroup: some View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupPrivacy)) {
+            ZappRow(
+                title: String(localizable: .settingsYouTorTitle),
+                subtitle: String(localizable: .settingsYouTorSubtitle),
+                icon: Asset.Assets.shield.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.torTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
             // One door to the three chat preferences, as on Android.
             ZappRow(
                 title: String(localizable: .settingsYouChatSettingsTitle),
@@ -142,18 +160,6 @@ struct SettingsTabContent: View {
                 iconBackground: .accentSoft
             ) {
                 store.send(.chatSettingsTapped)
-            }
-
-            ZappRowDivider(inset: true)
-
-            ZappRow(
-                title: String(localizable: .settingsYouTorTitle),
-                subtitle: String(localizable: .settingsYouTorSubtitle),
-                icon: Asset.Assets.shield.image,
-                iconTint: .accentText,
-                iconBackground: .accentSoft
-            ) {
-                store.send(.torTapped)
             }
         }
     }
@@ -178,7 +184,7 @@ struct SettingsTabContent: View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupP2p)) {
             ZappRow(
                 title: String(localizable: .settingsYouP2pPaymentMethodTitle),
-                subtitle: String(localizable: .settingsYouP2pPaymentMethodSubtitle),
+                subtitle: store.p2pRailSubtitle ?? String(localizable: .settingsYouP2pPaymentMethodSubtitle),
                 icon: Asset.Assets.Icons.pay.image,
                 iconTint: .accentText,
                 iconBackground: .accentSoft
@@ -188,9 +194,13 @@ struct SettingsTabContent: View {
 
             ZappRowDivider(inset: true)
 
+            // Android's "Base account": a cash-out waits a median of half an hour and sometimes
+            // far longer, so the one row that leads to it says so rather than reading as settings.
             ZappRow(
-                title: String(localizable: .settingsYouP2pTransactionsTitle),
-                subtitle: String(localizable: .settingsYouP2pTransactionsSubtitle),
+                title: String(localizable: .settingsYouBaseAccountTitle),
+                subtitle: store.hasPeerActivity
+                    ? String(localizable: .settingsYouBaseAccountInProgress)
+                    : String(localizable: .settingsYouBaseAccountSubtitle),
                 icon: Asset.Assets.Icons.noTransactions.image,
                 iconTint: .accentText,
                 iconBackground: .accentSoft
@@ -200,32 +210,10 @@ struct SettingsTabContent: View {
         }
     }
 
+    /// Android's order, less the Hardware wallet and Export viewing key rows iOS does not have yet.
+    /// Zpackets is iOS-only and sits last.
     @ViewBuilder private var walletGroup: some View {
         ZappSettingsGroup(title: String(localizable: .settingsYouGroupWallet)) {
-            ZappRow(
-                title: String(localizable: .settingsGiftCards),
-                subtitle: String(localizable: .giftCardListSubtitle),
-                icon: Asset.Assets.Icons.giftCard.image,
-                iconTint: .accentText,
-                iconBackground: .accentSoft
-            ) {
-                store.send(.giftCardListTapped)
-            }
-
-            ZappRowDivider(inset: true)
-
-            ZappRow(
-                title: String(localizable: .settingsYouLocalCurrencyTitle),
-                subtitle: String(localizable: .settingsYouLocalCurrencySubtitle),
-                icon: Asset.Assets.Icons.currencyDollar.image,
-                iconTint: .accentText,
-                iconBackground: .accentSoft
-            ) {
-                store.send(.localCurrencyTapped)
-            }
-
-            ZappRowDivider(inset: true)
-
             ZappRow(
                 title: String(localizable: .settingsPortfolioChartTitle),
                 subtitle: String(localizable: .settingsPortfolioChartSubtitle),
@@ -239,6 +227,18 @@ struct SettingsTabContent: View {
             ZappRowDivider(inset: true)
 
             ZappRow(
+                title: String(localizable: .settingsYouLocalCurrencyTitle),
+                subtitle: localCurrencySubtitle,
+                icon: Asset.Assets.Icons.currencyDollar.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.localCurrencyTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
                 title: String(localizable: .settingsYouServerTitle),
                 subtitle: String(localizable: .settingsYouServerSubtitle),
                 icon: Asset.Assets.Icons.server.image,
@@ -246,6 +246,18 @@ struct SettingsTabContent: View {
                 iconBackground: .accentSoft
             ) {
                 store.send(.chooseServerTapped)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappRow(
+                title: String(localizable: .settingsGiftCards),
+                subtitle: String(localizable: .giftCardListSubtitle),
+                icon: Asset.Assets.Icons.giftCard.image,
+                iconTint: .accentText,
+                iconBackground: .accentSoft
+            ) {
+                store.send(.giftCardListTapped)
             }
         }
     }
@@ -282,6 +294,18 @@ struct SettingsTabContent: View {
         .frame(maxWidth: .infinity)
         .padding(.top, Design.Spacing._4xl)
         .accessibilityElement(children: .combine)
+    }
+
+    /// Android's "USD - US Dollar". Android cannot turn conversion off from the You tab; iOS can, and
+    /// a row naming a currency that is not being shown would misstate what the app is doing.
+    private var localCurrencySubtitle: String {
+        guard let localCurrency = store.localCurrency, localCurrency.automatic else {
+            return String(localizable: .settingsYouLocalCurrencySubtitle)
+        }
+        return String(localizable: .settingsYouLocalCurrencyValue(
+            localCurrency.currency.code,
+            localCurrency.currency.displayName
+        ))
     }
 
     private var copyKeyTitle: String {
