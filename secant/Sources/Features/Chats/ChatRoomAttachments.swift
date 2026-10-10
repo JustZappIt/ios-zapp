@@ -30,11 +30,13 @@ extension ChatRoom {
         case media
     }
 
-    /// A picker the user asked for that cannot be presented until the sheet is gone.
+    /// A picker (or the Send ZEC address prompt) the user asked for that cannot be presented
+    /// until the sheet is gone.
     enum PendingAttachment: Equatable {
         case photos
         case file
         case camera
+        case addressRequest
     }
 
     // One branch per menu action; splitting the switch would scatter the menu rather than
@@ -61,6 +63,12 @@ extension ChatRoom {
                 state.attachmentPage = .actions
 
                 switch pending {
+                case .addressRequest:
+                    state.addressRequest = AddressRequestPrompt(
+                        name: state.conversation?.resolvedDisplayName(state.chatContacts)
+                    )
+                    return .none
+
                 case .photos:
                     state.showsPhotosPicker = true
                     return .none
@@ -201,9 +209,13 @@ extension ChatRoom {
                 return .none
 
             // Root opens the send flow, prefilled from `resolvedPeerWalletAddress` when there is
-            // one. A direct chat with none asks first (`addressRequestReduce()`).
+            // one. A direct chat with none asks first, once the sheet has closed.
             case .sendZecTapped:
                 state.showsAttachmentSheet = false
+                guard state.needsPeerAddressRequest else {
+                    return .send(.sendFormRequested)
+                }
+                state.pendingAttachment = .addressRequest
                 return .none
 
             default:
@@ -229,7 +241,8 @@ extension ChatRoom.State {
             .compactMap { message -> String? in
                 switch message.contentType {
                 case ChatContentType.walletAddress:
-                    return message.content
+                    // Unwrapped as the bubble shows it, or Send ZEC prefilled the JSON wrapper.
+                    return ChatMessageJSON.walletAddress(message.content)
                 case ChatContentType.paymentRequest where isDirect:
                     return ChatPaymentRequest.parse(message.content).requesterAddress
                 default:

@@ -95,6 +95,12 @@ enum ChatMessageJSON {
         string(in: object(content), key)
     }
 
+    /// The address in a wallet-address message: Android may wrap it as `{"content": addr}`
+    /// (`JSONObject(content).optString("content", content)`), else the body is the address.
+    static func walletAddress(_ content: String) -> String {
+        string(content, "content") ?? content
+    }
+
     /// Empty is absent, exactly like `optString(key, "").takeIf { it.isNotEmpty() }`.
     static func string(in object: [String: Any]?, _ key: String) -> String? {
         guard let value = object?[key] as? String, !value.isEmpty else { return nil }

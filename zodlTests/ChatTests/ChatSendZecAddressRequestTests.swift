@@ -71,12 +71,55 @@ import ZappMessaging
 
         // Parked until the attachment sheet has finished closing: iOS can't present over it.
         await store.send(.sendZecTapped) {
-            $0.isAddressRequestPending = true
+            $0.pendingAttachment = .addressRequest
         }
         await store.send(.attachmentSheetClosed) {
-            $0.isAddressRequestPending = false
+            $0.pendingAttachment = nil
             $0.addressRequest = ChatRoom.AddressRequestPrompt(name: "Dee")
         }
+    }
+
+    /// Android wraps a shared address as `{"content": addr}`. Send ZEC prefills the address the
+    /// bubble shows, not the wrapper, and so doesn't ask for one it already has.
+    @Test func aWrappedSharedAddressIsUnwrapped() {
+        var state = roomState(.direct)
+        state.messages = [
+            ZMMessage(
+                id: "addr",
+                conversationId: "conversation",
+                senderId: "peer",
+                content: #"{"content":"u1peeraddress"}"#,
+                contentType: ChatContentType.walletAddress,
+                isFromMe: false
+            )
+        ]
+
+        #expect(state.resolvedPeerWalletAddress == "u1peeraddress")
+        #expect(!state.needsPeerAddressRequest)
+    }
+
+    /// The canned request doesn't clear the reply a composer send is still holding.
+    @Test func askingLeavesAComposerSendsReplyAlone() async {
+        var state = roomState(.direct)
+        let quoted = ZMMessage(id: "q", conversationId: "conversation", senderId: "peer", content: "hi", isFromMe: false)
+        state.pendingReply = quoted
+        state.pendingReplyClientId = "local_composer"
+        state.addressRequest = ChatRoom.AddressRequestPrompt(name: "Dee")
+
+        let store = TestStore(initialState: state) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.sendMessage = { conversationId, content, _ in
+                ZMMessage(id: "sent-1", conversationId: conversationId, senderId: "me", content: content, isFromMe: true)
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.addressRequest(.askForAddressTapped))
+        await store.receive(\.sendSucceeded)
+
+        #expect(store.state.pendingReply == quoted)
+        #expect(store.state.pendingReplyClientId == "local_composer")
     }
 
     @Test func askingPostsTheRequestMessageAndLeavesTheDraftAlone() async {
@@ -137,7 +180,7 @@ import ZappMessaging
         store.send(.chatRoom(.sendZecTapped))
 
         #expect(store.path == .chatRoom)
-        #expect(store.chatRoomState.isAddressRequestPending)
+        #expect(store.chatRoomState.pendingAttachment == .addressRequest)
     }
 
     @Test func enterAnAddressOpensTheEmptyFormInChatContext() {

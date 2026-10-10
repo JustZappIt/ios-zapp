@@ -322,30 +322,37 @@ struct ChatNetworkDetailsView: View {
         return .textMuted
     }
 
+    /// Relay backup the user turned off reads "Off", not "Unavailable": it isn't a fault.
     private func backupValue(_ details: ZMConnectionDetails) -> String {
+        if !details.relayEnabled { return String(localizable: .chatNetworkOff) }
         if details.relaysConnected > 0 { return String(localizable: .chatNetworkConnected) }
         if details.relaysTotal > 0 { return String(localizable: .chatNetworkUnavailable) }
         return String(localizable: .chatNetworkOff)
     }
 
     private func backupColor(_ details: ZMConnectionDetails) -> ZappColors {
+        if !details.relayEnabled { return .textMuted }
         if details.relaysConnected > 0 { return .success }
         return details.relaysTotal > 0 ? .accent : .textMuted
     }
 
+    /// A health the core hasn't reported yet (still connecting, or after a boot failure) reads
+    /// "Unknown", not a green "Healthy" under a status row that says otherwise.
     private var dhtValue: String {
         switch details?.dhtHealth ?? state.dhtHealth {
+        case "healthy": return String(localizable: .chatNetworkDhtHealthy)
         case "degraded": return String(localizable: .chatNetworkDhtDegraded)
         case "critical": return String(localizable: .chatNetworkDhtCritical)
-        default: return String(localizable: .chatNetworkDhtHealthy)
+        default: return String(localizable: .generalUnknown)
         }
     }
 
     private var dhtColor: ZappColors {
         switch details?.dhtHealth ?? state.dhtHealth {
+        case "healthy": return .success
         case "degraded": return .accent
         case "critical": return .danger
-        default: return .success
+        default: return .textMuted
         }
     }
 

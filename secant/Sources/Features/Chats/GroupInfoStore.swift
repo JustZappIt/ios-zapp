@@ -64,6 +64,16 @@ struct GroupInfo {
                 && trimmedNameDraft != conversation.displayName
         }
 
+        /// Everyone in the group, us included, as Android's sheet counts them. `members` leaves
+        /// us out of the roster, and the conversation doesn't always list our key.
+        var memberCount: Int {
+            var keys = Set(conversation.participantIds.map { PublicKeyRules.sanitize($0) }.filter { !$0.isEmpty })
+            if !localPublicKey.isEmpty {
+                keys.insert(localPublicKey)
+            }
+            return keys.count
+        }
+
         var members: [GroupMember] {
             let creator = PublicKeyRules.sanitize(conversation.creatorKey ?? "")
 
@@ -123,7 +133,6 @@ struct GroupInfo {
 
         /// We left the group; this sheet's subject no longer exists. Root closes the room
         /// under it as well.
-        case didLeave
     }
 
     @Dependency(\.zappMessaging) var zappMessaging
@@ -225,18 +234,12 @@ struct GroupInfo {
                 state.alert = AlertState.leaveGroup
                 return .none
 
+            // ChatRoom runs the leave itself (`ChatRoom.Action.leftGroup`): an effect started here
+            // would be cancelled if the sheet were swiped away before the core answered.
             case .leaveConfirmed:
-                let conversationId = state.conversation.id
                 state.isMutating = true
                 state.didFail = false
-
-                return .run { send in
-                    try await zappMessaging.leaveConversation(conversationId)
-                    await send(.didLeave)
-                } catch: { error, send in
-                    LoggerProxy.error("Group info failed to leave group: \(error)")
-                    await send(.mutationFailed)
-                }
+                return .none
 
             case .mutationFinished:
                 state.isMutating = false
@@ -257,9 +260,6 @@ struct GroupInfo {
             case .alert:
                 return .none
 
-            case .didLeave:
-                state.isMutating = false
-                return .none
             }
         }
     }

@@ -114,9 +114,10 @@ struct NewChat {
         }
 
         /// Stays `.start` while creating, as Android keeps START CHAT (with its spinner)
-        /// rather than flipping back to the scanner mid-create.
+        /// rather than flipping back to the scanner mid-create. A complete key in the field
+        /// that isn't a chip yet also starts: the chat it names is the one meant.
         var primaryAction: PrimaryAction {
-            participants.isEmpty && !isCreating ? .scan : .start
+            participants.isEmpty && !canAddDetectedKey && !isCreating ? .scan : .start
         }
 
         var isPrimaryEnabled: Bool { !isCreating }
@@ -259,11 +260,18 @@ struct NewChat {
                 return .none
 
             case .startTapped:
+                // A key pasted or scanned but not added yet joins the chat it starts.
+                if state.canAddDetectedKey {
+                    addDetectedKey(&state)
+                }
                 guard !state.isCreating, let first = state.participants.first else { return .none }
 
                 // More than one participant is a group, which needs a name before it exists.
+                // The dialog shows a create failure from `errorCode`, so an older error (an own
+                // key pasted earlier, a failed DM) must not greet it.
                 guard state.participants.count == 1 else {
                     state.groupName = ""
+                    state.errorCode = nil
                     state.isNamingGroup = true
                     return .none
                 }

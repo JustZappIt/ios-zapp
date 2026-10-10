@@ -45,7 +45,8 @@ import ZappMessaging
     // MARK: - The docked primary action
 
     /// Android's dock: SCAN QR CODE until somebody is picked, START CHAT once a chip exists.
-    /// A pasted key is offered on the detected-key row; it is not a chip until it is added.
+    /// A pasted key is offered on the detected-key row, and the dock starts the chat it names
+    /// rather than reopening the scanner.
     @MainActor @Test func primaryActionOffersScanUntilAParticipantIsPicked() async {
         let store = makeStore()
 
@@ -57,7 +58,7 @@ import ZappMessaging
         }
 
         #expect(store.state.showsDetectedKey)
-        #expect(store.state.primaryAction == .scan)
+        #expect(store.state.primaryAction == .start)
 
         await store.send(.detectedKeyAdded) {
             $0.searchInput = ""
@@ -87,6 +88,48 @@ import ZappMessaging
         await store.receive(\.scanTapped)
 
         #expect(store.state.scan != nil)
+    }
+
+    /// Start chat with a key still in the field adds it and starts that chat.
+    @MainActor @Test func startWithAPastedKeyAddsItAndStarts() async {
+        let store = makeStore(dependencies: {
+            $0.zappMessaging.hasLeftDirectConversation = { _ in false }
+            $0.zappMessaging.createDirectConversation = { key, _ in
+                Self.conversation(id: "dm", type: .direct, keys: [key])
+            }
+        })
+        store.exhaustivity = .off
+
+        await store.send(.peerKeyChanged(Self.peerKey))
+        await store.send(.primaryTapped)
+        await store.receive(\.startTapped)
+
+        #expect(store.state.searchInput.isEmpty)
+        #expect(store.state.isCreating || store.state.participants.isEmpty)
+        await store.skipReceivedActions()
+    }
+
+    /// The group-name dialog shows a create failure from `errorCode`; an earlier error (our own
+    /// key pasted into the field) must not greet it.
+    @MainActor @Test func theGroupNameDialogOpensWithoutAnOlderError() async {
+        let store = makeStore(
+            myPublicKey: Self.ownKey,
+            contacts: [
+                ChatContact(publicKey: Self.peerKey, name: "Bea", address: "", isSaved: true),
+                ChatContact(publicKey: Self.otherKey, name: "Cy", address: "", isSaved: true)
+            ]
+        )
+        store.exhaustivity = .off
+
+        await store.send(.contactTapped(ChatContact(publicKey: Self.peerKey, name: "Bea", address: "", isSaved: true)))
+        await store.send(.contactTapped(ChatContact(publicKey: Self.otherKey, name: "Cy", address: "", isSaved: true)))
+        await store.send(.peerKeyChanged(Self.ownKey))
+        #expect(store.state.errorCode == .ownPublicKey)
+
+        await store.send(.startTapped)
+
+        #expect(store.state.isNamingGroup)
+        #expect(store.state.errorCode == nil)
     }
 
     // MARK: - Participant chips

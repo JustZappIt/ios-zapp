@@ -65,6 +65,9 @@ struct ChatRoom {
 
         /// Held so a failed send can hand the quote back with the draft.
         var pendingReply: ZMMessage?
+        /// The composer send `pendingReply` belongs to. Another text going out meanwhile (the
+        /// canned address request) must not clear it.
+        var pendingReplyClientId: String?
 
         /// Bound to the composer's `PhotosPicker`. Consumed and cleared the moment it lands.
         var pickedItem: PhotosPickerItem?
@@ -99,9 +102,6 @@ struct ChatRoom {
         /// Send ZEC with no address for a direct-chat peer: ask them for one, or type one in.
         /// Android's `addressRequestSheet`.
         var addressRequest: ChatRoom.AddressRequestPrompt?
-        /// Set by Send ZEC while the attachment sheet is still closing; iOS can't present the
-        /// prompt over it, so `attachmentSheetClosed` raises it.
-        var isAddressRequestPending = false
 
         /// mediaId -> 0...1 while a transfer is in flight.
         var mediaProgress: [String: Double] = [:]
@@ -328,11 +328,17 @@ struct ChatRoom {
         case cameraCaptured(Data)
         case shareAddressTapped
         case shareAddressFailed
-        /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address when known.
-        /// A direct chat with no known address asks first (`addressRequest`), and Root waits.
+        /// The room decides: a direct chat with no known address asks first (`addressRequest`),
+        /// anything else asks Root for the send form (`sendFormRequested`).
         case sendZecTapped
-        /// "Enter an address" is routed by Root into an empty `SendCoordFlow`.
+        /// Routed by Root into `SendCoordFlow`, prefilled with the peer's address when known.
+        /// Sent by Send ZEC, and by "Enter an address".
+        case sendFormRequested
         case addressRequest(AddressRequest)
+        /// The room runs Leave group, not the sheet, so closing the sheet mid-leave can't cancel
+        /// it. Root closes the room on `leftGroup`.
+        case leftGroup
+        case leaveGroupFailed
 
         enum AddressRequest: Equatable {
             case askForAddressTapped
@@ -494,9 +500,28 @@ struct ChatRoom {
                 }
                 return .none
 
+            // Run here rather than in the sheet: an effect of the sheet is cancelled when the
+            // sheet is swiped away, and a leave cancelled mid-call left the user in a group room
+            // they had left (or a failed leave with no error).
+            case .groupInfo(.presented(.leaveConfirmed)):
+                guard let conversationId = state.groupInfo?.conversation.id else { return .none }
+
+                return .run { send in
+                    try await zappMessaging.leaveConversation(conversationId)
+                    await send(.leftGroup)
+                } catch: { error, send in
+                    LoggerProxy.error("Group info failed to leave group: \(error)")
+                    await send(.leaveGroupFailed)
+                }
+
             // Root closes the room as well: the conversation is gone.
-            case .groupInfo(.presented(.didLeave)):
+            case .leftGroup:
                 state.groupInfo = nil
+                return .none
+
+            case .leaveGroupFailed:
+                state.groupInfo?.isMutating = false
+                state.groupInfo?.didFail = true
                 return .none
 
             case .groupInfo:
@@ -566,54 +591,12 @@ struct ChatRoom {
                 guard !content.isEmpty else { return .none }
 
                 let replyTo = state.replyingTo
-                let reply = replyTo.map {
-                    ZMReplyContext(
-                        id: $0.id,
-                        senderName: state.replySenderName(for: $0),
-                        content: String($0.content.prefix(replyPreviewMaxLength))
-                    )
-                }
-
                 state.draft = ""
-                state.sendDidFail = false
-                state.sendFailureMessage = nil
                 state.replyingTo = nil
-                state.pendingReply = replyTo
-                let conversationId = state.conversationId
-                let clientId = "local_\(UUID().uuidString)"
-
-                state.insert(
-                    ZMMessage(
-                        id: clientId,
-                        conversationId: conversationId,
-                        senderId: state.messagingState.identity?.publicKey ?? "",
-                        senderName: state.messagingState.identity?.displayName,
-                        content: content,
-                        contentType: ChatContentType.text,
-                        timestamp: Date(),
-                        isFromMe: true,
-                        status: "sending",
-                        replyToId: reply?.id,
-                        replyToSenderName: reply?.senderName,
-                        replyToContent: reply?.content
-                    )
-                )
-
-                return .run { send in
-                    let message = try await zappMessaging.sendMessage(conversationId, content, reply)
-                    await send(.sendSucceeded(clientId: clientId, message: message))
-                } catch: { error, send in
-                    LoggerProxy.error("Chat room failed to send message: \(error)")
-                    await send(
-                        .sendFailed(
-                            clientId: clientId,
-                            code: ZappMessagingFailureCode(error: error)
-                        )
-                    )
-                }
+                return sendText(content, replyingTo: replyTo, fromComposer: true, state: &state)
 
             case .sendSucceeded(let clientId, let message):
-                state.pendingReply = nil
+                state.releasePendingReply(for: clientId)
                 state.sendDidFail = false
                 state.sendFailureMessage = nil
                 state.reconcile(clientId: clientId, with: message)
@@ -657,6 +640,7 @@ struct ChatRoom {
 
                 if message.isFromMe {
                     state.pendingReply = nil
+                    state.pendingReplyClientId = nil
                 } else {
                     state.postEntryInboundMessageIds.insert(message.id)
                 }
@@ -701,7 +685,7 @@ struct ChatRoom {
                 if let index = state.messages.firstIndex(where: { $0.id == clientId }) {
                     state.messages[index] = state.messages[index].withStatus("failed")
                 }
-                state.pendingReply = nil
+                state.releasePendingReply(for: clientId)
                 state.sendDidFail = true
                 state.sendFailureMessage = code == .ownPublicKey || code == .ipc(.ownPublicKey)
                     ? String(localizable: .chatRoomOwnKeySendFailed)
@@ -921,6 +905,9 @@ struct ChatRoom {
                 .sendZecTapped:
                 return .none
 
+            case .sendFormRequested:
+                return .none
+
             // Owned by `addressRequestReduce()`, which runs first.
             case .addressRequest:
                 return .none
@@ -942,14 +929,25 @@ struct ChatRoom {
         }
     }
 
-    /// Posts a ready-made text message (the "ask for their address" request) the same way the
-    /// composer posts a typed one: it shows as "sending" at once and is reconciled when the core
-    /// answers. It never quotes anything and leaves the composer's draft and reply alone.
-    func postCannedText(_ content: String, state: inout State) -> Effect<Action> {
+    /// The one way a text message goes out, typed or ready-made (the "ask for their address"
+    /// request): it shows as "sending" at once and is reconciled when the core answers. Only a
+    /// composer send holds `pendingReply`; a ready-made one leaves the composer's reply alone.
+    func sendText(_ content: String, replyingTo replyTo: ZMMessage?, fromComposer: Bool, state: inout State) -> Effect<Action> {
+        let reply = replyTo.map {
+            ZMReplyContext(
+                id: $0.id,
+                senderName: state.replySenderName(for: $0),
+                content: String($0.content.prefix(replyPreviewMaxLength))
+            )
+        }
         state.sendDidFail = false
         state.sendFailureMessage = nil
         let conversationId = state.conversationId
         let clientId = "local_\(UUID().uuidString)"
+        if fromComposer {
+            state.pendingReply = replyTo
+            state.pendingReplyClientId = clientId
+        }
 
         state.insert(
             ZMMessage(
@@ -961,12 +959,15 @@ struct ChatRoom {
                 contentType: ChatContentType.text,
                 timestamp: Date(),
                 isFromMe: true,
-                status: "sending"
+                status: "sending",
+                replyToId: reply?.id,
+                replyToSenderName: reply?.senderName,
+                replyToContent: reply?.content
             )
         )
 
         return .run { send in
-            let message = try await zappMessaging.sendMessage(conversationId, content, nil)
+            let message = try await zappMessaging.sendMessage(conversationId, content, reply)
             await send(.sendSucceeded(clientId: clientId, message: message))
         } catch: { error, send in
             LoggerProxy.error("Chat room failed to send message: \(error)")
@@ -1074,6 +1075,13 @@ extension ZMMessage {
 // MARK: Placeholders
 
 extension ChatRoom.State {
+    /// Clears the held reply once the composer send it belongs to has settled.
+    mutating func releasePendingReply(for clientId: String) {
+        guard clientId == pendingReplyClientId else { return }
+        pendingReply = nil
+        pendingReplyClientId = nil
+    }
+
     static var initial: ChatRoom.State {
         .init(conversationId: "")
     }

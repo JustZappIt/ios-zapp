@@ -98,7 +98,7 @@ struct GroupInfoView: View {
                 .zappFont(.sectionTitle, style: ZappColors.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(String(localizable: .groupMembersCount(String(store.state.members.count))))
+            Text(String(localizable: .groupMembersCount(String(store.memberCount))))
                 .zappFont(.caption, style: ZappColors.textMuted)
         }
     }

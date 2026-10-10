@@ -220,6 +220,7 @@ import ZappMessaging
         await store.send(.sendZecTapped) {
             $0.showsAttachmentSheet = false
         }
+        await store.receive(\.sendFormRequested)
 
         #expect(store.state.resolvedPeerWalletAddress == nil)
     }
@@ -237,10 +238,11 @@ import ZappMessaging
             $0.showsAttachmentSheet = true
         }
 
-        // No follow-up action: Root reads `resolvedPeerWalletAddress` and opens the send flow.
+        // Root reads `resolvedPeerWalletAddress` and opens the send flow.
         await store.send(.sendZecTapped) {
             $0.showsAttachmentSheet = false
         }
+        await store.receive(\.sendFormRequested)
 
         #expect(store.state.resolvedPeerWalletAddress == unifiedAddress)
     }

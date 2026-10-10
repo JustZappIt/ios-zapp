@@ -75,13 +75,67 @@ import ZappMessaging
     @MainActor @Test func leavingClosesTheSheet() async {
         var state = ChatRoom.State(conversationId: "group", conversation: Self.group())
         state.groupInfo = GroupInfo.State(conversation: Self.group())
+        let left = LockIsolated<[String]>([])
         let store = TestStore(initialState: state) {
             ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.leaveConversation = { id in left.withValue { $0.append(id) } }
         }
+        store.exhaustivity = .off
 
-        await store.send(.groupInfo(.presented(.didLeave))) {
+        await store.send(.groupInfo(.presented(.leaveConfirmed)))
+        await store.receive(\.leftGroup) {
             $0.groupInfo = nil
         }
+        #expect(left.value == ["group"])
+    }
+
+    /// The room runs the leave, so swiping the sheet away mid-call doesn't cancel it: the room
+    /// still hears it finished and Root closes the room.
+    @MainActor @Test func dismissingTheSheetMidLeaveStillLeaves() async {
+        var state = ChatRoom.State(conversationId: "group", conversation: Self.group())
+        state.groupInfo = GroupInfo.State(conversation: Self.group())
+        let gate = AsyncStream<Void>.makeStream()
+        let store = TestStore(initialState: state) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.leaveConversation = { _ in
+                for await _ in gate.stream { break }
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.groupInfo(.presented(.leaveConfirmed)))
+        await store.send(.groupInfo(.dismiss))
+        #expect(store.state.groupInfo == nil)
+
+        gate.continuation.yield()
+        await store.receive(\.leftGroup)
+    }
+
+    /// Android counts every participant, us included; the roster leaves us out.
+    @Test func theMemberCountIncludesUs() {
+        let ownKey = String(repeating: "a", count: PublicKeyRules.hexLength)
+        let otherKey = String(repeating: "c", count: PublicKeyRules.hexLength)
+        func group(_ keys: [String]) -> GroupInfo.State {
+            var state = GroupInfo.State(conversation: ZMConversation(
+                id: "group",
+                type: .group,
+                participantIds: keys,
+                displayName: "Team",
+                createdAt: Date(timeIntervalSince1970: 0),
+                isOwner: true
+            ))
+            state.localPublicKey = ownKey
+            return state
+        }
+
+        let withoutUs = group([Self.peerKey, otherKey])
+        #expect(withoutUs.members.count == 2)
+        #expect(withoutUs.memberCount == 3)
+
+        // Our key listed among the participants is not counted twice.
+        #expect(group([Self.peerKey, otherKey, ownKey]).memberCount == 3)
     }
 
     /// Android offers Add member to the owner only; iOS keeps rename owner-only too.

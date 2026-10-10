@@ -177,7 +177,7 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
             return message.content.isEmpty ? nil : message.content
 
         case .walletAddress:
-            return ChatMessageJSON.string(message.content, "content") ?? message.content
+            return ChatMessageJSON.walletAddress(message.content)
 
         default:
             return nil

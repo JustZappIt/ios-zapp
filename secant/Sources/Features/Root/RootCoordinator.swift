@@ -734,13 +734,10 @@ extension Root {
 
                 // Send ZEC from the composer's attachment sheet. The address is whatever the peer
                 // shared in this chat, else their saved contact row — Android's
-                // `onSendZecClick`. A direct chat with neither asks first (the room shows the
-                // prompt and Root waits); its "Enter an address", and a group with no address,
-                // open the form empty, still in chat-send context.
-            case .chatRoom(.sendZecTapped), .chatRoom(.addressRequest(.enterAddressTapped)):
-                if case .chatRoom(.sendZecTapped) = action, state.chatRoomState.needsPeerAddressRequest {
-                    return .none
-                }
+                // `onSendZecClick`. The room decides whether to ask first (a direct chat with
+                // neither); it requests the form when it doesn't, and from "Enter an address".
+                // A group with no address opens the form empty, still in chat-send context.
+            case .chatRoom(.sendFormRequested):
                 state.sendCoordFlowState = .initial
                 state.returnsToChatRoomAfterWalletFlow = true
                 // No request id: this send settles nothing, it is just a payment to the peer.
@@ -872,7 +869,7 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
-            case .chatRoom(.groupInfo(.presented(.didLeave))):
+            case .chatRoom(.leftGroup):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
 
