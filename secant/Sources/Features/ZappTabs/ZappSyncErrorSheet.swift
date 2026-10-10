@@ -10,7 +10,8 @@
 //
 //  Copy and action set follow `SyncErrorVM.kt`: the generic "Something went wrong" instruction,
 //  then try again and switch server (always both), disable Tor (only while Tor is on), and contact
-//  support. The raw SDK message is not the body; it stays as a short secondary line so a support
+//  support. An incompatible server (a consensus-branch mismatch) keeps iOS's own title and puts
+//  Switch server first, since retrying can never fix it. The raw SDK message is not the body; it stays as a short secondary line so a support
 //  screenshot still carries the error code.
 //
 
@@ -37,6 +38,7 @@ struct ZappSyncErrorSheet: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let errorMessage: String
+    var isIncompatibleServer = false
     let isTorEnabled: Bool
     let onTryAgain: () -> Void
     let onSwitchServer: () -> Void
@@ -46,8 +48,10 @@ struct ZappSyncErrorSheet: View {
     @State private var contentHeight = Constants.estimatedHeight
 
     /// Android's `SyncErrorVM.createState`: both recovery routes every time, Tor only when on.
-    static func remedies(isTorEnabled: Bool) -> [Remedy] {
-        isTorEnabled ? [.retry, .switchServer, .disableTor] : [.retry, .switchServer]
+    /// Switch server leads for an incompatible server, the one case a retry can't fix.
+    static func remedies(isTorEnabled: Bool, isIncompatibleServer: Bool = false) -> [Remedy] {
+        let routes: [Remedy] = isIncompatibleServer ? [.switchServer, .retry] : [.retry, .switchServer]
+        return isTorEnabled ? routes + [.disableTor] : routes
     }
 
     var body: some View {
@@ -56,7 +60,7 @@ struct ZappSyncErrorSheet: View {
                 header
 
                 VStack(spacing: 0) {
-                    let remedies = Self.remedies(isTorEnabled: isTorEnabled)
+                    let remedies = Self.remedies(isTorEnabled: isTorEnabled, isIncompatibleServer: isIncompatibleServer)
                     ForEach(Array(remedies.enumerated()), id: \.offset) { index, remedy in
                         if index > 0 {
                             divider
@@ -91,8 +95,12 @@ struct ZappSyncErrorSheet: View {
                     style: ZappColors.danger
                 )
 
-            Text(localizable: .sheetSyncTimeoutTitle)
-                .zappFont(.sectionTitle, style: ZappColors.text)
+            Text(
+                localizable: isIncompatibleServer
+                    ? .smartBannerHelpSyncErrorIncompatibleServerTitle
+                    : .sheetSyncTimeoutTitle
+            )
+            .zappFont(.sectionTitle, style: ZappColors.text)
 
             Text(localizable: .sheetSyncTimeoutDesc)
                 .zappFont(.body, style: ZappColors.textMuted)

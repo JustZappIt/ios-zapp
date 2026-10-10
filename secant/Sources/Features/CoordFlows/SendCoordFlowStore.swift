@@ -176,7 +176,7 @@ struct SendCoordFlow {
         case topUpRequested
         case topUpDismissed
         case topUpSourcePicked(TopUpSource)
-        case topUpUnifiedAddressResolved(String?)
+        case topUpUnifiedAddressResolved(UnifiedAddress?)
         case viewTransactionRequested(SendConfirmation.State)
         case zecAssetSelected
     }

@@ -1461,9 +1461,6 @@ extension Root {
         }
     }
 
-    /// Applies the account-scoped reactions shared by a manual switch and every Keystone
-    /// auto-selection signal. The transaction fetch cancellation must finish before the refetch is
-    /// dispatched, or the switch could cancel its own work for the newly selected account.
     /// Android's `TopUpVM.onSourcePicked` for screens outside the send flow (Gift, Pay a merchant,
     /// Add funds to Base): Receive opens on the address the picked source can send to, going
     /// through Home's own route so the shielded address is derived first.
@@ -1472,8 +1469,20 @@ extension Root {
         return .send(.home(.receiveScreenRequested))
     }
 
+    /// Applies the account-scoped reactions shared by a manual switch and every Keystone
+    /// auto-selection signal. The transaction fetch cancellation must finish before the refetch is
+    /// dispatched, or the switch could cancel its own work for the newly selected account.
     private func accountSwitchedEffect(state: inout Root.State) -> Effect<Root.Action> {
         state.autoUpdateSwapCandidates.removeAll()
+        // Funding belongs to the account. Recomputed for the new one now, from the retained SDK
+        // state and without the old account's `.empty` carried over: waiting for the next sync
+        // tick left a funded account behind "Your wallet is empty" for up to a minute.
+        let funding = WalletFunding.afterAccountSwitch(
+            to: state.selectedWalletAccount,
+            latest: sdkSynchronizer.latestState(),
+            isRestoring: state.walletStatus == .restoring
+        )
+        state.$walletFunding.withLock { $0 = funding }
         state.homeState.transactionListState.isInvalidated = true
         state.transactionsCoordFlowState.transactionsManagerState.isInvalidated = true
         return .merge(

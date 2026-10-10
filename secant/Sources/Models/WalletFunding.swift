@@ -37,6 +37,21 @@ enum WalletFunding: Equatable {
         return .unknown
     }
 
+    /// The funding of an account just switched to, from the SDK's retained state. Starts from
+    /// `.unknown` so the previous account's `.empty` is never carried across.
+    static func afterAccountSwitch(
+        to account: WalletAccount?,
+        latest: SynchronizerState,
+        isRestoring: Bool
+    ) -> WalletFunding {
+        next(
+            previous: .unknown,
+            total: account.flatMap { latest.accountsBalances[$0.id]?.fundingTotal },
+            isUpToDate: SyncStatusSnapshot.snapshotFor(state: latest.syncStatus).syncStatus == .upToDate,
+            isRestoring: isRestoring
+        )
+    }
+
     /// Android's `withBaseUsdc`, for Pay a merchant, which can also pay from USDC on Base.
     /// `baseUsdc` is nil until the Base balance has been read; an unread balance never counts as
     /// empty.

@@ -108,14 +108,14 @@ struct GiftCard {
             !message.isEmpty && !GiftMessage.isWithinLimits(message)
         }
 
-        /// Both message bounds, not just the counter's: a note can sit well under 128 clusters and
-        /// still blow the 512-byte limit, and the link codec would refuse to encode it.
         /// Android's `GiftCardState.addFundsPanel`: a synced, empty wallet sees "Add ZEC" in place
         /// of the details form.
         var showsAddFundsPanel: Bool {
             visibleStage == .details && walletFunding == .empty
         }
 
+        /// Both message bounds, not just the counter's: a note can sit well under 128 clusters and
+        /// still blow the 512-byte limit, and the link codec would refuse to encode it.
         var canContinue: Bool {
             typedAmount != nil && (message.isEmpty || GiftMessage.isWithinLimits(message))
         }

@@ -21,6 +21,9 @@ struct Home {
         var isZappPoolBalancesSheetPresented = false
         var isZappShieldInfoPresented = false
         var isZappSyncErrorSheetPresented = false
+        /// Read from the keychain when the sync-error sheet opens, which offers "Disable Tor
+        /// protection" only while Tor is on.
+        var isZappTorEnabled = false
         /// Android's `HomeVM.hasSyncErrorBeenShown`: the sync-error sheet auto-opens once per
         /// error episode. The episode ends on the next completed sync, so an SDK retry loop that
         /// bounces between syncing and error does not re-raise a sheet the user just closed.
@@ -133,6 +136,7 @@ struct Home {
     @Dependency(\.shieldingProcessor) var shieldingProcessor
     @Dependency(\.swapAndPay) var swapAndPay
     @Dependency(\.userStoredPreferences) var userStoredPreferences
+    @Dependency(\.walletStorage) var walletStorage
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
 
     init() { }
@@ -215,10 +219,11 @@ struct Home {
                 )
 
             case .receiveScreenRequested:
-                let isKeystone = state.selectedWalletAccount?.vendor == .keystone
-                if let uuid = state.selectedWalletAccount?.id {
+                if let account = state.selectedWalletAccount {
+                    let uuid = account.id
+                    let receivers = account.privateUAReceivers
                     return .run { send in
-                        let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(uuid, isKeystone ? [.orchard] : [.sapling, .orchard])
+                        let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(uuid, receivers)
                         await send(.updatePrivateUA(privateUA))
                         await send(.receiveTapped)
                     }
@@ -314,6 +319,7 @@ struct Home {
                 case .error:
                     guard !state.hasZappSyncErrorEpisodeBeenShown else { return .none }
                     state.hasZappSyncErrorEpisodeBeenShown = true
+                    state.isZappTorEnabled = walletStorage.exportTorSetupFlag() ?? false
                     state.isZappSyncErrorSheetPresented = true
                 case .upToDate:
                     state.hasZappSyncErrorEpisodeBeenShown = false
@@ -323,6 +329,7 @@ struct Home {
                 return .none
 
             case .zappShieldTapped:
+                guard !state.smartBannerState.isShielding else { return .none }
                 // `isShieldingAcknowledged` is the keychain-backed "Do not show this message
                 // again." flag; SmartBanner loads it on appear and persists every toggle.
                 guard state.smartBannerState.isShieldingAcknowledged else {
@@ -333,6 +340,12 @@ struct Home {
 
             case .zappShieldInfoConfirmed:
                 state.isZappShieldInfoPresented = false
+                // One shield at a time: a second tap before the processor reports back would
+                // propose a second shielding over the same transparent funds. Set here rather than
+                // waiting for the processor's `.requested`, which arrives asynchronously; its
+                // terminal state clears it.
+                guard !state.smartBannerState.isShielding else { return .none }
+                state.smartBannerState.isShielding = true
                 shieldingProcessor.shieldFunds()
                 // Only the shielding banner narrates this shield. Closing whatever else holds the
                 // slot (the migration card, the backup reminder) would hide it for no reason.
@@ -392,6 +405,12 @@ struct Home {
             case .settingsTapped:
                 return .none
                 
+            case .binding(\.isZappSyncErrorSheetPresented):
+                if state.isZappSyncErrorSheetPresented {
+                    state.isZappTorEnabled = walletStorage.exportTorSetupFlag() ?? false
+                }
+                return .none
+
             case .binding:
                 return .none
                 

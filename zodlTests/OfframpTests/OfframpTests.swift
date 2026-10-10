@@ -125,6 +125,41 @@ struct OfframpTests {
         await store.send(.payDismissed) { $0.isPayConfirmationPresented = false }
     }
 
+    /// A refreshed quote the Base balance no longer covers gets no "Confirm payment": Pay now
+    /// would do nothing. The page shows its Add funds callout for the new quote instead.
+    @MainActor
+    @Test func unpayableRefreshedQuoteSkipsTheConfirmation() async {
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.quote = quote()
+        let refreshed = quote(usdcMicros: "3000000", canPayFromBase: false)
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.quote = { _, _ in refreshed }
+        }
+
+        await store.send(.payTapped) { $0.isLoading = true }
+        await store.receive(\.payQuoteRefreshed) {
+            $0.quote = refreshed
+            $0.isLoading = false
+        }
+    }
+
+    /// Add ZEC leaves Pay for Receive, so the screen's requests stop as they do on close.
+    @MainActor
+    @Test func leavingForTopUpEndsTheScreenSession() async {
+        let resets = LockIsolated(0)
+        var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
+        state.isTopUpSourcePickerPresented = true
+        let store = TestStore(initialState: state) { Offramp() } withDependencies: {
+            $0.offramp.resetScreen = { resets.withValue { $0 += 1 } }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.topUpSourcePicked(.exchange)) { $0.isTopUpSourcePickerPresented = false }
+        await store.receive(\.cancelAll)
+        await store.finish()
+        #expect(resets.value == 1)
+    }
+
     @MainActor
     @Test func scanningDoesNotCancelPaymentWaitingForDetails() async {
         var state = Offramp.State.initial(page: .amount, corridorContext: .payment)
@@ -435,7 +470,7 @@ struct OfframpTests {
         }
     }
 
-    private func quote(usdcMicros: String = "1000000") -> OfframpQuoteModel {
+    private func quote(usdcMicros: String = "1000000", canPayFromBase: Bool = true) -> OfframpQuoteModel {
         OfframpQuoteModel(
             currencyCode: "INR",
             fiatAmount: "100",
@@ -447,7 +482,7 @@ struct OfframpTests {
             baseBalanceDisplay: "2",
             shortfallMicros: "0",
             shortfallDisplay: "0",
-            canPayFromBase: true,
+            canPayFromBase: canPayFromBase,
             canBridgeToBase: true
         )
     }

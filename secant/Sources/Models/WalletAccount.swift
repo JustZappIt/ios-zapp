@@ -56,6 +56,12 @@ struct WalletAccount: Equatable, Hashable, Codable, Identifiable {
         privateUA?.stringEncoded
     }
 
+    /// The receivers of the shielded address Receive shows (`privateUA`). A Keystone can't hold
+    /// Sapling keys, so its address is Orchard only.
+    var privateUAReceivers: Set<ReceiverType> {
+        vendor == .keystone ? [.orchard] : [.sapling, .orchard]
+    }
+
     var saplingAddress: String? {
         try? defaultUA?.saplingReceiver().stringEncoded
     }

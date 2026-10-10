@@ -139,42 +139,70 @@ struct WalletFundingRuleTests {
         defer { setFunding(.unknown) }
 
         var state = Offramp.State(page: .topUp, corridorContext: .settings)
+        state.account = account(balanceMicros: "0")
         #expect(state.showsTopUpAddFundsPanel)
 
         state.hasTopUpCheckpoint = true
         #expect(!state.showsTopUpAddFundsPanel)
     }
 
-    @Test func aTopUpPickedFromGiftOpensReceiveOnTheTransparentAddress() async {
-        var state = Root.State.initial
-        state.path = .giftCard
-        state.$selectedWalletAccount.withLock { $0 = nil }
+    /// An account that can't bridge (testnet) funds Base with USDC directly; it needs no ZEC, so
+    /// it keeps its funding instructions instead of "Add ZEC".
+    @Test func addFundsToBaseIsNotGatedWhenTheAccountCannotBridge() {
+        setFunding(.empty)
+        defer { setFunding(.unknown) }
 
-        let store = TestStore(initialState: state) { Root() } withDependencies: {
-            $0.sdkSynchronizer = .noOp
-        }
-        store.exhaustivity = .off
-
-        await store.send(.giftCard(.delegate(.topUpSourcePicked(.exchange)))) {
-            $0.receiveFocusOnOpen = .tAddress
-        }
-        await store.receive(\.home.receiveScreenRequested)
-        await store.receive(\.home.receiveTapped) {
-            $0.receiveFocusOnOpen = nil
-            $0.path = .receive
-        }
-        #expect(store.state.receiveState.currentFocus == .tAddress)
-        // Receive re-applies this on appear, so the view can't snap back to shielded.
-        #expect(store.state.receiveState.focusOnAppear == .tAddress)
+        var state = Offramp.State(page: .topUp, corridorContext: .settings)
+        state.account = account(balanceMicros: "0", canBridgeToBase: false)
+        #expect(!state.showsTopUpAddFundsPanel)
     }
 
-    private func account(balanceMicros: String) -> OfframpAccountModel {
+    /// Funding belongs to the account: switching from an empty account to a funded one shows the
+    /// funded one's forms straight away, and an empty account's `.empty` doesn't carry over to one
+    /// whose balance hasn't been read yet.
+    @Test func switchingAccountsRecomputesFunding() {
+        let funded = walletAccount(idByte: 70)
+        let unread = walletAccount(idByte: 71)
+        var latest = SynchronizerState.zero
+        latest.syncStatus = .upToDate
+        latest.accountsBalances = [
+            funded.id: AccountBalance(
+                saplingBalance: .zero,
+                orchardBalance: PoolBalance(
+                    spendableValue: Zatoshi(100_000),
+                    changePendingConfirmation: .zero,
+                    valuePendingSpendability: .zero
+                ),
+                unshielded: .zero
+            )
+        ]
+
+        #expect(WalletFunding.afterAccountSwitch(to: funded, latest: latest, isRestoring: false) == .funded)
+        #expect(WalletFunding.afterAccountSwitch(to: unread, latest: latest, isRestoring: false) == .unknown)
+        #expect(WalletFunding.afterAccountSwitch(to: nil, latest: latest, isRestoring: false) == .unknown)
+    }
+
+    private func walletAccount(idByte: UInt8) -> WalletAccount {
+        WalletAccount(
+            Account(
+                id: AccountUUID(id: [UInt8](repeating: idByte, count: 16)),
+                name: "Zapp",
+                keySource: nil,
+                seedFingerprint: nil,
+                hdAccountIndex: Zip32AccountIndex(0),
+                ufvk: nil,
+                uivk: nil
+            )
+        )
+    }
+
+    private func account(balanceMicros: String, canBridgeToBase: Bool = true) -> OfframpAccountModel {
         OfframpAccountModel(
             address: "0xabc",
             balanceMicros: balanceMicros,
             balanceDisplay: nil,
             explorerURL: nil,
-            canBridgeToBase: true,
+            canBridgeToBase: canBridgeToBase,
             canRefundToZec: false
         )
     }

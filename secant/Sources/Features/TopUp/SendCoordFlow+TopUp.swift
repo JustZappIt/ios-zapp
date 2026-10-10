@@ -37,21 +37,24 @@ extension SendCoordFlow {
 
             case .topUpSourcePicked(.wallet):
                 state.isTopUpPresented = false
-                guard state.selectedWalletAccount?.privateUA == nil,
-                      let account = state.selectedWalletAccount else {
-                    return .send(.topUpUnifiedAddressResolved(state.selectedWalletAccount?.privateUnifiedAddress))
+                guard let account = state.selectedWalletAccount, account.privateUA == nil else {
+                    return .send(.topUpUnifiedAddressResolved(state.selectedWalletAccount?.privateUA))
                 }
                 // The shielded receive address is derived on demand, exactly as Home does before
-                // opening Receive (`Home.receiveScreenRequested`).
-                let receivers: Set<ReceiverType> = account.vendor == .keystone ? [.orchard] : [.sapling, .orchard]
+                // opening Receive (`Home.receiveScreenRequested`), and kept on the account the same
+                // way so Receive and Top Up show one address.
+                let accountId = account.id
+                let receivers = account.privateUAReceivers
                 return .run { [sdkSynchronizer] send in
-                    // Sent as its encoding: `UnifiedAddress` is not `Sendable`.
-                    let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(account.id, receivers)
-                    await send(.topUpUnifiedAddressResolved(privateUA?.stringEncoded))
+                    let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(accountId, receivers)
+                    await send(.topUpUnifiedAddressResolved(privateUA))
                 }
 
             case .topUpUnifiedAddressResolved(let privateUA):
-                let address = privateUA ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
+                if let privateUA {
+                    state.$selectedWalletAccount.withLock { $0?.privateUA = privateUA }
+                }
+                let address = privateUA?.stringEncoded ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
                 state.path.append(.addressDetails(topUpAddressDetails(address: address, maxPrivacy: true, state: state)))
                 return .none
 

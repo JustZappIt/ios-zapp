@@ -14,7 +14,6 @@ import SwiftUI
 
 struct ZappPayView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @Dependency(\.walletStorage) private var walletStorage
 
     private enum Constants {
         static let fabTrailingPadding: CGFloat = 18
@@ -151,6 +150,7 @@ struct ZappPayView: View {
                     store.isZappPoolBalancesSheetPresented = true
                 },
                 onToggleBalanceDisplay: { showZecAsPrimary.toggle() },
+                isShielding: store.smartBannerState.isShielding,
                 onShieldTapped: { store.send(.zappShieldTapped) }
             )
         }
@@ -383,6 +383,9 @@ extension ZappPayView {
         WithPerceptionTracking {
             ZappShieldFundsInfoSheet(
                 store: store.scope(state: \.smartBannerState, action: \.smartBanner),
+                // The balance the card shows. SmartBanner's copy only updates while the shielding
+                // banner holds its slot, so it could name an older, smaller amount.
+                transparentBalance: store.walletBalancesState.transparentBalance,
                 onShield: { store.send(.zappShieldInfoConfirmed) },
                 onNotNow: { store.isZappShieldInfoPresented = false }
             )
@@ -412,7 +415,8 @@ extension ZappPayView {
                 // Offline is actionable but is not itself the previous synchronizer failure, so
                 // its sheet carries no stale error detail.
                 errorMessage: syncState == .error ? store.smartBannerState.lastKnownErrorMessage : "",
-                isTorEnabled: walletStorage.exportTorSetupFlag() ?? false,
+                isIncompatibleServer: syncState == .error && store.smartBannerState.lastKnownErrorIsIncompatibleServer,
+                isTorEnabled: store.isZappTorEnabled,
                 onTryAgain: {
                     store.isZappSyncErrorSheetPresented = false
                     // `Home.retrySync` restarts the synchronizer — the counterpart to Android's

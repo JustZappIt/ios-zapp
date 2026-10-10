@@ -44,6 +44,8 @@ struct ZappBalanceCard: View {
     let showZecAsPrimary: Bool
     let onBalanceTapped: () -> Void
     let onToggleBalanceDisplay: () -> Void
+    /// A shield in flight; Shield stays disabled until it finishes.
+    var isShielding = false
     let onShieldTapped: () -> Void
 
     var body: some View {
@@ -203,7 +205,7 @@ struct ZappBalanceCard: View {
                 dotColor: .textSubtle
             )
 
-            ZappButton(title: String(localizable: .zappPayShield), action: onShieldTapped)
+            ZappButton(title: String(localizable: .zappPayShield), isEnabled: !isShielding, action: onShieldTapped)
                 .padding(.top, 14)
         }
     }

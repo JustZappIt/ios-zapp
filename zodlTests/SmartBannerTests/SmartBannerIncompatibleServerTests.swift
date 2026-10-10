@@ -163,4 +163,13 @@ import Testing
         #expect(ZappSyncErrorSheet.remedies(isTorEnabled: true) == [.retry, .switchServer, .disableTor])
         #expect(ZappSyncErrorSheet.remedies(isTorEnabled: false) == [.retry, .switchServer])
     }
+
+    /// Retrying can never fix a consensus-branch mismatch, so Switch server leads.
+    @Test func incompatibleServerPutsSwitchServerFirst() {
+        #expect(ZappSyncErrorSheet.remedies(isTorEnabled: false, isIncompatibleServer: true) == [.switchServer, .retry])
+        #expect(
+            ZappSyncErrorSheet.remedies(isTorEnabled: true, isIncompatibleServer: true)
+                == [.switchServer, .retry, .disableTor]
+        )
+    }
 }

@@ -76,9 +76,10 @@ struct Offramp {
         }
 
         /// Android's `BridgeToBaseState.addFundsPanel`: bridging needs ZEC; a saved top-up keeps
-        /// its form so it can still be resumed.
+        /// its form so it can still be resumed. An account that can't bridge (testnet) funds Base
+        /// by sending USDC to it directly, so it needs no ZEC and keeps its funding instructions.
         var showsTopUpAddFundsPanel: Bool {
-            !hasTopUpCheckpoint && walletFunding == .empty
+            !hasTopUpCheckpoint && account?.canBridgeToBase == true && walletFunding == .empty
         }
 
         var canSaveCorridor: Bool {
@@ -357,7 +358,9 @@ struct Offramp {
                 // payment", built from the commit-time quote — not only when that quote moved.
                 state.quote = refreshed
                 state.isLoading = false
-                state.isPayConfirmationPresented = true
+                // A rate or fee that moved can leave the Base balance short. The page then shows
+                // its Add funds callout for the refreshed quote; confirming would do nothing.
+                state.isPayConfirmationPresented = refreshed.canPayFromBase
                 return .none
 
             case .payConfirmed:
@@ -726,10 +729,11 @@ struct Offramp {
             case .retryTapped:
                 return .send(.onAppear)
 
-            case .delegate(.close):
+            case .delegate(.close), .delegate(.topUpSourcePicked):
+                // Add ZEC leaves Pay for Receive, so it ends the screen session like closing does.
                 return .send(.cancelAll)
 
-            case .delegate(.openActivity), .delegate(.topUpSourcePicked):
+            case .delegate(.openActivity):
                 return .none
             }
         }

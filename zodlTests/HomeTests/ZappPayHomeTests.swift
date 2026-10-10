@@ -89,6 +89,42 @@ import Testing
         }
     }
 
+    /// A second tap before the processor reports back must not start a second shielding over the
+    /// same transparent funds.
+    @Test func aSecondShieldTapWhileShieldingDoesNothing() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            var state = Home.State.initial
+            state.smartBannerState.isShieldingAcknowledged = true
+            let shieldCalls = LockIsolated(0)
+            let store = makeStore(initialState: state, shieldCalls: shieldCalls)
+
+            await store.send(.zappShieldTapped)
+            await store.receive(\.zappShieldInfoConfirmed)
+            await store.send(.zappShieldTapped)
+            await store.send(.zappShieldInfoConfirmed)
+
+            #expect(store.state.smartBannerState.isShielding)
+            #expect(shieldCalls.value == 1)
+        }
+    }
+
+    /// "Disable Tor protection" depends on the stored Tor setting, read into state as the sheet
+    /// opens rather than from the keychain on every render.
+    @Test func openingTheSyncErrorSheetReadsTheTorSetting() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let store = makeStore()
+            store.dependencies.walletStorage.exportTorSetupFlag = { true }
+
+            await store.send(.binding(.set(\.isZappSyncErrorSheetPresented, true)))
+
+            #expect(store.state.isZappTorEnabled)
+        }
+    }
+
     @Test func shieldingLeavesAMigrationBannerInPlace() async {
         await withDependencies {
             $0.defaultInMemoryStorage = InMemoryStorage()

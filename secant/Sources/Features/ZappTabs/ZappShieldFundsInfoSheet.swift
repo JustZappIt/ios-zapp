@@ -24,6 +24,7 @@ struct ZappShieldFundsInfoSheet: View {
     }
 
     @Perception.Bindable var store: StoreOf<SmartBanner>
+    let transparentBalance: Zatoshi
     let onShield: () -> Void
     let onNotNow: () -> Void
 
@@ -64,7 +65,7 @@ struct ZappShieldFundsInfoSheet: View {
                                     .zImage(size: 16, style: ZappColors.text)
                             }
 
-                            ZatoshiText(store.transparentBalance, .expanded, store.tokenName)
+                            ZatoshiText(transparentBalance, .expanded, store.tokenName)
                                 .zappFont(.sectionTitle, style: ZappColors.text)
                         }
                     }
