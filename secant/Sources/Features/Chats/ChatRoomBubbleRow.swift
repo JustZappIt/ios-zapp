@@ -22,8 +22,6 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
     @Environment(\.colorScheme) private var colorScheme
 
     private enum Constants {
-        /// Matches the media bubble, so a link card and a photo line up on the same edge.
-        static let linkPreviewWidth: CGFloat = 280
         static let highlightOpacity: CGFloat = 0.18
     }
 
@@ -80,8 +78,8 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
     private var kind: ChatMessageKind { ChatMessageKind.of(message) }
 
     /// One bubble per message type, dispatched in Android's order
-    /// (`ChatMessageBubble.kt: MessageContent`) via `ChatMessageKind`. Anything unrecognised —
-    /// including location, out of scope per Decision 3 — falls through to the text bubble.
+    /// (`ChatMessageBubble.kt: MessageContent`) via `ChatMessageKind`. Anything unrecognised
+    /// falls through to the text bubble.
     @ViewBuilder
     private var bubble: some View {
         switch kind {
@@ -128,24 +126,24 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
                 readReceiptsEnabled: readReceiptsEnabled
             )
 
-        case .text:
-            VStack(alignment: message.isFromMe ? .trailing : .leading, spacing: Design.Spacing._xxs) {
-                ChatMessageBubble(
-                    message: message,
-                    senderName: senderName,
-                    readReceiptsEnabled: readReceiptsEnabled,
-                    quotedMessage: quotedMessage,
-                    onQuoteTap: message.replyToId.map { quotedId in
-                        { store.send(.quoteTapped(quotedId)) }
-                    }
-                )
+        case .location:
+            ChatLocationBubble(
+                message: message,
+                senderName: senderName,
+                readReceiptsEnabled: readReceiptsEnabled
+            )
 
-                if let preview = linkPreview {
-                    ChatLinkPreviewCard(preview: preview)
-                        .frame(maxWidth: Constants.linkPreviewWidth)
+        case .text:
+            ChatMessageBubble(
+                message: message,
+                senderName: senderName,
+                readReceiptsEnabled: readReceiptsEnabled,
+                linkPreview: linkPreview,
+                quotedMessage: quotedMessage,
+                onQuoteTap: message.replyToId.map { quotedId in
+                    { store.send(.quoteTapped(quotedId)) }
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: message.isFromMe ? .trailing : .leading)
+            )
         }
     }
 
@@ -204,7 +202,7 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
             return message.content.isEmpty ? nil : message.content
 
         case .walletAddress:
-            return ChatMessageJSON.string(message.content, "content") ?? message.content
+            return ChatMessageJSON.walletAddress(message.content)
 
         default:
             return nil

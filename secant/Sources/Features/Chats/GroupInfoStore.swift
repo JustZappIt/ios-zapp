@@ -34,7 +34,7 @@ struct GroupInfo {
         /// Read from the messaging state, not guessed.
         var localPublicKey = ""
 
-        /// Non-nil while the inline rename field is open.
+        /// Non-nil while the rename dialog is open.
         var nameDraft: String?
 
         var isAddMemberPresented = false
@@ -48,6 +48,10 @@ struct GroupInfo {
         /// control is hidden rather than offered and then failing.
         var canRename: Bool { conversation.isOwner == true }
 
+        /// Only the creator's changes are accepted by the other members, so only the owner is
+        /// offered them. Android gates Add member the same way.
+        var canAddMember: Bool { conversation.isOwner == true }
+
         var isRenaming: Bool { nameDraft != nil }
 
         var trimmedNameDraft: String {
@@ -58,6 +62,16 @@ struct GroupInfo {
             !isMutating
                 && !trimmedNameDraft.isEmpty
                 && trimmedNameDraft != conversation.displayName
+        }
+
+        /// Everyone in the group, us included, as Android's sheet counts them. `members` leaves
+        /// us out of the roster, and the conversation doesn't always list our key.
+        var memberCount: Int {
+            var keys = Set(conversation.participantIds.map { PublicKeyRules.sanitize($0) }.filter { !$0.isEmpty })
+            if !localPublicKey.isEmpty {
+                keys.insert(localPublicKey)
+            }
+            return keys.count
         }
 
         var members: [GroupMember] {
@@ -103,7 +117,6 @@ struct GroupInfo {
     enum Action: Equatable {
         case onAppear
         case onDisappear
-        case backToHomeTapped
         case conversationsChanged([ZMConversation])
         case renameTapped
         case nameDraftChanged(String)
@@ -118,9 +131,8 @@ struct GroupInfo {
         case mutationFailed
         case alert(PresentationAction<Action>)
 
-        /// We left the group; this screen's subject no longer exists. Root clears the path —
-        /// a pushed screen cannot pop itself.
-        case didLeave
+        /// We left the group; this sheet's subject no longer exists. Root closes the room
+        /// under it as well.
     }
 
     @Dependency(\.zappMessaging) var zappMessaging
@@ -192,6 +204,7 @@ struct GroupInfo {
                 }
 
             case .addMemberTapped:
+                guard state.canAddMember else { return .none }
                 state.isAddMemberPresented = true
                 state.didFail = false
                 return .none
@@ -221,18 +234,12 @@ struct GroupInfo {
                 state.alert = AlertState.leaveGroup
                 return .none
 
+            // ChatRoom runs the leave itself (`ChatRoom.Action.leftGroup`): an effect started here
+            // would be cancelled if the sheet were swiped away before the core answered.
             case .leaveConfirmed:
-                let conversationId = state.conversation.id
                 state.isMutating = true
                 state.didFail = false
-
-                return .run { send in
-                    try await zappMessaging.leaveConversation(conversationId)
-                    await send(.didLeave)
-                } catch: { error, send in
-                    LoggerProxy.error("Group info failed to leave group: \(error)")
-                    await send(.mutationFailed)
-                }
+                return .none
 
             case .mutationFinished:
                 state.isMutating = false
@@ -253,12 +260,6 @@ struct GroupInfo {
             case .alert:
                 return .none
 
-            case .didLeave:
-                state.isMutating = false
-                return .none
-
-            case .backToHomeTapped:
-                return .none
             }
         }
     }

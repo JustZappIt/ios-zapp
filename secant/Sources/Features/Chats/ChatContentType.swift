@@ -27,8 +27,7 @@ enum ChatContentType {
     static let paymentRequest = "application/payment-request"
     static let zecTransaction = "application/zec-transaction"
 
-    /// Out of scope per Decision 3: incoming location messages keep the plain-text fallback
-    /// bubble. Listed so the wire vocabulary lives in one place and so `ChatMessageKind` can
-    /// name what it is deliberately not rendering.
+    /// Body is `{"latitude": …, "longitude": …}`. Rendered by `ChatLocationBubble`; sending a
+    /// location is not supported on iOS yet.
     static let location = "application/location"
 }

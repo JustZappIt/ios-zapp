@@ -195,9 +195,13 @@ struct ChatRoomView: View {
                     ChatContactFormView(store: formStore)
                 }
             }
+            .sheet(item: $store.scope(state: \.groupInfo, action: \.groupInfo)) { groupStore in
+                GroupInfoView(store: groupStore)
+            }
             .sheet(item: $store.scope(state: \.gifPicker, action: \.gifPicker)) { pickerStore in
                 ChatGIFPickerView(store: pickerStore)
             }
+            .chatAddressRequestSheet(store: store)
         }
     }
 
@@ -473,9 +477,10 @@ private struct ChatRoomInputRow: View {
         static let inputHorizontalPadding: CGFloat = 12
         static let inputVerticalPadding: CGFloat = 8
         static let sendIconSize: CGFloat = 24
-        static let minHeight: CGFloat = 44
+        /// `ChatRoomInputRow.kt`'s `INPUT_CONTROL_SIZE`, shared by both buttons and the field.
+        static let minHeight: CGFloat = 50
         static let disabledOpacity: CGFloat = 0.45
-        static let maxLines = 5
+        static let maxLines = 4
     }
 
     @Binding var draft: String
@@ -578,20 +583,25 @@ private struct ChatRoomInputRow: View {
 }
 
 private extension ZappTextStyle {
-    static let attachGlyph = ZappTextStyle(weight: .medium, size: 22, lineHeight: 24)
     static let gifGlyph = ZappTextStyle(weight: .bold, size: 10, lineHeight: 12, tracking: 0.4)
 }
 
+/// Android's attach box: an accent plus in a bordered surfaceAlt square.
 private struct ChatAttachGlyph: View {
-    static let size: CGFloat = 44
+    static let size: CGFloat = 50
+    static let iconSize: CGFloat = 24
 
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        Text(verbatim: "+")
-            .zappFont(.attachGlyph, style: ZappColors.text)
-            .frame(width: ChatAttachGlyph.size, height: ChatAttachGlyph.size)
-            .background(ZappColors.surfaceInput.color(colorScheme))
+        Asset.Assets.Icons.plus.image
+            .zImage(width: Self.iconSize, height: Self.iconSize, style: ZappColors.accent)
+            .frame(width: Self.size, height: Self.size)
+            .background(ZappColors.surfaceAlt.color(colorScheme))
+            .overlay {
+                Rectangle()
+                    .strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1)
+            }
     }
 }
 

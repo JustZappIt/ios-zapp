@@ -3,12 +3,9 @@
 //  Zapp
 //
 //  Start a conversation: search the saved contacts, scan a QR, or paste a peer's key.
-//  A one-to-one DM is the default — tapping a contact opens one straight away. Groups are
-//  an explicit opt-in: "New group" flips the same list into multi-select.
-//
-//  Android's NewConversation instead infers "group" from having selected more than one
-//  participant. Keeping the mode explicit here means the common case never has to pass
-//  through a selection step.
+//  Android's NewConversation model: one multi-select screen. Tapping a contact, or adding a
+//  pasted, scanned or typed key from the "Public key detected" row, builds participant chips.
+//  One chip starts (or reopens) the DM; two or more ask for a group name and create the group.
 //
 
 import ComposableArchitecture
@@ -19,13 +16,23 @@ import ZappMessaging
 struct NewChat {
     @ObservableState
     struct State: Equatable {
-        /// What the docked button does right now. With nothing entered there is nothing to
+        /// What the docked button does right now. With nobody picked there is nothing to
         /// start, so the slot advertises the scanner instead of sitting there disabled.
         enum PrimaryAction: Equatable {
             case scan
             case start
-            case createGroup
-            case confirmGroup
+        }
+
+        /// Someone picked for the conversation, shown as a chip.
+        struct Participant: Equatable, Identifiable {
+            let publicKey: String
+            /// What the chip reads: the contact's name, or an abbreviated key.
+            let name: String
+            /// What the core is told to call the peer. Nil for an unsaved pasted key, so the
+            /// abbreviated key on the chip never becomes their saved name.
+            let displayName: String?
+
+            var id: String { publicKey }
         }
 
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
@@ -33,7 +40,6 @@ struct NewChat {
         /// Held raw, not sanitized: the one field both searches contacts and takes a
         /// pasted key, so it has to keep the non-hex characters a name search needs.
         var searchInput = ""
-        var displayName = ""
         var isCreating = false
         var errorCode: ZappMessagingFailureCode?
         var didCopy = false
@@ -43,13 +49,12 @@ struct NewChat {
         /// start anything.
         var myPublicKey = ""
 
-        var isGroupMode = false
-        var selectedContacts: [ChatContact] = []
-        var groupName = ""
+        var participants: [Participant] = []
 
-        /// The group-name field is only revealed once members are picked, so the CTA
-        /// reads "Create group" both before and after it appears.
+        /// The "Name this group" dialog, opened by Start chat with two or more chips. It stays
+        /// up while the group is created.
         var isNamingGroup = false
+        var groupName = ""
 
         /// Non-nil while the "rejoin?" prompt is open, before an explicitly-left DM is recreated.
         @Presents var alert: AlertState<Action>?
@@ -94,52 +99,39 @@ struct NewChat {
             }
         }
 
-        /// Only an unknown pasted key needs a name; a saved contact already has one.
-        /// A group takes keys alone, so the field has no job there. Our own key is a dead
-        /// end, so naming it would be busywork.
-        var showsNameField: Bool { !isGroupMode && isValidKey && !isOwnKey && detectedContact == nil }
+        /// Android's "Public key detected" row: a complete key that is not already a chip. It
+        /// sits right above the search field, so Add is one thumb-reach tap after a paste.
+        var showsDetectedKey: Bool { isValidKey && !isDetectedKeySelected }
 
-        /// A complete key stops being text to edit and becomes the recipient, so the input
-        /// collapses into a single card. Showing both meant the same 64 characters twice.
-        var showsRecipientCard: Bool { isValidKey }
+        /// Our own key is a dead end, so the banner shows it without an Add.
+        var canAddDetectedKey: Bool { showsDetectedKey && !isOwnKey && !isCreating }
 
-        /// Nothing to search and nothing to search through: explain the screen instead of
-        /// rendering an empty list under an empty field.
+        /// Nothing to search, nobody picked and nobody to pick: explain the screen instead of
+        /// rendering an empty list. Android shows this whenever the field is empty, hiding
+        /// saved contacts until something is typed; listing them straight away is kept.
         var showsEmptyState: Bool {
-            !isGroupMode && searchInput.isEmpty && visibleContacts.isEmpty
+            searchInput.isEmpty && participants.isEmpty && visibleContacts.isEmpty
         }
 
-        var canStart: Bool { isValidKey && !isOwnKey && !isCreating }
-
+        /// Stays `.start` while creating, as Android keeps START CHAT (with its spinner)
+        /// rather than flipping back to the scanner mid-create. A complete key in the field
+        /// that isn't a chip yet also starts: the chat it names is the one meant.
         var primaryAction: PrimaryAction {
-            if isGroupMode {
-                return isNamingGroup ? .confirmGroup : .createGroup
-            }
-
-            return isValidKey ? .start : .scan
+            participants.isEmpty && !canAddDetectedKey && !isCreating ? .scan : .start
         }
 
-        var isPrimaryEnabled: Bool {
-            switch primaryAction {
-            case .scan: return !isCreating
-            case .start: return canStart
-            case .createGroup: return canCreateGroup
-            case .confirmGroup: return canConfirmGroup
-            }
-        }
+        var isPrimaryEnabled: Bool { !isCreating }
 
         var isDetectedKeySelected: Bool {
-            isValidKey && selectedContacts.contains { $0.publicKey == detectedKey }
+            isValidKey && participants.contains { $0.publicKey == detectedKey }
         }
 
-        var canCreateGroup: Bool { !selectedContacts.isEmpty && !isCreating }
-
         var canConfirmGroup: Bool {
-            canCreateGroup && !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            participants.count > 1 && !isCreating && !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
 
         func isSelected(_ contact: ChatContact) -> Bool {
-            selectedContacts.contains { $0.publicKey == contact.publicKey }
+            participants.contains { $0.publicKey == contact.publicKey }
         }
 
         init() { }
@@ -150,12 +142,13 @@ struct NewChat {
         case onDisappear
         case backToHomeTapped
         case peerKeyChanged(String)
-        case displayNameChanged(String)
         case pasteTapped
         case searchCleared
         case copyMyKeyTapped
         case copyIndicatorExpired
         case contactTapped(ChatContact)
+        case detectedKeyAdded
+        case participantRemoved(String)
         case startTapped
         case primaryTapped
         case scanTapped
@@ -168,10 +161,6 @@ struct NewChat {
         case rejoinConfirmed(publicKey: String, displayName: String?)
         case alert(PresentationAction<Action>)
 
-        case newGroupTapped
-        case detectedKeyAdded
-        case participantRemoved(String)
-        case groupCreateTapped
         case groupNameChanged(String)
         case groupConfirmTapped
         case groupCancelTapped
@@ -185,6 +174,23 @@ struct NewChat {
 
     private enum CancelID { case copyIndicator }
 
+    /// A pasted key can join without ever becoming a saved contact, so the chip is an unsaved
+    /// stand-in. It is local to this screen and never reaches @Shared.
+    private func addDetectedKey(_ state: inout State) {
+        let key = state.detectedKey
+        let name = state.detectedContact?.name
+
+        state.participants.append(
+            State.Participant(
+                publicKey: key,
+                name: name ?? String(key.prefix(Constants.keyPreviewLength)),
+                displayName: name
+            )
+        )
+        state.searchInput = ""
+        state.errorCode = nil
+    }
+
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
@@ -196,18 +202,8 @@ struct NewChat {
                 return .cancel(id: CancelID.copyIndicator)
 
             case .peerKeyChanged(let value):
-                // A name typed for the previous key must not carry over onto a different
-                // one, or the peer gets saved under a stranger's label.
-                let previousKey = state.detectedKey
                 state.searchInput = value
-                if state.detectedKey != previousKey {
-                    state.displayName = ""
-                }
                 state.errorCode = state.isOwnKey ? .ownPublicKey : nil
-                return .none
-
-            case .displayNameChanged(let value):
-                state.displayName = value
                 return .none
 
             case .pasteTapped:
@@ -217,7 +213,6 @@ struct NewChat {
 
             case .searchCleared:
                 state.searchInput = ""
-                state.displayName = ""
                 state.errorCode = nil
                 return .none
 
@@ -236,41 +231,57 @@ struct NewChat {
                 return .none
 
             case .contactTapped(let contact):
-                guard state.isGroupMode else {
-                    return start(&state, publicKey: contact.publicKey, displayName: contact.name)
-                }
                 guard !state.isCreating else { return .none }
 
-                if let index = state.selectedContacts.firstIndex(where: { $0.publicKey == contact.publicKey }) {
-                    state.selectedContacts.remove(at: index)
+                if state.isSelected(contact) {
+                    state.participants.removeAll { $0.publicKey == contact.publicKey }
                 } else {
-                    state.selectedContacts.append(contact)
+                    state.participants.append(
+                        State.Participant(publicKey: contact.publicKey, name: contact.name, displayName: contact.name)
+                    )
                 }
-
-                if state.selectedContacts.isEmpty {
-                    state.isNamingGroup = false
-                }
-
+                state.errorCode = nil
                 return .none
 
-            case .startTapped:
-                guard state.isValidKey, !state.isOwnKey else {
+            // Add on the "Public key detected" row: the key becomes a chip and the field clears
+            // for the next person, so a group can be built from several pasted keys.
+            case .detectedKeyAdded:
+                guard state.canAddDetectedKey else {
                     if state.isOwnKey { state.errorCode = .ownPublicKey }
                     return .none
                 }
 
-                let typed = state.displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-                let name = state.detectedContact?.name ?? (typed.isEmpty ? nil : typed)
-                let key = state.detectedKey
+                addDetectedKey(&state)
+                return .none
 
-                return start(&state, publicKey: key, displayName: name)
+            case .participantRemoved(let publicKey):
+                guard !state.isCreating else { return .none }
+                state.participants.removeAll { $0.publicKey == publicKey }
+                return .none
+
+            case .startTapped:
+                // A key pasted or scanned but not added yet joins the chat it starts.
+                if state.canAddDetectedKey {
+                    addDetectedKey(&state)
+                }
+                guard !state.isCreating, let first = state.participants.first else { return .none }
+
+                // More than one participant is a group, which needs a name before it exists.
+                // The dialog shows a create failure from `errorCode`, so an older error (an own
+                // key pasted earlier, a failed DM) must not greet it.
+                guard state.participants.count == 1 else {
+                    state.groupName = ""
+                    state.errorCode = nil
+                    state.isNamingGroup = true
+                    return .none
+                }
+
+                return start(&state, publicKey: first.publicKey, displayName: first.displayName)
 
             case .primaryTapped:
                 switch state.primaryAction {
                 case .scan: return .send(.scanTapped)
                 case .start: return .send(.startTapped)
-                case .createGroup: return .send(.groupCreateTapped)
-                case .confirmGroup: return .send(.groupConfirmTapped)
                 }
 
             case .scanTapped:
@@ -282,7 +293,7 @@ struct NewChat {
                 return .none
 
                 // The scanner only ever hands back a sanitized 64-hex key, so it lands in
-                // the same field a paste would and the detected-key card takes over.
+                // the same field a paste would and the detected-key row takes over.
             case .scan(.presented(.foundString(let key))):
                 state.scan = nil
                 return .send(.peerKeyChanged(key))
@@ -305,12 +316,13 @@ struct NewChat {
 
             case .created:
                 state.isCreating = false
-                state.isGroupMode = false
-                state.selectedContacts = []
+                state.participants = []
                 state.groupName = ""
                 state.isNamingGroup = false
                 return .none
 
+            // A failed group create keeps the naming dialog up, with the failure in it, so the
+            // name is not lost to a retry.
             case .createFailed(let code):
                 state.isCreating = false
                 state.errorCode = code
@@ -335,51 +347,6 @@ struct NewChat {
             case .alert:
                 return .none
 
-            case .newGroupTapped:
-                guard !state.isCreating, !state.isGroupMode else { return .none }
-                state.isGroupMode = true
-                state.errorCode = nil
-                return .none
-
-            // A pasted key can join a group without ever becoming a saved contact, so the chip
-            // is an unsaved stand-in. It is local to this screen and never reaches @Shared.
-            case .detectedKeyAdded:
-                guard state.isGroupMode, state.isValidKey, !state.isOwnKey, !state.isCreating else {
-                    if state.isOwnKey { state.errorCode = .ownPublicKey }
-                    return .none
-                }
-
-                let key = state.detectedKey
-                state.searchInput = ""
-
-                guard !state.selectedContacts.contains(where: { $0.publicKey == key }) else { return .none }
-
-                state.selectedContacts.append(
-                    ChatContact(
-                        publicKey: key,
-                        name: state.chatContacts.contact(for: key)?.name ?? String(key.prefix(Constants.keyPreviewLength)),
-                        lastUpdated: .distantPast,
-                        isSaved: false
-                    )
-                )
-
-                return .none
-
-            case .participantRemoved(let publicKey):
-                guard !state.isCreating else { return .none }
-                state.selectedContacts.removeAll { $0.publicKey == publicKey }
-
-                if state.selectedContacts.isEmpty {
-                    state.isNamingGroup = false
-                }
-
-                return .none
-
-            case .groupCreateTapped:
-                guard state.canCreateGroup else { return .none }
-                state.isNamingGroup = true
-                return .none
-
             case .groupNameChanged(let value):
                 state.groupName = value
                 state.errorCode = nil
@@ -391,7 +358,7 @@ struct NewChat {
                 state.errorCode = nil
 
                 let name = state.groupName.trimmingCharacters(in: .whitespacesAndNewlines)
-                let keys = state.selectedContacts.map(\.publicKey)
+                let keys = state.participants.map(\.publicKey)
 
                 return .run { send in
                     do {
@@ -405,15 +372,8 @@ struct NewChat {
 
             case .groupCancelTapped:
                 guard !state.isCreating else { return .none }
-
-                if state.isNamingGroup {
-                    state.isNamingGroup = false
-                    state.groupName = ""
-                    return .none
-                }
-
-                state.isGroupMode = false
-                state.selectedContacts = []
+                state.isNamingGroup = false
+                state.groupName = ""
                 state.errorCode = nil
                 return .none
 

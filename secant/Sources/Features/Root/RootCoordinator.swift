@@ -22,7 +22,6 @@ extension Root {
                 .chatContactsList(.backToHomeTapped),
                 .chatProfile(.backToHomeTapped),
                 .chatRoom(.backToHomeTapped),
-                .groupInfo(.backToHomeTapped),
                 .newChat(.backToHomeTapped),
                 .onramp(.delegate(.close)),
                 .receive(.backToHomeTapped),
@@ -733,31 +732,22 @@ extension Root {
             case .chatProfile(.deleteIdentityConfirmed):
                 return .send(.initialization(.resetZashiRequest(false)))
 
-                // Only a group has anything behind its title.
-            case .chatRoom(.titleTapped):
-                guard let conversation = state.chatRoomState.conversation,
-                      conversation.type == .group else {
-                    return .none
-                }
-                state.groupInfoState = .initial
-                state.groupInfoState.conversation = conversation
-                state.path = .groupInfo
-                return .none
-
                 // Send ZEC from the composer's attachment sheet. The address is whatever the peer
                 // shared in this chat, else their saved contact row — Android's
-                // `onSendZecClick`. With neither, the room asks for the scanner instead and this
-                // case never fires.
-            case .chatRoom(.sendZecTapped):
-                guard let address = state.chatRoomState.resolvedPeerWalletAddress else {
-                    return .none
-                }
+                // `onSendZecClick`. The room decides whether to ask first (a direct chat with
+                // neither); it requests the form when it doesn't, and from "Enter an address".
+                // A group with no address opens the form empty, still in chat-send context.
+            case .chatRoom(.sendFormRequested):
                 state.sendCoordFlowState = .initial
                 state.returnsToChatRoomAfterWalletFlow = true
                 // No request id: this send settles nothing, it is just a payment to the peer.
                 state.chatSendContext = .init(conversationId: state.chatRoomState.conversationId)
                 state.path = .sendCoordFlow
                 exchangeRate.refreshExchangeRateUSD()
+
+                guard let address = state.chatRoomState.resolvedPeerWalletAddress else {
+                    return .none
+                }
                 return .send(.sendCoordFlow(.sendForm(.addressUpdated(address.redacted))))
 
                 // A shared wallet-address bubble tapped into a send — Android's `onSendToAddress`,
@@ -828,16 +818,6 @@ extension Root {
                 state.path = .transactionsCoordFlow
                 return .none
 
-                // Falls out of Send ZEC when no peer address is known. The scanner ends in the
-                // same send form, so it returns to the room on the way out too — and it is still
-                // a chat-initiated send, so it carries the same receipt context.
-            case .chatRoom(.scanWalletAddressTapped):
-                state.scanCoordFlowState = .initial
-                state.returnsToChatRoomAfterWalletFlow = true
-                state.chatSendContext = .init(conversationId: state.chatRoomState.conversationId)
-                state.path = .scanCoordFlow
-                return .none
-
                 // MARK: - Chat payment receipt
 
                 // Android's `SubmitProposalUseCase.notifyChatPeer`. A send that was started from
@@ -889,7 +869,7 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
-            case .groupInfo(.didLeave):
+            case .chatRoom(.leftGroup):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
 

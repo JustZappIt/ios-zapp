@@ -372,6 +372,10 @@ extension SupportChat {
                     state.showsFileImporter = true
                     return .none
 
+                // Support has no Send ZEC, so nothing parks the address prompt here.
+                case .addressRequest:
+                    return .none
+
                 case .camera:
                     return .run { send in
                         guard cameraCapture.isAvailable() else {

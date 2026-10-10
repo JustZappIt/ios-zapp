@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [CHATS-PARITY] A location shared from Android now shows as a location card with its coordinates and an Open in Maps link, instead of raw text, and the Chats list previews it as "Location".
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
 - [PARITY] P2P wallet key now opens its own screen: your smart account address is shown openly, and the owner key stays locked until you reveal it with your app lock.
@@ -67,6 +68,12 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [CHATS-PARITY] Send ZEC in a chat now always opens the Send screen, as on Android. When Zapp doesn't know the other person's address the form opens empty instead of jumping to the QR scanner.
+- [CHATS-PARITY] Link previews in chats now sit inside the message bubble and open the link when tapped. The message composer matches Android: larger controls, an accent "+" button and up to four visible lines.
+- [CHATS-PARITY] The chat identity setup screen now matches Android: "Set Up Your Chat Identity" with a display name field and "Create my identity". The name rules appear only if the name doesn't fit them, and if setup fails you can copy the error details to send to the Zapp team.
+- [CHATS-PARITY] Chat connection status now reads like Android: the conversation header always says how the conversation is connected ("Peer online", "P2P connected", "Waiting for peer…", "Offline" and so on), the status chips use Android's short labels, and the network details sheet uses Android's sections, labels and icons, hiding details until they have loaded instead of showing "Unknown".
+- [CHATS-PARITY] Tapping a group's name now opens its details as a sheet over the conversation, as on Android: the name, member count, Rename and Add member (for the group owner), the member list and Leave group. Closing it returns you to the conversation, and a rename shows in the conversation header straight away.
+- [CHATS-PARITY] New conversation now works like Android: tap contacts (or add a pasted or scanned key) to build a list of people, then Start chat opens a direct chat for one person or asks you to name a group for two or more. The search field sits at the bottom next to the buttons, the screen explains that messages are peer-to-peer encrypted, and the separate New group mode is gone. The Chats button and empty state now say "New conversation" and point at the chat button.
 - [PARITY] The You tab now matches Android: "Base account" shows when a cash-out is still in progress, the P2P payment method and local currency rows name what you picked, and the Privacy and Wallet rows follow Android's order. The Wallet group is hidden until a wallet exists.
 - [PARITY] Deleting a contact now asks first, and failed saves, deletes or blocks are reported instead of failing silently. When editing, Save stays off until you change something.
 - [PARITY] Chat settings are saved together with a Save button, as on Android, and enabling background delivery asks for notification permission when you save.

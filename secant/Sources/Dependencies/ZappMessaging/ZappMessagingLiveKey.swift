@@ -147,8 +147,16 @@ private final class ZappMessagingImpl: @unchecked Sendable {
                 }
             } catch {
                 LoggerProxy.event("ZappMessaging: worklet boot failed: \(error)")
-                self.mutate { $0.phase = .failed(Self.errorCode(error)) }
+                // Tear the half-booted SDK down before `.failed` is visible, so a retry starts
+                // clean: a worklet that started but never answered still holds the store open,
+                // and its subscriptions would otherwise double up with the next SDK's.
+                if let failedSDK = self.sdk {
+                    await failedSDK.shutdown()
+                }
+                self.sdk = nil
+                self.cancellables.removeAll()
                 self.lock.withLock { self.hasStarted = false }
+                self.mutate { $0.phase = .failed(Self.errorCode(error)) }
             }
         }
     }
@@ -202,7 +210,17 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     }
 
     func retryIdentityDerivation() {
-        guard stateSubject.value.phase != .deriving else { return }
+        let phase = stateSubject.value.phase
+        guard phase != .deriving else { return }
+
+        // After a boot failure there is no worklet to derive on, so `deriveIfPossible` would
+        // return without doing anything and Retry was dead. Boot again instead; `start()`
+        // derives on reaching `.needsIdentity` from the name still queued.
+        if case .failed = phase {
+            start()
+            return
+        }
+
         mutate { $0.identityErrorCode = nil }
         deriveIfPossible()
     }

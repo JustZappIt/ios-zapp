@@ -1648,6 +1648,57 @@
         }
       }
     },
+    "chatBubble.locationOpenInMaps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Maps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir en Mapas"
+          }
+        }
+      }
+    },
+    "chatBubble.locationReceived" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location received"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ubicación recibida"
+          }
+        }
+      }
+    },
+    "chatBubble.locationShared" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location shared"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ubicación compartida"
+          }
+        }
+      }
+    },
     "chatBubble.paymentRequest.owe" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2685,23 +2736,6 @@
         }
       }
     },
-    "chatIdentity.failed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Couldn't set up chat"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo configurar el chat"
-          }
-        }
-      }
-    },
     "chatIdentity.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2715,23 +2749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "nombre de usuario"
-          }
-        }
-      }
-    },
-    "chatIdentity.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try again"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reintentar"
           }
         }
       }
@@ -2787,36 +2804,138 @@
         }
       }
     },
-    "chatList.connecting" : {
+    "chatIdentitySetup.copyDetails" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connecting…"
+            "value" : "Copy error details"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conectando…"
+            "value" : "Copiar detalles del error"
           }
         }
       }
     },
-    "chatList.degraded" : {
+    "chatIdentitySetup.create" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weak connection"
+            "value" : "Create my identity"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conexión débil"
+            "value" : "Crear mi identidad"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.deriveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't set up your chat identity from this wallet. Go back and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo configurar tu identidad de chat desde esta billetera. Vuelve atrás e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.displayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre visible"
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.nameInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display name must be 3–20 characters, using lowercase letters, numbers, or underscores."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El nombre visible debe tener entre 3 y 20 caracteres y usar letras minúsculas, números o guiones bajos."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your messaging identity is derived from your wallet. Pick a display name to finish setting it up."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu identidad de mensajería se deriva de tu billetera. Elige un nombre visible para terminar de configurarla."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.supportHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If this keeps happening, copy the error details and send them to the Zapp team."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si esto sigue ocurriendo, copia los detalles del error y envíalos al equipo de Zapp."
+          }
+        }
+      }
+    },
+    "chatIdentitySetup.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Up Your Chat Identity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura tu identidad de chat"
           }
         }
       }
@@ -2827,13 +2946,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tap + to start a new P2P chat"
+            "value" : "Tap the chat button to start a new P2P chat"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toca + para iniciar un nuevo chat P2P"
+            "value" : "Toca el botón de chat para iniciar un nuevo chat P2P"
           }
         }
       }
@@ -2997,13 +3116,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New chat"
+            "value" : "New conversation"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuevo chat"
+            "value" : "Nueva conversación"
           }
         }
       }
@@ -3021,23 +3140,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aún no hay mensajes"
-          }
-        }
-      }
-    },
-    "chatList.offline" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión"
           }
         }
       }
@@ -3106,6 +3208,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ sin leer"
+          }
+        }
+      }
+    },
+    "chatList.status.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "…"
+          }
+        }
+      }
+    },
+    "chatList.status.disconnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "off"
+          }
+        }
+      }
+    },
+    "chatList.status.error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "err"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "err"
           }
         }
       }
@@ -3246,19 +3399,36 @@
         }
       }
     },
+    "chatNetwork.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando"
+          }
+        }
+      }
+    },
     "chatNetwork.connections" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TCP connections"
+            "value" : "Connections"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conexiones TCP"
+            "value" : "Conexiones"
           }
         }
       }
@@ -3382,6 +3552,23 @@
         }
       }
     },
+    "chatNetwork.disconnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectado"
+          }
+        }
+      }
+    },
     "chatNetwork.error" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3405,13 +3592,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invites"
+            "value" : "Pending invites"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invitaciones"
+            "value" : "Invitaciones pendientes"
           }
         }
       }
@@ -3422,13 +3609,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT"
+            "value" : "Behind NAT, via relay"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT"
+            "value" : "Detrás de NAT, vía relé"
           }
         }
       }
@@ -3490,13 +3677,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P peers"
+            "value" : "Peers"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pares P2P"
+            "value" : "Pares"
           }
         }
       }
@@ -3514,6 +3701,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pendientes"
+          }
+        }
+      }
+    },
+    "chatNetwork.pendingCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ msgs in %2$@ queues"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ mensajes en %2$@ colas"
           }
         }
       }
@@ -3609,13 +3813,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Peers"
+            "value" : "Peers and DHT"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pares"
+            "value" : "Pares y DHT"
           }
         }
       }
@@ -3643,13 +3847,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strict NAT"
+            "value" : "Strict NAT, via relay"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "NAT estricta"
+            "value" : "NAT estricto, vía relé"
           }
         }
       }
@@ -5082,6 +5286,91 @@
         }
       }
     },
+    "chatRoom.chip.connected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.dht" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.err" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Err"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Err"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.off" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "chatRoom.chip.online" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Online"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En línea"
+          }
+        }
+      }
+    },
     "chatRoom.copyMessage" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5371,6 +5660,23 @@
         }
       }
     },
+    "chatRoom.openLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link from %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace de %@"
+          }
+        }
+      }
+    },
     "chatRoom.ownKeySendFailed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5384,57 +5690,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta conversación usa tu propia clave de mensajería. Elimínala e inicia un chat con la clave de la otra persona."
-          }
-        }
-      }
-    },
-    "chatRoom.peer.connected" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conectado"
-          }
-        }
-      }
-    },
-    "chatRoom.peer.offline" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión"
-          }
-        }
-      }
-    },
-    "chatRoom.peer.online" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Online"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En línea"
           }
         }
       }
@@ -5728,6 +5983,108 @@
         }
       }
     },
+    "chatRoom.sendZec.addressRequestText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could you share your wallet address so I can send you ZEC? Tap + and choose Share Address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Me compartes tu dirección de billetera para enviarte ZEC? Toca + y elige Compartir dirección."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.askForAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask for their address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedir su dirección"
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.enterAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribir una dirección"
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hasn't shared a wallet address in this chat. Ask for it, or enter one yourself."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no ha compartido una dirección de billetera en este chat. Pídesela o escríbela tú."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.messageUnnamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They haven't shared a wallet address in this chat. Ask for it, or enter one yourself."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta persona no ha compartido una dirección de billetera en este chat. Pídesela o escríbela tú."
+          }
+        }
+      }
+    },
+    "chatRoom.sendZec.noAddress.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No wallet address yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay dirección de billetera"
+          }
+        }
+      }
+    },
     "chatRoom.sendingMedia" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5894,6 +6251,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enviado, pendiente de entrega"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando…"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.dhtDegraded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT degraded"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT degradada"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.dhtUnreachable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT unreachable"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DHT inaccesible"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de conexión"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.offline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.p2pConnected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P connected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P2P conectado"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.peerOnline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peer online"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par en línea"
+          }
+        }
+      }
+    },
+    "chatRoom.subtitle.waitingForPeer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for peer…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando al par…"
           }
         }
       }
@@ -13704,23 +14197,6 @@
         }
       }
     },
-    "group.info.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Group"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grupo"
-          }
-        }
-      }
-    },
     "group.leave" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13772,6 +14248,23 @@
         }
       }
     },
+    "group.membersCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ members"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ miembros"
+          }
+        }
+      }
+    },
     "group.name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13789,36 +14282,19 @@
         }
       }
     },
-    "group.namePlaceholder" : {
+    "group.noContactsToAdd" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What to call this group"
+            "value" : "No contacts to add"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo llamar a este grupo"
-          }
-        }
-      }
-    },
-    "group.newGroup" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New group"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nuevo grupo"
+            "value" : "No hay contactos para añadir"
           }
         }
       }
@@ -13853,23 +14329,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Renombrar grupo"
-          }
-        }
-      }
-    },
-    "group.selectMembers" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select who to add"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige a quién añadir"
           }
         }
       }
@@ -19624,13 +20083,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scan someone's QR code or paste their public key to send them a message."
+            "value" : "Scan someone's QR code or enter their public key to send them a message."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escanea el código QR de alguien o pega su clave pública para enviarle un mensaje."
+            "value" : "Escanea el código QR de alguien o introduce su clave pública para enviarle un mensaje."
           }
         }
       }
@@ -19669,6 +20128,23 @@
         }
       }
     },
+    "newChat.groupNameTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name this group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponle nombre a este grupo"
+          }
+        }
+      }
+    },
     "newChat.invalidKey" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19699,40 +20175,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clave pública detectada"
-          }
-        }
-      }
-    },
-    "newChat.nameLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name (optional)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nombre (opcional)"
-          }
-        }
-      }
-    },
-    "newChat.namePlaceholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How they'll appear in your chats"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cómo aparecerán en tus chats"
           }
         }
       }
@@ -19907,6 +20349,23 @@
         }
       }
     },
+    "newChat.removeParticipant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar a %@"
+          }
+        }
+      }
+    },
     "newChat.scan" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19947,13 +20406,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search contacts, or paste a key"
+            "value" : "Type or paste a public key…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Busca contactos o pega una clave"
+            "value" : "Escribe o pega una clave pública…"
+          }
+        }
+      }
+    },
+    "newChat.selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionado"
           }
         }
       }
@@ -19981,13 +20457,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New chat"
+            "value" : "New conversation"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nuevo chat"
+            "value" : "Nueva conversación"
           }
         }
       }

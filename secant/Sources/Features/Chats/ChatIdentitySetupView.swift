@@ -18,9 +18,10 @@ struct ChatIdentitySetupView: View {
     @FocusState private var isNameFocused: Bool
 
     private enum Constants {
-        static let horizontalPadding: CGFloat = 18
+        static let horizontalPadding: CGFloat = 24
         static let fieldMinHeight: CGFloat = 52
         static let fieldPadding: CGFloat = 14
+        static let iconSize: CGFloat = 72
     }
 
     @Perception.Bindable var store: StoreOf<ChatIdentitySetup>
@@ -35,59 +36,57 @@ struct ChatIdentitySetupView: View {
         }
     }
 
+    /// Deriving and a failed derive stay on the form, as Android's do: the button carries the
+    /// progress and the error sits under it.
     @ViewBuilder private var content: some View {
         switch store.messagingState.phase {
         case .idle, .initializing:
             ChatIdentityProgress(label: nil)
 
-        case .needsIdentity:
+        case .needsIdentity, .deriving, .failed:
             form
-
-        case .deriving:
-            ChatIdentityProgress(label: String(localizable: .chatIdentityDeriving))
 
         case .ready:
             EmptyView()
-
-        case .failed:
-            failure
         }
     }
 
+    /// Android's `ChatIdentitySetupView`: a centred column under a person icon.
     private var form: some View {
-        VStack(spacing: 0) {
-            ZappScreenHeader(title: String(localizable: .chatIdentityTitle))
+        ScrollView {
+            VStack(spacing: 0) {
+                Asset.Assets.Icons.user.image
+                    .zImage(width: Constants.iconSize, height: Constants.iconSize, style: ZappColors.accent)
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: Design.Spacing._lg) {
-                    Text(String(localizable: .chatIdentitySubtitle))
-                        .zappFont(.body, style: ZappColors.textMuted)
-                        .fixedSize(horizontal: false, vertical: true)
+                Text(String(localizable: .chatIdentitySetupTitle))
+                    .zappFont(.displaySecondary, style: ZappColors.text)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, Design.Spacing._2xl)
 
-                    nameField
-
-                    Text(String(localizable: .chatIdentityRules))
-                        .zappFont(.caption, style: ZappColors.textSubtle)
-
-                    if let errorCode = store.errorCode {
-                        ChatIdentityError(code: errorCode)
-                    }
-
-                    ZappButton(title: ctaTitle, isEnabled: store.isValid) {
-                        store.send(store.errorCode == nil ? .continueTapped : .retryTapped)
-                    }
+                Text(String(localizable: .chatIdentitySetupSubtitle))
+                    .zappFont(.body, style: ZappColors.textMuted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, Design.Spacing._md)
-                }
-                .padding(.horizontal, Constants.horizontalPadding)
-                .padding(.top, Design.Spacing._2xl)
-                .padding(.bottom, ZappNavBar.clearance)
+
+                nameField
+                    .padding(.top, Design.Spacing._2xl)
+
+                submitButton
+                    .padding(.top, Design.Spacing._xl)
+
+                errorSection
             }
+            .padding(.horizontal, Constants.horizontalPadding)
+            .padding(.top, Design.Spacing._3xl)
+            .padding(.bottom, ZappNavBar.clearance)
+            .frame(maxWidth: .infinity)
         }
     }
 
     private var nameField: some View {
         TextField(
-            String(localizable: .chatIdentityPlaceholder),
+            String(localizable: .chatIdentitySetupDisplayName),
             text: Binding(
                 get: { store.displayName },
                 set: { store.send(.displayNameChanged($0)) }
@@ -98,6 +97,7 @@ struct ChatIdentitySetupView: View {
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled()
         .submitLabel(.done)
+        .onSubmit { store.send(.continueTapped) }
         .padding(.horizontal, Constants.fieldPadding)
         .padding(.vertical, Constants.fieldPadding)
         .frame(maxWidth: .infinity, minHeight: Constants.fieldMinHeight)
@@ -109,39 +109,52 @@ struct ChatIdentitySetupView: View {
         .zappFieldTapTarget($isNameFocused)
     }
 
-    private var failure: some View {
-        VStack(spacing: Design.Spacing._2xl) {
-            ChatIdentityError(code: store.errorCode ?? "")
+    private var submitButton: some View {
+        ZStack {
+            ZappButton(
+                title: store.isSubmitting ? "" : String(localizable: .chatIdentitySetupCreate),
+                isEnabled: !store.isSubmitting
+            ) {
+                store.send(.continueTapped)
+            }
 
-            ZappButton(title: String(localizable: .chatIdentityRetry)) {
-                store.send(.retryTapped)
+            if store.isSubmitting {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .tint(ZappColors.textSubtle.color(colorScheme))
+                    .accessibilityLabel(String(localizable: .chatIdentityDeriving))
             }
         }
-        .padding(.horizontal, Constants.horizontalPadding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.bottom, ZappNavBar.clearance)
     }
 
-    private var ctaTitle: String {
-        store.errorCode == nil
-            ? String(localizable: .chatIdentityContinue)
-            : String(localizable: .chatIdentityRetry)
-    }
-}
-
-private struct ChatIdentityError: View {
-    let code: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            Text(String(localizable: .chatIdentityFailed))
+    @ViewBuilder private var errorSection: some View {
+        if store.showsNameRulesError {
+            Text(String(localizable: .chatIdentitySetupNameInvalid))
                 .zappFont(.caption, style: ZappColors.danger)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, Design.Spacing._md)
+        } else if store.errorCode != nil {
+            VStack(spacing: Design.Spacing._md) {
+                Text(String(localizable: .chatIdentitySetupDeriveFailed))
+                    .zappFont(.caption, style: ZappColors.danger)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Text(code)
-                .zappFont(.mono, style: ZappColors.danger)
+                Text(String(localizable: .chatIdentitySetupSupportHint))
+                    .zappFont(.caption, style: ZappColors.textMuted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ZappButton(
+                    title: String(localizable: .chatIdentitySetupCopyDetails),
+                    variant: .secondary
+                ) {
+                    store.send(.copyErrorDetailsTapped)
+                }
+            }
+            .padding(.top, Design.Spacing._md)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
