@@ -13,6 +13,12 @@ struct ChatContactFormView: View {
         static let validKeyIconSize: CGFloat = 14
         static let keyHeadLength = 10
         static let keyTailLength = 6
+        static let screenInset: CGFloat = 18
+        static let fieldSpacing: CGFloat = 12
+        static let fieldInset: CGFloat = 14
+        static let fieldHeight: CGFloat = 52
+        static let glyphGap: CGFloat = 10
+        static let confirmVerticalPadding: CGFloat = 14
     }
 
     @Perception.Bindable var store: StoreOf<ChatContactForm>
@@ -22,48 +28,39 @@ struct ChatContactFormView: View {
             VStack(spacing: 0) {
                 ZappScreenHeader(title: title)
 
+                // Android's compact sheet: three icon-led fields, one error line, then the actions.
                 ScrollView {
-                    VStack(spacing: 0) {
-                        contactPreview
-                            .padding(.horizontal, 14)
-                            .padding(.top, Design.Spacing._lg)
+                    VStack(alignment: .leading, spacing: Constants.fieldSpacing) {
+                        nameField
+                        keyField
+                        addressField
 
-                        ZappSettingsGroup(title: String(localizable: .chatContactsFormDetails)) {
-                            VStack(alignment: .leading, spacing: Design.Spacing._xl) {
-                                labeledField(String(localizable: .chatContactsNameLabel)) { nameField }
-                                labeledField(String(localizable: .chatContactsKeyLabel)) { keyField }
-                            }
-                            .padding(Design.Spacing._lg)
-                        }
-
-                        ZappSettingsGroup(title: String(localizable: .chatContactsFormPayments)) {
-                            VStack(alignment: .leading, spacing: Design.Spacing._xl) {
-                                Text(localizable: .chatContactsFormPaymentsHint)
-                                    .zappFont(.caption, style: ZappColors.textMuted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                labeledField(String(localizable: .chatContactsAddressLabel)) { addressField }
-                            }
-                            .padding(Design.Spacing._lg)
+                        if let errorMessage = store.errorMessage {
+                            Text(errorMessage)
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
 
                         if store.isBlocked {
                             Text(String(localizable: .chatContactsBlockedNotice))
                                 .zappFont(.caption, style: ZappColors.danger)
-                                .padding(Design.Spacing._lg)
                         }
 
-                        if store.canBlock || store.isEditing {
+                        if store.isConfirmingDelete {
+                            deleteConfirmation
+                                .padding(.top, Design.Spacing._md)
+                        } else if store.canBlock || store.isEditing {
                             buttons
-                                .padding(.horizontal, 14)
                                 .padding(.top, Design.Spacing._md)
                         }
                     }
-                    .padding(.bottom, Design.Spacing._lg)
+                    .padding(.horizontal, Constants.screenInset)
+                    .padding(.vertical, Design.Spacing._xl)
                 }
                 .scrollDismissesKeyboard(.interactively)
 
                 ZappBottomActionBar(onBack: { store.send(.closeTapped) }) {
-                    ZappButton(title: String(localizable: .chatContactsSave), isEnabled: store.canSave) {
+                    ZappButton(title: saveTitle, isEnabled: store.canSave) {
                         store.send(.saveTapped)
                     }
                 }
@@ -79,61 +76,65 @@ struct ChatContactFormView: View {
         }
     }
 
-    private var contactPreview: some View {
-        ZappRow(
-            title: store.trimmedName.isEmpty ? String(localizable: .chatContactsFormPreview) : store.trimmedName,
-            subtitle: store.isValidKey ? abbreviatedKey : String(localizable: .chatContactsFormIntro),
-            icon: Asset.Assets.Icons.user.image,
-            iconTint: .accentText,
-            iconBackground: .accentSoft,
-            trailing: { EmptyView() }
-        )
-        .background(ZappColors.surface.color(colorScheme))
-        .overlay(alignment: .leading) {
-            Rectangle()
-                .fill(ZappColors.accent.color(colorScheme))
-                .frame(width: 3)
-        }
-    }
-
-    private func labeledField<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._sm) {
-            ZappSectionLabel(text: label)
-            content()
-        }
-    }
-
+    /// Add vs Edit follows whether a row exists, so a peer opened from their conversation who is
+    /// not saved yet reads as an add (Android always says "Edit Contact" there).
     private var title: String {
         store.isEditing
-            ? String(localizable: .chatContactsEdit)
-            : String(localizable: .chatContactsAdd)
+            ? String(localizable: .chatContactsEditTitle)
+            : String(localizable: .chatContactsAddTitle)
     }
 
-    private var nameField: some View {
-        ZappInputField(
-            placeholder: String(localizable: .chatContactsNamePlaceholder),
-            text: Binding(
-                get: { store.name },
-                set: { store.send(.nameChanged($0)) }
-            ),
-            accessibilityLabel: String(localizable: .chatContactsNameLabel)
-        ) {
-            ZappInputFieldGlyph(icon: Asset.Assets.Icons.user.image)
+    private var saveTitle: String {
+        store.isEditing
+            ? String(localizable: .chatContactsSaveChanges)
+            : String(localizable: .chatContactsSave)
+    }
+
+    /// Android offers copy wherever the contact is already known — its edit sheet.
+    private var offersCopy: Bool { store.isKeyLocked }
+
+    private func copyButton(_ field: ChatContactForm.CopyField, label: String) -> some View {
+        ZappCopyIconButton(isCopied: store.copiedField == field, accessibilityLabel: label) {
+            store.send(.copyTapped(field))
         }
+    }
+
+    /// A trailing slot, even an empty one, drops the field's right inset, so the copy button is
+    /// either there for the whole edit (inert while the name is blank) or the slot is absent.
+    @ViewBuilder private var nameField: some View {
+        if offersCopy {
+            ZappInputField(
+                placeholder: String(localizable: .chatContactsNamePlaceholder),
+                text: nameBinding,
+                accessibilityLabel: String(localizable: .chatContactsNameLabel),
+                leading: { ZappInputFieldGlyph(icon: Asset.Assets.Icons.user.image) },
+                trailing: { copyButton(.name, label: String(localizable: .chatContactsCopyName)) }
+            )
+        } else {
+            ZappInputField(
+                placeholder: String(localizable: .chatContactsNamePlaceholder),
+                text: nameBinding,
+                accessibilityLabel: String(localizable: .chatContactsNameLabel)
+            ) {
+                ZappInputFieldGlyph(icon: Asset.Assets.Icons.user.image)
+            }
+        }
+    }
+
+    private var nameBinding: Binding<String> {
+        Binding(
+            get: { store.name },
+            set: { store.send(.nameChanged($0)) }
+        )
     }
 
     private var keyField: some View {
         VStack(alignment: .leading, spacing: Design.Spacing._xs) {
             if store.isKeyLocked {
-                Text(store.publicKey)
-                    .zappFont(.mono, style: ZappColors.textMuted)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(Design.Spacing._md)
-                    .background(ZappColors.surfaceAlt.color(colorScheme))
+                lockedKeyRow
             } else {
                 ZappInputField(
-                    placeholder: String(localizable: .newChatPeerPlaceholder),
+                    placeholder: String(localizable: .chatContactsKeyPlaceholder),
                     text: Binding(
                         get: { store.publicKey },
                         set: { store.send(.publicKeyChanged($0)) }
@@ -180,6 +181,9 @@ struct ChatContactFormView: View {
                 accessibilityLabel: String(localizable: .chatContactsAddressLabel),
                 leading: { ZappInputFieldGlyph(icon: Asset.Assets.Icons.connectWallet.image) },
                 trailing: {
+                    if offersCopy && !store.trimmedAddress.isEmpty {
+                        copyButton(.address, label: String(localizable: .chatContactsCopyAddress))
+                    }
                     ZappInputFieldAction(
                         icon: Asset.Assets.Icons.scan.image,
                         accessibilityLabel: String(localizable: .chatContactsScanAddress)
@@ -226,6 +230,27 @@ struct ChatContactFormView: View {
         return "\(key.prefix(Constants.keyHeadLength))…\(key.suffix(Constants.keyTailLength))"
     }
 
+    /// Android's read-only key row: the key abbreviated, in an input-shaped box, with copy.
+    private var lockedKeyRow: some View {
+        HStack(spacing: 0) {
+            ZappInputFieldGlyph(icon: Asset.Assets.Icons.key.image)
+                .padding(.trailing, Constants.glyphGap)
+
+            Text(abbreviatedKey)
+                .zappFont(.mono, style: ZappColors.textMuted)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel(String(localizable: .chatContactsKeyLabel))
+                .accessibilityValue(store.publicKey)
+
+            copyButton(.publicKey, label: String(localizable: .chatContactsCopyKey))
+        }
+        .padding(.leading, Constants.fieldInset)
+        .frame(minHeight: Constants.fieldHeight)
+        .background(ZappColors.surfaceInput.color(colorScheme))
+        .overlay { Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1) }
+    }
+
     private var buttons: some View {
         VStack(spacing: Design.Spacing._md) {
             if store.canBlock {
@@ -242,6 +267,36 @@ struct ChatContactFormView: View {
                 .frame(maxWidth: .infinity)
             }
         }
+    }
+
+    /// Android's inline `DeleteConfirmation` panel, which stands in for the buttons until answered.
+    private var deleteConfirmation: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(String(localizable: .chatContactsDeleteConfirmTitle))
+                .zappFont(.rowTitle, style: ZappColors.danger)
+
+            Text(String(localizable: .chatContactsDeleteConfirmSubtitle))
+                .zappFont(.rowSubtitle, style: ZappColors.textMuted)
+                .padding(.top, Design.Spacing._xs)
+
+            HStack(spacing: Design.Spacing._lg) {
+                ZappButton(title: String(localizable: .generalCancel), variant: .secondary) {
+                    store.send(.deleteCancelled)
+                }
+                .frame(maxWidth: .infinity)
+
+                ZappButton(title: String(localizable: .chatContactsDeleteConfirm), variant: .danger) {
+                    store.send(.deleteConfirmed)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.top, Design.Spacing._lg)
+        }
+        .padding(.horizontal, Design.Spacing._lg)
+        .padding(.vertical, Constants.confirmVerticalPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(ZappColors.dangerSoft.color(colorScheme))
+        .overlay { Rectangle().strokeBorder(ZappColors.danger.color(colorScheme), lineWidth: 1) }
     }
 
     private var blockTitle: String {

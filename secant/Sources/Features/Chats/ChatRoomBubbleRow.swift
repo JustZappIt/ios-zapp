@@ -19,6 +19,12 @@ import UIKit
 import ZappMessaging
 
 struct ChatRoomBubbleRow: View, @MainActor Equatable {
+    @Environment(\.colorScheme) private var colorScheme
+
+    private enum Constants {
+        static let highlightOpacity: CGFloat = 0.18
+    }
+
     let store: StoreOf<ChatRoom>
 
     let message: ZMMessage
@@ -31,6 +37,10 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
     let linkPreview: ChatLinkPreview?
     let progress: Double?
     let isPaid: Bool
+    /// The message this one quotes, when the room still has it; supplies the quote's thumbnail.
+    let quotedMessage: ZMMessage?
+    /// Briefly true after a quote pointing at this message was tapped.
+    let isHighlighted: Bool
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.store === rhs.store
@@ -42,10 +52,14 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
             && lhs.linkPreview == rhs.linkPreview
             && lhs.progress == rhs.progress
             && lhs.isPaid == rhs.isPaid
+            && lhs.quotedMessage == rhs.quotedMessage
+            && lhs.isHighlighted == rhs.isHighlighted
     }
 
     var body: some View {
         bubble
+            .background(highlightColor)
+            .animation(ZappMotion.content, value: isHighlighted)
             .contentShape(Rectangle())
             .onAppear {
                 // Drives the link-preview fetch; only a text message with a URL needs the round trip.
@@ -124,9 +138,20 @@ struct ChatRoomBubbleRow: View, @MainActor Equatable {
                 message: message,
                 senderName: senderName,
                 readReceiptsEnabled: readReceiptsEnabled,
-                linkPreview: linkPreview
+                linkPreview: linkPreview,
+                quotedMessage: quotedMessage,
+                onQuoteTap: message.replyToId.map { quotedId in
+                    { store.send(.quoteTapped(quotedId)) }
+                }
             )
         }
+    }
+
+    /// The flash a tapped quote lands on, so the eye finds the original after the scroll.
+    private var highlightColor: Color {
+        isHighlighted
+            ? ZappColors.accent.color(colorScheme).opacity(Constants.highlightOpacity)
+            : .clear
     }
 
     /// Reply on every bubble (Android's swipe-to-reply equivalent), plus Copy on the ones that
