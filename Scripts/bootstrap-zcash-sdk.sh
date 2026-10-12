@@ -15,6 +15,20 @@ SIBLING="$(dirname "$APP_DIR")/zcash-swift-wallet-sdk"
 # Explicit, because errexit would otherwise kill the assignment with no message at all.
 PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)" \
   || fail "no zcashSwiftWalletSdk= pin in $APP_DIR/.zapp-deps"
+PIN_SOURCE=".zapp-deps"
+
+# Testnet only: ZAPP_SDK_PIN_OVERRIDE builds an exact commit on ZAPP_SDK_BRANCH instead of the pin,
+# under the same gates. The release lane still verifies against .zapp-deps, so an overridden
+# checkout cannot reach an App Store build.
+if [ -n "${ZAPP_SDK_PIN_OVERRIDE:-}" ]; then
+  [[ "$ZAPP_SDK_PIN_OVERRIDE" =~ ^[0-9a-f]{40}$ ]] \
+    || fail "ZAPP_SDK_PIN_OVERRIDE must be a full 40-character commit SHA"
+  [ -n "${ZAPP_SDK_BRANCH:-}" ] \
+    || fail "ZAPP_SDK_PIN_OVERRIDE needs ZAPP_SDK_BRANCH, the branch that carries the commit"
+  PINNED_REF="$ZAPP_SDK_PIN_OVERRIDE"
+  PIN_SOURCE="ZAPP_SDK_PIN_OVERRIDE"
+  echo "==> TESTNET ONLY: building $PINNED_REF from $ZAPP_SDK_BRANCH instead of the .zapp-deps pin"
+fi
 
 # The pin is on an unmerged branch that only our fork carries; upstream cannot resolve it.
 SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
@@ -26,7 +40,7 @@ if [ ! -d "$SIBLING" ]; then
   git -C "$SIBLING" fetch "$SDK_REMOTE" "$PINNED_BRANCH" || true
   if ! git -C "$SIBLING" cat-file -e "$PINNED_REF^{commit}" 2>/dev/null; then
     echo "!! $PINNED_REF is not reachable from $SDK_REMOTE ($PINNED_BRANCH)." >&2
-    echo "   The branch was probably force-pushed. Re-pin .zapp-deps to its current head," >&2
+    echo "   The branch was probably force-pushed. Re-pin $PIN_SOURCE to its current head," >&2
     echo "   or point ZAPP_SDK_REMOTE / ZAPP_SDK_BRANCH at wherever the commit now lives." >&2
     exit 1
   fi
@@ -40,7 +54,7 @@ else
   # zodl-slipstream is still a MANDATORY dependency rather than an optional feature.
   checked_out="$(git -C "$SIBLING" rev-parse HEAD)" || fail "$SIBLING is not a git checkout"
   if [ "$checked_out" != "$PINNED_REF" ]; then
-    echo "!! $SIBLING is at $checked_out, but .zapp-deps pins $PINNED_REF." >&2
+    echo "!! $SIBLING is at $checked_out, but $PIN_SOURCE pins $PINNED_REF." >&2
     echo "   Recover with:" >&2
     echo "     git -C $SIBLING fetch $SDK_REMOTE $PINNED_BRANCH" >&2
     echo "     git -C $SIBLING checkout $PINNED_REF" >&2
@@ -78,6 +92,9 @@ echo "==> Building the clean (slipstream-free) FFI — a few minutes from cold"
 echo "==> Purity gates"
 # One definition of the gates, shared with the release path — see the header of the
 # verifier for why a build-free check has to exist separately from this script.
-"$APP_DIR/Scripts/verify-zcash-sdk-artifact.sh"
+EXPECTED_PIN="$PINNED_REF" "$APP_DIR/Scripts/verify-zcash-sdk-artifact.sh"
 
 echo "==> Ready: clean libzcashlc.xcframework, 0 AGPL crates, both iOS slices gated"
+if [ -n "${ZAPP_SDK_PIN_OVERRIDE:-}" ]; then
+  echo "    TESTNET ONLY: build zodl-testnet; re-run without ZAPP_SDK_PIN_OVERRIDE before any other scheme"
+fi

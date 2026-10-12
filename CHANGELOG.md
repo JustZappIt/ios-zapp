@@ -123,6 +123,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [NU7] Testnet builds can send TAZ again after testnet's NU7 upgrade (block 4,465,026, October 4, 2026), when built against the NU7 wallet SDK branch (see the README). Shielded voting is unavailable in those builds, and their first launch upgrades the testnet wallet database so that earlier builds can no longer open it. App Store and internal builds are unchanged.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.
