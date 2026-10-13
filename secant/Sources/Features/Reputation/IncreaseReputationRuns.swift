@@ -48,7 +48,38 @@ extension IncreaseReputation {
         } catch: { _, send in
             await send(.statusReceived(runID: runID, status: .failed(.network)))
         }
-        .cancellable(id: CancelID.run, cancelInFlight: true)
+        .cancellable(id: CancelID.run(runID), cancelInFlight: true)
+    }
+
+    func cancelIdentityRun(_ state: State) -> Effect<Action> {
+        guard let run = state.run else { return .none }
+        guard let check = run.identityCheck else { return .cancel(id: CancelID.run(run.id)) }
+        // Revoke through the session owner before cancelling the UI collection. Cancelling that
+        // collection first can release the live-run gate before browser authorization is erased.
+        return .concatenate(
+            .run { [currencyCode = state.currencyCode] _ in
+                try await liveness.cancel(check, currencyCode, run.id)
+            } catch: { _, _ in
+            },
+            .cancel(id: CancelID.run(run.id))
+        )
+    }
+
+    func startIdentityRun(_ state: inout State, check: IdentityCheckModel) -> Effect<Action> {
+        let runID = uuid()
+        let nonce = uuid().uuidString.lowercased()
+        state.lastActiveStage = .ready
+        state.run = State.Run(
+            id: runID,
+            kind: check == .liveness ? .selfie : .passport,
+            name: check == .liveness ? String(localizable: .increaseReputationLivenessRow)
+                : String(localizable: .increaseReputationPassportRow),
+            stage: .preparing
+        )
+        let currencyCode = state.currencyCode
+        return collectSelfie(runID: runID) {
+            try await liveness.verifyIdentity(check, currencyCode, nonce, runID)
+        }
     }
 
     func startSelfieRun(_ state: inout State) -> Effect<Action> {
@@ -66,8 +97,9 @@ extension IncreaseReputation {
         state.lastActiveStage = .verifying
         state.run = State.Run(
             id: runID,
-            kind: .selfie,
-            name: String(localizable: .increaseReputationLivenessRow),
+            kind: ret.check == .liveness ? .selfie : .passport,
+            name: ret.check == .liveness ? String(localizable: .increaseReputationLivenessRow)
+                : String(localizable: .increaseReputationPassportRow),
             stage: .verifying,
             isWidgetOpened: true
         )
@@ -86,7 +118,7 @@ extension IncreaseReputation {
         } catch: { _, send in
             await send(.livenessStatusReceived(runID: runID, status: .failed(.network)))
         }
-        .cancellable(id: CancelID.run, cancelInFlight: true)
+        .cancellable(id: CancelID.run(runID), cancelInFlight: true)
     }
 
     func apply(_ status: ReclaimStatusModel, to state: inout State) {
@@ -135,6 +167,9 @@ extension IncreaseReputation {
         case .submitting:
             state.run?.stage = .submitting
             state.lastActiveStage = .submitting
+        case let .identityDone(summary):
+            apply(ReclaimStatusModel.done(summary), to: &state)
+            state.identityChecks = summary.identityChecks
         case let .done(standing):
             state.summaryRevision += 1
             state.isLoading = false
@@ -148,7 +183,9 @@ extension IncreaseReputation {
             state.lastActiveStage = .ready
         case let .failed(failure):
             state.run?.stage = .failed
-            state.run?.errorMessage = ReputationCopy.livenessFailureMessage(failure)
+            state.run?.errorMessage = run.kind == .passport
+                ? ReputationCopy.identityFailureMessage(failure)
+                : ReputationCopy.livenessFailureMessage(failure)
         }
     }
 
@@ -167,19 +204,33 @@ extension IncreaseReputation {
     }
 
     /// The first active indicator starts only once the user has left Zapp to begin verification.
-    static func steps(stage: State.Stage?, lastActiveStage: State.Stage, isSelfie: Bool = false) -> [ZappOfframpStepItem] {
+    static func steps(
+        stage: State.Stage?,
+        lastActiveStage: State.Stage,
+        isSelfie: Bool = false,
+        isPassport: Bool = false
+    ) -> [ZappOfframpStepItem] {
         let order: [State.Stage] = [.ready, .verifying, .submitting]
-        let labels = isSelfie
-            ? [
+        let labels: [String]
+        if isPassport {
+            labels = [
+                String(localizable: .increaseReputationLivenessStepOpen),
+                String(localizable: .increaseReputationPassportStepScan),
+                String(localizable: .increaseReputationStepSave)
+            ]
+        } else if isSelfie {
+            labels = [
                 String(localizable: .increaseReputationLivenessStepOpen),
                 String(localizable: .increaseReputationLivenessStepSelfie),
                 String(localizable: .increaseReputationStepSave)
             ]
-            : [
+        } else {
+            labels = [
                 String(localizable: .increaseReputationStepOpen),
                 String(localizable: .increaseReputationStepProve),
                 String(localizable: .increaseReputationStepSave)
             ]
+        }
         let reached: Int
         switch stage {
         case .preparing, .ready, nil: reached = -1

@@ -28,13 +28,22 @@ enum ReputationCopy {
         }
     }
 
+    static func identityFailureMessage(_ failure: LivenessFailureModel) -> String {
+        switch failure {
+        case .notLive, .notPassed: return String(localizable: .increaseReputationIdentityNotPassed)
+        case .alreadyClaimed: return String(localizable: .increaseReputationErrorAlreadyUsed)
+        case .notConfigured, .unavailable: return String(localizable: .increaseReputationErrorUnavailable)
+        default: return livenessFailureMessage(failure)
+        }
+    }
+
     static func livenessFailureMessage(_ failure: LivenessFailureModel) -> String {
         switch failure {
-        case .notConfigured: return String(localizable: .increaseReputationLivenessErrorUnavailable)
-        case .notLive: return String(localizable: .increaseReputationLivenessErrorNotLive)
+        case .notConfigured, .unavailable: return String(localizable: .increaseReputationLivenessErrorUnavailable)
+        case .notLive, .notPassed: return String(localizable: .increaseReputationLivenessErrorNotLive)
         case .alreadyClaimed: return String(localizable: .increaseReputationLivenessErrorAlreadyClaimed)
         case .expired: return String(localizable: .increaseReputationLivenessErrorExpired)
-        case .rejected: return String(localizable: .increaseReputationLivenessErrorRejected)
+        case .rejected, .alreadyVerified: return String(localizable: .increaseReputationLivenessErrorRejected)
         case .sponsorshipUnavailable: return String(localizable: .increaseReputationErrorGas)
         case .busy: return String(localizable: .increaseReputationErrorBusy)
         case .cancelled, .network, .unknown: return String(localizable: .increaseReputationErrorNetwork)

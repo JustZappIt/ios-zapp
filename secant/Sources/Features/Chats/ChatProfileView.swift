@@ -93,6 +93,14 @@ struct ChatProfileView: View {
                     )
                 }
             }
+            // Under the secret overlays, so the PIN pad its reveal asks for draws on top of it.
+            .overlay {
+                if store.isP2pKeyScreenPresented {
+                    ChatProfileP2pKeyView(store: store)
+                        .transition(.move(edge: .trailing))
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: store.isP2pKeyScreenPresented)
             .chatProfileSecretOverlays(store: store)
         }
     }

@@ -17,10 +17,14 @@ enum LivenessStatusModel: Equatable, Sendable {
     case verifying
     case submitting
     case done(LivenessStandingModel)
+    case identityDone(ReputationSummaryModel)
     case failed(LivenessFailureModel)
 }
 
 enum LivenessFailureModel: String, Equatable, Sendable {
+    case unavailable = "Unavailable"
+    case notPassed = "NotPassed"
+    case alreadyVerified = "AlreadyVerified"
     case notConfigured = "NotConfigured"
     case notLive = "NotLive"
     case alreadyClaimed = "AlreadyClaimed"
@@ -38,34 +42,36 @@ struct LivenessReturnModel: Equatable, Sendable {
     let code: String?
     let error: String?
     let state: String?
+    var check: IdentityCheckModel = .liveness
 
     var currencyCode: String? {
-        guard let state, let currency = LivenessReturn.companion.currencyFromState(state: state) else { return nil }
+        guard let state, let currency = IdentityReturn.companion.currencyFromState(state: state) else { return nil }
         return currency.code
     }
 }
 
-extension LivenessStandingModel {
-    init(_ value: AppleLivenessStanding) {
-        self.init(isVerified: value.isVerified, limitMicros: value.limitMicros, tierCapMicros: value.tierCapMicros)
-    }
-}
-
 extension LivenessStatusModel {
-    init(_ value: AppleLivenessStatus) {
+    init(_ value: AppleIdentityStatus) {
         switch onEnum(of: value) {
         case .preparing:
             self = .preparing
         case let .ready(ready):
-            self = .ready(widgetURL: ready.widgetUrl, expiresInSeconds: Int(ready.expiresInSeconds))
+            self = .ready(widgetURL: ready.widgetUrl, expiresInSeconds: 1800)
         case .verifying:
             self = .verifying
         case .submitting:
             self = .submitting
         case let .done(done):
-            self = .done(LivenessStandingModel(done.standing))
+            self = .identityDone(ReputationSummaryModel(done.summary))
         case let .failed(failed):
             self = .failed(LivenessFailureModel(rawValue: failed.reason) ?? .unknown)
         }
     }
+}
+
+enum IdentityCheckModel: String, Equatable, Sendable, CaseIterable {
+    case liveness = "Liveness"
+    case passport = "Passport"
+
+    var kotlin: IdentityCheck { self == .liveness ? .liveness : .passport }
 }

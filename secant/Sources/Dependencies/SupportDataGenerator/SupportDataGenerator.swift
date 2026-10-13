@@ -19,7 +19,7 @@ struct SupportData: Equatable {
 
 enum SupportDataGenerator {
     enum Constants {
-        static let email = "support@zodl.com"
+        static let email = "hello@justzappit.xyz"
         static let subject = String(localizable: .accountsZashi)
         static let subjectPPE = String(localizable: .proposalPartialMailSubject)
     }

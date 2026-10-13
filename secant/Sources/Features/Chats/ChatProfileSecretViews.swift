@@ -2,7 +2,8 @@
 //  ChatProfileSecretViews.swift
 //  Zapp
 //
-//  Android's ChatProfileSeedPhraseDialog / ChatProfileP2pKeyDialog / ChatProfilePinVerifyOverlay.
+//  Android's ChatProfileSeedPhraseDialog / ChatProfilePinVerifyOverlay. The P2P key has its own
+//  screen, `ChatProfileP2pKeyView`.
 //
 //  The lifecycle handlers below are the ones that matter: they are attached to the whole
 //  profile screen, not to the dialogs, so they fire even if SwiftUI has already torn a
@@ -31,15 +32,6 @@ private struct ChatProfileSecretOverlays: ViewModifier {
                     if store.showsSeedDialog {
                         ChatProfileSeedDialog(
                             words: store.seedWords,
-                            onDismiss: { store.send(.secretDismissed) }
-                        )
-                    } else if let key = store.p2pKey {
-                        ChatProfileP2PKeyDialog(
-                            key: key,
-                            didCopyAddress: store.didCopyP2PAddress,
-                            didCopyKey: store.didCopyP2PKey,
-                            onCopyAddress: { store.send(.copyP2PAddressTapped) },
-                            onCopyKey: { store.send(.copyP2PKeyTapped) },
                             onDismiss: { store.send(.secretDismissed) }
                         )
                     }
@@ -128,70 +120,9 @@ private struct ChatProfileSeedDialog: View {
     }
 }
 
-// MARK: - P2P wallet key
-
-private struct ChatProfileP2PKeyDialog: View {
-    let key: OfframpWalletKey
-    let didCopyAddress: Bool
-    let didCopyKey: Bool
-    let onCopyAddress: () -> Void
-    let onCopyKey: () -> Void
-    let onDismiss: () -> Void
-
-    var body: some View {
-        ChatProfileDialogShell(
-            title: String(localizable: .chatProfileP2pKeyDialogTitle),
-            message: String(localizable: .chatProfileP2pKeyDialogMessage),
-            onDismiss: onDismiss
-        ) {
-            VStack(alignment: .leading, spacing: Design.Spacing._md) {
-                field(
-                    label: String(localizable: .chatProfileP2pKeyAddressLabel),
-                    value: key.address,
-                    didCopy: didCopyAddress,
-                    onCopy: onCopyAddress
-                )
-
-                field(
-                    label: String(localizable: .chatProfileP2pKeyPrivateLabel),
-                    value: key.privateKeyHex.data,
-                    didCopy: didCopyKey,
-                    onCopy: onCopyKey
-                )
-            }
-        }
-    }
-
-    private func field(label: String, value: String, didCopy: Bool, onCopy: @escaping () -> Void) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-            HStack {
-                Text(label)
-                    .zappFont(.rowTitle, style: ZappColors.text)
-
-                Spacer()
-
-                Button(action: onCopy) {
-                    Text(
-                        didCopy
-                            ? String(localizable: .newChatCopied)
-                            : String(localizable: .chatProfileP2pKeyCopy)
-                    )
-                    .zappFont(.buttonSmall, style: didCopy ? ZappColors.success : ZappColors.accent)
-                }
-                .buttonStyle(.zappPress)
-            }
-
-            Text(value)
-                .zappFont(.mono, style: ZappColors.textMuted)
-                .fixedSize(horizontal: false, vertical: true)
-                .textSelection(.enabled)
-        }
-    }
-}
-
 // MARK: - Shell
 
-/// The read-only reveal shape both secret dialogs take: a title, an explanation, the secret, and
+/// The read-only reveal shape the seed dialog takes: a title, an explanation, the secret, and
 /// a single Done. `ZappDialog` supplies the panel itself.
 private struct ChatProfileDialogShell<Content: View>: View {
     let title: String
