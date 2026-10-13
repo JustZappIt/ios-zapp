@@ -68,6 +68,20 @@ pinned in [`.zapp-deps`](.zapp-deps) and generates its build artifacts. The dire
 AGPL-3.0-only zodl-slipstream crate, which we may not ship, so `zcash/zcash-swift-wallet-sdk`
 cannot resolve the pinned SHA. Override the source with `ZAPP_SDK_REMOTE` / `ZAPP_SDK_BRANCH`.
 
+Since testnet's NU7 upgrade (block 4,465,026), the pinned SDK signs testnet transactions with the
+wrong consensus branch ID, and lightwalletd rejects them. For `zodl-testnet` only,
+`ZAPP_SDK_PIN_OVERRIDE` builds an exact commit on `ZAPP_SDK_BRANCH` instead of the pin, under the
+same gates:
+
+```bash
+ZAPP_SDK_BRANCH=feature/nu7-testnet ZAPP_SDK_PIN_OVERRIDE=<full commit SHA> Scripts/bootstrap-zcash-sdk.sh
+```
+
+Re-run the script without the override before building any other scheme; the release lane refuses
+any SDK checkout other than the pin. That SDK has shielded voting compiled out, and it migrates the
+wallet database on first open, after which a build on the pin shows a sync error for that wallet.
+Switch back to the NU7 build rather than clearing app data.
+
 ### Prerequisites
 
 - Xcode matching [`.xcode-version`](.xcode-version)
