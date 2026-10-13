@@ -684,13 +684,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "People who join can read earlier messages in this group."
+            "value" : "People who join may see some earlier messages in this group."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quienes se unan podrán leer los mensajes anteriores de este grupo."
+            "value" : "Quienes se unan pueden ver algunos mensajes anteriores de este grupo."
           }
         }
       }
@@ -931,6 +931,20 @@
             "value" : "Tu solicitud está con el dueño del grupo."
           }
         }
+      }
+    },
+    "groupInvite.waitingQueued" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your request has not gone out yet. Zapp will send it when you are back online." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tu solicitud aún no se ha enviado. Zapp la enviará cuando vuelvas a estar en línea." } }
+      }
+    },
+    "chatNotifications.newActivity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New activity in Zapp" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nueva actividad en Zapp" } }
       }
     },
     "groupInvite.waitingBody" : {

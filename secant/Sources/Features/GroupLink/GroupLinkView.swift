@@ -29,7 +29,13 @@ struct GroupLinkView: View {
                         .padding(.vertical, Design.Spacing._lg)
                     }
 
-                    ZappBottomActionBar(onBack: { store.send(.backTapped) }) { EmptyView() }
+                    ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
+                        if store.link != nil {
+                            ZappButton(title: String(localizable: .groupLinkShare), isEnabled: !store.isBusy) {
+                                store.send(.shareTapped)
+                            }
+                        }
+                    }
                 }
                 .applyScreenBackground()
 
@@ -77,8 +83,11 @@ struct GroupLinkView: View {
         }
 
         if let link = store.link {
+            ChatIdentityQRCode(payload: link, size: 240)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel(String(localizable: .groupLinkHeader))
             ZappValueCard(value: link) {
-                ChatIdentityQRCode(payload: link, size: 72)
+                EmptyView()
             } trailing: {
                 Button {
                     store.send(.copyTapped)
@@ -133,16 +142,6 @@ struct GroupLinkView: View {
                 }
             }
         } else if store.isActive {
-            ZappButton(title: String(localizable: .groupLinkCopy), isEnabled: !store.isBusy) {
-                store.send(.copyTapped)
-            }
-            ZappButton(
-                title: String(localizable: .groupLinkShare),
-                variant: .secondary,
-                isEnabled: !store.isBusy
-            ) {
-                store.send(.shareTapped)
-            }
             ZappButton(title: String(localizable: .groupLinkReset), variant: .ghost, isEnabled: !store.isBusy) {
                 store.send(.resetTapped)
             }

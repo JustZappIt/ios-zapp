@@ -3,7 +3,7 @@
 //  zodlTests
 //
 
-import Combine
+@preconcurrency import Combine
 import ComposableArchitecture
 import Foundation
 import Testing
@@ -64,7 +64,10 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected) {
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        } assert: {
             $0.stage = .preview(nameHint: "Hiking Crew")
             $0.linkId = Self.linkId
         }
@@ -80,10 +83,16 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected)
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        }
         await store.send(.joinTapped)
-        await store.receive(\.joinAnswered) {
-            $0.stage = .waiting(linkId: Self.linkId, withOwner: false)
+        await store.receive { action in
+            guard case .response(_, .joinAnswered) = action else { return false }
+            return true
+        } assert: {
+            $0.stage = .waiting(linkId: Self.linkId, nameHint: "Hiking Crew", progress: .sent)
             $0.token = nil
         }
 
@@ -98,9 +107,15 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected)
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        }
         await store.send(.joinTapped)
-        await store.receive(\.joinFailed) {
+        await store.receive { action in
+            guard case .response(_, .joinFailed) = action else { return false }
+            return true
+        } assert: {
             $0.sendFailed = true
             $0.stage = .preview(nameHint: "Hiking Crew")
         }
@@ -116,17 +131,29 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected)
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        }
         await store.send(.joinTapped)
-        await store.receive(\.joinAnswered)
+        await store.receive { action in
+            guard case .response(_, .joinAnswered) = action else { return false }
+            return true
+        }
 
         updates.send(ZMGroupJoinUpdate(linkId: Self.linkId, status: .pendingApproval))
-        await store.receive(\.updated) {
-            $0.stage = .waiting(linkId: Self.linkId, withOwner: true)
+        await store.receive { action in
+            guard case .response(_, .updated) = action else { return false }
+            return true
+        } assert: {
+            $0.stage = .waiting(linkId: Self.linkId, nameHint: "Hiking Crew", progress: .withOwner)
         }
 
         updates.send(ZMGroupJoinUpdate(linkId: Self.linkId, status: .declined))
-        await store.receive(\.updated) {
+        await store.receive { action in
+            guard case .response(_, .updated) = action else { return false }
+            return true
+        } assert: {
             $0.stage = .failed(.declined)
         }
 
@@ -143,9 +170,15 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected)
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        }
         await store.send(.joinTapped)
-        await store.receive(\.joinAnswered) {
+        await store.receive { action in
+            guard case .response(_, .joinAnswered) = action else { return false }
+            return true
+        } assert: {
             $0.stage = .joined(conversationId: "g1", nameHint: "Hiking Crew", alreadyMember: true)
             $0.token = nil
         }
@@ -167,7 +200,10 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected) {
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        } assert: {
             $0.stage = .failed(.expired)
             $0.linkId = Self.linkId
             $0.token = nil
@@ -188,7 +224,10 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected) {
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        } assert: {
             $0.stage = .failed(.needsUpdate)
             $0.linkId = Self.linkId
             $0.token = nil
@@ -222,9 +261,15 @@ import ZappMessaging
         store.exhaustivity = .off
 
         await store.send(.onAppear)
-        await store.receive(\.inspected)
+        await store.receive { action in
+            guard case .response(_, .inspected) = action else { return false }
+            return true
+        }
         await store.send(.joinTapped)
-        await store.receive(\.joinAnswered)
+        await store.receive { action in
+            guard case .response(_, .joinAnswered) = action else { return false }
+            return true
+        }
 
         await store.send(.cancelTapped)
         await store.receive(\.delegate)

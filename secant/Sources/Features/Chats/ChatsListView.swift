@@ -164,7 +164,7 @@ struct ChatsListView: View {
                 : String(localizable: .groupInviteWaitingTitle),
             subtitle: waiting.status == .pendingApproval
                 ? String(localizable: .groupInviteWaitingOwner)
-                : String(localizable: .groupInviteWaitingBody),
+                : String(localizable: waiting.sent ? .groupInviteWaitingBody : .groupInviteWaitingQueued),
             trailing: {
                 Button(String(localizable: .groupInviteCancel)) {
                     store.send(.cancelWaitingJoinTapped(waiting.linkId))

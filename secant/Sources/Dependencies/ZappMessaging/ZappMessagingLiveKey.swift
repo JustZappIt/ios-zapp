@@ -75,6 +75,7 @@ extension ZappMessagingClient: DependencyKey {
             approveGroupJoinRequest: { try await impl.approveGroupJoinRequest(conversationId: $0, joinerKey: $1) },
             declineGroupJoinRequest: { try await impl.declineGroupJoinRequest(conversationId: $0, joinerKey: $1) },
             groupJoinRequestStream: { impl.groupJoinRequestSubject.eraseToAnyPublisher() },
+            groupJoinRequestWithdrawnStream: { impl.groupJoinRequestWithdrawnSubject.eraseToAnyPublisher() },
             removeMember: { try await impl.removeMember(conversationId: $0, publicKey: $1, resetLink: $2) },
             olderMemberCount: { try await impl.olderMemberCount(conversationId: $0) },
             groupMembershipStream: { impl.groupMembershipSubject.eraseToAnyPublisher() }
@@ -105,6 +106,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     let mediaProgressSubject = PassthroughSubject<(mediaId: String, progress: Double), Never>()
     let mediaCompleteSubject = PassthroughSubject<(mediaId: String, filePath: String), Never>()
     let groupJoinUpdateSubject = PassthroughSubject<ZMGroupJoinUpdate, Never>()
+    let groupJoinRequestWithdrawnSubject = PassthroughSubject<String, Never>()
     let groupJoinRequestSubject = PassthroughSubject<ZMGroupJoinApprovalRequest, Never>()
     let groupMembershipSubject = PassthroughSubject<GroupMembershipEvent, Never>()
 
@@ -503,8 +505,8 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         // The SDK admits people through invite links without asking the app each time, and the
         // worklet starts each run without the set, so it is pushed rather than queried.
         Task { @MainActor [weak self] in
-            guard let sdk = self?.sdk else { return }
-            try? await sdk.setBlockedKeys(Array(keys))
+            guard let self, let sdk = self.sdk, sdk.isInitialized, sdk.identity != nil else { return }
+            await self.reassertBlockedKeys(sdk)
         }
     }
 
@@ -718,6 +720,9 @@ private final class ZappMessagingImpl: @unchecked Sendable {
     /// identity lands — this is a privacy fix, not a tidiness one.
     @MainActor
     private func reassertPrivacySettings(_ sdk: ZappMessagingSDK) async {
+        // Contacts load before the worklet starts. Replay the cached set before publishing
+        // identity readiness; that first, pre-initialization push cannot reach the SDK.
+        await reassertBlockedKeys(sdk)
         let receipts = (userDefaults.objectForKey(PrefKey.readReceipts) as? Bool) ?? true
         let presence = (userDefaults.objectForKey(PrefKey.presence) as? Bool) ?? true
 
@@ -735,6 +740,15 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         mutate {
             $0.readReceiptsEnabled = receipts
             $0.presenceVisible = presence
+        }
+    }
+
+    @MainActor
+    private func reassertBlockedKeys(_ sdk: ZappMessagingSDK) async {
+        do {
+            try await sdk.setBlockedKeys(Array(lock.withLock { blockedKeys }))
+        } catch {
+            LoggerProxy.error("ZappMessaging: failed to synchronize blocked contacts")
         }
     }
 
@@ -833,7 +847,21 @@ private final class ZappMessagingImpl: @unchecked Sendable {
 
         sdk.groupJoinRequestReceived
             .receive(on: mainQueue)
-            .sink { [weak self] request in self?.groupJoinRequestSubject.send(request) }
+            .sink { [weak self] request in
+                self?.groupJoinRequestSubject.send(request)
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    let watching = self.lock.withLock { self.activeConversationId } == request.conversationId
+                        && UIApplication.shared.applicationState == .active
+                    guard !watching else { return }
+                    await ChatPushNotifications.shared.notifyGroupJoinRequest(request.conversationId)
+                }
+            }
+            .store(in: &cancellables)
+
+        sdk.groupJoinRequestWithdrawn
+            .receive(on: mainQueue)
+            .sink { [weak self] conversationId, _ in self?.groupJoinRequestWithdrawnSubject.send(conversationId) }
             .store(in: &cancellables)
 
         sdk.removedFromGroup

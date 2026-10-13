@@ -88,10 +88,12 @@ struct GroupInviteView: View {
         switch store.stage {
         case .preview, .requesting:
             return String(localizable: .groupInviteBody)
-        case .waiting(_, let withOwner):
-            return withOwner
-                ? String(localizable: .groupInviteWaitingOwner)
-                : String(localizable: .groupInviteWaitingBody)
+        case .waiting(_, _, let progress):
+            switch progress {
+            case .queued: return String(localizable: .groupInviteWaitingQueued)
+            case .sent: return String(localizable: .groupInviteWaitingBody)
+            case .withOwner: return String(localizable: .groupInviteWaitingOwner)
+            }
         default:
             return nil
         }
@@ -129,7 +131,7 @@ struct GroupInviteView: View {
             }
 
         case .requesting:
-            ZappBottomActionBar(onBack: { store.send(.notNowTapped) }) {
+            ZappBottomActionBar(onBack: { store.send(.delegate(.dismiss)) }) {
                 ZappButton(title: String(localizable: .groupInviteJoin), isEnabled: false) { }
             }
 

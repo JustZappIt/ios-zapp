@@ -65,14 +65,13 @@ struct GroupLink {
 
         var isLoading: Bool { info == nil && !didFail }
 
-        /// What is left of the link's life, in days, rounded up to the window the owner picked.
+        /// What is left of the link's life, in days, rounded up to the next whole day.
         /// Nil means it never expires, zero means it already has.
         func remainingDays(now: Date) -> Int? {
             guard let expiresAt = info?.expiresAt else { return nil }
             let remaining = expiresAt.timeIntervalSince(now)
             if remaining <= 0 { return 0 }
-            let days = Int((remaining / GroupLink.day).rounded(.up))
-            return GroupLink.expiryChoices.compactMap { $0 }.first { days <= $0 } ?? days
+            return Int((remaining / GroupLink.day).rounded(.up))
         }
 
         func expiryText(now: Date) -> String {
@@ -111,6 +110,7 @@ struct GroupLink {
         case loadFailed
         case requestsLoaded([ZMGroupJoinApprovalRequest])
         case requestReceived(ZMGroupJoinApprovalRequest)
+        case requestWithdrawn(String)
         case retryTapped
         case turnOnTapped
         case turnOffTapped
@@ -151,11 +151,18 @@ struct GroupLink {
                 guard state.isOwner else { return .none }
                 return .merge(
                     load(state.conversationId),
-                    .publisher {
-                        zappMessaging.groupJoinRequestStream()
-                            .filter { [id = state.conversationId] in $0.conversationId == id }
-                            .map(Action.requestReceived)
-                    }
+                    .merge(
+                        .publisher {
+                            zappMessaging.groupJoinRequestStream()
+                                .filter { [id = state.conversationId] in $0.conversationId == id }
+                                .map(Action.requestReceived)
+                        },
+                        .publisher {
+                            zappMessaging.groupJoinRequestWithdrawnStream()
+                                .filter { [id = state.conversationId] in $0 == id }
+                                .map(Action.requestWithdrawn)
+                        }
+                    )
                     .cancellable(id: state.requestsCancelId, cancelInFlight: true)
                 )
 
@@ -169,7 +176,7 @@ struct GroupLink {
                 state.info = info
                 state.didFail = false
                 state.isBusy = false
-                return .none
+                return loadRequests(state.conversationId)
 
             case .loadFailed:
                 state.isBusy = false
@@ -180,7 +187,7 @@ struct GroupLink {
                 state.requests = requests
                 return .none
 
-            case .requestReceived:
+            case .requestReceived, .requestWithdrawn:
                 return loadRequests(state.conversationId)
 
             case .retryTapped:
@@ -331,15 +338,12 @@ struct GroupLink {
     }
 
     private func load(_ conversationId: String) -> Effect<Action> {
-        .merge(
-            .run { send in
-                await send(.linkLoaded(try await zappMessaging.groupLink(conversationId)))
-            } catch: { error, send in
-                LoggerProxy.error("Group link failed to load: \(error)")
-                await send(.loadFailed)
-            },
-            loadRequests(conversationId)
-        )
+        .run { send in
+            await send(.linkLoaded(try await zappMessaging.groupLink(conversationId)))
+        } catch: { error, send in
+            LoggerProxy.error("Group link failed to load: \(error)")
+            await send(.loadFailed)
+        }
     }
 
     private func loadRequests(_ conversationId: String) -> Effect<Action> {
@@ -347,6 +351,23 @@ struct GroupLink {
             if let requests = try? await zappMessaging.groupJoinRequests(conversationId) {
                 await send(.requestsLoaded(requests))
             }
+        }
+    }
+}
+
+// Bearer links must stay redacted even in DEBUG / UNREDACTED builds. The SDK's
+// CustomDebugStringConvertible does not protect TCA's reflection-based dump or diff.
+extension GroupLink.State: CustomDumpStringConvertible {
+    var customDumpDescription: String {
+        "GroupLink.State(isBusy: \(isBusy), didFail: \(didFail), redacted)"
+    }
+}
+
+extension GroupLink.Action: CustomDumpStringConvertible {
+    var customDumpDescription: String {
+        switch self {
+        case .linkLoaded: return "GroupLink.Action.linkLoaded(<redacted>)"
+        default: return String(reflecting: self)
         }
     }
 }

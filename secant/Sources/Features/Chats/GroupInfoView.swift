@@ -378,7 +378,7 @@ private struct RemoveMemberDialog: View {
                 ZappButton(
                     title: String(localizable: .groupMemberRemoveConfirm),
                     variant: .danger,
-                    isEnabled: !removing.isBusy,
+                    isEnabled: removing.isLoaded && !removing.isBusy,
                     action: onConfirm
                 )
             }

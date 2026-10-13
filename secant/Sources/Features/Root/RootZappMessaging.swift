@@ -56,6 +56,11 @@ extension Root {
                 // An invite tapped before the chat identity existed waits in the store, because
                 // joining needs an identity to name the joiner. This is the moment it can open.
                 let identityArrived = state.zappMessagingState.identity == nil && messagingState.identity != nil
+                if identityArrived {
+                    // Reassert on every identity session, as Android does. The contact load can
+                    // have happened while the worklet was still unavailable.
+                    zappMessaging.setBlockedKeys(state.chatContacts.blockedKeys)
+                }
                 state.zappMessagingState = messagingState
                 state.zappTabsState.chatUnreadCount = messagingState.totalUnreadCount
                 state.zappTabsState.hasChatIdentity = messagingState.identity != nil

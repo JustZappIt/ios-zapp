@@ -33,6 +33,7 @@ struct GroupInfo {
             var resetLink = true
             var canResetLink = false
             var olderMemberCount = 0
+            var isLoaded = false
             var isBusy = false
         }
 
@@ -132,7 +133,8 @@ struct GroupInfo {
         case addMemberDismissed
         case inviteLinkTapped
         case removeMemberTapped(GroupMember)
-        case removeContextLoaded(olderMemberCount: Int, canResetLink: Bool)
+        case removeContextLoaded(publicKey: String, olderMemberCount: Int, canResetLink: Bool)
+        case removeContextFailed(publicKey: String)
         case removeResetLinkToggled
         case removeDismissed
         case removeConfirmed
@@ -253,15 +255,27 @@ struct GroupInfo {
                 state.didFail = false
                 // The dialog reads the group before it speaks, so it says what this group will
                 // actually do rather than what removal does in general.
-                return .run { [id = state.conversation.id] send in
-                    let older = (try? await zappMessaging.olderMemberCount(id)) ?? 0
-                    let hasLink = (try? await zappMessaging.groupLink(id))?.state == .active
-                    await send(.removeContextLoaded(olderMemberCount: older, canResetLink: hasLink))
+                return .run { [id = state.conversation.id, key = member.publicKey] send in
+                    do {
+                        let older = try await zappMessaging.olderMemberCount(id)
+                        let hasLink = try await zappMessaging.groupLink(id).state == .active
+                        await send(.removeContextLoaded(publicKey: key, olderMemberCount: older, canResetLink: hasLink))
+                    } catch {
+                        await send(.removeContextFailed(publicKey: key))
+                    }
                 }
 
-            case let .removeContextLoaded(olderMemberCount, canResetLink):
+            case let .removeContextLoaded(publicKey, olderMemberCount, canResetLink):
+                guard state.removing?.member.publicKey == publicKey else { return .none }
                 state.removing?.olderMemberCount = olderMemberCount
                 state.removing?.canResetLink = canResetLink
+                state.removing?.isLoaded = true
+                return .none
+
+            case .removeContextFailed(let publicKey):
+                guard state.removing?.member.publicKey == publicKey else { return .none }
+                state.removing = nil
+                state.didFail = true
                 return .none
 
             case .removeResetLinkToggled:
@@ -273,7 +287,7 @@ struct GroupInfo {
                 return .none
 
             case .removeConfirmed:
-                guard let draft = state.removing, !draft.isBusy else { return .none }
+                guard let draft = state.removing, draft.isLoaded, !draft.isBusy else { return .none }
                 state.removing?.isBusy = true
                 state.didFail = false
                 let resetLink = draft.resetLink && draft.canResetLink

@@ -1058,7 +1058,9 @@ extension Root {
                 return .send(.destination(.updateDestination(.onboarding)))
 
             case .groupInvite(.delegate(.dismiss)):
-                return .send(.destination(.updateDestination(.home)))
+                let hasWallet = state.appInitializationState != .keysMissing
+                    && state.appInitializationState != .uninitialized
+                return .send(.destination(.updateDestination(hasWallet ? .home : .onboarding)))
 
             case .groupInvite(.delegate(.openConversation(let conversationId))):
                 // Home first, then the room: the preview is a destination, not a path entry, so

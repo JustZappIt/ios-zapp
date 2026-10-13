@@ -422,6 +422,10 @@ struct ZappMessagingClient {
         Empty().eraseToAnyPublisher()
     }
 
+    var groupJoinRequestWithdrawnStream: @Sendable () -> AnyPublisher<String, Never> = {
+        Empty().eraseToAnyPublisher()
+    }
+
     /// Owner: drops the member and gives the group a new secret, so what is said next cannot be
     /// read with the old one.
     var removeMember: @Sendable (
