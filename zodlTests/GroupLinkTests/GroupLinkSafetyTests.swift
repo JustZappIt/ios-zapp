@@ -20,10 +20,15 @@ struct GroupLinkSafetyTests {
             var state = GroupLink.State(conversationId: "room")
             state.info = info
             state.linkToShare = Self.link
+            let before = Root.State.initial
+            var after = before
+            after.groupLinkState = state
             let descriptions = [
                 String(customDumping: state),
                 String(customDumping: GroupLink.Action.linkLoaded(info)),
-                diff(GroupLink.State(conversationId: "room"), state) ?? ""
+                String(customDumping: Root.Action.groupLink(.linkLoaded(info))),
+                String(customDumping: after),
+                diff(before, after) ?? ""
             ]
             for description in descriptions {
                 #expect(!description.contains(Self.secret))
@@ -54,7 +59,8 @@ struct GroupLinkSafetyTests {
             let now = Date(timeIntervalSince1970: 1_000)
             var state = GroupLink.State(conversationId: "room")
             state.info = ZMGroupLinkInfo(
-                conversationId: "room", state: .active,
+                conversationId: "room",
+                state: .active,
                 expiresAt: now.addingTimeInterval(Double(days) * GroupLink.day - 1)
             )
             #expect(state.remainingDays(now: now) == days)
@@ -184,6 +190,52 @@ struct GroupLinkSafetyTests {
             await store.send(.zappMessagingStateChanged(messaging))
             #expect(pushed.values == [[blockedKey]])
             await store.receive(\.groupInviteResumePending)
+            await store.finish()
+        }
+    }
+
+    @MainActor @Test func launchDelayDoesNotDismissAnInviteOpenedWhileItWaits() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let queue = DispatchQueue.test
+            let store = TestStore(initialState: Root.State.initial) { Root() } withDependencies: {
+                $0.walletStorage = .noOp
+                $0.mainQueue = queue.eraseToAnyScheduler()
+            }
+            store.exhaustivity = .off
+            await store.send(.initialization(.checkBackupPhraseValidation))
+            await store.send(.destination(.updateDestination(.groupInvite)))
+            await queue.advance(by: .seconds(0.5))
+            await store.receive(\.initialization.finishLaunchNavigation)
+            await store.finish()
+            #expect(store.state.destinationState.destination == .groupInvite)
+        }
+    }
+
+    @MainActor @Test func walletInitializationResumesAnInviteWhenIdentityRestoredFirst() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let pending = PendingGroupInviteStore(persistence: .inMemory())
+            guard case .accepted(let token) = pending.put(Self.link) else {
+                Issue.record("Invalid fixture")
+                return
+            }
+            var state = Root.State.initial
+            state.$featureFlags.withLock { $0 = FeatureFlags(groupLinks: true) }
+            state.zappMessagingState.identity = ZMIdentity(publicKey: "owner", displayName: "Owner")
+            let store = TestStore(initialState: state) { Root() } withDependencies: {
+                $0.walletStorage = .noOp
+                $0.mainQueue = .immediate
+                $0.pendingGroupInvites = pending
+            }
+            store.exhaustivity = .off
+            await store.send(.initialization(.checkBackupPhraseValidation))
+            await store.receive(\.groupInviteResumed)
+            await store.receive(\.destination.updateDestination)
+            #expect(store.state.groupInviteState.token == token)
+            #expect(store.state.destinationState.destination == .groupInvite)
             await store.finish()
         }
     }

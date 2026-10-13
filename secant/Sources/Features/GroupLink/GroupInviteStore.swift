@@ -162,10 +162,10 @@ struct GroupInvite {
 
             // A request an earlier tap already made, which the SDK knows about and this screen
             // does not.
-            case .statusRefreshed(let refreshID, let updates):
+            case let .statusRefreshed(refreshID, updates):
                 guard state.statusRefreshID == refreshID else { return .none }
                 guard let linkId = state.linkId,
-                      let update = updates.first(where: { $0.linkId == linkId }) else {
+                    let update = updates.first(where: { $0.linkId == linkId }) else {
                     return .none
                 }
                 return .send(.response(state.sessionID, .updated(update)))
@@ -192,7 +192,7 @@ struct GroupInvite {
 
             case .joinAnswered(let result):
                 guard case .requesting = state.stage,
-                      result.linkId == nil || result.linkId == state.linkId else { return .none }
+                    result.linkId == nil || result.linkId == state.linkId else { return .none }
                 if let linkId = result.linkId { state.linkId = linkId }
                 switch result.status {
                 case .requested, .alreadyRequested:
@@ -241,6 +241,7 @@ struct GroupInvite {
                 case .waiting:
                     // A status read started before the owner's acknowledgement can arrive last.
                     if case .waiting(_, _, .withOwner) = state.stage { return .none }
+                    if case .waiting(_, _, .sent) = state.stage, !update.sent { return .none }
                     state.stage = .waiting(
                         linkId: update.linkId,
                         nameHint: update.nameHint ?? state.stage.nameHint,
@@ -334,7 +335,6 @@ struct GroupInvite {
         }
         .cancellable(id: StatusCancelId(sessionID: state.sessionID), cancelInFlight: true)
     }
-
 }
 
 extension GroupInvite.Stage {

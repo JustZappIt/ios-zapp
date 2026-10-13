@@ -73,7 +73,7 @@ struct GroupInviteView: View {
                 ?? String(localizable: .groupInviteTitle)
         case .waiting:
             return String(localizable: .groupInviteWaitingTitle)
-        case .joined(_, let name, let alreadyMember):
+        case let .joined(_, name, alreadyMember):
             if alreadyMember { return String(localizable: .groupInviteAlreadyMember) }
             return named(name) { String(localizable: .groupInviteJoinedNamed($0)) }
                 ?? String(localizable: .groupInviteJoined)

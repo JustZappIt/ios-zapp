@@ -7,7 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
-- [#72] Share group invite links with a scannable QR code, approve new members, and remove members from group chats. Pending requests survive app restarts and show when they are waiting for a connection or owner approval.
+- [#72] Share group invite links with a scannable QR code, approve new members, and remove members from group chats. Invites resume after wallet setup, and pending requests survive app restarts and show when they are waiting for a connection or owner approval.
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
 - [PARITY] P2P wallet key now opens its own screen: your smart account address is shown openly, and the owner key stays locked until you reveal it with your app lock.

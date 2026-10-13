@@ -59,6 +59,8 @@ struct GroupInviteRegressionTests {
         #expect(pending.link(for: token) == nil)
         await store.send(.updated(ZMGroupJoinUpdate(linkId: "current", status: .waiting, sent: true)))
         #expect(store.state.stage == .waiting(linkId: "current", nameHint: "Crew", progress: .sent))
+        await store.send(.updated(ZMGroupJoinUpdate(linkId: "current", status: .waiting, sent: false)))
+        #expect(store.state.stage == .waiting(linkId: "current", nameHint: "Crew", progress: .sent))
         await store.send(.updated(ZMGroupJoinUpdate(linkId: "current", status: .pendingApproval)))
         await store.send(.updated(ZMGroupJoinUpdate(linkId: "current", status: .waiting)))
         #expect(store.state.stage == .waiting(linkId: "current", nameHint: "Crew", progress: .withOwner))

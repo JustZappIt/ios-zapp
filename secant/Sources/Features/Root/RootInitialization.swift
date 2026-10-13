@@ -68,6 +68,7 @@ extension Root {
     enum InitializationAction {
         case appDelegate(AppDelegateAction)
         case checkBackupPhraseValidation
+        case finishLaunchNavigation
         case checkRestoreWalletFlag(SyncStatus)
         case checkWalletInitialization
         case checkWalletConfig
@@ -1378,19 +1379,27 @@ extension Root {
                 }
 
                 state.appInitializationState = .initialized
-                let isAtDeeplinkWarningScreen = state.destinationState.destination == .deeplinkWarning
-                // A claim opened from a cold start must not be yanked to home mid-preview.
-                let isAtGiftClaimScreen = state.destinationState.destination == .giftClaim
-
                 return .run { send in
-                    // Delay the splash overlay dismissal
+                    // Delay the splash overlay dismissal, then read the current navigation
+                    // state. An invite can open while this delay is still running.
                     try await mainQueue.sleep(for: .seconds(0.5))
-                    if !isAtDeeplinkWarningScreen && !isAtGiftClaimScreen {
-                        await send(.destination(.updateDestination(Root.DestinationState.Destination.home)))
-                    }
+                    await send(.initialization(.finishLaunchNavigation))
                 }
                 .cancellable(id: state.CancelId, cancelInFlight: true)
-                
+
+            case .initialization(.finishLaunchNavigation):
+                switch state.destinationState.destination {
+                case .deeplinkWarning, .giftClaim, .groupInvite:
+                    return .none
+                default:
+                    // Identity restoration can finish before wallet initialization. Retry the
+                    // held invite now that both prerequisites can be satisfied.
+                    return .concatenate(
+                        .send(.destination(.updateDestination(.home))),
+                        .send(.groupInviteResumePending)
+                    )
+                }
+
             case .initialization(.resetZashiRequest(let areMetadataPreserved)):
                 state.areMetadataPreserved = areMetadataPreserved
                 // Gift custody guard on the use path itself, not just the screen: the reset wipes
