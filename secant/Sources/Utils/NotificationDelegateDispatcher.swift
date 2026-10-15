@@ -28,6 +28,7 @@ final class NotificationDelegateDispatcher: NSObject, @preconcurrency UNUserNoti
 
     private func isChat(_ request: UNNotificationRequest) -> Bool {
         ChatPushNotifications.topic(from: request.content.userInfo) != nil
+            || request.content.userInfo["groupJoinConversationId"] is String
     }
 
     func userNotificationCenter(

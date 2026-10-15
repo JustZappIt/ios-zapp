@@ -25,6 +25,7 @@ struct Root {
             case giftCard
             case giftCardList
             case groupInfo
+            case groupLink
             case increaseReputation
             case newChat
             case onramp
@@ -259,6 +260,8 @@ struct Root {
         var giftCardState = GiftCard.State()
         var giftCardListState = GiftCardList.State()
         var giftClaimState = GiftClaim.State()
+        var groupInviteState = GroupInvite.State()
+        var groupLinkState = GroupLink.State.initial
         var peerCashOutActivityReturn: PeerCashOutActivityReturn?
         var peerCashOutOrigin = PeerCashOutOrigin.pay
         var offrampOrigin = OfframpOrigin.pay
@@ -335,9 +338,11 @@ struct Root {
             // Both gift screens can put bearer material on screen, and the create flow broadcasts.
             case .giftCard, .giftCardList:
                 return true
+            // `.groupLink` shows a bearer secret but broadcasts nothing and touches no server,
+            // so a server switch behind it costs nothing.
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress, .groupInfo,
-                 .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
+                 .groupLink, .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -481,6 +486,12 @@ struct Root {
         case giftCardList(GiftCardList.Action)
         case giftClaim(GiftClaim.Action)
         case giftLinkReceived(String)
+        case groupInvite(GroupInvite.Action)
+        case groupLink(GroupLink.Action)
+        case groupInviteReceived(String)
+        /// An invite held until there was a wallet, an onboarding and an identity to open it with.
+        case groupInviteResumePending
+        case groupInviteResumed(String)
         case giftStartupSweep
         case giftResumePendingClaim
         case giftClaimResumed(String)
@@ -593,6 +604,7 @@ struct Root {
     @Dependency(\.autoServerSelection) var autoServerSelection
     @Dependency(\.uriParser) var uriParser
     @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+    @Dependency(\.pendingGroupInvites) var pendingGroupInvites
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
@@ -745,6 +757,14 @@ struct Root {
 
         Scope(state: \.giftClaimState, action: \.giftClaim) {
             GiftClaim()
+        }
+
+        Scope(state: \.groupInviteState, action: \.groupInvite) {
+            GroupInvite()
+        }
+
+        Scope(state: \.groupLinkState, action: \.groupLink) {
+            GroupLink()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {

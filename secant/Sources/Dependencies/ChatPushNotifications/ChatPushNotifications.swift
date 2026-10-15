@@ -180,6 +180,23 @@ final class ChatPushNotifications: NSObject {
         }
     }
 
+    /// Like a message alert, a join request reveals no group or sender on the lock screen.
+    func notifyGroupJoinRequest(_ conversationId: String) async {
+        guard isEnabled else { return }
+        let content = UNMutableNotificationContent()
+        content.body = String(localizable: .chatNotificationsNewActivity)
+        content.sound = .default
+        content.userInfo = ["groupJoinConversationId": conversationId]
+        let request = UNNotificationRequest(
+            identifier: "group-join-\(conversationId)", content: content, trigger: nil
+        )
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+        } catch {
+            LoggerProxy.error("Chat join request notification failed")
+        }
+    }
+
     func didRegisterForRemoteNotifications(deviceToken: Data) {
         guard configured else { return }
         Messaging.messaging().apnsToken = deviceToken
@@ -247,6 +264,10 @@ extension ChatPushNotifications: @preconcurrency UNUserNotificationCenterDelegat
     ) async {
         // The notification stays a generic doorbell: reconciliation remains the authoritative
         // message path. The topic is the only routing hint it carries, and it is resolved here.
+        if let conversationId = response.notification.request.content.userInfo["groupJoinConversationId"] as? String {
+            ChatNotificationTapRelay.shared.send(conversationId)
+            return
+        }
         guard
             let topic = Self.topic(from: response.notification.request.content.userInfo),
             let conversationId = topicConversations[topic]
