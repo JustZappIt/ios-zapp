@@ -505,7 +505,7 @@ private final class ZappMessagingImpl: @unchecked Sendable {
         // The SDK admits people through invite links without asking the app each time, and the
         // worklet starts each run without the set, so it is pushed rather than queried.
         Task { @MainActor [weak self] in
-            guard let self, let sdk = self.sdk, sdk.isInitialized, sdk.identity != nil else { return }
+            guard let self, let sdk = self.sdk, sdk.identity != nil else { return }
             await self.reassertBlockedKeys(sdk)
         }
     }

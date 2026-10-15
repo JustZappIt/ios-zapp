@@ -26,6 +26,7 @@ struct GroupLinkSafetyTests {
             let descriptions = [
                 String(customDumping: state),
                 String(customDumping: GroupLink.Action.linkLoaded(info)),
+                String(customDumping: GroupLink.Action.response(UUID(), .linkLoaded(info))),
                 String(customDumping: Root.Action.groupLink(.linkLoaded(info))),
                 String(customDumping: after),
                 diff(before, after) ?? ""
@@ -90,12 +91,21 @@ struct GroupLinkSafetyTests {
             }
             store.exhaustivity = .off
             await store.send(.onAppear)
-            await store.receive(\.requestsLoaded)
+            await store.receive {
+                guard case .response(_, .requestsLoaded) = $0 else { return false }
+                return true
+            }
             #expect(store.state.requests == [request])
             await subscription.countReached(1)
             withdrawn.send("room")
-            await store.receive(\.requestWithdrawn)
-            await store.receive(\.requestsLoaded)
+            await store.receive {
+                guard case .response(_, .requestWithdrawn) = $0 else { return false }
+                return true
+            }
+            await store.receive {
+                guard case .response(_, .requestsLoaded) = $0 else { return false }
+                return true
+            }
             #expect(store.state.requests.isEmpty)
             #expect(calls.values == ["room", "room"])
             await store.send(.onDisappear)

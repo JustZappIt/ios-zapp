@@ -14,39 +14,39 @@ struct GroupInviteView: View {
             VStack(spacing: 0) {
                 ZappScreenHeader(title: String(localizable: .groupInviteHeader))
 
-                GeometryReader { geometry in
-                    ScrollView {
-                        VStack(spacing: Design.Spacing._lg) {
-                            groupMark
+                ScrollView {
+                    VStack(spacing: Design.Spacing._lg) {
+                        groupMark
+                        Spacer().frame(height: Design.Spacing._xs)
 
-                            if let titleText {
-                                Text(titleText)
-                                    .zappFont(.sectionTitle, style: ZappColors.text)
-                                    .multilineTextAlignment(.center)
-                            } else {
-                                ProgressView()
-                            }
-
-                            if let subtitleText {
-                                Text(subtitleText)
-                                    .zappFont(.body, style: ZappColors.textMuted)
-                                    .multilineTextAlignment(.center)
-                            }
-
-                            if store.sendFailed {
-                                Text(String(localizable: .groupInviteSendFailed))
-                                    .zappFont(.caption, style: ZappColors.danger)
-                                    .multilineTextAlignment(.center)
-                            }
+                        if let titleText {
+                            Text(titleText)
+                                .zappFont(.sectionTitle, style: ZappColors.text)
+                                .multilineTextAlignment(.center)
+                        } else {
+                            ProgressView()
                         }
-                        .frame(minHeight: geometry.size.height, alignment: .center)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
+
+                        if let subtitleText {
+                            Text(subtitleText)
+                                .zappFont(.body, style: ZappColors.textMuted)
+                                .multilineTextAlignment(.center)
+                        }
+
+                        if store.sendFailed {
+                            Text(String(localizable: .groupInviteSendFailed))
+                                .zappFont(.caption, style: ZappColors.danger)
+                                .multilineTextAlignment(.center)
+                        }
+                        Spacer().frame(height: Design.Spacing._lg)
+                        actions
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, Design.Spacing._3xl)
+                    .padding(.vertical, Design.Spacing._4xl)
                 }
 
-                bottomBar
+                ZappBottomActionBar(onBack: back)
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
@@ -59,8 +59,8 @@ struct GroupInviteView: View {
             Circle()
                 .fill(ZappColors.surfaceAlt.color(colorScheme))
                 .frame(width: 72, height: 72)
-            Image(systemName: "person.3.fill")
-                .foregroundColor(ZappColors.text.color(colorScheme))
+            Asset.Assets.Icons.users.image
+                .zImage(width: 24, height: 24, style: ZappColors.text)
         }
     }
 
@@ -118,41 +118,38 @@ struct GroupInviteView: View {
     }
 
     @ViewBuilder
-    private var bottomBar: some View {
+    private var actions: some View {
         switch store.stage {
         case .preview:
-            ZappBottomActionBar(onBack: { store.send(.notNowTapped) }) {
-                VStack(spacing: Design.Spacing._md) {
-                    ZappButton(title: String(localizable: .groupInviteJoin)) { store.send(.joinTapped) }
-                    ZappButton(title: String(localizable: .groupInviteNotNow), variant: .ghost) {
-                        store.send(.notNowTapped)
-                    }
-                }
+            ZappButton(title: String(localizable: .groupInviteJoin)) { store.send(.joinTapped) }
+            ZappButton(title: String(localizable: .groupInviteNotNow), variant: .ghost) {
+                store.send(.notNowTapped)
             }
 
         case .requesting:
-            ZappBottomActionBar(onBack: { store.send(.delegate(.dismiss)) }) {
-                ZappButton(title: String(localizable: .groupInviteJoin), isEnabled: false) { }
-            }
+            ZappButton(title: String(localizable: .groupInviteJoin), isLoading: true) { }
 
         case .waiting:
-            ZappBottomActionBar(onBack: { store.send(.delegate(.dismiss)) }) {
-                ZappButton(title: String(localizable: .groupInviteCancel), variant: .ghost) {
-                    store.send(.cancelTapped)
-                }
+            ZappButton(title: String(localizable: .groupInviteCancel), variant: .ghost) {
+                store.send(.cancelTapped)
             }
 
         case .joined(let conversationId, _, _):
-            ZappBottomActionBar(onBack: { store.send(.delegate(.dismiss)) }) {
-                if let conversationId {
-                    ZappButton(title: String(localizable: .groupInviteOpenGroup)) {
-                        store.send(.openGroupTapped(conversationId))
-                    }
+            if let conversationId {
+                ZappButton(title: String(localizable: .groupInviteOpenGroup)) {
+                    store.send(.openGroupTapped(conversationId))
                 }
             }
 
         case .reading, .failed, .comingSoon:
-            ZappBottomActionBar(onBack: { store.send(.delegate(.dismiss)) }) { EmptyView() }
+            EmptyView()
+        }
+    }
+
+    private func back() {
+        switch store.stage {
+        case .reading, .preview: store.send(.notNowTapped)
+        default: store.send(.delegate(.dismiss))
         }
     }
 }

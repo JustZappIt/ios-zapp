@@ -119,10 +119,8 @@ extension Root {
                 }
 
             case .groupInviteReceived(let raw):
-                // A preview already on screen is never interrupted: its request is in flight and
-                // its effects still land on `groupInviteState`.
-                guard state.destinationState.destination != .groupInvite else { return .none }
                 guard state.featureFlags.groupLinks else {
+                    guard state.destinationState.destination != .groupInvite else { return .none }
                     // Nothing is stored while the feature is off, but the tap still lands
                     // somewhere that says so.
                     state.groupInviteState = GroupInvite.State(comingSoon: true)
@@ -130,11 +128,15 @@ extension Root {
                 }
                 switch pendingGroupInvites.put(raw) {
                 case .accepted(let token):
+                    // Persist first, even while another request owns the preview. Its effects
+                    // must finish against their own state; dismissal opens the next held invite.
+                    guard state.destinationState.destination != .groupInvite else { return .none }
                     return .send(.groupInviteResumed(token))
                 case .alreadyPending:
                     // Its preview is already on its way in.
                     return .none
                 case .refused:
+                    guard state.destinationState.destination != .groupInvite else { return .none }
                     // Not a group link after all, or too many waiting. The tap still lands.
                     state.groupInviteState = GroupInvite.State(token: nil)
                     return .send(.destination(.updateDestination(.groupInvite)))
@@ -153,7 +155,8 @@ extension Root {
                 return .send(.groupInviteResumed(token))
 
             case .groupInviteResumed(let token):
-                guard state.appInitializationState == .initialized,
+                guard state.destinationState.destination != .groupInvite,
+                      state.appInitializationState == .initialized,
                       state.zappMessagingState.identity != nil else {
                     // The invite stays in the store and opens once the app is ready for it.
                     return .none

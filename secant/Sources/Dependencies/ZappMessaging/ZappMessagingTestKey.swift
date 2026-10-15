@@ -141,6 +141,7 @@ extension ZappMessagingClient: TestDependencyKey {
         approveGroupJoinRequest: { _, _ in true },
         declineGroupJoinRequest: { _, _ in },
         groupJoinRequestStream: { Empty().eraseToAnyPublisher() },
+        groupJoinRequestWithdrawnStream: { Empty().eraseToAnyPublisher() },
         removeMember: { _, _, _ in ZMRemoveMemberResult(participants: [], olderMemberCount: 0) },
         olderMemberCount: { _ in 0 },
         groupMembershipStream: { Empty().eraseToAnyPublisher() }

@@ -1059,6 +1059,16 @@ extension Root {
                 return .send(.destination(.updateDestination(.onboarding)))
 
             case .groupInvite(.delegate(.dismiss)):
+                if state.featureFlags.groupLinks,
+                   state.appInitializationState == .initialized,
+                   state.zappMessagingState.identity != nil,
+                   let token = pendingGroupInvites.newestToken(excluding: state.groupInviteState.token) {
+                    // The child tears down the old session before this state is replaced. The
+                    // destination stays visible, so start the next preview explicitly rather
+                    // than relying on SwiftUI to deliver another onAppear.
+                    state.groupInviteState = GroupInvite.State(token: token)
+                    return .send(.groupInvite(.onAppear))
+                }
                 let hasWallet = state.appInitializationState != .keysMissing
                     && state.appInitializationState != .uninitialized
                 return .send(.destination(.updateDestination(hasWallet ? .home : .onboarding)))

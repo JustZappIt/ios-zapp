@@ -46,7 +46,10 @@ struct GroupLink {
         /// Non-nil while the share sheet is up. The link, and nothing around it.
         var linkToShare: String?
 
-        var requestsCancelId = UUID()
+        // Root reuses this feature for different groups. Cancellation alone cannot stop an
+        // SDK call that is already in flight, so every asynchronous reply carries its session.
+        var sessionID = UUID()
+        var isVisible = false
 
         var isActive: Bool { info?.state == .active }
         var link: String? { isActive ? info?.link : nil }
@@ -83,6 +86,16 @@ struct GroupLink {
             }
         }
 
+        func isExpirySelected(_ days: Int?, now: Date) -> Bool {
+            guard let expiresAt = info?.expiresAt else { return days == nil }
+            let remaining = expiresAt.timeIntervalSince(now)
+            guard remaining > 0,
+                  let preset = GroupLink.expiryChoices.compactMap({ $0 }).first(where: {
+                      remaining <= Double($0) * GroupLink.day
+                  }) else { return false }
+            return days == preset
+        }
+
         static func limitText(_ maxJoins: Int?) -> String {
             guard let maxJoins else { return String(localizable: .groupLinkLimitNone) }
             return String(localizable: .groupLinkLimitPeopleFmt("\(maxJoins)"))
@@ -103,6 +116,7 @@ struct GroupLink {
     }
 
     enum Action: Equatable {
+        indirect case response(UUID, Action)
         case onAppear
         case onDisappear
         case backTapped
@@ -145,11 +159,19 @@ struct GroupLink {
     init() { }
 
     var body: some Reducer<State, Action> {
-        Reduce { state, action in
+        Reduce { state, receivedAction in
+            let action: Action
+            if case .response(let sessionID, let response) = receivedAction {
+                guard state.isVisible, state.sessionID == sessionID else { return .none }
+                action = response
+            } else {
+                action = receivedAction
+            }
             switch action {
             case .onAppear:
-                guard state.isOwner else { return .none }
-                return .merge(
+                guard state.isOwner, !state.isVisible else { return .none }
+                state.isVisible = true
+                return scoped(.merge(
                     load(state.conversationId),
                     .merge(
                         .publisher {
@@ -163,20 +185,21 @@ struct GroupLink {
                                 .map(Action.requestWithdrawn)
                         }
                     )
-                    .cancellable(id: state.requestsCancelId, cancelInFlight: true)
-                )
+                ), sessionID: state.sessionID)
 
-            case .onDisappear:
-                return .merge(.cancel(id: state.requestsCancelId), .cancel(id: CancelId.copyFeedback))
-
-            case .backTapped:
-                return .none
+            case .onDisappear, .backTapped:
+                let sessionID = state.sessionID
+                state.isVisible = false
+                state.sessionID = UUID()
+                state.isBusy = false
+                return .merge(.cancel(id: sessionID), .cancel(id: CancelId.copyFeedback))
 
             case .linkLoaded(let info):
+                guard info.conversationId == state.conversationId else { return .none }
                 state.info = info
                 state.didFail = false
                 state.isBusy = false
-                return loadRequests(state.conversationId)
+                return scoped(loadRequests(state.conversationId), sessionID: state.sessionID)
 
             case .loadFailed:
                 state.isBusy = false
@@ -188,11 +211,11 @@ struct GroupLink {
                 return .none
 
             case .requestReceived, .requestWithdrawn:
-                return loadRequests(state.conversationId)
+                return scoped(loadRequests(state.conversationId), sessionID: state.sessionID)
 
             case .retryTapped:
                 state.didFail = false
-                return load(state.conversationId)
+                return scoped(load(state.conversationId), sessionID: state.sessionID)
 
             case .turnOnTapped:
                 return call(&state) { [id = state.conversationId] in
@@ -261,11 +284,11 @@ struct GroupLink {
                 // Universal Clipboard to another device.
                 pasteboard.setSensitiveString(RedactableString(link))
                 state.isCopied = true
-                return .run { send in
+                return scoped(.run { send in
                     try await clock.sleep(for: .seconds(2))
                     await send(.copyFeedbackElapsed)
                 }
-                .cancellable(id: CancelId.copyFeedback, cancelInFlight: true)
+                .cancellable(id: CancelId.copyFeedback, cancelInFlight: true), sessionID: state.sessionID)
 
             case .copyFeedbackElapsed:
                 state.isCopied = false
@@ -284,37 +307,40 @@ struct GroupLink {
                 state.isBusy = true
                 state.didFail = false
                 state.isFull = false
-                return .run { [id = state.conversationId] send in
+                return scoped(.run { [id = state.conversationId] send in
                     let admitted = try await zappMessaging.approveGroupJoinRequest(id, joinerKey)
                     await send(.answerFinished(admitted: admitted))
                 } catch: { error, send in
                     LoggerProxy.error("Group link failed to approve a request: \(error)")
                     await send(.actionFailed)
-                }
+                }, sessionID: state.sessionID)
 
             case .declineTapped(let joinerKey):
                 guard !state.isBusy else { return .none }
                 state.isBusy = true
                 state.didFail = false
                 state.isFull = false
-                return .run { [id = state.conversationId] send in
+                return scoped(.run { [id = state.conversationId] send in
                     try await zappMessaging.declineGroupJoinRequest(id, joinerKey)
                     await send(.answerFinished(admitted: true))
                 } catch: { error, send in
                     LoggerProxy.error("Group link failed to decline a request: \(error)")
                     await send(.actionFailed)
-                }
+                }, sessionID: state.sessionID)
 
             // Either way the request is gone from the owner's device, so the list and the record
             // are read again rather than patched.
             case .answerFinished(let admitted):
                 state.isBusy = false
                 state.isFull = !admitted
-                return load(state.conversationId)
+                return scoped(load(state.conversationId), sessionID: state.sessionID)
 
             case .actionFailed:
                 state.isBusy = false
                 state.didFail = true
+                return .none
+
+            case .response:
                 return .none
             }
         }
@@ -329,12 +355,18 @@ struct GroupLink {
         state.isBusy = true
         state.didFail = false
         state.isFull = false
-        return .run { send in
+        return scoped(.run { send in
             await send(.linkLoaded(try await operation()))
         } catch: { error, send in
             LoggerProxy.error("Group link control failed: \(error)")
             await send(.actionFailed)
-        }
+        }, sessionID: state.sessionID)
+    }
+
+    private func scoped(_ effect: Effect<Action>, sessionID: UUID) -> Effect<Action> {
+        effect
+            .map { .response(sessionID, $0) }
+            .cancellable(id: sessionID)
     }
 
     private func load(_ conversationId: String) -> Effect<Action> {
@@ -367,6 +399,7 @@ extension GroupLink.Action: CustomDumpStringConvertible {
     var customDumpDescription: String {
         switch self {
         case .linkLoaded: return "GroupLink.Action.linkLoaded(<redacted>)"
+        case .response(_, let action): return "GroupLink.Action.response(\(action.customDumpDescription))"
         default: return String(reflecting: self)
         }
     }

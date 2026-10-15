@@ -124,6 +124,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [#72] Group invite screens now follow Android's layout and selection controls. Additional invites are kept while another preview is open, and returning to a different group's link no longer risks showing an earlier group's link or requests.
 - [#72] Keep group invite links out of debug logs, honor blocked contacts and cancelled requests, and prevent one invite from replacing another. Member removal waits for its warnings and link-reset options, invite expiry shows the actual time remaining, and invite links work in testnet without skipping wallet onboarding.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.

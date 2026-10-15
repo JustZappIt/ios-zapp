@@ -72,8 +72,8 @@ final class PendingGroupInviteStore: @unchecked Sendable {
     }
 
     /// The token of the most recent invite still waiting, for the resume after onboarding.
-    func newestToken() -> String? {
-        lock.withLock { liveLocked().first?.token }
+    func newestToken(excluding token: String? = nil) -> String? {
+        lock.withLock { liveLocked().first { $0.token != token }?.token }
     }
 
     func remove(token: String) {

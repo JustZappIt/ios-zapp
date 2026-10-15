@@ -6,72 +6,49 @@ import SwiftUI
 /// The owner's invite link: the link itself, what sharing it means, and the controls over it.
 struct GroupLinkView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @State private var enlargedLink: String?
 
     @Perception.Bindable var store: StoreOf<GroupLink>
 
     var body: some View {
         WithPerceptionTracking {
-            ZStack {
-                VStack(spacing: 0) {
-                    ZappScreenHeader(title: String(localizable: .groupLinkHeader))
+            VStack(spacing: 0) {
+                ZappScreenHeader(title: String(localizable: .groupLinkHeader))
 
-                    ScrollView {
-                        VStack(spacing: Design.Spacing._lg) {
-                            if !store.isOwner {
-                                Text(String(localizable: .groupLinkOwnerOnly))
-                                    .zappFont(.body, style: ZappColors.textMuted)
-                            } else {
-                                ownerContent
-                            }
+                ScrollView {
+                    VStack(alignment: .leading, spacing: Design.Spacing._lg) {
+                        if !store.isOwner {
+                            Text(String(localizable: .groupLinkOwnerOnly))
+                                .zappFont(.body, style: ZappColors.textMuted)
+                        } else {
+                            ownerContent
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, Design.Spacing._lg)
-                        .padding(.vertical, Design.Spacing._lg)
+                        Spacer().frame(height: Design.Spacing._md)
                     }
-
-                    ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                        if store.link != nil {
-                            ZappButton(title: String(localizable: .groupLinkShare), isEnabled: !store.isBusy) {
-                                store.send(.shareTapped)
-                            }
-                        }
-                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(Design.Spacing._xl)
                 }
-                .applyScreenBackground()
 
-                if store.isConfirmingReset {
-                    resetDialog
+                ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
+                    if store.link != nil {
+                        ZappButton(title: String(localizable: .groupLinkShare), isEnabled: !store.isBusy) {
+                            store.send(.shareTapped)
+                        }
+                    }
                 }
             }
+            .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
             .onDisappear { store.send(.onDisappear) }
-            .confirmationDialog(
-                String(localizable: .groupLinkExpiryLabel),
-                isPresented: Binding(
-                    get: { store.picker == .expiry },
-                    set: { if !$0 { store.send(.pickerDismissed) } }
-                ),
-                titleVisibility: .visible
-            ) {
-                ForEach(GroupLink.expiryChoices.indices, id: \.self) { index in
-                    let days = GroupLink.expiryChoices[index]
-                    Button(expiryChoiceTitle(days)) { store.send(.expiryPicked(days)) }
-                }
-            }
-            .confirmationDialog(
-                String(localizable: .groupLinkLimitLabel),
-                isPresented: Binding(
-                    get: { store.picker == .limit },
-                    set: { if !$0 { store.send(.pickerDismissed) } }
-                ),
-                titleVisibility: .visible
-            ) {
-                ForEach(GroupLink.limitChoices.indices, id: \.self) { index in
-                    let limit = GroupLink.limitChoices[index]
-                    Button(GroupLink.State.limitText(limit)) { store.send(.limitPicked(limit)) }
-                }
+            .zashiSheet(isPresented: sheetPresented, horizontalPadding: Design.Spacing._md) {
+                sheetContent
             }
             .overlay { shareSheet }
+            .zappQRSpotlight(payload: $enlargedLink) { payload, edge in
+                ChatIdentityQRCode(payload: payload, size: edge)
+            } action: { _ in
+                EmptyView()
+            }
         }
     }
 
@@ -83,28 +60,24 @@ struct GroupLinkView: View {
         }
 
         if let link = store.link {
-            ChatIdentityQRCode(payload: link, size: 240)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel(String(localizable: .groupLinkHeader))
-            ZappValueCard(value: link) {
-                EmptyView()
-            } trailing: {
-                Button {
-                    store.send(.copyTapped)
-                } label: {
-                    Image(systemName: store.isCopied ? "checkmark" : "doc.on.doc")
-                        .foregroundColor(ZappColors.text.color(colorScheme))
-                        .frame(minWidth: 44, minHeight: 44)
-                }
-                .accessibilityLabel(String(localizable: .groupLinkCopy))
+            Button {
+                enlargedLink = link
+            } label: {
+                ChatIdentityQRCode(payload: link, size: 240)
             }
+            .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel(String(localizable: .groupLinkQrContentDescription))
+                .accessibilityAddTraits(.isButton)
         }
 
-        if store.info != nil {
+        if store.isActive {
             Text(String(localizable: .groupLinkWarning))
                 .zappFont(.body, style: ZappColors.text)
                 .fixedSize(horizontal: false, vertical: true)
+        }
 
+        if store.info != nil {
             Text(String(localizable: .groupLinkHistoryNote))
                 .zappFont(.caption, style: ZappColors.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -156,45 +129,53 @@ struct GroupLinkView: View {
     }
 
     private var requests: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing._md) {
-            Text(String(localizable: .groupLinkRequestsLabel))
-                .zappFont(.eyebrow, style: ZappColors.textSubtle)
+        VStack(alignment: .leading, spacing: 0) {
+            ZappGroupHeader(text: String(localizable: .groupLinkRequestsLabel))
 
-            ForEach(store.requests) { request in
-                VStack(alignment: .leading, spacing: Design.Spacing._xs) {
-                    Text(request.joinerName)
-                        .zappFont(.rowTitle, style: ZappColors.text)
-                    Text(String(localizable: .groupLinkRequestSubtitle))
-                        .zappFont(.rowSubtitle, style: ZappColors.textMuted)
-                    if let contactName = store.state.contactName(for: request.joinerKey) {
-                        Text(String(localizable: .groupLinkRequestContactFmt(contactName)))
-                            .zappFont(.caption, style: ZappColors.textMuted)
-                    }
-                    if request.previouslyRemoved {
-                        Text(String(localizable: .groupLinkRequestRemovedBefore))
-                            .zappFont(.caption, style: ZappColors.textSubtle)
-                    }
-                    HStack(spacing: Design.Spacing._md) {
-                        ZappButton(
-                            title: String(localizable: .groupLinkRequestApprove),
-                            isEnabled: !store.isBusy
-                        ) {
-                            store.send(.approveTapped(request.joinerKey))
+            VStack(spacing: 0) {
+                ForEach(store.requests) { request in
+                    WithPerceptionTracking {
+                        VStack(alignment: .leading, spacing: Design.Spacing._xs) {
+                            Text(request.joinerName)
+                                .zappFont(.rowTitle, style: ZappColors.text)
+                            Text(String(localizable: .groupLinkRequestSubtitle))
+                                .zappFont(.rowSubtitle, style: ZappColors.textMuted)
+                            if let contactName = store.state.contactName(for: request.joinerKey) {
+                                Text(String(localizable: .groupLinkRequestContactFmt(contactName)))
+                                    .zappFont(.caption, style: ZappColors.textMuted)
+                            }
+                            if request.previouslyRemoved {
+                                ZappStatusChip(text: String(localizable: .groupLinkRequestRemovedBefore))
+                            }
+                            HStack(spacing: Design.Spacing._md) {
+                                ZappCompactButton(
+                                    title: String(localizable: .groupLinkRequestApprove),
+                                    variant: .primary,
+                                    isEnabled: !store.isBusy
+                                ) {
+                                    store.send(.approveTapped(request.joinerKey))
+                                }
+                                ZappCompactButton(
+                                    title: String(localizable: .groupLinkRequestDecline),
+                                    variant: .primary,
+                                    isEnabled: !store.isBusy
+                                ) {
+                                    store.send(.declineTapped(request.joinerKey))
+                                }
+                            }
                         }
-                        ZappButton(
-                            title: String(localizable: .groupLinkRequestDecline),
-                            variant: .ghost,
-                            isEnabled: !store.isBusy
-                        ) {
-                            store.send(.declineTapped(request.joinerKey))
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, Design.Spacing._lg)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        if request.id != store.requests.last?.id {
+                            ZappRowDivider(inset: true)
                         }
                     }
                 }
-                .padding(Design.Spacing._md)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(ZappColors.surface.color(colorScheme))
-                .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
             }
+            .background(ZappColors.surface.color(colorScheme))
+            .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
         }
     }
 
@@ -209,6 +190,8 @@ struct GroupLinkView: View {
                 action: { store.send(.pickerOpened(.expiry)) }
             )
 
+            ZappRowDivider(inset: true)
+
             ZappRow(
                 title: String(localizable: .groupLinkLimitLabel),
                 trailing: {
@@ -218,55 +201,112 @@ struct GroupLinkView: View {
                 action: { store.send(.pickerOpened(.limit)) }
             )
 
-            ZappRow(
-                title: String(localizable: .groupLinkNameToggle),
-                trailing: {
-                    ZappToggle(
-                        isOn: store.info?.includeName ?? true,
-                        accessibilityLabel: String(localizable: .groupLinkNameToggle)
-                    ) {
-                        store.send(.nameToggled)
-                    }
-                },
-                action: { store.send(.nameToggled) }
-            )
+            ZappRowDivider(inset: true)
 
-            ZappRow(
+            ZappToggleRow(
+                title: String(localizable: .groupLinkNameToggle),
+                isOn: store.info?.includeName ?? true,
+                isEnabled: !store.isBusy
+            ) {
+                store.send(.nameToggled)
+            }
+
+            ZappRowDivider(inset: true)
+
+            ZappToggleRow(
                 title: String(localizable: .groupLinkApprovalToggle),
                 subtitle: String(localizable: .groupLinkApprovalHelp),
-                trailing: {
-                    ZappToggle(
-                        isOn: store.info?.approval == .owner,
-                        accessibilityLabel: String(localizable: .groupLinkApprovalToggle)
-                    ) {
-                        store.send(.approvalToggled)
-                    }
-                },
-                action: { store.send(.approvalToggled) }
-            )
+                isOn: store.info?.approval == .owner,
+                isEnabled: !store.isBusy
+            ) {
+                store.send(.approvalToggled)
+            }
         }
         .background(ZappColors.surface.color(colorScheme))
         .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
     }
 
-    private var resetDialog: some View {
-        ZappDialog(onScrimTap: { store.send(.resetDismissed) }) {
+    private var sheetPresented: Binding<Bool> {
+        Binding(
+            get: { store.picker != nil || store.isConfirmingReset },
+            set: { presented in
+                if !presented {
+                    store.send(.pickerDismissed)
+                    store.send(.resetDismissed)
+                }
+            }
+        )
+    }
+
+    @ViewBuilder
+    private var sheetContent: some View {
+        if store.isConfirmingReset {
+            resetConfirmation
+        } else if let picker = store.picker {
+            pickerContent(picker)
+        }
+    }
+
+    private func pickerContent(_ picker: GroupLink.Picker) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(String(localizable: picker == .expiry ? .groupLinkExpiryLabel : .groupLinkLimitLabel))
+                .zappFont(.sectionTitle, style: ZappColors.text)
+                .padding(.horizontal, Design.Spacing._xl)
+                .padding(.vertical, Design.Spacing._md)
+
+            if picker == .expiry {
+                ForEach(GroupLink.expiryChoices.indices, id: \.self) { index in
+                    WithPerceptionTracking {
+                        let days = GroupLink.expiryChoices[index]
+                        ZappSelectionRow(
+                            title: expiryChoiceTitle(days),
+                            isSelected: store.state.isExpirySelected(days, now: Date()),
+                            isEnabled: !store.isBusy
+                        ) {
+                            store.send(.expiryPicked(days))
+                        }
+                    }
+                }
+            } else {
+                ForEach(GroupLink.limitChoices.indices, id: \.self) { index in
+                    WithPerceptionTracking {
+                        let limit = GroupLink.limitChoices[index]
+                        ZappSelectionRow(
+                            title: GroupLink.State.limitText(limit),
+                            isSelected: store.info?.maxJoins == limit,
+                            isEnabled: !store.isBusy
+                        ) {
+                            store.send(.limitPicked(limit))
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.bottom, Design.Spacing._3xl)
+        .background(ZappColors.surface.color(colorScheme))
+    }
+
+    private var resetConfirmation: some View {
+        VStack(spacing: Design.Spacing._md) {
             Text(String(localizable: .groupLinkResetTitle))
                 .zappFont(.sectionTitle, style: ZappColors.text)
 
             Text(String(localizable: .groupLinkResetBody))
                 .zappFont(.body, style: ZappColors.textMuted)
+                .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding(.bottom, Design.Spacing._lg)
 
-            HStack(spacing: Design.Spacing._lg) {
-                ZappButton(title: String(localizable: .groupLinkCancel), variant: .ghost) {
-                    store.send(.resetDismissed)
-                }
-                ZappButton(title: String(localizable: .groupLinkResetConfirm), variant: .danger) {
-                    store.send(.resetConfirmed)
-                }
+            ZappButton(title: String(localizable: .groupLinkResetConfirm), variant: .danger) {
+                store.send(.resetConfirmed)
+            }
+            ZappButton(title: String(localizable: .groupLinkCancel), variant: .ghost) {
+                store.send(.resetDismissed)
             }
         }
+        .padding(.horizontal, Design.Spacing._xl)
+        .padding(.vertical, Design.Spacing._2xl)
+        .background(ZappColors.surface.color(colorScheme))
     }
 
     @ViewBuilder
