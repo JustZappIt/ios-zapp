@@ -61,6 +61,10 @@ struct ZappBalanceChart: View {
         let history: ZappBalanceHistory
     }
 
+    private enum Constants {
+        static let placeholderHeight: CGFloat = 140
+    }
+
     @Environment(\.colorScheme)
     private var colorScheme
     @Environment(\.scenePhase)
@@ -95,9 +99,12 @@ struct ZappBalanceChart: View {
             case .hidden:
                 Color.clear.frame(height: 0)
             case .loading:
-                // No skeleton: the balance sits above, and a reload keeps what is drawn, so a
-                // period tap never lands here.
-                Color.clear.frame(height: 0)
+                // Android's `ChartLoading`: a flat 140pt placeholder, no period selector. A reload
+                // keeps what is drawn, so only the first load lands here.
+                Rectangle()
+                    .fill(ZappColors.surfaceAlt.color(colorScheme))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: Constants.placeholderHeight)
             case .data(let data):
                 content {
                     fiatDelta(data)
@@ -111,8 +118,8 @@ struct ZappBalanceChart: View {
                     )
                 }
             case .zecData(let points):
+                // Android's `computeDelta()` is fiat-only: ZEC mode draws no delta row.
                 content {
-                    zecDelta(points)
                     ZappSparkChart(
                         points: points,
                         accessibilitySummary: chartAccessibilitySummary(period: period.label, detail: tokenName),
@@ -132,9 +139,6 @@ struct ZappBalanceChart: View {
 
     private func content<Content: View>(@ViewBuilder chart: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(String(localizable: .zappPayChartTitle))
-                .zappFont(.sectionTitle, style: ZappColors.text)
-
             chart()
 
             // The selector stays mounted in every visible state. Dropping it while a period loaded
@@ -150,7 +154,7 @@ struct ZappBalanceChart: View {
     private var emptyChart: some View {
         Text(String(localizable: .zappPayChartEmpty))
             .zappFont(.caption, style: ZappColors.textSubtle)
-            .frame(maxWidth: .infinity, minHeight: 140)
+            .frame(maxWidth: .infinity, minHeight: Constants.placeholderHeight)
             .multilineTextAlignment(.center)
     }
 
@@ -163,27 +167,6 @@ struct ZappBalanceChart: View {
             separatorDot
             Text("\(isPositive ? "+" : "-")\(formatPercentage(abs(data.percentageChange)))")
                 .zappFont(.caption, style: style)
-        }
-    }
-
-    @ViewBuilder
-    private func zecDelta(_ points: [ZappChartPoint]) -> some View {
-        let first = Int64(points.first?.value ?? 0)
-        let last = Int64(points.last?.value ?? 0)
-        let change = last - first
-        let isPositive = change >= 0
-        let style = isPositive ? ZappColors.success : ZappColors.danger
-
-        // Android's `computeDelta()` returns null when the window opens on a zero balance — there is
-        // no baseline to take a percentage against — and renders no delta row at all.
-        if first > 0 {
-            HStack(spacing: 8) {
-                Text("\(isPositive ? "▲" : "▼") \(Zatoshi(abs(change)).decimalString()) \(tokenName)")
-                    .zappFont(.caption, style: style)
-                separatorDot
-                Text("\(isPositive ? "+" : "-")\(String(format: "%.2f%%", Double(abs(change)) / Double(first) * 100))")
-                    .zappFont(.caption, style: style)
-            }
         }
     }
 

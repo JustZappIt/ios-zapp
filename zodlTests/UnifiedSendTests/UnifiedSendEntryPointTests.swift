@@ -252,17 +252,32 @@ import ZappMessaging
         #expect(store.swapAndPayCoordFlowState.swapAndPayState.isSwapToZecExperienceEnabled)
     }
 
-    /// Top Up hands off to the Offramp bridge-funds corridor (Android's `TopUpArgs`).
-    @Test func topUpOpensTheOfframpBridgeCorridor() async {
+    /// Top Up opens Android's `TopUpArgs` source picker over the form, never the Base bridge.
+    /// Picking a source pushes that address's QR on the send flow's own stack, so back returns to
+    /// the form: an exchange gets the transparent address, another wallet the shielded one.
+    @Test func topUpOpensTheSourcePickerAndStaysInTheSendFlow() async {
         let store = payTabStore()
 
         store.send(.home(.sendTapped))
         store.send(.sendCoordFlow(.topUpRequested))
-        await waitForRoot { store.path == .offramp }
+        #expect(store.sendCoordFlowState.isTopUpPresented)
+        #expect(store.path == .sendCoordFlow)
 
-        #expect(store.path == .offramp)
-        await waitForRoot { store.offrampState.page == .topUp }
-        #expect(store.offrampState.page == .topUp)
+        store.send(.sendCoordFlow(.topUpSourcePicked(.exchange)))
+        #expect(store.sendCoordFlowState.isTopUpPresented == false)
+        #expect(store.path == .sendCoordFlow)
+        #expect(Self.topUpAddressDetails(store)?.maxPrivacy == false)
+
+        store.send(.sendCoordFlow(.topUpRequested))
+        store.send(.sendCoordFlow(.topUpSourcePicked(.wallet)))
+        await waitForRoot { store.sendCoordFlowState.path.count == 2 }
+        #expect(Self.topUpAddressDetails(store)?.maxPrivacy == true)
+        #expect(store.path == .sendCoordFlow)
+    }
+
+    private static func topUpAddressDetails(_ store: StoreOf<Root>) -> AddressDetails.State? {
+        guard case let .addressDetails(details) = store.sendCoordFlowState.path.last else { return nil }
+        return details
     }
 }
 

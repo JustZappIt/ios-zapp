@@ -87,8 +87,8 @@ extension SendCoordFlow {
             case .swap(.customBackRequired):
                 return .send(.sendForm(.dismissRequired))
 
-                // Delegates handled by Root.
-            case .topUpRequested, .swapToZecRequested:
+                // Delegate handled by Root.
+            case .swapToZecRequested:
                 return .none
 
                 // MARK: - Address Book

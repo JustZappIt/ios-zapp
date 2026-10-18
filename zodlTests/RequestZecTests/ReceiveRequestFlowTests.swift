@@ -10,21 +10,23 @@ import Testing
 /// Phase 14 §4.1 moved the Request chain out of Receive's `NavigationStack` and into its own
 /// presentation so it rises the way Android's `REQUEST` route does. These cover the behaviour that
 /// moved with it — the chain still advances in the same order, still carries the segment's own
-/// address, and Cancel now closes the presentation instead of emptying a shared stack.
+/// address, and Cancel now closes the presentation instead of emptying a shared stack. The chain
+/// is Android's two stages: the amount screen (with an inline note) goes straight to the QR.
 @Suite struct ReceiveRequestFlowTests {
     private let address = "u1someshieldedaddress".redacted
 
-    @MainActor @Test func theKeyboardAdvancesToTheMemoScreenCarryingTheAmountAndAddress() async {
+    @MainActor @Test func theKeyboardGoesStraightToTheQRWithTheNote() async {
         let state = ReceiveRequestFlow.State(address: address, maxPrivacy: true)
         let store = TestStore(initialState: state) { ReceiveRequestFlow() }
         store.exhaustivity = .off
 
+        await store.send(.noteChanged("Dinner"))
         await store.send(.zecKeyboard(.nextTapped))
 
         #expect(store.state.path.count == 1)
 
-        guard case .requestZec(let pushed) = store.state.path.last else {
-            Issue.record("Expected the memo screen to be pushed")
+        guard case .requestZecSummary(let pushed) = store.state.path.last else {
+            Issue.record("Expected the QR page to be pushed")
             return
         }
 
@@ -32,23 +34,35 @@ import Testing
         // shielded one — this is why the chain could not simply reuse `RequestZecCoordFlow`.
         #expect(pushed.address == address)
         #expect(pushed.maxPrivacy)
+        #expect(pushed.memoState.text == "Dinner")
     }
 
-    @MainActor @Test func requestingFromTheMemoScreenPushesTheSummary() async {
-        var state = ReceiveRequestFlow.State(address: address, maxPrivacy: false)
-        state.path.append(.requestZec(state.requestZecState))
-
+    /// A transparent address cannot take a memo, so a transparent request never carries one.
+    @MainActor @Test func aTransparentRequestDropsTheNote() async {
+        var state = ReceiveRequestFlow.State(address: "tmTransparent".redacted, maxPrivacy: false)
+        state.memo = "Dinner"
         let store = TestStore(initialState: state) { ReceiveRequestFlow() }
         store.exhaustivity = .off
 
-        await store.send(.path(.element(id: 0, action: .requestZec(.requestTapped))))
+        await store.send(.zecKeyboard(.nextTapped))
 
-        #expect(store.state.path.count == 2)
-
-        guard case .requestZecSummary = store.state.path.last else {
-            Issue.record("Expected the summary to be pushed")
+        guard case .requestZecSummary(let pushed) = store.state.path.last else {
+            Issue.record("Expected the QR page to be pushed")
             return
         }
+        #expect(pushed.memoState.text.isEmpty)
+    }
+
+    @MainActor @Test func theNoteIsCappedAtTheMemoByteLimit() async {
+        let store = TestStore(initialState: ReceiveRequestFlow.State(address: address, maxPrivacy: true)) {
+            ReceiveRequestFlow()
+        }
+        store.exhaustivity = .off
+
+        await store.send(.noteChanged(String(repeating: "é", count: 400)))
+
+        #expect(store.state.memo.utf8.count <= ReceiveRequestFlow.noteByteLimit)
+        #expect(store.state.memo.count == ReceiveRequestFlow.noteByteLimit / 2)
     }
 
     /// Cancel used to `path.removeAll()` back to Receive. The chain is its own presentation now,

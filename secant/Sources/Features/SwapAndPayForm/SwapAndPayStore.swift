@@ -649,10 +649,11 @@ struct SwapAndPay {
                 return .send(.updateAssetsAccordingToSearchTerm)
                 
             case .getQuoteTapped:
-                let isKeystone = state.selectedWalletAccount?.vendor == .keystone
-                if let uuid = state.selectedWalletAccount?.id {
+                if let account = state.selectedWalletAccount {
+                    let uuid = account.id
+                    let receivers = account.privateUAReceivers
                     return .run { send in
-                        let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(uuid, isKeystone ? [.orchard] : [.sapling, .orchard])
+                        let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(uuid, receivers)
                         await send(.updatePrivateUA(privateUA))
                         await send(.getQuote)
                     }

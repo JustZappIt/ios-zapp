@@ -27,6 +27,7 @@ struct RequestZec {
         @Shared(.inMemory(.selectedWalletAccount)) var selectedWalletAccount: WalletAccount? = nil
         var storedEnlargedQR: CGImage?
         var storedQR: CGImage?
+        @Shared(.inMemory(.toast)) var toast: Toast.Edge? = nil
 
         init() {}
     }
@@ -34,6 +35,8 @@ struct RequestZec {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<RequestZec.State>)
         case cancelRequestTapped
+        /// The QR page's address copy (Android's `RequestQrCodeView.AddressSection`).
+        case copyAddressTapped
         case generateEnlargedQRCode
         case generateQRCode(Bool)
         case memo(MessageEditor.Action)
@@ -47,6 +50,7 @@ struct RequestZec {
         case shareQR
     }
     
+    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zcashSDKEnvironment) var zcashSDKEnvironment
     
     init() { }
@@ -73,6 +77,11 @@ struct RequestZec {
             case .binding:
                 return .none
                 
+            case .copyAddressTapped:
+                pasteboard.setString(state.address)
+                state.$toast.withLock { $0 = .top(String(localizable: .generalCopiedToTheClipboard)) }
+                return .none
+
             case .cancelRequestTapped:
                 return .none
                 

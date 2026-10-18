@@ -22,15 +22,20 @@ struct ZecKeyboardView: View {
         static let switchBox: CGFloat = 40
         static let sheetIconBox: CGFloat = 44
         static let sheetIconSize: CGFloat = 20
+        static let noteIconSize: CGFloat = 16
     }
 
     @Perception.Bindable var store: StoreOf<ZecKeyboard>
 
     let tokenName: String
+    /// Android's Request amount screen carries an optional note inline (`RequestAmountView`).
+    /// Nil keeps the keyboard as it was for every other caller.
+    let note: Binding<String>?
 
-    init(store: StoreOf<ZecKeyboard>, tokenName: String) {
+    init(store: StoreOf<ZecKeyboard>, tokenName: String, note: Binding<String>? = nil) {
         self.store = store
         self.tokenName = tokenName
+        self.note = note
     }
 
     var body: some View {
@@ -85,6 +90,12 @@ struct ZecKeyboardView: View {
             if store.currencyConversion != nil {
                 convertedInput
                     .padding(.top, Design.Spacing._lg)
+            }
+
+            if let note {
+                noteField(note)
+                    .padding(.top, Design.Spacing._2xl)
+                    .padding(.horizontal, Design.Spacing._2xl)
             }
 
             Spacer()
@@ -163,6 +174,21 @@ struct ZecKeyboardView: View {
         }
         .minimumScaleFactor(0.6)
         .padding(.horizontal, Design.Spacing._2xl)
+    }
+
+    private func noteField(_ note: Binding<String>) -> some View {
+        HStack(spacing: 10) {
+            Asset.Assets.Icons.pencil.image
+                .zImage(width: Constants.noteIconSize, height: Constants.noteIconSize, style: ZappColors.textSubtle)
+
+            TextField(String(localizable: .requestZecNoteHint), text: note)
+                .textFieldStyle(.plain)
+                .zappFont(.body, style: ZappColors.text)
+                .submitLabel(.done)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .overlay(Rectangle().strokeBorder(ZappColors.border.color(colorScheme), lineWidth: 1))
     }
 
     private var keypad: some View {
