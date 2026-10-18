@@ -44,7 +44,7 @@ import ZappMessaging
     /// without a fraction). Key order is Android's insertion order.
     @Test func payloadMatchesAndroidFieldSetWithFiatAndMemo() {
         let payload = RequestChatPicker.payload(
-            for: Self.request(zec: "1.5", memo: "Dinner"),
+            for: Self.request(zec: "1.5", memo: "Dinner", typedFiat: "60"),
             rate: Self.rate(40),
             id: "req-1"
         )
@@ -60,6 +60,14 @@ import ZappMessaging
         let payload = RequestChatPicker.payload(for: Self.request(zec: "2"), rate: nil, id: "req-2")
 
         #expect(payload == #"{"requesterAddress":"utest1requester","id":"req-2","amount":2,"token":"ZEC"}"#)
+    }
+
+    /// A ZEC-typed request carries no fiat even with a live rate, so the payer sees "0.25 ZEC",
+    /// not "$12.50 / ≈ 0.25 ZEC" (MrIdli's item 1 on zapp-android #92).
+    @Test func payloadOmitsFiatWhenTheUserTypedZec() {
+        let payload = RequestChatPicker.payload(for: Self.request(zec: "0.25"), rate: Self.rate(50), id: "req-4")
+
+        #expect(payload == #"{"requesterAddress":"utest1requester","id":"req-4","amount":0.25,"token":"ZEC"}"#)
     }
 
     /// A fiat-typed request sends the typed amount (scale 2, HALF_UP), not the ZEC converted back.

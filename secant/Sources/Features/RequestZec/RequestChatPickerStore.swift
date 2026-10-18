@@ -103,14 +103,14 @@ struct RequestChatPicker {
     }
 
     /// `sendRequestInChat`'s body. Nil when the amount is not positive, which Android also refuses
-    /// to send. Fiat rides along only when a rate is known: the amount the user typed if they typed
-    /// fiat, otherwise the ZEC amount converted, both at Android's 2-decimal HALF_UP scale.
+    /// to send. Fiat rides along only when the user typed the amount in fiat (Android's
+    /// `typedFiatAmount`): the typed amount at Android's 2-decimal HALF_UP scale, in the rate's
+    /// currency, which is the one the keyboard typed in. A ZEC-typed request carries no fiat, so the
+    /// payer is not shown a dollar figure nobody asked for.
     static func payload(for request: Request, rate: ChatFiatRate?, id: String) -> String? {
         guard request.zecAmount > 0 else { return nil }
 
-        let fiatAmount = rate.map {
-            ChatAmountFormat.roundedFiat(request.typedFiatAmount ?? $0.zecToFiat(request.zecAmount))
-        }
+        let fiatAmount = rate == nil ? nil : request.typedFiatAmount.map(ChatAmountFormat.roundedFiat)
 
         return ChatPaymentRequest.json(
             id: id,
