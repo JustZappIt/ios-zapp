@@ -174,7 +174,10 @@ struct GroupLinkSafetyTests {
             let store = TestStore(initialState: state) { Root() }
             store.exhaustivity = .off
             await store.send(.groupInvite(.delegate(.dismiss)))
-            await store.receive(\.destination.updateDestination)
+            await store.receive {
+                guard case .destination(.updateDestination) = $0 else { return false }
+                return true
+            }
             #expect(store.state.destinationState.destination == (hasWallet ? .home : .onboarding))
             await store.finish()
         }
@@ -217,7 +220,10 @@ struct GroupLinkSafetyTests {
             await store.send(.initialization(.checkBackupPhraseValidation))
             await store.send(.destination(.updateDestination(.groupInvite)))
             await queue.advance(by: .seconds(0.5))
-            await store.receive(\.initialization.finishLaunchNavigation)
+            await store.receive {
+                guard case .initialization(.finishLaunchNavigation) = $0 else { return false }
+                return true
+            }
             await store.finish()
             #expect(store.state.destinationState.destination == .groupInvite)
         }
@@ -243,7 +249,10 @@ struct GroupLinkSafetyTests {
             store.exhaustivity = .off
             await store.send(.initialization(.checkBackupPhraseValidation))
             await store.receive(\.groupInviteResumed)
-            await store.receive(\.destination.updateDestination)
+            await store.receive {
+                guard case .destination(.updateDestination) = $0 else { return false }
+                return true
+            }
             #expect(store.state.groupInviteState.token == token)
             #expect(store.state.destinationState.destination == .groupInvite)
             await store.finish()

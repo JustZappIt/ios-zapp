@@ -37,15 +37,34 @@ import Testing
         #expect(store.newestToken() == nil)
     }
 
-    @Test func theSameLinkTwiceIsAlreadyPending() {
+    @Test func aRepeatTapReturnsTheSameTokenAndMakesItTheNewest() {
         let store = makeStore()
 
-        guard case .accepted = store.put(Self.link("a")) else {
+        guard case .accepted(let token) = store.put(Self.link("a")),
+            case .accepted = store.put(Self.link("b")) else {
             Issue.record("the first tap is accepted")
             return
         }
 
-        #expect(store.put(Self.link("a")) == .alreadyPending)
+        #expect(store.newestToken() != token)
+        #expect(store.put(Self.link("a")) == .accepted(token: token))
+        #expect(store.newestToken() == token)
+        store.remove(token: token)
+        #expect(store.link(for: token) == nil, "a repeat tap must not create a second copy")
+    }
+
+    @Test func aRepeatTapRefreshesTheHeldInvitesLifetime() {
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        let clock = MutableClock(now: start)
+        let store = makeStore(now: { clock.now })
+        guard case .accepted(let token) = store.put(Self.link("a")) else {
+            Issue.record("the first tap is accepted")
+            return
+        }
+        clock.now = start.addingTimeInterval(6 * 24 * 60 * 60)
+        #expect(store.put(Self.link("a")) == .accepted(token: token))
+        clock.now = start.addingTimeInterval(8 * 24 * 60 * 60)
+        #expect(store.link(for: token) == Self.link("a"))
     }
 
     /// Newest first, so a flood of links drops the oldest rather than the one just tapped.
@@ -88,7 +107,7 @@ import Testing
         let store = makeStore()
 
         guard case .accepted(let first) = store.put(Self.link("a")),
-              case .accepted(let second) = store.put(Self.link("b")) else {
+            case .accepted(let second) = store.put(Self.link("b")) else {
             Issue.record("both links are accepted")
             return
         }

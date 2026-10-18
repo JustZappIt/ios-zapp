@@ -1076,7 +1076,7 @@ extension Root {
             case .groupInvite(.delegate(.openConversation(let conversationId))):
                 // Home first, then the room: the preview is a destination, not a path entry, so
                 // the room has to be pushed onto the home path it leaves behind.
-                return .merge(
+                return .concatenate(
                     .send(.destination(.updateDestination(.home))),
                     .send(.chatNotificationTapped(conversationId))
                 )

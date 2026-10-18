@@ -40,7 +40,6 @@ struct GroupLink {
         var didFail = false
         /// Approving ran the checks again and the group is full.
         var isFull = false
-        var isCopied = false
         var picker: Picker?
         var isConfirmingReset = false
         /// Non-nil while the share sheet is up. The link, and nothing around it.
@@ -137,8 +136,6 @@ struct GroupLink {
         case limitPicked(Int?)
         case nameToggled
         case approvalToggled
-        case copyTapped
-        case copyFeedbackElapsed
         case shareTapped
         case shareFinished
         case approveTapped(String)
@@ -147,13 +144,7 @@ struct GroupLink {
         case actionFailed
     }
 
-    private enum CancelId {
-        case copyFeedback
-    }
-
-    @Dependency(\.continuousClock) var clock
     @Dependency(\.date) var date
-    @Dependency(\.pasteboard) var pasteboard
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
@@ -192,7 +183,7 @@ struct GroupLink {
                 state.isVisible = false
                 state.sessionID = UUID()
                 state.isBusy = false
-                return .merge(.cancel(id: sessionID), .cancel(id: CancelId.copyFeedback))
+                return .cancel(id: sessionID)
 
             case .linkLoaded(let info):
                 guard info.conversationId == state.conversationId else { return .none }
@@ -277,22 +268,6 @@ struct GroupLink {
                 return call(&state) { [id = state.conversationId] in
                     try await zappMessaging.updateGroupLink(id, ZMGroupLinkOptions(approval: approval))
                 }
-
-            case .copyTapped:
-                guard let link = state.link else { return .none }
-                // Sensitive: local only and short lived, so a bearer secret does not ride the
-                // Universal Clipboard to another device.
-                pasteboard.setSensitiveString(RedactableString(link))
-                state.isCopied = true
-                return scoped(.run { send in
-                    try await clock.sleep(for: .seconds(2))
-                    await send(.copyFeedbackElapsed)
-                }
-                .cancellable(id: CancelId.copyFeedback, cancelInFlight: true), sessionID: state.sessionID)
-
-            case .copyFeedbackElapsed:
-                state.isCopied = false
-                return .none
 
             case .shareTapped:
                 state.linkToShare = state.link

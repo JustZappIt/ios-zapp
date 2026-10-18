@@ -5,13 +5,10 @@ import Security
 
 /// What the store made of an incoming invite link.
 enum GroupInviteIntake: Equatable {
-    /// Held. The token retrieves the link.
+    /// Held. A repeat tap returns the same token, so a dismissed preview can be reopened.
     case accepted(token: String)
 
-    /// This exact link is already waiting, so the preview it would open is already on its way.
-    case alreadyPending
-
-    /// Not a group link, oversized, or too many already waiting. There is nothing to open.
+    /// Not a group link, or oversized. There is nothing to open.
     case refused
 }
 
@@ -56,12 +53,12 @@ final class PendingGroupInviteStore: @unchecked Sendable {
     func put(_ raw: String) -> GroupInviteIntake {
         guard let link = GroupInviteLinks.canonical(raw) else { return .refused }
         return lock.withLock {
-            var invites = liveLocked()
-            if invites.contains(where: { $0.link == link }) { return .alreadyPending }
-            let token = UUID().uuidString
+            let invites = liveLocked()
+            let token = invites.first { $0.link == link }?.token ?? UUID().uuidString
             // Newest first, so an older invite is the one dropped when the store is full.
-            invites.insert(PendingGroupInvite(token: token, link: link, receivedAt: now()), at: 0)
-            writeLocked(Array(invites.prefix(Self.maxPending)))
+            // Like Android, a repeat tap refreshes its lifetime and moves it to the front.
+            let entry = PendingGroupInvite(token: token, link: link, receivedAt: now())
+            writeLocked(Array(([entry] + invites.filter { $0.token != token }).prefix(Self.maxPending)))
             return .accepted(token: token)
         }
     }

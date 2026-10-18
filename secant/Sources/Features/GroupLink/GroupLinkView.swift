@@ -29,13 +29,7 @@ struct GroupLinkView: View {
                     .padding(Design.Spacing._xl)
                 }
 
-                ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
-                    if store.link != nil {
-                        ZappButton(title: String(localizable: .groupLinkShare), isEnabled: !store.isBusy) {
-                            store.send(.shareTapped)
-                        }
-                    }
-                }
+                bottomActionBar
             }
             .applyScreenBackground()
             .onAppear { store.send(.onAppear) }
@@ -49,6 +43,21 @@ struct GroupLinkView: View {
             } action: { _ in
                 EmptyView()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var bottomActionBar: some View {
+        // The active link has one Share action, like Android. With no link, use the
+        // back-only bar so an empty primary-action slot does not draw a bordered card.
+        if store.isOwner && store.link != nil {
+            ZappBottomActionBar(onBack: { store.send(.backTapped) }) {
+                ZappButton(title: String(localizable: .groupLinkShare), isEnabled: !store.isBusy) {
+                    store.send(.shareTapped)
+                }
+            }
+        } else {
+            ZappBottomActionBar(onBack: { store.send(.backTapped) })
         }
     }
 

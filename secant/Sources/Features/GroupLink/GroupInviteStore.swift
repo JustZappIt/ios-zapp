@@ -87,6 +87,7 @@ struct GroupInvite {
         let sessionID: UUID
     }
 
+    @Dependency(\.continuousClock) var clock
     @Dependency(\.pendingGroupInvites) var pendingGroupInvites
     @Dependency(\.zappMessaging) var zappMessaging
 
@@ -125,7 +126,7 @@ struct GroupInvite {
                     .run { [sessionID = state.sessionID] send in
                         // Reading is local. An unavailable worklet must not spend the link.
                         do {
-                            let inspection = try await zappMessaging.inspectGroupLink(link)
+                            let inspection = try await inspect(link)
                             guard !Task.isCancelled else { return }
                             await send(.response(sessionID, .inspected(inspection)))
                         } catch {
@@ -298,6 +299,18 @@ struct GroupInvite {
             case .response:
                 return .none
             }
+        }
+    }
+
+    private func inspect(_ link: String) async throws -> ZMGroupLinkInspection {
+        do {
+            return try await zappMessaging.inspectGroupLink(link)
+        } catch {
+            // As on Android, give a starting worklet one retry. A transient local read
+            // failure must not spend the link or contact the group owner.
+            try await clock.sleep(for: .milliseconds(1_500))
+            try Task.checkCancellation()
+            return try await zappMessaging.inspectGroupLink(link)
         }
     }
 

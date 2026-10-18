@@ -132,12 +132,9 @@ extension Root {
                     // must finish against their own state; dismissal opens the next held invite.
                     guard state.destinationState.destination != .groupInvite else { return .none }
                     return .send(.groupInviteResumed(token))
-                case .alreadyPending:
-                    // Its preview is already on its way in.
-                    return .none
                 case .refused:
                     guard state.destinationState.destination != .groupInvite else { return .none }
-                    // Not a group link after all, or too many waiting. The tap still lands.
+                    // Not a group link after all, or oversized. The tap still lands.
                     state.groupInviteState = GroupInvite.State(token: nil)
                     return .send(.destination(.updateDestination(.groupInvite)))
                 }

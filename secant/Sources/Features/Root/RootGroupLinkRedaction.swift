@@ -6,7 +6,9 @@ extension Root.Action: CustomDumpReflectable {
     var customDumpMirror: Mirror {
         switch self {
         case .groupInviteReceived:
-            return Mirror(reflecting: "Root.Action.groupInviteReceived(<redacted>)")
+            // Keep an enum mirror with redacted children. A String's leaf mirror makes
+            // CustomDump fall back to describing the original action, exposing the URL.
+            return Mirror(self, children: ["groupInviteReceived": "<redacted>"], displayStyle: .enum)
         default:
             return Mirror(reflecting: self)
         }
@@ -18,8 +20,10 @@ extension Root.DestinationAction: CustomDumpReflectable {
         switch self {
         // The URL already contains the secret before routing classifies it. Redact every
         // deeplink so malformed invites and appended tracking text cannot escape this boundary.
-        case .deeplink, .deeplinkFailed:
-            return Mirror(reflecting: "Root.DestinationAction.deeplink(<redacted>)")
+        case .deeplink:
+            return Mirror(self, children: ["deeplink": "<redacted>"], displayStyle: .enum)
+        case .deeplinkFailed:
+            return Mirror(self, children: ["deeplinkFailed": "<redacted>"], displayStyle: .enum)
         default:
             return Mirror(reflecting: self)
         }
