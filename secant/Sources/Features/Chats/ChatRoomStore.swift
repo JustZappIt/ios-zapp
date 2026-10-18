@@ -29,6 +29,10 @@ struct ChatRoom {
 
         var conversationId: String
         var conversation: ZMConversation?
+
+        /// The owner removed this device from the group. The history stays where it is; nothing
+        /// new can be sent, and the SDK would refuse it anyway.
+        var isRemovedFromGroup: Bool { conversation?.removedAt != nil }
         var messages: [ZMMessage] = []
         var draft = ""
         var isLoading = true
@@ -121,6 +125,7 @@ struct ChatRoom {
         var rowIds: [String: String] = [:]
 
         var messageReceivedCancelId = UUID()
+        var conversationCancelId = UUID()
         var messagingStateCancelId = UUID()
         var messageStatusCancelId = UUID()
         var mediaProgressCancelId = UUID()
@@ -294,6 +299,7 @@ struct ChatRoom {
         case sendSucceeded(clientId: String, message: ZMMessage)
         case messagesLoaded([ZMMessage])
         case messageReceived(ZMMessage)
+        case conversationChanged(ZMConversation)
         case messagingStateChanged(ZappMessagingState)
         case networkChipTapped
         case networkDetailsDismissed
@@ -415,6 +421,16 @@ struct ChatRoom {
                             .map(Action.messageReceived)
                     }
                     .cancellable(id: state.messageReceivedCancelId, cancelInFlight: true),
+                    // The list is not mounted while an invite is open. Read the SDK snapshot
+                    // here too, so a newly joined group has its name and roster immediately,
+                    // and a removal switches an already-open room to read only.
+                    .publisher {
+                        zappMessaging.conversationsStream()
+                            .compactMap { $0.first { $0.id == conversationId } }
+                            .removeDuplicates()
+                            .map(Action.conversationChanged)
+                    }
+                    .cancellable(id: state.conversationCancelId, cancelInFlight: true),
                     .publisher {
                         zappMessaging.stateStream()
                             .map(Action.messagingStateChanged)
@@ -444,6 +460,7 @@ struct ChatRoom {
 
                 return .merge(
                     .cancel(id: state.messageReceivedCancelId),
+                    .cancel(id: state.conversationCancelId),
                     .cancel(id: state.messagingStateCancelId),
                     .cancel(id: state.messageStatusCancelId),
                     .cancel(id: state.mediaProgressCancelId),
@@ -543,7 +560,7 @@ struct ChatRoom {
 
             case .sendTapped:
                 let content = state.trimmedDraft
-                guard !content.isEmpty else { return .none }
+                guard !content.isEmpty, !state.isRemovedFromGroup else { return .none }
 
                 let replyTo = state.replyingTo
                 let reply = replyTo.map {
@@ -653,6 +670,11 @@ struct ChatRoom {
                 } catch: { error, _ in
                     LoggerProxy.error("Chat room mark-read for incoming message failed: \(error)")
                 }
+
+            case .conversationChanged(let conversation):
+                guard conversation.id == state.conversationId else { return .none }
+                state.conversation = conversation
+                return .none
 
             case .messagingStateChanged(let messagingState):
                 guard messagingState != state.messagingState else { return .none }

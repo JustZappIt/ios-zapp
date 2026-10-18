@@ -12,6 +12,7 @@ struct ChatsList {
     @ObservableState
     struct State: Equatable {
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+        @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
         /// Android persists the same flag as `IS_CHAT_TOS_ACCEPTED`.
         @Shared(.appStorage(.chatTermsAccepted)) var chatTermsAccepted = false
 
@@ -19,6 +20,10 @@ struct ChatsList {
 
         var conversations: [ZMConversation] = []
         var messagingState = ZappMessagingState()
+
+        /// Invite links this device is waiting on. They live in the SDK, not in the back stack,
+        /// so the list is the one place someone can see a tapped link is still waiting.
+        var waitingJoins: [ZMGroupJoinUpdate] = []
 
         /// Distinguishes "no conversations yet" from "the first snapshot has not arrived".
         var isLoaded = false
@@ -29,6 +34,7 @@ struct ChatsList {
 
         var conversationsCancelId = UUID()
         var stateCancelId = UUID()
+        var joinUpdatesCancelId = UUID()
 
         /// Decides which side of `isSupportConversation` this device is on. Absent until the
         /// chat identity lands, which is exactly Android's `chatConversationsRepository.localPublicKey`.
@@ -124,6 +130,9 @@ struct ChatsList {
         case networkDetailsLoaded(ZMConnectionDetails)
         case networkDetailsFailed
         case leaveConversationRequested(String)
+        case joinUpdated(ZMGroupJoinUpdate)
+        case waitingJoinsLoaded([ZMGroupJoinUpdate])
+        case cancelWaitingJoinTapped(String)
         case termsAccepted
         case termsDeclined
 
@@ -140,6 +149,17 @@ struct ChatsList {
     @Dependency(\.zappMessaging) var zappMessaging
 
     init() { }
+
+    /// The SDK is the authority on what this device is waiting on, so the list is read back
+    /// rather than patched from an event.
+    private func refreshWaitingJoins(_ isEnabled: Bool) -> Effect<Action> {
+        guard isEnabled else { return .none }
+        return .run { send in
+            if let updates = try? await zappMessaging.groupJoinStatus() {
+                await send(.waitingJoinsLoaded(updates.filter(\.status.isWaiting)))
+            }
+        }
+    }
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
@@ -162,6 +182,12 @@ struct ChatsList {
                     }
                     .cancellable(id: state.conversationsCancelId, cancelInFlight: true),
                     .publisher {
+                        zappMessaging.groupJoinUpdatesStream()
+                            .map(ChatsList.Action.joinUpdated)
+                    }
+                    .cancellable(id: state.joinUpdatesCancelId, cancelInFlight: true),
+                    refreshWaitingJoins(state.featureFlags.groupLinks),
+                    .publisher {
                         zappMessaging.stateStream()
                             .throttle(for: .seconds(0.2), scheduler: mainQueue, latest: true)
                             .map(ChatsList.Action.messagingStateChanged)
@@ -178,7 +204,8 @@ struct ChatsList {
             case .onDisappear:
                 return .merge(
                     .cancel(id: state.conversationsCancelId),
-                    .cancel(id: state.stateCancelId)
+                    .cancel(id: state.stateCancelId),
+                    .cancel(id: state.joinUpdatesCancelId)
                 )
 
             case .conversationsUpdated(let conversations):
@@ -195,6 +222,23 @@ struct ChatsList {
             case .messagingStateChanged(let messagingState):
                 state.messagingState = messagingState
                 return .none
+
+            case .joinUpdated:
+                return refreshWaitingJoins(state.featureFlags.groupLinks)
+
+            case .waitingJoinsLoaded(let updates):
+                state.waitingJoins = updates
+                return .none
+
+            case .cancelWaitingJoinTapped(let linkId):
+                return .run { [enabled = state.featureFlags.groupLinks] send in
+                    _ = try? await zappMessaging.cancelGroupJoin(linkId)
+                    if let updates = try? await zappMessaging.groupJoinStatus() {
+                        _ = enabled
+                        await send(.waitingJoinsLoaded(updates.filter(\.status.isWaiting)))
+                    }
+                }
+
 
             case .networkChipTapped:
                 state.showsNetworkDetails = true
@@ -311,4 +355,5 @@ extension ChatsList {
     ) {
         ChatsList()
     }
+
 }

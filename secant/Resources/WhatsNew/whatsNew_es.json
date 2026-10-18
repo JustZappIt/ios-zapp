@@ -1,6 +1,29 @@
 {
     "releases": [
         {
+            "version": "1.0.3",
+            "date": "15-10-2026",
+            "timestamp": 1792090800,
+            "sections": [
+                {
+                    "title": "Añadido:",
+                    "bulletpoints": [
+                        "Toca la cita de una respuesta en un chat para ir al mensaje original.",
+                        "Contactos: inicia un chat directamente desde un contacto, explora los contactos con encabezados A-Z y copia el nombre, la clave de mensajería o la dirección de billetera de un contacto.",
+                        "Oculta o muestra tus saldos desde la pantalla Pay con el nuevo botón de ojo.",
+                        "Votación de titulares de monedas: vota propuestas de gobernanza de Zcash desde Tú, luego Gobernanza."
+                    ]
+                },
+                {
+                    "title": "Corregido:",
+                    "bulletpoints": [
+                        "Al pegar una frase de recuperación, ahora se valida correctamente.",
+                        "Corregimos varios problemas al guardar fotos de chat y al cerrar la pantalla de exportación de secretos."
+                    ]
+                }
+            ]
+        },
+        {
             "version": "3.7.3",
             "date": "11-07-2026",
             "timestamp": 1783775476,
