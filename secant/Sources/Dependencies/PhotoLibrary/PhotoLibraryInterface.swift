@@ -27,6 +27,10 @@ struct PhotoLibraryClient {
     /// time. Throws `PhotoLibraryError.notAuthorized` when the user has refused — iOS never
     /// re-prompts, so the caller has to surface that rather than wait on a dialog.
     var saveImage: @Sendable (URL) async throws -> Void
+
+    /// Same permission rules as `saveImage`, for an image the app rendered itself (the Request
+    /// QR) rather than a file on disk. `data` must be an encoded image, e.g. PNG.
+    var saveImageData: @Sendable (Data) async throws -> Void
 }
 
 enum PhotoLibraryError: Error, Equatable {

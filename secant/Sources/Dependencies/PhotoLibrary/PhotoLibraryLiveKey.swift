@@ -26,6 +26,18 @@ extension PhotoLibraryClient: DependencyKey {
                 LoggerProxy.error("PhotoLibrary: save to library failed")
                 throw PhotoLibraryError.saveFailed
             }
+        },
+        saveImageData: { data in
+            guard await requestAddOnlyAccess() else { throw PhotoLibraryError.notAuthorized }
+
+            do {
+                try await PHPhotoLibrary.shared().performChanges {
+                    PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: nil)
+                }
+            } catch {
+                LoggerProxy.error("PhotoLibrary: save image data to library failed")
+                throw PhotoLibraryError.saveFailed
+            }
         }
     )
 
@@ -45,5 +57,5 @@ extension PhotoLibraryClient: DependencyKey {
 }
 
 extension PhotoLibraryClient {
-    static let noOp = Self(saveImage: { _ in })
+    static let noOp = Self(saveImage: { _ in }, saveImageData: { _ in })
 }

@@ -66,6 +66,10 @@ struct ReceiveRequestFlow {
             case .zecKeyboard(.nextTapped):
                 state.requestZecState.memoState.text = state.memo
                 state.requestZecState.requestedZec = state.zecKeyboardState.amount.roundToAvoidDustSpend()
+                // "Send in chat" puts the typed fiat amount on the wire, as Android's `sendRequestInChat` does.
+                state.requestZecState.requestedFiat = state.zecKeyboardState.isInputInZec
+                    ? nil
+                    : Decimal(state.zecKeyboardState.currencyValue)
                 state.path.append(.requestZec(state.requestZecState))
                 return .none
 

@@ -7,6 +7,8 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [REQUEST] A payment request can now be sent straight into a chat. Below the request QR, "Send in chat" opens "Send request to" with your chat contacts (blocked contacts are left out); pick one and Zapp opens or starts your chat with them, sends the request as a payable request bubble — with the amount in your local currency too when you typed it in your local currency — and takes you into that conversation. While it sends, the sheet can't be swiped away, and if sending fails it says so and lets you pick again.
+- [REQUEST] "Save QR to Photos" below the request QR saves the request's QR code (black on white, with the Zcash logo) to your photo library. Zapp asks for permission to add photos the first time and confirms when it's saved; if photo access is turned off it says so and offers "Open settings".
 - [#72] Share group invite links with a scannable QR code, approve new members, and remove members from group chats. Invites resume after wallet setup, and pending requests survive app restarts and show when they are waiting for a connection or owner approval.
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
