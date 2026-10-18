@@ -28,6 +28,7 @@ struct ChatSplitBillSheet: View {
     private enum Constants {
         static let shareFieldWidth: CGFloat = 150
         static let unitSpacing: CGFloat = 8
+        static let unitTapTarget: CGFloat = 44
     }
 
     @Perception.Bindable var store: StoreOf<ChatRoom>
@@ -155,6 +156,8 @@ struct ChatSplitBillSheet: View {
 
     /// Tapping the unit swaps the whole sheet between ZEC and fiat, the way Android's
     /// `UnitLabel` does. Only the total carries the toggle; the share rows just label.
+    /// The glyph alone is a 7 pt target, so the button claims a 44 pt square. Keep the negative
+    /// padding outside the button style so its hit-test shape stays 44 pt while the row keeps its height.
     @ViewBuilder
     private func unitLabel(canToggle: Bool) -> some View {
         if canToggle {
@@ -163,8 +166,11 @@ struct ChatSplitBillSheet: View {
             } label: {
                 Text(unit)
                     .zappFont(.caption, style: ZappColors.text)
+                    .frame(minWidth: Constants.unitTapTarget, minHeight: Constants.unitTapTarget)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.zappPress)
+            .padding(.vertical, -Constants.unitTapTarget / 4)
             .accessibilityLabel(String(localizable: .chatSplitCurrencyToggle))
         } else {
             Text(unit)

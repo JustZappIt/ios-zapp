@@ -112,6 +112,29 @@ import ZappMessaging
         #expect(shares.first?.amount == Decimal(2))
     }
 
+    /// A fiat share carries the price as typed, so the payer sees exactly what was typed rather
+    /// than a reconversion of the rounded ZEC — Android's `SplitShareInput.fiat`.
+    @Test func aShareTypedInFiatCarriesTheTypedPrice() {
+        var split = ChatRoom.SplitBillState(isGroup: false, participants: participants(1))
+        split.isFiat = true
+        split.totalText = "13"
+
+        let share = split.shares(rate: rate(50)).first
+
+        #expect(share?.amount == Decimal(string: "0.26"))
+        #expect(share?.fiat == .init(amount: Decimal(13), currencyCode: "USD"))
+    }
+
+    @Test func aShareTypedInZecCarriesNoPrice() {
+        var split = ChatRoom.SplitBillState(isGroup: false, participants: participants(1))
+        split.totalText = "0.25"
+
+        let share = split.shares(rate: rate(50)).first
+
+        #expect(share?.amount == Decimal(string: "0.25"))
+        #expect(share?.fiat == nil)
+    }
+
     @Test func canSendRequiresAPositiveTotalAndAtLeastOneShare() {
         var split = ChatRoom.SplitBillState(isGroup: false, participants: participants(1))
 
@@ -143,8 +166,7 @@ import ZappMessaging
             shares: shares,
             memo: "Dinner",
             requesterAddress: "utest1abc",
-            isGroup: true,
-            rate: nil
+            isGroup: true
         )
 
         #expect(payloads.count == 3)
@@ -167,8 +189,7 @@ import ZappMessaging
             shares: [.init(publicKey: "key0", displayName: "peer0", amount: Decimal(5))],
             memo: "",
             requesterAddress: "utest1abc",
-            isGroup: false,
-            rate: nil
+            isGroup: false
         )
 
         let parsed = try? #require(payloads.first).map(ChatPaymentRequest.parse)
@@ -179,21 +200,57 @@ import ZappMessaging
         #expect(parsed?.memo == nil)
     }
 
-    /// The embedded fiat amount is scaled to 2 decimals HALF_UP, matching Android's
-    /// `setScale(FIAT_SCALE, RoundingMode.HALF_UP)`.
+    /// The embedded fiat amount is the typed price scaled to 2 decimals HALF_UP, matching
+    /// Android's `setScale(FIAT_DECIMALS, RoundingMode.HALF_UP)`.
     @Test func embeddedFiatIsScaledToTwoDecimals() {
+        var split = ChatRoom.SplitBillState(isGroup: false, participants: participants(1))
+        split.isFiat = true
+        split.totalText = "33.335"
+
         let payloads = ChatRoom.splitPayloads(
-            shares: [.init(publicKey: "key0", displayName: "peer0", amount: Decimal(1))],
+            shares: split.shares(rate: rate(50)),
             memo: "",
             requesterAddress: "utest1abc",
-            isGroup: false,
-            rate: rate(33.333)
+            isGroup: false
         )
 
         let parsed = ChatPaymentRequest.parse(payloads[0])
 
-        #expect(parsed.fiatAmount == Decimal(string: "33.33"))
+        #expect(parsed.fiatAmount == Decimal(string: "33.34"))
         #expect(parsed.fiatCurrency == "USD")
+    }
+
+    // MARK: - Card headline (`PaymentRequestBubble.kt: fiatLabels`)
+
+    /// The embedded price is in the payload, so a payer with no live rate still sees the price
+    /// the request was typed at.
+    @Test func withoutALiveRateARequestTypedInFiatKeepsItsPrice() throws {
+        let payload = try #require(
+            ChatPaymentRequest.json(
+                id: "req",
+                amount: Decimal(string: "0.25") ?? 0,
+                requesterAddress: "utest1abc",
+                memo: nil,
+                fiatAmount: Decimal(13),
+                fiatCurrency: "USD"
+            )
+        )
+
+        let labels = ChatPaymentRequestBubble.labels(for: ChatPaymentRequest.parse(payload), rate: nil)
+
+        #expect(labels.amount == "$13.00")
+        #expect(labels.equivalent == "≈ 0.25 ZEC")
+    }
+
+    @Test func withoutALiveRateARequestTypedInZecShowsOnlyZec() throws {
+        let payload = try #require(
+            ChatPaymentRequest.json(id: "req", amount: Decimal(string: "0.25") ?? 0, requesterAddress: "utest1abc", memo: nil)
+        )
+
+        let labels = ChatPaymentRequestBubble.labels(for: ChatPaymentRequest.parse(payload), rate: nil)
+
+        #expect(labels.amount == "0.25 ZEC")
+        #expect(labels.equivalent == nil)
     }
 
     // MARK: - Reducer
@@ -280,6 +337,66 @@ import ZappMessaging
         #expect(parsed.allSatisfy { $0.splitCount == 3 })
         #expect(parsed.allSatisfy { $0.amount == Decimal(3) })
         #expect(parsed.compactMap(\.debtorId).sorted() == ["key0", "key1"])
+    }
+
+    /// A request typed in ZEC must not carry a price: the payer's card would lead with a dollar
+    /// figure the requester never asked for.
+    @MainActor @Test func aRequestTypedInZecCarriesNoFiatAmount() async throws {
+        let parsed = try await sendDirectRequest(totalText: "2", isFiat: false)
+
+        #expect(parsed.amount == Decimal(2))
+        #expect(parsed.fiatAmount == nil)
+        #expect(parsed.fiatCurrency == nil)
+    }
+
+    /// A request typed in fiat keeps the price it was typed at.
+    @MainActor @Test func aRequestTypedInFiatCarriesItsFiatAmount() async throws {
+        let parsed = try await sendDirectRequest(totalText: "100", isFiat: true)
+
+        #expect(parsed.amount == Decimal(2))
+        #expect(parsed.fiatAmount == Decimal(100))
+        #expect(parsed.fiatCurrency == "USD")
+    }
+
+    /// Sends a one-person request at 50 USD per ZEC and returns the parsed payload.
+    @MainActor private func sendDirectRequest(totalText: String, isFiat: Bool) async throws -> ChatPaymentRequest {
+        var state = ChatRoom.State(conversationId: "conversation")
+        state.$zashiWalletAccount.withLock { $0 = try? zashiAccount() }
+        state.$currencyConversion.withLock { $0 = CurrencyConversion(.usd, ratio: 50, timestamp: 0) }
+        state.splitBill = ChatRoom.SplitBillState(
+            isGroup: false,
+            participants: participants(1),
+            totalText: totalText,
+            isFiat: isFiat
+        )
+
+        let sent = LockIsolated<[String]>([])
+
+        let store = TestStore(initialState: state) {
+            ChatRoom()
+        } withDependencies: {
+            $0.zappMessaging.sendPaymentRequest = { conversationId, payload in
+                sent.withValue { $0.append(payload) }
+
+                return ZMMessage(
+                    id: UUID().uuidString,
+                    conversationId: conversationId,
+                    senderId: "me",
+                    content: payload,
+                    contentType: ChatContentType.paymentRequest,
+                    isFromMe: true
+                )
+            }
+        }
+        store.exhaustivity = .off
+
+        await store.send(.splitSendTapped) {
+            $0.splitBill = nil
+        }
+        await store.receive(\.messageReceived)
+
+        let payload = try #require(sent.value.first)
+        return ChatPaymentRequest.parse(payload)
     }
 
     /// An out-of-range share kills the WHOLE batch rather than sending a partial split the group

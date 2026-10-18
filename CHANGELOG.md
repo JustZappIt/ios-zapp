@@ -123,6 +123,8 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [CHATS] New payment requests entered in ZEC now show the requested ZEC amount first, with its current local-currency equivalent underneath. Requests entered in local currency keep exactly the amount that was typed as their headline, even when the payer has no current exchange rate.
+- [CHATS] The currency toggle in chat payment requests and split bills is easier to tap, with a full 44-point tap target.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.
