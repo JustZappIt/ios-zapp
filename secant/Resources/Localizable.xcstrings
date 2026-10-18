@@ -34375,6 +34375,23 @@
         }
       }
     },
+    "unifiedSend.crosspayInfo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About CrossPay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de CrossPay"
+          }
+        }
+      }
+    },
     "unifiedSend.depositToSwapForZec" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -34507,6 +34524,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recibirá ≈ %@ %@"
+          }
+        }
+      }
+    },
+    "unifiedSend.theyReceiveApproxLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They receive ≈"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibirá ≈"
+          }
+        }
+      }
+    },
+    "unifiedSend.theyReceiveExact" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They receive exactly"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibirá exactamente"
           }
         }
       }

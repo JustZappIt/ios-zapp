@@ -39,6 +39,8 @@ extension SendCoordFlow {
             case .zecAssetSelected:
                 state.isAssetPickerPresented = false
                 guard state.mode != .zec else { return .none }
+                // An exact-output amount is a token figure, never ZEC: it is dropped, not carried.
+                Self.resetExactOutput(&state)
                 state.mode = .zec
                 let carriedAmount = state.swapState.isInputInUsd ? "" : state.swapState.amountText
                 state.swapState.address = ""
@@ -54,9 +56,13 @@ extension SendCoordFlow {
             case .swapAssetSelected(let asset):
                 state.isAssetPickerPresented = false
                 let wasZec = state.mode == .zec
+                // Android's `clearTokenAmount` on an asset change: a destination amount typed for one
+                // asset means nothing for another, so the form returns to exact-input.
+                Self.resetExactOutput(&state)
                 state.mode = .swap
-                // The unified screen only ever runs Android's EXACT_INPUT swap (spend ZEC, receive
-                // the picked asset). Swap-to-ZEC lives in `SwapAndPayCoordFlow`.
+                // The unified screen spends ZEC to receive the picked asset; it starts in Android's
+                // EXACT_INPUT and moves to EXACT_OUTPUT only when the destination amount is typed.
+                // Swap-to-ZEC lives in `SwapAndPayCoordFlow`.
                 state.swapState.isSwapExperienceEnabled = true
                 state.swapState.isSwapToZecExperienceEnabled = false
                 state.swapState.address = ""
@@ -333,6 +339,9 @@ extension SendCoordFlow {
                     return .none
                 }
                 _ = state.path.popLast()
+                // Android: a scanned recipient starts a fresh payment, so an exact-output amount
+                // typed for the previous one no longer applies.
+                Self.resetExactOutput(&state)
                 state.swapState.address = address
                 return .none
 
@@ -449,7 +458,7 @@ extension SendCoordFlow {
                 sendConfirmationState.amount = Zatoshi(NSDecimalNumber(decimal: quote.amountIn).int64Value)
                 sendConfirmationState.feeRequired = proposal.totalFeeRequired()
                 sendConfirmationState.proposal = proposal
-                sendConfirmationState.type = .swap
+                sendConfirmationState.type = state.swapState.isSwapExperienceEnabled ? .swap : .pay
                 state.path.append(.sending(sendConfirmationState))
                 guard let last = state.path.ids.last else { return .none }
                 // `sendRequested` (not `sendTapped`) — the app-lock check above already happened, and
@@ -469,7 +478,7 @@ extension SendCoordFlow {
                 )
                 sendConfirmationState.feeRequired = proposal.totalFeeRequired()
                 sendConfirmationState.proposal = proposal
-                sendConfirmationState.type = .swap
+                sendConfirmationState.type = state.swapState.isSwapExperienceEnabled ? .swap : .pay
                 state.path.append(.confirmWithKeystone(sendConfirmationState))
                 if let last = state.path.ids.last {
                     return .send(.path(.element(id: last, action: .confirmWithKeystone(.resolvePCZT))))
@@ -595,8 +604,8 @@ extension SendCoordFlow {
     }
 
     /// Records the pending swap against the transaction that is about to be broadcast, mirroring
-    /// `SwapAndPayCoordFlow`'s `swapRequested`. `exactInput` is always `true` here: the unified
-    /// screen only runs Android's EXACT_INPUT swap (spend ZEC, receive the picked asset).
+    /// `SwapAndPayCoordFlow`'s `swapRequested`. `exactInput` follows the quote's mode, so an
+    /// exact-output payment is listed as a CrossPay payment, as on Android.
     private func markSwapTransaction(_ state: inout State, address: String) {
         guard let provider = state.swapState.selectedAsset?.provider else {
             return
@@ -608,7 +617,7 @@ extension SendCoordFlow {
             state.swapState.totalUSDFees,
             state.swapState.zecAsset?.id ?? "",
             state.swapState.selectedAsset?.id ?? "",
-            true,
+            state.swapState.isSwapExperienceEnabled,
             SwapConstants.pendingDeposit,
             state.swapState.zecToBeSpendInQuoteUSFormat
         )

@@ -82,6 +82,19 @@ struct SendCoordFlow {
         /// off, so scanning from inside the form can only pick up a plain address.
         var isScanZip321Enabled = true
 
+        // Swap mode, exact-output (Android's `tokenAmountInner` / `tokenFiatAmountInner`). The
+        // destination amount as typed, the currency it was typed in, and the currency the field
+        // shows: flipping the display never re-derives the typed figure, so it cannot drift.
+        var destinationText = ""
+        var destinationTypedAmount: Decimal?
+        var isDestinationTypedInUsd = false
+        /// Android's `destinationCurrency`. Purely presentational.
+        var isDestinationInUsd = false
+        /// The pay side's USD toggle, parked while exact-output replaces the pay field.
+        var isPayInUsdBeforeExactOutput = false
+        /// Android's `CrossPayInfoArgs` sheet.
+        var isCrossPayInfoPresented = false
+
         var isSwap: Bool { mode == .swap }
 
         /// Android's `hasZeroBalance` (`account.spendableShieldedBalance == 0`).
@@ -90,7 +103,10 @@ struct SendCoordFlow {
         }
 
         var isInsufficientFunds: Bool {
-            mode == .zec ? sendFormState.isInsufficientFunds : swapState.isInsufficientFunds
+            if mode == .zec {
+                return sendFormState.isInsufficientFunds
+            }
+            return isExactOutput ? isExactOutputInsufficientFunds : swapState.isInsufficientFunds
         }
 
         /// A swap submission is already on the path. The quote sheet's Confirm can deliver a second
@@ -117,7 +133,8 @@ struct SendCoordFlow {
             case .zec:
                 return sendFormState.isValidForm ? .review : .disabled
             case .swap:
-                return (swapState.isValidForm && !swapState.isQuoteRequestInFlight) ? .review : .disabled
+                let isValidForm = isExactOutput ? isExactOutputFormValid : swapState.isValidForm
+                return (isValidForm && !swapState.isQuoteRequestInFlight) ? .review : .disabled
             }
         }
 
@@ -141,7 +158,17 @@ struct SendCoordFlow {
         case assetPickerRequested
         case backButtonTapped
         case backToHomeTapped
+        case crossPayInfoDismissed
+        /// Android's `onCrossPayInfoClick` — the swap-mode header's (i).
+        case crossPayInfoTapped
+        /// Android's `onDestinationCurrencySwap` — flips the destination field between token and USD.
+        case destinationCurrencySwapped
+        /// Android's `onTokenAmountChange` / `onTokenFiatAmountChange`: typing the destination amount
+        /// makes the swap exact-output.
+        case destinationAmountChanged(String)
         case path(StackActionOf<Path>)
+        /// Android's `onPayEstimateClick` — the only way back from exact-output to exact-input.
+        case payEstimateTapped
         case resolveSendResult(SendConfirmation.State.Result?, SendConfirmation.State)
         case sendForm(SendForm.Action)
         case swap(SwapAndPay.Action)
@@ -160,6 +187,7 @@ struct SendCoordFlow {
     @Dependency(\.audioServices) var audioServices
     @Dependency(\.keystoneHandler) var keystoneHandler
     @Dependency(\.localAuthentication) var localAuthentication
+    @Dependency(\.locale) var locale
     @Dependency(\.numberFormatter) var numberFormatter
     @Dependency(\.swapAndPay) var swapAndPay
     @Dependency(\.userMetadataProvider) var userMetadataProvider
@@ -168,6 +196,8 @@ struct SendCoordFlow {
 
     var body: some Reducer<State, Action> {
         coordinatorReduce()
+
+        exactOutputReduce()
 
         Scope(state: \.sendFormState, action: \.sendForm) {
             SendForm()
