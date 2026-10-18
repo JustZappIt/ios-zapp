@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [#72] Share group invite links with a scannable QR code, approve new members, and remove members from group chats. Invites resume after wallet setup, and pending requests survive app restarts and show when they are waiting for a connection or owner approval.
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
 - [PARITY] P2P wallet key now opens its own screen: your smart account address is shown openly, and the owner key stays locked until you reveal it with your app lock.
@@ -123,6 +124,9 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [#72] Newly joined groups show their name and group controls immediately, open chats become read-only when you are removed, and invite links can be retried after a startup delay. Keep incoming invite links out of debug logs and match Android's controls, with a single Share action and a back-only bar when no link is active.
+- [#72] Group invite screens now follow Android's layout and selection controls. Additional invites are kept while another preview is open, and returning to a different group's link no longer risks showing an earlier group's link or requests.
+- [#72] Keep group invite links out of debug logs, honor blocked contacts and cancelled requests, and prevent one invite from replacing another. Member removal waits for its warnings and link-reset options, invite expiry shows the actual time remaining, and invite links work in testnet without skipping wallet onboarding.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.
