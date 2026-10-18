@@ -116,7 +116,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
-- [CHATS] New payment requests entered in ZEC now show the requested ZEC amount first, with its current local-currency equivalent underneath. Requests entered in local currency keep that amount as their headline.
+- [CHATS] New payment requests entered in ZEC now show the requested ZEC amount first, with its current local-currency equivalent underneath. Requests entered in local currency keep exactly the amount that was typed as their headline, even when the payer has no current exchange rate.
 - [CHATS] The currency toggle in chat payment requests and split bills is easier to tap, with a full 44-point tap target.
 - [P2P] Selfie and passport checks now return to Zapp through the supported verification links, validate returns against your saved session, and recover after app restarts. Retries preserve completed checks and reconcile pending transactions without sending twice.
 - [CHATS] A room no longer redraws every bubble when a peer comes online, a message is read elsewhere or a link preview arrives, and scrolling a busy room does less work per message.

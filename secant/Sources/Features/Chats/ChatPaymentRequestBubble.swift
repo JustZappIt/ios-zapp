@@ -187,32 +187,33 @@ struct ChatPaymentRequestBubble: View {
         )
     }
 
+    private var labels: (amount: String, equivalent: String?) {
+        Self.labels(for: request, rate: fiatRate)
+    }
+
     /// The amount/equivalent pair, mirroring `parsePaymentRequest`'s precedence:
     /// an embedded fiat amount (the requester typed a price) leads and pushes ZEC into the
     /// equivalent line; otherwise ZEC, the amount actually asked for, leads and a live conversion
-    /// sits under it, so the headline doesn't drift with the rate; with no rate at all only ZEC is
-    /// shown. Note that Android suppresses the EMBEDDED label too when there is no live rate — a
-    /// stale price is not shown as a price.
-    private var labels: (amount: String, equivalent: String?) {
-        let request = self.request
+    /// sits under it, so the headline doesn't drift with the rate; with no rate and no embedded
+    /// price only ZEC is shown.
+    static func labels(for request: ChatPaymentRequest, rate: ChatFiatRate?) -> (amount: String, equivalent: String?) {
         let zecLabel = "\(ChatAmountFormat.zec(request.amount)) \(request.token)"
 
-        guard let fiatRate else { return (zecLabel, nil) }
-
+        // The embedded price is in the payload, so it shows even when the payer has no live rate.
         if let embedded = embeddedFiatLabel(request) {
             return (embedded, "≈ \(zecLabel)")
         }
 
-        guard request.amount > 0 else { return (zecLabel, nil) }
+        guard let rate, request.amount > 0 else { return (zecLabel, nil) }
 
         let converted = ChatAmountFormat.fiat(
-            ChatAmountFormat.roundedFiat(fiatRate.zecToFiat(request.amount))
+            ChatAmountFormat.roundedFiat(rate.zecToFiat(request.amount))
         )
 
-        return (zecLabel, "≈ \(fiatRate.symbol)\(converted)")
+        return (zecLabel, "≈ \(rate.symbol)\(converted)")
     }
 
-    private func embeddedFiatLabel(_ request: ChatPaymentRequest) -> String? {
+    private static func embeddedFiatLabel(_ request: ChatPaymentRequest) -> String? {
         guard
             let code = request.fiatCurrency,
             let currency = CurrencyISO4217(rawValue: code.uppercased()),

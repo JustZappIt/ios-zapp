@@ -29,9 +29,17 @@ extension ChatRoom {
 
     /// One participant's resolved share, in ZEC — Android's `SplitShareInput`.
     struct SplitShare: Equatable {
+        /// A price as typed — Android's `PaymentRequestFiatAmount`.
+        struct Fiat: Equatable {
+            let amount: Decimal
+            let currencyCode: String
+        }
+
         let publicKey: String
         let displayName: String
         let amount: Decimal
+        /// The share's price as typed, present only when the total was typed in fiat.
+        var fiat: Fiat?
     }
 
     struct SplitBillState: Equatable {
@@ -72,23 +80,29 @@ extension ChatRoom {
         }
 
         /// Android's `computeShares`: an override wins over the equal split, anything not
-        /// positive drops out, and a fiat entry is converted to ZEC before it leaves the sheet.
+        /// positive drops out, and a fiat entry is converted to ZEC before it leaves the sheet,
+        /// keeping the price it was typed at.
         func shares(rate: ChatFiatRate?) -> [SplitShare] {
-            let usesFiat = isFiat && rate != nil
-
-            return participants.compactMap { participant in
+            participants.compactMap { participant in
                 let entered = shareOverrides[participant.publicKey].flatMap(ChatDecimalInput.parse)
 
                 guard let displayed = entered ?? equalShare, displayed > 0 else { return nil }
 
-                let zec = usesFiat && rate != nil
-                    ? ChatAmountFormat.roundedZec(rate?.fiatToZec(displayed) ?? displayed)
-                    : displayed
+                guard isFiat, let rate else {
+                    return SplitShare(
+                        publicKey: participant.publicKey,
+                        displayName: participant.displayName,
+                        amount: displayed
+                    )
+                }
 
+                // The typed price travels as-is, so the payer sees what was typed rather than a
+                // reconversion of the rounded ZEC.
                 return SplitShare(
                     publicKey: participant.publicKey,
                     displayName: participant.displayName,
-                    amount: zec
+                    amount: ChatAmountFormat.roundedZec(rate.fiatToZec(displayed)),
+                    fiat: .init(amount: ChatAmountFormat.roundedFiat(displayed), currencyCode: rate.currency.code)
                 )
             }
         }
@@ -193,15 +207,11 @@ extension ChatRoom {
                     return .none
                 }
 
-                // A fiat amount travels only when the requester typed one. It fixes the card's
-                // headline at that price, so attaching it to an amount typed in ZEC would show the
-                // payer a dollar figure nobody asked for.
                 let payloads = ChatRoom.splitPayloads(
                     shares: shares,
                     memo: split.memoText.trimmingCharacters(in: .whitespacesAndNewlines),
                     requesterAddress: requesterAddress,
-                    isGroup: split.isGroup,
-                    rate: split.isFiat ? rate : nil
+                    isGroup: split.isGroup
                 )
 
                 state.splitBill = nil
@@ -236,16 +246,13 @@ extension ChatRoom {
         shares: [SplitShare],
         memo: String,
         requesterAddress: String,
-        isGroup: Bool,
-        rate: ChatFiatRate?
+        isGroup: Bool
     ) -> [String] {
         // `shares.size + 1` in a group: the requester is paying a share too.
         let splitCount = isGroup ? shares.count + 1 : 1
 
         return shares.compactMap { share in
-            let fiatAmount = rate.map { ChatAmountFormat.roundedFiat($0.zecToFiat(share.amount)) }
-
-            return ChatPaymentRequest.json(
+            ChatPaymentRequest.json(
                 id: UUID().uuidString,
                 amount: share.amount,
                 requesterAddress: requesterAddress,
@@ -253,8 +260,10 @@ extension ChatRoom {
                 debtorId: share.publicKey,
                 debtorName: share.displayName,
                 splitCount: splitCount,
-                fiatAmount: fiatAmount,
-                fiatCurrency: rate?.currency.code
+                // Present only when the share was typed in fiat: it fixes the payer's headline at
+                // that price, so a share typed in ZEC travels without one.
+                fiatAmount: share.fiat?.amount,
+                fiatCurrency: share.fiat?.currencyCode
             )
         }
     }
