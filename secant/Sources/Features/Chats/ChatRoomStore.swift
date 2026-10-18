@@ -29,6 +29,10 @@ struct ChatRoom {
 
         var conversationId: String
         var conversation: ZMConversation?
+
+        /// The owner removed this device from the group. The history stays where it is; nothing
+        /// new can be sent, and the SDK would refuse it anyway.
+        var isRemovedFromGroup: Bool { conversation?.removedAt != nil }
         var messages: [ZMMessage] = []
         var draft = ""
         var isLoading = true
@@ -65,6 +69,19 @@ struct ChatRoom {
 
         /// Held so a failed send can hand the quote back with the draft.
         var pendingReply: ZMMessage?
+
+        /// The message a tapped quote pointed at, flashed briefly once the list has scrolled to it.
+        var highlightedMessageId: String?
+
+        /// A pending scroll to a quoted message. The view clears it via `quoteScrollHandled`.
+        var quoteScrollRequest: QuoteScrollRequest?
+
+        /// `nonce` makes two taps on the same quote distinct, so the second still scrolls after
+        /// the user has moved away.
+        struct QuoteScrollRequest: Equatable {
+            let rowId: String
+            let nonce: UUID
+        }
 
         /// Bound to the composer's `PhotosPicker`. Consumed and cleared the moment it lands.
         var pickedItem: PhotosPickerItem?
@@ -108,6 +125,7 @@ struct ChatRoom {
         var rowIds: [String: String] = [:]
 
         var messageReceivedCancelId = UUID()
+        var conversationCancelId = UUID()
         var messagingStateCancelId = UUID()
         var messageStatusCancelId = UUID()
         var mediaProgressCancelId = UUID()
@@ -281,6 +299,7 @@ struct ChatRoom {
         case sendSucceeded(clientId: String, message: ZMMessage)
         case messagesLoaded([ZMMessage])
         case messageReceived(ZMMessage)
+        case conversationChanged(ZMConversation)
         case messagingStateChanged(ZappMessagingState)
         case networkChipTapped
         case networkDetailsDismissed
@@ -290,6 +309,10 @@ struct ChatRoom {
         case retrySendTapped(ZMMessage)
         case replyTapped(ZMMessage)
         case cancelReplyTapped
+        /// The quote block on a reply was tapped; the payload is the quoted message's id.
+        case quoteTapped(String)
+        case quoteScrollHandled
+        case quoteHighlightExpired(String)
         case pickedItemChanged(PhotosPickerItem?)
         case mediaPasted(fileURL: URL, type: UTType)
         case gifButtonTapped
@@ -358,6 +381,7 @@ struct ChatRoom {
 
     enum CancelID {
         case draftLinkPreview
+        case quoteHighlight
     }
 
     @Dependency(\.cameraCapture) var cameraCapture
@@ -397,6 +421,16 @@ struct ChatRoom {
                             .map(Action.messageReceived)
                     }
                     .cancellable(id: state.messageReceivedCancelId, cancelInFlight: true),
+                    // The list is not mounted while an invite is open. Read the SDK snapshot
+                    // here too, so a newly joined group has its name and roster immediately,
+                    // and a removal switches an already-open room to read only.
+                    .publisher {
+                        zappMessaging.conversationsStream()
+                            .compactMap { $0.first { $0.id == conversationId } }
+                            .removeDuplicates()
+                            .map(Action.conversationChanged)
+                    }
+                    .cancellable(id: state.conversationCancelId, cancelInFlight: true),
                     .publisher {
                         zappMessaging.stateStream()
                             .map(Action.messagingStateChanged)
@@ -426,6 +460,7 @@ struct ChatRoom {
 
                 return .merge(
                     .cancel(id: state.messageReceivedCancelId),
+                    .cancel(id: state.conversationCancelId),
                     .cancel(id: state.messagingStateCancelId),
                     .cancel(id: state.messageStatusCancelId),
                     .cancel(id: state.mediaProgressCancelId),
@@ -525,14 +560,15 @@ struct ChatRoom {
 
             case .sendTapped:
                 let content = state.trimmedDraft
-                guard !content.isEmpty else { return .none }
+                guard !content.isEmpty, !state.isRemovedFromGroup else { return .none }
 
                 let replyTo = state.replyingTo
                 let reply = replyTo.map {
                     ZMReplyContext(
                         id: $0.id,
                         senderName: state.replySenderName(for: $0),
-                        content: String($0.content.prefix(replyPreviewMaxLength))
+                        content: ChatReplyPreview.wireContent(for: $0),
+                        contentType: ChatReplyPreview.wireContentType(for: $0)
                     )
                 }
 
@@ -557,7 +593,8 @@ struct ChatRoom {
                         status: "sending",
                         replyToId: reply?.id,
                         replyToSenderName: reply?.senderName,
-                        replyToContent: reply?.content
+                        replyToContent: reply?.content,
+                        replyToContentType: reply?.contentType
                     )
                 )
 
@@ -634,6 +671,11 @@ struct ChatRoom {
                     LoggerProxy.error("Chat room mark-read for incoming message failed: \(error)")
                 }
 
+            case .conversationChanged(let conversation):
+                guard conversation.id == state.conversationId else { return .none }
+                state.conversation = conversation
+                return .none
+
             case .messagingStateChanged(let messagingState):
                 guard messagingState != state.messagingState else { return .none }
 
@@ -680,7 +722,8 @@ struct ChatRoom {
                     ZMReplyContext(
                         id: $0,
                         senderName: failedMessage.replyToSenderName ?? String(localizable: .generalUnknown),
-                        content: failedMessage.replyToContent ?? ""
+                        content: failedMessage.replyToContent ?? "",
+                        contentType: failedMessage.replyToContentType
                     )
                 }
                 state.messages[index] = failedMessage.withStatus("sending")
@@ -710,6 +753,33 @@ struct ChatRoom {
 
             case .cancelReplyTapped:
                 state.replyingTo = nil
+                return .none
+
+            // A quote points at a persisted id. The room only holds its most recent page, so the
+            // original can be older than what is loaded, or one this device never received.
+            case .quoteTapped(let quotedId):
+                guard state.visibleMessages.contains(where: { $0.id == quotedId }) else {
+                    state.$toast.withLock { $0 = .top(String(localizable: .chatRoomOriginalMessageUnavailable)) }
+                    return .none
+                }
+
+                state.quoteScrollRequest = .init(rowId: state.rowIds[quotedId] ?? quotedId, nonce: UUID())
+                state.highlightedMessageId = quotedId
+
+                return .run { send in
+                    try await clock.sleep(for: quoteHighlightDuration)
+                    await send(.quoteHighlightExpired(quotedId))
+                }
+                .cancellable(id: CancelID.quoteHighlight, cancelInFlight: true)
+
+            case .quoteScrollHandled:
+                state.quoteScrollRequest = nil
+                return .none
+
+            case .quoteHighlightExpired(let quotedId):
+                if state.highlightedMessageId == quotedId {
+                    state.highlightedMessageId = nil
+                }
                 return .none
 
             case .pickedItemChanged(let item):
@@ -936,7 +1006,7 @@ struct ChatRoom {
 
 private let messagePageSize = 50
 private let maxLiveRoomMessages = 500
-private let replyPreviewMaxLength = 100
+private let quoteHighlightDuration: Duration = .milliseconds(1500)
 private let maxEarlyStatuses = 64
 
 /// Delivery state only ever moves forward. Without this a late relay or persistence event can
@@ -984,7 +1054,8 @@ extension ZMMessage {
             status: status,
             replyToId: replyToId,
             replyToSenderName: replyToSenderName,
-            replyToContent: replyToContent
+            replyToContent: replyToContent,
+            replyToContentType: replyToContentType
         )
     }
 }

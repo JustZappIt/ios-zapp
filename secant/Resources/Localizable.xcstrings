@@ -90,8 +90,8 @@
     "%@%%" : {
 
     },
-    "chatNotifications.backgroundSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Get a private alert when a direct message arrives"}},"es":{"stringUnit":{"state":"translated","value":"Recibe una alerta privada cuando llegue un mensaje directo"}}}},
-    "chatNotifications.backgroundTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Background chat alerts"}},"es":{"stringUnit":{"state":"translated","value":"Alertas de chat en segundo plano"}}}},
+    "chatNotifications.backgroundSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Receive private alerts without keeping Zapp running"}},"es":{"stringUnit":{"state":"translated","value":"Recibe alertas privadas sin mantener Zapp abierta"}}}},
+    "chatNotifications.backgroundTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Background delivery"}},"es":{"stringUnit":{"state":"translated","value":"Entrega en segundo plano"}}}},
     "chatSettings.sectionDelivery" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Delivery"}},"es":{"stringUnit":{"state":"translated","value":"Entrega"}}}},
     "chatSettings.title" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
     "increaseReputation.ageRequirement" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Needs an account about a year old"}},"es":{"stringUnit":{"state":"translated","value":"Necesita una cuenta de aproximadamente un a\u00f1o"}}}},
@@ -184,8 +184,1144 @@
     "reputation.unreadableTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn't reach Base"}},"es":{"stringUnit":{"state":"translated","value":"No pudimos conectar con Base"}}}},
     "reputation.verifiedGroup" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"VERIFIED"}},"es":{"stringUnit":{"state":"translated","value":"VERIFICADAS"}}}},
     "reputation.verifyToBuy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verify to buy"}},"es":{"stringUnit":{"state":"translated","value":"Verifica para comprar"}}}},
-    "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status and alerts"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea y alertas"}}}},
+    "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status, delivery"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea, entrega"}}}},
     "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
+    "groupMember.removedSelf" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You were removed from this group."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te expulsaron de este grupo."
+          }
+        }
+      }
+    },
+    "groupMember.removedFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You removed %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsaste a %@"
+          }
+        }
+      }
+    },
+    "groupMember.removeTitleFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Expulsar a %@?"
+          }
+        }
+      }
+    },
+    "groupMember.removeResetLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset the invite link too"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer también el enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupMember.removeOlderNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some members use an older version of Zapp. They will see new messages here after they update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos miembros usan una versión anterior de Zapp. Verán los mensajes nuevos aquí cuando actualicen."
+          }
+        }
+      }
+    },
+    "groupMember.removeConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsar"
+          }
+        }
+      }
+    },
+    "groupMember.removeBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They will stop getting new messages from this group. They keep the messages they already have."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dejará de recibir los mensajes nuevos de este grupo. Conserva los mensajes que ya tiene."
+          }
+        }
+      }
+    },
+    "groupMember.remove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsar del grupo"
+          }
+        }
+      }
+    },
+    "groupLink.warning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone with this link can join. Share it only with people you trust."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cualquiera con este enlace puede unirse. Compártelo solo con personas de confianza."
+          }
+        }
+      }
+    },
+    "groupLink.turnOn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.turnOff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn off link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir enlace"
+          }
+        }
+      }
+    },
+    "groupLink.retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
+          }
+        }
+      }
+    },
+    "groupLink.resetTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset this link?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Restablecer este enlace?"
+          }
+        }
+      }
+    },
+    "groupLink.resetConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer"
+          }
+        }
+      }
+    },
+    "groupLink.resetBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The old link will stop working. Anyone who has it will need the new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace anterior dejará de funcionar. Quien lo tenga necesitará el nuevo."
+          }
+        }
+      }
+    },
+    "groupLink.reset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer enlace"
+          }
+        }
+      }
+    },
+    "groupLink.requestsLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join requests"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitudes para unirse"
+          }
+        }
+      }
+    },
+    "groupLink.requestSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asked to join with the invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pidió unirse con el enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.requestRemovedBefore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed before"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsado antes"
+          }
+        }
+      }
+    },
+    "groupLink.requestDecline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechazar"
+          }
+        }
+      }
+    },
+    "groupLink.requestContactFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In your contacts as %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En tus contactos como %@"
+          }
+        }
+      }
+    },
+    "groupLink.requestApprove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approve"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprobar"
+          }
+        }
+      }
+    },
+    "groupLink.qrContentDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR code for the invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR del enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Many people joined in the last hour, so new requests now wait for your approval."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muchas personas se unieron en la última hora, así que las nuevas solicitudes esperan tu aprobación."
+          }
+        }
+      }
+    },
+    "groupLink.ownerOnly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the group owner can share an invite link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo el dueño del grupo puede compartir un enlace de invitación."
+          }
+        }
+      }
+    },
+    "groupLink.offNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The invite link is off."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace de invitación está desactivado."
+          }
+        }
+      }
+    },
+    "groupLink.nameToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show group name in the link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el nombre del grupo en el enlace"
+          }
+        }
+      }
+    },
+    "groupLink.limitPeopleFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ people"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ personas"
+          }
+        }
+      }
+    },
+    "groupLink.limitNone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No limit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin límite"
+          }
+        }
+      }
+    },
+    "groupLink.limitLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "People who can join with this link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personas que pueden unirse con este enlace"
+          }
+        }
+      }
+    },
+    "groupLink.historyNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "People who join may see some earlier messages in this group."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quienes se unan pueden ver algunos mensajes anteriores de este grupo."
+          }
+        }
+      }
+    },
+    "groupLink.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.expiryOneDay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In 1 day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En 1 día"
+          }
+        }
+      }
+    },
+    "groupLink.expiryNever" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca"
+          }
+        }
+      }
+    },
+    "groupLink.expiryLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link expires"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace caduca"
+          }
+        }
+      }
+    },
+    "groupLink.expiryDaysFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@ days"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En %@ días"
+          }
+        }
+      }
+    },
+    "groupLink.expired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caducado"
+          }
+        }
+      }
+    },
+    "groupLink.copy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.copied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link copied"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlace copiado"
+          }
+        }
+      }
+    },
+    "groupLink.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "groupLink.approvalToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approve new members"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprobar nuevos miembros"
+          }
+        }
+      }
+    },
+    "groupLink.approvalHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this is on, people who use the link wait until you let them in."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, quienes usen el enlace esperan hasta que les des acceso."
+          }
+        }
+      }
+    },
+    "groupLink.actionFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That did not work. Check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No funcionó. Revisa tu conexión e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.waitingTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting to join"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando para unirte"
+          }
+        }
+      }
+    },
+    "groupInvite.waitingOwner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your request is with the group owner."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu solicitud está con el dueño del grupo."
+          }
+        }
+      }
+    },
+    "groupInvite.waitingQueued" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your request has not gone out yet. Zapp will send it when you are back online." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tu solicitud aún no se ha enviado. Zapp la enviará cuando vuelvas a estar en línea." } }
+      }
+    },
+    "chatNotifications.newActivity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New activity in Zapp" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nueva actividad en Zapp" } }
+      }
+    },
+    "groupInvite.waitingBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will join when the group owner opens Zapp."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te unirás cuando el dueño del grupo abra Zapp."
+          }
+        }
+      }
+    },
+    "groupInvite.update" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Zapp to use this link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza Zapp para usar este enlace."
+          }
+        }
+      }
+    },
+    "groupInvite.unreadable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This link could not be read. Ask for a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer este enlace. Pide uno nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.titleNamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join %@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Unirte a %@?"
+          }
+        }
+      }
+    },
+    "groupInvite.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join this group?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Unirte a este grupo?"
+          }
+        }
+      }
+    },
+    "groupInvite.sendFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your request did not go out. Check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu solicitud no se envió. Revisa tu conexión e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.openGroup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.notNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        }
+      }
+    },
+    "groupInvite.joinedNamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You joined %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te uniste a %@"
+          }
+        }
+      }
+    },
+    "groupInvite.joined" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You joined the group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te uniste al grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.join" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unirme al grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.inactive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This invite link is no longer active."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este enlace de invitación ya no está activo."
+          }
+        }
+      }
+    },
+    "groupInvite.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group invite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitación a un grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.full" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This group is full."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este grupo está lleno."
+          }
+        }
+      }
+    },
+    "groupInvite.expired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This invite has expired. Ask for a new link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta invitación ha caducado. Pide un enlace nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.declined" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The group owner did not accept your request."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El dueño del grupo no aceptó tu solicitud."
+          }
+        }
+      }
+    },
+    "groupInvite.comingSoon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group invite links are coming soon."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los enlaces de invitación a grupos llegarán pronto."
+          }
+        }
+      }
+    },
+    "groupInvite.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel request"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar solicitud"
+          }
+        }
+      }
+    },
+    "groupInvite.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Members will see your name and when you are online. You can leave at any time."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los miembros verán tu nombre y cuándo estás en línea. Puedes salir cuando quieras."
+          }
+        }
+      }
+    },
+    "groupInvite.alreadyMember" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are already in this group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya estás en este grupo"
+          }
+        }
+      }
+    },
     "~%@ %@" : {
       "localizations" : {
         "en" : {
@@ -1294,13 +2430,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use your device's authentication settings"
+            "value" : "Use your device's biometric settings"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usa los ajustes de autenticación de tu dispositivo"
+            "value" : "Usa los ajustes biométricos de tu dispositivo"
           }
         }
       }
@@ -1345,7 +2481,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Lock"
+            "value" : "App lock"
           }
         },
         "es" : {
@@ -1569,13 +2705,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block %@? You'll stop receiving their messages, and they won't be told they've been blocked."
+            "value" : "Block %@? You will no longer receive messages from this user. They won't be notified that they've been blocked."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Bloquear a %@? Dejarás de recibir sus mensajes y no se le avisará de que le has bloqueado."
+            "value" : "¿Bloquear a %@? Dejarás de recibir mensajes de este usuario. No se le avisará de que le has bloqueado."
           }
         }
       }
@@ -1586,7 +2722,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block user"
+            "value" : "Block User"
           }
         },
         "es" : {
@@ -1620,13 +2756,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock %@? You'll be able to receive their messages again."
+            "value" : "Unblock %@? You will be able to receive messages from them again."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Desbloquear a %@? Volverás a recibir sus mensajes."
+            "value" : "¿Desbloquear a %@? Podrás volver a recibir sus mensajes."
           }
         }
       }
@@ -1637,7 +2773,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock user"
+            "value" : "Unblock User"
           }
         },
         "es" : {
@@ -1926,13 +3062,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "So you can pay them from the chat"
+            "value" : "Enter Unified Address…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para que puedas pagarles desde el chat"
+            "value" : "Introduce la dirección unificada…"
           }
         }
       }
@@ -2039,19 +3175,36 @@
         }
       }
     },
+    "chatContacts.addTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add New Contact"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir nuevo contacto"
+          }
+        }
+      }
+    },
     "chatContacts.block" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Block"
+            "value" : "Block user"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bloquear"
+            "value" : "Bloquear usuario"
           }
         }
       }
@@ -2090,19 +3243,138 @@
         }
       }
     },
+    "chatContacts.copyAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy wallet address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar dirección de billetera"
+          }
+        }
+      }
+    },
+    "chatContacts.copyKey" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy messaging key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar clave de mensajería"
+          }
+        }
+      }
+    },
+    "chatContacts.copyName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy contact name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar nombre del contacto"
+          }
+        }
+      }
+    },
     "chatContacts.delete" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove contact"
+            "value" : "Delete contact"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminar contacto"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirmSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta acción no se puede deshacer."
+          }
+        }
+      }
+    },
+    "chatContacts.deleteConfirmTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete contact?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar contacto?"
+          }
+        }
+      }
+    },
+    "chatContacts.deleteFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't delete contact. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo eliminar el contacto. Inténtalo de nuevo."
           }
         }
       }
@@ -2124,13 +3396,13 @@
         }
       }
     },
-    "chatContacts.edit" : {
+    "chatContacts.editTitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit contact"
+            "value" : "Edit Contact"
           }
         },
         "es" : {
@@ -2147,13 +3419,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save someone's public key to give them a name."
+            "value" : "Add contacts to start chatting"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guarda la clave pública de alguien para darle un nombre."
+            "value" : "Añade contactos para empezar a chatear"
           }
         }
       }
@@ -2171,61 +3443,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aún no hay contactos"
-          }
-        }
-      }
-    },
-    "chatContacts.form.details" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contact details"
-          }
-        }
-      }
-    },
-    "chatContacts.form.payments" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ZEC address"
-          }
-        }
-      }
-    },
-    "chatContacts.form.paymentsHint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optional. Add a wallet address to send ZEC to this contact."
-          }
-        }
-      }
-    },
-    "chatContacts.form.preview" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New contact"
-          }
-        }
-      }
-    },
-    "chatContacts.form.intro" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A name you know. A private way to connect."
           }
         }
       }
@@ -2264,6 +3481,23 @@
         }
       }
     },
+    "chatContacts.keyPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messaging Key (64 hex chars)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de mensajería (64 caracteres hex)"
+          }
+        }
+      }
+    },
     "chatContacts.nameLabel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2287,13 +3521,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What you'll call them"
+            "value" : "Enter contact name…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cómo les llamarás"
+            "value" : "Introduce el nombre del contacto…"
           }
         }
       }
@@ -2311,6 +3545,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guardar"
+          }
+        }
+      }
+    },
+    "chatContacts.saveChanges" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save changes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar cambios"
+          }
+        }
+      }
+    },
+    "chatContacts.savedCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld saved"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld guardados"
+          }
+        }
+      }
+    },
+    "chatContacts.saveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save contact. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar el contacto. Inténtalo de nuevo."
           }
         }
       }
@@ -2349,6 +3634,23 @@
         }
       }
     },
+    "chatContacts.startChat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start chat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar chat"
+          }
+        }
+      }
+    },
     "chatContacts.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2372,13 +3674,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unblock"
+            "value" : "Unblock user"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquear"
+            "value" : "Desbloquear usuario"
           }
         }
       }
@@ -3522,6 +4824,227 @@
         }
       }
     },
+    "chatP2pKey.infoButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How the P2P key works"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo funciona la clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoDerivation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This key is derived from your seed phrase on its own path. It is not your Zcash spending key and it cannot touch your ZEC. Losing the app never loses it: the same seed always re-derives the same key."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta clave se deriva de tu frase semilla por su propia ruta. No es tu clave de gasto de Zcash y no puede tocar tu ZEC. Perder la app nunca la pierde: la misma semilla siempre vuelve a derivar la misma clave."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSafety" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone holding the private key controls that account and the funds sitting in it. Export it only if you need to move those funds with another wallet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quien tenga la clave privada controla esa cuenta y los fondos que contiene. Expórtala solo si necesitas mover esos fondos con otra billetera."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoSmartAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It owns a smart account. The address your cash-outs settle through is a contract account on Base that this key controls, which is what lets Zapp sponsor the network fees so you never hold gas."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es la propietaria de una cuenta inteligente. La dirección por la que se liquidan tus retiros es una cuenta de contrato en Base que controla esta clave, lo que permite a Zapp patrocinar las comisiones de red para que nunca necesites gas."
+          }
+        }
+      }
+    },
+    "chatP2pKey.infoTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About your P2P key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de tu clave P2P"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The address derived from the owner key. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La dirección derivada de la clave de propietario. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerAddressLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clave de propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.ownerLockedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The private key that controls the smart account. Revealing it asks for your app lock first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La clave privada que controla la cuenta inteligente. Para mostrarla primero se te pedirá el bloqueo de la app."
+          }
+        }
+      }
+    },
+    "chatP2pKey.privateKeyCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never share this. Anyone with it can spend everything in the smart account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca la compartas. Quien la tenga puede gastar todo lo que hay en la cuenta inteligente."
+          }
+        }
+      }
+    },
+    "chatP2pKey.reveal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal owner key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar clave de propietario"
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountCaption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Base account your P2P cash-outs settle through. Safe to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cuenta de Base por la que se liquidan tus retiros P2P. Se puede compartir."
+          }
+        }
+      }
+    },
+    "chatP2pKey.smartAccountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta inteligente"
+          }
+        }
+      }
+    },
     "chatPrivacy.onlineStatusIntro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3647,13 +5170,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Let people you chat with see when you're connected"
+            "value" : "Let people see when you're connected"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permite que las personas con las que chateas vean cuándo estás conectado"
+            "value" : "Permite que vean cuándo estás conectado"
           }
         }
       }
@@ -3664,13 +5187,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show my online status"
+            "value" : "Online status"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mostrar mi estado en línea"
+            "value" : "Estado en línea"
           }
         }
       }
@@ -3800,13 +5323,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Send and show read status when both sides allow it"
+            "value" : "Send and show read status"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enviar y mostrar el estado leído cuando ambas partes lo permitan"
+            "value" : "Enviar y mostrar el estado de lectura"
           }
         }
       }
@@ -3817,13 +5340,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow read receipts"
+            "value" : "Read receipts"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permitir confirmaciones de lectura"
+            "value" : "Confirmaciones de lectura"
           }
         }
       }
@@ -4055,13 +5578,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This removes your messaging identity and all chat history from this device. Your funds are unaffected and can be recovered at any time with your seed phrase."
+            "value" : "This removes your messaging identity and all chat history, and resets this device back to onboarding. Your wallet funds can be restored with your seed phrase."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esto elimina tu identidad de mensajería y todo el historial de chats de este dispositivo. Tus fondos no se ven afectados y puedes recuperarlos en cualquier momento con tu frase semilla."
+            "value" : "Esto elimina tu identidad de mensajería y todo el historial de chats, y devuelve este dispositivo al inicio. Los fondos de tu billetera se pueden restaurar con tu frase semilla."
           }
         }
       }
@@ -4117,6 +5640,23 @@
         }
       }
     },
+    "chatProfile.displayNameSaveFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't save your display name. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar tu nombre visible. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
     "chatProfile.groupIdentity" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4168,23 +5708,6 @@
         }
       }
     },
-    "chatProfile.p2pKeyAddressLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Owner address"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dirección del propietario"
-          }
-        }
-      }
-    },
     "chatProfile.p2pKeyCopy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4198,40 +5721,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copiar"
-          }
-        }
-      }
-    },
-    "chatProfile.p2pKeyDialogMessage" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Derived from your seed phrase. This key controls your P2P cash-out account — anyone with it can spend those funds."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Derivada de tu frase semilla. Esta clave controla tu cuenta de retiro P2P: cualquiera que la tenga puede gastar esos fondos."
-          }
-        }
-      }
-    },
-    "chatProfile.p2pKeyDialogTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "P2P wallet key"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clave de billetera P2P"
           }
         }
       }
@@ -4531,7 +6020,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backs up both your messaging and wallet identities"
+            "value" : "Backs up both messaging & wallet identities"
           }
         },
         "es" : {
@@ -5103,6 +6592,23 @@
         }
       }
     },
+    "chatRoom.originalMessageUnavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original message not available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El mensaje original no está disponible"
+          }
+        }
+      }
+    },
     "chatRoom.reply" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5116,6 +6622,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Responder"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindFile" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindGIF" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIF"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GIF"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindLocation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ubicación"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindPaymentRequest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment request"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud de pago"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindPhoto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindTransaction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transaction"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transacción"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindVideo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "chatRoom.replyKindWalletAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección de la billetera"
           }
         }
       }
@@ -5439,6 +7081,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mensajes no leídos"
+          }
+        }
+      }
+    },
+    "chatSettings.deliveryFooter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sends a generic alert through Apple's push service when an encrypted message may be waiting. The alert carries no message content; messages stay encrypted and sync when you open Zapp."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envía una alerta genérica a través del servicio de notificaciones de Apple cuando puede haber un mensaje cifrado esperando. La alerta no incluye el contenido; los mensajes siguen cifrados y se sincronizan al abrir Zapp."
+          }
+        }
+      }
+    },
+    "chatSettings.privacyFooter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both work in both directions. Turning one off also hides other people's read status and online dots from you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambos funcionan en las dos direcciones. Desactivar uno también te oculta el estado de lectura y los puntos de conexión de los demás."
           }
         }
       }
@@ -26346,6 +28022,57 @@
         }
       }
     },
+    "settingsYou.baseAccountInProgress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cash-out in progress"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retiro en curso"
+          }
+        }
+      }
+    },
+    "settingsYou.baseAccountSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your USDC balance and activity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu saldo y actividad en USDC"
+          }
+        }
+      }
+    },
+    "settingsYou.baseAccountTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta Base"
+          }
+        }
+      }
+    },
     "settingsYou.chatProfile.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26584,6 +28311,23 @@
         }
       }
     },
+    "settingsYou.localCurrencyValue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
+        }
+      }
+    },
     "settingsYou.p2pPaymentMethodSubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -26618,36 +28362,36 @@
         }
       }
     },
-    "settingsYou.p2pTransactionsSubtitle" : {
+    "settingsYou.p2pRailCurrenciesMore" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View payments and recover cancelled orders"
+            "value" : "%1$@ and %2$lld more"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Consulta pagos y recupera pedidos cancelados"
+            "value" : "%1$@ y %2$lld más"
           }
         }
       }
     },
-    "settingsYou.p2pTransactionsTitle" : {
+    "settingsYou.p2pRailSubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P transactions"
+            "value" : "%1$@ - %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transacciones P2P"
+            "value" : "%1$@ - %2$@"
           }
         }
       }
@@ -26658,13 +28402,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your name, messaging key, privacy"
+            "value" : "Seed phrase, messaging key, wallet address"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu nombre, clave de mensajería, privacidad"
+            "value" : "Frase semilla, clave de mensajería, dirección de billetera"
           }
         }
       }
@@ -32086,6 +33830,23 @@
         }
       }
     },
+    "torSetup.sectionControl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control"
+          }
+        }
+      }
+    },
     "torSetup.settings.desc1" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -32133,6 +33894,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Protección Tor"
+          }
+        }
+      }
+    },
+    "torSetup.toggleSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route supported app network requests through Tor"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enruta a través de Tor las solicitudes de red compatibles de la app"
           }
         }
       }

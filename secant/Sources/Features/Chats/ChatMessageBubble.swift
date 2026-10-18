@@ -26,6 +26,10 @@ struct ChatMessageBubble: View {
     /// Read receipts are reciprocal. The stored status remains read, but the bubble only
     /// highlights it while receipts are enabled.
     var readReceiptsEnabled: Bool
+    /// The message this one quotes, when the room still has it; supplies the quote's thumbnail.
+    var quotedMessage: ZMMessage?
+    /// Tapping the quote block. The row routes it to a scroll to the quoted message.
+    var onQuoteTap: (() -> Void)?
 
     private var isFromMe: Bool { message.isFromMe }
     private var hasQuote: Bool { message.replyToId != nil }
@@ -118,8 +122,13 @@ struct ChatMessageBubble: View {
         .fixedSize()
     }
 
+    /// A quoted photo, file, payment request, transaction, address or location is named by its
+    /// kind, with a thumbnail when the room still has the picture; a quote from a client that
+    /// predates `replyToContentType` reads as text, as before. Tapping it jumps to the original.
     private var quote: some View {
-        HStack(spacing: Design.Spacing._md) {
+        let kind = ChatReplyQuoteKind(contentType: message.replyToContentType)
+
+        return HStack(spacing: Design.Spacing._md) {
             Rectangle()
                 .fill(ZappColors.accent.color(colorScheme))
                 .frame(width: Constants.quoteBarWidth, height: Constants.quoteBarHeight)
@@ -131,17 +140,24 @@ struct ChatMessageBubble: View {
                         .lineLimit(1)
                 }
 
-                Text(message.replyToContent ?? "")
-                    .zappFont(.caption, style: ZappColors.textMuted)
-                    .lineLimit(1)
+                ChatReplyQuoteLine(kind: kind, content: message.replyToContent)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            if kind.showsThumbnail, let quotedMessage {
+                ChatReplyQuoteThumbnail(message: quotedMessage, size: Constants.quoteBarHeight)
+            }
         }
         .padding(.horizontal, Constants.padding)
         .padding(.top, Constants.quoteTopPadding)
         .padding(.bottom, Constants.quoteBottomPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(ZappColors.surfaceInput.color(colorScheme))
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onQuoteTap?()
+        }
+        .accessibilityAddTraits(onQuoteTap == nil ? [] : .isButton)
     }
 
     private var bubbleColor: Color {
@@ -208,6 +224,22 @@ private extension ZappTextStyle {
                 replyToId: "1",
                 replyToSenderName: "satoshi",
                 replyToContent: "Sharp corners only."
+            ),
+            readReceiptsEnabled: true
+        )
+
+        ChatMessageBubble(
+            message: ZMMessage(
+                id: "4",
+                conversationId: "c",
+                senderId: "peer",
+                senderName: "satoshi",
+                content: "Where was this?",
+                isFromMe: false,
+                replyToId: "0",
+                replyToSenderName: "me",
+                replyToContent: "beach day",
+                replyToContentType: "image/jpeg"
             ),
             readReceiptsEnabled: true
         )

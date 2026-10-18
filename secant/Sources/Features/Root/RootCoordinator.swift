@@ -889,6 +889,19 @@ extension Root {
 
                 // Leaving drops you out of the group entirely, so go back to the list
                 // rather than to a room that no longer exists.
+            case .groupInfo(.inviteLinkTapped):
+                state.groupLinkState = GroupLink.State(
+                    conversationId: state.groupInfoState.conversation.id,
+                    isOwner: state.groupInfoState.conversation.isOwner == true
+                )
+                state.path = .groupLink
+                return .none
+
+            case .groupLink(.backTapped):
+                // Back to the group it belongs to, which is where it was opened from.
+                state.path = .groupInfo
+                return .none
+
             case .groupInfo(.didLeave):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
@@ -917,7 +930,8 @@ extension Root {
 
                 // Creating a conversation lands the user straight in it, rather than
                 // back on a list they then have to find it in.
-            case .newChat(.created(let conversation)):
+            case .newChat(.created(let conversation)),
+                .chatContactsList(.conversationOpened(let conversation)):
                 state.chatRoomState = .initial
                 state.chatRoomState.conversationId = conversation.id
                 state.chatRoomState.conversation = conversation
@@ -1044,6 +1058,29 @@ extension Root {
             case .giftClaim(.delegate(.routeToOnboarding)):
                 return .send(.destination(.updateDestination(.onboarding)))
 
+            case .groupInvite(.delegate(.dismiss)):
+                if state.featureFlags.groupLinks,
+                   state.appInitializationState == .initialized,
+                   state.zappMessagingState.identity != nil,
+                   let token = pendingGroupInvites.newestToken(excluding: state.groupInviteState.token) {
+                    // The child tears down the old session before this state is replaced. The
+                    // destination stays visible, so start the next preview explicitly rather
+                    // than relying on SwiftUI to deliver another onAppear.
+                    state.groupInviteState = GroupInvite.State(token: token)
+                    return .send(.groupInvite(.onAppear))
+                }
+                let hasWallet = state.appInitializationState != .keysMissing
+                    && state.appInitializationState != .uninitialized
+                return .send(.destination(.updateDestination(hasWallet ? .home : .onboarding)))
+
+            case .groupInvite(.delegate(.openConversation(let conversationId))):
+                // Home first, then the room: the preview is a destination, not a path entry, so
+                // the room has to be pushed onto the home path it leaves behind.
+                return .concatenate(
+                    .send(.destination(.updateDestination(.home))),
+                    .send(.chatNotificationTapped(conversationId))
+                )
+
             case .giftStartupSweep:
                 return .merge(
                     .run { _ in
@@ -1098,6 +1135,11 @@ extension Root {
 
             case .zappTabs(.chatSettingsTapped):
                 state.path = .chatSettings
+                return .none
+
+            case .chatProfile(.chatSettingsSaved):
+                guard state.path == .chatSettings else { return .none }
+                state.path = nil
                 return .none
 
             case .zappTabs(.readReceiptsTapped):

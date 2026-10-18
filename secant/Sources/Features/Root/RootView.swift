@@ -81,6 +81,20 @@ private extension RootView {
                         store.send(.splashRemovalRequested)
                     }
 
+                case .groupInvite:
+                    NavigationView {
+                        GroupInviteView(
+                            store: store.scope(
+                                state: \.groupInviteState,
+                                action: \.groupInvite
+                            )
+                        )
+                    }
+                    .navigationViewStyle(.stack)
+                    .overlayedWithSplash(store.splashAppeared) {
+                        store.send(.splashRemovalRequested)
+                    }
+
                 case .deeplinkWarning:
                     NavigationView {
                         DeeplinkWarningView(
@@ -157,6 +171,9 @@ private extension RootView {
                         .onChange(of: store.path) { value in
                             if value == nil {
                                 store.send(.home(.onAppear))
+                                // The You tab stays mounted under a pushed screen, so its live
+                                // subtitles are re-read when that screen closes.
+                                store.send(.zappTabs(.youTabAppeared))
                             } else {
                                 store.send(.home(.onDisappear))
                             }
@@ -511,6 +528,15 @@ private extension RootView {
                                     store: store.scope(
                                         state: \.groupInfoState,
                                         action: \.groupInfo
+                                    )
+                                )
+                                .transition(.move(edge: .trailing))
+                                .zIndex(1)
+                            } else if path == .groupLink {
+                                GroupLinkView(
+                                    store: store.scope(
+                                        state: \.groupLinkState,
+                                        action: \.groupLink
                                     )
                                 )
                                 .transition(.move(edge: .trailing))
