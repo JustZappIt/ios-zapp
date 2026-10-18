@@ -86,9 +86,12 @@ import ZappMessaging
         }
 
         #expect(store.state.isOwnKey)
-        #expect(!store.state.canStart)
+        #expect(!store.state.canAddDetectedKey)
 
+        // Our own key never becomes a chip, so there is nobody to start a chat with.
+        await store.send(.detectedKeyAdded)
         await store.send(.startTapped)
+        #expect(store.state.participants.isEmpty)
         #expect(!store.state.isCreating)
     }
 

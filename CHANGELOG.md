@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [CHATS-PARITY] A location shared from Android now shows as a location card with its coordinates and an Open in Maps link, instead of raw text, and the Chats list previews it as "Location".
 - [PAY] Empty wallets now offer Add ZEC up front in Send, Swap, Gift Zpacket, merchant payments and Base top-ups, while saved payments remain resumable.
 - [#72] Share group invite links with a scannable QR code, approve new members, and remove members from group chats. Invites resume after wallet setup, and pending requests survive app restarts and show when they are waiting for a connection or owner approval.
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
@@ -69,6 +70,12 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [CHATS-PARITY] Send ZEC in a chat uses the other person's shared address or payment request. When their address is unknown, you can ask them to share it or enter one yourself instead of being sent to the QR scanner.
+- [CHATS-PARITY] Link previews in chats now sit inside the message bubble and open the link when tapped. The message composer matches Android: larger controls, an accent "+" button and up to four visible lines.
+- [CHATS-PARITY] The chat identity setup screen now matches Android: "Set Up Your Chat Identity" with a display name field and "Create my identity". The name rules appear only if the name doesn't fit them, and if setup fails you can copy the error details to send to the Zapp team.
+- [CHATS-PARITY] Chat connection status now reads like Android: the conversation header always says how the conversation is connected ("Peer online", "P2P connected", "Waiting for peer…", "Offline" and so on), the status chips use Android's short labels, and the network details sheet uses Android's sections, labels and icons, hiding details until they have loaded instead of showing "Unknown".
+- [CHATS-PARITY] Tapping a group's name now opens its details as a sheet over the conversation, as on Android: the name, member count, Rename and Add member (for the group owner), the member list and Leave group. Closing it returns you to the conversation, and a rename shows in the conversation header straight away.
+- [CHATS-PARITY] New conversation now works like Android: tap contacts (or add a pasted or scanned key) to build a list of people, then Start chat opens a direct chat for one person or asks you to name a group for two or more. The search field sits at the bottom next to the buttons, the screen explains that messages are peer-to-peer encrypted, and the separate New group mode is gone. The Chats button and empty state now say "New conversation" and point at the chat button.
 - [PAY] Pay now uses Android's scrolling home layout, migration card, shielding explanation and sync-error remedies. Send and Swap use Review, with swap slippage in the bottom bar; Receive uses a shorter address display, and requests go from amount and optional note straight to the shareable QR. Merchant payments always ask for confirmation, with clearer recovery for payments in progress.
 - [PARITY] The You tab now matches Android: "Base account" shows when a cash-out is still in progress, the P2P payment method and local currency rows name what you picked, and the Privacy and Wallet rows follow Android's order. The Wallet group is hidden until a wallet exists.
 - [PARITY] Deleting a contact now asks first, and failed saves, deletes or blocks are reported instead of failing silently. When editing, Save stays off until you change something.
@@ -126,6 +133,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [#81] Group details keep invite links and controls for removing members when opened over a conversation; returning from invite links takes you back to the same chat.
 - [PAY] Leaving Send cancels a pending Top Up lookup, and late results cannot open a QR in a new flow or for a different account. Merchant payments notice incoming Base funds and fresh quote balances instead of remaining stuck on Add ZEC.
 - [#72] Newly joined groups show their name and group controls immediately, open chats become read-only when you are removed, and invite links can be retried after a startup delay. Keep incoming invite links out of debug logs and match Android's controls, with a single Share action and a back-only bar when no link is active.
 - [#72] Group invite screens now follow Android's layout and selection controls. Additional invites are kept while another preview is open, and returning to a different group's link no longer risks showing an earlier group's link or requests.

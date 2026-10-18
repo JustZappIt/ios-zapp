@@ -523,15 +523,6 @@ private extension RootView {
                                 )
                                 .transition(.move(edge: .trailing))
                                 .zIndex(1)
-                            } else if path == .groupInfo {
-                                GroupInfoView(
-                                    store: store.scope(
-                                        state: \.groupInfoState,
-                                        action: \.groupInfo
-                                    )
-                                )
-                                .transition(.move(edge: .trailing))
-                                .zIndex(1)
                             } else if path == .groupLink {
                                 GroupLinkView(
                                     store: store.scope(

@@ -118,19 +118,21 @@ import ZappMessaging
         #expect(store.path == nil)
     }
 
-    // MARK: - Scan flow
+    // MARK: - Send ZEC without a known address
 
-    /// Send ZEC with no known peer address falls out to the scanner, and cancelling the scanner
-    /// has to land back on the room rather than dropping the user onto the tabs.
-    @Test func aScanStartedFromAChatRoomUnwindsBackOntoThatRoom() {
+    /// Android's `onSendZecClick` opens the send form even with no address to prefill, still in
+    /// chat-send context, and backing out lands on the room rather than the tabs.
+    @Test func sendZecWithNoPeerAddressOpensAnEmptySendFormThatUnwindsToTheRoom() {
         let store = rootStore(peerSharedAddress: false)
 
-        store.send(.chatRoom(.scanWalletAddressTapped))
+        store.send(.chatRoom(.sendZecTapped))
 
-        #expect(store.path == .scanCoordFlow)
+        #expect(store.path == .sendCoordFlow)
         #expect(store.returnsToChatRoomAfterWalletFlow)
+        #expect(store.chatSendContext?.conversationId == "conversation")
+        #expect(store.sendCoordFlowState.sendFormState.address.data.isEmpty)
 
-        store.send(.scanCoordFlow(.scan(.cancelTapped)))
+        store.send(.sendCoordFlow(.sendForm(.dismissRequired)))
 
         #expect(store.path == .chatRoom)
         #expect(!store.returnsToChatRoomAfterWalletFlow)

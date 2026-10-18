@@ -33,8 +33,9 @@ enum ChatMessageKind: Equatable {
     case image
     case video
     case file
-    /// Plain text, and the deliberate fallback for anything unrecognised — including
-    /// `application/location`, which Decision 3 puts out of scope.
+    /// Rendered from an incoming message only; iOS does not send locations yet.
+    case location
+    /// Plain text, and the deliberate fallback for anything unrecognised.
     case text
 
     static func of(_ message: ZMMessage) -> ChatMessageKind {
@@ -44,6 +45,7 @@ enum ChatMessageKind: Equatable {
         case ChatContentType.paymentRequest: return .paymentRequest
         case ChatContentType.walletAddress: return .walletAddress
         case ChatContentType.zecTransaction: return .zecTransaction
+        case ChatContentType.location: return .location
         default: break
         }
 
@@ -91,6 +93,12 @@ enum ChatMessageJSON {
 
     static func string(_ content: String, _ key: String) -> String? {
         string(in: object(content), key)
+    }
+
+    /// The address in a wallet-address message: Android may wrap it as `{"content": addr}`
+    /// (`JSONObject(content).optString("content", content)`), else the body is the address.
+    static func walletAddress(_ content: String) -> String {
+        string(content, "content") ?? content
     }
 
     /// Empty is absent, exactly like `optString(key, "").takeIf { it.isNotEmpty() }`.

@@ -45,9 +45,114 @@ struct ChatRoomGroupMembershipTests {
             #expect(store.state.chatRoomState.title == "Hiking Crew")
             #expect(store.state.chatRoomState.isGroup)
             await store.send(.chatRoom(.titleTapped))
-            #expect(store.state.path == .groupInfo)
-            #expect(store.state.groupInfoState.conversation == Self.group)
+            #expect(store.state.path == .chatRoom)
+            #expect(store.state.chatRoomState.groupInfo?.conversation == Self.group)
+            await store.send(.chatRoom(.groupInfo(.dismiss)))
             await store.send(.chatRoom(.onDisappear))
+            await store.finish()
+        }
+    }
+
+    @MainActor
+    @Test func inviteLinksOpenFromTheSheetAndReturnToTheSameRoom() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let group = ZMConversation(
+                id: "owned-room", type: .group, participantIds: ["owner", "guest"], displayName: "Crew", isOwner: true
+            )
+            var state = Root.State.initial
+            state.path = .chatRoom
+            state.chatRoomState = ChatRoom.State(conversationId: group.id, conversation: group)
+            state.chatRoomState.draft = "Keep this draft"
+            state.chatRoomState.groupInfo = GroupInfo.State(conversation: group)
+            state.$featureFlags.withLock { $0 = FeatureFlags(groupLinks: true) }
+            let store = TestStore(initialState: state) { Root() }
+            store.exhaustivity = .off
+
+            await store.send(.chatRoom(.groupInfo(.presented(.inviteLinkTapped))))
+            #expect(store.state.path == .groupLink)
+            #expect(store.state.groupLinkState.conversationId == "owned-room")
+            #expect(store.state.groupLinkState.isOwner)
+            #expect(store.state.chatRoomState.groupInfo == nil)
+
+            await store.send(.groupLink(.backTapped))
+            #expect(store.state.path == .chatRoom)
+            #expect(store.state.chatRoomState.conversation == group)
+            #expect(store.state.chatRoomState.draft == "Keep this draft")
+            await store.finish()
+        }
+    }
+
+    @MainActor
+    @Test(arguments: [false, true])
+    func inviteLinksStayUnavailableWithoutOwnershipOrTheFeature(isOwner: Bool) async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let group = ZMConversation(
+                id: "room", type: .group, participantIds: ["owner", "guest"], displayName: "Crew", isOwner: isOwner
+            )
+            var state = Root.State.initial
+            state.path = .chatRoom
+            state.chatRoomState = ChatRoom.State(conversationId: group.id, conversation: group)
+            state.chatRoomState.groupInfo = GroupInfo.State(conversation: group)
+            state.$featureFlags.withLock { $0 = FeatureFlags(groupLinks: !isOwner) }
+            let store = TestStore(initialState: state) { Root() }
+
+            #expect(store.state.chatRoomState.groupInfo?.canShareLink == false)
+            #expect(store.state.chatRoomState.groupInfo?.canRemoveMembers == false)
+            await store.send(.chatRoom(.groupInfo(.presented(.inviteLinkTapped))))
+            #expect(store.state.path == .chatRoom)
+            #expect(store.state.chatRoomState.groupInfo?.conversation == group)
+            await store.finish()
+        }
+    }
+
+    @MainActor
+    @Test func memberRemovalFromTheSheetKeepsTheRoomRosterCurrent() async {
+        await withDependencies {
+            $0.defaultInMemoryStorage = InMemoryStorage()
+        } operation: {
+            let owner = String(repeating: "a", count: PublicKeyRules.hexLength)
+            let guest = String(repeating: "b", count: PublicKeyRules.hexLength)
+            let group = ZMConversation(
+                id: "room", type: .group, participantIds: [owner, guest], displayName: "Crew", isOwner: true
+            )
+            var state = ChatRoom.State(conversationId: group.id, conversation: group)
+            state.groupInfo = GroupInfo.State(conversation: group)
+            state.groupInfo?.$featureFlags.withLock { $0 = FeatureFlags(groupLinks: true) }
+            let removed = SignalledRecords<String>()
+            let store = TestStore(initialState: state) { ChatRoom() } withDependencies: {
+                $0.zappMessaging.olderMemberCount = { _ in 2 }
+                $0.zappMessaging.groupLink = { id in ZMGroupLinkInfo(conversationId: id, state: .active) }
+                $0.zappMessaging.removeMember = { _, key, reset in
+                    #expect(reset)
+                    removed.record(key)
+                    return ZMRemoveMemberResult(participants: [owner], olderMemberCount: 2)
+                }
+                $0.zappMessaging.refreshConversations = { }
+            }
+            store.exhaustivity = .off
+
+            await store.send(.groupInfo(.presented(.removeMemberTapped(
+                GroupMember(publicKey: guest, name: "Guest", isOwner: false)
+            ))))
+            await store.receive(\.groupInfo.presented.removeContextLoaded)
+            #expect(store.state.groupInfo?.removing?.olderMemberCount == 2)
+            #expect(store.state.groupInfo?.removing?.canResetLink == true)
+
+            await store.send(.groupInfo(.presented(.removeConfirmed)))
+            await store.receive(\.groupInfo.presented.removeFinished)
+            #expect(removed.values == [guest])
+            #expect(store.state.groupInfo?.removing == nil)
+
+            let updated = ZMConversation(
+                id: group.id, type: .group, participantIds: [owner], displayName: group.displayName, isOwner: true
+            )
+            await store.send(.groupInfo(.presented(.conversationsChanged([updated]))))
+            #expect(store.state.conversation?.participantIds == [owner])
+            #expect(store.state.groupInfo?.members.map(\.publicKey) == [owner])
             await store.finish()
         }
     }

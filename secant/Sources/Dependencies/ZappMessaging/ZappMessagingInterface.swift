@@ -250,7 +250,8 @@ struct ZappMessagingClient {
     /// The name is the sole trigger for derivation — nothing happens without it.
     var setDisplayName: @Sendable (String) -> Void
 
-    /// Re-attempt a failed derive. No-ops while one is in flight.
+    /// Re-attempt a failed derive, or reboot the worklet after a failed boot. No-ops while a
+    /// derive is in flight.
     var retryIdentityDerivation: @Sendable () -> Void
 
     var updateDisplayName: @Sendable (String) async throws -> Void

@@ -205,7 +205,9 @@ import ZappMessaging
 
     // MARK: - Send ZEC / scan
 
-    @MainActor @Test func sendZecFallsBackToTheScannerWhenNoPeerAddressIsKnown() async {
+    /// Android opens the send form even with no address to prefill; the room only closes its
+    /// sheet and leaves the routing to Root.
+    @MainActor @Test func sendZecWithNoPeerAddressStillJustRoutesToRoot() async {
         let store = TestStore(initialState: ChatRoom.State(conversationId: "conversation")) {
             ChatRoom()
         }
@@ -218,8 +220,9 @@ import ZappMessaging
         await store.send(.sendZecTapped) {
             $0.showsAttachmentSheet = false
         }
+        await store.receive(\.sendFormRequested)
 
-        await store.receive(\.scanWalletAddressTapped)
+        #expect(store.state.resolvedPeerWalletAddress == nil)
     }
 
     @MainActor @Test func sendZecKeepsRoutingToRootWhenThePeerSharedAnAddress() async {
@@ -235,10 +238,11 @@ import ZappMessaging
             $0.showsAttachmentSheet = true
         }
 
-        // No follow-up action: Root reads `resolvedPeerWalletAddress` and opens the send flow.
+        // Root reads `resolvedPeerWalletAddress` and opens the send flow.
         await store.send(.sendZecTapped) {
             $0.showsAttachmentSheet = false
         }
+        await store.receive(\.sendFormRequested)
 
         #expect(store.state.resolvedPeerWalletAddress == unifiedAddress)
     }

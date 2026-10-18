@@ -98,7 +98,7 @@ enum ChatReplyPreview {
         let resolved = ChatMessageKind.resolvedContentType(of: message)
         let kind = ChatMessageKind.of(message)
 
-        if kind == .text, resolved != ChatContentType.location {
+        if kind == .text {
             return ChatContentType.text
         }
 
@@ -127,14 +127,13 @@ enum ChatReplyPreview {
             summary = zecSummary(amount: receipt.amount, memo: nil, fallback: message.content)
 
         case .walletAddress:
-            summary = ChatMessageJSON.string(message.content, "content") ?? message.content
+            summary = ChatMessageJSON.walletAddress(message.content)
+
+        case .location:
+            summary = locationSummary(message.content)
 
         case .image, .video, .file, .text:
-            if ChatMessageKind.resolvedContentType(of: message) == ChatContentType.location {
-                summary = locationSummary(message.content)
-            } else {
-                summary = message.content
-            }
+            summary = message.content
         }
 
         return String(summary.trimmingCharacters(in: .whitespacesAndNewlines).prefix(maxLength))

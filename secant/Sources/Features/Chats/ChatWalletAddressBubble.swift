@@ -45,7 +45,7 @@ struct ChatWalletAddressBubble: View {
     /// `JSONObject(content).optString("content", content)` — a JSON body's `content` field, else
     /// the raw body.
     private var address: String {
-        ChatMessageJSON.string(message.content, "content") ?? message.content
+        ChatMessageJSON.walletAddress(message.content)
     }
 
     var body: some View {

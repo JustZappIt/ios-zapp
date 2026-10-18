@@ -30,11 +30,13 @@ extension ChatRoom {
         case media
     }
 
-    /// A picker the user asked for that cannot be presented until the sheet is gone.
+    /// A picker (or the Send ZEC address prompt) the user asked for that cannot be presented
+    /// until the sheet is gone.
     enum PendingAttachment: Equatable {
         case photos
         case file
         case camera
+        case addressRequest
     }
 
     // One branch per menu action; splitting the switch would scatter the menu rather than
@@ -61,6 +63,12 @@ extension ChatRoom {
                 state.attachmentPage = .actions
 
                 switch pending {
+                case .addressRequest:
+                    state.addressRequest = AddressRequestPrompt(
+                        name: state.conversation?.resolvedDisplayName(state.chatContacts)
+                    )
+                    return .none
+
                 case .photos:
                     state.showsPhotosPicker = true
                     return .none
@@ -200,18 +208,14 @@ extension ChatRoom {
                 state.sendFailureMessage = String(localizable: .chatRoomShareAddressFailed)
                 return .none
 
-            // Root opens the send flow prefilled, reading `resolvedPeerWalletAddress`. With no
-            // address to prefill there is nothing to send to, so the room offers the scanner
-            // instead — Android reaches the same scan from its send-ZEC path.
+            // Root opens the send flow, prefilled from `resolvedPeerWalletAddress` when there is
+            // one. A direct chat with none asks first, once the sheet has closed.
             case .sendZecTapped:
                 state.showsAttachmentSheet = false
-
-                return state.resolvedPeerWalletAddress == nil
-                    ? .send(.scanWalletAddressTapped)
-                    : .none
-
-            case .scanWalletAddressTapped:
-                state.showsAttachmentSheet = false
+                guard state.needsPeerAddressRequest else {
+                    return .send(.sendFormRequested)
+                }
+                state.pendingAttachment = .addressRequest
                 return .none
 
             default:
@@ -224,13 +228,28 @@ extension ChatRoom {
 // MARK: - Peer address resolution
 
 extension ChatRoom.State {
-    /// The newest address the peer posted into THIS chat. Android's `resolvePeerWalletAddress()`
-    /// reads the same last-wins wallet-address message.
+    /// The newest address the peer posted into THIS chat: an address card, or in a direct chat
+    /// the `requesterAddress` on a payment request they sent. In a group only an address card
+    /// says plainly enough whose address it is. Android's `resolvePeerWalletAddress()`.
     var peerSharedWalletAddress: String? {
-        messages
-            .last { !$0.isFromMe && $0.contentType == ChatContentType.walletAddress }
-            .map(\.content)
-            .flatMap { $0.isEmpty ? nil : $0 }
+        let isDirect = conversation?.type == .direct
+
+        return messages
+            .reversed()
+            .lazy
+            .filter { !$0.isFromMe }
+            .compactMap { message -> String? in
+                switch message.contentType {
+                case ChatContentType.walletAddress:
+                    // Unwrapped as the bubble shows it, or Send ZEC prefilled the JSON wrapper.
+                    return ChatMessageJSON.walletAddress(message.content)
+                case ChatContentType.paymentRequest where isDirect:
+                    return ChatPaymentRequest.parse(message.content).requesterAddress
+                default:
+                    return nil
+                }
+            }
+            .first { !$0.isEmpty }
     }
 
     /// The peer's saved address-book row, so Send ZEC prefills for a saved contact who has not
@@ -252,6 +271,11 @@ extension ChatRoom.State {
 
     var resolvedPeerWalletAddress: String? {
         peerSharedWalletAddress ?? savedContactWalletAddress
+    }
+
+    /// Send ZEC has nobody to prefill in a direct chat, so the room asks before opening the form.
+    var needsPeerAddressRequest: Bool {
+        conversation?.type == .direct && resolvedPeerWalletAddress == nil
     }
 
     /// The other side of a DM. A conversation can list OUR key among its participants, so it is
