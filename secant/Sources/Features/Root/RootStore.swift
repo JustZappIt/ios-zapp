@@ -24,6 +24,7 @@ struct Root {
             case chatWalletAddress
             case giftCard
             case giftCardList
+            case groupLink
             case increaseReputation
             case newChat
             case onramp
@@ -208,6 +209,8 @@ struct Root {
         @Shared(.inMemory(.walletAccounts)) var walletAccounts: [WalletAccount] = []
         var walletConfig: WalletConfig
         @Shared(.inMemory(.walletStatus)) var walletStatus: WalletStatus = .none
+        /// Whether the money flows have anything to spend; derived on every sync tick below.
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
         var wasRestoringWhenDisconnected = false
         var welcomeState: Welcome.State
         @Shared(.inMemory(.zashiWalletAccount)) var zashiWalletAccount: WalletAccount? = nil
@@ -257,6 +260,8 @@ struct Root {
         var giftCardState = GiftCard.State()
         var giftCardListState = GiftCardList.State()
         var giftClaimState = GiftClaim.State()
+        var groupInviteState = GroupInvite.State()
+        var groupLinkState = GroupLink.State.initial
         var peerCashOutActivityReturn: PeerCashOutActivityReturn?
         var peerCashOutOrigin = PeerCashOutOrigin.pay
         var offrampOrigin = OfframpOrigin.pay
@@ -264,6 +269,9 @@ struct Root {
         /// replaces the first rather than racing a second navigation against it.
         var p2pRailResolveCancelId = UUID()
         var receiveState = Receive.State.initial
+        /// The address Receive opens on when Add ZEC sends someone there: an exchange can only
+        /// send to the transparent one. Applied and cleared when Receive opens.
+        var receiveFocusOnOpen: Receive.State.AddressType?
         var requestZecCoordFlowState = RequestZecCoordFlow.State.initial
         var scanCoordFlowState = ScanCoordFlow.State.initial
         var migrationCoordFlowState = MigrationCoordFlow.State.initial
@@ -333,9 +341,11 @@ struct Root {
             // Both gift screens can put bearer material on screen, and the create flow broadcasts.
             case .giftCard, .giftCardList:
                 return true
+            // `.groupLink` shows a bearer secret but broadcasts nothing and touches no server,
+            // so a server switch behind it costs nothing.
             case .addKeystoneHWWalletCoordFlow, .chatContacts, .chatOnlineStatus, .chatProfile,
                  .chatReadReceipts, .chatRoom, .chatSettings, .chatWalletAddress,
-                 .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
+                 .groupLink, .newChat, .currencyConversionSetup, .p2pActivity, .p2pPaymentMethod, .portfolioChartSetup, .receive,
                  .requestZecCoordFlow, .securitySettings, .serverSwitch,
                  .supportChat, .supportTicketList, .torSetup, .walletBackup:
                 return false
@@ -351,9 +361,9 @@ struct Root {
         /// `path == nil` excludes every pushed Root flow (including Zapp's chat,
         /// offramp, payment, settings, and support destinations). The remaining
         /// terms cover presentation states outside `Path`: Keystone signing,
-        /// Server Setup, background work, alerts, and the two live Zapp Pay sheets. Upstream
+        /// Server Setup, background work, alerts, and the live Zapp Pay sheets. Upstream
         /// Home informational sheets keep their bindings in child state and can re-present, but
-        /// interrupting either actionable Zapp sheet would discard in-progress user context.
+        /// interrupting an actionable Zapp sheet would discard in-progress user context.
         var canPresentIronwoodAnnouncement: Bool {
             destinationState.destination == .home
                 && path == nil
@@ -361,6 +371,7 @@ struct Root {
                 && !serverSetupViewBinding
                 && !homeState.isZappPoolBalancesSheetPresented
                 && !homeState.isZappSyncErrorSheetPresented
+                && !homeState.isZappShieldInfoPresented
                 && bgTask == nil
                 && alert == nil
                 && splashAppeared
@@ -478,6 +489,12 @@ struct Root {
         case giftCardList(GiftCardList.Action)
         case giftClaim(GiftClaim.Action)
         case giftLinkReceived(String)
+        case groupInvite(GroupInvite.Action)
+        case groupLink(GroupLink.Action)
+        case groupInviteReceived(String)
+        /// An invite held until there was a wallet, an onboarding and an identity to open it with.
+        case groupInviteResumePending
+        case groupInviteResumed(String)
         case giftStartupSweep
         case giftResumePendingClaim
         case giftClaimResumed(String)
@@ -590,6 +607,7 @@ struct Root {
     @Dependency(\.autoServerSelection) var autoServerSelection
     @Dependency(\.uriParser) var uriParser
     @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+    @Dependency(\.pendingGroupInvites) var pendingGroupInvites
     @Dependency(\.userDefaults) var userDefaults
     @Dependency(\.userMetadataProvider) var userMetadataProvider
     @Dependency(\.userStoredPreferences) var userStoredPreferences
@@ -738,6 +756,14 @@ struct Root {
 
         Scope(state: \.giftClaimState, action: \.giftClaim) {
             GiftClaim()
+        }
+
+        Scope(state: \.groupInviteState, action: \.groupInvite) {
+            GroupInvite()
+        }
+
+        Scope(state: \.groupLinkState, action: \.groupLink) {
+            GroupLink()
         }
 
         Scope(state: \.offrampState, action: \.offramp) {

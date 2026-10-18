@@ -30,12 +30,14 @@ struct PeerCashOutFormView: View {
                 GeometryReader { geometry in
                     ScrollView {
                         VStack(spacing: 0) {
+                            // Android's `PeerCashOutView` order: amount, ledger, top up,
+                            // currencies, where you get paid, orders in progress.
                             amountHero
                             ledger.padding(.top, 6)
                             notice
-                            handleField.padding(.top, 16)
-                            currencyChips
                             topUpButton.padding(.top, 16)
+                            currencyChips
+                            handleField.padding(.top, 16)
                             openOrders
 
                             Spacer(minLength: 16)

@@ -49,6 +49,13 @@ struct Offramp {
         var isTopUpAmountInsufficient = false
         var isTopUpValidationLoading = false
         var topUpValidatedMicros: String?
+        @Shared(.inMemory(.walletFunding)) var walletFunding: WalletFunding = .unknown
+        /// Android's Top Up sheet, raised by the empty wallet's Add ZEC.
+        var isTopUpSourcePickerPresented = false
+        var isFundingObservationActive = false
+        /// A quote can finish after the account read began. Keep its newer balance through amount
+        /// edits; the next visit or funding refresh replaces it with a new account read.
+        var quotedBaseBalance: String?
 
         var selectedCorridor: OfframpCorridor? {
             corridors.first { $0.currencyCode == selectedCurrencyCode }
@@ -59,6 +66,35 @@ struct Offramp {
         }
 
         var latestProgress: OfframpProgressModel? { progress.last }
+
+        /// The Base USDC balance once it has been read; nil until then.
+        var baseUsdc: Decimal? {
+            let balance = account?.balanceMicros.flatMap { Decimal(string: $0) }.map { $0 / 1_000_000 }
+            // Quotes report available funds; an account read also includes funds reserved by
+            // other orders. A positive answer from either proves the wallet is not empty.
+            if let quotedBaseBalance, let quoted = Decimal(string: quotedBaseBalance, locale: .current), quoted > 0 {
+                return max(balance ?? 0, quoted)
+            }
+            return balance
+        }
+
+        var baseBalanceDisplay: String? {
+            quotedBaseBalance ?? account?.balanceDisplay
+        }
+
+        /// Android's `UpiOfframpState.addFundsPanel`: a merchant can be paid from ZEC or from USDC
+        /// on Base, so only an empty wallet with an empty (read) Base balance sees Add ZEC. An
+        /// order in flight keeps its form, so it can still be resumed.
+        var showsPayAddFundsPanel: Bool {
+            !hasCheckpoint && walletFunding.withBaseUsdc(baseUsdc) == .empty
+        }
+
+        /// Android's `BridgeToBaseState.addFundsPanel`: bridging needs ZEC; a saved top-up keeps
+        /// its form so it can still be resumed. An account that can't bridge (testnet) funds Base
+        /// by sending USDC to it directly, so it needs no ZEC and keeps its funding instructions.
+        var showsTopUpAddFundsPanel: Bool {
+            !hasTopUpCheckpoint && account?.canBridgeToBase == true && walletFunding == .empty
+        }
 
         var canSaveCorridor: Bool {
             !isLoading && draftCurrencyCode != selectedCurrencyCode
@@ -85,6 +121,9 @@ struct Offramp {
 
     enum Action: Equatable {
         case onAppear
+        case onDisappear
+        case baseFundingRefreshed(OfframpAccountModel)
+        case walletFundingChanged
         case loadedCorridors([OfframpCorridor], String?, String?)
         case loadFailed(String)
         case accountLoaded(OfframpAccountModel)
@@ -134,6 +173,9 @@ struct Offramp {
         case cancelAll
         case backTapped
         case retryTapped
+        case addZecTapped
+        case topUpSourcePickerDismissed
+        case topUpSourcePicked(SendCoordFlow.TopUpSource)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -141,6 +183,8 @@ struct Offramp {
             /// P2P history is one unified feed now, so this screen hands it over rather than
             /// carrying a second copy of the list beside it.
             case openActivity
+            /// Root opens Receive on the address that source can send to.
+            case topUpSourcePicked(SendCoordFlow.TopUpSource)
         }
     }
 
@@ -162,6 +206,8 @@ struct Offramp {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                state.isFundingObservationActive = true
+                state.quotedBaseBalance = nil
                 state.isLoading = true
                 state.errorMessage = nil
                 let page = state.page
@@ -189,8 +235,30 @@ struct Offramp {
                     } catch: { _, _ in
                         // Swallowed: the page is already on screen, so leave the balance blank.
                     }
-                    .cancellable(id: CancelID.account, cancelInFlight: true)
+                    .cancellable(id: CancelID.account, cancelInFlight: true),
+                    baseFundingObservationEffect(state.shouldRefreshBaseFunding)
                 )
+
+            case .onDisappear:
+                state.isFundingObservationActive = false
+                return baseFundingObservationEffect(false)
+
+            case .walletFundingChanged:
+                guard state.isFundingObservationActive else { return .none }
+                return baseFundingObservationEffect(state.shouldRefreshBaseFunding)
+
+            case .baseFundingRefreshed(let account):
+                guard state.isFundingObservationActive, state.shouldRefreshBaseFunding else {
+                    return baseFundingObservationEffect(false)
+                }
+                state.account = account
+                state.quotedBaseBalance = nil
+                if (state.baseUsdc ?? 0) > 0 {
+                    // An old shortfall quote would still offer Add funds after the deposit.
+                    // Keep the amount and let Review get a fresh quote for the funded account.
+                    state.quote = nil
+                }
+                return .none
 
             case let .loadedCorridors(corridors, checkpointCurrency, topUpCheckpoint):
                 state.corridors = corridors
@@ -310,6 +378,7 @@ struct Offramp {
                     return .none
                 }
                 state.quote = quote
+                state.updateBaseBalance(from: quote)
                 state.isLoading = false
                 return .none
 
@@ -327,14 +396,15 @@ struct Offramp {
                 .cancellable(id: CancelID.request, cancelInFlight: true)
 
             case .payQuoteRefreshed(let refreshed):
-                let changed = state.quote != refreshed
+                // Android's `UpiOfframpVM.onSendClick`: every payment goes through "Confirm
+                // payment", built from the commit-time quote — not only when that quote moved.
                 state.quote = refreshed
+                state.updateBaseBalance(from: refreshed)
                 state.isLoading = false
-                if changed {
-                    state.isPayConfirmationPresented = true
-                    return .none
-                }
-                return .send(.payConfirmed)
+                // A rate or fee that moved can leave the Base balance short. The page then shows
+                // its Add funds callout for the refreshed quote; confirming would do nothing.
+                state.isPayConfirmationPresented = refreshed.canPayFromBase
+                return .none
 
             case .payConfirmed:
                 guard let quote = state.quote, quote.canPayFromBase, !state.isLoading else { return .none }
@@ -653,8 +723,10 @@ struct Offramp {
                 return .none
 
             case .cancelAll:
+                state.isFundingObservationActive = false
                 state.isLoading = false
                 return .merge(
+                    baseFundingObservationEffect(false),
                     .cancel(id: CancelID.operation),
                     .cancel(id: CancelID.request),
                     .cancel(id: CancelID.refundPreview),
@@ -687,14 +759,33 @@ struct Offramp {
                     return .send(.delegate(.close))
                 }
 
+            case .addZecTapped:
+                state.isTopUpSourcePickerPresented = true
+                return .none
+
+            case .topUpSourcePickerDismissed:
+                state.isTopUpSourcePickerPresented = false
+                return .none
+
+            case .topUpSourcePicked(let source):
+                state.isTopUpSourcePickerPresented = false
+                return .send(.delegate(.topUpSourcePicked(source)))
+
             case .retryTapped:
                 return .send(.onAppear)
 
-            case .delegate(.close):
+            case .delegate(.close), .delegate(.topUpSourcePicked):
+                // Add ZEC leaves Pay for Receive, so it ends the screen session like closing does.
                 return .send(.cancelAll)
 
             case .delegate(.openActivity):
                 return .none
+            }
+        }
+        .onChange(of: \.shouldRefreshBaseFunding) { _, shouldRefresh in
+            Reduce { state, _ in
+                guard state.isFundingObservationActive else { return .none }
+                return baseFundingObservationEffect(shouldRefresh)
             }
         }
     }

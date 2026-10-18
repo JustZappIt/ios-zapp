@@ -171,8 +171,8 @@ struct SupportChat {
             case .backTapped:
                 return .none
 
-                // Creating the ticket is the whole topic picker: a group whose only remote member
-                // is the support agent, then the (never-rendered) category marker, then the bot
+                // Creating the ticket is the whole topic picker: a group whose only remote members
+                // are the support agents, then the (never-rendered) category marker, then the bot
                 // greeting. All three go through calls that already exist — no new wire format.
             case .categorySelected(let category):
                 guard state.conversationId == nil, !state.isSubmittingCategory else { return .none }
@@ -182,7 +182,7 @@ struct SupportChat {
                 return .run { send in
                     let conversation = try await zappMessaging.createGroup(
                         SupportChatConstants.conversationDisplayName(for: category),
-                        [SupportChatConstants.supportPublicKey]
+                        SupportChatConstants.supportPublicKeys
                     )
 
                     _ = try await zappMessaging.sendMessage(

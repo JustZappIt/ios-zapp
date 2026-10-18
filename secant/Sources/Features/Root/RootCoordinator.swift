@@ -231,6 +231,11 @@ extension Root {
                 
             case .home(.receiveTapped):
                 state.receiveState = .initial
+                if let focus = state.receiveFocusOnOpen {
+                    state.receiveState.currentFocus = focus
+                    state.receiveState.focusOnAppear = focus
+                    state.receiveFocusOnOpen = nil
+                }
                 state.path = .receive
                 return .none
 
@@ -267,6 +272,7 @@ extension Root {
                 state.sendCoordFlowState.mode = .swap
                 state.sendCoordFlowState.swapState.isSwapExperienceEnabled = true
                 state.sendCoordFlowState.swapState.isSwapToZecExperienceEnabled = false
+                state.sendCoordFlowState.isSwapEntry = true
                 state.returnsToChatRoomAfterWalletFlow = false
                 state.chatSendContext = nil
                 state.path = .sendCoordFlow
@@ -867,8 +873,22 @@ extension Root {
                     LoggerProxy.error("Failed to post chat transaction receipt: \(error)")
                 }
 
-                // Leaving drops you out of the group entirely, so go back to the list
-                // rather than to a room that no longer exists.
+            case .chatRoom(.groupInfo(.presented(.inviteLinkTapped))):
+                guard let groupInfo = state.chatRoomState.groupInfo, groupInfo.canShareLink else { return .none }
+                state.groupLinkState = GroupLink.State(
+                    conversationId: groupInfo.conversation.id,
+                    isOwner: groupInfo.conversation.isOwner == true
+                )
+                state.chatRoomState.groupInfo = nil
+                state.path = .groupLink
+                return .none
+
+            case .groupLink(.backTapped):
+                state.path = .chatRoom
+                return .none
+
+            // Leaving drops you out of the group entirely, so go back to the list
+            // rather than to a room that no longer exists.
             case .chatRoom(.leftGroup):
                 state.path = nil
                 return .run { _ in try? await zappMessaging.refreshConversations() }
@@ -1009,6 +1029,11 @@ extension Root {
                 state.path = nil
                 return .none
 
+                // Add ZEC from an empty wallet's gift screen: the Top Up source picks which
+                // address Receive opens on (an exchange can only send to the transparent one).
+            case .giftCard(.delegate(.topUpSourcePicked(let source))):
+                return openReceiveForTopUp(source, state: &state)
+
             case .giftCard(.delegate(.openSavedCards)):
                 state.giftCardListState = GiftCardList.State()
                 state.path = .giftCardList
@@ -1024,6 +1049,29 @@ extension Root {
 
             case .giftClaim(.delegate(.routeToOnboarding)):
                 return .send(.destination(.updateDestination(.onboarding)))
+
+            case .groupInvite(.delegate(.dismiss)):
+                if state.featureFlags.groupLinks,
+                   state.appInitializationState == .initialized,
+                   state.zappMessagingState.identity != nil,
+                   let token = pendingGroupInvites.newestToken(excluding: state.groupInviteState.token) {
+                    // The child tears down the old session before this state is replaced. The
+                    // destination stays visible, so start the next preview explicitly rather
+                    // than relying on SwiftUI to deliver another onAppear.
+                    state.groupInviteState = GroupInvite.State(token: token)
+                    return .send(.groupInvite(.onAppear))
+                }
+                let hasWallet = state.appInitializationState != .keysMissing
+                    && state.appInitializationState != .uninitialized
+                return .send(.destination(.updateDestination(hasWallet ? .home : .onboarding)))
+
+            case .groupInvite(.delegate(.openConversation(let conversationId))):
+                // Home first, then the room: the preview is a destination, not a path entry, so
+                // the room has to be pushed onto the home path it leaves behind.
+                return .concatenate(
+                    .send(.destination(.updateDestination(.home))),
+                    .send(.chatNotificationTapped(conversationId))
+                )
 
             case .giftStartupSweep:
                 return .merge(
@@ -1058,6 +1106,9 @@ extension Root {
                 state.peerCashOutActivityReturn = nil
                 state.path = .p2pActivity
                 return .none
+
+            case .offramp(.delegate(.topUpSourcePicked(let source))):
+                return openReceiveForTopUp(source, state: &state)
 
             case .offramp(.delegate(.openActivity)):
                 state.offrampActivityReturn = Root.State.OfframpActivityReturn(
@@ -1302,17 +1353,6 @@ extension Root {
                 state.chatSendContext = nil
                 return .send(.fetchTransactionsForTheSelectedAccount)
 
-                // Android's `PrimaryButtonState.TopUp` → `TopUpArgs`. On iOS the bridge-funds
-                // corridor lives in Offramp; `addFundsTapped` is the action that opens its Top-Up
-                // page and loads the account behind it.
-            case .sendCoordFlow(.topUpRequested):
-                state.offrampState = .initial(page: .amount, corridorContext: .settings)
-                state.offrampOrigin = .pay
-                state.returnsToChatRoomAfterWalletFlow = false
-                state.chatSendContext = nil
-                state.path = .offramp
-                return .send(.offramp(.addFundsTapped))
-
                 // Swap-to-ZEC (deposit an external asset, receive ZEC) is not part of Android's
                 // unified screen. It keeps its own flow, entered from the unified form's deposit
                 // affordance so the corridor is not orphaned by the merge — this is the routing the
@@ -1444,11 +1484,28 @@ extension Root {
         }
     }
 
+    /// Android's `TopUpVM.onSourcePicked` for screens outside the send flow (Gift, Pay a merchant,
+    /// Add funds to Base): Receive opens on the address the picked source can send to, going
+    /// through Home's own route so the shielded address is derived first.
+    func openReceiveForTopUp(_ source: SendCoordFlow.TopUpSource, state: inout Root.State) -> Effect<Root.Action> {
+        state.receiveFocusOnOpen = source == .exchange ? .tAddress : .uaAddress
+        return .send(.home(.receiveScreenRequested))
+    }
+
     /// Applies the account-scoped reactions shared by a manual switch and every Keystone
     /// auto-selection signal. The transaction fetch cancellation must finish before the refetch is
     /// dispatched, or the switch could cancel its own work for the newly selected account.
     private func accountSwitchedEffect(state: inout Root.State) -> Effect<Root.Action> {
         state.autoUpdateSwapCandidates.removeAll()
+        // Funding belongs to the account. Recomputed for the new one now, from the retained SDK
+        // state and without the old account's `.empty` carried over: waiting for the next sync
+        // tick left a funded account behind "Your wallet is empty" for up to a minute.
+        let funding = WalletFunding.afterAccountSwitch(
+            to: state.selectedWalletAccount,
+            latest: sdkSynchronizer.latestState(),
+            isRestoring: state.walletStatus == .restoring
+        )
+        state.$walletFunding.withLock { $0 = funding }
         state.homeState.transactionListState.isInvalidated = true
         state.transactionsCoordFlowState.transactionsManagerState.isInvalidated = true
         return .merge(

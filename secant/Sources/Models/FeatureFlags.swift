@@ -9,6 +9,10 @@ struct FeatureFlags: Equatable {
     let addUAtoMemo: Bool
     let appLaunchBiometric: Bool
     let flexa: Bool
+    /// Group invite links: the owner's link screen, the joiner's preview, and member removal.
+    /// Compile-time and per flavor, like `migration`, because the SDK advertises the feature
+    /// independently and a runtime toggle could strand a request nobody can answer.
+    let groupLinks: Bool
     /// Orchard -> Ironwood migration. Deliberately a compile-time, per-flavor flag rather than a
     /// runtime-togglable `WalletConfig` one: the SDK's migration sync gate is flag-independent, so a
     /// user able to switch migration off mid-run could leave overdue transfers blocking sync with no
@@ -20,12 +24,14 @@ struct FeatureFlags: Equatable {
         addUAtoMemo: Bool = false,
         appLaunchBiometric: Bool = true,
         flexa: Bool = false,
+        groupLinks: Bool = false,
         migration: Bool = false,
         selectText: Bool = true
     ) {
         self.addUAtoMemo = addUAtoMemo
         self.appLaunchBiometric = appLaunchBiometric
         self.flexa = flexa
+        self.groupLinks = groupLinks
         self.migration = migration
         self.selectText = selectText
     }

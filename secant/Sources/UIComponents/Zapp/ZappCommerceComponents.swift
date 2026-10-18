@@ -107,7 +107,7 @@ struct ZappCompactButton: View {
     let action: () -> Void
 
     var body: some View {
-        ZappButton(title: title, variant: variant, isEnabled: isEnabled, action: action)
+        ZappButton(title: title, variant: variant, isEnabled: isEnabled, size: .compact, action: action)
             .fixedSize(horizontal: true, vertical: false)
     }
 }

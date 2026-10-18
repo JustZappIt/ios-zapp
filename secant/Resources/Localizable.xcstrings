@@ -184,8 +184,1229 @@
     "reputation.unreadableTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Couldn't reach Base"}},"es":{"stringUnit":{"state":"translated","value":"No pudimos conectar con Base"}}}},
     "reputation.verifiedGroup" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"VERIFIED"}},"es":{"stringUnit":{"state":"translated","value":"VERIFICADAS"}}}},
     "reputation.verifyToBuy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verify to buy"}},"es":{"stringUnit":{"state":"translated","value":"Verifica para comprar"}}}},
+    "requestZec.address.shielded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Shielded Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección protegida"
+          }
+        }
+      }
+    },
+    "requestZec.address.transparent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Transparent Address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dirección transparente"
+          }
+        }
+      }
+    },
+    "requestZec.copyAddress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy address"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar dirección"
+          }
+        }
+      }
+    },
+    "requestZec.noteHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a note (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrega una nota (opcional)"
+          }
+        }
+      }
+    },
+    "requestZec.noteLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTE"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NOTA"
+          }
+        }
+      }
+    },
     "settingsYou.chatSettingsSubtitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Read receipts, online status, delivery"}},"es":{"stringUnit":{"state":"translated","value":"Confirmaciones de lectura, estado en l\u00ednea, entrega"}}}},
     "settingsYou.chatSettingsTitle" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Chat settings"}},"es":{"stringUnit":{"state":"translated","value":"Ajustes de chat"}}}},
+    "groupMember.removedSelf" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You were removed from this group."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te expulsaron de este grupo."
+          }
+        }
+      }
+    },
+    "groupMember.removedFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You removed %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsaste a %@"
+          }
+        }
+      }
+    },
+    "groupMember.removeTitleFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Expulsar a %@?"
+          }
+        }
+      }
+    },
+    "groupMember.removeResetLink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset the invite link too"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer también el enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupMember.removeOlderNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some members use an older version of Zapp. They will see new messages here after they update."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos miembros usan una versión anterior de Zapp. Verán los mensajes nuevos aquí cuando actualicen."
+          }
+        }
+      }
+    },
+    "groupMember.removeConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsar"
+          }
+        }
+      }
+    },
+    "groupMember.removeBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They will stop getting new messages from this group. They keep the messages they already have."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dejará de recibir los mensajes nuevos de este grupo. Conserva los mensajes que ya tiene."
+          }
+        }
+      }
+    },
+    "groupMember.remove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsar del grupo"
+          }
+        }
+      }
+    },
+    "groupLink.warning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone with this link can join. Share it only with people you trust."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cualquiera con este enlace puede unirse. Compártelo solo con personas de confianza."
+          }
+        }
+      }
+    },
+    "groupLink.turnOn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.turnOff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn off link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir enlace"
+          }
+        }
+      }
+    },
+    "groupLink.retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
+          }
+        }
+      }
+    },
+    "groupLink.resetTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset this link?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Restablecer este enlace?"
+          }
+        }
+      }
+    },
+    "groupLink.resetConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer"
+          }
+        }
+      }
+    },
+    "groupLink.resetBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The old link will stop working. Anyone who has it will need the new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace anterior dejará de funcionar. Quien lo tenga necesitará el nuevo."
+          }
+        }
+      }
+    },
+    "groupLink.reset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer enlace"
+          }
+        }
+      }
+    },
+    "groupLink.requestsLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join requests"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitudes para unirse"
+          }
+        }
+      }
+    },
+    "groupLink.requestSubtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asked to join with the invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pidió unirse con el enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.requestRemovedBefore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed before"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expulsado antes"
+          }
+        }
+      }
+    },
+    "groupLink.requestDecline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechazar"
+          }
+        }
+      }
+    },
+    "groupLink.requestContactFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In your contacts as %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En tus contactos como %@"
+          }
+        }
+      }
+    },
+    "groupLink.requestApprove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approve"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprobar"
+          }
+        }
+      }
+    },
+    "groupLink.qrContentDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR code for the invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR del enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Many people joined in the last hour, so new requests now wait for your approval."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muchas personas se unieron en la última hora, así que las nuevas solicitudes esperan tu aprobación."
+          }
+        }
+      }
+    },
+    "groupLink.ownerOnly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only the group owner can share an invite link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo el dueño del grupo puede compartir un enlace de invitación."
+          }
+        }
+      }
+    },
+    "groupLink.offNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The invite link is off."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace de invitación está desactivado."
+          }
+        }
+      }
+    },
+    "groupLink.nameToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show group name in the link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el nombre del grupo en el enlace"
+          }
+        }
+      }
+    },
+    "groupLink.limitPeopleFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ people"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ personas"
+          }
+        }
+      }
+    },
+    "groupLink.limitNone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No limit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin límite"
+          }
+        }
+      }
+    },
+    "groupLink.limitLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "People who can join with this link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personas que pueden unirse con este enlace"
+          }
+        }
+      }
+    },
+    "groupLink.historyNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "People who join may see some earlier messages in this group."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quienes se unan pueden ver algunos mensajes anteriores de este grupo."
+          }
+        }
+      }
+    },
+    "groupLink.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlace de invitación"
+          }
+        }
+      }
+    },
+    "groupLink.expiryOneDay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In 1 day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En 1 día"
+          }
+        }
+      }
+    },
+    "groupLink.expiryNever" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca"
+          }
+        }
+      }
+    },
+    "groupLink.expiryLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link expires"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El enlace caduca"
+          }
+        }
+      }
+    },
+    "groupLink.expiryDaysFmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@ days"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En %@ días"
+          }
+        }
+      }
+    },
+    "groupLink.expired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caducado"
+          }
+        }
+      }
+    },
+    "groupLink.copy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar enlace"
+          }
+        }
+      }
+    },
+    "groupLink.copied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link copied"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enlace copiado"
+          }
+        }
+      }
+    },
+    "groupLink.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "groupLink.approvalToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approve new members"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprobar nuevos miembros"
+          }
+        }
+      }
+    },
+    "groupLink.approvalHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this is on, people who use the link wait until you let them in."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, quienes usen el enlace esperan hasta que les des acceso."
+          }
+        }
+      }
+    },
+    "groupLink.actionFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That did not work. Check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No funcionó. Revisa tu conexión e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.waitingTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting to join"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando para unirte"
+          }
+        }
+      }
+    },
+    "groupInvite.waitingOwner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your request is with the group owner."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu solicitud está con el dueño del grupo."
+          }
+        }
+      }
+    },
+    "groupInvite.waitingQueued" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your request has not gone out yet. Zapp will send it when you are back online." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Tu solicitud aún no se ha enviado. Zapp la enviará cuando vuelvas a estar en línea." } }
+      }
+    },
+    "chatNotifications.newActivity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New activity in Zapp" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nueva actividad en Zapp" } }
+      }
+    },
+    "groupInvite.waitingBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will join when the group owner opens Zapp."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te unirás cuando el dueño del grupo abra Zapp."
+          }
+        }
+      }
+    },
+    "groupInvite.update" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Zapp to use this link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza Zapp para usar este enlace."
+          }
+        }
+      }
+    },
+    "groupInvite.unreadable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This link could not be read. Ask for a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer este enlace. Pide uno nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.titleNamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join %@?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Unirte a %@?"
+          }
+        }
+      }
+    },
+    "groupInvite.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join this group?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Unirte a este grupo?"
+          }
+        }
+      }
+    },
+    "groupInvite.sendFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your request did not go out. Check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu solicitud no se envió. Revisa tu conexión e inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.openGroup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.notNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        }
+      }
+    },
+    "groupInvite.joinedNamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You joined %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te uniste a %@"
+          }
+        }
+      }
+    },
+    "groupInvite.joined" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You joined the group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te uniste al grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.join" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unirme al grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.inactive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This invite link is no longer active."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este enlace de invitación ya no está activo."
+          }
+        }
+      }
+    },
+    "groupInvite.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group invite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invitación a un grupo"
+          }
+        }
+      }
+    },
+    "groupInvite.full" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This group is full."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este grupo está lleno."
+          }
+        }
+      }
+    },
+    "groupInvite.expired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This invite has expired. Ask for a new link."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta invitación ha caducado. Pide un enlace nuevo."
+          }
+        }
+      }
+    },
+    "groupInvite.declined" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The group owner did not accept your request."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El dueño del grupo no aceptó tu solicitud."
+          }
+        }
+      }
+    },
+    "groupInvite.comingSoon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group invite links are coming soon."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los enlaces de invitación a grupos llegarán pronto."
+          }
+        }
+      }
+    },
+    "groupInvite.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel request"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar solicitud"
+          }
+        }
+      }
+    },
+    "groupInvite.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Members will see your name and when you are online. You can leave at any time."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los miembros verán tu nombre y cuándo estás en línea. Puedes salir cuando quieras."
+          }
+        }
+      }
+    },
+    "groupInvite.alreadyMember" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are already in this group"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya estás en este grupo"
+          }
+        }
+      }
+    },
     "~%@ %@" : {
       "localizations" : {
         "en" : {
@@ -13454,13 +14675,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swaps"
+            "value" : "Swap"
           }
         }
       }
@@ -20815,13 +22036,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BASE BALANCE"
+            "value" : "Balance on Base"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SALDO EN BASE"
+            "value" : "Saldo en Base"
           }
         }
       }
@@ -20917,13 +22138,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Return to ZEC"
+            "value" : "Refund to ZEC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Devolver a ZEC"
+            "value" : "Reembolsar a ZEC"
           }
         }
       }
@@ -20933,6 +22154,57 @@
     "offramp.history.type.buy" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Buy"}},"es":{"stringUnit":{"state":"translated","value":"Comprar"}}}},
     "offramp.history.type.pay" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Pay"}},"es":{"stringUnit":{"state":"translated","value":"Pagar"}}}},
     "offramp.history.type.sell" : {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sell"}},"es":{"stringUnit":{"state":"translated","value":"Vender"}}}},
+    "offramp.pay.addFundsToPay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add funds to pay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar fondos para pagar"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monto"
+          }
+        }
+      }
+    },
+    "offramp.pay.amountSent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount sent"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe enviado"
+          }
+        }
+      }
+    },
     "offramp.history.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20984,6 +22256,108 @@
         }
       }
     },
+    "offramp.pay.confirm.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay %1$@ using about %2$@ USDC at %3$@ per USDC."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paga %1$@ con aproximadamente %2$@ USDC a %3$@ por USDC."
+          }
+        }
+      }
+    },
+    "offramp.pay.confirm.payNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagar ahora"
+          }
+        }
+      }
+    },
+    "offramp.pay.discardInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard local order & start over"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar orden local y empezar de nuevo"
+          }
+        }
+      }
+    },
+    "offramp.pay.errorInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An offramp is already in progress. Resume it before starting a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya hay un offramp en curso. Reanúdalo antes de iniciar otro."
+          }
+        }
+      }
+    },
+    "offramp.pay.recentTransactions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent transactions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transacciones recientes"
+          }
+        }
+      }
+    },
+    "offramp.pay.resumeInFlight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume in-flight offramp"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar offramp en curso"
+          }
+        }
+      }
+    },
     "offramp.pay.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20997,40 +22371,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pagar a un comercio"
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The rate, fee, or required USDC changed. Review the updated quote before confirming."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La tasa, la comisión o los USDC necesarios cambiaron. Revisa la cotización actualizada antes de confirmar."
-          }
-        }
-      }
-    },
-    "offramp.pay.updated.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Review updated payment quote"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisar la cotización de pago actualizada"
           }
         }
       }
@@ -32677,6 +34017,227 @@
         }
       }
     },
+    "topUp.addFundsPanel.base" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you move funds to Base."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de mover fondos a Base."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.gift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you fund a Zpacket. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cargar un Zpacket. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.payMerchant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC or USDC on Base before you pay. Zapp pays merchants from either."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC o USDC en Base antes de pagar. Zapp paga a los comercios con cualquiera de los dos."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you send. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de enviar. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.swap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC before you swap it. Receive it from another wallet or an exchange."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade ZEC antes de cambiarlos. Recíbelos desde otra billetera o un exchange."
+          }
+        }
+      }
+    },
+    "topUp.addFundsPanel.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wallet is empty"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu billetera está vacía"
+          }
+        }
+      }
+    },
+    "topUp.addZec" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add ZEC"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar ZEC"
+          }
+        }
+      }
+    },
+    "topUp.fromExchange.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchanges like Binance or Coinbase can only send to a transparent address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los exchanges como Binance o Coinbase solo pueden enviar a una dirección transparente."
+          }
+        }
+      }
+    },
+    "topUp.fromExchange.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From an exchange"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde un exchange"
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive directly to your shielded address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recibe directamente en tu dirección blindada."
+          }
+        }
+      }
+    },
+    "topUp.fromWallet.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From another wallet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde otra billetera"
+          }
+        }
+      }
+    },
+    "topUp.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose where your ZEC is coming from."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige de dónde provienen tus ZEC."
+          }
+        }
+      }
+    },
+    "topUp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How are you topping up?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo vas a recargar?"
+          }
+        }
+      }
+    },
     "torSettingsSheet.desc" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -34142,23 +35703,6 @@
         }
       }
     },
-    "zappPay.chart.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Portfolio value"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Valor del portafolio"
-          }
-        }
-      }
-    },
     "zappPay.empty.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -34318,7 +35862,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "See all"
+            "value" : "See All"
           }
         },
         "es" : {
@@ -34483,6 +36027,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "zappSync.offlineReconnecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline, reconnecting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión, reconectando"
           }
         }
       }
@@ -35107,13 +36668,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your Revtag, without the @"
+            "value" : "Revtag (e.g. andrew1abc)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu Revtag, sin la @"
+            "value" : "Revtag (p. ej. andrew1abc)"
           }
         }
       }
@@ -35124,13 +36685,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The email address registered with Zelle"
+            "value" : "Email address enrolled with Zelle"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El correo electrónico registrado en Zelle"
+            "value" : "Correo electrónico registrado en Zelle"
           }
         }
       }
@@ -35141,13 +36702,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your $ChimeSign"
+            "value" : "ChimeSign (e.g. $andrew)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu $ChimeSign"
+            "value" : "ChimeSign (p. ej. $andrew)"
           }
         }
       }
@@ -35158,13 +36719,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your monzo.me username"
+            "value" : "Monzo.me username"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu nombre de usuario de monzo.me"
+            "value" : "Usuario de Monzo.me"
           }
         }
       }
@@ -35243,13 +36804,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AMOUNT TO OFFER"
+            "value" : "Amount"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IMPORTE A OFRECER"
+            "value" : "Cantidad"
           }
         }
       }
@@ -35362,13 +36923,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ at today's rate"
+            "value" : "≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "≈ %1$@ %2$@ al cambio de hoy"
+            "value" : "≈ %1$@ %2$@"
           }
         }
       }
@@ -35379,13 +36940,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indicative rate"
+            "value" : "Rate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tipo indicativo"
+            "value" : "Tasa"
           }
         }
       }
@@ -35396,13 +36957,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "1 USDC = %1$@ %2$@"
+            "value" : "1 USDC ≈ %1$@ %2$@"
           }
         }
       }
@@ -35447,13 +37008,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Held by orders in progress"
+            "value" : "In progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retenido por órdenes en curso"
+            "value" : "En curso"
           }
         }
       }
@@ -35464,13 +37025,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paid to you on"
+            "value" : "Paid to"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Te pagan en"
+            "value" : "Se paga a"
           }
         }
       }
@@ -35481,13 +37042,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "WHERE BUYERS PAY YOU"
+            "value" : "Where you get paid"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "DÓNDE TE PAGAN LOS COMPRADORES"
+            "value" : "Dónde te pagan"
           }
         }
       }
@@ -35515,13 +37076,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This service can't confirm the handle for us. Check it carefully — buyers will send your money to exactly what you enter here."
+            "value" : "We cannot confirm this handle. A buyer pays exactly what you register here, so check it carefully."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este servicio no puede confirmarnos el identificador. Revísalo con cuidado: los compradores enviarán tu dinero exactamente a lo que escribas aquí."
+            "value" : "No podemos confirmar este identificador. Un comprador paga exactamente lo que registres aquí, así que revísalo con cuidado."
           }
         }
       }
@@ -35532,13 +37093,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CURRENCIES YOU'LL ACCEPT"
+            "value" : "Currencies you accept"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MONEDAS QUE ACEPTARÁS"
+            "value" : "Monedas que aceptas"
           }
         }
       }
@@ -35566,13 +37127,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Review and confirm"
+            "value" : "Continue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisar y confirmar"
+            "value" : "Continuar"
           }
         }
       }
@@ -35583,13 +37144,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "YOUR OPEN ORDERS"
+            "value" : "Orders in progress"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TUS ÓRDENES ABIERTAS"
+            "value" : "Órdenes en curso"
           }
         }
       }
@@ -35617,13 +37178,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offer at least %@ USDC."
+            "value" : "Enter at least %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ofrece al menos %@ USDC."
+            "value" : "Introduce al menos %@ USDC"
           }
         }
       }
@@ -35634,13 +37195,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can offer up to %@ USDC right now."
+            "value" : "Enter at most %@ USDC"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ahora mismo puedes ofrecer hasta %@ USDC."
+            "value" : "Introduce como máximo %@ USDC"
           }
         }
       }
@@ -35668,13 +37229,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That doesn't look like a valid handle for this service."
+            "value" : "That does not look like a valid handle for this rail."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eso no parece un identificador válido para este servicio."
+            "value" : "Eso no parece un identificador válido para esta vía."
           }
         }
       }
@@ -35702,13 +37263,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Larger than buyers usually take (about %@ USDC each). It will still fill, but probably in pieces over several hours."
+            "value" : "Buyers take about %@ USDC at a time, so this will fill in several pieces over a few hours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es mayor de lo que suelen tomar los compradores (unos %@ USDC cada uno). Se llenará igualmente, pero probablemente por partes durante varias horas."
+            "value" : "Los compradores toman unos %@ USDC cada vez, así que esto se llenará en varias partes a lo largo de unas horas."
           }
         }
       }
@@ -36943,13 +38504,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "P2P activity"
+            "value" : "Base activity"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actividad P2P"
+            "value" : "Actividad en Base"
           }
         }
       }
@@ -36994,13 +38555,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nothing here yet. Orders you open and payments you make will appear here."
+            "value" : "No activity yet."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aquí no hay nada todavía. Las órdenes que abras y los pagos que hagas aparecerán aquí."
+            "value" : "Aún no hay actividad."
           }
         }
       }

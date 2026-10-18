@@ -25,6 +25,9 @@ struct Receive {
         }
 
         var currentFocus = AddressType.uaAddress
+        /// The tab every appearance starts on: shielded, unless Add ZEC sent someone here for an
+        /// exchange, which can only send to the transparent address.
+        var focusOnAppear = AddressType.uaAddress
         var isAddressExplainerPresented = false
         var isExplainerForShielded = false
         var memo = ""

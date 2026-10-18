@@ -23,10 +23,23 @@ struct GroupInfo {
     @ObservableState
     struct State: Equatable {
         @Shared(.inMemory(.chatContacts)) var chatContacts: ChatContacts = .empty
+        @Shared(.inMemory(.featureFlags)) var featureFlags: FeatureFlags = .initial
+
+        /// A member the owner is about to remove, with what this group can honestly promise about
+        /// it: whether some members are still on a build that ignores removal, and whether there
+        /// is a live invite link the person could walk back in with.
+        struct RemoveDraft: Equatable {
+            let member: GroupMember
+            var resetLink = true
+            var canResetLink = false
+            var olderMemberCount = 0
+            var isLoaded = false
+            var isBusy = false
+        }
 
         @Presents var alert: AlertState<Action>?
 
-        /// Seeded by Root and re-seeded from `conversationsStream` after every mutation — the
+        /// Seeded by ChatRoom and re-seeded from `conversationsStream` after every mutation — the
         /// core is the only authority on who is in the group and what it is called.
         var conversation: ZMConversation
 
@@ -40,6 +53,7 @@ struct GroupInfo {
         var isAddMemberPresented = false
         var isMutating = false
         var didFail = false
+        var removing: RemoveDraft?
 
         var conversationsCancelId = UUID()
 
@@ -51,6 +65,8 @@ struct GroupInfo {
         /// Only the creator's changes are accepted by the other members, so only the owner is
         /// offered them. Android gates Add member the same way.
         var canAddMember: Bool { conversation.isOwner == true }
+        var canShareLink: Bool { conversation.isOwner == true && featureFlags.groupLinks }
+        var canRemoveMembers: Bool { conversation.isOwner == true && featureFlags.groupLinks }
 
         var isRenaming: Bool { nameDraft != nil }
 
@@ -124,15 +140,20 @@ struct GroupInfo {
         case renameSaveTapped
         case addMemberTapped
         case addMemberDismissed
+        case inviteLinkTapped
+        case removeMemberTapped(GroupMember)
+        case removeContextLoaded(publicKey: String, olderMemberCount: Int, canResetLink: Bool)
+        case removeContextFailed(publicKey: String)
+        case removeResetLinkToggled
+        case removeDismissed
+        case removeConfirmed
+        case removeFinished
         case memberSelected(ChatContact)
         case leaveTapped
         case leaveConfirmed
         case mutationFinished
         case mutationFailed
         case alert(PresentationAction<Action>)
-
-        /// We left the group; this sheet's subject no longer exists. Root closes the room
-        /// under it as well.
     }
 
     @Dependency(\.zappMessaging) var zappMessaging
@@ -230,6 +251,66 @@ struct GroupInfo {
                     await send(.mutationFailed)
                 }
 
+            case .inviteLinkTapped:
+                // Root closes the sheet and opens the link screen for this conversation.
+                return .none
+
+            case .removeMemberTapped(let member):
+                guard state.canRemoveMembers else { return .none }
+                state.removing = State.RemoveDraft(member: member)
+                state.didFail = false
+                // The dialog reads the group before it speaks, so it says what this group will
+                // actually do rather than what removal does in general.
+                return .run { [id = state.conversation.id, key = member.publicKey] send in
+                    do {
+                        let older = try await zappMessaging.olderMemberCount(id)
+                        let hasLink = try await zappMessaging.groupLink(id).state == .active
+                        await send(.removeContextLoaded(publicKey: key, olderMemberCount: older, canResetLink: hasLink))
+                    } catch {
+                        await send(.removeContextFailed(publicKey: key))
+                    }
+                }
+
+            case let .removeContextLoaded(publicKey, olderMemberCount, canResetLink):
+                guard state.removing?.member.publicKey == publicKey else { return .none }
+                state.removing?.olderMemberCount = olderMemberCount
+                state.removing?.canResetLink = canResetLink
+                state.removing?.isLoaded = true
+                return .none
+
+            case .removeContextFailed(let publicKey):
+                guard state.removing?.member.publicKey == publicKey else { return .none }
+                state.removing = nil
+                state.didFail = true
+                return .none
+
+            case .removeResetLinkToggled:
+                state.removing?.resetLink.toggle()
+                return .none
+
+            case .removeDismissed:
+                state.removing = nil
+                return .none
+
+            case .removeConfirmed:
+                guard let draft = state.removing, draft.isLoaded, !draft.isBusy else { return .none }
+                state.removing?.isBusy = true
+                state.didFail = false
+                let resetLink = draft.resetLink && draft.canResetLink
+
+                return .run { [id = state.conversation.id, key = draft.member.publicKey] send in
+                    _ = try await zappMessaging.removeMember(id, key, resetLink)
+                    await send(.removeFinished)
+                } catch: { error, send in
+                    LoggerProxy.error("Group info failed to remove a member: \(error)")
+                    await send(.mutationFailed)
+                }
+
+            case .removeFinished:
+                state.removing = nil
+                state.isMutating = false
+                return .run { _ in try? await zappMessaging.refreshConversations() }
+
             case .leaveTapped:
                 state.alert = AlertState.leaveGroup
                 return .none
@@ -247,6 +328,7 @@ struct GroupInfo {
 
             case .mutationFailed:
                 state.isMutating = false
+                state.removing?.isBusy = false
                 state.didFail = true
                 return .none
 

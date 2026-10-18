@@ -29,8 +29,9 @@ struct P2pPaymentMethodView: View {
                                 .padding(.bottom, Design.Spacing._lg)
                         }
 
-                        cashOutGroup
+                        // Android's `P2pPaymentMethodVM` order: p2p.me first, then Peer.
                         scanAndPayGroup
+                        cashOutGroup
                     }
                     .padding(.vertical, Design.Spacing._lg)
                 }
@@ -50,8 +51,6 @@ struct P2pPaymentMethodView: View {
         }
     }
 
-    /// Cash-out first: it is the newer product and the one a user arriving from Pay is least likely
-    /// to expect, so it is the group they read rather than the one they scroll past.
     private var cashOutGroup: some View {
         ZappSettingsGroup(
             title: "",

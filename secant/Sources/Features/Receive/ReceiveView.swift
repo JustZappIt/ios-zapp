@@ -65,7 +65,7 @@ struct ReceiveView: View {
 
     private var content: some View {
         VStack(spacing: 0) {
-            ZappScreenHeader(title: String(localizable: .tabsReceiveZec)) {
+            ZappScreenHeader(title: String(localizable: .tabsReceive)) {
                 // Android keeps the address-type explainer behind an info action; the Zapp
                 // rewrite had dropped the entry point and left only the one-line tip.
                 ZappInfoButton(accessibilityLabel: String(localizable: .receiveHelpInfoAccessibility)) {
@@ -96,11 +96,13 @@ struct ReceiveView: View {
                         .frame(maxWidth: Constants.qrMaxSize + (Design.Spacing._md * 2))
 
                         HStack(alignment: .top, spacing: Design.Spacing._md) {
-                            Text(segment.address)
+                            // Android's `Ellipsize.MIDDLE` (10 + 10 characters); the copy button
+                            // carries the full address.
+                            Text(segment.address.zappEllipsized(head: 10, tail: 10))
                                 .zappFont(.mono, style: ZappColors.textMuted)
-                                .textSelection(.enabled)
-                                .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(1)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .accessibilityLabel(segment.address)
 
                             copyIconButton(segment)
                         }
@@ -155,7 +157,7 @@ struct ReceiveView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ZappColors.bg.color(colorScheme))
-        .onAppear { store.send(.updateCurrentFocus(.uaAddress)) }
+        .onAppear { store.send(.updateCurrentFocus(store.focusOnAppear)) }
         // Mounted here, not on the NavigationStack, which already owns the Request fullScreenCover.
         .sheet(isPresented: explainerBinding) {
             WithPerceptionTracking { explainerSheet }

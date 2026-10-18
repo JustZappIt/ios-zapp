@@ -68,6 +68,7 @@ extension Root {
     enum InitializationAction {
         case appDelegate(AppDelegateAction)
         case checkBackupPhraseValidation
+        case finishLaunchNavigation
         case checkRestoreWalletFlag(SyncStatus)
         case checkWalletInitialization
         case checkWalletConfig
@@ -157,7 +158,7 @@ extension Root {
                 // runs the background boundary at all.
                 state.didScheduleStartFailureRetry = false
                 let giftResume: Effect<Root.Action> = state.appInitializationState == .initialized
-                    ? .send(.giftResumePendingClaim)
+                    ? .merge(.send(.giftResumePendingClaim), .send(.groupInviteResumePending))
                     : .none
                 if state.isLockedInKeychainUnavailableState || !sdkSynchronizer.latestState().syncStatus.isPrepared {
                     return .merge(migrationTickEffect, migrationCheck, giftResume, .send(.initialization(.initialSetups)))
@@ -353,6 +354,18 @@ extension Root {
                     return migrationReconcileEffect
                 }
                 
+                // Android's `ObserveFundingUseCase.zec()`: the money flows read this to offer
+                // "Add ZEC" up front rather than a form an empty wallet cannot pay for.
+                let isUpToDate = SyncStatusSnapshot.snapshotFor(state: latestState.data.syncStatus).syncStatus == .upToDate
+                state.$walletFunding.withLock {
+                    $0 = WalletFunding.next(
+                        previous: $0,
+                        total: latestState.data.accountsBalances[account.id]?.fundingTotal,
+                        isUpToDate: isUpToDate,
+                        isRestoring: state.walletStatus == .restoring
+                    )
+                }
+
                 // update flexa balance
                 if let accountBalance = latestState.data.accountsBalances[account.id] {
                     // Pool-agnostic accessors: sum sapling + orchard + ironwood (and any future
@@ -1378,19 +1391,27 @@ extension Root {
                 }
 
                 state.appInitializationState = .initialized
-                let isAtDeeplinkWarningScreen = state.destinationState.destination == .deeplinkWarning
-                // A claim opened from a cold start must not be yanked to home mid-preview.
-                let isAtGiftClaimScreen = state.destinationState.destination == .giftClaim
-
                 return .run { send in
-                    // Delay the splash overlay dismissal
+                    // Delay the splash overlay dismissal, then read the current navigation
+                    // state. An invite can open while this delay is still running.
                     try await mainQueue.sleep(for: .seconds(0.5))
-                    if !isAtDeeplinkWarningScreen && !isAtGiftClaimScreen {
-                        await send(.destination(.updateDestination(Root.DestinationState.Destination.home)))
-                    }
+                    await send(.initialization(.finishLaunchNavigation))
                 }
                 .cancellable(id: state.CancelId, cancelInFlight: true)
-                
+
+            case .initialization(.finishLaunchNavigation):
+                switch state.destinationState.destination {
+                case .deeplinkWarning, .giftClaim, .groupInvite:
+                    return .none
+                default:
+                    // Identity restoration can finish before wallet initialization. Retry the
+                    // held invite now that both prerequisites can be satisfied.
+                    return .concatenate(
+                        .send(.destination(.updateDestination(.home))),
+                        .send(.groupInviteResumePending)
+                    )
+                }
+
             case .initialization(.resetZashiRequest(let areMetadataPreserved)):
                 state.areMetadataPreserved = areMetadataPreserved
                 // Gift custody guard on the use path itself, not just the screen: the reset wipes
@@ -1567,6 +1588,9 @@ extension Root {
                     .send(.batteryStateChanged),
                     .run { [migrationManager] send in
                         await zappMessaging.wipe()
+                        // A held invite is as personal as the chats it leads to, and it outlives
+                        // the worklet's store on its own, in the Keychain.
+                        pendingGroupInvites.clear()
                         await migrationManager.wipeAllMigrationState()
                         await send(.resetZashiKeychainRequest)
                     }
@@ -1711,12 +1735,16 @@ extension Root {
                 state.destinationState.destination = .home
                 // A recipient who tapped a link before having a wallet deferred it on the way to
                 // onboarding; the wallet now exists, so their claim comes back.
-                let resumeDeferredGift: Effect<Root.Action> = .run { send in
-                    @Dependency(\.pendingGiftLinks) var pendingGiftLinks
-                    if let token = pendingGiftLinks.resumeDeferred() {
-                        await send(.giftClaimResumed(token))
-                    }
-                }
+                let resumeDeferredGift: Effect<Root.Action> = .merge(
+                    .run { send in
+                        @Dependency(\.pendingGiftLinks) var pendingGiftLinks
+                        if let token = pendingGiftLinks.resumeDeferred() {
+                            await send(.giftClaimResumed(token))
+                        }
+                    },
+                    // The same for a group invite tapped before there was a wallet to join with.
+                    .send(.groupInviteResumePending)
+                )
                 if state.isStaleWalletHealedAlertPending {
                     return .merge(
                         presentStaleWalletHealedAlertEffect(cancelId: state.staleWalletHealedAlertCancelId),
