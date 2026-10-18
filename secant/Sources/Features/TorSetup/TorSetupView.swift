@@ -44,12 +44,12 @@ struct TorSetupView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.bottom, Design.Spacing._3xl)
 
-                    ZappSectionLabel(text: String(localizable: .settingsPrivate))
+                    ZappSectionLabel(text: String(localizable: .torSetupSectionControl))
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     ZappToggleRow(
                         title: String(localizable: .smartBannerContentTorTitle),
-                        subtitle: String(localizable: .torSetupEnableDesc),
+                        subtitle: String(localizable: .torSetupToggleSubtitle),
                         icon: Asset.Assets.Icons.shieldZap.image,
                         iconTint: .accentText,
                         iconBackground: .accentSoft,

@@ -1,6 +1,29 @@
 {
     "releases": [
         {
+            "version": "1.0.3",
+            "date": "15-10-2026",
+            "timestamp": 1792090800,
+            "sections": [
+                {
+                    "title": "Added:",
+                    "bulletpoints": [
+                        "Tap a reply's quote in a chat to jump to the original message.",
+                        "Contacts: start a chat straight from a contact, browse contacts under A-Z headers, and copy a contact's name, messaging key or wallet address.",
+                        "Hide or reveal your balances from the Pay screen with the new eye button.",
+                        "Coinholder Polling: vote on Zcash governance proposals from You, then Governance."
+                    ]
+                },
+                {
+                    "title": "Fixed:",
+                    "bulletpoints": [
+                        "Pasting a recovery phrase now validates correctly.",
+                        "We fixed several issues with saving chat photos and closing the secret export screen."
+                    ]
+                }
+            ]
+        },
+        {
             "version": "3.7.3",
             "date": "11-07-2026",
             "timestamp": 1783775476,

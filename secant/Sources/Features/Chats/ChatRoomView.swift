@@ -69,7 +69,7 @@ struct ChatRoomView: View {
                 if let replyingTo = store.replyingTo {
                     ChatReplyBar(
                         senderName: store.state.replySenderName(for: replyingTo),
-                        content: replyingTo.content,
+                        message: replyingTo,
                         onCancel: { store.send(.cancelReplyTapped) }
                     )
                 }
@@ -265,6 +265,12 @@ struct ChatRoomView: View {
                             let localPublicKey = store.localPublicKey
                             let fiatRate = store.chatFiatRate
                             let paidRequestIds = store.paidRequestIds
+                            let highlightedMessageId = store.highlightedMessageId
+                            // A reply's quote looks up the message it points at for its thumbnail.
+                            let messagesById = Dictionary(
+                                store.visibleMessages.map { ($0.id, $0) },
+                                uniquingKeysWith: { first, _ in first }
+                            )
 
                             if store.isLoading && store.visibleMessages.isEmpty {
                                 ProgressView()
@@ -288,7 +294,9 @@ struct ChatRoomView: View {
                                             linkPreview: store.messageLinkPreviews[message.id],
                                             progress: message.mediaId.flatMap { store.mediaProgress[$0] },
                                             isPaid: ChatPaymentSettlement.requestId(of: message)
-                                                .map { paidRequestIds.contains($0) } ?? false
+                                                .map { paidRequestIds.contains($0) } ?? false,
+                                            quotedMessage: message.replyToId.flatMap { messagesById[$0] },
+                                            isHighlighted: message.id == highlightedMessageId
                                         )
                                         .equatable()
                                     }
@@ -340,6 +348,13 @@ struct ChatRoomView: View {
                 .onChange(of: isComposerFocused) { isFocused in
                     guard isFocused, !items.isEmpty else { return }
                     scroll(proxy, to: ChatRoomItem.bottomId, animated: true)
+                }
+                // A tapped quote centres its original, so it reads as "here it is" rather than
+                // being pinned to an edge.
+                .onChange(of: store.quoteScrollRequest) { request in
+                    guard let request else { return }
+                    scroll(proxy, to: "msg_\(request.rowId)", anchor: .center, animated: true)
+                    store.send(.quoteScrollHandled)
                 }
             }
         }
