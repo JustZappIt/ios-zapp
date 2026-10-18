@@ -71,6 +71,7 @@ struct SendCoordFlow {
 
     @ObservableState
     struct State {
+        let topUpAddressCancelID = UUID()
         var path = StackState<Path.State>()
         var sendFormState = SendForm.State.initial
         var swapState = SwapAndPay.State.initial
@@ -82,6 +83,7 @@ struct SendCoordFlow {
         var isAssetPickerPresented = false
         /// Android's `TopUpArgs` sheet, raised by the "Top Up" CTA. See `SendCoordFlow+TopUp`.
         var isTopUpPresented = false
+        var topUpAddressRequestID: UUID?
         /// Opened from the Pay tab's Swap action. Android's FAB opens a screen titled "Swap"; this
         /// form keeps that title while it is in swap mode.
         var isSwapEntry = false
@@ -176,7 +178,7 @@ struct SendCoordFlow {
         case topUpRequested
         case topUpDismissed
         case topUpSourcePicked(TopUpSource)
-        case topUpUnifiedAddressResolved(String?)
+        case topUpUnifiedAddressResolved(requestID: UUID, accountID: AccountUUID?, address: String?)
         case viewTransactionRequested(SendConfirmation.State)
         case zecAssetSelected
     }

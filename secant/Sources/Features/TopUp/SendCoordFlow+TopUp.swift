@@ -9,6 +9,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 @preconcurrency import ZcashLightClientKit
 
 extension SendCoordFlow {
@@ -22,7 +23,8 @@ extension SendCoordFlow {
             switch action {
             case .topUpRequested:
                 state.isTopUpPresented = true
-                return .none
+                state.topUpAddressRequestID = nil
+                return .cancel(id: state.topUpAddressCancelID)
 
             case .topUpDismissed:
                 state.isTopUpPresented = false
@@ -30,15 +32,25 @@ extension SendCoordFlow {
 
             case .topUpSourcePicked(.exchange):
                 state.isTopUpPresented = false
+                state.topUpAddressRequestID = nil
                 let address = state.selectedWalletAccount?.transparentAddress
                     ?? String(localizable: .receiveErrorCantExtractTransparentAddress)
                 state.path.append(.addressDetails(topUpAddressDetails(address: address, maxPrivacy: false, state: state)))
-                return .none
+                return .cancel(id: state.topUpAddressCancelID)
 
             case .topUpSourcePicked(.wallet):
                 state.isTopUpPresented = false
+                let requestID = UUID()
+                state.topUpAddressRequestID = requestID
                 guard let account = state.selectedWalletAccount, account.privateUA == nil else {
-                    return .send(.topUpUnifiedAddressResolved(state.selectedWalletAccount?.privateUnifiedAddress))
+                    return .merge(
+                        .cancel(id: state.topUpAddressCancelID),
+                        .send(.topUpUnifiedAddressResolved(
+                            requestID: requestID,
+                            accountID: state.selectedWalletAccount?.id,
+                            address: state.selectedWalletAccount?.privateUnifiedAddress
+                        ))
+                    )
                 }
                 // The shielded receive address is derived on demand with the same receivers Home
                 // uses before opening Receive (`WalletAccount.privateUAReceivers`).
@@ -47,13 +59,30 @@ extension SendCoordFlow {
                 return .run { [sdkSynchronizer] send in
                     // Sent as its encoding: `UnifiedAddress` is not `Sendable`.
                     let privateUA = try? await sdkSynchronizer.getCustomUnifiedAddress(accountId, receivers)
-                    await send(.topUpUnifiedAddressResolved(privateUA?.stringEncoded))
+                    try Task.checkCancellation()
+                    await send(.topUpUnifiedAddressResolved(
+                        requestID: requestID,
+                        accountID: accountId,
+                        address: privateUA?.stringEncoded
+                    ))
                 }
+                .cancellable(id: state.topUpAddressCancelID, cancelInFlight: true)
 
-            case .topUpUnifiedAddressResolved(let privateUA):
+            case let .topUpUnifiedAddressResolved(requestID, accountID, privateUA):
+                // Root retains this child after leaving Send. A late lookup must never push its
+                // QR into a replacement flow or label the previous account's address as the new one.
+                guard
+                    state.topUpAddressRequestID == requestID,
+                    state.selectedWalletAccount?.id == accountID
+                else { return .none }
+                state.topUpAddressRequestID = nil
                 let address = privateUA ?? String(localizable: .receiveErrorCantExtractUnifiedAddress)
                 state.path.append(.addressDetails(topUpAddressDetails(address: address, maxPrivacy: true, state: state)))
                 return .none
+
+            case .sendForm(.dismissRequired), .swapToZecRequested, .backToHomeTapped:
+                state.topUpAddressRequestID = nil
+                return .cancel(id: state.topUpAddressCancelID)
 
             default:
                 return .none

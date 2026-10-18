@@ -32,6 +32,8 @@ struct OfframpView: View {
             .background(ZappColors.bg.color(colorScheme))
             .zappSwipeBack { store.send(.backTapped) }
             .onAppear { store.send(.onAppear) }
+            .onDisappear { store.send(.onDisappear) }
+            .onChange(of: store.walletFunding) { _ in store.send(.walletFundingChanged) }
             .zashiSheet(isPresented: $isPaymentInfoPresented) { paymentMethodInfo }
             .zashiSheet(isPresented: $isTopUpInfoPresented) { topUpInfo }
             .zashiSheet(
@@ -322,7 +324,7 @@ struct OfframpView: View {
                 ),
                 ZappCompactLedgerRow(
                     label: text("offramp.pay.baseBalance", "Base balance"),
-                    value: store.account?.balanceDisplay.map { "\($0) USDC" } ?? "—"
+                    value: store.baseBalanceDisplay.map { "\($0) USDC" } ?? "—"
                 )
             ])
 

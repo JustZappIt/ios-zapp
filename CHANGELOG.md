@@ -7,6 +7,7 @@ directly impact users rather than highlighting other crucial architectural updat
 ## [Unreleased]
 
 ### Added
+- [PAY] Empty wallets now offer Add ZEC up front in Send, Swap, Gift Zpacket, merchant payments and Base top-ups, while saved payments remain resumable.
 - [CHAT] Tap a reply's quote to jump to the original message. Quotes now name photos, files, payment requests and other message types, with picture thumbnails when available.
 - [PARITY] Contacts: start a chat straight from a contact, browse contacts under A–Z headers with a saved count, and copy a contact's name, messaging key or wallet address from its sheet. Chat contacts with a ZEC address now appear when picking a Send recipient.
 - [PARITY] P2P wallet key now opens its own screen: your smart account address is shown openly, and the owner key stays locked until you reveal it with your app lock.
@@ -27,7 +28,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Long-pressing a conversation in the Chats list now peeks at it before you commit to opening it, showing the name, when it was last active or how many messages are unread, and the last thing that was said — alongside the existing Leave action.
 - [ZAPP-1] Send and Swap are now one screen. Whichever way you get there — the Pay tab's Send or Swap action, Send ZEC or a payment request in a chat, tapping a shared address, scanning a QR code, or "send again" from a transaction — you land on the same Send screen, with the recipient already filled in where Zapp knows it. An asset selector sits in the middle of the form: leave it on ZEC to send ZEC, or pick Bitcoin, Ethereum, USDC or any other supported token and the same screen becomes a swap, adding the estimated amount they'll receive and a slippage control. Switching asset clears the recipient (an address for one chain is meaningless on another) but keeps the amount you'd already typed. If you opened the screen from a chat and then switch it to a swap, the person you were chatting with is no longer told you paid them — that ZEC goes to the swap provider, not to them, and any payment request they sent stays unpaid.
 - [ZAPP-1] The Send screen now has a single amount field with an "≈" line underneath showing the same amount in your other currency, and a button to swap which one you type in — replacing the two side-by-side amount boxes.
-- [ZAPP-1] With an empty wallet, or when the amount is more than you can spend, the Send screen's button becomes "Top Up" and takes you to the bridge-funds screen, with a line explaining you can top up from an exchange or another wallet.
+- [ZAPP-1] With an empty wallet, or when the amount is more than you can spend, Send offers Add ZEC or Top Up. Choose an exchange for your transparent-address QR, or another wallet for your shielded-address QR; Back returns to the Send form.
 - [ZAPP-1] Depositing another asset to receive ZEC is still available: it now has its own entry from the Send screen when you're swapping ("Deposit another asset to get ZEC").
 - [ZAPP-1] Contact cards now hold a wallet address per chain. Alongside the ZEC address there's an "Additional addresses" section for Transparent (Zcash), EVM and Solana addresses, so a contact saved on Android arrives on iPhone complete. Every address field — and the messaging key itself — has a QR button that opens the scanner and fills in that specific field.
 - [ZAPP-1] Starting a new chat no longer means typing or pasting a 64-character key: there's now a scan button next to the search field that reads someone's messaging QR code straight into it. Codes that aren't a messaging key are ignored rather than pasted in.
@@ -67,6 +68,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [PAY] Pay now uses Android's scrolling home layout, migration card, shielding explanation and sync-error remedies. Send and Swap use Review, with swap slippage in the bottom bar; Receive uses a shorter address display, and requests go from amount and optional note straight to the shareable QR. Merchant payments always ask for confirmation, with clearer recovery for payments in progress.
 - [PARITY] The You tab now matches Android: "Base account" shows when a cash-out is still in progress, the P2P payment method and local currency rows name what you picked, and the Privacy and Wallet rows follow Android's order. The Wallet group is hidden until a wallet exists.
 - [PARITY] Deleting a contact now asks first, and failed saves, deletes or blocks are reported instead of failing silently. When editing, Save stays off until you change something.
 - [PARITY] Chat settings are saved together with a Save button, as on Android, and enabling background delivery asks for notification permission when you save.
@@ -123,6 +125,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [PAY] Leaving Send cancels a pending Top Up lookup, and late results cannot open a QR in a new flow or for a different account. Merchant payments notice incoming Base funds and fresh quote balances instead of remaining stuck on Add ZEC.
 - [CHAT] Reply thumbnails now appear and refresh when choosing another photo, replies remain sendable when a message contains an unrecognised type, and quoted wallet addresses show the address instead of a JSON wrapper.
 - [ZAPP-1] Correcting a recovery word through suggestions now clears its error highlight, and pasting over existing words highlights incomplete words for correction.
 - [ZAPP-1] Pasting a recovery phrase now fills its word fields, keeps incomplete words highlighted for correction, and lets you continue once the phrase is valid.

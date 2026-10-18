@@ -90,6 +90,7 @@ struct OfframpTests {
         }
         // Android always confirms, even when the commit-time quote did not move.
         await store.receive(\.payQuoteRefreshed) {
+            $0.quotedBaseBalance = "2"
             $0.isLoading = false
             $0.isPayConfirmationPresented = true
         }
@@ -119,6 +120,7 @@ struct OfframpTests {
         await store.send(.payTapped) { $0.isLoading = true }
         await store.receive(\.payQuoteRefreshed) {
             $0.quote = refreshed
+            $0.quotedBaseBalance = "2"
             $0.isLoading = false
             $0.isPayConfirmationPresented = true
         }
@@ -139,6 +141,7 @@ struct OfframpTests {
         await store.send(.payTapped) { $0.isLoading = true }
         await store.receive(\.payQuoteRefreshed) {
             $0.quote = refreshed
+            $0.quotedBaseBalance = "2"
             $0.isLoading = false
         }
     }
