@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import UIKit
 import ZappMessaging
 
 private enum ChatSwipeConstants {
@@ -18,9 +19,10 @@ private enum ChatSwipeConstants {
 /// Swipe-left-to-reveal action row, mirroring `ChatListSwipeToLeave.kt`.
 ///
 /// The chat list is a `ScrollView`/`LazyVStack`, not a `List`, so `.swipeActions` is unavailable.
-/// The gesture is attached with `.simultaneousGesture` — the same arrangement `ZashiBack`'s
-/// edge-swipe uses — so the enclosing scroll view keeps its vertical pan; tracking only starts once
-/// the drag is unambiguously horizontal and leftwards.
+/// Tracking only starts once the drag is unambiguously horizontal and leftwards, so the enclosing
+/// scroll view keeps its vertical pan. From iOS 18 that takes a UIKit recognizer
+/// (`ChatLeftSwipeRecognizer`): a `DragGesture` on the row claims the touch even through
+/// `.simultaneousGesture`, and once rows fill the screen the list can no longer be scrolled.
 struct ChatSwipeToRevealRow<Content: View>: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -53,7 +55,7 @@ struct ChatSwipeToRevealRow<Content: View>: View {
                 .offset(x: offsetX)
         }
         .id(identity)
-        .simultaneousGesture(swipeGesture)
+        .chatSwipeGesture(drag: swipeGesture, onChanged: trackSwipe, onEnded: endSwipe)
         .accessibilityAction(named: Text(actionLabel)) { onAction() }
     }
 
@@ -70,35 +72,40 @@ struct ChatSwipeToRevealRow<Content: View>: View {
     private var swipeGesture: some Gesture {
         DragGesture(minimumDistance: ChatSwipeConstants.minimumDistance, coordinateSpace: .local)
             .onChanged { value in
-                if !isTracking {
-                    guard beginsSwipe(value) else { return }
-                    isTracking = true
-                }
+                guard isTracking || beginsSwipe(value) else { return }
 
-                offsetX = min(0, max(-ChatSwipeConstants.maxTranslation, value.translation.width))
-                updateArmedState()
+                trackSwipe(value.translation.width)
             }
-            .onEnded { _ in
-                guard isTracking else { return }
+            .onEnded { _ in endSwipe(allowsCommit: true) }
+    }
 
-                let commits = -offsetX >= ChatSwipeConstants.revealThreshold
-                isArmed = false
+    private func trackSwipe(_ translation: CGFloat) {
+        isTracking = true
+        offsetX = min(0, max(-ChatSwipeConstants.maxTranslation, translation))
+        updateArmedState()
+    }
 
-                withAnimation(ZappMotion.content) {
-                    offsetX = 0
-                }
+    /// `allowsCommit` is false when the system cancels the swipe, which only snaps the row back.
+    private func endSwipe(allowsCommit: Bool) {
+        guard isTracking else { return }
 
-                if commits {
-                    onAction()
-                }
+        let commits = allowsCommit && -offsetX >= ChatSwipeConstants.revealThreshold
+        isArmed = false
 
-                // The row's own Button reports its tap on touch-up too, in the same run-loop turn
-                // as this handler and in no guaranteed order. Clearing the flag one turn later
-                // means `guardedTap` still sees the swipe and drops the tap — the analogue of
-                // Android consuming the pointer change to cancel the clickable's tap tracking.
-                // Without it, swiping a row would leave the conversation *and* open it.
-                DispatchQueue.main.async { isTracking = false }
-            }
+        withAnimation(ZappMotion.content) {
+            offsetX = 0
+        }
+
+        if commits {
+            onAction()
+        }
+
+        // The row's own Button reports its tap on touch-up too, in the same run-loop turn
+        // as this handler and in no guaranteed order. Clearing the flag one turn later
+        // means `guardedTap` still sees the swipe and drops the tap — the analogue of
+        // Android consuming the pointer change to cancel the clickable's tap tracking.
+        // Without it, swiping a row would leave the conversation *and* open it.
+        DispatchQueue.main.async { isTracking = false }
     }
 
     /// A swipe and a tap are the same touch, so a completed swipe must swallow the tap.
@@ -123,6 +130,64 @@ struct ChatSwipeToRevealRow<Content: View>: View {
 
         if armed {
             ZappHaptics.selection()
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func chatSwipeGesture(
+        drag: some Gesture,
+        onChanged: @escaping (CGFloat) -> Void,
+        onEnded: @escaping (Bool) -> Void
+    ) -> some View {
+        if #available(iOS 18.0, *) {
+            gesture(ChatLeftSwipeRecognizer(onChanged: onChanged, onEnded: onEnded))
+        } else {
+            // Before iOS 18 a simultaneous drag leaves the scroll view's pan alone.
+            simultaneousGesture(drag)
+        }
+    }
+}
+
+/// A pan that refuses to begin unless the touch is moving leftwards more than vertically, so every
+/// other pan stays with the enclosing scroll view.
+@available(iOS 18.0, *)
+private struct ChatLeftSwipeRecognizer: UIGestureRecognizerRepresentable {
+    /// Horizontal translation since the touch went down.
+    let onChanged: (CGFloat) -> Void
+    /// `true` when the finger lifted, `false` when the system cancelled the pan.
+    let onEnded: (Bool) -> Void
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
+        let recognizer = UIPanGestureRecognizer()
+        recognizer.delegate = context.coordinator
+        return recognizer
+    }
+
+    func handleUIGestureRecognizerAction(_ recognizer: UIPanGestureRecognizer, context: Context) {
+        switch recognizer.state {
+        case .began, .changed:
+            onChanged(recognizer.translation(in: recognizer.view).x)
+        case .ended:
+            onEnded(true)
+        case .cancelled, .failed:
+            onEnded(false)
+        default:
+            break
+        }
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
+
+            let velocity = pan.velocity(in: pan.view)
+            return velocity.x < 0 && abs(velocity.x) > abs(velocity.y)
         }
     }
 }
