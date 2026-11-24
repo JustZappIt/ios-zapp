@@ -25,14 +25,20 @@
 zappMessaging=58f3cc72792d5efe663ebb4fd397f845dfcec2ac
 
 # zcash-swift-wallet-sdk — sibling LOCAL Swift package; run Scripts/bootstrap-zcash-sdk.sh
-# after a fresh clone. Build with NO --slipstream. Pinned by SHA because the branch is
-# unmerged upstream. Retire once upstream cuts 2.9.0; the released artifact is clean by default.
+# after a fresh clone. Build with NO --slipstream.
 #
-# The pin is branch `zapp/sdk-mit-on-main`, hosted on our PUBLIC fork: SDK origin/main with
-# our 10 fork commits replayed on top. Upstream carries none of them, so a clone of
-# zcash/zcash-swift-wallet-sdk cannot resolve this SHA. Two properties the branch has to
-# keep, both checked by Scripts/verify-zcash-sdk-artifact.sh and the purity gates in the
-# bootstrap script:
+# The pin is branch `feature/nu7-mainnet`, hosted on our PUBLIC fork: `zapp/sdk-mit-on-main`
+# (SDK origin/main with our fork commits replayed on top) moved onto librustzcash's NU7
+# releases. Upstream carries none of it, so a clone of zcash/zcash-swift-wallet-sdk cannot
+# resolve this SHA.
+#
+# There is no upstream release to go back to. 4.0.0 is upstream's last, and it does not know
+# NU7, so a build on it cannot sync. Its successor, zodl-inc/zodl-swift-wallet-sdk, is
+# AGPL-3.0-only, and its LICENSE-EXCEPTIONS.md grants no App Store permission to anyone but
+# Znewco, so moving to it is a licensing decision, not a routine bump.
+#
+# Two properties the branch has to keep, both checked by Scripts/verify-zcash-sdk-artifact.sh
+# and the purity gates in the bootstrap script:
 #
 #   1. MIT-clean by default, because we may not ship AGPL to the App Store. The
 #      AGPL-3.0-only zodl-slipstream crate sits behind the optional `slipstream` cargo
@@ -49,4 +55,4 @@ zappMessaging=58f3cc72792d5efe663ebb4fd397f845dfcec2ac
 # line's newer librustzcash generation. We do not ship that variant.
 #
 # GitHub: https://github.com/JustZappIt/zcash-swift-wallet-sdk
-zcashSwiftWalletSdk=dcbe616d515491b09a09182b18396c82f708454f
+zcashSwiftWalletSdk=6c895f29b02c1aee6f4fe943d1987bfecb609a67

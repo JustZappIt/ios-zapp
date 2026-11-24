@@ -34,6 +34,13 @@ func votingAccountIndex(for account: WalletAccount?) -> UInt32 {
 // MARK: - Voting namespace (helpers only — no reducer)
 
 enum Voting {
+    // MARK: - Availability
+
+    /// Whether the app offers coinholder polling. It does not while the wallet SDK's NU7 build has
+    /// shielded voting compiled out: every `VotingRustBackend` call throws there. The feature itself
+    /// stays compiled so that a wallet reset still clears what it stored.
+    static let isOffered = false
+
     // MARK: - Vote record
 
     /// Persisted record of when a round's selected votes completed submission,

@@ -60,19 +60,17 @@ import ZcashLightClientKit
         #expect(MigrationETA.minutesFromNow(scheduledHeight: 1 + delta, clock: slow) == 1200)
     }
 
-    /// Default construction is the pre-P3 behaviour exactly — Zcash's target spacing — so a clock
-    /// built without a measurement is never worse than what it replaced.
+    /// Default construction is Zcash's target spacing from NU7.
     @Test func theDefaultRateIsTargetSpacing() {
         let clock = MigrationChainClock(tip: 1000)
-        #expect(clock.secondsPerBlock == 75.0)
-        #expect(MigrationETA.minutesFromNow(scheduledHeight: 1048, clock: clock) == 60)
+        #expect(clock.secondsPerBlock == 25.0)
+        #expect(MigrationETA.minutesFromNow(scheduledHeight: 1144, clock: clock) == 60)
     }
 
     // MARK: - The notification buffer
 
-    /// Two blocks at target spacing IS 150 s, so on a healthy chain both readings of "add two
-    /// blocks" agree.
-    @Test func theBufferIsTwoBlocksAtTargetSpacing() {
+    /// Two blocks at target spacing is 50 s, so a healthy chain gets the 150 s floor.
+    @Test func theBufferIsTheFloorAtTargetSpacing() {
         #expect(MigrationChainClock(tip: 1000).notificationBuffer == 150)
     }
 
@@ -107,9 +105,9 @@ import ZcashLightClientKit
     // MARK: - Bucketing through the frame
 
     @Test func minutesFloorRatherThanRound() {
-        // 1 block at 75 s is 1.25 minutes — one minute, not two.
+        // 4 blocks at 25 s is 1.67 minutes — one minute, not two.
         let clock = MigrationChainClock(tip: 1000)
-        #expect(MigrationETA.minutesFromNow(scheduledHeight: 1001, clock: clock) == 1)
+        #expect(MigrationETA.minutesFromNow(scheduledHeight: 1004, clock: clock) == 1)
     }
 
     @Test func aSubMinuteDistanceReadsAsReadyNow() {
