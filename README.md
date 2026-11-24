@@ -55,7 +55,7 @@ out beside this repository. Both are public:
 <some-dir>/
   ios-zapp/                 <-- this repository
   zappMessaging/            <-- JustZappIt/zappmessaging-sdk, cloned under this name
-  zcash-swift-wallet-sdk/   <-- JustZappIt/zcash-swift-wallet-sdk, branch zapp/sdk-mit-on-main
+  zcash-swift-wallet-sdk/   <-- JustZappIt/zcash-swift-wallet-sdk, branch feature/nu7-mainnet
 ```
 
 `Scripts/bootstrap-zappmessaging.sh` clones the messaging SDK to the right place at the commit
@@ -64,9 +64,14 @@ pinned in [`.zapp-deps`](.zapp-deps) and generates its build artifacts. The dire
 
 `Scripts/bootstrap-zcash-sdk.sh` does the same for the wallet SDK, then compiles its Rust FFI
 (`libzcashlc.xcframework` — a few minutes from cold). The pin lives on our fork's
-`zapp/sdk-mit-on-main` branch rather than upstream: upstream's default build links the
-AGPL-3.0-only zodl-slipstream crate, which we may not ship, so `zcash/zcash-swift-wallet-sdk`
-cannot resolve the pinned SHA. Override the source with `ZAPP_SDK_REMOTE` / `ZAPP_SDK_BRANCH`.
+`feature/nu7-mainnet` branch rather than upstream: upstream's last MIT release does not know the
+NU7 network upgrade, and its AGPL-3.0-only successor is one we may not ship, so
+`zcash/zcash-swift-wallet-sdk` cannot resolve the pinned SHA. Override the source with
+`ZAPP_SDK_REMOTE` / `ZAPP_SDK_BRANCH`.
+
+That SDK upgrades the wallet database the first time it opens it; going back to a build on an
+earlier pin afterwards is not supported. It has shielded voting compiled out, so the app does not
+offer Coinholder Polling (`Voting.isOffered`).
 
 ### Prerequisites
 

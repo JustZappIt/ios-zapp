@@ -18,7 +18,7 @@ PINNED_REF="$(grep '^zcashSwiftWalletSdk=' "$APP_DIR/.zapp-deps" | cut -d= -f2)"
 
 # The pin is on an unmerged branch that only our fork carries; upstream cannot resolve it.
 SDK_REMOTE="${ZAPP_SDK_REMOTE:-https://github.com/JustZappIt/zcash-swift-wallet-sdk.git}"
-PINNED_BRANCH="${ZAPP_SDK_BRANCH:-zapp/sdk-mit-on-main}"
+PINNED_BRANCH="${ZAPP_SDK_BRANCH:-feature/nu7-mainnet}"
 
 if [ ! -d "$SIBLING" ]; then
   echo "==> Cloning zcash-swift-wallet-sdk beside the app ($SIBLING)"

@@ -57,7 +57,9 @@ struct SettingsTabContent: View {
                         privacyGroup
 
                         #if VOTING_ENABLED
-                        governanceGroup
+                        if Voting.isOffered {
+                            governanceGroup
+                        }
                         #endif
 
                         p2pGroup

@@ -49,16 +49,18 @@ struct SettingsView: View {
                             ZappRowDivider(inset: true)
 
                             #if VOTING_ENABLED
-                            ZappRow(
-                                title: String(localizable: .settingsCoinholderPolling),
-                                icon: Asset.Assets.Icons.checkVerified.image,
-                                iconTint: .accentText,
-                                iconBackground: .accentSoft
-                            ) {
-                                store.send(.coinholderPollingTapped)
-                            }
+                            if Voting.isOffered {
+                                ZappRow(
+                                    title: String(localizable: .settingsCoinholderPolling),
+                                    icon: Asset.Assets.Icons.checkVerified.image,
+                                    iconTint: .accentText,
+                                    iconBackground: .accentSoft
+                                ) {
+                                    store.send(.coinholderPollingTapped)
+                                }
 
-                            ZappRowDivider(inset: true)
+                                ZappRowDivider(inset: true)
+                            }
                             #endif
 
                             ZappRow(

@@ -25,7 +25,7 @@ runs:
     # workspace, and the package is referenced as ../zcash-swift-wallet-sdk — a SIBLING of
     # the checked-out app. Land it inside, then move it up one level.
     #
-    # The pin is a SHA on zapp/sdk-mit-on-main, a branch only our fork carries. Name the
+    # The pin is a SHA on feature/nu7-mainnet, a branch only our fork carries. Name the
     # fork rather than upstream: upstream resolves the SHA today only because our repo is a
     # GitHub fork of it and the two share an object store, which is incidental rather than a
     # contract — and is exactly why this kept passing while a plain clone in

@@ -69,6 +69,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Your You tab now shows your chat QR code in place of the initials tile, so someone can scan you without you having to find the code first.
 
 ### Changed
+- [NU7] Coinholder Polling is not offered for now, because the NU7 wallet SDK does not include shielded voting yet. Nothing was deleted, and resetting the wallet still clears what voting stored.
 - [PAY] Pay now uses Android's scrolling home layout, migration card, shielding explanation and sync-error remedies. Send and Swap use Review, with swap slippage in the bottom bar; Receive uses a shorter address display, and requests go from amount and optional note straight to the shareable QR. Merchant payments always ask for confirmation, with clearer recovery for payments in progress.
 - [PARITY] The You tab now matches Android: "Base account" shows when a cash-out is still in progress, the P2P payment method and local currency rows name what you picked, and the Privacy and Wallet rows follow Android's order. The Wallet group is hidden until a wallet exists.
 - [PARITY] Deleting a contact now asks first, and failed saves, deletes or blocks are reported instead of failing silently. When editing, Save stays off until you change something.
@@ -126,6 +127,7 @@ directly impact users rather than highlighting other crucial architectural updat
 - [ZAPP-1] Removed the Flexa "pay with Flexa" entry point. It was reachable in the shipping build but the integration was never configured, so tapping it could not complete a payment.
 
 ### Fixed
+- [NU7] Zapp works again after Zcash's NU7 network upgrade (mainnet block 3,543,405, November 2026; testnet block 4,465,026). Earlier versions can no longer sync on either network, finding no server compatible, and anything they send is refused. A private migration to Ironwood started before the upgrade asks you to update its plan. Restoring a recent wallet and claiming a recent Zpacket scan far fewer blocks. The first launch upgrades the wallet database; going back to an earlier version afterwards is not supported.
 - [PAY] Leaving Send cancels a pending Top Up lookup, and late results cannot open a QR in a new flow or for a different account. Merchant payments notice incoming Base funds and fresh quote balances instead of remaining stuck on Add ZEC.
 - [#72] Newly joined groups show their name and group controls immediately, open chats become read-only when you are removed, and invite links can be retried after a startup delay. Keep incoming invite links out of debug logs and match Android's controls, with a single Share action and a back-only bar when no link is active.
 - [#72] Group invite screens now follow Android's layout and selection controls. Additional invites are kept while another preview is open, and returning to a different group's link no longer risks showing an earlier group's link or requests.

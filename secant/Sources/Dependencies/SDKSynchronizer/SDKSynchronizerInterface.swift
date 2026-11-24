@@ -186,7 +186,7 @@ struct SDKSynchronizerClient: Sendable {
     /// The projected chain tip, measured from recently scanned block headers — height→wall-clock math
     /// for notification scheduling, and due-ness reasoning between syncs.
     let estimatedMigrationChainTip: @Sendable () async throws -> BlockHeight
-    /// The measured seconds-per-block used by `estimatedMigrationChainTip` (clamped 5–150 s, 75 s
+    /// The measured seconds-per-block used by `estimatedMigrationChainTip` (clamped 5–150 s, 25 s
     /// fallback) — the height→time conversion factor for notification fire times.
     let estimatedMigrationSecondsPerBlock: @Sendable () async throws -> Double
     /// Wallet-scope: whether ordinary sync should currently be paused for a migration privacy gate.

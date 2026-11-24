@@ -14,7 +14,7 @@
 //  "in ~3 hours" while the engine calls the same transfer due and broadcasts it. Same tip for both,
 //  no contradiction.
 //
-//  WHY THE MEASURED RATE AND NOT 75 s. 75 s is Zcash's TARGET spacing, and it stays the fallback
+//  WHY THE MEASURED RATE AND NOT 25 s. 25 s is Zcash's TARGET spacing from NU7, and it is the fallback
 //  here. It is not what any particular chain does over any particular hour — testnet especially can
 //  run far off target — and the migration's whole user-facing promise is a schedule measured in
 //  hours. An ETA built on a rate that is wrong by a third is wrong by hours.
@@ -31,7 +31,7 @@ struct MigrationChainClock: Equatable, Sendable {
     /// Zcash's target block spacing — the fallback when the wallet has too few scanned blocks to
     /// measure a real rate (the SDK falls back to the same number, and clamps its own measurement
     /// to [5, 150] s).
-    static let targetSecondsPerBlock = 75.0
+    static let targetSecondsPerBlock = 25.0
 
     /// The chain tip this clock reads from — the SDK's estimated tip in production.
     let tip: BlockHeight
@@ -76,8 +76,7 @@ struct MigrationChainClock: Equatable, Sendable {
     }
 
     /// The slack added to a height before it is used as a NOTIFICATION time — two blocks, never
-    /// less than 150 s (which is two blocks at target spacing, so the two readings agree on a
-    /// healthy chain and the slower one wins on a slow one).
+    /// less than 150 s (which is six blocks at target spacing, so only a slow chain exceeds it).
     ///
     /// Asymmetric on purpose. A poke that fires LATE costs nothing — the step is still there, and
     /// the user takes it whenever they open the app. A poke that fires EARLY is a wasted

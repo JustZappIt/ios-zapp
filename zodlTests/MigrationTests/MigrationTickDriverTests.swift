@@ -1517,7 +1517,7 @@ import ComposableArchitecture
         let scheduled = LockIsolated<[(MigrationNotification, Date?)]>([])
         let secondsPerBlock = MigrationChainClock.targetSecondsPerBlock
         let notificationBuffer = max(2 * secondsPerBlock, 150)
-        let rowHeight = Self.tip + 400
+        let rowHeight = Self.tip + 1200
         let outlookHeight = Self.tip + 100_000
         let beforeDrive = Date()
 
@@ -1556,12 +1556,12 @@ import ComposableArchitecture
         let armedDate = scheduled.value.first?.1
         #expect(armedDate != nil, "the row's own send window must still arm a poke")
 
-        // The row's window: 400 blocks out at the measured rate, run through the row derivation's
+        // The row's window: 1,200 blocks out at the measured rate, run through the row derivation's
         // MINUTES rounding (`MigrationETA.minutesFromNow`) then back to seconds by the arm — a
-        // clean 400 * 75s = 30000s = 500 minutes, so no rounding slop enters — plus the two-block
-        // notification slack. The outlook sits ~86 days further out (100,000 blocks) and, if the
+        // clean 1,200 * 25s = 30000s = 500 minutes, so no rounding slop enters — plus the
+        // notification slack. The outlook sits ~29 days further out (100,000 blocks) and, if the
         // fold were broken (e.g. folding on the OUTLOOK unconditionally), would pull the armed
-        // date out to roughly `beforeDrive + 7,500,150s` — far outside this band.
+        // date out to roughly `beforeDrive + 2,500,150s` — far outside this band.
         let rowExpectedOffset = 500.0 * 60 + notificationBuffer
         let lowerBound = beforeDrive.addingTimeInterval(rowExpectedOffset - 60)
         let upperBound = beforeDrive.addingTimeInterval(rowExpectedOffset + 60)
